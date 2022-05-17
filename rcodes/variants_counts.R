@@ -4,7 +4,7 @@
 ######################
 
 ## Read variant lists from Zhaoming et al 
-zhaoming.etal.vars <- read.table("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Yadav_Sapkota/additional_papers/Zhaoming_Wang_Genetic_risk_for_subsequent_neoplasms_JCO.2018.77.8589/sjlife-genetics-sn.txt", sep = "\t", header =T)
+zhaoming.etal.vars <- read.table("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Yadav_Sapkota/additional_papers/Zhaoming_Wang_Genetic_risk_for_subsequent_neoplasms_JCO.2018.77.8589/P-PL-sjlife-genetics-sn_SNP_INDEL_only.txt", sep = "\t", header =T)
 head(zhaoming.etal.vars)
 dim(zhaoming.etal.vars)
 var.classes <- table(zhaoming.etal.vars$Class)
@@ -24,3 +24,4 @@ sum(grepl(WANTED.types, VCF$CLNSIG, ignore.case = T))
 
 WANTED.vars.clinvar <- VCF[grepl(WANTED.types, VCF$CLNSIG, ignore.case = T),]
 
+                      
