@@ -25,15 +25,15 @@ library(data.table)
 
 # Loop over all chromosomes
 chromosomes <- 1:22
-SNPEFF.VCF <- {}
-for( i in 1:length(chromosomes)){
+FINAL.VCF <- {}
 
+capture.output (for( i in 1:length(chromosomes)){
 print(paste0("Doing chromosome ", chromosomes[i]))
-    
+  
 VCF <- fread(paste0("MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr", chromosomes[i], ".PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155-FIELDS-simple.txt"))
 
 #####################################
-## Clinvar based L/PL VCF variants ##
+## Clinvar based P/LP VCF variants ##
 #####################################
 print(as.data.frame(table(VCF$CLNSIG)))
 # Var1     Freq
@@ -58,13 +58,28 @@ print(as.data.frame(table(VCF$CLNSIG)))
 # 19                                   protective|_risk_factor        5
 # 20                                               risk_factor       22
 
-
-WANTED.types <- c("^Pathogenic/Likely_pathogenic$|^Likely_pathogenic$|^Pathogenic/Likely_pathogenic$|^Pathogenic$|Pathogenic\\|_risk_factor")
-sum(grepl(WANTED.types, VCF$CLNSIG, ignore.case = T))
+## Wanted Clinvar patterns
+WANTED.types.clinvar <- c("^Pathogenic/Likely_pathogenic$|^Likely_pathogenic$|^Likely_pathogenic/Pathogenic$|^Pathogenic$|Pathogenic\\|_risk_factor|^Pathogenic\\|")
+print(paste0("Total P or LP vars from clinvar: ", sum(grepl(WANTED.types.clinvar, VCF$CLNSIG, ignore.case = T))))
+# 3505
+  
+## Wanted MetaSVM patterns D (available patterns: D= Deleterious; T= Tolerated)
+wanted.types.MetaSVM <- c("D")
+print(paste0("Total Deleterious vars from MetaSVM: ", sum(grepl(wanted.types.MetaSVM, VCF$dbNSFP_MetaSVM_pred, ignore.case = T))))
 # 3505
 
-VCF <- VCF[grepl(WANTED.types, VCF$CLNSIG, ignore.case = T),]
-SNPEFF.VCF <- rbind.data.frame(SNPEFF.VCF, VCF)
-}
-as.data.frame(table(VCF$`ANN[*].EFFECT`))
-                      
+  
+VCF.clinvar <- VCF[grepl(WANTED.types.clinvar, VCF$CLNSIG, ignore.case = T),]
+VCF.clinvar$PRED_TYPE <- "Clinvar"
+VCF.MetaSVM <- VCF[grepl(wanted.types.MetaSVM, VCF$dbNSFP_MetaSVM_pred, ignore.case = T),]
+VCF.MetaSVM$PRED_TYPE="MetaSVM"
+VCF <- rbind.data.frame(VCF.clinvar, VCF.MetaSVM)
+FINAL.VCF <- rbind.data.frame(FINAL.VCF, VCF)
+}, file = "SNPEFF_clinvar_metaSVM_from_R_filtering_process.log")
+
+save.image("SNPEFF_clinvar_metaSVM_from_R_filtering_process.RData")
+
+load("SNPEFF_clinvar_metaSVM_from_R_filtering_process.RData")
+
+
+as.data.frame(table(FINAL.VCF$`ANN[*].EFFECT`))
