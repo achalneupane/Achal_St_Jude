@@ -158,7 +158,6 @@ data.demographics.df <- as.data.frame(data.demographics)
 
 dim(data.demographics.df)
 MRN <- data.demographics.df[1:2]
-write.table(MRN, "Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/PHENOTYPE/MRN_SJLID_05_02_2022.csv", quote = FALSE, row.names = FALSE, sep = "\t")
 
 data.demographics.df <- data.demographics.df[, c("sjlid", "gender", "race", "racegrp", "ethnic", "hispanic")]
 
@@ -240,10 +239,17 @@ rtdosimetrysjl_heart_20211112.df <- as.data.frame(rtdosimetrysjl_heart_20211112)
 
 rtdosimetrysjl_heart_20211112.df <- rtdosimetrysjl_heart_20211112.df[, c("sjlid", "ccss", "RadYN", "HeartAvg")]
 
+## There are additional sjlids (33 more) in this data that do not match with demographics; they also do not MRN, so there are only 10103 samples with MRN
+dim(rtdosimetrysjl_heart_20211112.df)
+# 4504
+sum(rtdosimetrysjl_heart_20211112.df$sjlid %in% data.demographics.df$sjlid)
+# 4471
+
+write.table(MRN, "Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/PHENOTYPE/MRN_SJLID_05_02_2022.csv", quote = FALSE, row.names = FALSE, sep = "\t")
 
 
 ## Merge all dataframes
-tt <- Reduce(
+FINAL.Merged <- Reduce(
   function(x, y)
     merge(x, y, by = "sjlid", all = TRUE),
   list(data.demographics.df, data.diagnosis.df, data.lastcondt.df, 
@@ -251,6 +257,8 @@ tt <- Reduce(
        radiation_dosimetry.df, rtdosimetrysjl_heart_20211112.df, data.long))
 
 
+tt <- FINAL.Merged %>%
+  mutate_if(is.character, trimws)
 
 write.table(tt, "Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/PHENOTYPE/ctcaegrades_Event_data_sjlife_horizontal_format_05_02_2022.txt", quote = FALSE, row.names = FALSE, sep = "\t")
 
