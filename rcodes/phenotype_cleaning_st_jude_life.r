@@ -256,7 +256,7 @@ FINAL.Merged <- Reduce(
        data.chemosum_dose.df, data.chemosum_yn.df, data.radiationsum_yn.df,
        radiation_dosimetry.df, rtdosimetrysjl_heart_20211112.df, data.long))
 
-
+# Found some white spaces that generated more rows than there are in dataframe, so removing those whitespaces
 tt <- FINAL.Merged %>%
   mutate_if(is.character, trimws)
 
