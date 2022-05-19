@@ -186,7 +186,7 @@ data.diagnosis.df <- data.diagnosis.df[, c("sjlid", "agedx", "diaggrp", "diag")]
 ##################
 data.lastcondt <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Tracking Data/lstcondt.sas7bdat")
 data.lastcondt.df <- as.data.frame(data.lastcondt)
-View(data.lastcondt.df)
+# View(data.lastcondt.df)
 
 cat(colnames(data.lastcondt.df), sep = ", ")
 
@@ -197,7 +197,7 @@ data.lastcondt.df <- data.lastcondt.df[, c("sjlid", "agelstcontact")]
 ###################
 data.chemosum_dose <- read_sas("chemosum_dose.sas7bdat")
 data.chemosum_dose.df <- as.data.frame(data.chemosum_dose)
-View(data.chemosum_dose.df)
+# View(data.chemosum_dose.df)
 
 data.chemosum_dose.df <- data.chemosum_dose.df[, c("sjlid", "anthra_jama_dose_any", "anthra_jco_dose_any")]
 
@@ -206,7 +206,7 @@ data.chemosum_dose.df <- data.chemosum_dose.df[, c("sjlid", "anthra_jama_dose_an
 ###################
 data.chemosum_yn <- read_sas("chemosum_yn.sas7bdat")
 data.chemosum_yn.df <- as.data.frame(data.chemosum_yn)
-View(data.chemosum_yn.df)
+# View(data.chemosum_yn.df)
 cat(colnames(data.chemosum_yn.df), sep = ", ")
 
 data.chemosum_yn.df <- data.chemosum_yn.df[, c("sjlid", "anthracyclines_any")]
@@ -216,7 +216,7 @@ data.chemosum_yn.df <- data.chemosum_yn.df[, c("sjlid", "anthracyclines_any")]
 #####################
 data.radiationsum_yn <- read_sas("radiationsum_yn.sas7bdat")
 data.radiationsum_yn.df <- as.data.frame(data.radiationsum_yn)
-View(data.radiationsum_yn.df)
+# View(data.radiationsum_yn.df)
 
 # cat(colnames(data.radiationsum_yn.df), sep = ", ")
 
@@ -227,7 +227,7 @@ data.radiationsum_yn.df <- data.radiationsum_yn.df[colnames(data.radiationsum_yn
 #########################
 radiation_dosimetry <- read_sas("radiation_dosimetry.sas7bdat")
 radiation_dosimetry.df <- as.data.frame(radiation_dosimetry)
-View(radiation_dosimetry.df)
+# View(radiation_dosimetry.df)
 
 radiation_dosimetry.df <- radiation_dosimetry.df[, c("sjlid", "chestrt_yn", "maxchestrtdose")]
 
@@ -236,7 +236,7 @@ radiation_dosimetry.df <- radiation_dosimetry.df[, c("sjlid", "chestrt_yn", "max
 ###################################
 rtdosimetrysjl_heart_20211112 <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/MDA Dosimetry (Partial)/rtdosimetrysjl_heart_20211112.sas7bdat")
 rtdosimetrysjl_heart_20211112.df <- as.data.frame(rtdosimetrysjl_heart_20211112)
-View(rtdosimetrysjl_heart_20211112.df)
+# View(rtdosimetrysjl_heart_20211112.df)
 
 rtdosimetrysjl_heart_20211112.df <- rtdosimetrysjl_heart_20211112.df[, c("sjlid", "ccss", "RadYN", "HeartAvg")]
 
@@ -250,7 +250,9 @@ tt <- Reduce(
        data.chemosum_dose.df, data.chemosum_yn.df, data.radiationsum_yn.df,
        radiation_dosimetry.df, rtdosimetrysjl_heart_20211112.df, data.long))
 
-write.table(tt, "Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/PHENOTYPE/ctcaegrades_Event_data_sjlife_horizontal_format_05_02_2022.csv", quote = FALSE, row.names = FALSE, sep = "\t")
+
+
+write.table(tt, "Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/PHENOTYPE/ctcaegrades_Event_data_sjlife_horizontal_format_05_02_2022.txt", quote = FALSE, row.names = FALSE, sep = "\t")
 
 
 # count_dims <- function(x){
@@ -262,4 +264,4 @@ write.table(tt, "Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjli
 # names(mylist) <- c("data.demographics.df", "data.diagnosis.df", "data.lastcondt.df", "data.chemosum_dose.df", "data.chemosum_yn.df", "data.radiationsum_yn.df", "radiation_dosimetry.df", "rtdosimetrysjl_heart_20211112.df")
 # lapply(mylist, count_dims)
 
-
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/PHENOTYPE/phenotype_cleaning.RDATA")
