@@ -156,6 +156,10 @@ data.demographics.df <- as.data.frame(data.demographics)
 # View(data.demographics.df)
 # cat(colnames(data.demographics.df), sep = ", ")
 
+dim(data.demographics.df)
+MRN <- data.demographics.df[1:2]
+write.table(MRN, "Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/PHENOTYPE/MRN_SJLID_05_02_2022.csv", quote = FALSE, row.names = FALSE, sep = "\t")
+
 data.demographics.df <- data.demographics.df[, c("sjlid", "gender", "race", "racegrp", "ethnic", "hispanic")]
 
 ###############
@@ -246,7 +250,7 @@ tt <- Reduce(
        data.chemosum_dose.df, data.chemosum_yn.df, data.radiationsum_yn.df,
        radiation_dosimetry.df, rtdosimetrysjl_heart_20211112.df, data.long))
 
-write.table(tt, "Z:/ResearchHome/ClusterHome/aneupane/OUTPUT_FILES/ctcaegrades_Event_data_sjlife_horizontal_format_05_02_2022.csv", quote = FALSE, row.names = FALSE, sep = "\t")
+write.table(tt, "Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/PHENOTYPE/ctcaegrades_Event_data_sjlife_horizontal_format_05_02_2022.csv", quote = FALSE, row.names = FALSE, sep = "\t")
 
 
 # count_dims <- function(x){
