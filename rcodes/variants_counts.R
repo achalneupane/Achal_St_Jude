@@ -32,6 +32,7 @@ zhaoming.etal.vars$Pos_GRCh38 <- trimws(zhaoming.etal.vars$Pos_GRCh38, which = "
 qin.etal.vars$Chr <- trimws(qin.etal.vars$Chr, which = "both")
 qin.etal.vars$Pos_GRCh38 <- trimws(qin.etal.vars$Pos_GRCh38, which = "both")
 
+
 #############################
 #############################
 ## SNPEFF ##### Annotation ##
