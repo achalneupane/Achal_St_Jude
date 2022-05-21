@@ -640,3 +640,29 @@ plink --memory 400000 --threads 24 --bfile ${BFILE} --allow-no-sex --cluster --g
 # Performing multidimensional scaling analysis (SVD algorithm, 4
 # dimensions)... done.
 # MDS solution written to final_EAS_ADMIXTURE-PCAS_EAS.mds .
+
+
+#####################################################################
+## check variants from  SNP eff in Zhaoming and Qin et al's papers ##
+#####################################################################
+# For this task, I am mostly using R code variants_counts.R
+# First create a list of variants to be searched
+grep -v '^##' MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr4.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf | cut -d$'\t' -f3| head
+
+rm all_variants.txt
+getVars()
+{
+PATTERN=$1
+FILE=$2	
+if grep -q ${PATTERN} ${FILE} ; then
+echo "found $PATTERN" >> var_search_result.txt
+fi
+}
+
+export -f getVars
+
+for PATTERN in $(cat zhaoming_variant_sites.txt); do
+echo "Doing $PATTERN"
+parallel -j22 getVars ${PATTERN} MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr{}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf ::: {1..22}
+done
+
