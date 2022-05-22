@@ -54,6 +54,7 @@ print(paste0("Doing chromosome ", chromosomes[i]))
   
 VCF <- fread(paste0("MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr", chromosomes[i], ".PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155-FIELDS-simple.txt"))
 
+
 #####################################
 ## Clinvar based P/LP VCF variants ##
 #####################################
