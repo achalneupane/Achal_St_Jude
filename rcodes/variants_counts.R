@@ -46,7 +46,7 @@ library(data.table)
 chromosomes <- 1:22
 
 # First check how many variants in Zhaoming et al and Qin et al are also in our VCF dataset
-## Here
+## Here we
 
 FINAL.VCF <- {}
 
