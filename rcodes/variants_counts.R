@@ -2,7 +2,6 @@
 ## Achal Neupane    ##
 ## Date: 05/12/2022 ##
 ######################
-
 ## Read variant lists from Zhaoming et al 
 Sys.setlocale("LC_ALL", "C")
 zhaoming.etal.vars <- read.delim("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Yadav_Sapkota/additional_papers/Zhaoming_Wang_Genetic_risk_for_subsequent_neoplasms_JCO.2018.77.8589/P-PL-sjlife-genetics-sn_SNV_INDELS.txt", sep = "\t", header =T, stringsAsFactors = F)
@@ -45,6 +44,9 @@ library(data.table)
 
 # Loop over all chromosomes
 chromosomes <- 1:22
+
+# First check how many variants in Zhaoming et al and Qin et al are also in our VCF dataset
+
 FINAL.VCF <- {}
 
 capture.output (for( i in 1:length(chromosomes)){
