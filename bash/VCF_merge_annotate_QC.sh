@@ -642,27 +642,39 @@ plink --memory 400000 --threads 24 --bfile ${BFILE} --allow-no-sex --cluster --g
 # MDS solution written to final_EAS_ADMIXTURE-PCAS_EAS.mds .
 
 
-#####################################################################
-## check variants from  SNP eff in Zhaoming and Qin et al's papers ##
-#####################################################################
+####################################################################
+## check variants from  SNPeff in Zhaoming and Qin et al's papers ##
+####################################################################
 # For this task, I am mostly using R code variants_counts.R
 # First create a list of variants to be searched
-grep -v '^##' MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr4.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf | cut -d$'\t' -f3| head
 
-rm all_variants.txt
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/variants_in_VCF
+ln -s ../MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf .
+
+module load parallel
 getVars()
 {
-PATTERN=$1
-FILE=$2	
-if grep -q ${PATTERN} ${FILE} ; then
-echo "found $PATTERN" >> var_search_result.txt
-fi
+VCF="$1"
+CHR="$2"
+grep -v "^##" ${VCF} | cut -f3 | cut -d";" -f1 > CHR${CHR}_Vars.vcf
 }
 
 export -f getVars
+parallel -j22 getVars MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr{}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf {} ::: {1..22}
 
-for PATTERN in $(cat zhaoming_variant_sites.txt); do
-echo "Doing $PATTERN"
-parallel -j22 getVars ${PATTERN} MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr{}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf ::: {1..22}
-done
 
+# Then run R script variants_counts.R
+
+##################
+## LoF variants ##
+##################
+# Qin et al: frameshift      missense      nonsense    proteinDel        splice splice_region 
+# 196            70           175             1            74             4 
+
+## Annotation of interest
+# frameshift_variant, start_lost, stop_gained, missense_variant, splice, ^splice_region_variant$
+
+LoFvars()
+{
+egrep 'frameshift_variant|start_lost|stop_gained|missense_variant|splice|^splice_region_variant$|nonsense' MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr14.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf
+}

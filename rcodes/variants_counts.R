@@ -2,7 +2,9 @@
 ## Achal Neupane    ##
 ## Date: 05/12/2022 ##
 ######################
-## Read variant lists from Zhaoming et al 
+## First check how many variants in Zhaoming et al and Qin et al are also in our VCF dataset
+# Read variant lists from Zhaoming et al 
+library(data.table)
 Sys.setlocale("LC_ALL", "C")
 zhaoming.etal.vars <- read.delim("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Yadav_Sapkota/additional_papers/Zhaoming_Wang_Genetic_risk_for_subsequent_neoplasms_JCO.2018.77.8589/P-PL-sjlife-genetics-sn_SNV_INDELS.txt", sep = "\t", header =T, stringsAsFactors = F)
 head(zhaoming.etal.vars)
@@ -31,6 +33,46 @@ zhaoming.etal.vars$Pos_GRCh38 <- trimws(zhaoming.etal.vars$Pos_GRCh38, which = "
 qin.etal.vars$Chr <- trimws(qin.etal.vars$Chr, which = "both")
 qin.etal.vars$Pos_GRCh38 <- trimws(qin.etal.vars$Pos_GRCh38, which = "both")
 
+## Check if these variants are in our VCF files
+i=5
+
+Qin_in_VCF <- {}
+Zhaoming_in_VCF <- {}
+# CHR=1:22
+CHR=20
+for(i in 1:length(CHR)){
+print(paste0("Doing Chr ", CHR[i]))
+VCF_vars <- fread(paste0("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/variants_in_VCF/", "CHR", CHR[i],"_Vars.vcf"), sep = "\t")
+VCF_vars$SNP_pos <- substr(VCF_vars$ID, 1, sapply(gregexpr(":", VCF_vars$ID), "[", 2) - 1)
+print(paste0("Qin ", sum(VCF_vars$SNP_pos %in% qin.etal.vars$KEY.pos)))
+print(paste0("Zhaoming ", sum(VCF_vars$SNP_pos %in% zhaoming.etal.vars$KEY.pos)))
+Qin_in_VCF.tmp <- VCF_vars[VCF_vars$SNP_pos %in% qin.etal.vars$KEY.pos,]
+Zhaoming_in_VCF.tmp <- VCF_vars[VCF_vars$SNP_pos %in% zhaoming.etal.vars$KEY.pos,]
+Qin_in_VCF <- rbind.data.frame(Qin_in_VCF, Qin_in_VCF.tmp)
+Zhaoming_in_VCF <- rbind.data.frame(Zhaoming_in_VCF, Zhaoming_in_VCF.tmp)
+}
+
+write.table(Qin_in_VCF, "Qin_in_VCF.txt", sep = "\t", quote = FALSE, row.names = F, col.names =T, append = TRUE)
+write.table(Zhaoming_in_VCF, "Zhaoming_in_VCF.txt", sep = "\t", quote = FALSE, row.names = F, col.names =T, append = TRUE)
+
+length(unique(qin.etal.vars$KEY.pos))
+# 389
+sum(unique(Qin_in_VCF$SNP_pos) %in% unique(qin.etal.vars$KEY.pos))
+# 205
+
+length(unique(zhaoming.etal.vars$KEY.pos))
+# 295
+sum(unique(Zhaoming_in_VCF$ID) %in% unique(zhaoming.etal.vars$KEY.varID))
+# 159
+
+
+sum(Qin_in_VCF$ID %in% qin.etal.vars$KEY.varID)
+# 205
+Qin.types <- qin.etal.vars[qin.etal.vars$KEY.varID %in% Qin_in_VCF$ID,]
+Qin_in_VCF$ID %in% qin.etal.vars$KEY.varID
+
+sum(Zhaoming_in_VCF$ID %in% zhaoming.etal.vars$KEY.varID)
+# 159
 
 #############################
 #############################
@@ -39,14 +81,13 @@ qin.etal.vars$Pos_GRCh38 <- trimws(qin.etal.vars$Pos_GRCh38, which = "both")
 #############################
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/")
 ## read annotated SJLIFE annotated VCF 
-library(data.table)
-
-
 # Loop over all chromosomes
 chromosomes <- 1:22
 
-# First check how many variants in Zhaoming et al and Qin et al are also in our VCF dataset
-##
+## Use Linux commands to look for Lof Genes
+
+## Now extract variants of ClinVar and MetaSVM significance
+
 
 FINAL.VCF <- {}
 
@@ -96,6 +137,11 @@ VCF.MetaSVM$PRED_TYPE="MetaSVM"
 VCF <- rbind.data.frame(VCF.clinvar, VCF.MetaSVM)
 FINAL.VCF <- rbind.data.frame(FINAL.VCF, VCF)
 }, file = "SNPEFF_clinvar_metaSVM_from_R_filtering_process.log")
+
+# Qing et al 2020; We considered a missense variant highfunctional impact if
+# classified as Deleterious by MetaSVM or listed as Pathogenic/
+# Likely-Pathogenic in ClinVar
+FINAL.VCF.missense <- FINAL.VCF[grepl("missense", FINAL.VCF$`ANN[*].EFFECT`),]
 
 save.image("SNPEFF_clinvar_metaSVM_from_R_filtering_process.RData")
 
