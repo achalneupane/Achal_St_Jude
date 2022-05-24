@@ -677,3 +677,5 @@ cat $(ls *.dbSNP155-FIELDS-simple.txt| sort -V)| egrep 'frameshift_variant|start
 awk '{ print $3 }' LoF_variants.txt| cut -d";" -f1 > LoF_variants_ID.txt
 
 ## Now I am checking the concordance for Indels from the Qin et al and Zhaoming et al in our VCF file
+zhaoming_et_al_variants_bed.txt
+awk '{if($2 != $3) print}' zhaoming_et_al_variants_bed.txt > zhaoming_et_al_variants_INDEL_bed.txt
