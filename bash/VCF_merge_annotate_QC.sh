@@ -672,9 +672,8 @@ parallel -j22 getVars MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr{}.PASS.decomposed.vcf-
 # 196            70           175             1            74             4 
 
 ## Annotation of interest
-# frameshift_variant, start_lost, stop_gained, missense_variant, splice, ^splice_region_variant$
+# frameshift_variant, start_lost, stop_gained, splice, ^splice_region_variant$
+cat $(ls *.dbSNP155-FIELDS-simple.txt| sort -V)| egrep 'frameshift_variant|start_lost|stop_gained|splice|splice_region_variant' > LoF_variants.txt
+awk '{ print $3 }' LoF_variants.txt| cut -d";" -f1 > LoF_variants_ID.txt
 
-LoFvars()
-{
-egrep 'frameshift_variant|start_lost|stop_gained|missense_variant|splice|^splice_region_variant$|nonsense' MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr14.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf
-}
+## Now I am checking the concordance for Indels from the Qin et al and Zhaoming et al in our VCF file

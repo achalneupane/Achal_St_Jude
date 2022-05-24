@@ -74,21 +74,33 @@ Qin_in_VCF$ID %in% qin.etal.vars$KEY.varID
 sum(Zhaoming_in_VCF$ID %in% zhaoming.etal.vars$KEY.varID)
 # 159
 
+
+
+## fix positions for Indels
+sum(grepl("^-$", qin.etal.vars$START))
+
+
+## Creating bed files from variants in Qin and Zhaoming et al.
+zhaoming.etal.vars$KEY.pos
+
+cbind(sapply(strsplit(zhaoming.etal.vars$KEY.pos,":"), `[`, 1), sapply(strsplit(zhaoming.etal.vars$KEY.pos,":"), `[`, 2), sapply(strsplit(zhaoming.etal.vars$KEY.pos,":"), `[`, 2))
+
+
+
+
 #############################
 #############################
 ## SNPEFF ##### Annotation ##
 #############################
 #############################
+# https://pcingola.github.io/SnpEff/adds/VCFannotationformat_v1.0.pdf
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/")
 ## read annotated SJLIFE annotated VCF 
 # Loop over all chromosomes
 chromosomes <- 1:22
 
-## Use Linux commands to look for Lof Genes
 
 ## Now extract variants of ClinVar and MetaSVM significance
-
-
 FINAL.VCF <- {}
 
 capture.output (for( i in 1:length(chromosomes)){
@@ -155,71 +167,184 @@ FINAL.VCF$CHROM <- trimws(FINAL.VCF$CHROM, which = "both")
 FINAL.VCF$POS <- trimws(FINAL.VCF$POS, which = "both")
 
 
-as.data.frame(table(FINAL.VCF$`ANN[*].EFFECT`))
+## Label indels and SNVs
+qin.etal.vars$varTypes <- NULL
+qin.etal.vars$varTypes[grepl("^A$|^T$|^G$|^C$", qin.etal.vars$Reference_Allele) & grepl("^A$|^T$|^G$|^C$", qin.etal.vars$Mutant_Allele)] <- "SNV"
+qin.etal.vars$CHROM <- paste0("chr",qin.etal.vars$Chr)
+qin.etal.vars$START <- as.numeric(qin.etal.vars$Pos_GRCh38)
+qin.etal.vars$END <- as.numeric(qin.etal.vars$Pos_GRCh38)
+qin.etal.vars$varTypes [!grepl("SNV", qin.etal.vars$varTypes)] <- "INDEL"
+qin.etal.vars$END [grepl("INDEL", qin.etal.vars$varTypes)] <- NA
+qin.etal.vars$END [grepl("bp", qin.etal.vars$Reference_Allele)] <- as.numeric(gsub("bp| ","", qin.etal.vars$Reference_Allele 
+                                                                                   [grepl("bp", qin.etal.vars$Reference_Allele)])) +
+  as.numeric(qin.etal.vars$START [grepl("bp", qin.etal.vars$Reference_Allele)]) + 1
 
 
-CLINVAR <- FINAL.VCF[grepl("Clinvar", FINAL.VCF$PRED_TYPE),]
-MetaSVM <- FINAL.VCF[grepl("MetaSVM", FINAL.VCF$PRED_TYPE),]
+qin.etal.vars$END [grepl("bp", qin.etal.vars$Mutant_Allele)] <- as.numeric(gsub("bp| ","", qin.etal.vars$Mutant_Allele 
+                                                                                [grepl("bp", qin.etal.vars$Mutant_Allele)])) +
+  as.numeric(qin.etal.vars$START [grepl("bp", qin.etal.vars$Mutant_Allele)]) + 1
 
 
-## Clinvar and MetaSVM
-FINAL.VCF$KEY.pos <- paste(FINAL.VCF$CHROM, FINAL.VCF$POS, sep = ":")
-FINAL.VCF$KEY.varID <- paste(FINAL.VCF$CHROM, FINAL.VCF$POS, FINAL.VCF$REF, FINAL.VCF$ALT, sep = ":")
+qin.etal.vars$END[is.na(qin.etal.vars$END)&qin.etal.vars$Reference_Allele !="-"] <- nchar(gsub("-", "", qin.etal.vars$Reference_Allele))[is.na(qin.etal.vars$END)&qin.etal.vars$Reference_Allele !="-"] + 
+  + as.numeric(qin.etal.vars$START[is.na(qin.etal.vars$END)&qin.etal.vars$Reference_Allele !="-"]) +1
 
 
-## Zhaoming et al
-length(unique(zhaoming.etal.vars$KEY.pos)) # 295
-sum(unique(zhaoming.etal.vars$KEY.pos) %in% FINAL.VCF$KEY.pos)
-# 126
+qin.etal.vars$END[is.na(qin.etal.vars$END)&qin.etal.vars$Mutant_Allele !="-"] <- nchar(gsub("-", "", qin.etal.vars$Mutant_Allele))[is.na(qin.etal.vars$END)&qin.etal.vars$Mutant_Allele !="-"] + 
+  + as.numeric(qin.etal.vars$START[is.na(qin.etal.vars$END)&qin.etal.vars$Mutant_Allele !="-"]) +1
 
-length(unique(zhaoming.etal.vars$KEY.varID)) # 299
-sum(unique(zhaoming.etal.vars$KEY.varID) %in% FINAL.VCF$KEY.varID)
-# 123
+qin.etal.vars$START[qin.etal.vars$varTypes == "INDEL"] <- as.numeric(qin.etal.vars$START) [qin.etal.vars$varTypes == "INDEL"]-1
 
-## Qin et al
-length(unique(qin.etal.vars$KEY.pos)) # 389
-sum(unique(qin.etal.vars$KEY.pos) %in% FINAL.VCF$KEY.pos)
-# 94
-length(unique(qin.etal.vars$KEY.varID)) # 392
-sum(unique(qin.etal.vars$KEY.varID) %in% FINAL.VCF$KEY.varID)
+## BED file
+write.table(cbind.data.frame(qin.etal.vars$CHROM,qin.etal.vars$START, qin.etal.vars$END), "qin_et_al_variants_bed.txt", row.names = F, col.names = F, quote = F, sep = "\t")
+
+# Now check how many of the SNVs are in LOF and CLINVAR annotation in our dataset
+qin.SNV <- qin.etal.vars[qin.etal.vars$varTypes == "SNV",]
+
+length(unique(qin.SNV$KEY.varID))
+# 211
+sum(unique(qin.SNV$KEY.varID) %in% FINAL.VCF$KEY.varID[FINAL.VCF$PRED_TYPE == "Clinvar"])
+# 91
+sum(unique(qin.SNV$KEY.varID) %in% FINAL.VCF$KEY.varID[FINAL.VCF$PRED_TYPE == "MetaSVM"])
+# 20
+## CLINVAR+METASVM
+sum(unique(qin.SNV$KEY.varID) %in% FINAL.VCF$KEY.varID)
 # 95
 
-############################
-# check how many samples are from CLINVAR
-## Zhaoming et al
-length(unique(zhaoming.etal.vars$KEY.pos)) # 295
-sum(unique(zhaoming.etal.vars$KEY.pos) %in% CLINVAR$KEY.pos)
-# 115
+# In LOF
+LOF <- fread("LoF_variants_ID.txt")
+LOF <- as.character(LOF$V1)
+sum(unique(qin.SNV$KEY.varID) %in% LOF)
+# 188
+# In everything
+sum(unique(qin.SNV$KEY.varID) %in% c(LOF, FINAL.VCF$KEY.varID))
+# 205
 
-length(unique(zhaoming.etal.vars$KEY.varID)) # 299
-sum(unique(zhaoming.etal.vars$KEY.varID) %in% CLINVAR$KEY.varID)
+
+
+
+########################################
+## Now repeat this for Zhaoming et al ##
+########################################
+## Label indels and SNVs
+zhaoming.etal.vars$varTypes <- NULL
+zhaoming.etal.vars$varTypes[grepl("^A$|^T$|^G$|^C$", zhaoming.etal.vars$Reference_Allele) & grepl("^A$|^T$|^G$|^C$", zhaoming.etal.vars$Mutant_Allele)] <- "SNV"
+zhaoming.etal.vars$CHROM <- paste0("chr",zhaoming.etal.vars$Chr)
+zhaoming.etal.vars$START <- as.numeric(zhaoming.etal.vars$Pos_GRCh38)
+zhaoming.etal.vars$END <- as.numeric(zhaoming.etal.vars$Pos_GRCh38)
+zhaoming.etal.vars$varTypes [!grepl("SNV", zhaoming.etal.vars$varTypes)] <- "INDEL"
+zhaoming.etal.vars$END [grepl("INDEL", zhaoming.etal.vars$varTypes)] <- NA
+zhaoming.etal.vars$END [grepl("bp", zhaoming.etal.vars$Reference_Allele)] <- as.numeric(gsub("bp| ","", zhaoming.etal.vars$Reference_Allele 
+                                                                                   [grepl("bp", zhaoming.etal.vars$Reference_Allele)])) +
+  as.numeric(zhaoming.etal.vars$START [grepl("bp", zhaoming.etal.vars$Reference_Allele)]) + 1
+
+
+zhaoming.etal.vars$END [grepl("bp", zhaoming.etal.vars$Mutant_Allele)] <- as.numeric(gsub("bp| ","", zhaoming.etal.vars$Mutant_Allele 
+                                                                                [grepl("bp", zhaoming.etal.vars$Mutant_Allele)])) +
+  as.numeric(zhaoming.etal.vars$START [grepl("bp", zhaoming.etal.vars$Mutant_Allele)]) + 1
+
+
+zhaoming.etal.vars$END[is.na(zhaoming.etal.vars$END)&zhaoming.etal.vars$Reference_Allele !="-"] <- nchar(gsub("-", "", zhaoming.etal.vars$Reference_Allele))[is.na(zhaoming.etal.vars$END)&zhaoming.etal.vars$Reference_Allele !="-"] + 
+  + as.numeric(zhaoming.etal.vars$START[is.na(zhaoming.etal.vars$END)&zhaoming.etal.vars$Reference_Allele !="-"]) +1
+
+
+zhaoming.etal.vars$END[is.na(zhaoming.etal.vars$END)&zhaoming.etal.vars$Mutant_Allele !="-"] <- nchar(gsub("-", "", zhaoming.etal.vars$Mutant_Allele))[is.na(zhaoming.etal.vars$END)&zhaoming.etal.vars$Mutant_Allele !="-"] + 
+  + as.numeric(zhaoming.etal.vars$START[is.na(zhaoming.etal.vars$END)&zhaoming.etal.vars$Mutant_Allele !="-"]) +1
+
+zhaoming.etal.vars$START[zhaoming.etal.vars$varTypes == "INDEL"] <- as.numeric(zhaoming.etal.vars$START) [zhaoming.etal.vars$varTypes == "INDEL"]-1
+
+## BED file
+write.table(cbind.data.frame(zhaoming.etal.vars$CHROM,zhaoming.etal.vars$START, zhaoming.etal.vars$END), "zhaoming_et_al_variants_bed.txt", row.names = F, col.names = F, quote = F, sep = "\t")
+
+# Now check how many of the SNVs are in LOF and CLINVAR annotation in our dataset
+zhaoming.SNV <- zhaoming.etal.vars[zhaoming.etal.vars$varTypes == "SNV",]
+
+length(unique(zhaoming.SNV$KEY.varID))
+# 166
+sum(unique(zhaoming.SNV$KEY.varID) %in% FINAL.VCF$KEY.varID[FINAL.VCF$PRED_TYPE == "Clinvar"])
 # 114
-
-## Qin et al
-length(unique(qin.etal.vars$KEY.pos)) # 389
-sum(unique(qin.etal.vars$KEY.pos) %in% CLINVAR$KEY.pos)
-# 91
-length(unique(qin.etal.vars$KEY.varID)) # 392
-sum(unique(qin.etal.vars$KEY.varID) %in% CLINVAR$KEY.varID)
-# 91
-
-# check how many samples are from MetaSVM
-length(unique(zhaoming.etal.vars$KEY.pos)) # 295
-sum(unique(zhaoming.etal.vars$KEY.pos) %in% MetaSVM$KEY.pos)
-# 30
-
-length(unique(zhaoming.etal.vars$KEY.varID)) # 299
-sum(unique(zhaoming.etal.vars$KEY.varID) %in% MetaSVM$KEY.varID)
+sum(unique(zhaoming.SNV$KEY.varID) %in% FINAL.VCF$KEY.varID[FINAL.VCF$PRED_TYPE == "MetaSVM"])
 # 28
+## CLINVAR+METASVM
+sum(unique(zhaoming.SNV$KEY.varID) %in% FINAL.VCF$KEY.varID)
+# 123
 
-## Qin et al
-length(unique(qin.etal.vars$KEY.pos)) # 389
-sum(unique(qin.etal.vars$KEY.pos) %in% MetaSVM$KEY.pos)
-# 19
-length(unique(qin.etal.vars$KEY.varID)) # 392
-sum(unique(qin.etal.vars$KEY.varID) %in% MetaSVM$KEY.varID)
-# 20
+# In LOF
+LOF <- fread("LoF_variants_ID.txt")
+LOF <- as.character(LOF$V1)
+sum(unique(zhaoming.SNV$KEY.varID) %in% LOF)
+# 128
+# In everything
+sum(unique(zhaoming.SNV$KEY.varID) %in% c(LOF, FINAL.VCF$KEY.varID))
+# 155
 
-write.table(paste0(unique(zhaoming.etal.vars$KEY.varID),":"), "zhaoming_variants.txt", row.names = F, col.names = F, quote = F)
-write.table(paste0(unique(zhaoming.etal.vars$KEY.pos),":"), "zhaoming_variant_sites.txt", row.names = F, col.names = F, quote = F)
+
+
+ 
+# as.data.frame(table(FINAL.VCF$`ANN[*].EFFECT`))
+# 
+# 
+# CLINVAR <- FINAL.VCF[grepl("Clinvar", FINAL.VCF$PRED_TYPE),]
+# MetaSVM <- FINAL.VCF[grepl("MetaSVM", FINAL.VCF$PRED_TYPE),]
+# 
+# 
+# ## Clinvar and MetaSVM
+# FINAL.VCF$KEY.pos <- paste(FINAL.VCF$CHROM, FINAL.VCF$POS, sep = ":")
+# FINAL.VCF$KEY.varID <- paste(FINAL.VCF$CHROM, FINAL.VCF$POS, FINAL.VCF$REF, FINAL.VCF$ALT, sep = ":")
+# 
+# 
+# ## Zhaoming et al
+# length(unique(zhaoming.etal.vars$KEY.pos)) # 295
+# sum(unique(zhaoming.etal.vars$KEY.pos) %in% FINAL.VCF$KEY.pos)
+# # 126
+# 
+# length(unique(zhaoming.etal.vars$KEY.varID)) # 299
+# sum(unique(zhaoming.etal.vars$KEY.varID) %in% FINAL.VCF$KEY.varID)
+# # 123
+# 
+# ## Qin et al
+# length(unique(qin.etal.vars$KEY.pos)) # 389
+# sum(unique(qin.etal.vars$KEY.pos) %in% FINAL.VCF$KEY.pos)
+# # 94
+# length(unique(qin.etal.vars$KEY.varID)) # 392
+# sum(unique(qin.etal.vars$KEY.varID) %in% FINAL.VCF$KEY.varID)
+# # 95
+# 
+# ############################
+# # check how many samples are from CLINVAR
+# ## Zhaoming et al
+# length(unique(zhaoming.etal.vars$KEY.pos)) # 295
+# sum(unique(zhaoming.etal.vars$KEY.pos) %in% CLINVAR$KEY.pos)
+# # 115
+# 
+# length(unique(zhaoming.etal.vars$KEY.varID)) # 299
+# sum(unique(zhaoming.etal.vars$KEY.varID) %in% CLINVAR$KEY.varID)
+# # 114
+# 
+# ## Qin et al
+# length(unique(qin.etal.vars$KEY.pos)) # 389
+# sum(unique(qin.etal.vars$KEY.pos) %in% CLINVAR$KEY.pos)
+# # 91
+# length(unique(qin.etal.vars$KEY.varID)) # 392
+# sum(unique(qin.etal.vars$KEY.varID) %in% CLINVAR$KEY.varID)
+# # 91
+# 
+# # check how many samples are from MetaSVM
+# length(unique(zhaoming.etal.vars$KEY.pos)) # 295
+# sum(unique(zhaoming.etal.vars$KEY.pos) %in% MetaSVM$KEY.pos)
+# # 30
+# 
+# length(unique(zhaoming.etal.vars$KEY.varID)) # 299
+# sum(unique(zhaoming.etal.vars$KEY.varID) %in% MetaSVM$KEY.varID)
+# # 28
+# 
+# ## Qin et al
+# length(unique(qin.etal.vars$KEY.pos)) # 389
+# sum(unique(qin.etal.vars$KEY.pos) %in% MetaSVM$KEY.pos)
+# # 19
+# length(unique(qin.etal.vars$KEY.varID)) # 392
+# sum(unique(qin.etal.vars$KEY.varID) %in% MetaSVM$KEY.varID)
+# # 20
+# 
+# write.table(paste0(unique(zhaoming.etal.vars$KEY.varID),":"), "zhaoming_variants.txt", row.names = F, col.names = F, quote = F)
+# write.table(paste0(unique(zhaoming.etal.vars$KEY.pos),":"), "zhaoming_variant_sites.txt", row.names = F, col.names = F, quote = F)
 
