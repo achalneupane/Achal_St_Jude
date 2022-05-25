@@ -677,5 +677,65 @@ cat $(ls *.dbSNP155-FIELDS-simple.txt| sort -V)| egrep 'frameshift_variant|start
 awk '{ print $3 }' LoF_variants.txt| cut -d";" -f1 > LoF_variants_ID.txt
 
 ## Now I am checking the concordance for Indels from the Qin et al and Zhaoming et al in our VCF file
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction
 zhaoming_et_al_variants_bed.txt
-awk '{if($2 != $3) print}' zhaoming_et_al_variants_bed.txt > zhaoming_et_al_variants_INDEL_bed.txt
+awk '{if($2 != $3) print}' zhaoming_et_al_variants_bed.txt > zhaoming_et_al_variants_INDEL.bed
+awk '{if($2 != $3) print}' qin_et_al_variants_bed.txt > qin_et_al_variants_INDEL.bed
+
+
+ln -s ../MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf .
+
+tabIndexed()
+{
+module load bcftools
+module load tabix	
+CHR="$1"
+VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf"
+bgzip -c ${VCF} > ${VCF}.gz
+tabix -p vcf ${VCF}.gz
+}
+
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf
+export -f tabIndexed
+parallel -j22 tabIndexed {} ::: {1..22}
+
+
+## Extract all INDELs from the annotated VCF; These VCF needs to be tabix indexed
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf
+ln -s ../zhaoming_et_al_variants_INDEL.bed .
+ln -s ../qin_et_al_variants_INDEL.bed .
+
+#!/bin/bash
+
+# Extract genotypes from the original GATK VCF (provided by Comp. Bio. department) before any QC/hard filtering
+module load bcftools
+
+# Variants from Zhaoming et al
+zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1 > zhaoming_indel_in_annotatedVCF
+awk '{ print $1":"$2"-"$3 }' zhaoming_et_al_variants_INDEL.bed| sort -V| uniq > zhaoming_indel_tabix
+for chr in {1..22}; do
+tabix MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz $(cat zhaoming_indel_tabix) 
+done | awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' >> zhaoming_indel_in_annotatedVCF
+
+## Bcftools
+zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' > sjlife_zhaoming.vcf
+for chr in {1..22}; do
+bcftools view -Ov MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz -R zhaoming_et_al_variants_INDEL.bed | grep -v '^#'| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' >> sjlife_zhaoming.vcf
+done
+
+
+# Variants from Qin et al
+zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1 > qin_indel_in_annotatedVCF
+awk '{ print $1":"$2"-"$3 }' qin_et_al_variants_INDEL.bed| sort -V| uniq > qin_indel_tabix
+for chr in {1..22}; do
+tabix MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz $(cat qin_indel_tabix) 
+done | awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' >> qin_indel_in_annotatedVCF
+
+# Bcftools
+zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' > sjlife_qin.vcf
+for chr in {1..22}; do
+bcftools view -Oz ~/Work/WGS_SJLIFE/VCF_original/SJLIFE.GERMLINE.3006.GATKv3.4.vqsr.release.0714.vcf.gz -R qin_et_al_variants_INDEL.bed |grep -v '^#'| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' >> sjlife_qin.vcf
+done
+
+
+

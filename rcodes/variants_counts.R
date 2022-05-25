@@ -5,6 +5,7 @@
 ## First check how many variants in Zhaoming et al and Qin et al are also in our VCF dataset
 # Read variant lists from Zhaoming et al 
 library(data.table)
+library(dplyr)
 Sys.setlocale("LC_ALL", "C")
 zhaoming.etal.vars <- read.delim("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Yadav_Sapkota/additional_papers/Zhaoming_Wang_Genetic_risk_for_subsequent_neoplasms_JCO.2018.77.8589/P-PL-sjlife-genetics-sn_SNV_INDELS.txt", sep = "\t", header =T, stringsAsFactors = F)
 head(zhaoming.etal.vars)
@@ -195,10 +196,11 @@ qin.etal.vars$END[is.na(qin.etal.vars$END)&qin.etal.vars$Mutant_Allele !="-"] <-
 qin.etal.vars$START[qin.etal.vars$varTypes == "INDEL"] <- as.numeric(qin.etal.vars$START) [qin.etal.vars$varTypes == "INDEL"]-1
 
 ## BED file
-write.table(cbind.data.frame(qin.etal.vars$CHROM,qin.etal.vars$START, qin.etal.vars$END), "qin_et_al_variants_bed.txt", row.names = F, col.names = F, quote = F, sep = "\t")
+write.table(cbind.data.frame(qin.etal.vars$CHROM,qin.etal.vars$START, qin.etal.vars$END), "qin_et_al_variants.bed", row.names = F, col.names = F, quote = F, sep = "\t")
 
 # Now check how many of the SNVs are in LOF and CLINVAR annotation in our dataset
 qin.SNV <- qin.etal.vars[qin.etal.vars$varTypes == "SNV",]
+qin.INDEL <- qin.etal.vars[qin.etal.vars$varTypes == "INDEL",]
 
 length(unique(qin.SNV$KEY.varID))
 # 211
@@ -211,8 +213,9 @@ sum(unique(qin.SNV$KEY.varID) %in% FINAL.VCF$KEY.varID)
 # 95
 
 # In LOF
-LOF <- fread("LoF_variants_ID.txt")
-LOF <- as.character(LOF$V1)
+LOF.df <- fread("LoF_variants_ID.txt", header = F)
+LOF.df$Key.Pos <- sub('^([^:]+:[^:]+).*', '\\1', LOF.df$V1)
+LOF <- as.character(LOF.df$V1)
 sum(unique(qin.SNV$KEY.varID) %in% LOF)
 # 188
 # In everything
@@ -253,10 +256,11 @@ zhaoming.etal.vars$END[is.na(zhaoming.etal.vars$END)&zhaoming.etal.vars$Mutant_A
 zhaoming.etal.vars$START[zhaoming.etal.vars$varTypes == "INDEL"] <- as.numeric(zhaoming.etal.vars$START) [zhaoming.etal.vars$varTypes == "INDEL"]-1
 
 ## BED file
-write.table(cbind.data.frame(zhaoming.etal.vars$CHROM,zhaoming.etal.vars$START, zhaoming.etal.vars$END), "zhaoming_et_al_variants_bed.txt", row.names = F, col.names = F, quote = F, sep = "\t")
+write.table(cbind.data.frame(zhaoming.etal.vars$CHROM,zhaoming.etal.vars$START, zhaoming.etal.vars$END), "zhaoming_et_al_variants.bed", row.names = F, col.names = F, quote = F, sep = "\t")
 
 # Now check how many of the SNVs are in LOF and CLINVAR annotation in our dataset
 zhaoming.SNV <- zhaoming.etal.vars[zhaoming.etal.vars$varTypes == "SNV",]
+zhaoming.INDEL <- zhaoming.etal.vars[zhaoming.etal.vars$varTypes == "INDEL",]
 
 length(unique(zhaoming.SNV$KEY.varID))
 # 166
@@ -277,9 +281,69 @@ sum(unique(zhaoming.SNV$KEY.varID) %in% LOF)
 sum(unique(zhaoming.SNV$KEY.varID) %in% c(LOF, FINAL.VCF$KEY.varID))
 # 155
 
+#############################
+## NOw checking for INDELS ##
+#############################
+unique(zhaoming.INDEL$KEY.varID)
+zhaoming.INDEL <- zhaoming.INDEL %>% distinct(KEY.varID, .keep_all = TRUE)
+
+zhaoming.INDEL$Pos_GRCh38 <- as.numeric(zhaoming.INDEL$Pos_GRCh38)
+zhaoming.INDEL$Pos_GRCh38.minus1 <- zhaoming.INDEL$Pos_GRCh38-1
+zhaoming.INDEL$KEY.pos.indels <- paste0("chr", zhaoming.INDEL$Chr, ":", zhaoming.INDEL$Pos_GRCh38.minus1)
+write.table(cbind.data.frame(zhaoming.INDEL$CHROM,zhaoming.INDEL$START, zhaoming.INDEL$END), "zhaoming_et_al_variants_INDEL.bed", row.names = F, col.names = F, quote = F, sep = "\t")
 
 
- 
+unique(qin.INDEL$KEY.varID)
+qin.INDEL <- qin.INDEL %>% distinct(KEY.varID, .keep_all = TRUE)
+
+qin.INDEL$Pos_GRCh38 <- as.numeric(qin.INDEL$Pos_GRCh38)
+qin.INDEL$Pos_GRCh38.minus1 <- qin.INDEL$Pos_GRCh38-1
+qin.INDEL$KEY.pos.indels <- paste0("chr", qin.INDEL$Chr, ":", qin.INDEL$Pos_GRCh38.minus1)
+write.table(cbind.data.frame(qin.INDEL$CHROM, qin.INDEL$START, qin.INDEL$END), "qin_et_al_variants_INDEL.bed", row.names = F, col.names = F, quote = F, sep = "\t")
+
+
+
+
+
+
+
+
+
+
+length(unique(zhaoming.INDEL$KEY.pos.indels))
+# 130
+sum(unique(zhaoming.INDEL$KEY.pos.indels) %in% FINAL.VCF$KEY.pos[FINAL.VCF$PRED_TYPE == "Clinvar"])
+# 39
+sum(unique(zhaoming.INDEL$KEY.pos.indels) %in% FINAL.VCF$KEY.pos[FINAL.VCF$PRED_TYPE == "MetaSVM"])
+# 0
+sum(unique(zhaoming.INDEL$KEY.pos.indels) %in% LOF.df$Key.Pos)
+# 65
+sum(unique(zhaoming.INDEL$KEY.pos.indels) %in% c(FINAL.VCF$KEY.pos, LOF.df$Key.Pos))
+# 66
+
+
+
+#####################################################################
+#####################################################################
+#####################################################################
+#####################################################################
+
+
+## Check these in original VCFs from Yadav
+zhaoming_original_VCF <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/zhaoming_vars_vcf.txt")
+zhaoming_original_VCF$V2 <- paste0("chr", zhaoming_original_VCF$V1,":", zhaoming_original_VCF$V4, ":", zhaoming_original_VCF$V5, ":", zhaoming_original_VCF$V6)
+zhaoming_original_VCF$KEY.Pos <- paste0("chr", zhaoming_original_VCF$V1,":", zhaoming_original_VCF$V4)
+write.table(zhaoming_original_VCF, "Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/zhaoming_vars_vcf_edited.txt", col.names = F, row.names = F, quote = F, sep = "\t")
+sum(unique(zhaoming.etal.vars$KEY.pos) %in% zhaoming_original_VCF$KEY.Pos)
+sum(unique(zhaoming.etal.vars$KEY.varID) %in% zhaoming_original_VCF$V2)
+
+
+qin_original_VCF <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/qin_vars_vcf.txt")
+qin_original_VCF$V2 <- paste0("chr", qin_original_VCF$V1,":", qin_original_VCF$V4, ":", qin_original_VCF$V5, ":", qin_original_VCF$V6)
+qin_original_VCF$KEY.Pos <- paste0("chr", qin_original_VCF$V1,":", qin_original_VCF$V4)
+write.table(qin_original_VCF, "Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/qin_vars_vcf_edited.txt", col.names = F, row.names = F, quote = F, sep = "\t")
+sum(unique(qin.etal.vars$KEY.pos) %in% qin_original_VCF$KEY.Pos)
+sum(unique(qin.etal.vars$KEY.varID) %in% qin_original_VCF$V2)
 # as.data.frame(table(FINAL.VCF$`ANN[*].EFFECT`))
 # 
 # 
