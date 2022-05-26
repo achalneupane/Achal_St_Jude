@@ -756,6 +756,7 @@ done
 # bcftools view -Ov MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz -R zhaoming_et_al_variants_INDEL.bed | grep -v '^#'| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' >> sjlife_zhaoming.vcf
 # done
 
+
 ###########################
 ## INDELS from Qin et al ##
 ###########################
@@ -788,6 +789,7 @@ done
 # done
 
 ## Now, I will manually check each indel for exact match.
-# From Zhaoming's list of INDELs, I was able to find only 71/133 INDELs in our VCF
-
+# From Zhaoming's list of INDELs, I was able to find only 70/133 INDELs in our VCF
+# From Qin's list of INDELs, I was able to find only 82/181 INDELs in our VCF
+# This is save as zhaoming_and_qin_et_al_variant_INDEL_comparison_in_SJLIFE.xlxs on /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf
 

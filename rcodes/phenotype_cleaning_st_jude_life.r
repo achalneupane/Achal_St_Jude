@@ -75,74 +75,6 @@ data.long <- data.long %>%
 # write.table(data.long, "Z:/ResearchHome/ClusterHome/aneupane/OUTPUT_FILES/ctcaegrades_Event_data_sjlife_horizontal_format_04_27_2022.csv", quote = FALSE, row.names = FALSE, sep = "\t")
 
 
-
-# ###################################
-# ## ctcaegrades_20210401.sas7bdat ##
-# ###################################
-# 
-# 
-# i = grep("ctcaegrades_20210401.sas7bdat", all.sas.files)
-# data <- read_sas(all.sas.files[i])
-# data.df <- as.data.frame(data)
-# View(data.df)
-# 
-# ## Recode any values other than 0-5 as NAs
-## Clean condition stings
-# data.df$condition <- gsub("_$", "", (gsub("_+", "_",  gsub("[^A-Za-z0-9]", "_", data.df$condition))))
-# dim(data.df)
-# 
-# ## Omit NA grades
-# # data.df <- data.df[!is.na(data.df$grade),]
-# 
-# # data.df <- data.df[c(2,5,6,8,9,10,11)]
-# data.df <- data.df[c(2,8,10,11)]
-# 
-# # > head(as.data.frame(data.df))
-# # sjlid            condition grade ageevent
-# # 1 SJL1527107         Hearing_Loss     1 58.83798
-# # 3 SJL1527107         Hearing_Loss     4 68.00000
-# # 4 SJL1527107         Hearing_Loss     4 70.00000
-# # 5 SJL1527107 Aortic_Root_Aneurysm     0 64.48456
-# # 6 SJL1527107 Aortic_Root_Aneurysm     0 70.96675
-# # 7 SJL1527107        Atrial_myxoma     0 64.48456
-# 
-# # data.df.condition <- data.df %>% group_by(condition) %>% top_n(1, ageevent)
-# SJLID <- unique(data.df$sjlid)
-# 
-# 
-# 
-# LIST2 <- list()
-# for(i in 1:length(SJLID)){
-#   tmp.df <- data.df[data.df$sjlid %in% SJLID[i],]
-#   CONDITIONS <- unique(tmp.df$condition)
-#   LIST1 <- list()
-#   for(j in 1:length(CONDITIONS)){
-#     print(paste0("Doing SJLID-- ", SJLID[i], " for condition-- ", CONDITIONS[j], " -- ITERATION i: ", i, " and j ", j))
-#     tmp.df.condition <- tmp.df[tmp.df$condition %in% CONDITIONS[j],]
-#     tmp.df.condition <-  tmp.df.condition <- tmp.df.condition %>% arrange(condition, desc(grade), desc(ageevent)) %>% distinct(condition, .keep_all = TRUE)
-#     # tmp.df.condition <- as.data.frame(tmp.df.condition %>% group_by(condition) %>% top_n(1, grade) %>% top_n(1, ageevent))
-#     colnames(tmp.df.condition)[-c(1:2)] <- paste(tmp.df.condition$condition,colnames(tmp.df.condition)[-c(1:2)], sep = "_")
-#     LIST1[[j]] <- tmp.df.condition[3:4]
-#   }
-#   LIST2.tmp <- data.frame(LIST1)
-#   LIST2.tmp$sjlid <- SJLID[i]
-#   LIST2[[i]] <- LIST2.tmp
-# }
-
-# 
-# data.long <- rbindlist(LIST2, fill = TRUE)
-# # options(digits=10)
-# data.long <- data.long %>%
-#   relocate(sjlid)
-# 
-# write.table(data.long, "Z:/ResearchHome/ClusterHome/aneupane/OUTPUT_FILES/ctcaegrades_20210401_Event_data_sjlife_horizontal_format_Achal_04_26_2022.csv", quote = FALSE, row.names = FALSE, sep = "\t")
-
-
-####################################################################################
-####################################################################################
-####################################################################################
-
-
 ##############
 ## Clinical ##
 ##############
@@ -273,3 +205,46 @@ write.table(tt, "Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjli
 # lapply(mylist, count_dims)
 
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/PHENOTYPE/phenotype_cleaning.RDATA")
+
+## On 05/26/2022; we received Phenotype for Email subject: 'Attribution fraction for SN'
+#####################
+## wgspop.sas7bdat ##
+#####################
+# WORKDIR:/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE
+wgspop <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE/wgspop.sas7bdat")
+head(wgspop)
+
+
+wgsdiag <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE/wgsdiag.sas7bdat")
+head(wgsdiag)
+
+
+subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
+head(subneo)
+
+
+radiation <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE/radiation.sas7bdat")
+head(radiation)
+
+
+drug <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE/drug.sas7bdat")
+head(drug)
+
+
+demog <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE/demog.sas7bdat")
+head(demog)
+
+
+adultbmi <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE/adultbmi.sas7bdat")
+head(adultbmi)
+
+
+adolhabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE/adolhabits.sas7bdat")
+head(adolhabits)
+
+
+adlthabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE/adlthabits.sas7bdat")
+head(adlthabits)
+
+
+lapply(list(wgspop, wgsdiag, subneo, radiation, drug, demog, adultbmi, adolhabits, adlthabits), dim)

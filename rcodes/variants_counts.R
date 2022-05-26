@@ -315,26 +315,24 @@ qin.INDEL.edited$KEY.varID <- gsub(" ","",qin.INDEL.edited$KEY.varID)
 qin.INDEL.edited$tabix_query <- paste0(qin.INDEL.edited$CHROM, ":", qin.INDEL.edited$START, "-", qin.INDEL.edited$END)
 write.table(qin.INDEL.edited, "qin_et_al_variants_INDEL.bed", row.names = F, col.names = F, quote = F, sep = "\t")
 
+###############
+## Qin et al ##
+###############
+unique(qin.INDEL$KEY.varID)
+qin.INDEL <- qin.INDEL %>% distinct(KEY.varID, .keep_all = TRUE)
+
+qin.INDEL$Pos_GRCh38 <- as.numeric(qin.INDEL$Pos_GRCh38)
+qin.INDEL$Pos_GRCh38.minus1 <- qin.INDEL$Pos_GRCh38-1
+qin.INDEL$KEY.pos.indels <- paste0("chr", qin.INDEL$Chr, ":", qin.INDEL$Pos_GRCh38.minus1)
+qin.INDEL.edited <- cbind.data.frame(KEY.varID = qin.INDEL$KEY.varID, CHROM = qin.INDEL$CHROM,
+                                     START = qin.INDEL$START, END = qin.INDEL$END)
+qin.INDEL.edited$KEY.varID <- gsub(" ","",qin.INDEL.edited$KEY.varID)
+qin.INDEL.edited$tabix_query <- paste0(qin.INDEL.edited$CHROM, ":", qin.INDEL.edited$START, "-", qin.INDEL.edited$END)
+write.table(qin.INDEL.edited, "qin_et_al_variants_INDEL.bed", row.names = F, col.names = F, quote = F, sep = "\t")
 
 
 
-
-
-
-
-
-
-length(unique(zhaoming.INDEL$KEY.pos.indels))
-# 130
-sum(unique(zhaoming.INDEL$KEY.pos.indels) %in% FINAL.VCF$KEY.pos[FINAL.VCF$PRED_TYPE == "Clinvar"])
-# 39
-sum(unique(zhaoming.INDEL$KEY.pos.indels) %in% FINAL.VCF$KEY.pos[FINAL.VCF$PRED_TYPE == "MetaSVM"])
-# 0
-sum(unique(zhaoming.INDEL$KEY.pos.indels) %in% LOF.df$Key.Pos)
-# 65
-sum(unique(zhaoming.INDEL$KEY.pos.indels) %in% c(FINAL.VCF$KEY.pos, LOF.df$Key.Pos))
-# 66
-
+# Now compare how many from zhaoming.INDEL.edited.bed were found in zhaoming_et_al_variants_INDEL.bed.out
 
 
 #####################################################################
