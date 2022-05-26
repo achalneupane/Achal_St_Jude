@@ -332,8 +332,22 @@ write.table(qin.INDEL.edited, "qin_et_al_variants_INDEL.bed", row.names = F, col
 
 
 
-# Now compare how many from zhaoming.INDEL.edited.bed were found in zhaoming_et_al_variants_INDEL.bed.out
+# Now compare how many from zhaoming.INDEL.edited.bed were found in
+# zhaoming_et_al_variants_INDEL.bed.out There is a excel file I have created for
+# indel:
+# //research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf/zhaoming_and_qin_et_al_variant_INDEL_comparison_in_SJLIFE.xlsx
 
+
+## Now that I have checked the concordance of these variants from Qin and Zhaoming in SJLIFE, I am going to group the variants by genes next
+#####################
+## Filter variants ##
+#####################
+LOF.VCF <- fread("LoF_variants.txt", header = T, sep = "\t")
+LOF.VCF$PRED_TYPE <- "LoF"
+LOF.VCF$KEY.pos <- paste(LOF.VCF$CHROM, LOF.VCF$POS, sep = ":")        
+LOF.VCF$KEY.varID <- paste(LOF.VCF$CHROM, LOF.VCF$POS, LOF.VCF$REF, LOF.VCF$ALT, sep = ":")     
+
+FINAL.VCF
 
 #####################################################################
 #####################################################################
