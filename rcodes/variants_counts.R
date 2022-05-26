@@ -284,22 +284,36 @@ sum(unique(zhaoming.SNV$KEY.varID) %in% c(LOF, FINAL.VCF$KEY.varID))
 #############################
 ## NOw checking for INDELS ##
 #############################
+## Zhaoming et al ##
+####################
 unique(zhaoming.INDEL$KEY.varID)
 zhaoming.INDEL <- zhaoming.INDEL %>% distinct(KEY.varID, .keep_all = TRUE)
 
 zhaoming.INDEL$Pos_GRCh38 <- as.numeric(zhaoming.INDEL$Pos_GRCh38)
 zhaoming.INDEL$Pos_GRCh38.minus1 <- zhaoming.INDEL$Pos_GRCh38-1
 zhaoming.INDEL$KEY.pos.indels <- paste0("chr", zhaoming.INDEL$Chr, ":", zhaoming.INDEL$Pos_GRCh38.minus1)
-write.table(cbind.data.frame(zhaoming.INDEL$CHROM,zhaoming.INDEL$START, zhaoming.INDEL$END), "zhaoming_et_al_variants_INDEL.bed", row.names = F, col.names = F, quote = F, sep = "\t")
+zhaoming.INDEL.edited <- cbind.data.frame(KEY.varID = zhaoming.INDEL$KEY.varID, CHROM = zhaoming.INDEL$CHROM,
+                                          START = zhaoming.INDEL$START, END = zhaoming.INDEL$END)
+zhaoming.INDEL.edited$KEY.varID <- gsub(" ","",zhaoming.INDEL.edited$KEY.varID)
+zhaoming.INDEL.edited$tabix_query <- paste0(zhaoming.INDEL.edited$CHROM, ":", zhaoming.INDEL.edited$START, "-", zhaoming.INDEL.edited$END)
+write.table(zhaoming.INDEL.edited, "zhaoming_et_al_variants_INDEL.bed", row.names = F, col.names = F, quote = F, sep = "\t")
 
+# Now compare how many from zhaoming.INDEL.edited.bed were found in zhaoming_et_al_variants_INDEL.bed.out
 
+###############
+## Qin et al ##
+###############
 unique(qin.INDEL$KEY.varID)
 qin.INDEL <- qin.INDEL %>% distinct(KEY.varID, .keep_all = TRUE)
 
 qin.INDEL$Pos_GRCh38 <- as.numeric(qin.INDEL$Pos_GRCh38)
 qin.INDEL$Pos_GRCh38.minus1 <- qin.INDEL$Pos_GRCh38-1
 qin.INDEL$KEY.pos.indels <- paste0("chr", qin.INDEL$Chr, ":", qin.INDEL$Pos_GRCh38.minus1)
-write.table(cbind.data.frame(qin.INDEL$CHROM, qin.INDEL$START, qin.INDEL$END), "qin_et_al_variants_INDEL.bed", row.names = F, col.names = F, quote = F, sep = "\t")
+qin.INDEL.edited <- cbind.data.frame(KEY.varID = qin.INDEL$KEY.varID, CHROM = qin.INDEL$CHROM,
+                                          START = qin.INDEL$START, END = qin.INDEL$END)
+qin.INDEL.edited$KEY.varID <- gsub(" ","",qin.INDEL.edited$KEY.varID)
+qin.INDEL.edited$tabix_query <- paste0(qin.INDEL.edited$CHROM, ":", qin.INDEL.edited$START, "-", qin.INDEL.edited$END)
+write.table(qin.INDEL.edited, "qin_et_al_variants_INDEL.bed", row.names = F, col.names = F, quote = F, sep = "\t")
 
 
 

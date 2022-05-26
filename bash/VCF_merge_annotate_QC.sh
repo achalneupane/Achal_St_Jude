@@ -710,32 +710,84 @@ ln -s ../qin_et_al_variants_INDEL.bed .
 # Extract genotypes from the original GATK VCF (provided by Comp. Bio. department) before any QC/hard filtering
 module load bcftools
 
-# Variants from Zhaoming et al
-zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1 > zhaoming_indel_in_annotatedVCF
-awk '{ print $1":"$2"-"$3 }' zhaoming_et_al_variants_INDEL.bed| sort -V| uniq > zhaoming_indel_tabix
-for chr in {1..22}; do
-tabix MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz $(cat zhaoming_indel_tabix) 
-done | awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' >> zhaoming_indel_in_annotatedVCF
+############################################################################################################################################
+## Now, let's search all the INDELS in Zhaoming and Qin et al in our annotated VCF files. We are checking indels +-1bp up and down stream ##
+############################################################################################################################################
+################################
+## INDELS from Zhaoming et al ##
+################################
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf
 
-## Bcftools
-zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' > sjlife_zhaoming.vcf
-for chr in {1..22}; do
-bcftools view -Ov MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz -R zhaoming_et_al_variants_INDEL.bed | grep -v '^#'| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' >> sjlife_zhaoming.vcf
+## Tabix
+# line="chr1:17028712:_:C       chr1    17028711        17028714        chr1:17028711-17028714"
+zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> zhaoming_et_al_variants_INDEL.bed.out
+LIST=zhaoming_et_al_variants_INDEL.bed
+# tabixSearch()
+# {
+# #!/bin/bash
+# module load tabix
+# CHR="$1"
+# LIST="$2"
+for CHR in {1..22}; do
+VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz"
+for line in $(cat ${LIST}); do
+FOUND_LINE=()	
+query="$(echo ${line}| awk '{ print $5 }')"
+SNPId="$(echo ${line}| awk '{ print $1 }')"
+IFS=$'\n'
+FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
+if [ -n "${FOUND_LINE}" ]; then
+for each in "${FOUND_LINE[@]}"
+do
+echo -e "${SNPId}\t${each}" >> ${LIST}.out
+done
+fi
+done
+done
+# }
+
+# export -f tabixSearch
+# export LIST="zhaoming_et_al_variants_INDEL.bed"
+# parallel -j22 tabixSearch {} ${LIST} ::: {1..22}
+
+# ## Bcftools
+# zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' > sjlife_zhaoming.vcf
+# for chr in {1..22}; do
+# bcftools view -Ov MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz -R zhaoming_et_al_variants_INDEL.bed | grep -v '^#'| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' >> sjlife_zhaoming.vcf
+# done
+
+###########################
+## INDELS from Qin et al ##
+###########################
+## Tabix
+zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> qin_et_al_variants_INDEL.bed.out
+LIST=qin_et_al_variants_INDEL.bed
+for CHR in {1..22}; do
+VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz"
+for line in $(cat ${LIST}); do
+FOUND_LINE=()	
+query="$(echo ${line}| awk '{ print $5 }')"
+SNPId="$(echo ${line}| awk '{ print $1 }')"
+IFS=$'\n'
+FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
+if [ -n "${FOUND_LINE}" ]; then
+for each in "${FOUND_LINE[@]}"
+do
+echo -e "${SNPId}\t${each}" >> ${LIST}.out
+done
+fi
+done
 done
 
+## saved this bit of code as search_indel.sh
 
-# Variants from Qin et al
-zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1 > qin_indel_in_annotatedVCF
-awk '{ print $1":"$2"-"$3 }' qin_et_al_variants_INDEL.bed| sort -V| uniq > qin_indel_tabix
-for chr in {1..22}; do
-tabix MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz $(cat qin_indel_tabix) 
-done | awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' >> qin_indel_in_annotatedVCF
+# # Bcftools
+# zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' > sjlife_qin.vcf
+# for chr in {1..22}; do
+# bcftools view -Ov MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz -R qin_et_al_variants_INDEL.bed | grep -v '^#'| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' >> sjlife_qin.vcf
+# done
 
-# Bcftools
-zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' > sjlife_qin.vcf
-for chr in {1..22}; do
-bcftools view -Oz ~/Work/WGS_SJLIFE/VCF_original/SJLIFE.GERMLINE.3006.GATKv3.4.vqsr.release.0714.vcf.gz -R qin_et_al_variants_INDEL.bed |grep -v '^#'| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' >> sjlife_qin.vcf
-done
-
+## Now, I will manually check each indel for exact match.
+# From Zhaoming's list of INDELs, I was able to find only 71/133 INDELs in our VCF
 
 
