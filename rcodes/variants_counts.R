@@ -259,6 +259,7 @@ zhaoming.etal.vars$START[zhaoming.etal.vars$varTypes == "INDEL"] <- as.numeric(z
 write.table(cbind.data.frame(zhaoming.etal.vars$CHROM,zhaoming.etal.vars$START, zhaoming.etal.vars$END), "zhaoming_et_al_variants.bed", row.names = F, col.names = F, quote = F, sep = "\t")
 
 # Now check how many of the SNVs are in LOF and CLINVAR annotation in our dataset
+
 zhaoming.SNV <- zhaoming.etal.vars[zhaoming.etal.vars$varTypes == "SNV",]
 zhaoming.INDEL <- zhaoming.etal.vars[zhaoming.etal.vars$varTypes == "INDEL",]
 
@@ -296,9 +297,8 @@ zhaoming.INDEL.edited <- cbind.data.frame(KEY.varID = zhaoming.INDEL$KEY.varID, 
                                           START = zhaoming.INDEL$START, END = zhaoming.INDEL$END)
 zhaoming.INDEL.edited$KEY.varID <- gsub(" ","",zhaoming.INDEL.edited$KEY.varID)
 zhaoming.INDEL.edited$tabix_query <- paste0(zhaoming.INDEL.edited$CHROM, ":", zhaoming.INDEL.edited$START, "-", zhaoming.INDEL.edited$END)
+zhaoming.INDEL.edited$tabix_query_PM_10bps <- paste0(zhaoming.INDEL.edited$CHROM, ":", zhaoming.INDEL.edited$START-9, "-", zhaoming.INDEL.edited$END+9)
 write.table(zhaoming.INDEL.edited, "zhaoming_et_al_variants_INDEL.bed", row.names = F, col.names = F, quote = F, sep = "\t")
-
-# Now compare how many from zhaoming.INDEL.edited.bed were found in zhaoming_et_al_variants_INDEL.bed.out
 
 ###############
 ## Qin et al ##
@@ -313,23 +313,8 @@ qin.INDEL.edited <- cbind.data.frame(KEY.varID = qin.INDEL$KEY.varID, CHROM = qi
                                           START = qin.INDEL$START, END = qin.INDEL$END)
 qin.INDEL.edited$KEY.varID <- gsub(" ","",qin.INDEL.edited$KEY.varID)
 qin.INDEL.edited$tabix_query <- paste0(qin.INDEL.edited$CHROM, ":", qin.INDEL.edited$START, "-", qin.INDEL.edited$END)
+qin.INDEL.edited$tabix_query_PM_10bps <- paste0(qin.INDEL.edited$CHROM, ":", qin.INDEL.edited$START-9, "-", qin.INDEL.edited$END+9)
 write.table(qin.INDEL.edited, "qin_et_al_variants_INDEL.bed", row.names = F, col.names = F, quote = F, sep = "\t")
-
-###############
-## Qin et al ##
-###############
-unique(qin.INDEL$KEY.varID)
-qin.INDEL <- qin.INDEL %>% distinct(KEY.varID, .keep_all = TRUE)
-
-qin.INDEL$Pos_GRCh38 <- as.numeric(qin.INDEL$Pos_GRCh38)
-qin.INDEL$Pos_GRCh38.minus1 <- qin.INDEL$Pos_GRCh38-1
-qin.INDEL$KEY.pos.indels <- paste0("chr", qin.INDEL$Chr, ":", qin.INDEL$Pos_GRCh38.minus1)
-qin.INDEL.edited <- cbind.data.frame(KEY.varID = qin.INDEL$KEY.varID, CHROM = qin.INDEL$CHROM,
-                                     START = qin.INDEL$START, END = qin.INDEL$END)
-qin.INDEL.edited$KEY.varID <- gsub(" ","",qin.INDEL.edited$KEY.varID)
-qin.INDEL.edited$tabix_query <- paste0(qin.INDEL.edited$CHROM, ":", qin.INDEL.edited$START, "-", qin.INDEL.edited$END)
-write.table(qin.INDEL.edited, "qin_et_al_variants_INDEL.bed", row.names = F, col.names = F, quote = F, sep = "\t")
-
 
 
 # Now compare how many from zhaoming.INDEL.edited.bed were found in
@@ -342,17 +327,47 @@ write.table(qin.INDEL.edited, "qin_et_al_variants_INDEL.bed", row.names = F, col
 #####################
 ## Filter variants ##
 #####################
+CLINVAR <- FINAL.VCF[FINAL.VCF$PRED_TYPE == "Clinvar",]
+CLINVAR <- CLINVAR[!duplicated(CLINVAR$KEY.varID),]
+
+MetaSVM <- FINAL.VCF[FINAL.VCF$PRED_TYPE == "MetaSVM",]
+MetaSVM <- MetaSVM[!duplicated(MetaSVM$KEY.varID),]
+
 LOF.VCF <- fread("LoF_variants.txt", header = T, sep = "\t")
 LOF.VCF$PRED_TYPE <- "LoF"
 LOF.VCF$KEY.pos <- paste(LOF.VCF$CHROM, LOF.VCF$POS, sep = ":")        
 LOF.VCF$KEY.varID <- paste(LOF.VCF$CHROM, LOF.VCF$POS, LOF.VCF$REF, LOF.VCF$ALT, sep = ":")     
 
-FINAL.VCF
+non.intron.LoF <- LOF.VCF[grepl("splice_region_variant&intron_variant", LOF.VCF$`ANN[*].EFFECT`),]
+sum(unique(zhaoming.SNV$KEY.varID) %in% non.intron.LoF$KEY.varID)
+tt <- non.intron.LoF[non.intron.LoF$KEY.varID %in% unique(zhaoming.SNV$KEY.varID),]
+
+# LOF.VCF <- LOF.VCF[!duplicated(LOF.VCF$KEY.varID),]
+
+
+
+##################################
+## How many variants per gene ? ##
+##################################
+df <- CLINVAR
+group_and_concat <- df %>%
+  dplyr::select(`ANN[*].GENE`, KEY.varID) %>% 
+  dplyr::group_by(`ANN[*].GENE`) %>%
+  dplyr::summarise(all_variants_SJLIFE = paste(KEY.varID, collapse = ","))
+  
+group_and_concat$counts_var_SJLIFE <- lengths(strsplit(group_and_concat$all_variants_SJLIFE, ","))
+
+qin.genes.vars <- qin.etal.vars
+unique(qin.etal.vars$Gene) %in% group_and_concat$`ANN[*].GENE` 
 
 #####################################################################
 #####################################################################
 #####################################################################
 #####################################################################
+
+
+
+
 
 
 ## Check these in original VCFs from Yadav
