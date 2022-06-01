@@ -975,6 +975,9 @@ sed -i "s/\r//g"  ${LIST}_V2_results.out
 @@@@@ Open these two output files on Excel spreadsheet `Zhaoming_and_qin_in_VCF_prior_to_any_QC.xlxs` on Z:\ResearchHome\Groups\sapkogrp\projects\Genomics\common\attr_fraction
 @@@@@ I have checked the concordance of these variants manually.
 
+
+
+
 #####################################################
 ## Now search these variants in the VCF I prepared ##
 #####################################################
@@ -1032,3 +1035,66 @@ echo -e "${SNPId}\t${VAR_TYPE}\tNA\tNA\tNA\tNA\tNA" >> POST_QC_VCF_${LIST}_V2_re
 fi
 done
 sed -i "s/\r//g"  POST_QC_VCF_${LIST}_V2_results.out
+
+
+# Now use R code: variant_counts.R
+
+# #####################
+# ## Filter variants ##
+# #####################
+# CLINVAR <- FINAL.VCF[FINAL.VCF$PRED_TYPE == "Clinvar",]
+# CLINVAR <- CLINVAR[!duplicated(CLINVAR$KEY.varID),]
+
+# MetaSVM <- FINAL.VCF[FINAL.VCF$PRED_TYPE == "MetaSVM",]
+# MetaSVM <- MetaSVM[!duplicated(MetaSVM$KEY.varID),]
+
+# LOF.VCF <- fread("LoF_variants.txt", header = T, sep = "\t")
+# LOF.VCF$PRED_TYPE <- "LoF"
+# LOF.VCF$KEY.pos <- paste(LOF.VCF$CHROM, LOF.VCF$POS, sep = ":")        
+# LOF.VCF$KEY.varID <- paste(LOF.VCF$CHROM, LOF.VCF$POS, LOF.VCF$REF, LOF.VCF$ALT, sep = ":")     
+
+# non.intron.LoF <- LOF.VCF[grepl("splice_region_variant&intron_variant", LOF.VCF$`ANN[*].EFFECT`),]
+# sum(unique(zhaoming.SNV$KEY.varID) %in% non.intron.LoF$KEY.varID)
+# tt <- non.intron.LoF[non.intron.LoF$KEY.varID %in% unique(zhaoming.SNV$KEY.varID),]
+
+# # LOF.VCF <- LOF.VCF[!duplicated(LOF.VCF$KEY.varID),]
+
+# #####################################################################
+# #####################################################################
+# #####################################################################
+# #####################################################################
+
+# ##################################################
+# ## Now, check these in original VCFs from Yadav ##
+# ##################################################
+# ## Zhaoming
+# zhaoming_in_vcf <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/Zhaoming_in_VCF_prior_to_any_QC.txt", sep = "\t", header = T, check.names = F)
+# zhaoming_in_vcf <- zhaoming_in_vcf[1:10]
+# head(zhaoming_in_vcf)
+# # zhaoming_in_vcf <- zhaoming_in_vcf[zhaoming_in_vcf$Match_per_var == "Y",]
+
+# zhaoming_in_vcf$MATCHED.IN.CLINVAR <- ""
+# zhaoming_in_vcf$MATCHED.IN.MetaSVM <- ""
+# zhaoming_in_vcf$MATCHED.IN.LOF <- ""
+# zhaoming_in_vcf$MATCHED.IN.ANY.ANNOTATION <- ""
+# zhaoming_in_vcf$MATCHED.IN.CLINVAR[zhaoming_in_vcf$ID %in% CLINVAR$KEY.varID] <- "Y"
+# zhaoming_in_vcf$MATCHED.IN.MetaSVM[zhaoming_in_vcf$ID %in% MetaSVM$KEY.varID] <- "Y"
+# zhaoming_in_vcf$MATCHED.IN.LOF[zhaoming_in_vcf$ID %in% LOF.VCF$KEY.varID] <- "Y"
+# zhaoming_in_vcf$MATCHED.IN.ANY.ANNOTATION[zhaoming_in_vcf$ID %in% unique(c(CLINVAR$KEY.varID, MetaSVM$KEY.varID, LOF.VCF$KEY.varID))] <- "Y"
+
+# # Now if zhaoming_in_vcf$Match_YN is not Y, then make all columns Not Y
+# zhaoming_in_vcf[!zhaoming_in_vcf$Match_YN == "Y",c("MATCHED.IN.CLINVAR", "MATCHED.IN.MetaSVM", "MATCHED.IN.LOF", "MATCHED.IN.ANY.ANNOTATION")] <- ""
+# zhaoming_in_vcf$notes <- ""
+# ## Note: Match_per_var is where the variants in VCF match exactly (YES/NO). It is a unique Y/N value per variant whereas Match_YN could have duplicate YES/or NOs
+# library(dplyr)
+# library(tidyr)
+# # Return column names in a column where the value matches a given string
+# zhaoming_in_vcf <- zhaoming_in_vcf %>% 
+#   mutate(across(c(MATCHED.IN.CLINVAR, MATCHED.IN.MetaSVM, MATCHED.IN.LOF), ~case_when(. == "Y" ~ cur_column()), .names = 'new_{col}')) %>%
+#   unite(notes, starts_with('new'), na.rm = TRUE, sep = ';')
+# zhaoming_in_vcf$notes <- gsub("MATCHED.IN.", "", zhaoming_in_vcf$notes)
+
+# zhaoming_in_vcf$notes [zhaoming_in_vcf$Match_per_var =="Y" & !zhaoming_in_vcf$MATCHED.IN.ANY.ANNOTATION == "Y" ] <- "QC_DROPPED"
+# zhaoming_in_vcf$notes [is.na(zhaoming_in_vcf$ID)] <- "NOT_CALLED_BY_GATK"
+
+# write.table(zhaoming_in_vcf, " Zhaoming_and_qin_in_VCF_prior_to_any_QC_Final_list.txt", row.names = F, col.names = F, quote = F, sep = "\t")

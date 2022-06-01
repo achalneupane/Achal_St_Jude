@@ -407,7 +407,8 @@ tt <- non.intron.LoF[non.intron.LoF$KEY.varID %in% unique(zhaoming.SNV$KEY.varID
 ##################################################
 ## Now, check these in original VCFs from Yadav ##
 ##################################################
-## Zhaoming
+## Zhaoming ##
+##############
 zhaoming_in_vcf <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/Zhaoming_in_VCF_prior_to_any_QC.txt", sep = "\t", header = T, check.names = F)
 zhaoming_in_vcf <- zhaoming_in_vcf[1:10]
 head(zhaoming_in_vcf)
@@ -437,7 +438,47 @@ zhaoming_in_vcf$notes <- gsub("MATCHED.IN.", "", zhaoming_in_vcf$notes)
 zhaoming_in_vcf$notes [zhaoming_in_vcf$Match_per_var =="Y" & !zhaoming_in_vcf$MATCHED.IN.ANY.ANNOTATION == "Y" ] <- "QC_DROPPED"
 zhaoming_in_vcf$notes [is.na(zhaoming_in_vcf$ID)] <- "NOT_CALLED_BY_GATK"
 
-write.table(zhaoming_in_vcf, " Zhaoming_and_qin_in_VCF_prior_to_any_QC_Final_list.txt", row.names = F, col.names = F, quote = F, sep = "\t")
+zhaoming_in_vcf$notes [zhaoming_in_vcf$Match_per_var =="N" & !is.na(zhaoming_in_vcf$ID)] <- "Not_Matched"
+
+write.table(zhaoming_in_vcf, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/Zhaoming_in_VCF_prior_to_any_QC_Final_list.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+
+#########
+## Qin ##
+#########
+qin_in_vcf <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/qin_in_VCF_prior_to_any_QC.txt", sep = "\t", header = T, check.names = F)
+qin_in_vcf <- qin_in_vcf[1:10]
+head(qin_in_vcf)
+# qin_in_vcf <- qin_in_vcf[qin_in_vcf$Match_per_var == "Y",]
+
+qin_in_vcf$MATCHED.IN.CLINVAR <- ""
+qin_in_vcf$MATCHED.IN.MetaSVM <- ""
+qin_in_vcf$MATCHED.IN.LOF <- ""
+qin_in_vcf$MATCHED.IN.ANY.ANNOTATION <- ""
+qin_in_vcf$MATCHED.IN.CLINVAR[qin_in_vcf$ID %in% CLINVAR$KEY.varID] <- "Y"
+qin_in_vcf$MATCHED.IN.MetaSVM[qin_in_vcf$ID %in% MetaSVM$KEY.varID] <- "Y"
+qin_in_vcf$MATCHED.IN.LOF[qin_in_vcf$ID %in% LOF.VCF$KEY.varID] <- "Y"
+qin_in_vcf$MATCHED.IN.ANY.ANNOTATION[qin_in_vcf$ID %in% unique(c(CLINVAR$KEY.varID, MetaSVM$KEY.varID, LOF.VCF$KEY.varID))] <- "Y"
+
+# Now if qin_in_vcf$Match_YN is not Y, then make all columns Not Y
+qin_in_vcf[!qin_in_vcf$Match_YN == "Y",c("MATCHED.IN.CLINVAR", "MATCHED.IN.MetaSVM", "MATCHED.IN.LOF", "MATCHED.IN.ANY.ANNOTATION")] <- ""
+qin_in_vcf$notes <- ""
+## Note: Match_per_var is where the variants in VCF match exactly (YES/NO). It is a unique Y/N value per variant whereas Match_YN could have duplicate YES/or NOs
+library(dplyr)
+library(tidyr)
+# Return column names in a column where the value matches a given string
+qin_in_vcf <- qin_in_vcf %>% 
+  mutate(across(c(MATCHED.IN.CLINVAR, MATCHED.IN.MetaSVM, MATCHED.IN.LOF), ~case_when(. == "Y" ~ cur_column()), .names = 'new_{col}')) %>%
+  unite(notes, starts_with('new'), na.rm = TRUE, sep = ';')
+qin_in_vcf$notes <- gsub("MATCHED.IN.", "", qin_in_vcf$notes)
+
+qin_in_vcf$notes [qin_in_vcf$Match_per_var =="Y" & !qin_in_vcf$MATCHED.IN.ANY.ANNOTATION == "Y" ] <- "QC_DROPPED"
+qin_in_vcf$notes [is.na(qin_in_vcf$ID)] <- "NOT_CALLED_BY_GATK"
+
+qin_in_vcf$notes [qin_in_vcf$Match_per_var =="N" & !is.na(qin_in_vcf$ID)] <- "Not_Matched"
+
+write.table(qin_in_vcf, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/Qin_in_VCF_prior_to_any_QC_Final_list.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+
+
 
 
 ##################################
