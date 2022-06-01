@@ -717,114 +717,114 @@ module load bcftools
 ################################
 ## INDELS from Zhaoming et al ##
 ################################
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf
+# cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf
 
-## Tabix
-# line="chr1:17028712:_:C       chr1    17028711        17028714        chr1:17028711-17028714"
-zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> zhaoming_et_al_variants_INDEL.bed.out
-LIST=zhaoming_et_al_variants_INDEL.bed
-# tabixSearch()
-# {
-# #!/bin/bash
-# module load tabix
-# CHR="$1"
-# LIST="$2"
-for CHR in {1..22}; do
-VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz"
-for line in $(cat ${LIST}); do
-FOUND_LINE=()	
-query="$(echo ${line}| awk '{ print $5 }')"
-SNPId="$(echo ${line}| awk '{ print $1 }')"
-IFS=$'\n'
-FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
-if [ -n "${FOUND_LINE}" ]; then
-for each in "${FOUND_LINE[@]}"
-do
-echo -e "${SNPId}\t${each}" >> ${LIST}.out
-done
-fi
-done
-done
-# }
-
-
-
-## Search in +/- 5 bases
-LIST=zhaoming_et_al_variants_INDEL.bed
-zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> ${LIST}_plus_minu10bps.out
-for CHR in {1..22}; do
-VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz"
-for line in $(cat ${LIST}); do
-FOUND_LINE=()	
-query="$(echo ${line}| awk '{ print $6 }')"
-SNPId="$(echo ${line}| awk '{ print $1 }')"
-IFS=$'\n'
-FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
-if [ -n "${FOUND_LINE}" ]; then
-for each in "${FOUND_LINE[@]}"
-do
-echo -e "${SNPId}\t${each}" >> ${LIST}_plus_minu10bps.out
-done
-fi
-done
-done
+# ## Tabix
+# # line="chr1:17028712:_:C       chr1    17028711        17028714        chr1:17028711-17028714"
+# zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> zhaoming_et_al_variants_INDEL.bed.out
+# LIST=zhaoming_et_al_variants_INDEL.bed
+# # tabixSearch()
+# # {
+# # #!/bin/bash
+# # module load tabix
+# # CHR="$1"
+# # LIST="$2"
+# for CHR in {1..22}; do
+# VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz"
+# for line in $(cat ${LIST}); do
+# FOUND_LINE=()	
+# query="$(echo ${line}| awk '{ print $5 }')"
+# SNPId="$(echo ${line}| awk '{ print $1 }')"
+# IFS=$'\n'
+# FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
+# if [ -n "${FOUND_LINE}" ]; then
+# for each in "${FOUND_LINE[@]}"
+# do
+# echo -e "${SNPId}\t${each}" >> ${LIST}.out
+# done
+# fi
+# done
+# done
+# # }
 
 
 
-# export -f tabixSearch
-# export LIST="zhaoming_et_al_variants_INDEL.bed"
-# parallel -j22 tabixSearch {} ${LIST} ::: {1..22}
-
-# ## Bcftools
-# zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' > sjlife_zhaoming.vcf
-# for chr in {1..22}; do
-# bcftools view -Ov MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz -R zhaoming_et_al_variants_INDEL.bed | grep -v '^#'| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' >> sjlife_zhaoming.vcf
+# ## Search in +/- 5 bases
+# LIST=zhaoming_et_al_variants_INDEL.bed
+# zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> ${LIST}_plus_minu10bps.out
+# for CHR in {1..22}; do
+# VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz"
+# for line in $(cat ${LIST}); do
+# FOUND_LINE=()	
+# query="$(echo ${line}| awk '{ print $6 }')"
+# SNPId="$(echo ${line}| awk '{ print $1 }')"
+# IFS=$'\n'
+# FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
+# if [ -n "${FOUND_LINE}" ]; then
+# for each in "${FOUND_LINE[@]}"
+# do
+# echo -e "${SNPId}\t${each}" >> ${LIST}_plus_minu10bps.out
+# done
+# fi
+# done
 # done
 
 
-###########################
-## INDELS from Qin et al ##
-###########################
-## Tabix
-zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> qin_et_al_variants_INDEL.bed.out
-LIST=qin_et_al_variants_INDEL.bed
-for CHR in {1..22}; do
-VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz"
-for line in $(cat ${LIST}); do
-FOUND_LINE=()	
-query="$(echo ${line}| awk '{ print $5 }')"
-SNPId="$(echo ${line}| awk '{ print $1 }')"
-IFS=$'\n'
-FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
-if [ -n "${FOUND_LINE}" ]; then
-for each in "${FOUND_LINE[@]}"
-do
-echo -e "${SNPId}\t${each}" >> ${LIST}.out
-done
-fi
-done
-done
+
+# # export -f tabixSearch
+# # export LIST="zhaoming_et_al_variants_INDEL.bed"
+# # parallel -j22 tabixSearch {} ${LIST} ::: {1..22}
+
+# # ## Bcftools
+# # zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' > sjlife_zhaoming.vcf
+# # for chr in {1..22}; do
+# # bcftools view -Ov MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz -R zhaoming_et_al_variants_INDEL.bed | grep -v '^#'| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' >> sjlife_zhaoming.vcf
+# # done
 
 
-## Search in +/- 5 bases
-LIST=qin_et_al_variants_INDEL.bed
-zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> ${LIST}_plus_minu10bps.out
-for CHR in {1..22}; do
-VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz"
-for line in $(cat ${LIST}); do
-FOUND_LINE=()	
-query="$(echo ${line}| awk '{ print $6 }')"
-SNPId="$(echo ${line}| awk '{ print $1 }')"
-IFS=$'\n'
-FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
-if [ -n "${FOUND_LINE}" ]; then
-for each in "${FOUND_LINE[@]}"
-do
-echo -e "${SNPId}\t${each}" >> ${LIST}_plus_minu10bps.out
-done
-fi
-done
-done
+# ###########################
+# ## INDELS from Qin et al ##
+# ###########################
+# ## Tabix
+# zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> qin_et_al_variants_INDEL.bed.out
+# LIST=qin_et_al_variants_INDEL.bed
+# for CHR in {1..22}; do
+# VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz"
+# for line in $(cat ${LIST}); do
+# FOUND_LINE=()	
+# query="$(echo ${line}| awk '{ print $5 }')"
+# SNPId="$(echo ${line}| awk '{ print $1 }')"
+# IFS=$'\n'
+# FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
+# if [ -n "${FOUND_LINE}" ]; then
+# for each in "${FOUND_LINE[@]}"
+# do
+# echo -e "${SNPId}\t${each}" >> ${LIST}.out
+# done
+# fi
+# done
+# done
+
+
+# ## Search in +/- 5 bases
+# LIST=qin_et_al_variants_INDEL.bed
+# zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> ${LIST}_plus_minu10bps.out
+# for CHR in {1..22}; do
+# VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz"
+# for line in $(cat ${LIST}); do
+# FOUND_LINE=()	
+# query="$(echo ${line}| awk '{ print $6 }')"
+# SNPId="$(echo ${line}| awk '{ print $1 }')"
+# IFS=$'\n'
+# FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
+# if [ -n "${FOUND_LINE}" ]; then
+# for each in "${FOUND_LINE[@]}"
+# do
+# echo -e "${SNPId}\t${each}" >> ${LIST}_plus_minu10bps.out
+# done
+# fi
+# done
+# done
 
 ## saved this bit of code as search_indel.sh
 
@@ -846,64 +846,189 @@ zcat $VCF | bgzip -c > ${VCF}.gz
 tabix -p vcf ${VCF}.gz
 
 
-for f in *.vcf; do
+for f in *_v2.vcf; do
 	echo $f
 	cp $f ${f}.gz
 done
 
-for f in *.vcf.gz; do
+for f in *_v2.vcf.gz; do
 	echo $f
 bcftools sort -Oz $f -o sorted_${f}
 done
 
-for f in sorted_*.vcf.gz; do
+for f in sorted_*v2.vcf.gz; do
 	echo $f
 bcftools index -f -t --threads 4 ${f}
 done
 
 
-bcftools merge --threads 4 sorted_sjlife_1_zhaoming.vcf.gz sorted_sjlife_2_zhaoming.vcf.gz -0 -Oz -o MERGED_sorted_sjlife_1_2_zhaoming.vcf.gz
-bcftools index -f -t --threads 4 MERGED_sorted_sjlife_1_2_zhaoming.vcf.gz
+## Edit Zhaoming vcf
+bcftools merge --threads 4 sorted_sjlife_1_zhaoming_v2.vcf.gz sorted_sjlife_2_zhaoming_v2.vcf.gz -0 -Oz -o MERGED_sorted_sjlife_1_2_zhaoming_v2.vcf.gz
+bcftools index -f -t --threads 4 MERGED_sorted_sjlife_1_2_zhaoming_v2.vcf.gz
+## Convert to biallelic
+bcftools norm -m-any --check-ref -w -f /research_jude/rgs01_jude/reference/public/genomes/Homo_sapiens/GRCh38/GRCh38_no_alt/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa MERGED_sorted_sjlife_1_2_zhaoming_v2.vcf.gz Oz -o MERGED_biallelic_sorted_sjlife_1_2_zhaoming_v2.vcf.gz
+bcftools annotate --set-id '%CHROM\:%POS\:%REF\:%FIRST_ALT' MERGED_biallelic_sorted_sjlife_1_2_zhaoming_v2.vcf.gz -Oz -o MERGED_biallelic_sorted_sjlife_1_2_zhaoming_ID_edited.vcf.gz
+bcftools index -f -t --threads 4 MERGED_biallelic_sorted_sjlife_1_2_zhaoming_ID_edited.vcf.gz
 
-bcftools merge --threads 4 sorted_sjlife_1_qin.vcf.gz sorted_sjlife_2_qin.vcf.gz -0 -Oz -o MERGED_sorted_sjlife_1_2_qin.vcf.gz
-bcftools index -f -t --threads 4 MERGED_sorted_sjlife_1_2_qin.vcf.gz
 
-## Search in +/- 5 bases in Yadav's VCF (VCF prior to QC)
+## Edit qin vcf
+bcftools merge --threads 4 sorted_sjlife_1_qin_v2.vcf.gz sorted_sjlife_2_qin_v2.vcf.gz -0 -Oz -o MERGED_sorted_sjlife_1_2_qin_v2.vcf.gz
+bcftools index -f -t --threads 4 MERGED_sorted_sjlife_1_2_qin_v2.vcf.gz
+## Convert to biallelic
+bcftools norm -m-any --check-ref -w -f /research_jude/rgs01_jude/reference/public/genomes/Homo_sapiens/GRCh38/GRCh38_no_alt/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa MERGED_sorted_sjlife_1_2_qin_v2.vcf.gz Oz -o MERGED_biallelic_sorted_sjlife_1_2_qin_v2.vcf.gz
+bcftools annotate --set-id '%CHROM\:%POS\:%REF\:%FIRST_ALT' MERGED_biallelic_sorted_sjlife_1_2_qin_v2.vcf.gz -Oz -o MERGED_biallelic_sorted_sjlife_1_2_qin_ID_edited.vcf.gz
+bcftools index -f -t --threads 4 MERGED_biallelic_sorted_sjlife_1_2_qin_ID_edited.vcf.gz
+
+
+
+## Search in +/- 10 bases in Yadav's VCF (VCF prior to QC)
+# cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction
+# ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf/zhaoming_et_al_variants_INDEL.bed .
+# ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf/qin_et_al_variants_INDEL.bed .
+
+# LIST=zhaoming_et_al_variants_INDEL.bed
+# VCF="MERGED_sorted_sjlife_1_2_zhaoming.vcf.gz"
+# zgrep "^#CHROM" ${VCF}|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> ${LIST}_plus_minu10bps.out
+# for line in $(cat ${LIST}); do
+# FOUND_LINE=()	
+# query="$(echo ${line}| awk '{ print $6 }')"
+# SNPId="$(echo ${line}| awk '{ print $1 }')"
+# IFS=$'\n'
+# FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
+# if [ -n "${FOUND_LINE}" ]; then
+# for each in "${FOUND_LINE[@]}"
+# do
+# echo -e "${SNPId}\t${each}" >> ${LIST}_plus_minu10bps.out
+# done
+# else
+# echo -e "${SNPId}\tNA\tNA\tNA\tNA" >> ${LIST}_plus_minu10bps.out
+# fi
+# done
+
+
+# LIST=qin_et_al_variants_INDEL.bed
+# VCF="MERGED_sorted_sjlife_1_2_qin.vcf.gz"
+# zgrep "^#CHROM" ${VCF}|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> ${LIST}_plus_minu10bps.out
+# for line in $(cat ${LIST}); do
+# FOUND_LINE=()	
+# query="$(echo ${line}| awk '{ print $6 }')"
+# SNPId="$(echo ${line}| awk '{ print $1 }')"
+# IFS=$'\n'
+# FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
+# if [ -n "${FOUND_LINE}" ]; then
+# for each in "${FOUND_LINE[@]}"
+# do
+# echo -e "${SNPId}\t${each}" >> ${LIST}_plus_minu10bps.out
+# done
+# fi
+# done
+
+
+# Search in +/- 10 bases in Yadav's VCF (VCF prior to QC)
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction
-ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf/zhaoming_et_al_variants_INDEL.bed .
-ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf/qin_et_al_variants_INDEL.bed .
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/zhaoming_et_al_SNV_INDEL_Search_list_V2.bed .
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/qin_et_al_SNV_INDEL_Search_list_V2.bed .
 
-LIST=zhaoming_et_al_variants_INDEL.bed
-VCF="MERGED_sorted_sjlife_1_2_zhaoming.vcf.gz"
-zgrep "^#CHROM" ${VCF}|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> ${LIST}_plus_minu10bps.out
+LIST="zhaoming_et_al_SNV_INDEL_Search_list_V2.bed"
+VCF="MERGED_biallelic_sorted_sjlife_1_2_zhaoming_ID_edited.vcf.gz"
+zgrep "^#CHROM" ${VCF}|head -1 | awk '{ print "KEY.varID\tVAR_TYPE\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> ${LIST}_V2_results.out
 for line in $(cat ${LIST}); do
 FOUND_LINE=()	
 query="$(echo ${line}| awk '{ print $6 }')"
+VAR_TYPE="$(echo ${line}| awk '{ print $7 }')"
 SNPId="$(echo ${line}| awk '{ print $1 }')"
 IFS=$'\n'
 FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
 if [ -n "${FOUND_LINE}" ]; then
 for each in "${FOUND_LINE[@]}"
 do
-echo -e "${SNPId}\t${each}" >> ${LIST}_plus_minu10bps.out
+echo -e "${SNPId}\t${VAR_TYPE}\t${each}" >> ${LIST}_V2_results.out
 done
+else
+echo -e "${SNPId}\t${VAR_TYPE}\tNA\tNA\tNA\tNA\tNA" >> ${LIST}_V2_results.out
 fi
 done
+sed -i "s/\r//g"  ${LIST}_V2_results.out
 
 
-LIST=qin_et_al_variants_INDEL.bed
-VCF="MERGED_sorted_sjlife_1_2_qin.vcf.gz"
-zgrep "^#CHROM" ${VCF}|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> ${LIST}_plus_minu10bps.out
+LIST="qin_et_al_SNV_INDEL_Search_list_V2.bed"
+VCF="MERGED_biallelic_sorted_sjlife_1_2_qin_ID_edited.vcf.gz"
+zgrep "^#CHROM" ${VCF}|head -1 | awk '{ print "KEY.varID\tVAR_TYPE\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> ${LIST}_V2_results.out
 for line in $(cat ${LIST}); do
 FOUND_LINE=()	
 query="$(echo ${line}| awk '{ print $6 }')"
+VAR_TYPE="$(echo ${line}| awk '{ print $7 }')"
 SNPId="$(echo ${line}| awk '{ print $1 }')"
 IFS=$'\n'
 FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
 if [ -n "${FOUND_LINE}" ]; then
 for each in "${FOUND_LINE[@]}"
 do
-echo -e "${SNPId}\t${each}" >> ${LIST}_plus_minu10bps.out
+echo -e "${SNPId}\t${VAR_TYPE}\t${each}" >> ${LIST}_V2_results.out
 done
+else
+echo -e "${SNPId}\t${VAR_TYPE}\tNA\tNA\tNA\tNA\tNA" >> ${LIST}_V2_results.out
 fi
 done
+sed -i "s/\r//g"  ${LIST}_V2_results.out
+
+@@@@@ Open these two output files on Excel spreadsheet `Zhaoming_and_qin_in_VCF_prior_to_any_QC.xlxs` on Z:\ResearchHome\Groups\sapkogrp\projects\Genomics\common\attr_fraction
+@@@@@ I have checked the concordance of these variants manually.
+
+#####################################################
+## Now search these variants in the VCF I prepared ##
+#####################################################
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf
+
+# Let's merge the vcf.gz 
+module load bcftools
+FILES=$(ls MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz| sort -V)
+bcftools concat ${FILES} -Oz -o MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr.ALL.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz 
+bcftools index -f -t --threads 20 MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr.ALL.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz 
+
+
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/zhaoming_et_al_SNV_INDEL_Search_list_V2.bed .
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/qin_et_al_SNV_INDEL_Search_list_V2.bed .
+
+LIST="zhaoming_et_al_SNV_INDEL_Search_list_V2.bed"
+VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr.ALL.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz"
+zcat ${VCF} | head -10000 | zgrep "^#CHROM"|head -1 | awk '{ print "KEY.varID\tVAR_TYPE\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> POST_QC_VCF_${LIST}_V2_results.out
+for line in $(cat ${LIST}); do
+FOUND_LINE=()	
+query="$(echo ${line}| awk '{ print $6 }')"
+VAR_TYPE="$(echo ${line}| awk '{ print $7 }')"
+SNPId="$(echo ${line}| awk '{ print $1 }')"
+IFS=$'\n'
+FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
+if [ -n "${FOUND_LINE}" ]; then
+for each in "${FOUND_LINE[@]}"
+do
+echo -e "${SNPId}\t${VAR_TYPE}\t${each}" >> POST_QC_VCF_${LIST}_V2_results.out
+done
+else
+echo -e "${SNPId}\t${VAR_TYPE}\tNA\tNA\tNA\tNA\tNA" >> POST_QC_VCF_${LIST}_V2_results.out
+fi
+done
+sed -i "s/\r//g"  POST_QC_VCF_${LIST}_V2_results.out
+
+
+LIST="qin_et_al_SNV_INDEL_Search_list_V2.bed"
+VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr.ALL.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz"
+zcat ${VCF} | head -10000 | zgrep "^#CHROM"|head -1 | awk '{ print "KEY.varID\tVAR_TYPE\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> POST_QC_VCF_${LIST}_V2_results.out
+for line in $(cat ${LIST}); do
+FOUND_LINE=()	
+query="$(echo ${line}| awk '{ print $6 }')"
+VAR_TYPE="$(echo ${line}| awk '{ print $7 }')"
+SNPId="$(echo ${line}| awk '{ print $1 }')"
+IFS=$'\n'
+FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
+if [ -n "${FOUND_LINE}" ]; then
+for each in "${FOUND_LINE[@]}"
+do
+echo -e "${SNPId}\t${VAR_TYPE}\t${each}" >> POST_QC_VCF_${LIST}_V2_results.out
+done
+else
+echo -e "${SNPId}\t${VAR_TYPE}\tNA\tNA\tNA\tNA\tNA" >> POST_QC_VCF_${LIST}_V2_results.out
+fi
+done
+sed -i "s/\r//g"  POST_QC_VCF_${LIST}_V2_results.out

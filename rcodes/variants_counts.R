@@ -95,7 +95,7 @@ cbind(sapply(strsplit(zhaoming.etal.vars$KEY.pos,":"), `[`, 1), sapply(strsplit(
 #############################
 #############################
 # https://pcingola.github.io/SnpEff/adds/VCFannotationformat_v1.0.pdf
-setwd("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/")
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION")
 ## read annotated SJLIFE annotated VCF 
 # Loop over all chromosomes
 chromosomes <- 1:22
@@ -156,9 +156,7 @@ FINAL.VCF <- rbind.data.frame(FINAL.VCF, VCF)
 # Likely-Pathogenic in ClinVar
 FINAL.VCF.missense <- FINAL.VCF[grepl("missense", FINAL.VCF$`ANN[*].EFFECT`),]
 
-save.image("SNPEFF_clinvar_metaSVM_from_R_filtering_process.RData")
 
-load("SNPEFF_clinvar_metaSVM_from_R_filtering_process.RData")
 
 #######################################################################
 ## Check which of the variants from the previous studies are present ##
@@ -258,6 +256,7 @@ zhaoming.etal.vars$START[zhaoming.etal.vars$varTypes == "INDEL"] <- as.numeric(z
 ## BED file
 write.table(cbind.data.frame(zhaoming.etal.vars$CHROM,zhaoming.etal.vars$START, zhaoming.etal.vars$END), "zhaoming_et_al_variants.bed", row.names = F, col.names = F, quote = F, sep = "\t")
 
+
 # Now check how many of the SNVs are in LOF and CLINVAR annotation in our dataset
 
 zhaoming.SNV <- zhaoming.etal.vars[zhaoming.etal.vars$varTypes == "SNV",]
@@ -274,7 +273,7 @@ sum(unique(zhaoming.SNV$KEY.varID) %in% FINAL.VCF$KEY.varID)
 # 123
 
 # In LOF
-LOF <- fread("LoF_variants_ID.txt")
+LOF <- fread("LoF_variants_ID.txt", header = F)
 LOF <- as.character(LOF$V1)
 sum(unique(zhaoming.SNV$KEY.varID) %in% LOF)
 # 128
@@ -299,6 +298,17 @@ zhaoming.INDEL.edited$KEY.varID <- gsub(" ","",zhaoming.INDEL.edited$KEY.varID)
 zhaoming.INDEL.edited$tabix_query <- paste0(zhaoming.INDEL.edited$CHROM, ":", zhaoming.INDEL.edited$START, "-", zhaoming.INDEL.edited$END)
 zhaoming.INDEL.edited$tabix_query_PM_10bps <- paste0(zhaoming.INDEL.edited$CHROM, ":", zhaoming.INDEL.edited$START-9, "-", zhaoming.INDEL.edited$END+9)
 write.table(zhaoming.INDEL.edited, "zhaoming_et_al_variants_INDEL.bed", row.names = F, col.names = F, quote = F, sep = "\t")
+## Create another bed with INDELs +/- 10 and SNVs with START-1
+BED.zhaoming.indel.snv <- cbind.data.frame(CHR = zhaoming.SNV$CHROM, START = zhaoming.SNV$START-1, END = zhaoming.SNV$END)
+CHR <- sapply(strsplit(as.character(zhaoming.INDEL.edited$tabix_query_PM_10bps),':'), "[", 1)
+START <- gsub("-.*","",sapply(strsplit(as.character(zhaoming.INDEL.edited$tabix_query_PM_10bps),':'), "[", 2))
+END <- gsub(".*-","",sapply(strsplit(as.character(zhaoming.INDEL.edited$tabix_query_PM_10bps),':'), "[", 2))
+BED.zhaoming.indel.snv <- rbind.data.frame(BED.zhaoming.indel.snv, cbind.data.frame(CHR,START, END))
+
+BED.zhaoming.indel.snv$KEY <- paste(BED.zhaoming.indel.snv$CHR,BED.zhaoming.indel.snv$START, BED.zhaoming.indel.snv$END, sep= ":")
+BED.zhaoming.indel.snv <- BED.zhaoming.indel.snv %>% distinct(KEY, .keep_all = TRUE)
+write.table(BED.zhaoming.indel.snv[1:3], "zhaoming_et_al_SNV_start_minus_1_INDEL_plus_min_10.bed", row.names = F, col.names = F, quote = F, sep = "\t")
+
 
 ###############
 ## Qin et al ##
@@ -316,6 +326,49 @@ qin.INDEL.edited$tabix_query <- paste0(qin.INDEL.edited$CHROM, ":", qin.INDEL.ed
 qin.INDEL.edited$tabix_query_PM_10bps <- paste0(qin.INDEL.edited$CHROM, ":", qin.INDEL.edited$START-9, "-", qin.INDEL.edited$END+9)
 write.table(qin.INDEL.edited, "qin_et_al_variants_INDEL.bed", row.names = F, col.names = F, quote = F, sep = "\t")
 
+
+## Create another bed with INDELs +/- 10 and SNVs with START-1
+BED.qin.indel.snv <- cbind.data.frame(CHR = qin.SNV$CHROM, START = qin.SNV$START-1, END = qin.SNV$END)
+CHR <- sapply(strsplit(as.character(qin.INDEL.edited$tabix_query_PM_10bps),':'), "[", 1)
+START <- gsub("-.*","",sapply(strsplit(as.character(qin.INDEL.edited$tabix_query_PM_10bps),':'), "[", 2))
+END <- gsub(".*-","",sapply(strsplit(as.character(qin.INDEL.edited$tabix_query_PM_10bps),':'), "[", 2))
+BED.qin.indel.snv <- rbind.data.frame(BED.qin.indel.snv, cbind.data.frame(CHR,START, END))
+
+BED.qin.indel.snv$KEY <- paste(BED.qin.indel.snv$CHR,BED.qin.indel.snv$START, BED.qin.indel.snv$END, sep= ":")
+BED.qin.indel.snv <- BED.qin.indel.snv %>% distinct(KEY, .keep_all = TRUE)
+write.table(BED.qin.indel.snv[1:3], "qin_et_al_SNV_start_minus_1_INDEL_plus_min_10.bed", row.names = F, col.names = F, quote = F, sep = "\t")
+
+
+## Create second search list
+# Zhaoming
+zhaoming.SNV.edited <- zhaoming.SNV %>% distinct(KEY.varID, .keep_all = TRUE)
+zhaoming.SNV.edited <- cbind.data.frame(KEY.varID = zhaoming.SNV.edited$KEY.varID, CHROM = zhaoming.SNV.edited$CHROM, START = zhaoming.SNV.edited$START, END = zhaoming.SNV.edited$END)
+zhaoming.SNV.edited$tabix_query <- paste0(zhaoming.SNV.edited$CHROM, ":", zhaoming.SNV.edited$START, "-", zhaoming.SNV.edited$END)
+zhaoming.SNV.edited$tabix_query_PM_10bps <- zhaoming.SNV.edited$tabix_query
+zhaoming.SNV.edited$TYPE <- "SNV"
+zhaoming.INDEL.edited$TYPE <- "INDEL" 
+zhaoming.SNV.INDEL.search.list <- rbind.data.frame(zhaoming.INDEL.edited, zhaoming.SNV.edited)
+write.table(zhaoming.SNV.INDEL.search.list, "zhaoming_et_al_SNV_INDEL_Search_list_V2.bed", row.names = F, col.names = F, quote = F, sep = "\t")
+
+
+# Qin
+qin.SNV.edited <- qin.SNV %>% distinct(KEY.varID, .keep_all = TRUE)
+qin.SNV.edited <- cbind.data.frame(KEY.varID = qin.SNV.edited$KEY.varID, CHROM = qin.SNV.edited$CHROM, START = qin.SNV.edited$START, END = qin.SNV.edited$END)
+qin.SNV.edited$tabix_query <- paste0(qin.SNV.edited$CHROM, ":", qin.SNV.edited$START, "-", qin.SNV.edited$END)
+qin.SNV.edited$tabix_query_PM_10bps <- qin.SNV.edited$tabix_query
+qin.SNV.edited$TYPE <- "SNV"
+qin.INDEL.edited$TYPE <- "INDEL" 
+qin.SNV.INDEL.search.list <- rbind.data.frame(qin.INDEL.edited, qin.SNV.edited)
+write.table(qin.SNV.INDEL.search.list, "qin_et_al_SNV_INDEL_Search_list_V2.bed", row.names = F, col.names = F, quote = F, sep = "\t")
+
+
+# KEY.varID CHROM     START       END              tabix_query     tabix_query_PM_10bps
+# 1       chr2:47803501:C:-  chr2  47803500  47803503   chr2:47803500-47803503   chr2:47803491-47803512
+# 2 chr2:68513118:AAACACC:-  chr2  68513117  68513126   chr2:68513117-68513126   chr2:68513108-68513135
+# 3   chr14:75047853:-:16bp chr14  75047852  75047870  chr14:75047852-75047870  chr14:75047843-75047879
+# 4   chr13:32339288:AAAG:- chr13  32339287  32339293  chr13:32339287-32339293  chr13:32339278-32339302
+# 5   chr16:1775961:TCCCC:- chr16   1775960   1775967    chr16:1775960-1775967    chr16:1775951-1775976
+# 6      chr2:127272935:T:-  chr2 127272934 127272937 chr2:127272934-127272937 chr2:127272925-127272946
 
 # Now compare how many from zhaoming.INDEL.edited.bed were found in
 # zhaoming_et_al_variants_INDEL.bed.out There is a excel file I have created for
@@ -346,6 +399,47 @@ tt <- non.intron.LoF[non.intron.LoF$KEY.varID %in% unique(zhaoming.SNV$KEY.varID
 
 
 
+#####################################################################
+#####################################################################
+#####################################################################
+#####################################################################
+
+##################################################
+## Now, check these in original VCFs from Yadav ##
+##################################################
+## Zhaoming
+zhaoming_in_vcf <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/Zhaoming_in_VCF_prior_to_any_QC.txt", sep = "\t", header = T, check.names = F)
+zhaoming_in_vcf <- zhaoming_in_vcf[1:10]
+head(zhaoming_in_vcf)
+# zhaoming_in_vcf <- zhaoming_in_vcf[zhaoming_in_vcf$Match_per_var == "Y",]
+
+zhaoming_in_vcf$MATCHED.IN.CLINVAR <- ""
+zhaoming_in_vcf$MATCHED.IN.MetaSVM <- ""
+zhaoming_in_vcf$MATCHED.IN.LOF <- ""
+zhaoming_in_vcf$MATCHED.IN.ANY.ANNOTATION <- ""
+zhaoming_in_vcf$MATCHED.IN.CLINVAR[zhaoming_in_vcf$ID %in% CLINVAR$KEY.varID] <- "Y"
+zhaoming_in_vcf$MATCHED.IN.MetaSVM[zhaoming_in_vcf$ID %in% MetaSVM$KEY.varID] <- "Y"
+zhaoming_in_vcf$MATCHED.IN.LOF[zhaoming_in_vcf$ID %in% LOF.VCF$KEY.varID] <- "Y"
+zhaoming_in_vcf$MATCHED.IN.ANY.ANNOTATION[zhaoming_in_vcf$ID %in% unique(c(CLINVAR$KEY.varID, MetaSVM$KEY.varID, LOF.VCF$KEY.varID))] <- "Y"
+
+# Now if zhaoming_in_vcf$Match_YN is not Y, then make all columns Not Y
+zhaoming_in_vcf[!zhaoming_in_vcf$Match_YN == "Y",c("MATCHED.IN.CLINVAR", "MATCHED.IN.MetaSVM", "MATCHED.IN.LOF", "MATCHED.IN.ANY.ANNOTATION")] <- ""
+zhaoming_in_vcf$notes <- ""
+## Note: Match_per_var is where the variants in VCF match exactly (YES/NO). It is a unique Y/N value per variant whereas Match_YN could have duplicate YES/or NOs
+library(dplyr)
+library(tidyr)
+# Return column names in a column where the value matches a given string
+zhaoming_in_vcf <- zhaoming_in_vcf %>% 
+  mutate(across(c(MATCHED.IN.CLINVAR, MATCHED.IN.MetaSVM, MATCHED.IN.LOF), ~case_when(. == "Y" ~ cur_column()), .names = 'new_{col}')) %>%
+  unite(notes, starts_with('new'), na.rm = TRUE, sep = ';')
+zhaoming_in_vcf$notes <- gsub("MATCHED.IN.", "", zhaoming_in_vcf$notes)
+
+zhaoming_in_vcf$notes [zhaoming_in_vcf$Match_per_var =="Y" & !zhaoming_in_vcf$MATCHED.IN.ANY.ANNOTATION == "Y" ] <- "QC_DROPPED"
+zhaoming_in_vcf$notes [is.na(zhaoming_in_vcf$ID)] <- "NOT_CALLED_BY_GATK"
+
+write.table(zhaoming_in_vcf, " Zhaoming_and_qin_in_VCF_prior_to_any_QC_Final_list.txt", row.names = F, col.names = F, quote = F, sep = "\t")
+
+
 ##################################
 ## How many variants per gene ? ##
 ##################################
@@ -354,40 +448,21 @@ group_and_concat <- df %>%
   dplyr::select(`ANN[*].GENE`, KEY.varID) %>% 
   dplyr::group_by(`ANN[*].GENE`) %>%
   dplyr::summarise(all_variants_SJLIFE = paste(KEY.varID, collapse = ","))
-  
+
 group_and_concat$counts_var_SJLIFE <- lengths(strsplit(group_and_concat$all_variants_SJLIFE, ","))
 
 qin.genes.vars <- qin.etal.vars
 unique(qin.etal.vars$Gene) %in% group_and_concat$`ANN[*].GENE` 
 
-#####################################################################
-#####################################################################
-#####################################################################
-#####################################################################
+
+
+save.image("SNPEFF_clinvar_metaSVM_from_R_filtering_process.RData")
+
+load("SNPEFF_clinvar_metaSVM_from_R_filtering_process.RData")
 
 
 
-
-
-
-## Check these in original VCFs from Yadav
-zhaoming_original_VCF <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/zhaoming_vars_vcf.txt")
-zhaoming_original_VCF$V2 <- paste0("chr", zhaoming_original_VCF$V1,":", zhaoming_original_VCF$V4, ":", zhaoming_original_VCF$V5, ":", zhaoming_original_VCF$V6)
-zhaoming_original_VCF$KEY.Pos <- paste0("chr", zhaoming_original_VCF$V1,":", zhaoming_original_VCF$V4)
-write.table(zhaoming_original_VCF, "Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/zhaoming_vars_vcf_edited.txt", col.names = F, row.names = F, quote = F, sep = "\t")
-sum(unique(zhaoming.etal.vars$KEY.pos) %in% zhaoming_original_VCF$KEY.Pos)
-sum(unique(zhaoming.etal.vars$KEY.varID) %in% zhaoming_original_VCF$V2)
-
-
-qin_original_VCF <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/qin_vars_vcf.txt")
-qin_original_VCF$V2 <- paste0("chr", qin_original_VCF$V1,":", qin_original_VCF$V4, ":", qin_original_VCF$V5, ":", qin_original_VCF$V6)
-qin_original_VCF$KEY.Pos <- paste0("chr", qin_original_VCF$V1,":", qin_original_VCF$V4)
-write.table(qin_original_VCF, "Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/qin_vars_vcf_edited.txt", col.names = F, row.names = F, quote = F, sep = "\t")
-sum(unique(qin.etal.vars$KEY.pos) %in% qin_original_VCF$KEY.Pos)
-sum(unique(qin.etal.vars$KEY.varID) %in% qin_original_VCF$V2)
-# as.data.frame(table(FINAL.VCF$`ANN[*].EFFECT`))
-# 
-# 
+ 
 # CLINVAR <- FINAL.VCF[grepl("Clinvar", FINAL.VCF$PRED_TYPE),]
 # MetaSVM <- FINAL.VCF[grepl("MetaSVM", FINAL.VCF$PRED_TYPE),]
 # 
