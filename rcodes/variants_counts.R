@@ -410,7 +410,7 @@ tt <- non.intron.LoF[non.intron.LoF$KEY.varID %in% unique(zhaoming.SNV$KEY.varID
 ## Zhaoming ##
 ##############
 zhaoming_in_vcf <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/Zhaoming_in_VCF_prior_to_any_QC.txt", sep = "\t", header = T, check.names = F)
-zhaoming_in_vcf <- zhaoming_in_vcf[1:10]
+zhaoming_in_vcf <- zhaoming_in_vcf[1:11]
 head(zhaoming_in_vcf)
 # zhaoming_in_vcf <- zhaoming_in_vcf[zhaoming_in_vcf$Match_per_var == "Y",]
 
@@ -435,7 +435,8 @@ zhaoming_in_vcf <- zhaoming_in_vcf %>%
   unite(notes, starts_with('new'), na.rm = TRUE, sep = ';')
 zhaoming_in_vcf$notes <- gsub("MATCHED.IN.", "", zhaoming_in_vcf$notes)
 
-zhaoming_in_vcf$notes [zhaoming_in_vcf$Match_per_var =="Y" & !zhaoming_in_vcf$MATCHED.IN.ANY.ANNOTATION == "Y" ] <- "QC_DROPPED"
+zhaoming_in_vcf$notes [zhaoming_in_vcf$QC_Dropped == "QC_Dropped"] <- "QC_Dropped"
+# zhaoming_in_vcf$notes [zhaoming_in_vcf$Match_per_var =="Y" & !zhaoming_in_vcf$MATCHED.IN.ANY.ANNOTATION == "Y" ] <- "QC_DROPPED"
 zhaoming_in_vcf$notes [is.na(zhaoming_in_vcf$ID)] <- "NOT_CALLED_BY_GATK"
 
 zhaoming_in_vcf$notes [zhaoming_in_vcf$Match_per_var =="N" & !is.na(zhaoming_in_vcf$ID)] <- "Not_Matched"
@@ -446,7 +447,7 @@ write.table(zhaoming_in_vcf, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/
 ## Qin ##
 #########
 qin_in_vcf <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/qin_in_VCF_prior_to_any_QC.txt", sep = "\t", header = T, check.names = F)
-qin_in_vcf <- qin_in_vcf[1:10]
+qin_in_vcf <- qin_in_vcf[1:11]
 head(qin_in_vcf)
 # qin_in_vcf <- qin_in_vcf[qin_in_vcf$Match_per_var == "Y",]
 
@@ -471,7 +472,8 @@ qin_in_vcf <- qin_in_vcf %>%
   unite(notes, starts_with('new'), na.rm = TRUE, sep = ';')
 qin_in_vcf$notes <- gsub("MATCHED.IN.", "", qin_in_vcf$notes)
 
-qin_in_vcf$notes [qin_in_vcf$Match_per_var =="Y" & !qin_in_vcf$MATCHED.IN.ANY.ANNOTATION == "Y" ] <- "QC_DROPPED"
+qin_in_vcf$notes [qin_in_vcf$QC_Dropped == "QC_Dropped"] <- "QC_Dropped"
+# qin_in_vcf$notes [qin_in_vcf$Match_per_var =="Y" & !qin_in_vcf$MATCHED.IN.ANY.ANNOTATION == "Y" ] <- "QC_DROPPED"
 qin_in_vcf$notes [is.na(qin_in_vcf$ID)] <- "NOT_CALLED_BY_GATK"
 
 qin_in_vcf$notes [qin_in_vcf$Match_per_var =="N" & !is.na(qin_in_vcf$ID)] <- "Not_Matched"
