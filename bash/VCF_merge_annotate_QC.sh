@@ -837,7 +837,7 @@ module load bcftools
 ## Now, I will manually check each indel for exact match.
 # From Zhaoming's list of INDELs, I was able to find only 70/133 INDELs in our VCF
 # From Qin's list of INDELs, I was able to find only 82/181 INDELs in our VCF
-# This is save as zhaoming_and_qin_et_al_variant_INDEL_comparison_in_SJLIFE.xlxs on /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf
+# This is saved as zhaoming_and_qin_et_al_variant_INDEL_comparison_in_SJLIFE.xlxs on /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf
 
 
 # Also checking these in Yadav's VCF files
@@ -1098,3 +1098,137 @@ sed -i "s/\r//g"  POST_QC_VCF_${LIST}_V2_results.out
 # zhaoming_in_vcf$notes [is.na(zhaoming_in_vcf$ID)] <- "NOT_CALLED_BY_GATK"
 
 # write.table(zhaoming_in_vcf, " Zhaoming_and_qin_in_VCF_prior_to_any_QC_Final_list.txt", row.names = F, col.names = F, quote = F, sep = "\t")
+
+#################################################################
+## Checking if any of the variants not called by GATK present: ##
+#################################################################
+# ## Zhaoming:
+# for var in chr12:25245328:C:G chr13:48473359:G:A chr17:7674230:C:T chr12:111418878:G:A
+
+# arr_variable=(chr12:25245328-25245328 chr13:48473359-48473359 chr17:7674230-7674230 chr12:111418878-111418878)
+
+# ## now loop through the above array
+# VCF="sorted_sjlife_1_zhaoming_v2.vcf.gz"
+# VCF="sorted_sjlife_2_zhaoming_v2.vcf.gz"
+
+# for i in "${arr_variable[@]}"
+# do
+# tabix ${VCF} $i| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }'
+# done
+
+# arr_variable=(chr5:75584794-75584794)
+# VCF="sorted_sjlife_1_qin_v2.vcf.gz"
+# VCF="sorted_sjlife_2_qin_v2.vcf.gz"
+
+# for i in "${arr_variable[@]}"
+# do
+# tabix ${VCF} $i| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }'
+# done
+
+# ## None were found in individual VCFs
+
+module load vcftools
+TYPE="zhaoming"
+# TYPE="qin"
+VCF="MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.vcf.gz"
+
+
+vcftools --gzvcf ${VCF} \
+--minGQ 5 \
+--min-meanDP 5 \
+--recode \
+--stdout \
+| bgzip > MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.dp5.gq5.no.filter.pass.vcf.gz
+
+
+vcftools --gzvcf ${VCF} \
+--keep-filtered PASS \
+--minGQ 5 \
+--min-meanDP 5 \
+--recode \
+--stdout \
+| bgzip > MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.dp5.gq5.pass.vcf.gz
+
+
+vcftools --gzvcf ${VCF} \
+--keep-filtered PASS \
+--minGQ 10 \
+--min-meanDP 5 \
+--recode \
+--stdout \
+| bgzip > MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.dp5.gq10.pass.vcf.gz
+
+vcftools --gzvcf ${VCF} \
+--keep-filtered PASS \
+--minGQ 15 \
+--min-meanDP 10 \
+--recode \
+--stdout \
+| bgzip > MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.dp10.gq15.pass.vcf.gz
+
+vcftools --gzvcf ${VCF} \
+--keep-filtered PASS \
+--minGQ 20 \
+--min-meanDP 10 \
+--recode \
+--stdout \
+| bgzip > MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.dp10.gq20.pass.vcf.gz
+
+
+vcftools --gzvcf ${VCF} \
+--minGQ 20 \
+--min-meanDP 10 \
+--recode \
+--stdout \
+| bgzip > MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.dp10.gq20.no.filterpass.vcf.gz
+
+
+# Now let's check the vars determined to be dropped in qin VCF are really dropped after applying this QC
+# echo $(cat vars_dropped_in_QC_qin.txt| paste -s -d"|")
+# wc -l vars_dropped_in_QC_qin.txt
+# 106 vars
+TYPE="qin"
+var="chr14:75047852:T:TAACTCGCCCATAACTA|chr13:32339287:AAAAG:A|chr16:1775960:TTCCCC:T|chr2:127272934:CT:C|chr6:30708301:ACT:A|chr8:42355545:CATCATCAGCGAATTGGGCTGAAGTAAG:C|chr6:31759819:GCCAGGTGCTGGCA:G|chr15:30905539:GGTTGAAAAACGTGAGGCAT:G|chr17:43070931:TTCTTCTGGGGTCAGGCCAG:T|chr13:102872217:C:CA|chr3:121522031:TAC:T|chr1:27894301:CCA:C|chr17:58732547:CAGT:C|chr9:35074172:GGACGGATCCA:G|chr13:32362626:GCCTTT:G|chr7:7639125:AT:A|chr8:89984550:CA:C|chr19:49862556:GAA:G|chr15:89333601:G:GCTA|chr3:14147980:GCAGACGATGTATC:G|chr12:21475808:AAAAC:A|chr11:65860844:GAGGCGACCCGCAGC:G|chr13:102862141:CAG:C|chr12:21471424:ATACT:A|chr6:30707797:ACT:A|chr6:30708067:G:GT|chr15:89324187:CCT:C|chr13:32337160:TAAAC:T|chr19:45364832:CCTCA:C|chr2:68490198:CAA:C|chr14:45159189:C:CA|chr14:75030646:CT:C|chr7:44073203:A:AG|chr17:43094316:TGATTCAGACTCCCCATCATGTGAGTCATCAGAACCTAACA:T|chr10:49471091:CTA:C|chr10:101579579:AG:A|chr17:35101325:AGCCTCCC:A|chr2:127286924:C:CACTGCT|chr4:83462857:CAAAG:C|chr6:35457937:G:GC|chr15:30905892:T:TA|chr5:132609339:CAAAG:C|chr13:32379464:AC:A|chr17:43124027:ACT:A|chr10:49461381:CCT:C|chr1:241861444:GA:G|chr15:90765412:GATGTAAGTT:G|chr14:45189222:AC:A|chr2:127289348:CAA:C|chr8:11786115:C:CAGCA|chr7:44080814:T:TG|chr5:80672319:C:CTG|chr17:43092848:GTT:G|chr5:132604019:CAA:C|chr16:3589547:CCT:C|chr10:49482711:T:TC|chr1:75815039:A:AT|chr11:65862211:AAT:A|chr10:49472935:CTGGGTCATAGA:C|chr17:50376072:T:TA|chr9:35079169:G:GC|chr1:46273464:AG:A|chr1:46260006:TC:T|chr13:32337160:TA:T|chr1:2201225:CCT:C|chr4:177341536:GGT:G|chr10:14936586:TCTTC:T|chr14:20352261:A:AC|chr1:241878811:ATG:A|chr13:32339482:TTATG:T|chr3:129433215:GA:G|chr13:32339062:CAG:C|chr7:5997348:CG:C|chr9:97689554:CA:C|chr14:45137187:GTGTT:G|chr19:48137531:AG:A|chr16:13926709:AAG:A|chr16:89740841:GAGA:G|chr11:22625192:CCGCTATCACCTTCAGGAAGTTGTTCTGAGGCAAG:C|chr17:34983545:C:CAT|chr16:23635228:AC:A|chr5:176908638:TG:T|chr5:132589652:ACT:A|chr1:226365988:G:GT|chr10:101579754:AC:A|chr19:43560989:TC:T|chr17:61715948:T:TA|chr17:34983189:AG:A|chr3:14156338:GAGTAGACCGC:G|chr3:121489730:TA:T|chr5:132557417:T:TA|chr8:94387020:AG:A|chr2:47799609:CAAAG:C|chr5:75569452:T:TG|chr15:43457065:C:CT|chr15:75349042:G:GC|chr1:46274204:CA:C|chr14:60734947:ACT:A|chr2:68526220:AAG:A|chr19:49862415:GA:G|chr7:44074235:T:G|chr11:47234610:C:T|chr11:65863848:C:T|chr11:65861036:C:T|chr11:61331693:T:G"
+echo -e "${TYPE} vars from VCF with no filter\t $(zgrep -Ew $var MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.vcf.gz| wc -l)"  > variant_counts_at_different_hard_filters.txt
+echo -e "${TYPE} vars from VCF after dp5, gq5 NOpass filter\t $(zgrep -Ew $var MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.dp5.gq5.no.filter.pass.vcf.gz| wc -l)"  >> variant_counts_at_different_hard_filters.txt
+echo -e "${TYPE} vars from VCF after dp5, gq5 pass filter\t $(zgrep -Ew $var MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.dp5.gq5.pass.vcf.gz | wc -l)" >> variant_counts_at_different_hard_filters.txt
+echo -e "${TYPE} vars from VCF after dp5, gq10 pass filter\t $(zgrep -Ew $var MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.dp5.gq10.pass.vcf.gz | wc -l)" >> variant_counts_at_different_hard_filters.txt
+echo -e "${TYPE} vars from VCF after dp10, gq15 pass filter\t $(zgrep -Ew $var MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.dp10.gq15.pass.vcf.gz | wc -l)" >> variant_counts_at_different_hard_filters.txt
+echo -e "${TYPE} vars from VCF after dp10, gq20 pass filter\t $(zgrep -Ew $var MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.dp10.gq20.pass.vcf.gz | wc -l)" >> variant_counts_at_different_hard_filters.txt
+echo -e "${TYPE} vars from VCF after dp10, gq20 NOpass filter\t $(zgrep -Ew $var MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.dp10.gq20.no.filterpass.vcf.gz | wc -l)" >> variant_counts_at_different_hard_filters.txt
+
+
+
+
+# echo $(cat vars_dropped_in_QC_zhaoming.txt| paste -s -d"|")
+# wc -l vars_dropped_in_QC_zhaoming.txt
+# 67 
+# for var in $(cat vars_dropped_in_QC_zhaoming.txt); do
+# 	echo "doing: $var"
+# 	zgrep -w $var MERGED_biallelic_sorted_sjlife_1_2_zhaoming_ID_edited.vcf.gz| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' 
+# done
+TYPE="zhaoming"
+var="chr5:112839210:AG:A|chr17:43094316:TGATTCAGACTCCCCATCATGTGAGTCATCAGAACCTAACA:T|chr17:43124027:ACT:A|chr17:43070931:TTCTTCTGGGGTCAGGCCAG:T|chr13:32339062:CAG:C|chr13:32339287:AAAAG:A|chr13:32339482:TTATG:T|chr13:32337160:TAAAC:T|chr13:32337160:TA:T|chr16:68823523:CTG:C|chr14:95103391:G:GT|chr14:95117713:TA:T|chr2:47799609:CAAAG:C|chr17:31227281:G:GA|chr17:31259066:CA:C|chr17:31229953:CAA:C|chr17:31258501:AG:A|chr16:23635228:AC:A|chr9:37020778:C:CA|chr9:95485696:G:GTA|chr9:95458145:GC:G|chr13:48345089:AT:A|chr13:48349012:TA:T|chr13:48381280:AT:A|chr13:48364922:TA:T|chr13:48303990:G:GC|chr10:102627189:AG:A|chr10:102630077:CAA:C|chr17:7676152:C:CG|chr16:2060686:AC:A|chr11:32396281:G:GT|chr15:90765412:GATGTAAGTT:G|chr17:61715948:T:TA|chr17:8237439:GCTTT:G|chr11:10764306:AG:A|chr2:232210386:C:CT|chr19:45364832:CCTCA:C|chr2:127272934:CT:C|chr2:127286924:C:CACTGCT|chr2:127289348:CAA:C|chr13:102872217:C:CA|chr13:102862141:CAG:C|chr10:49482711:T:TC|chr10:49472935:CTGGGTCATAGA:C|chr10:49461381:CCT:C|chr16:89740841:GAGA:G|chr6:35457937:G:GC|chr11:22625192:CCGCTATCACCTTCAGGAAGTTGTTCTGAGGCAAG:C|chr9:35074172:GGACGGATCCA:G|chr14:45159189:C:CA|chr14:45189222:AC:A|chr14:45137187:GTGTT:G|chr4:54699759:ACAGT:A|chr5:132604019:CAA:C|chr5:132557417:T:TA|chr5:132609339:CAAAG:C|chr17:35101325:AGCCTCCC:A|chr8:144513108:CAT:C|chr8:144516695:GC:G|chr8:144514362:TC:T|chr16:3589547:CCT:C|chr8:31081140:AG:A|chr9:97689554:CA:C|chr3:14156338:GAGTAGACCGC:G|chr11:112093129:C:T|chr11:108325416:C:T|chr11:47234610:C:T"
+echo -e "${TYPE} vars from VCF with no filter\t $(zgrep -Ew $var MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.vcf.gz| wc -l)"  >> variant_counts_at_different_hard_filters.txt
+echo -e "${TYPE} vars from VCF after dp5, gq5 NOpass filter\t $(zgrep -Ew $var MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.dp5.gq5.no.filter.pass.vcf.gz| wc -l)"  >> variant_counts_at_different_hard_filters.txt
+echo -e "${TYPE} vars from VCF after dp5, gq5 pass filter\t $(zgrep -Ew $var MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.dp5.gq5.pass.vcf.gz | wc -l)" >> variant_counts_at_different_hard_filters.txt
+echo -e "${TYPE} vars from VCF after dp5, gq10 pass filter\t $(zgrep -Ew $var MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.dp5.gq10.pass.vcf.gz | wc -l)" >> variant_counts_at_different_hard_filters.txt
+echo -e "${TYPE} vars from VCF after dp10, gq15 pass filter\t $(zgrep -Ew $var MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.dp10.gq15.pass.vcf.gz | wc -l)" >> variant_counts_at_different_hard_filters.txt
+echo -e "${TYPE} vars from VCF after dp10, gq20 pass filter\t $(zgrep -Ew $var MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.dp10.gq20.pass.vcf.gz | wc -l)" >> variant_counts_at_different_hard_filters.txt
+echo -e "${TYPE} vars from VCF after dp10, gq20 NOpass filter\t $(zgrep -Ew $var MERGED_biallelic_sorted_sjlife_1_2_${TYPE}_ID_edited.dp10.gq20.no.filterpass.vcf.gz | wc -l)" >> variant_counts_at_different_hard_filters.txt
+
+# Most of these variants failed because they did not pass VQSR during hard filtering
+# qin vars from VCF with no filter         108
+# qin vars from VCF after dp5, gq5 NOpass filter   108
+# qin vars from VCF after dp5, gq5 pass filter     1
+# qin vars from VCF after dp5, gq10 pass filter    1
+# qin vars from VCF after dp10, gq15 pass filter   1
+# qin vars from VCF after dp10, gq20 pass filter   1
+# qin vars from VCF after dp10, gq20 NOpass filter         108
+# zhaoming vars from VCF with no filter    71
+# zhaoming vars from VCF after dp5, gq5 NOpass filter      71
+# zhaoming vars from VCF after dp5, gq5 pass filter        0
+# zhaoming vars from VCF after dp5, gq10 pass filter       0
+# zhaoming vars from VCF after dp10, gq15 pass filter      0
+# zhaoming vars from VCF after dp10, gq20 pass filter      0
+# zhaoming vars from VCF after dp10, gq20 NOpass filter    71
