@@ -50,11 +50,55 @@ ln -s ../MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC.vcf.gz .
 cat ../rename_VCF_ids_to_sjlids.txt ../SJLIFEWGS_3006_vcfid_to_sjlid.linkfile > rename_link_file.txt .
 mkdir logs
 
+##########################
+## Edit PRS score files ##
+##########################
+
 # Sites to look for PRS:
 # https://prsweb.sph.umich.edu:8443/displayData/displayTable?select_desc=174.1&select_phenomes=MGI&select_odds=2
 # https://www.pgscatalog.org/score/PGS000015/
+##################################
+## Breast cancer (Michigan web) ##
+##################################
+awk ' {FS=OFS="\t"; $(NF+1) = "Chr"$1":"$2 }1' PRSWEB_PHECODE174.1_Onco-iCOGS-Overall-BRCA_PRS-CS_UKB_20200608_WEIGHTS.txt | grep -v ^## > OVERALL_PRSWEB_PHECODE174.1_Onco-iCOGS-Overall-BRCA_PRS-CS_UKB_20200608_WEIGHTS_edited_1.txt
+awk ' {FS=OFS="\t"; $(NF+1) = "Chr"$1":"$2 }1' PRSWEB_PHECODE174.1_Onco-iCOGS-ER-positive-BRCA_PRS-CS_MGI_20200608_WEIGHTS.txt | grep -v ^## > ER_POS_PRSWEB_PHECODE174.1_Onco-iCOGS-ER-positive-BRCA_PRS-CS_MGI_20200608_WEIGHTS_edited_1.txt
+awk ' {FS=OFS="\t"; $(NF+1) = "Chr"$1":"$2 }1' PRSWEB_PHECODE174.1_GWAS-Catalog-r2019-05-03-X174.1_PT_UKB_20200608_WEIGHTS.txt| grep -v ^## > ER_NEG_PRSWEB_PHECODE174.1_GWAS-Catalog-r2019-05-03-X174.1_PT_UKB_20200608_WEIGHTS_edited_1.txt
 
 
+awk '{print "chr"$1"\t"$2"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6}' OVERALL_PRSWEB_PHECODE174.1_Onco-iCOGS-Overall-BRCA_PRS-CS_UKB_20200608_WEIGHTS_edited_1.txt | sed -n '1d;p' | head> test.bed
+
+# Print last col: awk '{print $(NF)}'
+awk '{print "chr"$1"\t"$2"\t"$2+1"\t"$6}' OVERALL_PRSWEB_PHECODE174.1_Onco-iCOGS-Overall-BRCA_PRS-CS_UKB_20200608_WEIGHTS_edited_1.txt | sed -n '1d;p' > Michigan_OVERALL.bed
+awk '{print "chr"$1"\t"$2"\t"$2+1"\t"$6}' ER_POS_PRSWEB_PHECODE174.1_Onco-iCOGS-ER-positive-BRCA_PRS-CS_MGI_20200608_WEIGHTS_edited_1.txt | sed -n '1d;p' > Michigan_ER_POS.bed
+awk '{print "chr"$1"\t"$2"\t"$2+1"\t"$9}' ER_NEG_PRSWEB_PHECODE174.1_GWAS-Catalog-r2019-05-03-X174.1_PT_UKB_20200608_WEIGHTS_edited_1.txt | sed -n '1d;p' > Michigan_ER_NEG.bed
+
+/home/aneupane/liftover/liftOver Michigan_OVERALL.bed /home/aneupane/liftover/hg19ToHg38.over.chain Michigan_OVERALL_GrCh38.bed Michigan_OVERALL_unmapped.bed
+# [aneupane@noderome164 all_downloads]$ /home/aneupane/liftover/liftOver Michigan_OVERALL.bed /home/aneupane/liftover/hg19ToHg38.over.chain Michigan_OVERALL_GrCh38.bed Michigan_OVERALL_unmapped.bed
+# Reading liftover chains
+# Mapping coordinates
+
+
+## Excel Match =INDEX(Mavaddat_2019_GrCH38_converted!A:A,MATCH(Mavaddat_2019_Table_S7_GRCh37!A2,Mavaddat_2019_GrCH38_converted!D:D,FALSE))
+
+/home/aneupane/liftover/liftOver Michigan_ER_POS.bed /home/aneupane/liftover/hg19ToHg38.over.chain Michigan_ER_POS_GrCh38.bed Michigan_ER_POS_unmapped.bed
+/home/aneupane/liftover/liftOver Michigan_ER_NEG.bed /home/aneupane/liftover/hg19ToHg38.over.chain Michigan_ER_NEG_GrCh38.bed Michigan_ER_NEG_unmapped.bed
+
+###################
+## Mavaddat 2019 ##
+###################
+/home/aneupane/liftover/liftOver Mavaddat_2019_table_S7_GrCh37.bed /home/aneupane/liftover/hg19ToHg38.over.chain Mavaddat_2019_table_S7_GrCh38.bed Mavaddat_2019_table_S7_unmapped.bed
+
+################
+## Khera 2018 ##
+################
+/home/aneupane/liftover/liftOver Khera_2018_Hg19.bed /home/aneupane/liftover/hg19ToHg38.over.chain Khera_2018_Hg19_GrCh38.bed Khera_2018_Hg19_unmapped.bed
+
+
+awk 'FNR==NR{a[$4] = (a[$4]==""?"":a[$4] " ") $2 OFS $3 OFS $4; next}
+    {print $4, ($4 in a ? a[$4] : 0)}' Michigan_ER_NEG_GrCh38.bed ER_NEG_PRSWEB_PHECODE174.1_GWAS-Catalog-r2019-05-03-X174.1_PT_UKB_20200608_WEIGHTS_edited_1.txt
+##########################
+##########################
+##########################
 
 # -f (reference sequence) in bcftools will turn on left-alignment and normalization, however, see also the --do-not-normalize option below. (https://samtools.github.io/bcftools/bcftools.html)
 cat <<\EoF > edit_vcf_header.sh
@@ -116,8 +160,8 @@ done;
 ## VCF annotation ##
 ####################
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation
-ln -s ../*.vcf.gz .
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff
+ln -s ../../MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf.gz* .
 ## See VCF_merge_annotate_QC.sh for details about generating reference files and databases
 
 for i in {1..22}; do \
@@ -125,18 +169,18 @@ export CHR="chr${i}"; \
 echo "Annotating $CHR"; \
 unset INPUT_VCF; \
 export THREADS=4; \
-export INPUT_VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.${CHR}.PASS.decomposed.vcf.gz"; \
+export INPUT_VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.${CHR}.preQC_biallelic_renamed_ID_edited.vcf.gz"; \
 export JAVA="java"; \
 export JAVAOPTS="-Xms4g -Xmx30g"; \
-export WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/"; \
+export WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/"; \
 export REF="/research_jude/rgs01_jude/reference/public/genomes/Homo_sapiens/GRCh38/GRCh38_no_alt/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa"; \
-export SNPEFF="/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/snpEff.jar"; \
-export SNPSIFT="/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/SnpSift.jar"; \
-export CLINVAR="/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/clinvar/clinvar.vcf.gz"
+export SNPEFF="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/snpEff.jar"; \
+export SNPSIFT="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/SnpSift.jar"; \
+export CLINVAR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/clinvar/clinvar.vcf.gz"
 export GATK="/hpcf/apps/gatk/install/3.7/GenomeAnalysisTK.jar"; \
-export DBNSFPfile="/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/dbNSFP/GRCh38/dbNSFP4.1a.txt.gz"; \
-export EXACDB="/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/exac0.3/ExAC.0.3.GRCh38.vcf.gz"; \
-export ONELINEPL="/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/scripts/vcfEffOnePerLine.pl"; \
+export DBNSFPfile="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/dbNSFP/GRCh38/dbNSFP4.1a.txt.gz"; \
+export EXACDB="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/exac0.3/ExAC.0.3.GRCh38.vcf.gz"; \
+export ONELINEPL="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/scripts/vcfEffOnePerLine.pl"; \
 bsub \
 	-P "${CHR}_annotate" \
 	-J "${CHR}_annotate" \

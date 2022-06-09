@@ -505,6 +505,11 @@ load("SNPEFF_clinvar_metaSVM_from_R_filtering_process.RData")
 
 
 
+
+
+
+
+
  
 # CLINVAR <- FINAL.VCF[grepl("Clinvar", FINAL.VCF$PRED_TYPE),]
 # MetaSVM <- FINAL.VCF[grepl("MetaSVM", FINAL.VCF$PRED_TYPE),]
