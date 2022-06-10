@@ -83,6 +83,7 @@ awk '{print "chr"$1"\t"$2"\t"$2+1"\t"$9}' ER_NEG_PRSWEB_PHECODE174.1_GWAS-Catalo
 /home/aneupane/liftover/liftOver Michigan_ER_POS.bed /home/aneupane/liftover/hg19ToHg38.over.chain Michigan_ER_POS_GrCh38.bed Michigan_ER_POS_unmapped.bed
 /home/aneupane/liftover/liftOver Michigan_ER_NEG.bed /home/aneupane/liftover/hg19ToHg38.over.chain Michigan_ER_NEG_GrCh38.bed Michigan_ER_NEG_unmapped.bed
 
+
 ###################
 ## Mavaddat 2019 ##
 ###################
@@ -92,6 +93,17 @@ awk '{print "chr"$1"\t"$2"\t"$2+1"\t"$9}' ER_NEG_PRSWEB_PHECODE174.1_GWAS-Catalo
 ## Khera 2018 ##
 ################
 /home/aneupane/liftover/liftOver Khera_2018_Hg19.bed /home/aneupane/liftover/hg19ToHg38.over.chain Khera_2018_Hg19_GrCh38.bed Khera_2018_Hg19_unmapped.bed
+
+####################
+## Vijayakrishnan ##
+####################
+/home/aneupane/liftover/liftOver ALL_Vijayakrishnan_GRCh37.bed /home/aneupane/liftover/hg19ToHg38.over.chain ALL_Vijayakrishnan_Hg19_GrCh38.bed ALL_Vijayakrishnan_Hg19_unmapped.bed
+
+##############################
+## Pleiotropy all Positions ##
+##############################
+/home/aneupane/liftover/liftOver GRCh37_all_pos.bed /home/aneupane/liftover/hg19ToHg38.over.chain GRCh37_all_pos_Hg19_GrCh38.bed GRCh37_all_pos_Hg19_unmapped.bed
+
 
 
 awk 'FNR==NR{a[$4] = (a[$4]==""?"":a[$4] " ") $2 OFS $3 OFS $4; next}
