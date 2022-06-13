@@ -1,7 +1,8 @@
-######################
-## Achal Neupane    ##
-## Date: 05/12/2022 ##
-######################
+###########################
+## Achal Neupane         ##
+## Date: 06/13/2022      ##
+## VCF annotation PRE-QC ##
+###########################
 ## First check how many variants in Zhaoming et al and Qin et al are also in our VCF dataset
 # Read variant lists from Zhaoming et al 
 library(data.table)
