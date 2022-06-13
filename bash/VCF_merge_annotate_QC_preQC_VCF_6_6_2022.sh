@@ -51,95 +51,6 @@ cat ../rename_VCF_ids_to_sjlids.txt ../SJLIFEWGS_3006_vcfid_to_sjlid.linkfile > 
 mkdir logs
 
 ##########################
-## Edit PRS score files ##
-##########################
-
-# Sites to look for PRS:
-# https://prsweb.sph.umich.edu:8443/displayData/displayTable?select_desc=174.1&select_phenomes=MGI&select_odds=2
-# https://www.pgscatalog.org/score/PGS000015/
-##################################
-## Breast cancer (Michigan web) ##
-##################################
-awk ' {FS=OFS="\t"; $(NF+1) = "Chr"$1":"$2 }1' PRSWEB_PHECODE174.1_Onco-iCOGS-Overall-BRCA_PRS-CS_UKB_20200608_WEIGHTS.txt | grep -v ^## > OVERALL_PRSWEB_PHECODE174.1_Onco-iCOGS-Overall-BRCA_PRS-CS_UKB_20200608_WEIGHTS_edited_1.txt
-awk ' {FS=OFS="\t"; $(NF+1) = "Chr"$1":"$2 }1' PRSWEB_PHECODE174.1_Onco-iCOGS-ER-positive-BRCA_PRS-CS_MGI_20200608_WEIGHTS.txt | grep -v ^## > ER_POS_PRSWEB_PHECODE174.1_Onco-iCOGS-ER-positive-BRCA_PRS-CS_MGI_20200608_WEIGHTS_edited_1.txt
-awk ' {FS=OFS="\t"; $(NF+1) = "Chr"$1":"$2 }1' PRSWEB_PHECODE174.1_GWAS-Catalog-r2019-05-03-X174.1_PT_UKB_20200608_WEIGHTS.txt| grep -v ^## > ER_NEG_PRSWEB_PHECODE174.1_GWAS-Catalog-r2019-05-03-X174.1_PT_UKB_20200608_WEIGHTS_edited_1.txt
-
-
-awk '{print "chr"$1"\t"$2"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6}' OVERALL_PRSWEB_PHECODE174.1_Onco-iCOGS-Overall-BRCA_PRS-CS_UKB_20200608_WEIGHTS_edited_1.txt | sed -n '1d;p' | head> test.bed
-
-# Print last col: awk '{print $(NF)}'
-awk '{print "chr"$1"\t"$2"\t"$2+1"\t"$6}' OVERALL_PRSWEB_PHECODE174.1_Onco-iCOGS-Overall-BRCA_PRS-CS_UKB_20200608_WEIGHTS_edited_1.txt | sed -n '1d;p' > Michigan_OVERALL.bed
-awk '{print "chr"$1"\t"$2"\t"$2+1"\t"$6}' ER_POS_PRSWEB_PHECODE174.1_Onco-iCOGS-ER-positive-BRCA_PRS-CS_MGI_20200608_WEIGHTS_edited_1.txt | sed -n '1d;p' > Michigan_ER_POS.bed
-awk '{print "chr"$1"\t"$2"\t"$2+1"\t"$9}' ER_NEG_PRSWEB_PHECODE174.1_GWAS-Catalog-r2019-05-03-X174.1_PT_UKB_20200608_WEIGHTS_edited_1.txt | sed -n '1d;p' > Michigan_ER_NEG.bed
-
-/home/aneupane/liftover/liftOver Michigan_OVERALL.bed /home/aneupane/liftover/hg19ToHg38.over.chain Michigan_OVERALL_GrCh38.bed Michigan_OVERALL_unmapped.bed
-# [aneupane@noderome164 all_downloads]$ /home/aneupane/liftover/liftOver Michigan_OVERALL.bed /home/aneupane/liftover/hg19ToHg38.over.chain Michigan_OVERALL_GrCh38.bed Michigan_OVERALL_unmapped.bed
-# Reading liftover chains
-# Mapping coordinates
-
-
-## Excel Match =INDEX(Mavaddat_2019_GrCH38_converted!A:A,MATCH(Mavaddat_2019_Table_S7_GRCh37!A2,Mavaddat_2019_GrCH38_converted!D:D,FALSE))
-
-/home/aneupane/liftover/liftOver Michigan_ER_POS.bed /home/aneupane/liftover/hg19ToHg38.over.chain Michigan_ER_POS_GrCh38.bed Michigan_ER_POS_unmapped.bed
-/home/aneupane/liftover/liftOver Michigan_ER_NEG.bed /home/aneupane/liftover/hg19ToHg38.over.chain Michigan_ER_NEG_GrCh38.bed Michigan_ER_NEG_unmapped.bed
-
-
-###################
-## Mavaddat 2019 ##
-###################
-/home/aneupane/liftover/liftOver Mavaddat_2019_table_S7_GrCh37.bed /home/aneupane/liftover/hg19ToHg38.over.chain Mavaddat_2019_table_S7_GrCh38.bed Mavaddat_2019_table_S7_unmapped.bed
-
-################
-## Khera 2018 ##
-################
-/home/aneupane/liftover/liftOver Khera_2018_Hg19.bed /home/aneupane/liftover/hg19ToHg38.over.chain Khera_2018_Hg19_GrCh38.bed Khera_2018_Hg19_unmapped.bed
-
-####################
-## Vijayakrishnan ##
-####################
-/home/aneupane/liftover/liftOver ALL_Vijayakrishnan_GRCh37.bed /home/aneupane/liftover/hg19ToHg38.over.chain ALL_Vijayakrishnan_Hg19_GrCh38.bed ALL_Vijayakrishnan_Hg19_unmapped.bed
-
-##############################
-## Pleiotropy all Positions ##
-##############################
-/home/aneupane/liftover/liftOver GRCh37_all_pos.bed /home/aneupane/liftover/hg19ToHg38.over.chain GRCh37_all_pos_Hg19_GrCh38.bed GRCh37_all_pos_Hg19_unmapped.bed
-
-
-
-awk 'FNR==NR{a[$4] = (a[$4]==""?"":a[$4] " ") $2 OFS $3 OFS $4; next}
-    {print $4, ($4 in a ? a[$4] : 0)}' Michigan_ER_NEG_GrCh38.bed ER_NEG_PRSWEB_PHECODE174.1_GWAS-Catalog-r2019-05-03-X174.1_PT_UKB_20200608_WEIGHTS_edited_1.txt
-
-
-## Extract plink subset for PRS
-ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf.gz* .
-
-cat ../SNVs_PRS.bed ../Indels_PRS.bed > PRS_vars.bed
-
-
-module load bcftools/1.9
-module load plink/1.90b
-
-for it in {1..22}; do
-echo "Doing chr${it}"; \
-export CHR="$it"; \
-export THREADS=30; \
-	bsub \
-	-P "chr${CHR}_extract" \
-	-J "chr${CHR}_extract" \
-	-o "${PWD}/logs/chr${CHR}_extract.%J" \
-	-n ${THREADS} \
-	-R "rusage[mem=6000]" \
-	"./extract_variants_from_VCF_for_PRS.sh"; \
-done
-
-
-# bjobs| grep RUN| grep extract| cut -d$' ' -f1| xargs bkill
-
-## Harmonize alleles
-head -1 ../ALL_Cancers_PRS_data.txt > test_chr20_PRS_file.txt
-grep -w chr20 ../ALL_Cancers_PRS_data.txt >> test_chr20_PRS_file.txt
-
-##########################
 ##########################
 ##########################
 
@@ -235,66 +146,153 @@ done;
 
 
 
-#####################################
-## Annovar and intervar Annotation ##
-#####################################
-# First check avblist hg38_avdblist.txt for the latest releases
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/annovar
-perl annotate_variation.pl -webfrom annovar -downdb avdblist -buildver hg38 /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/annovar/annovar/humandb/
+# #####################################
+# ## Annovar and intervar Annotation ##
+# #####################################
+# # First check avblist hg38_avdblist.txt for the latest releases
+# cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/annovar
+# perl annotate_variation.pl -webfrom annovar -downdb avdblist -buildver hg38 /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/annovar/annovar/humandb/
 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar 1000g2015aug humandb/
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar refGene humandb/
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar exac03 humandb/
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar exac03nontcga humandb/
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar esp6500siv2_all humandb/ 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar gnomad_exome humandb/ 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar gnomad_genome humandb/ 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar dbnsfp42c humandb/ 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar revel humandb/ 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar intervar_20180118 humandb/ 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar dbscsnv11 humandb/ 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar cosmic70 humandb/ 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar nci60 humandb/ 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar clinvar_20220320 humandb/ 
-
-
-## Annovar annotation ##
-# https://annovar.openbioinformatics.org/en/latest/user-guide/startup/
-# NOTE: the -operation argument tells ANNOVAR which operations to use for each of the protocols: g means gene-based, gx means gene-based with cross-reference annotation (from -xref argument), r means region-based and f means filter-based.
-
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/ANNOVAR_ANNOTATION
-ln -s ../../*.vcf.gz .
-
-## Intervar ##
-## Add Intervar annotation
-# --input_type AVinput or VCF or VCF_m
-
-for i in {1..22}; do \
-export CHR="chr${i}"; \
-echo "Annotating $CHR"; \
-unset INPUT_VCF; \
-export THREADS=4; \
-export INPUT_VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.${CHR}.PASS.decomposed.vcf.gz"; \
-export JAVA="java"; \
-export JAVAOPTS="-Xms4g -Xmx30g"; \
-export WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/ANNOVAR_ANNOTATION/"; \
-export REF="/research_jude/rgs01_jude/reference/public/genomes/Homo_sapiens/GRCh38/GRCh38_no_alt/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa"; \
-export SNPEFF="/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/snpEff.jar"; \
-export SNPSIFT="/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/SnpSift.jar"; \
-export CLINVAR="/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/clinvar/clinvar.vcf.gz"
-export GATK="/hpcf/apps/gatk/install/3.7/GenomeAnalysisTK.jar"; \
-export EXACDB="/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/exac0.3/ExAC.0.3.GRCh38.vcf.gz"; \
-bsub \
--P "${CHR}_ANNOVAR" \
--J "${CHR}_ANNOVAR" \
--o "${WORKDIR}/logs/${INPUT_VCF%.vcf*}_ANNOVAR.%J" \
--n ${THREADS} \
--R "rusage[mem=8192]" \
-"./entrypoint_ANNOVAR_annotation.sh"; \
-done;
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar 1000g2015aug humandb/
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar refGene humandb/
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar exac03 humandb/
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar exac03nontcga humandb/
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar esp6500siv2_all humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar gnomad_exome humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar gnomad_genome humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar dbnsfp42c humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar revel humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar intervar_20180118 humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar dbscsnv11 humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar cosmic70 humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar nci60 humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar clinvar_20220320 humandb/ 
 
 
+# ## Annovar annotation ##
+# # https://annovar.openbioinformatics.org/en/latest/user-guide/startup/
+# # NOTE: the -operation argument tells ANNOVAR which operations to use for each of the protocols: g means gene-based, gx means gene-based with cross-reference annotation (from -xref argument), r means region-based and f means filter-based.
 
+# cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/ANNOVAR_ANNOTATION
+# ln -s ../../*.vcf.gz .
+
+# ## Intervar ##
+# ## Add Intervar annotation
+# # --input_type AVinput or VCF or VCF_m
+
+# for i in {1..22}; do \
+# export CHR="chr${i}"; \
+# echo "Annotating $CHR"; \
+# unset INPUT_VCF; \
+# export THREADS=4; \
+# export INPUT_VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.${CHR}.PASS.decomposed.vcf.gz"; \
+# export JAVA="java"; \
+# export JAVAOPTS="-Xms4g -Xmx30g"; \
+# export WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/ANNOVAR_ANNOTATION/"; \
+# export REF="/research_jude/rgs01_jude/reference/public/genomes/Homo_sapiens/GRCh38/GRCh38_no_alt/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa"; \
+# export SNPEFF="/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/snpEff.jar"; \
+# export SNPSIFT="/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/SnpSift.jar"; \
+# export CLINVAR="/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/clinvar/clinvar.vcf.gz"
+# export GATK="/hpcf/apps/gatk/install/3.7/GenomeAnalysisTK.jar"; \
+# export EXACDB="/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/exac0.3/ExAC.0.3.GRCh38.vcf.gz"; \
+# bsub \
+# -P "${CHR}_ANNOVAR" \
+# -J "${CHR}_ANNOVAR" \
+# -o "${WORKDIR}/logs/${INPUT_VCF%.vcf*}_ANNOVAR.%J" \
+# -n ${THREADS} \
+# -R "rusage[mem=8192]" \
+# "./entrypoint_ANNOVAR_annotation.sh"; \
+# done;
+
+
+##########################
+## Edit PRS score files ##
+##########################
+
+# Sites to look for PRS:
+# https://prsweb.sph.umich.edu:8443/displayData/displayTable?select_desc=174.1&select_phenomes=MGI&select_odds=2
+# https://www.pgscatalog.org/score/PGS000015/
+##################################
+## Breast cancer (Michigan web) ##
+##################################
+awk ' {FS=OFS="\t"; $(NF+1) = "Chr"$1":"$2 }1' PRSWEB_PHECODE174.1_Onco-iCOGS-Overall-BRCA_PRS-CS_UKB_20200608_WEIGHTS.txt | grep -v ^## > OVERALL_PRSWEB_PHECODE174.1_Onco-iCOGS-Overall-BRCA_PRS-CS_UKB_20200608_WEIGHTS_edited_1.txt
+awk ' {FS=OFS="\t"; $(NF+1) = "Chr"$1":"$2 }1' PRSWEB_PHECODE174.1_Onco-iCOGS-ER-positive-BRCA_PRS-CS_MGI_20200608_WEIGHTS.txt | grep -v ^## > ER_POS_PRSWEB_PHECODE174.1_Onco-iCOGS-ER-positive-BRCA_PRS-CS_MGI_20200608_WEIGHTS_edited_1.txt
+awk ' {FS=OFS="\t"; $(NF+1) = "Chr"$1":"$2 }1' PRSWEB_PHECODE174.1_GWAS-Catalog-r2019-05-03-X174.1_PT_UKB_20200608_WEIGHTS.txt| grep -v ^## > ER_NEG_PRSWEB_PHECODE174.1_GWAS-Catalog-r2019-05-03-X174.1_PT_UKB_20200608_WEIGHTS_edited_1.txt
+
+
+awk '{print "chr"$1"\t"$2"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6}' OVERALL_PRSWEB_PHECODE174.1_Onco-iCOGS-Overall-BRCA_PRS-CS_UKB_20200608_WEIGHTS_edited_1.txt | sed -n '1d;p' | head> test.bed
+
+# Print last col: awk '{print $(NF)}'
+awk '{print "chr"$1"\t"$2"\t"$2+1"\t"$6}' OVERALL_PRSWEB_PHECODE174.1_Onco-iCOGS-Overall-BRCA_PRS-CS_UKB_20200608_WEIGHTS_edited_1.txt | sed -n '1d;p' > Michigan_OVERALL.bed
+awk '{print "chr"$1"\t"$2"\t"$2+1"\t"$6}' ER_POS_PRSWEB_PHECODE174.1_Onco-iCOGS-ER-positive-BRCA_PRS-CS_MGI_20200608_WEIGHTS_edited_1.txt | sed -n '1d;p' > Michigan_ER_POS.bed
+awk '{print "chr"$1"\t"$2"\t"$2+1"\t"$9}' ER_NEG_PRSWEB_PHECODE174.1_GWAS-Catalog-r2019-05-03-X174.1_PT_UKB_20200608_WEIGHTS_edited_1.txt | sed -n '1d;p' > Michigan_ER_NEG.bed
+
+/home/aneupane/liftover/liftOver Michigan_OVERALL.bed /home/aneupane/liftover/hg19ToHg38.over.chain Michigan_OVERALL_GrCh38.bed Michigan_OVERALL_unmapped.bed
+# [aneupane@noderome164 all_downloads]$ /home/aneupane/liftover/liftOver Michigan_OVERALL.bed /home/aneupane/liftover/hg19ToHg38.over.chain Michigan_OVERALL_GrCh38.bed Michigan_OVERALL_unmapped.bed
+# Reading liftover chains
+# Mapping coordinates
+
+
+## Excel Match =INDEX(Mavaddat_2019_GrCH38_converted!A:A,MATCH(Mavaddat_2019_Table_S7_GRCh37!A2,Mavaddat_2019_GrCH38_converted!D:D,FALSE))
+
+/home/aneupane/liftover/liftOver Michigan_ER_POS.bed /home/aneupane/liftover/hg19ToHg38.over.chain Michigan_ER_POS_GrCh38.bed Michigan_ER_POS_unmapped.bed
+/home/aneupane/liftover/liftOver Michigan_ER_NEG.bed /home/aneupane/liftover/hg19ToHg38.over.chain Michigan_ER_NEG_GrCh38.bed Michigan_ER_NEG_unmapped.bed
+
+
+###################
+## Mavaddat 2019 ##
+###################
+/home/aneupane/liftover/liftOver Mavaddat_2019_table_S7_GrCh37.bed /home/aneupane/liftover/hg19ToHg38.over.chain Mavaddat_2019_table_S7_GrCh38.bed Mavaddat_2019_table_S7_unmapped.bed
+
+################
+## Khera 2018 ##
+################
+/home/aneupane/liftover/liftOver Khera_2018_Hg19.bed /home/aneupane/liftover/hg19ToHg38.over.chain Khera_2018_Hg19_GrCh38.bed Khera_2018_Hg19_unmapped.bed
+
+####################
+## Vijayakrishnan ##
+####################
+/home/aneupane/liftover/liftOver ALL_Vijayakrishnan_GRCh37.bed /home/aneupane/liftover/hg19ToHg38.over.chain ALL_Vijayakrishnan_Hg19_GrCh38.bed ALL_Vijayakrishnan_Hg19_unmapped.bed
+
+##############################
+## Pleiotropy all Positions ##
+##############################
+/home/aneupane/liftover/liftOver GRCh37_all_pos.bed /home/aneupane/liftover/hg19ToHg38.over.chain GRCh37_all_pos_Hg19_GrCh38.bed GRCh37_all_pos_Hg19_unmapped.bed
+
+
+
+awk 'FNR==NR{a[$4] = (a[$4]==""?"":a[$4] " ") $2 OFS $3 OFS $4; next}
+    {print $4, ($4 in a ? a[$4] : 0)}' Michigan_ER_NEG_GrCh38.bed ER_NEG_PRSWEB_PHECODE174.1_GWAS-Catalog-r2019-05-03-X174.1_PT_UKB_20200608_WEIGHTS_edited_1.txt
+
+
+## Extract plink subset for PRS
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf.gz* .
+
+cat ../SNVs_PRS.bed ../Indels_PRS.bed > PRS_vars.bed
+
+
+module load bcftools/1.9
+module load plink/1.90b
+
+for it in {1..22}; do
+echo "Doing chr${it}"; \
+export CHR="$it"; \
+export THREADS=30; \
+	bsub \
+	-P "chr${CHR}_extract" \
+	-J "chr${CHR}_extract" \
+	-o "${PWD}/logs/chr${CHR}_extract.%J" \
+	-n ${THREADS} \
+	-R "rusage[mem=6000]" \
+	"./extract_variants_from_VCF_for_PRS.sh"; \
+done
+
+
+# bjobs| grep RUN| grep extract| cut -d$' ' -f1| xargs bkill
+
+## Harmonize alleles
+head -1 ../ALL_Cancers_PRS_data.txt > test_chr20_PRS_file.txt
+grep -w chr20 ../ALL_Cancers_PRS_data.txt >> test_chr20_PRS_file.txt
 
 
 ####################################################################
@@ -318,7 +316,7 @@ export -f getVars
 parallel -j22 getVars MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr{}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf {} ::: {1..22}
 
 
-# Then run R script variants_counts.R
+# Then run R variants_counts_preQC_VCF_06_13_2022
 
 ##################
 ## LoF variants ##

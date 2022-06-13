@@ -158,12 +158,15 @@ PRS.SNVS <- PRS.SNVS[!duplicated(PRS.SNVS$KEY),1:3]
 # all.cancers <- all.cancers[!duplicated(all.cancers$KEY),]
 all.cancers$CHROM <- gsub("chr", "", all.cancers$CHROM)
 
+all.cancers <- all.cancers[!is.na(all.cancers$CHROM),]
+
 write.table(PRS.INDELS, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/Indels_PRS.bed", row.names = F, col.names = F, quote = F, sep = "\t")
 write.table(PRS.SNVS, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/SNVs_PRS.bed", row.names = F, col.names = F, quote = F, sep = "\t")
 write.table(all.cancers, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", row.names = F, col.names = T, quote = F, sep = "\t")
 
 
+
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data/")
 ## Combine Bim file and PRS file together
 bim_file <- read.table("PRS_chr20.bim", header = T)
-bim_file$KEY <- 
+
