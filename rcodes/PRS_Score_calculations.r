@@ -90,22 +90,22 @@ Khera_2018 <- cbind.data.frame(CHROM = Khera_2018$CHROM, POS_GRCh38 = Khera_2018
 
 
 ## Michigan Web
-MichiganWeb_ER_NEG <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/breast/all_downloads/MichiganWeb/ER_NEG_PRSWEB_PHECODE174.1_GWAS-Catalog-r2019-05-03-X174.1_PT_UKB_20200608_WEIGHTS_edited_1.txt", header = T, sep = "\t")
-MichiganWeb_ER_NEG <- cbind.data.frame(CHROM = paste0("chr", MichiganWeb_ER_NEG$CHROM), POS_GRCh38 = MichiganWeb_ER_NEG$POS, 
+MichiganWeb_ER_NEG <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/breast/all_downloads/MichiganWeb/Michigan_ER_NEG_GrCh38_edited.txt", header = T, sep = "\t")
+MichiganWeb_ER_NEG <- cbind.data.frame(CHROM = MichiganWeb_ER_NEG$CHROM, POS_GRCh38 = MichiganWeb_ER_NEG$POS_GRCh38, 
                                REF= MichiganWeb_ER_NEG$OA, Effect_allele = MichiganWeb_ER_NEG$EA, 
-                               Effect_size = MichiganWeb_ER_NEG$WEIGHT, TYPE = "MichiganWeb_ER_NEG", 
+                               Effect_size = MichiganWeb_ER_NEG$Weight, TYPE = "MichiganWeb_ER_NEG", 
                                Cancer = "Breast", Significant_YN = "Y")
 
-MichiganWeb_ER_POS <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/breast/all_downloads/MichiganWeb/ER_POS_PRSWEB_PHECODE174.1_Onco-iCOGS-ER-positive-BRCA_PRS-CS_MGI_20200608_WEIGHTS_edited_1.txt", header = T, sep = "\t")
-MichiganWeb_ER_POS <- cbind.data.frame(CHROM = paste0("chr", MichiganWeb_ER_POS$CHROM), POS_GRCh38 = MichiganWeb_ER_POS$POS, 
+MichiganWeb_ER_POS <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/breast/all_downloads/MichiganWeb/Michigan_ER_POS_GrCh38_edited.txt", header = T, sep = "\t")
+MichiganWeb_ER_POS <- cbind.data.frame(CHROM = MichiganWeb_ER_POS$CHROM, POS_GRCh38 = MichiganWeb_ER_POS$POS_GRCh38, 
                                        REF= MichiganWeb_ER_POS$OA, Effect_allele = MichiganWeb_ER_POS$EA, 
-                                       Effect_size = MichiganWeb_ER_POS$WEIGHT, TYPE = "MichiganWeb_ER_POS", 
+                                       Effect_size = MichiganWeb_ER_POS$Weight, TYPE = "MichiganWeb_ER_POS", 
                                        Cancer = "Breast", Significant_YN = "Y")
 
-MichiganWeb_ER_OVERALL <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/breast/all_downloads/MichiganWeb/OVERALL_PRSWEB_PHECODE174.1_Onco-iCOGS-Overall-BRCA_PRS-CS_UKB_20200608_WEIGHTS_edited_1.txt", header = T, sep = "\t")
-MichiganWeb_ER_OVERALL <- cbind.data.frame(CHROM = paste0("chr", MichiganWeb_ER_OVERALL$CHROM), POS_GRCh38 = MichiganWeb_ER_OVERALL$POS, 
+MichiganWeb_ER_OVERALL <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/breast/all_downloads/MichiganWeb/Michigan_OVERALL_GrCh38_edited.txt", header = T, sep = "\t")
+MichiganWeb_ER_OVERALL <- cbind.data.frame(CHROM = MichiganWeb_ER_OVERALL$CHROM, POS_GRCh38 = MichiganWeb_ER_OVERALL$POS_GRCh38, 
                                        REF= MichiganWeb_ER_OVERALL$OA, Effect_allele = MichiganWeb_ER_OVERALL$EA, 
-                                       Effect_size = MichiganWeb_ER_OVERALL$WEIGHT, TYPE = "MichiganWeb_ER_OVERALL", 
+                                       Effect_size = MichiganWeb_ER_OVERALL$Weight, TYPE = "MichiganWeb_ER_OVERALL", 
                                        Cancer = "Breast", Significant_YN = "Y")
 
 MichiganWeb <- rbind.data.frame(MichiganWeb_ER_NEG, MichiganWeb_ER_POS, MichiganWeb_ER_OVERALL)
@@ -148,7 +148,22 @@ dim(all.cancers.SNVS)
 PRS.SNVS <- cbind.data.frame(CHROM = all.cancers.SNVS$CHROM, START = all.cancers.SNVS$POS_GRCh38-1, END = all.cancers.SNVS$POS_GRCh38)
 
 
+PRS.INDELS$KEY <- paste(PRS.INDELS$CHROM, PRS.INDELS$START, PRS.INDELS$END, sep = ":")
+PRS.INDELS <- PRS.INDELS[!duplicated(PRS.INDELS$KEY),1:3]
+
+PRS.SNVS$KEY <- paste(PRS.SNVS$CHROM, PRS.SNVS$START, PRS.SNVS$END, sep = ":")
+PRS.SNVS <- PRS.SNVS[!duplicated(PRS.SNVS$KEY),1:3]
+
+# all.cancers$KEY <- paste(all.cancers$CHROM, all.cancers$POS_GRCh38, sep = ":")
+# all.cancers <- all.cancers[!duplicated(all.cancers$KEY),]
+all.cancers$CHROM <- gsub("chr", "", all.cancers$CHROM)
 
 write.table(PRS.INDELS, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/Indels_PRS.bed", row.names = F, col.names = F, quote = F, sep = "\t")
 write.table(PRS.SNVS, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/SNVs_PRS.bed", row.names = F, col.names = F, quote = F, sep = "\t")
 write.table(all.cancers, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+
+
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data/")
+## Combine Bim file and PRS file together
+bim_file <- read.table("PRS_chr20.bim", header = T)
+bim_file$KEY <- 

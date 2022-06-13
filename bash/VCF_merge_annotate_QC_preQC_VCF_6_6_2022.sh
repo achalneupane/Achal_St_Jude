@@ -129,26 +129,15 @@ export THREADS=30; \
 	-o "${PWD}/logs/chr${CHR}_extract.%J" \
 	-n ${THREADS} \
 	-R "rusage[mem=6000]" \
-	"./extract_vcf_to_plink.sh"; \
+	"./extract_variants_from_VCF_for_PRS.sh"; \
 done
 
 
 # bjobs| grep RUN| grep extract| cut -d$' ' -f1| xargs bkill
 
-
-VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.preQC_biallelic_renamed_ID_edited.vcf.gz"
-REF="/research_jude/rgs01_jude/reference/public/genomes/Homo_sapiens/GRCh38/GRCh38_no_alt/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa"; 
-GATK="/hpcf/apps/gatk/install/3.7/GenomeAnalysisTK.jar"
-module load java/13.0.1
-module load gatk/3.7
-java -Xmx2g -jar ${GATK} \
-       -R ${REF} \
-       -T SelectVariants \
-       --variant ${VCF} \
-       -o test.vcf.gz \
-       -L PRS_vars_chr22.bed
-
-
+## Harmonize alleles
+head -1 ../ALL_Cancers_PRS_data.txt > test_chr20_PRS_file.txt
+grep -w chr20 ../ALL_Cancers_PRS_data.txt >> test_chr20_PRS_file.txt
 
 ##########################
 ##########################
