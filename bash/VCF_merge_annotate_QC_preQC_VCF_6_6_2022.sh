@@ -108,6 +108,48 @@ awk '{print "chr"$1"\t"$2"\t"$2+1"\t"$9}' ER_NEG_PRSWEB_PHECODE174.1_GWAS-Catalo
 
 awk 'FNR==NR{a[$4] = (a[$4]==""?"":a[$4] " ") $2 OFS $3 OFS $4; next}
     {print $4, ($4 in a ? a[$4] : 0)}' Michigan_ER_NEG_GrCh38.bed ER_NEG_PRSWEB_PHECODE174.1_GWAS-Catalog-r2019-05-03-X174.1_PT_UKB_20200608_WEIGHTS_edited_1.txt
+
+
+## Extract plink subset for PRS
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf.gz* .
+
+cat ../SNVs_PRS.bed ../Indels_PRS.bed > PRS_vars.bed
+
+
+module load bcftools/1.9
+module load plink/1.90b
+
+for it in {1..22}; do
+echo "Doing chr${it}"; \
+export CHR="$it"; \
+export THREADS=30; \
+	bsub \
+	-P "chr${CHR}_extract" \
+	-J "chr${CHR}_extract" \
+	-o "${PWD}/logs/chr${CHR}_extract.%J" \
+	-n ${THREADS} \
+	-R "rusage[mem=6000]" \
+	"./extract_vcf_to_plink.sh"; \
+done
+
+
+# bjobs| grep RUN| grep extract| cut -d$' ' -f1| xargs bkill
+
+
+VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.preQC_biallelic_renamed_ID_edited.vcf.gz"
+REF="/research_jude/rgs01_jude/reference/public/genomes/Homo_sapiens/GRCh38/GRCh38_no_alt/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa"; 
+GATK="/hpcf/apps/gatk/install/3.7/GenomeAnalysisTK.jar"
+module load java/13.0.1
+module load gatk/3.7
+java -Xmx2g -jar ${GATK} \
+       -R ${REF} \
+       -T SelectVariants \
+       --variant ${VCF} \
+       -o test.vcf.gz \
+       -L PRS_vars_chr22.bed
+
+
+
 ##########################
 ##########################
 ##########################
