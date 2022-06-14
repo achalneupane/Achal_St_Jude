@@ -234,7 +234,7 @@ awk '{print "chr"$1"\t"$2"\t"$2+1"\t"$9}' ER_NEG_PRSWEB_PHECODE174.1_GWAS-Catalo
 
 
 ## Excel Match =INDEX(Mavaddat_2019_GrCH38_converted!A:A,MATCH(Mavaddat_2019_Table_S7_GRCh37!A2,Mavaddat_2019_GrCH38_converted!D:D,FALSE))
-
+         # Something you want from different spreadsheet,MATCH(Match what?, Match Where?, exact match?
 /home/aneupane/liftover/liftOver Michigan_ER_POS.bed /home/aneupane/liftover/hg19ToHg38.over.chain Michigan_ER_POS_GrCh38.bed Michigan_ER_POS_unmapped.bed
 /home/aneupane/liftover/liftOver Michigan_ER_NEG.bed /home/aneupane/liftover/hg19ToHg38.over.chain Michigan_ER_NEG_GrCh38.bed Michigan_ER_NEG_unmapped.bed
 
