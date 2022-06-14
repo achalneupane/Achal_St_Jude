@@ -302,21 +302,21 @@ grep -w chr20 ../ALL_Cancers_PRS_data.txt >> test_chr20_PRS_file.txt
 # First create a list of variants to be searched
 
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/variants_in_VCF
-ln -s ../MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf .
+# ln -s ../MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf .
 
-module load parallel
-getVars()
-{
-VCF="$1"
-CHR="$2"
-grep -v "^##" ${VCF} | cut -f3 | cut -d";" -f1 > CHR${CHR}_Vars.vcf
-}
+# module load parallel
+# getVars()
+# {
+# VCF="$1"
+# CHR="$2"
+# grep -v "^##" ${VCF} | cut -f3 | cut -d";" -f1 > CHR${CHR}_Vars.vcf
+# }
 
-export -f getVars
-parallel -j22 getVars MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr{}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf {} ::: {1..22}
+# export -f getVars
+# parallel -j22 getVars MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr{}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf {} ::: {1..22}
 
 
-# Then run R variants_counts_preQC_VCF_06_13_2022
+# Then run R variants_counts_preQC_VCF_06_13_2022.R
 
 ##################
 ## LoF variants ##
@@ -326,7 +326,7 @@ parallel -j22 getVars MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr{}.PASS.decomposed.vcf-
 
 ## Annotation of interest
 # frameshift_variant, start_lost, stop_gained, splice, ^splice_region_variant$
-head -1 MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr10.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155-FIELDS-simple.txt > LoF_variants.txt
+head -1 MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr10.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155-FIELDS-simple.txt > LoF_variants.txt
 cat $(ls *.dbSNP155-FIELDS-simple.txt| sort -V)| egrep 'frameshift_variant|start_lost|stop_gained|splice|splice_region_variant' >> LoF_variants.txt
 awk '{ print $3 }' LoF_variants.txt| cut -d";" -f1 > LoF_variants_ID.txt
 
@@ -354,227 +354,16 @@ export -f tabIndexed
 parallel -j22 tabIndexed {} ::: {1..22}
 
 
-## Extract all INDELs from the annotated VCF; These VCF needs to be tabix indexed
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf
-ln -s ../zhaoming_et_al_variants_INDEL.bed .
-ln -s ../qin_et_al_variants_INDEL.bed .
-
-#!/bin/bash
-
-# Extract genotypes from the original GATK VCF (provided by Comp. Bio. department) before any QC/hard filtering
-module load bcftools
-
-############################################################################################################################################
-## Now, let's search all the INDELS in Zhaoming and Qin et al in our annotated VCF files. We are checking indels +-1bp up and down stream ##
-############################################################################################################################################
-################################
-## INDELS from Zhaoming et al ##
-################################
-# cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf
-
-# ## Tabix
-# # line="chr1:17028712:_:C       chr1    17028711        17028714        chr1:17028711-17028714"
-# zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> zhaoming_et_al_variants_INDEL.bed.out
-# LIST=zhaoming_et_al_variants_INDEL.bed
-# # tabixSearch()
-# # {
-# # #!/bin/bash
-# # module load tabix
-# # CHR="$1"
-# # LIST="$2"
-# for CHR in {1..22}; do
-# VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz"
-# for line in $(cat ${LIST}); do
-# FOUND_LINE=()	
-# query="$(echo ${line}| awk '{ print $5 }')"
-# SNPId="$(echo ${line}| awk '{ print $1 }')"
-# IFS=$'\n'
-# FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
-# if [ -n "${FOUND_LINE}" ]; then
-# for each in "${FOUND_LINE[@]}"
-# do
-# echo -e "${SNPId}\t${each}" >> ${LIST}.out
-# done
-# fi
-# done
-# done
-# # }
 
 
 
-# ## Search in +/- 5 bases
-# LIST=zhaoming_et_al_variants_INDEL.bed
-# zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> ${LIST}_plus_minu10bps.out
-# for CHR in {1..22}; do
-# VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz"
-# for line in $(cat ${LIST}); do
-# FOUND_LINE=()	
-# query="$(echo ${line}| awk '{ print $6 }')"
-# SNPId="$(echo ${line}| awk '{ print $1 }')"
-# IFS=$'\n'
-# FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
-# if [ -n "${FOUND_LINE}" ]; then
-# for each in "${FOUND_LINE[@]}"
-# do
-# echo -e "${SNPId}\t${each}" >> ${LIST}_plus_minu10bps.out
-# done
-# fi
-# done
-# done
 
 
 
-# # export -f tabixSearch
-# # export LIST="zhaoming_et_al_variants_INDEL.bed"
-# # parallel -j22 tabixSearch {} ${LIST} ::: {1..22}
-
-# # ## Bcftools
-# # zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' > sjlife_zhaoming.vcf
-# # for chr in {1..22}; do
-# # bcftools view -Ov MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz -R zhaoming_et_al_variants_INDEL.bed | grep -v '^#'| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' >> sjlife_zhaoming.vcf
-# # done
-
-
-# ###########################
-# ## INDELS from Qin et al ##
-# ###########################
-# ## Tabix
-# zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> qin_et_al_variants_INDEL.bed.out
-# LIST=qin_et_al_variants_INDEL.bed
-# for CHR in {1..22}; do
-# VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz"
-# for line in $(cat ${LIST}); do
-# FOUND_LINE=()	
-# query="$(echo ${line}| awk '{ print $5 }')"
-# SNPId="$(echo ${line}| awk '{ print $1 }')"
-# IFS=$'\n'
-# FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
-# if [ -n "${FOUND_LINE}" ]; then
-# for each in "${FOUND_LINE[@]}"
-# do
-# echo -e "${SNPId}\t${each}" >> ${LIST}.out
-# done
-# fi
-# done
-# done
-
-
-# ## Search in +/- 5 bases
-# LIST=qin_et_al_variants_INDEL.bed
-# zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> ${LIST}_plus_minu10bps.out
-# for CHR in {1..22}; do
-# VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz"
-# for line in $(cat ${LIST}); do
-# FOUND_LINE=()	
-# query="$(echo ${line}| awk '{ print $6 }')"
-# SNPId="$(echo ${line}| awk '{ print $1 }')"
-# IFS=$'\n'
-# FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
-# if [ -n "${FOUND_LINE}" ]; then
-# for each in "${FOUND_LINE[@]}"
-# do
-# echo -e "${SNPId}\t${each}" >> ${LIST}_plus_minu10bps.out
-# done
-# fi
-# done
-# done
-
-## saved this bit of code as search_indel.sh
-
-# # Bcftools
-# zgrep "^#CHROM" MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr22.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz|head -1| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' > sjlife_qin.vcf
-# for chr in {1..22}; do
-# bcftools view -Ov MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.gz -R qin_et_al_variants_INDEL.bed | grep -v '^#'| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' >> sjlife_qin.vcf
-# done
-
-## Now, I will manually check each indel for exact match.
-# From Zhaoming's list of INDELs, I was able to find only 70/133 INDELs in our VCF
-# From Qin's list of INDELs, I was able to find only 82/181 INDELs in our VCF
-# This is saved as zhaoming_and_qin_et_al_variant_INDEL_comparison_in_SJLIFE.xlxs on /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf
-
-
-# Also checking these in Yadav's VCF files
-VCF="sjlife_1_zhaoming.vcf"
-zcat $VCF | bgzip -c > ${VCF}.gz
-tabix -p vcf ${VCF}.gz
-
-
-for f in *_v2.vcf; do
-	echo $f
-	cp $f ${f}.gz
-done
-
-for f in *_v2.vcf.gz; do
-	echo $f
-bcftools sort -Oz $f -o sorted_${f}
-done
-
-for f in sorted_*v2.vcf.gz; do
-	echo $f
-bcftools index -f -t --threads 4 ${f}
-done
-
-
-## Edit Zhaoming vcf
-bcftools merge --threads 4 sorted_sjlife_1_zhaoming_v2.vcf.gz sorted_sjlife_2_zhaoming_v2.vcf.gz -0 -Oz -o MERGED_sorted_sjlife_1_2_zhaoming_v2.vcf.gz
-bcftools index -f -t --threads 4 MERGED_sorted_sjlife_1_2_zhaoming_v2.vcf.gz
-## Convert to biallelic
-bcftools norm -m-any --check-ref -w -f /research_jude/rgs01_jude/reference/public/genomes/Homo_sapiens/GRCh38/GRCh38_no_alt/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa MERGED_sorted_sjlife_1_2_zhaoming_v2.vcf.gz Oz -o MERGED_biallelic_sorted_sjlife_1_2_zhaoming_v2.vcf.gz
-bcftools annotate --set-id '%CHROM\:%POS\:%REF\:%FIRST_ALT' MERGED_biallelic_sorted_sjlife_1_2_zhaoming_v2.vcf.gz -Oz -o MERGED_biallelic_sorted_sjlife_1_2_zhaoming_ID_edited.vcf.gz
-bcftools index -f -t --threads 4 MERGED_biallelic_sorted_sjlife_1_2_zhaoming_ID_edited.vcf.gz
-
-
-## Edit qin vcf
-bcftools merge --threads 4 sorted_sjlife_1_qin_v2.vcf.gz sorted_sjlife_2_qin_v2.vcf.gz -0 -Oz -o MERGED_sorted_sjlife_1_2_qin_v2.vcf.gz
-bcftools index -f -t --threads 4 MERGED_sorted_sjlife_1_2_qin_v2.vcf.gz
-## Convert to biallelic
-bcftools norm -m-any --check-ref -w -f /research_jude/rgs01_jude/reference/public/genomes/Homo_sapiens/GRCh38/GRCh38_no_alt/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa MERGED_sorted_sjlife_1_2_qin_v2.vcf.gz Oz -o MERGED_biallelic_sorted_sjlife_1_2_qin_v2.vcf.gz
-bcftools annotate --set-id '%CHROM\:%POS\:%REF\:%FIRST_ALT' MERGED_biallelic_sorted_sjlife_1_2_qin_v2.vcf.gz -Oz -o MERGED_biallelic_sorted_sjlife_1_2_qin_ID_edited.vcf.gz
-bcftools index -f -t --threads 4 MERGED_biallelic_sorted_sjlife_1_2_qin_ID_edited.vcf.gz
 
 
 
-## Search in +/- 10 bases in Yadav's VCF (VCF prior to QC)
-# cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction
-# ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf/zhaoming_et_al_variants_INDEL.bed .
-# ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/annotated_indexed_vcf/qin_et_al_variants_INDEL.bed .
 
-# LIST=zhaoming_et_al_variants_INDEL.bed
-# VCF="MERGED_sorted_sjlife_1_2_zhaoming.vcf.gz"
-# zgrep "^#CHROM" ${VCF}|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> ${LIST}_plus_minu10bps.out
-# for line in $(cat ${LIST}); do
-# FOUND_LINE=()	
-# query="$(echo ${line}| awk '{ print $6 }')"
-# SNPId="$(echo ${line}| awk '{ print $1 }')"
-# IFS=$'\n'
-# FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
-# if [ -n "${FOUND_LINE}" ]; then
-# for each in "${FOUND_LINE[@]}"
-# do
-# echo -e "${SNPId}\t${each}" >> ${LIST}_plus_minu10bps.out
-# done
-# else
-# echo -e "${SNPId}\tNA\tNA\tNA\tNA" >> ${LIST}_plus_minu10bps.out
-# fi
-# done
-
-
-# LIST=qin_et_al_variants_INDEL.bed
-# VCF="MERGED_sorted_sjlife_1_2_qin.vcf.gz"
-# zgrep "^#CHROM" ${VCF}|head -1 | awk '{ print "KEY.varID\t"$1"\t"$2"\t"$3"\t"$4"\t"$5 }'> ${LIST}_plus_minu10bps.out
-# for line in $(cat ${LIST}); do
-# FOUND_LINE=()	
-# query="$(echo ${line}| awk '{ print $6 }')"
-# SNPId="$(echo ${line}| awk '{ print $1 }')"
-# IFS=$'\n'
-# FOUND_LINE=( $(tabix ${VCF} ${query}| awk '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5 }' ) )
-# if [ -n "${FOUND_LINE}" ]; then
-# for each in "${FOUND_LINE[@]}"
-# do
-# echo -e "${SNPId}\t${each}" >> ${LIST}_plus_minu10bps.out
-# done
-# fi
-# done
 
 
 # Search in +/- 10 bases in Yadav's VCF (VCF prior to QC)

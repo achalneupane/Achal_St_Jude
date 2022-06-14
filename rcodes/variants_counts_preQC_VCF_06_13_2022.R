@@ -8,87 +8,6 @@
 library(data.table)
 library(dplyr)
 Sys.setlocale("LC_ALL", "C")
-zhaoming.etal.vars <- read.delim("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Yadav_Sapkota/additional_papers/Zhaoming_Wang_Genetic_risk_for_subsequent_neoplasms_JCO.2018.77.8589/P-PL-sjlife-genetics-sn_SNV_INDELS.txt", sep = "\t", header =T, stringsAsFactors = F)
-head(zhaoming.etal.vars)
-dim(zhaoming.etal.vars)
-var.classification <- table(zhaoming.etal.vars$Classification)
-var.classification
-# LP   P 
-# 160 188
-
-zhaoming.etal.vars$STUDY <- "Genetic_Risk_for_SN"
-zhaoming.etal.vars$KEY.pos <- paste0("chr", zhaoming.etal.vars$Chr, ":", zhaoming.etal.vars$Pos_GRCh38)
-zhaoming.etal.vars$KEY.varID <- paste0("chr", zhaoming.etal.vars$Chr, ":", zhaoming.etal.vars$Pos_GRCh38, ":", zhaoming.etal.vars$Reference_Allele, ":", zhaoming.etal.vars$Mutant_Allele)
-
-## Reading variants from Qin et al (DNA-repair)
-qin.etal.vars <- read.table("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Yadav_Sapkota/additional_papers/Na_Qin_Pathogenic Germline Mutations in DNA Repair Genes in Combination With Cancer Treatment Exposures/supplementary_DS_jco.19.02760.txt", sep = "\t", header =T, stringsAsFactors = F)
-head(qin.etal.vars)
-
-qin.etal.vars$STUDY <- "DNA_Repair"
-qin.etal.vars$KEY.pos <- paste0("chr", qin.etal.vars$Chr, ":", qin.etal.vars$Pos_GRCh38)
-qin.etal.vars$KEY.varID <- paste0("chr", qin.etal.vars$Chr, ":", qin.etal.vars$Pos_GRCh38, ":", qin.etal.vars$Reference_Allele, ":", qin.etal.vars$Mutant_Allele)
-
-## Check if the variants in Zhaoming et al and Qin et al are also in our datasets
-zhaoming.etal.vars$Chr <- trimws(zhaoming.etal.vars$Chr, which = "both")
-zhaoming.etal.vars$Pos_GRCh38 <- trimws(zhaoming.etal.vars$Pos_GRCh38, which = "both")
-
-qin.etal.vars$Chr <- trimws(qin.etal.vars$Chr, which = "both")
-qin.etal.vars$Pos_GRCh38 <- trimws(qin.etal.vars$Pos_GRCh38, which = "both")
-
-## Check if these variants are in our VCF files
-i=5
-
-Qin_in_VCF <- {}
-Zhaoming_in_VCF <- {}
-# CHR=1:22
-CHR=20
-for(i in 1:length(CHR)){
-print(paste0("Doing Chr ", CHR[i]))
-VCF_vars <- fread(paste0("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION/variants_in_VCF/", "CHR", CHR[i],"_Vars.vcf"), sep = "\t")
-VCF_vars$SNP_pos <- substr(VCF_vars$ID, 1, sapply(gregexpr(":", VCF_vars$ID), "[", 2) - 1)
-print(paste0("Qin ", sum(VCF_vars$SNP_pos %in% qin.etal.vars$KEY.pos)))
-print(paste0("Zhaoming ", sum(VCF_vars$SNP_pos %in% zhaoming.etal.vars$KEY.pos)))
-Qin_in_VCF.tmp <- VCF_vars[VCF_vars$SNP_pos %in% qin.etal.vars$KEY.pos,]
-Zhaoming_in_VCF.tmp <- VCF_vars[VCF_vars$SNP_pos %in% zhaoming.etal.vars$KEY.pos,]
-Qin_in_VCF <- rbind.data.frame(Qin_in_VCF, Qin_in_VCF.tmp)
-Zhaoming_in_VCF <- rbind.data.frame(Zhaoming_in_VCF, Zhaoming_in_VCF.tmp)
-}
-
-write.table(Qin_in_VCF, "Qin_in_VCF.txt", sep = "\t", quote = FALSE, row.names = F, col.names =T, append = TRUE)
-write.table(Zhaoming_in_VCF, "Zhaoming_in_VCF.txt", sep = "\t", quote = FALSE, row.names = F, col.names =T, append = TRUE)
-
-length(unique(qin.etal.vars$KEY.pos))
-# 389
-sum(unique(Qin_in_VCF$SNP_pos) %in% unique(qin.etal.vars$KEY.pos))
-# 205
-
-length(unique(zhaoming.etal.vars$KEY.pos))
-# 295
-sum(unique(Zhaoming_in_VCF$ID) %in% unique(zhaoming.etal.vars$KEY.varID))
-# 159
-
-
-sum(Qin_in_VCF$ID %in% qin.etal.vars$KEY.varID)
-# 205
-Qin.types <- qin.etal.vars[qin.etal.vars$KEY.varID %in% Qin_in_VCF$ID,]
-Qin_in_VCF$ID %in% qin.etal.vars$KEY.varID
-
-sum(Zhaoming_in_VCF$ID %in% zhaoming.etal.vars$KEY.varID)
-# 159
-
-
-
-## fix positions for Indels
-sum(grepl("^-$", qin.etal.vars$START))
-
-
-## Creating bed files from variants in Qin and Zhaoming et al.
-zhaoming.etal.vars$KEY.pos
-
-cbind(sapply(strsplit(zhaoming.etal.vars$KEY.pos,":"), `[`, 1), sapply(strsplit(zhaoming.etal.vars$KEY.pos,":"), `[`, 2), sapply(strsplit(zhaoming.etal.vars$KEY.pos,":"), `[`, 2))
-
-
-
 
 #############################
 #############################
@@ -96,7 +15,7 @@ cbind(sapply(strsplit(zhaoming.etal.vars$KEY.pos,":"), `[`, 1), sapply(strsplit(
 #############################
 #############################
 # https://pcingola.github.io/SnpEff/adds/VCFannotationformat_v1.0.pdf
-setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/SNPEFF_ANNOTATION")
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/")
 ## read annotated SJLIFE annotated VCF 
 # Loop over all chromosomes
 chromosomes <- 1:22
@@ -108,7 +27,7 @@ FINAL.VCF <- {}
 capture.output (for( i in 1:length(chromosomes)){
 print(paste0("Doing chromosome ", chromosomes[i]))
   
-VCF <- fread(paste0("MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr", chromosomes[i], ".PASS.decomposed.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155-FIELDS-simple.txt"))
+VCF <- fread(paste0("MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr", chromosomes[i], ".preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155-FIELDS-simple.txt"))
 
 #####################################
 ## Clinvar based P/LP VCF variants ##
@@ -498,9 +417,7 @@ group_and_concat$counts_var_SJLIFE <- lengths(strsplit(group_and_concat$all_vari
 qin.genes.vars <- qin.etal.vars
 unique(qin.etal.vars$Gene) %in% group_and_concat$`ANN[*].GENE` 
 
-
-save.image("SNPEFF_clinvar_metaSVM_from_R_filtering_process.RData")
-
+save.image("SNPEFF_clinvar_metaSVM_from_R_filtering_process_PreQC_VCF.RData")
 load("SNPEFF_clinvar_metaSVM_from_R_filtering_process.RData")
 
 
