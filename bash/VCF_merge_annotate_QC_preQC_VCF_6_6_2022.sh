@@ -290,6 +290,14 @@ done
 
 # bjobs| grep RUN| grep extract| cut -d$' ' -f1| xargs bkill
 
+
+## Merge plink files
+for CHR in {1..22}; do
+echo "PRS_chr${CHR}" >> merge_list.txt
+done
+plink --make-bed --merge-list merge_list.txt  --out sjlife_all_P
+
+
 ## Harmonize alleles
 head -1 ../ALL_Cancers_PRS_data.txt > test_chr20_PRS_file.txt
 grep -w chr20 ../ALL_Cancers_PRS_data.txt >> test_chr20_PRS_file.txt
