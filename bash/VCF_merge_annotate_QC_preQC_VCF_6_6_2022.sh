@@ -284,7 +284,7 @@ export THREADS=4; \
 	-e "${PWD}/logs/chr${CHR}_extract_err.%J" \
 	-o "${PWD}/logs/chr${CHR}_extract.%J" \
 	-n ${THREADS} \
-	-R "rusage[mem=30000]" \
+	-R "rusage[mem=50000]" \
 	"./extract_variants_from_VCF_for_PRS.sh"; \
 done
 
@@ -294,9 +294,9 @@ done
 
 ## Merge plink files
 for CHR in {1..22}; do
-echo "PRS_chr${CHR}" >> merge_list.txt
+echo "PRS_chr${CHR}_v2" >> merge_list.txt
 done
-plink --make-bed --merge-list merge_list.txt  --out sjlife_all_P
+plink --make-bed --merge-list merge_list.txt  --out sjlife_all_PRS
 
 
 ## Harmonize alleles

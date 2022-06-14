@@ -115,13 +115,15 @@ nrow(LoF.unique)
 
 
 # How many SNPs from Clinvar, MetaSVM and LoF
-Predicted.vars.inVCF.Unique <-  rbind.data.frame(CLINVAR.unique, LoF.unique, MetaSVM.unique)
-table(Predicted.vars.inVCF.Unique$PRED_TYPE)
-# Clinvar     LoF MetaSVM 
-# 4705  316386   83479 
+# Predicted.vars.inVCF <-  rbind.data.frame(CLINVAR, LoF, MetaSVM)
+# table(Predicted.vars.inVCF$PRED_TYPE)
+# # Clinvar     LoF MetaSVM 
+# # 4705  316386   83479 
+# 
+# # remove duplicates
+# Predicted.vars.inVCF.Unique <- Predicted.vars.inVCF[!duplicated(Predicted.vars.inVCF$KEY),]
 
-# remove duplicates
-Predicted.vars.inVCF.Unique$KEY
+Predicted.vars.inVCF.Unique <-  rbind.data.frame(CLINVAR.unique, LoF.unique, MetaSVM.unique)
 
 #######################################################################
 ## Check which of the variants from the previous studies are present ##
@@ -155,12 +157,32 @@ group_and_concat <- df %>%
 
 group_and_concat$counts_var_SJLIFE <- lengths(strsplit(group_and_concat$all_variants_SJLIFE, ","))
 
+zhaoming.variants$Gene[!zhaoming.variants$Gene %in% group_and_concat$`ANN[*].GENE`]
+# "MRE11A" == "MRE11"
+
+qin.variants$Gene[!qin.variants$Gene %in% group_and_concat$`ANN[*].GENE`]
+# "FAM175A" == "ABRAXAS1"
+# "C1orf86" == "FAAP20"  
+# "MRE11A" == "MRE11"
+# "C19orf40" == "FAAP24"
+# "SHFM1" == "SEM1"
+
+## Recode above gene names
+group_and_concat$`ANN[*].GENE`[group_and_concat$`ANN[*].GENE` == "MRE11"] <- "MRE11A"
+group_and_concat$`ANN[*].GENE`[group_and_concat$`ANN[*].GENE` == "ABRAXAS1"] <- "FAM175A"
+group_and_concat$`ANN[*].GENE`[group_and_concat$`ANN[*].GENE` == "FAAP20"] <- "C1orf86"
+group_and_concat$`ANN[*].GENE`[group_and_concat$`ANN[*].GENE` == "FAAP24"] <- "C19orf40"
+group_and_concat$`ANN[*].GENE`[group_and_concat$`ANN[*].GENE` == "SEM1"] <- "SHFM1"
+
 
 sum(zhaoming.variants$Gene %in% group_and_concat$`ANN[*].GENE` )
+# 299
 sum(qin.variants$Gene %in% group_and_concat$`ANN[*].GENE`)
+# 392
 
-group_and_concat$Previous_study [group_and_concat$`ANN[*].GENE` %in% unique(zhaoming.variants$Gene)] <- "zhaoming"
-group_and_concat$Previous_study [group_and_concat$`ANN[*].GENE` %in% unique(zhaoming.variants$Gene) & is.na(group_and_concat$Previous_study)] <- "qin"
+group_and_concat$Zhaoming_YN <- ifelse(group_and_concat$`ANN[*].GENE` %in% unique(zhaoming.variants$Gene), "Y", "N" )
+group_and_concat$Qin_YN <- ifelse(group_and_concat$`ANN[*].GENE` %in% unique(qin.variants$Gene), "Y", "N" )
+
 
 save.image("SNPEFF_clinvar_metaSVM_from_R_filtering_process_PreQC_VCF.RData")
 load("SNPEFF_clinvar_metaSVM_from_R_filtering_process_PreQC_VCF.RData")

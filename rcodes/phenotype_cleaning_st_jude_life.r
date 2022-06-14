@@ -210,41 +210,44 @@ save.image("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/PH
 #####################
 ## wgspop.sas7bdat ##
 #####################
-# WORKDIR:/research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE
-wgspop <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE/wgspop.sas7bdat")
+# WORKDIR:/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE
+wgspop <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/wgspop.sas7bdat")
 head(wgspop)
 
 
-wgsdiag <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE/wgsdiag.sas7bdat")
+wgsdiag <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/wgsdiag.sas7bdat")
 head(wgsdiag)
 
 
-subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
+subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
 head(subneo)
 
 
-radiation <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE/radiation.sas7bdat")
+radiation <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/radiation.sas7bdat")
 head(radiation)
 
 
-drug <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE/drug.sas7bdat")
+drug <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/drug.sas7bdat")
 head(drug)
 
 
-demog <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE/demog.sas7bdat")
+demog <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/demog.sas7bdat")
 head(demog)
 
 
-adultbmi <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE/adultbmi.sas7bdat")
+adultbmi <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.sas7bdat")
 head(adultbmi)
 
 
-adolhabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE/adolhabits.sas7bdat")
+adolhabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adolhabits.sas7bdat")
 head(adolhabits)
 
 
-adlthabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/attr_fraction/PHENOTYPE/adlthabits.sas7bdat")
+adlthabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.sas7bdat")
 head(adlthabits)
 
 
 lapply(list(wgspop, wgsdiag, subneo, radiation, drug, demog, adultbmi, adolhabits, adlthabits), dim)
+
+
+

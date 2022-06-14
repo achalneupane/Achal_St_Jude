@@ -168,5 +168,79 @@ write.table(all.cancers, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/comm
 
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data/")
 ## Combine Bim file and PRS file together
-bim_file <- read.table("PRS_chr20.bim", header = T)
+bim_file <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data/sjlife_all_PRS.bim", header = T)
+all.cancer <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", header = T)
 
+all.cancer$KEY <- paste(all.cancer$CHROM, all.cancer$POS_GRCh38, sep = ":")
+# all.cancer$REF, all.cancer$Effect_allele,
+
+######################
+## Harmonize allele ##
+######################
+
+# Process the variants to match their alleles
+
+# Read the input file including variants with no direct match of their alleles
+args = commandArgs(trailingOnly = TRUE)
+dat = read.table(args[1], header = FALSE, stringsAsFactors = FALSE)
+# dat = read.table("Z:/ResearchHome/ClusterHome/ysapkota/Work/CAD_PRS/y", header = FALSE, stringsAsFactors = FALSE)
+
+## Function to flip alleles
+flip_alleles = function(x){
+  if(x=="A"){
+    y="T"
+  } else if (x=="T"){
+    y="A"
+  } else if (x=="C"){
+    y="G"
+  } else if (x=="G"){
+    y="C"
+  }
+  return(y)
+}
+
+# Process each variant to check the alleles
+dat.out = NULL
+for (i in 1:nrow(dat)){
+  chr=dat$V1[i]
+  pos = dat$V4[i]
+  variant = dat$V2[i]
+  khera_a1 = dat$V7[i]
+  khera_a2 = dat$V8[i]
+  khera_weight = dat$V9[i]
+  wgs_a1 = dat$V5[i]
+  wgs_a2 = dat$V6[i]
+  # First find out if the wgs_a1 have more than one character
+  if(nchar(wgs_a1)>1){
+    wgs_a1_first = substr(wgs_a1, 1, 1)
+    wgs_a1_last = substr(wgs_a1, nchar(wgs_a1), nchar(wgs_a1))
+    wgs_a1_changed = ifelse(wgs_a1_first==wgs_a2, wgs_a1_last, wgs_a1_first)
+  } else {
+    wgs_a1_changed = wgs_a1
+  }
+  # Then do the same for wgs_a2 allele
+  if (nchar(wgs_a2)>1){
+    wgs_a2_first = substr(wgs_a2, 1, 1)
+    wgs_a2_last = substr(wgs_a2, nchar(wgs_a2), nchar(wgs_a2))
+    wgs_a2_changed = ifelse(wgs_a2_first==wgs_a1, wgs_a2_last, wgs_a2_first)
+  } else {
+    wgs_a2_changed = wgs_a2
+  }
+  # Now check if the changed wgs alleles match with those from Khera et al
+  # No alleles flipped
+  if ((wgs_a1_changed == khera_a1 & wgs_a2_changed == khera_a2) | (wgs_a1_changed == khera_a2 & wgs_a2_changed == khera_a1)){
+    wgs_a1_new = wgs_a1_changed; wgs_a2_new = wgs_a2_changed; match=1
+  } else if((flip_alleles(wgs_a1_changed) == khera_a1 & wgs_a2_changed == khera_a2) | (flip_alleles(wgs_a1_changed) == khera_a2 & wgs_a2_changed == khera_a1)) { # only a1 flipped
+    wgs_a1_new = flip_alleles(wgs_a1_changed); wgs_a2_new = wgs_a2_changed; match=1
+  } else if ((wgs_a1_changed == khera_a1 & flip_alleles(wgs_a2_changed) == khera_a2) | (wgs_a1_changed == khera_a2 & flip_alleles(wgs_a2_changed) == khera_a1)) { # only a2 flipped
+    wgs_a1_new = wgs_a1_changed; wgs_a2_new = flip_alleles(wgs_a2_changed); match=1
+  } else if ((flip_alleles(wgs_a1_changed) == khera_a1 & flip_alleles(wgs_a2_changed) == khera_a2) | (flip_alleles(wgs_a1_changed) == khera_a2 & flip_alleles(wgs_a2_changed) == khera_a1)){ # both a1 and a2 flipped
+    wgs_a1_new = flip_alleles(wgs_a1_changed); wgs_a2_new = flip_alleles(wgs_a2_changed); match=1
+  } else {
+    wgs_a1_new = wgs_a1_changed; wgs_a2_new = wgs_a2_changed; match=0
+  }
+  dat.out = rbind(dat.out, data.frame(chr, pos, variant, khera_a1, khera_a2, wgs_a1, wgs_a2, wgs_a1_new, wgs_a2_new, match))
+}
+
+# Write data to disc
+write.table(dat.out, paste0(args[1], "_alleles_harmonized"), row.names = FALSE, quote = FALSE)
