@@ -277,13 +277,14 @@ module load plink/1.90b
 for it in {1..22}; do
 echo "Doing chr${it}"; \
 export CHR="$it"; \
-export THREADS=30; \
+export THREADS=4; \
 	bsub \
 	-P "chr${CHR}_extract" \
 	-J "chr${CHR}_extract" \
+	-e "${PWD}/logs/chr${CHR}_extract_err.%J" \
 	-o "${PWD}/logs/chr${CHR}_extract.%J" \
 	-n ${THREADS} \
-	-R "rusage[mem=6000]" \
+	-R "rusage[mem=30000]" \
 	"./extract_variants_from_VCF_for_PRS.sh"; \
 done
 

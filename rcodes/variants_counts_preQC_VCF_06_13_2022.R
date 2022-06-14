@@ -71,11 +71,36 @@ VCF <- rbind.data.frame(VCF.clinvar, VCF.MetaSVM)
 FINAL.VCF <- rbind.data.frame(FINAL.VCF, VCF)
 }, file = "SNPEFF_clinvar_metaSVM_from_R_filtering_process.log")
 
-# Qing et al 2020; We considered a missense variant highfunctional impact if
-# classified as Deleterious by MetaSVM or listed as Pathogenic/
-# Likely-Pathogenic in ClinVar
-FINAL.VCF.missense <- FINAL.VCF[grepl("missense", FINAL.VCF$`ANN[*].EFFECT`),]
+FINAL.VCF$KEY <- paste(FINAL.VCF$CHROM, FINAL.VCF$POS, FINAL.VCF$REF, FINAL.VCF$ALT, sep =":")
 
+# FINAL.VCF.unique <- FINAL.VCF[duplicated(FINAL.VCF$KEY),]
+
+CLINVAR <- FINAL.VCF[FINAL.VCF$PRED_TYPE == "Clinvar",]
+table(CLINVAR$CLNSIG)
+nrow(CLINVAR)
+# 60892
+
+MetaSVM <- FINAL.VCF[FINAL.VCF$PRED_TYPE == "MetaSVM",]
+
+CLINVAR.unique <- CLINVAR[!duplicated(CLINVAR$KEY),]
+table(CLINVAR.unique$CLNSIG)
+
+MetaSVM.unique <- MetaSVM[!duplicated(MetaSVM$KEY),]
+
+nrow(CLINVAR.unique)
+# 4705
+nrow(MetaSVM.unique)
+# 83479
+
+# How many from Clinvar, MetaSVM and LoF
+table(FINAL.VCF.unique$PRED_TYPE)
+
+
+
+
+## Read Qin and Zhaoming variants from the previous list
+zhaoming <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/zhaoming_et_al_SNV_INDEL_Search_list.txt", sep = "\t", header = T)
+zhaoming.variants <- zhaoming[grepl("Y|N", zhaoming$Match_per_var),]
 
 
 #######################################################################
@@ -418,7 +443,7 @@ qin.genes.vars <- qin.etal.vars
 unique(qin.etal.vars$Gene) %in% group_and_concat$`ANN[*].GENE` 
 
 save.image("SNPEFF_clinvar_metaSVM_from_R_filtering_process_PreQC_VCF.RData")
-load("SNPEFF_clinvar_metaSVM_from_R_filtering_process.RData")
+load("SNPEFF_clinvar_metaSVM_from_R_filtering_process_PreQC_VCF.RData")
 
 
 
