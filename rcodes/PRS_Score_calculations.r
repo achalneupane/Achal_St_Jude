@@ -128,6 +128,10 @@ all.cancers
 
 all.cancers.INDELS <- all.cancers[nchar(all.cancers$REF) != 1 | nchar(all.cancers$Effect_allele) != 1 ,]
 dim(all.cancers.INDELS)
+
+# Calculating the base position for END in INDELS. First, I am removing the
+# matching bases from REF and ALT and adding the nchar to the START to get the
+# END position
 library(stringr) # for str_remove function
 fun <- function(a, b){
   a1 <- substr(a,1,1)
@@ -166,24 +170,64 @@ write.table(all.cancers, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/comm
 
 
 
+all.cancers <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", header = T)
+all.cancers$KEY <- paste0("chr", paste(all.cancers$CHROM, all.cancers$POS_GRCh38, all.cancers$REF, all.cancers$Effect_allele, sep = ":"))
+all.cancers$KEY2 <- paste0("chr", paste(all.cancers$CHROM, all.cancers$POS_GRCh38, sep = ":"))
+dim(all.cancers) 
+
+## extract plink subset
+write.table(as.data.frame(all.cancers$KEY), "PRS_all_cancers_vars.txt", col.names = F, row.names = F, quote = F)
+
+# 2241452
+
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data/")
 ## Combine Bim file and PRS file together
-bim_file <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data/sjlife_all_PRS.bim", header = T)
-all.cancer <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", header = T)
+bim_file <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data/sjlife_all_PRS.bim", header = F)
+bim_file$KEY2 <- paste0("chr", paste(bim_file$V1, bim_file$V4, sep = ":"))
 
-all.cancer$KEY <- paste(all.cancer$CHROM, all.cancer$POS_GRCh38, sep = ":")
-# all.cancer$REF, all.cancer$Effect_allele,
+sum(all.cancers$KEY %in% bim_file$V2)
+# 1119903
+all.cancers.in.bim <- all.cancers[all.cancers$KEY %in% bim_file$V2,]
+
+bim_file.not.in.all.cancers <- bim_file[!bim_file$V2 %in% all.cancers.in.bim$KEY,]
+
+all.cancers.not.in.bim <- all.cancers[!all.cancers$KEY %in% bim_file$V2,]
+
+## Now merge all.cancers.not.in.bim and bim_file.not.in.all.cancers
+sum(all.cancers.not.in.bim$KEY2 %in% bim_file.not.in.all.cancers$KEY2)
+# 705741
+
+dat <- merge(bim_file.not.in.all.cancers, all.cancers.not.in.bim, by="KEY2", all.x=F)
+colnames(dat)
+# [1] "KEY2"           "V1"             "V2"             "V3"             "V4"             "V5"             "V6"             "CHROM"         
+# [9] "POS_GRCh38"     "REF"            "Effect_allele"  "Effect_size"    "TYPE"           "Cancer"         "Significant_YN" "KEY"
+
+dat <- dat[,c( "V1", "V2", "V3", "V4", "V5", "V6", "REF", "Effect_allele", "Effect_size")]
+colnames(dat) <- paste0("V",1:9)
+table(nchar(dat$V6))
+table(nchar(dat$V7))
+
+dat.SNVs <- dat[nchar(dat$V6) ==1 & nchar(dat$V7) ==1, ]
+## Remove rows with <DEL> in bim from SNV file
+dat.SNVs <- dat.SNVs[!grepl("DEL", dat.SNVs$V2, ignore.case = T),]
+
+
+dat.INDELs <- dat[nchar(dat$V6) !=1| nchar(dat$V7) !=1, ]
+
+
 
 ######################
-## Harmonize allele ##
+## Harmonize alleles ##
 ######################
 
 # Process the variants to match their alleles
 
-# Read the input file including variants with no direct match of their alleles
-args = commandArgs(trailingOnly = TRUE)
-dat = read.table(args[1], header = FALSE, stringsAsFactors = FALSE)
-# dat = read.table("Z:/ResearchHome/ClusterHome/ysapkota/Work/CAD_PRS/y", header = FALSE, stringsAsFactors = FALSE)
+# # Read the input file including variants with no direct match of their alleles
+# args = commandArgs(trailingOnly = TRUE)
+# dat = read.table(args[1], header = FALSE, stringsAsFactors = FALSE)
+# # dat = read.table("Z:/ResearchHome/ClusterHome/ysapkota/Work/CAD_PRS/y", header = FALSE, stringsAsFactors = FALSE)
+
+dat <- dat.SNVs
 
 ## Function to flip alleles
 flip_alleles = function(x){
@@ -202,6 +246,7 @@ flip_alleles = function(x){
 # Process each variant to check the alleles
 dat.out = NULL
 for (i in 1:nrow(dat)){
+  print(paste0("Doing row ", i ))
   chr=dat$V1[i]
   pos = dat$V4[i]
   variant = dat$V2[i]
@@ -243,4 +288,4 @@ for (i in 1:nrow(dat)){
 }
 
 # Write data to disc
-write.table(dat.out, paste0(args[1], "_alleles_harmonized"), row.names = FALSE, quote = FALSE)
+write.table(dat.out, paste0(PRS.SNVs, "_alleles_harmonized"), row.names = FALSE, quote = FALSE)

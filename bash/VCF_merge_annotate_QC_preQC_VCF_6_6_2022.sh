@@ -299,6 +299,58 @@ done
 plink --make-bed --merge-list merge_list.txt  --out sjlife_all_PRS
 
 
+## Extract from plink file
+plink --bfile sjlife_all_PRS --extract PRS_all_cancers_vars.txt --make-bed --keep-allele-order --out sjlife_found
+# 1166746 variants loaded from .bim file.
+# 4507 people (0 males, 0 females, 4507 ambiguous) loaded from .fam.
+# Ambiguous sex IDs written to sjlife_found_set1.nosex .
+# --extract: 772858 variants remaining.
+# Warning: At least 347045 duplicate IDs in --extract file.
+# Using 1 thread (no multithreaded calculations invoked.
+# Before main variant filters, 4507 founders and 0 nonfounders present.
+# Calculating allele frequencies... done.
+# Total genotyping rate is 0.999866.
+# 772858 variants and 4507 people pass filters and QC.
+# exclude set 1
+awk '{ print $2 }' sjlife_found_set1.bim > set1_vars
+
+plink --bfile sjlife_all_PRS --exclude set1_vars --make-bed --keep-allele-order --out sjlife_notfound
+# 1166746 variants loaded from .bim file.
+# 4507 people (0 males, 0 females, 4507 ambiguous) loaded from .fam.
+# Ambiguous sex IDs written to sjlife_notfound.nosex .
+# --exclude: 393888 variants remaining.
+# Using 1 thread (no multithreaded calculations invoked.
+# Before main variant filters, 4507 founders and 0 nonfounders present.
+# Calculating allele frequencies... done.
+# Total genotyping rate is 0.999598.
+# 393888 variants and 4507 people pass filters and QC.
+
+plink --bfile sjlife_all_PRS --flip sjlife_notfound.bim --make-bed --keep-allele-order --out sjlife_all_PRS_flipped
+# 1166746 variants loaded from .bim file.
+# 4507 people (0 males, 0 females, 4507 ambiguous) loaded from .fam.
+# Ambiguous sex IDs written to sjlife_all_PRS_flipped.nosex .
+# --flip: 392692 SNPs flipped, 1969440 SNP IDs not present.
+# Warning: 24877 variants had at least one non-A/C/G/T allele name.
+# Using 1 thread (no multithreaded calculations invoked.
+# Before main variant filters, 4507 founders and 0 nonfounders present.
+# Calculating allele frequencies... done.
+# Total genotyping rate is 0.999776.
+# 1166746 variants and 4507 people pass filters and QC.
+
+## Now extract again from the flipped
+plink --bfile sjlife_all_PRS_flipped --extract PRS_all_cancers_vars.txt --make-bed --keep-allele-order --out sjlife_found_v2
+# 1166746 variants loaded from .bim file.
+# 4507 people (0 males, 0 females, 4507 ambiguous) loaded from .fam.
+# Ambiguous sex IDs written to sjlife_found_v2.nosex .
+# --extract: 772858 variants remaining.
+# Warning: At least 347045 duplicate IDs in --extract file.
+# Using 1 thread (no multithreaded calculations invoked.
+# Before main variant filters, 4507 founders and 0 nonfounders present.
+# Calculating allele frequencies... done.
+# Total genotyping rate is 0.999866.
+# 772858 variants and 4507 people pass filters and QC.
+
+
 ## Harmonize alleles
 head -1 ../ALL_Cancers_PRS_data.txt > test_chr20_PRS_file.txt
 grep -w chr20 ../ALL_Cancers_PRS_data.txt >> test_chr20_PRS_file.txt
