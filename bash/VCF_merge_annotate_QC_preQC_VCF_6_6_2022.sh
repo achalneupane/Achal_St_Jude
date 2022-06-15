@@ -356,6 +356,27 @@ head -1 ../ALL_Cancers_PRS_data.txt > test_chr20_PRS_file.txt
 grep -w chr20 ../ALL_Cancers_PRS_data.txt >> test_chr20_PRS_file.txt
 
 
+
+## Extract Clinvar, MetaSVM and LoF variants from VCF
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/annotated_variants/annotated_vars_from_PreQC_VCF_Clinvar_MetaSVM_LoF
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf.gz* .
+
+for it in {1..22}; do
+echo "Doing chr${it}"; \
+export CHR="$it"; \
+export THREADS=4; \
+	bsub \
+	-P "chr${CHR}_extract" \
+	-J "chr${CHR}_extract" \
+	-e "${PWD}/logs/chr${CHR}_extract_err.%J" \
+	-o "${PWD}/logs/chr${CHR}_extract.%J" \
+	-n ${THREADS} \
+	-R "rusage[mem=60000]" \
+	"./extract_variants_from_VCF_for_Clinvar_MetaSVM_LoF_PreQC.sh"; \
+done
+
+
+
 ####################################################################
 ## check variants from  SNPeff in Zhaoming and Qin et al's papers ##
 ####################################################################

@@ -125,6 +125,7 @@ nrow(LoF.unique)
 
 Predicted.vars.inVCF.Unique <-  rbind.data.frame(CLINVAR.unique, LoF.unique, MetaSVM.unique)
 
+
 #######################################################################
 ## Check which of the variants from the previous studies are present ##
 #######################################################################
@@ -184,7 +185,12 @@ group_and_concat$Zhaoming_YN <- ifelse(group_and_concat$`ANN[*].GENE` %in% uniqu
 group_and_concat$Qin_YN <- ifelse(group_and_concat$`ANN[*].GENE` %in% unique(qin.variants$Gene), "Y", "N" )
 
 
-save.image("SNPEFF_clinvar_metaSVM_from_R_filtering_process_PreQC_VCF.RData")
+## Variants to be extracted from VCF file for genotypes
+vars.to.extract.from.VCF <- Predicted.vars.inVCF.Unique[!duplicated(Predicted.vars.inVCF.Unique$KEY),]
+vars.to.extract.from.VCF.bed <- cbind.data.frame(CHROM = vars.to.extract.from.VCF$CHROM, START = as.numeric(vars.to.extract.from.VCF$POS) -1, END = vars.to.extract.from.VCF$POS)
+write.table(vars.to.extract.from.VCF.bed, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/annotated_variants/annotated_vars_from_PreQC_VCF_Clinvar_MetaSVM_LoF/Variants_from_annotation_Clinvar_MetaSVM_LoF_PreQC.bed", row.names = FALSE, quote = FALSE, col.names = F, sep = "\t")
+
+# save.image("SNPEFF_clinvar_metaSVM_from_R_filtering_process_PreQC_VCF.RData")
 load("SNPEFF_clinvar_metaSVM_from_R_filtering_process_PreQC_VCF.RData")
 
 
