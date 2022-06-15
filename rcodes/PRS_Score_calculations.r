@@ -216,9 +216,9 @@ dat.INDELs <- dat[nchar(dat$V6) !=1| nchar(dat$V7) !=1, ]
 
 
 
-######################
+#######################
 ## Harmonize alleles ##
-######################
+#######################
 
 # Process the variants to match their alleles
 
@@ -288,4 +288,4 @@ for (i in 1:nrow(dat)){
 }
 
 # Write data to disc
-write.table(dat.out, paste0(PRS.SNVs, "_alleles_harmonized"), row.names = FALSE, quote = FALSE)
+write.table(dat.out, "PRS_SNVs_alleles_harmonized", row.names = FALSE, quote = FALSE)

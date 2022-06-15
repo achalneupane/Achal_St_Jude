@@ -204,24 +204,43 @@ write.table(tt, "Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjli
 # names(mylist) <- c("data.demographics.df", "data.diagnosis.df", "data.lastcondt.df", "data.chemosum_dose.df", "data.chemosum_yn.df", "data.radiationsum_yn.df", "radiation_dosimetry.df", "rtdosimetrysjl_heart_20211112.df")
 # lapply(mylist, count_dims)
 
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/PHENOTYPE/phenotype_cleaning.RDATA")
+# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/PHENOTYPE/phenotype_cleaning.RDATA")
 
 ## On 05/26/2022; we received Phenotype for Email subject: 'Attribution fraction for SN'
 #####################
 ## wgspop.sas7bdat ##
 #####################
 # WORKDIR:/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE")
+
+## Recode any values other than 0-5 as NAs
+data.df$grade[!grepl("0|1|2|3|4|5", data.df$grade)] <- NA
+
+## Omit NA grades
+# data.df <- data.df[!is.na(data.df$grade),]
+
+## Clean condition stings
+data.df$condition <- gsub("_$", "", (gsub("_+", "_",  gsub("[^A-Za-z0-9]", "_", data.df$condition))))
+dim(data.df)
+
+
 wgspop <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/wgspop.sas7bdat")
 head(wgspop)
 
 
 wgsdiag <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/wgsdiag.sas7bdat")
 head(wgsdiag)
-
+# table(wgsdiag$diaggrp)
 
 subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
 head(subneo)
+table(subneo$diaggrp)
 
+
+##
+
+
+###
 
 radiation <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/radiation.sas7bdat")
 head(radiation)
@@ -238,13 +257,19 @@ head(demog)
 adultbmi <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.sas7bdat")
 head(adultbmi)
 
+# adlthabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.sas7bdat")
+adlthabits <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.txt", header = T, sep ="\t")
+head(adlthabits)
+adlthabits$agesurvey <- floor(adlthabits$agesurvey_diff_of_dob_datecomp)
+
+## For each samples, get habits immediately after 18 years of age in agesurvey
+
+
+
+
 
 adolhabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adolhabits.sas7bdat")
 head(adolhabits)
-
-
-adlthabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.sas7bdat")
-head(adlthabits)
 
 
 lapply(list(wgspop, wgsdiag, subneo, radiation, drug, demog, adultbmi, adolhabits, adlthabits), dim)
