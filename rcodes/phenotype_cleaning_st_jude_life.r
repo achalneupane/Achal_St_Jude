@@ -236,7 +236,6 @@ subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/att
 head(subneo)
 table(subneo$diaggrp)
 
-
 ##
 
 
@@ -260,7 +259,28 @@ head(adultbmi)
 # adlthabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.sas7bdat")
 adlthabits <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.txt", header = T, sep ="\t")
 head(adlthabits)
+# remove duplicated rows
+adlthabits <- distinct(adlthabits)
 adlthabits$agesurvey <- floor(adlthabits$agesurvey_diff_of_dob_datecomp)
+
+samples.sjlife <- unique(adlthabits$SJLIFEID)
+
+lifestyle <- {}
+for (i in 1:length(samples.sjlife)){
+  print(paste0("Doing ", i))
+  dat <- adlthabits[adlthabits$SJLIFEID == samples.sjlife[i],]
+  if (max(dat$agesurvey) >= 18){
+    # print("YES")
+    dat2 <- dat[dat$agesurvey >= 18,]
+    lifestyle.tmp <- dat2[which(dat2$agesurvey_diff_of_dob_datecomp == min(dat2$agesurvey_diff_of_dob_datecomp)),]
+  } else {
+    # print("NO")
+    lifestyle.tmp <-  dat[which(dat$agesurvey_diff_of_dob_datecomp == max(dat$agesurvey_diff_of_dob_datecomp)),]
+    lifestyle.tmp[9:ncol(lifestyle.tmp)] <- NA
+  }
+  lifestyle <- rbind.data.frame(lifestyle, lifestyle.tmp)
+}
+
 
 ## For each samples, get habits immediately after 18 years of age in agesurvey
 
