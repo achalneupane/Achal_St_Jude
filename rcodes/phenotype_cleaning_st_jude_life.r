@@ -213,15 +213,15 @@ write.table(tt, "Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjli
 # WORKDIR:/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE")
 
-## Recode any values other than 0-5 as NAs
-data.df$grade[!grepl("0|1|2|3|4|5", data.df$grade)] <- NA
-
-## Omit NA grades
-# data.df <- data.df[!is.na(data.df$grade),]
-
-## Clean condition stings
-data.df$condition <- gsub("_$", "", (gsub("_+", "_",  gsub("[^A-Za-z0-9]", "_", data.df$condition))))
-dim(data.df)
+# ## Recode any values other than 0-5 as NAs
+# data.df$grade[!grepl("0|1|2|3|4|5", data.df$grade)] <- NA
+# 
+# ## Omit NA grades
+# # data.df <- data.df[!is.na(data.df$grade),]
+# 
+# ## Clean condition stings
+# data.df$condition <- gsub("_$", "", (gsub("_+", "_",  gsub("[^A-Za-z0-9]", "_", data.df$condition))))
+# dim(data.df)
 
 
 wgspop <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/wgspop.sas7bdat")

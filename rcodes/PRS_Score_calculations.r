@@ -182,22 +182,20 @@ write.table(as.data.frame(all.cancers$KEY), "PRS_all_cancers_vars.txt", col.name
 
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data/")
 ## Combine Bim file and PRS file together
-bim_file <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data/sjlife_all_PRS.bim", header = F)
+# bim_file <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data/sjlife_all_PRS.bim", header = F)
+bim_file <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data/sjlife_notfound.bim", header = F)
 bim_file$KEY2 <- paste0("chr", paste(bim_file$V1, bim_file$V4, sep = ":"))
 
 sum(all.cancers$KEY %in% bim_file$V2)
-# 1119903
-all.cancers.in.bim <- all.cancers[all.cancers$KEY %in% bim_file$V2,]
-
-bim_file.not.in.all.cancers <- bim_file[!bim_file$V2 %in% all.cancers.in.bim$KEY,]
-
-all.cancers.not.in.bim <- all.cancers[!all.cancers$KEY %in% bim_file$V2,]
-
+# 0
+# all.cancers.in.bim <- all.cancers[all.cancers$KEY %in% bim_file$V2,]
+# bim_file.not.in.all.cancers <- bim_file[!bim_file$V2 %in% all.cancers.in.bim$KEY,]
+# all.cancers.not.in.bim <- all.cancers[!all.cancers$KEY %in% bim_file$V2,]
 ## Now merge all.cancers.not.in.bim and bim_file.not.in.all.cancers
-sum(all.cancers.not.in.bim$KEY2 %in% bim_file.not.in.all.cancers$KEY2)
+# sum(all.cancers.not.in.bim$KEY2 %in% bim_file.not.in.all.cancers$KEY2)
 # 705741
 
-dat <- merge(bim_file.not.in.all.cancers, all.cancers.not.in.bim, by="KEY2", all.x=F)
+dat <- merge(bim_file, all.cancers, by="KEY2", all.x=F)
 colnames(dat)
 # [1] "KEY2"           "V1"             "V2"             "V3"             "V4"             "V5"             "V6"             "CHROM"         
 # [9] "POS_GRCh38"     "REF"            "Effect_allele"  "Effect_size"    "TYPE"           "Cancer"         "Significant_YN" "KEY"
@@ -289,3 +287,4 @@ for (i in 1:nrow(dat)){
 
 # Write data to disc
 write.table(dat.out, "PRS_SNVs_alleles_harmonized", row.names = FALSE, quote = FALSE)
+save.image("PRS_SNVs_alleles_harmonizedm.RData")
