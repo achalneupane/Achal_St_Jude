@@ -259,6 +259,11 @@ awk '{print "chr"$1"\t"$2"\t"$2+1"\t"$9}' ER_NEG_PRSWEB_PHECODE174.1_GWAS-Catalo
 ##############################
 /home/aneupane/liftover/liftOver GRCh37_all_pos.bed /home/aneupane/liftover/hg19ToHg38.over.chain GRCh37_all_pos_Hg19_GrCh38.bed GRCh37_all_pos_Hg19_unmapped.bed
 
+########################
+## Wang et al African ##
+########################
+/home/aneupane/liftover/liftOver Wang_African_GRCh37.bed /home/aneupane/liftover/hg19ToHg38.over.chain Wang_African_GrCh38.bed Wang_African_Hg19_unmapped.bed
+
 
 
 awk 'FNR==NR{a[$4] = (a[$4]==""?"":a[$4] " ") $2 OFS $3 OFS $4; next}
@@ -266,6 +271,7 @@ awk 'FNR==NR{a[$4] = (a[$4]==""?"":a[$4] " ") $2 OFS $3 OFS $4; next}
 
 
 ## Extract plink subset for PRS
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data
 ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf.gz* .
 
 cat ../SNVs_PRS.bed ../Indels_PRS.bed > PRS_vars.bed
@@ -281,13 +287,30 @@ export THREADS=4; \
 	bsub \
 	-P "chr${CHR}_extract" \
 	-J "chr${CHR}_extract" \
-	-e "${PWD}/logs/chr${CHR}_extract_err.%J" \
-	-o "${PWD}/logs/chr${CHR}_extract.%J" \
+	-e "${PWD}/logs/chr${CHR}_extractV3_err.%J" \
+	-o "${PWD}/logs/chr${CHR}_extractV3.%J" \
 	-n ${THREADS} \
 	-R "rusage[mem=50000]" \
 	"./extract_variants_from_VCF_for_PRS.sh"; \
 done
 
+
+for it in 4 5 6 8 9 10 11 12 14; do
+echo "Doing chr${it}"; \
+export CHR="$it"; \
+export THREADS=4; \
+	bsub \
+	-P "chr${CHR}_extract" \
+	-J "chr${CHR}_extract" \
+	-e "${PWD}/logs/chr${CHR}_extractV3_err.%J" \
+	-o "${PWD}/logs/chr${CHR}_extractV3.%J" \
+	-n ${THREADS} \
+	-R "rusage[mem=50000]" \
+	"./extract_variants_from_VCF_for_PRS.sh"; \
+done
+
+for i in {1..22}; do
+wc -l PRS_chr${i}_v3.bim PRS_chr${i}_v2.bim
 
 # bjobs| grep RUN| grep extract| cut -d$' ' -f1| xargs bkill
 
@@ -299,56 +322,83 @@ done
 plink --make-bed --merge-list merge_list.txt  --out sjlife_all_PRS
 
 
+# # Variants with PRS scores from all cancer types
+# [aneupane@noderome186 plink_data]$ wc -l PRS_all_cancers_vars.txt
+# 1546921 PRS_all_cancers_vars.txt
+
+
 ## Extract from plink file
-plink --bfile sjlife_all_PRS --extract PRS_all_cancers_vars.txt --make-bed --keep-allele-order --out sjlife_found
+# Step 1.
+plink --bfile sjlife_all_PRS --extract PRS_all_cancers_vars.txt --make-bed --keep-allele-order --out sjlife_found_set1
 # 1166746 variants loaded from .bim file.
 # 4507 people (0 males, 0 females, 4507 ambiguous) loaded from .fam.
 # Ambiguous sex IDs written to sjlife_found_set1.nosex .
-# --extract: 772858 variants remaining.
-# Warning: At least 347045 duplicate IDs in --extract file.
+# --extract: 1119973 variants remaining.
 # Using 1 thread (no multithreaded calculations invoked.
 # Before main variant filters, 4507 founders and 0 nonfounders present.
 # Calculating allele frequencies... done.
-# Total genotyping rate is 0.999866.
-# 772858 variants and 4507 people pass filters and QC.
-# exclude set 1
+# Total genotyping rate is 0.999865.
+# 1119973 variants and 4507 people pass filters and QC.
+# Note: No phenotypes present.
+# --make-bed to sjlife_found_set1.bed + sjlife_found_set1.bim +
+
+
+
 awk '{ print $2 }' sjlife_found_set1.bim > set1_vars
 
-plink --bfile sjlife_all_PRS --exclude set1_vars --make-bed --keep-allele-order --out sjlife_notfound
+# Step 2.
+# Excluding variants that did match in step 1
+plink --bfile sjlife_all_PRS --exclude set1_vars --make-bed --keep-allele-order --out sjlife_not_found
+# 1031903 MB RAM detected; reserving 515951 MB for main workspace.
 # 1166746 variants loaded from .bim file.
 # 4507 people (0 males, 0 females, 4507 ambiguous) loaded from .fam.
-# Ambiguous sex IDs written to sjlife_notfound.nosex .
-# --exclude: 393888 variants remaining.
+# Ambiguous sex IDs written to sjlife_not_found.nosex .
+# --exclude: 46773 variants remaining.
 # Using 1 thread (no multithreaded calculations invoked.
 # Before main variant filters, 4507 founders and 0 nonfounders present.
 # Calculating allele frequencies... done.
-# Total genotyping rate is 0.999598.
-# 393888 variants and 4507 people pass filters and QC.
+# Total genotyping rate is 0.997624.
+# 46773 variants and 4507 people pass filters and QC.
+# Note: No phenotypes present.
+# --make-bed to sjlife_not_found.bed + sjlife_not_found.bim +
 
-plink --bfile sjlife_all_PRS --flip sjlife_notfound.bim --make-bed --keep-allele-order --out sjlife_all_PRS_flipped
+
+# Step 3.
+awk '{ print $2 }' sjlife_not_found.bim > flip_list
+# Now flipping variants that did not match in step 1 (flip list obtained from step 2)
+plink --bfile sjlife_all_PRS --flip flip_list --make-bed --keep-allele-order --out sjlife_all_PRS_flipped
+# 1031903 MB RAM detected; reserving 515951 MB for main workspace.
 # 1166746 variants loaded from .bim file.
 # 4507 people (0 males, 0 females, 4507 ambiguous) loaded from .fam.
 # Ambiguous sex IDs written to sjlife_all_PRS_flipped.nosex .
-# --flip: 392692 SNPs flipped, 1969440 SNP IDs not present.
-# Warning: 24877 variants had at least one non-A/C/G/T allele name.
+# --flip: 45577 SNPs flipped.
+# Warning: 24857 variants had at least one non-A/C/G/T allele name.
 # Using 1 thread (no multithreaded calculations invoked.
 # Before main variant filters, 4507 founders and 0 nonfounders present.
 # Calculating allele frequencies... done.
 # Total genotyping rate is 0.999776.
 # 1166746 variants and 4507 people pass filters and QC.
+# Note: No phenotypes present.
+# --make-bed to sjlife_all_PRS_flipped.bed + sjlife_all_PRS_flipped.bim +
+# sjlife_all_PRS_flipped.fam ... done.
+
+
+
 
 ## Now extract again from the flipped
 plink --bfile sjlife_all_PRS_flipped --extract PRS_all_cancers_vars.txt --make-bed --keep-allele-order --out sjlife_found_v2
 # 1166746 variants loaded from .bim file.
 # 4507 people (0 males, 0 females, 4507 ambiguous) loaded from .fam.
 # Ambiguous sex IDs written to sjlife_found_v2.nosex .
-# --extract: 772858 variants remaining.
-# Warning: At least 347045 duplicate IDs in --extract file.
+# --extract: 1119973 variants remaining.
 # Using 1 thread (no multithreaded calculations invoked.
 # Before main variant filters, 4507 founders and 0 nonfounders present.
 # Calculating allele frequencies... done.
-# Total genotyping rate is 0.999866.
-# 772858 variants and 4507 people pass filters and QC.
+# Total genotyping rate is 0.999865.
+# 1119973 variants and 4507 people pass filters and QC.
+# Note: No phenotypes present.
+# --make-bed to sjlife_found_v2.bed + sjlife_found_v2.bim + sjlife_found_v2.fam
+
 
 
 ## Harmonize alleles
@@ -376,7 +426,30 @@ export THREADS=4; \
 done
 
 
+## Merge all plink files
+for CHR in {1..22}; do
+echo "Annotated_Pathogenic_PreQC_chr${CHR}" >> merge_list.txt
+done
+plink --make-bed --merge-list merge_list.txt  --out sjlife_all_pathogenic_variants_PreQC
+## Recode
+plink --bfile sjlife_all_pathogenic_variants_PreQC --recodeA --out sjlife_all_pathogenic_variants_PreQC_recodeA
+plink --bfile sjlife_all_pathogenic_variants_PreQC --recode12 --out sjlife_all_pathogenic_variants_PreQC_recode12
+plink --bfile sjlife_all_pathogenic_variants_PreQC --recodeAD --out sjlife_all_pathogenic_variants_PreQC_recodeAD
 
+# https://zzz.bwh.harvard.edu/plink/dataman.shtml
+# plink --file data --recodeAD
+# which, assuming C is the minor allele, will recode genotypes as follows:
+#  SNP       SNP_A ,  SNP_HET
+#      ---       -----    -----
+#      A A   ->    0   ,   0
+#      A C   ->    1   ,   1
+#      C C   ->    2   ,   0
+#      0 0   ->   NA   ,  NA
+
+# n otherwords, the default for the additive recoding is to count the number of minor alleles per person. The --recodeAD option produces both an additive and dominance coding: use --recodeA instead to skip the SNP_HET coding.
+# The --recodeAD option saves the data to a single file
+
+## Therefore, --recodeA is the right option to get the carriers
 ####################################################################
 ## check variants from  SNPeff in Zhaoming and Qin et al's papers ##
 ####################################################################
