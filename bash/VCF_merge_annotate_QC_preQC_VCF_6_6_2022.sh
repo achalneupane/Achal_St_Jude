@@ -376,14 +376,13 @@ plink --bfile sjlife_all_PRS_all --exclude set1_vars --make-bed --keep-allele-or
 
 
 # Step 3.
-awk '{ print $2 }' sjlife_not_found.bim > flip_list
+awk '{ print $1":"$4 }' sjlife_not_found.bim > flip_list
 # Now flipping variants that did not match in step 1 (flip list obtained from step 2)
-plink --bfile sjlife_all_PRS_all --flip flip_list --make-bed --keep-allele-order --out sjlife_all_PRS_flipped
+plink --bfile sjlife_not_found --flip flip_list --make-bed --out sjlife_all_PRS_flipped
 # 1166787 variants loaded from .bim file.
 # 4507 people (0 males, 0 females, 4507 ambiguous) loaded from .fam.
 # Ambiguous sex IDs written to sjlife_all_PRS_flipped.nosex .
-# --flip: 45599 SNPs flipped.
-# Warning: 24882 variants had at least one non-A/C/G/T allele name.
+# --flip: 0 SNPs flipped, 46804 SNP IDs not present.
 # Using 1 thread (no multithreaded calculations invoked.
 # Before main variant filters, 4507 founders and 0 nonfounders present.
 # Calculating allele frequencies... done.
@@ -391,13 +390,16 @@ plink --bfile sjlife_all_PRS_all --flip flip_list --make-bed --keep-allele-order
 # 1166787 variants and 4507 people pass filters and QC.
 # Note: No phenotypes present.
 # --make-bed to sjlife_all_PRS_flipped.bed + sjlife_all_PRS_flipped.bim +
+# sjlife_all_PRS_flipped.fam ... done.
+
+
 
 
 
 
 
 ## Now extract again from the flipped. Here flipping alleles did not add any new matches
-plink --bfile sjlife_all_PRS_flipped --extract PRS_all_cancers_vars.txt --make-bed --keep-allele-order --out sjlife_found_v2
+plink --bfile sjlife_all_PRS_flipped --extract PRS_all_cancers_vars.txt --make-bed --out sjlife_found_v2
 # 1166787 variants loaded from .bim file.
 # 4507 people (0 males, 0 females, 4507 ambiguous) loaded from .fam.
 # Ambiguous sex IDs written to sjlife_found_v2.nosex .
@@ -412,29 +414,37 @@ plink --bfile sjlife_all_PRS_flipped --extract PRS_all_cancers_vars.txt --make-b
 
 
 
-awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $0, a[$1":"$4]}' ../ALL_Cancers_PRS_data.txt sjlife_all_PRS_all.bim | awk '($5==$7 || $5==$8) && ($6==$7 || $6==$8)' | awk '!a[$1":"$4]++' | wc -l
+awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $0, a[$1":"$4]}' ../ALL_Cancers_PRS_data.txt sjlife_all_PRS_flipped.bim | awk '($5==$7 || $5==$8) && ($6==$7 || $6==$8)' | awk '!a[$1":"$4]++' | wc -l
+1119983
 
-1119969
-
- 
-
-Of the 2241452 variants in the PRS file (which seem to have duplicates as well), there are 1121116 unique variants.
-
- 
-
+Of the 2241696 variants in the PRS file (which seem to have duplicates as well), there are 1121122 unique variants.
 wc -l ../ALL_Cancers_PRS_data.txt
-
-2241453 ../ALL_Cancers_PRS_data.txt
-
- 
-
+2241697 ../ALL_Cancers_PRS_data.txt
 awk '!a[$1":"$2]++' ../ALL_Cancers_PRS_data.txt | wc -l
+1121123
 
-1121117
-
- 
+# 1140 missing
 
 
+# Run the PRS analysis 
+ln -s ../Analysis_ready_ALL_Cancers_PRS_data.txt .
+array=($(cut -d$'\t' -f4 Analysis_ready_ALL_Cancers_PRS_data.txt| sort -V | uniq))
+
+for i in "${array[@]}"; do
+echo "Doing ${i}"
+used=$(echo $(grep -w ${i} Analysis_ready_ALL_Cancers_PRS_data.txt| wc -l))
+grep -w ${i} Analysis_ready_ALL_Cancers_PRS_data.txt | awk '{ print $1,$2,$3 }' > PRS_${i}.score
+plink --bfile sjlife_all_PRS_flipped --out Scores_for_${i}_with_${used}_vars --score PRS_${i}.score
+done
+
+# Cancer types
+# array=($(cut -d$'\t' -f5 Analysis_ready_ALL_Cancers_PRS_data.txt| sort -V | uniq))
+# for i in "${array[@]}"; do
+# echo "Doing ${i}"
+# used=$(echo $(grep -w ${i} Analysis_ready_ALL_Cancers_PRS_data.txt| wc -l))
+# grep -w ${i} Analysis_ready_ALL_Cancers_PRS_data.txt | awk '{ print $1,$2,$3 }'| sort -V| uniq > AN_PRS_${i}.score
+# plink --bfile sjlife_all_PRS_flipped --out AN_Scores_for_${i}_with_${used}_vars --score AN_PRS_${i}.score
+# done
 
 
 

@@ -148,6 +148,7 @@ all.cancers <- rbind.data.frame(Breast, other_cancers)
 ###############################
 ## fix effect size +/- signs ##
 ###############################
+all.cancers.saved <- all.cancers
 all.cancers[all.cancers$Effect_size < 0, c("REF", "Effect_allele")] <- all.cancers[all.cancers$Effect_size < 0, c("Effect_allele", "REF")]
 all.cancers$Effect_size <- abs(all.cancers$Effect_size)
 
@@ -260,7 +261,8 @@ OLD.all.cancers$KEY3 <- paste0("chr", paste(OLD.all.cancers$CHROM, OLD.all.cance
 
 old.keys <- as.character(c(OLD.all.cancers$KEY, OLD.all.cancers$KEY3))
 
-sum(new.keys %in% old.keys)
+sum(!new.keys %in% old.keys)
+# 351
 new.keys <- new.keys[!new.keys %in% old.keys]
 
 new.set1 <- all.cancers[all.cancers$KEY %in% new.keys,]
@@ -273,15 +275,18 @@ write.table(ALL.cancers.Keys, "PRS_all_cancers_vars.txt", col.names = F, row.nam
 
 write.table(PRS.INDELS, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/Indels_PRS.bed", row.names = F, col.names = F, quote = F, sep = "\t")
 write.table(PRS.SNVS, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/SNVs_PRS.bed", row.names = F, col.names = F, quote = F, sep = "\t")
-write.table(all.cancers, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+
+all.cancers1 <- all.cancers
+all.cancers1$CHROM <- gsub("chr", "", all.cancers1$CHROM)
+write.table(all.cancers1[1:8], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+
+write.table(all.cancers1[1:8], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+
 
 
 ###################################################################
 ## create bed files for the new variants missed in first attempt ##
 ###################################################################
-
- 
-
 new.all.cancers.INDELS <- new.set.all[nchar(new.set.all$REF) != 1 | nchar(new.set.all$Effect_allele) != 1 ,]
 nrow(new.all.cancers.INDELS)
 # 0
@@ -301,78 +306,152 @@ write.table(new.PRS.SNVS, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/com
 
 
 
+
+####################################
+## Create PRS analysis ready file ##
+####################################
+colnames(ALL.cancers.Keys) <- "KEY"
+
+plink.final.bim <- read.table("sjlife_all_PRS_all.bim")
+# plink.final.bim <- read.table("sjlife_all_PRS_flipped.bim")
+
+sum(all.cancers$KEY %in% plink.final.bim$V2)
+sum(all.cancers$KEY3 %in% plink.final.bim$V2)
+final.set1 <- all.cancers [all.cancers$KEY %in% plink.final.bim$V2,]
+final.set1 <- cbind.data.frame(SNPId = final.set1$KEY, Effect_allele = final.set1$Effect_allele, Effect_size = final.set1$Effect_size, TYPE = final.set1$TYPE, Cancer = final.set1$Cancer)
+
+final.set2 <- all.cancers [all.cancers$KEY3 %in% plink.final.bim$V2,]
+final.set2 <- cbind.data.frame(SNPId = final.set2$KEY3, Effect_allele = final.set2$Effect_allele, Effect_size = final.set2$Effect_size, TYPE = final.set2$TYPE, Cancer = final.set2$Cancer)
+
+final.set <- rbind.data.frame(final.set1, final.set2)
+dim(final.set)
+# [1] 2239393       5
+sum(final.set$SNPId %in% plink.final.bim$V2)
+# 2239393
+
+length(unique(final.set$SNPId))
+# 1119983
+
+write.table(final.set, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/Analysis_ready_ALL_Cancers_PRS_data.txt", row.names = F, col.names = F, quote = F, sep = "\t")
+as.data.frame(table(final.set$TYPE))
+
+# Var1    Freq  Plink
+# 1                    ALL_Vijayakrishnan      15 
+# 2                 Allman_African_Breast      75 46
+# 3                Allman_Hispanic_Breast      71 63
+# 4                     Khera_2018_Breast      77 73
+# 5           Mavaddat_2015_ER_NEG_Breast      77 73
+# 6       Mavaddat_2015_ER_OVERALL_Breast      77 73
+# 7           Mavaddat_2015_ER_POS_Breast      77 73
+# 8           Mavaddat_2019_ER_NEG_Breast     313 293
+# 9       Mavaddat_2019_ER_OVERALL_Breast     313 293
+# 10          Mavaddat_2019_ER_POS_Breast     313 293
+# 11                     Meningioma_Claus       1 
+# 12                   Meningioma_Dobbins       2 
+# 13            MichiganWeb_ER_NEG_Breast      79 78
+# 14        MichiganWeb_ER_OVERALL_Breast 1120348 1119253
+# 15            MichiganWeb_ER_POS_Breast 1119079 1118016
+# 16            Pleiotropy_Bi_directional      21 21
+# 17             Pleiotropy_Meta_analysis      21 21
+# 18                Pleiotropy_One_cohort       9 9
+# 19           Pleiotropy_One_directional     137 133
+# 20                    Pleiotropy_PRSWEB     179 179
+# 21 Pleiotropy_Replication_prior_studies     308 300
+# 22                     Sarcoma_Machiela       6 6
+# 23                  Wang_African_Breast      98 97
+
+meningioma <- all.cancers [grepl("Meningioma", all.cancers$TYPE ),]
+ALL <- all.cancers [grepl("Vijay", all.cancers$TYPE ),]
+Allman_African <- all.cancers [grepl("Allman_African", all.cancers$TYPE ),]
+
+
+# find that are missing
+# first remove those that are present in final.set from all.cancers
+all.cancers.not.matched <- all.cancers [!all.cancers$KEY %in% final.set$SNPId,]
+all.cancers.not.matched <- all.cancers.not.matched [!all.cancers.not.matched$KEY3 %in% final.set$SNPId,]
+
+head(plink.final.bim)
+plink.final.bim$KEY2 <- paste0("chr", paste(plink.final.bim$V1, plink.final.bim$V4, sep = ":"))
+
+sum(all.cancers.not.matched$KEY2 %in% plink.final.bim$KEY2)
+
+plink.final.bim.matched2 <- plink.final.bim[plink.final.bim$KEY2 %in% all.cancers.not.matched$KEY2,]
+plink.final.bim.matched2
+
+TT <- merge(plink.final.bim.matched2, all.cancers.not.matched, by ="KEY2",  all = T)
+
 # #######################
 # ## Harmonize alleles ##
 # #######################
 # 
-# # Process the variants to match their alleles
-# 
-# # # Read the input file including variants with no direct match of their alleles
-# # args = commandArgs(trailingOnly = TRUE)
-# # dat = read.table(args[1], header = FALSE, stringsAsFactors = FALSE)
-# # # dat = read.table("Z:/ResearchHome/ClusterHome/ysapkota/Work/CAD_PRS/y", header = FALSE, stringsAsFactors = FALSE)
-# 
-# dat <- dat.SNVs[1:1000,]
-# 
-# ## Function to flip alleles
-# flip_alleles = function(x){
-#   if(x=="A"){
-#     y="T"
-#   } else if (x=="T"){
-#     y="A"
-#   } else if (x=="C"){
-#     y="G"
-#   } else if (x=="G"){
-#     y="C"
-#   }
-#   return(y)
-# }
-# 
-# # Process each variant to check the alleles
-# dat.out = NULL
-# for (i in 1:nrow(dat)){
-#   print(paste0("Doing row ", i ))
-#   chr=dat$V1[i]
-#   pos = dat$V4[i]
-#   variant = dat$V2[i]
-#   khera_a1 = dat$V7[i]
-#   khera_a2 = dat$V8[i]
-#   khera_weight = dat$V9[i]
-#   wgs_a1 = dat$V5[i]
-#   wgs_a2 = dat$V6[i]
-#   # First find out if the wgs_a1 have more than one character
-#   if(nchar(wgs_a1)>1){
-#     wgs_a1_first = substr(wgs_a1, 1, 1)
-#     wgs_a1_last = substr(wgs_a1, nchar(wgs_a1), nchar(wgs_a1))
-#     wgs_a1_changed = ifelse(wgs_a1_first==wgs_a2, wgs_a1_last, wgs_a1_first)
-#   } else {
-#     wgs_a1_changed = wgs_a1
-#   }
-#   # Then do the same for wgs_a2 allele
-#   if (nchar(wgs_a2)>1){
-#     wgs_a2_first = substr(wgs_a2, 1, 1)
-#     wgs_a2_last = substr(wgs_a2, nchar(wgs_a2), nchar(wgs_a2))
-#     wgs_a2_changed = ifelse(wgs_a2_first==wgs_a1, wgs_a2_last, wgs_a2_first)
-#   } else {
-#     wgs_a2_changed = wgs_a2
-#   }
-#   # Now check if the changed wgs alleles match with those from Khera et al
-#   # No alleles flipped
-#   if ((wgs_a1_changed == khera_a1 & wgs_a2_changed == khera_a2) | (wgs_a1_changed == khera_a2 & wgs_a2_changed == khera_a1)){
-#     wgs_a1_new = wgs_a1_changed; wgs_a2_new = wgs_a2_changed; match=1
-#   } else if((flip_alleles(wgs_a1_changed) == khera_a1 & wgs_a2_changed == khera_a2) | (flip_alleles(wgs_a1_changed) == khera_a2 & wgs_a2_changed == khera_a1)) { # only a1 flipped
-#     wgs_a1_new = flip_alleles(wgs_a1_changed); wgs_a2_new = wgs_a2_changed; match=1
-#   } else if ((wgs_a1_changed == khera_a1 & flip_alleles(wgs_a2_changed) == khera_a2) | (wgs_a1_changed == khera_a2 & flip_alleles(wgs_a2_changed) == khera_a1)) { # only a2 flipped
-#     wgs_a1_new = wgs_a1_changed; wgs_a2_new = flip_alleles(wgs_a2_changed); match=1
-#   } else if ((flip_alleles(wgs_a1_changed) == khera_a1 & flip_alleles(wgs_a2_changed) == khera_a2) | (flip_alleles(wgs_a1_changed) == khera_a2 & flip_alleles(wgs_a2_changed) == khera_a1)){ # both a1 and a2 flipped
-#     wgs_a1_new = flip_alleles(wgs_a1_changed); wgs_a2_new = flip_alleles(wgs_a2_changed); match=1
-#   } else {
-#     wgs_a1_new = wgs_a1_changed; wgs_a2_new = wgs_a2_changed; match=0
-#   }
-#   dat.out = rbind(dat.out, data.frame(chr, pos, variant, khera_a1, khera_a2, wgs_a1, wgs_a2, wgs_a1_new, wgs_a2_new, match))
-# }
+# Process the variants to match their alleles
+
+# # Read the input file including variants with no direct match of their alleles
+# args = commandArgs(trailingOnly = TRUE)
+# dat = read.table(args[1], header = FALSE, stringsAsFactors = FALSE)
+# # dat = read.table("Z:/ResearchHome/ClusterHome/ysapkota/Work/CAD_PRS/y", header = FALSE, stringsAsFactors = FALSE)
+
+dat <- dat.SNVs[1:1000,]
+
+## Function to flip alleles
+flip_alleles = function(x){
+  if(x=="A"){
+    y="T"
+  } else if (x=="T"){
+    y="A"
+  } else if (x=="C"){
+    y="G"
+  } else if (x=="G"){
+    y="C"
+  }
+  return(y)
+}
+
+# Process each variant to check the alleles
+dat.out = NULL
+for (i in 1:nrow(dat)){
+  print(paste0("Doing row ", i ))
+  chr=dat$V1[i]
+  pos = dat$V4[i]
+  variant = dat$V2[i]
+  khera_a1 = dat$V7[i]
+  khera_a2 = dat$V8[i]
+  khera_weight = dat$V9[i]
+  wgs_a1 = dat$V5[i]
+  wgs_a2 = dat$V6[i]
+  # First find out if the wgs_a1 have more than one character
+  if(nchar(wgs_a1)>1){
+    wgs_a1_first = substr(wgs_a1, 1, 1)
+    wgs_a1_last = substr(wgs_a1, nchar(wgs_a1), nchar(wgs_a1))
+    wgs_a1_changed = ifelse(wgs_a1_first==wgs_a2, wgs_a1_last, wgs_a1_first)
+  } else {
+    wgs_a1_changed = wgs_a1
+  }
+  # Then do the same for wgs_a2 allele
+  if (nchar(wgs_a2)>1){
+    wgs_a2_first = substr(wgs_a2, 1, 1)
+    wgs_a2_last = substr(wgs_a2, nchar(wgs_a2), nchar(wgs_a2))
+    wgs_a2_changed = ifelse(wgs_a2_first==wgs_a1, wgs_a2_last, wgs_a2_first)
+  } else {
+    wgs_a2_changed = wgs_a2
+  }
+  # Now check if the changed wgs alleles match with those from Khera et al
+  # No alleles flipped
+  if ((wgs_a1_changed == khera_a1 & wgs_a2_changed == khera_a2) | (wgs_a1_changed == khera_a2 & wgs_a2_changed == khera_a1)){
+    wgs_a1_new = wgs_a1_changed; wgs_a2_new = wgs_a2_changed; match=1
+  } else if((flip_alleles(wgs_a1_changed) == khera_a1 & wgs_a2_changed == khera_a2) | (flip_alleles(wgs_a1_changed) == khera_a2 & wgs_a2_changed == khera_a1)) { # only a1 flipped
+    wgs_a1_new = flip_alleles(wgs_a1_changed); wgs_a2_new = wgs_a2_changed; match=1
+  } else if ((wgs_a1_changed == khera_a1 & flip_alleles(wgs_a2_changed) == khera_a2) | (wgs_a1_changed == khera_a2 & flip_alleles(wgs_a2_changed) == khera_a1)) { # only a2 flipped
+    wgs_a1_new = wgs_a1_changed; wgs_a2_new = flip_alleles(wgs_a2_changed); match=1
+  } else if ((flip_alleles(wgs_a1_changed) == khera_a1 & flip_alleles(wgs_a2_changed) == khera_a2) | (flip_alleles(wgs_a1_changed) == khera_a2 & flip_alleles(wgs_a2_changed) == khera_a1)){ # both a1 and a2 flipped
+    wgs_a1_new = flip_alleles(wgs_a1_changed); wgs_a2_new = flip_alleles(wgs_a2_changed); match=1
+  } else {
+    wgs_a1_new = wgs_a1_changed; wgs_a2_new = wgs_a2_changed; match=0
+  }
+  dat.out = rbind(dat.out, data.frame(chr, pos, variant, khera_a1, khera_a2, wgs_a1, wgs_a2, wgs_a1_new, wgs_a2_new, match))
+}
 
 # Write data to disc
-write.table(dat.out, "PRS_SNVs_alleles_harmonized", row.names = FALSE, quote = FALSE)
-save.image("PRS_vars_search.RData")
-load("PRS_SNVs_alleles_harmonized.RData")
+# write.table(dat.out, "PRS_SNVs_alleles_harmonized", row.names = FALSE, quote = FALSE)
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/PRS_vars_search.RData")
+# load("PRS_SNVs_alleles_harmonized.RData")
