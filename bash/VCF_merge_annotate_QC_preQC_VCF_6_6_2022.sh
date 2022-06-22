@@ -295,23 +295,6 @@ export THREADS=4; \
 done
 
 
-for it in 4 5 6 8 9 10 11 12 14; do
-echo "Doing chr${it}"; \
-export CHR="$it"; \
-export THREADS=4; \
-	bsub \
-	-P "chr${CHR}_extract" \
-	-J "chr${CHR}_extract" \
-	-e "${PWD}/logs/chr${CHR}_extractV3_err.%J" \
-	-o "${PWD}/logs/chr${CHR}_extractV3.%J" \
-	-n ${THREADS} \
-	-R "rusage[mem=50000]" \
-	"./extract_variants_from_VCF_for_PRS.sh"; \
-done
-
-for i in {1..22}; do
-wc -l PRS_chr${i}_v3.bim PRS_chr${i}_v2.bim
-
 # bjobs| grep RUN| grep extract| cut -d$' ' -f1| xargs bkill
 
 
@@ -321,6 +304,34 @@ echo "PRS_chr${CHR}_v2" >> merge_list.txt
 done
 plink --make-bed --merge-list merge_list.txt  --out sjlife_all_PRS
 
+
+
+## run this one more time for the variants that I missed in the first run
+ln -s ../extract_batch2_SNVs_PRS.bed .
+for it in 1 2 3 4 5 6 7 8 9 10 11 12 14 16 18 19 22; do
+echo "Doing chr${it}"; \
+export CHR="$it"; \
+export THREADS=4; \
+	bsub \
+	-P "chr${CHR}_extract" \
+	-J "chr${CHR}_extract" \
+	-e "${PWD}/logs/chr${CHR}_extractV3_err.%J" \
+	-o "${PWD}/logs/chr${CHR}_extractV3.%J" \
+	-n ${THREADS} \
+	-R "rusage[mem=20000]" \
+	"./extract_variants_from_VCF_for_PRS_v3.sh"; \
+done
+
+
+## Merge plink files
+for CHR in 1 2 3 4 5 6 7 8 9 10 11 12 14 16 18 19 22; do
+echo "PRS_chr${CHR}_v3" >> merge_list2.txt
+done
+plink --make-bed --merge-list merge_list2.txt  --out sjlife_all_PRS2
+
+# merge sjlife_all_PRS and sjlife_all_PRS2
+
+plink --bfile sjlife_all_PRS --bmerge sjlife_all_PRS2 --out sjlife_all_PRS_all
 
 # # Variants with PRS scores from all cancer types
 # [aneupane@noderome186 plink_data]$ wc -l PRS_all_cancers_vars.txt

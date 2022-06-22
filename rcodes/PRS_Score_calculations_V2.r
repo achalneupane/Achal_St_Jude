@@ -214,22 +214,18 @@ PRS.SNVS <- PRS.SNVS[!duplicated(PRS.SNVS$KEY),1:3]
 
 
 
-write.table(PRS.INDELS, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/Indels_PRS.bed", row.names = F, col.names = F, quote = F, sep = "\t")
-write.table(PRS.SNVS, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/SNVs_PRS.bed", row.names = F, col.names = F, quote = F, sep = "\t")
-write.table(all.cancers, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", row.names = F, col.names = T, quote = F, sep = "\t")
-
 
 ###################################
 ## Check Matches with plink file ##
 ###################################
 
 
-all.cancers <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", header = T)
+# all.cancers <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", header = T)
 all.cancers$KEY <- paste(all.cancers$CHROM, all.cancers$POS_GRCh38, all.cancers$REF, all.cancers$Effect_allele, sep = ":")
 all.cancers$KEY2 <- paste(all.cancers$CHROM, all.cancers$POS_GRCh38, sep = ":")
 all.cancers$KEY3 <- paste(all.cancers$CHROM, all.cancers$POS_GRCh38, all.cancers$Effect_allele, all.cancers$REF, sep = ":")
 dim(all.cancers) 
-# 2241452    10
+# 2241696      11
 
 # Unique SNPIDs
 length(unique(all.cancers$KEY))
@@ -243,8 +239,7 @@ all.cancers[grepl("X",all.cancers$KEY),]
 
 # extract plink subset
 ALL.cancers.Keys <- as.data.frame(unique(c(all.cancers$KEY, all.cancers$KEY3)))
-write.table(ALL.cancers.Keys, "PRS_all_cancers_vars.txt", col.names = F, row.names = F, quote = F)
-
+new.keys <- as.character(unique(c(all.cancers$KEY, all.cancers$KEY3)))
 
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data/")
 ## Combine Bim file and PRS file together
@@ -258,8 +253,52 @@ sum(unique(as.character(ALL.cancers.Keys$`unique(c(all.cancers$KEY, all.cancers$
 # 1119974
 
 
-## Extract the difference from the and run the bcftools on the difference again
-unique(as.character(ALL.cancers.Keys$`unique(c(all.cancers$KEY, all.cancers$KEY3))`)) [unique(as.character(ALL.cancers.Keys$`unique(c(all.cancers$KEY, all.cancers$KEY3))`)) %in% as.character(bim_file_all$KEY)]
+## Extract the difference from the old PRS and run the bcftools on the difference again
+OLD.all.cancers <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/OLD_ALL_Cancers_PRS_data.txt", header = T)
+OLD.all.cancers$KEY <- paste0("chr", paste(OLD.all.cancers$CHROM, OLD.all.cancers$POS_GRCh38, OLD.all.cancers$REF, OLD.all.cancers$Effect_allele, sep = ":"))
+OLD.all.cancers$KEY3 <- paste0("chr", paste(OLD.all.cancers$CHROM, OLD.all.cancers$POS_GRCh38, OLD.all.cancers$Effect_allele, OLD.all.cancers$REF, sep = ":"))
+
+old.keys <- as.character(c(OLD.all.cancers$KEY, OLD.all.cancers$KEY3))
+
+sum(new.keys %in% old.keys)
+new.keys <- new.keys[!new.keys %in% old.keys]
+
+new.set1 <- all.cancers[all.cancers$KEY %in% new.keys,]
+new.set2 <- all.cancers[all.cancers$KEY3 %in% new.keys,]
+
+new.set.all <- rbind.data.frame(new.set1, new.set2)
+new.set.all <- distinct(new.set.all)
+
+write.table(ALL.cancers.Keys, "PRS_all_cancers_vars.txt", col.names = F, row.names = F, quote = F)
+
+write.table(PRS.INDELS, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/Indels_PRS.bed", row.names = F, col.names = F, quote = F, sep = "\t")
+write.table(PRS.SNVS, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/SNVs_PRS.bed", row.names = F, col.names = F, quote = F, sep = "\t")
+write.table(all.cancers, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+
+
+###################################################################
+## create bed files for the new variants missed in first attempt ##
+###################################################################
+
+ 
+
+new.all.cancers.INDELS <- new.set.all[nchar(new.set.all$REF) != 1 | nchar(new.set.all$Effect_allele) != 1 ,]
+nrow(new.all.cancers.INDELS)
+# 0
+
+new.all.cancers.SNVS <- new.set.all[!(nchar(new.set.all$REF) != 1 | nchar(new.set.all$Effect_allele) != 1),]
+nrow(new.all.cancers.SNVS)
+# 2241511
+
+new.PRS.SNVS <- cbind.data.frame(CHROM = new.all.cancers.SNVS$CHROM, START = new.all.cancers.SNVS$POS_GRCh38-1, END = new.all.cancers.SNVS$POS_GRCh38)
+
+
+new.PRS.SNVS$KEY <- paste(new.PRS.SNVS$CHROM, new.PRS.SNVS$START, new.PRS.SNVS$END, sep = ":")
+new.PRS.SNVS <- new.PRS.SNVS[!duplicated(new.PRS.SNVS$KEY),1:3]
+
+write.table(new.PRS.SNVS, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/extract_batch2_SNVs_PRS.bed", row.names = F, col.names = F, quote = F, sep = "\t")
+
+
 
 
 # #######################
