@@ -295,24 +295,6 @@ export THREADS=4; \
 done
 
 
-for it in 4 5 6 8 9 10 11 12 14; do
-echo "Doing chr${it}"; \
-export CHR="$it"; \
-export THREADS=4; \
-	bsub \
-	-P "chr${CHR}_extract" \
-	-J "chr${CHR}_extract" \
-	-e "${PWD}/logs/chr${CHR}_extractV3_err.%J" \
-	-o "${PWD}/logs/chr${CHR}_extractV3.%J" \
-	-n ${THREADS} \
-	-R "rusage[mem=50000]" \
-	"./extract_variants_from_VCF_for_PRS.sh"; \
-done
-
-for i in {1..22}; do
-wc -l PRS_chr${i}_v3.bim PRS_chr${i}_v2.bim
-done
-
 # bjobs| grep RUN| grep extract| cut -d$' ' -f1| xargs bkill
 
 
@@ -323,91 +305,150 @@ done
 plink --make-bed --merge-list merge_list.txt  --out sjlife_all_PRS
 
 
+
+## run this one more time for the variants that I missed in the first run
+ln -s ../extract_batch2_SNVs_PRS.bed .
+for it in 1 2 3 4 5 6 7 8 9 10 11 12 14 16 18 19 22; do
+echo "Doing chr${it}"; \
+export CHR="$it"; \
+export THREADS=4; \
+	bsub \
+	-P "chr${CHR}_extract" \
+	-J "chr${CHR}_extract" \
+	-e "${PWD}/logs/chr${CHR}_extractV3_err.%J" \
+	-o "${PWD}/logs/chr${CHR}_extractV3.%J" \
+	-n ${THREADS} \
+	-R "rusage[mem=20000]" \
+	"./extract_variants_from_VCF_for_PRS_v3.sh"; \
+done
+
+
+## also run for missing meningioma variants
+for it in 10 11; do
+echo "Doing chr${it}"; \
+export CHR="$it"; \
+export THREADS=4; \
+	bsub \
+	-P "chr${CHR}_extract" \
+	-J "chr${CHR}_extract" \
+	-e "${PWD}/logs/chr${CHR}_extractV3_err.%J" \
+	-o "${PWD}/logs/chr${CHR}_extractV3.%J" \
+	-n ${THREADS} \
+	-R "rusage[mem=20000]" \
+	"./meningioma_extract_variants_from_VCF_for_PRS.sh"; \
+done
+
+## Merge plink files
+for CHR in 1 2 3 4 5 6 7 8 9 10 11 12 14 16 18 19 22; do
+echo "PRS_chr${CHR}_v3" >> merge_list2.txt
+done
+plink --make-bed --merge-list merge_list2.txt  --out sjlife_all_PRS2
+
+# merge sjlife_all_PRS and sjlife_all_PRS2
+
+plink --bfile sjlife_all_PRS --bmerge sjlife_all_PRS2 --out sjlife_all_PRS_all
+
+
+for CHR in 10 11; do
+echo "PRS_chr${CHR}_v4" >> merge_list3.txt
+done
+plink --make-bed --merge-list merge_list3.txt  --out sjlife_all_PRS3
+
+# merge sjlife_all_PRS and sjlife_all_PRS2
+
+plink --bfile sjlife_all_PRS_all --bmerge sjlife_all_PRS3 --out sjlife_all_PRS_all_final
+
 # # Variants with PRS scores from all cancer types
 # [aneupane@noderome186 plink_data]$ wc -l PRS_all_cancers_vars.txt
 # 1546921 PRS_all_cancers_vars.txt
 
 
-## Extract from plink file
-# Step 1.
-plink --bfile sjlife_all_PRS --extract PRS_all_cancers_vars_ALL.txt --make-bed --keep-allele-order --out sjlife_found_set1
-# 1166746 variants loaded from .bim file.
-# 4507 people (0 males, 0 females, 4507 ambiguous) loaded from .fam.
-# Ambiguous sex IDs written to sjlife_found_set1.nosex .
-# --extract: 1119973 variants remaining.
-# Using 1 thread (no multithreaded calculations invoked.
-# Before main variant filters, 4507 founders and 0 nonfounders present.
-# Calculating allele frequencies... done.
-# Total genotyping rate is 0.999865.
-# 1119973 variants and 4507 people pass filters and QC.
-# Note: No phenotypes present.
-# --make-bed to sjlife_found_set1.bed + sjlife_found_set1.bim +
-
-
-
-awk '{ print $2 }' sjlife_found_set1.bim > set1_vars
-
-# Step 2.
-# Excluding variants that did match in step 1
-plink --bfile sjlife_all_PRS --exclude set1_vars --make-bed --keep-allele-order --out sjlife_not_found
-# 1031903 MB RAM detected; reserving 515951 MB for main workspace.
-# 1166746 variants loaded from .bim file.
-# 4507 people (0 males, 0 females, 4507 ambiguous) loaded from .fam.
-# Ambiguous sex IDs written to sjlife_not_found.nosex .
-# --exclude: 46773 variants remaining.
-# Using 1 thread (no multithreaded calculations invoked.
-# Before main variant filters, 4507 founders and 0 nonfounders present.
-# Calculating allele frequencies... done.
-# Total genotyping rate is 0.997624.
-# 46773 variants and 4507 people pass filters and QC.
-# Note: No phenotypes present.
-# --make-bed to sjlife_not_found.bed + sjlife_not_found.bim +
-
-
-# Step 3.
-awk '{ print $2 }' sjlife_not_found.bim > flip_list
-plink --bfile sjlife_not_found --flip flip_list --make-bed --keep-allele-order --out sjlife_not_found_flipped
-# 46804 variants loaded from .bim file.
-# 4507 people (0 males, 0 females, 4507 ambiguous) loaded from .fam.
-# Ambiguous sex IDs written to sjlife_not_found_flipped.nosex .
-# --flip: 45599 SNPs flipped.
-# Warning: 24882 variants had at least one non-A/C/G/T allele name.
-# Using 1 thread (no multithreaded calculations invoked.
-# Before main variant filters, 4507 founders and 0 nonfounders present.
-# Calculating allele frequencies... 87%                                                                                                         done.
-# Total genotyping rate is 0.997626.
-# 46804 variants and 4507 people pass filters and QC.
-# Note: No phenotypes present.
-# --make-bed to sjlife_not_found_flipped.bed + sjlife_not_found_flipped.bim +
-# sjlife_not_found_flipped.fam ... done.
-
-
-## Rename the SNP ID
-awk '{ $2="chr"$1":"$4":"$6":"$5; print $0 }' sjlife_not_found_flipped.bim >  sjlife_not_found_flipped_1.bim
-
-plink --bfile sjlife_all_PRS --bmerge sjlife_not_found_flipped.bed sjlife_not_found_flipped_1.bim sjlife_not_found_flipped.fam --out sjlife_all_PRS_flipped
-
-
-## Now extract again from the flipped
-plink --bfile sjlife_all_PRS_flipped --extract PRS_all_cancers_vars.txt --make-bed --out sjlife_found_v2
-# 1212367 variants loaded from .bim file.
-# 4507 people (0 males, 0 females, 4507 ambiguous) loaded from .fam.
-# Ambiguous sex IDs written to sjlife_found_v2.nosex .
-# --extract: 1119987 variants remaining.
-# Using 1 thread (no multithreaded calculations invoked.
-# Before main variant filters, 4507 founders and 0 nonfounders present.
-# Calculating allele frequencies... done.
-# Total genotyping rate is 0.999865.
-# 1119987 variants and 4507 people pass filters and QC.
-# Note: No phenotypes present.
-# --make-bed to sjlife_found_v2.bed + sjlife_found_v2.bim + sjlife_found_v2.fam
+# ## Extract from plink file
+# # Step 1.
+# plink --bfile sjlife_all_PRS_all --extract PRS_all_cancers_vars.txt --make-bed --keep-allele-order --out sjlife_found_set1
+# # 1166787 variants loaded from .bim file.
+# # 4507 people (0 males, 0 females, 4507 ambiguous) loaded from .fam.
+# # Ambiguous sex IDs written to sjlife_found_set1.nosex .
+# # --extract: 1119983 variants remaining.
+# # Using 1 thread (no multithreaded calculations invoked.
+# # Before main variant filters, 4507 founders and 0 nonfounders present.
+# # Calculating allele frequencies... done.
+# # Total genotyping rate is 0.999865.
+# # 1119983 variants and 4507 people pass filters and QC.
+# # Note: No phenotypes present.
+# # --make-bed to sjlife_found_set1.bed + sjlife_found_set1.bim +
 
 
 
 
-## Harmonize alleles
-head -1 ../ALL_Cancers_PRS_data.txt > test_chr20_PRS_file.txt
-grep -w chr20 ../ALL_Cancers_PRS_data.txt >> test_chr20_PRS_file.txt
+# awk '{ print $2 }' sjlife_found_set1.bim > set1_vars
+
+# # Step 2.
+# # Excluding variants that did match in step 1
+# plink --bfile sjlife_all_PRS_all --exclude set1_vars --make-bed --keep-allele-order --out sjlife_not_found
+# # 1166787 variants loaded from .bim file.
+# # 4507 people (0 males, 0 females, 4507 ambiguous) loaded from .fam.
+# # Ambiguous sex IDs written to sjlife_not_found.nosex .
+# # --exclude: 46804 variants remaining.
+# # Using 1 thread (no multithreaded calculations invoked.
+# # Before main variant filters, 4507 founders and 0 nonfounders present.
+# # Calculating allele frequencies... done.
+# # Total genotyping rate is 0.997626.
+# # 46804 variants and 4507 people pass filters and QC.
+# # Note: No phenotypes present.
+# # --make-bed to sjlife_not_found.bed + sjlife_not_found.bim +
+# # sjlife_not_found.fam ... done.
+
+
+# # Step 3.
+# awk '{ print $2 }' sjlife_not_found.bim > flip_list
+# # Now flipping variants that did not match in step 1 (flip list obtained from step 2)
+# plink --bfile sjlife_all_PRS_all --flip flip_list --make-bed --keep-allele-order --out sjlife_all_PRS_flipped
+# # 1166787 variants loaded from .bim file.
+# # 4507 people (0 males, 0 females, 4507 ambiguous) loaded from .fam.
+# # Ambiguous sex IDs written to sjlife_all_PRS_flipped.nosex .
+# # --flip: 45599 SNPs flipped.
+# # Warning: 24882 variants had at least one non-A/C/G/T allele name.
+# # Using 1 thread (no multithreaded calculations invoked.
+# # Before main variant filters, 4507 founders and 0 nonfounders present.
+# # Calculating allele frequencies... done.
+# # Total genotyping rate is 0.999776.
+# # 1166787 variants and 4507 people pass filters and QC.
+# # Note: No phenotypes present.
+# # --make-bed to sjlife_all_PRS_flipped.bed + sjlife_all_PRS_flipped.bim +
+
+
+
+
+
+# ## Now extract again from the flipped. Here flipping alleles did not add any new matches
+# plink --bfile sjlife_all_PRS_flipped --extract PRS_all_cancers_vars.txt --make-bed --keep-allele-order --out sjlife_found_v2
+# # 1166787 variants loaded from .bim file.
+# # 4507 people (0 males, 0 females, 4507 ambiguous) loaded from .fam.
+# # Ambiguous sex IDs written to sjlife_found_v2.nosex .
+# # --extract: 1119983 variants remaining.
+# # Using 1 thread (no multithreaded calculations invoked.
+# # Before main variant filters, 4507 founders and 0 nonfounders present.
+# # Calculating allele frequencies... done.
+# # Total genotyping rate is 0.999865.
+# # 1119983 variants and 4507 people pass filters and QC.
+# # Note: No phenotypes present.
+# # --make-bed to sjlife_found_v2.bed + sjlife_found_v2.bim + sjlife_found_v2.fam
+
+
+
+awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $0, a[$1":"$4]}' ../ALL_Cancers_PRS_data.txt sjlife_all_PRS_flipped.bim | awk '($5==$7 || $5==$8) && ($6==$7 || $6==$8)' | awk '!a[$1":"$4]++' | wc -l
+1119983
+
+Of the 2241696 variants in the PRS file (which seem to have duplicates as well), there are 1121122 unique variants.
+wc -l ../ALL_Cancers_PRS_data.txt
+2241697 ../ALL_Cancers_PRS_data.txt
+awk '!a[$1":"$2]++' ../ALL_Cancers_PRS_data.txt | wc -l
+1121123
+
+
+
+
 
 
 

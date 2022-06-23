@@ -160,9 +160,6 @@ all.cancers$CHROM <- vapply(strsplit(all.cancers$CHROM, '_'), function(x)
   paste(x[seq.int(1)], collapse='_'), character(1L))
 
 
-## Fix any variants with REF X
-tt <- all.cancers[grepl("X", all.cancers$REF),]
-
 
 CHR14 <- all.cancers[grepl("chr14", all.cancers$CHROM),]
 ######################
@@ -230,10 +227,10 @@ dim(all.cancers)
 
 # Unique SNPIDs
 length(unique(all.cancers$KEY))
-# 1547006
+# 1547005
 # Unique Sites
 length(unique(all.cancers$KEY2))
-# 1121122
+# 1121120
 
 # Variants with missing REF
 all.cancers[grepl("X",all.cancers$KEY),]
@@ -279,8 +276,81 @@ write.table(PRS.SNVS, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/
 
 all.cancers1 <- all.cancers
 all.cancers1$CHROM <- gsub("chr", "", all.cancers1$CHROM)
-write.table(all.cancers1[1:8], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", row.names = F, col.names = T, quote = F, sep = "\t")
-write.table(all.cancers1[1:8], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+
+all.cancers2 <- all.cancers1
+
+# Fix variants with X in reference
+# i=1; chr2:145366886:X:A >> plink >> chr2:145366886:C:A
+i=1
+all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,] <- 
+  apply(all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,], 2, function(x) gsub("X","C",x))  
+
+i=2
+all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,] <- 
+  apply(all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,], 2, function(x) gsub("X","C",x))  
+
+i=3
+all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,] <- 
+  apply(all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,], 2, function(x) gsub("X","T",x))  
+
+i=4
+all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,] <- 
+  apply(all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,], 2, function(x) gsub("X","T",x))  
+
+i=5
+all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,] <- 
+  apply(all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,], 2, function(x) gsub("X","A",x))  
+
+i=6
+all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,] <- 
+  apply(all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,], 2, function(x) gsub("X","T",x))  
+
+i=7
+all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,] <- 
+  apply(all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,], 2, function(x) gsub("X","G",x))  
+
+i=8
+all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,] <- 
+  apply(all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,], 2, function(x) gsub("X","T",x))  
+
+i=9
+all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,] <- 
+  apply(all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,], 2, function(x) gsub("X","C",x))  
+
+i=10
+all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,] <- 
+  apply(all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,], 2, function(x) gsub("X","T",x))  
+
+i=11
+all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,] <- 
+  apply(all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,], 2, function(x) gsub("X","T",x))  
+
+i=12
+all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,] <- 
+  apply(all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,], 2, function(x) gsub("X","A",x))  
+
+i=13
+all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,] <- 
+  apply(all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,], 2, function(x) gsub("X","G",x))  
+
+i=14
+all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,] <- 
+  apply(all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,], 2, function(x) gsub("X","C",x))  
+
+i=15
+all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,] <- 
+  apply(all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,], 2, function(x) gsub("X","A",x))  
+
+i=1
+all.cancers2 [grepl("Meningioma", all.cancers2$Cancer),][i,] <- 
+  apply(all.cancers2 [grepl("Meningioma", all.cancers2$Cancer),][i,], 2, function(x) gsub("X","A",x)) 
+
+
+
+
+# write.table(all.cancers1[1:8], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+write.table(all.cancers1[1:8], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data2.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+
 
 
 ###################################################################

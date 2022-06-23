@@ -16,15 +16,22 @@ awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[
 # No direct match
 awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/ALL_Cancers_PRS_data.txt_$study plink_data/sjlife_all_PRS_all.bim \
 | awk '!(($4==$6 || $4==$7) && ($5==$6 || $5==$7))' | grep -v DEL > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match
+# Exclude those that are already a direct match
+awk 'NR==FNR{a[$1":"$3];next}!($1":"$3 in a){print}' prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match \
+> prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final
+
+wc -l prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final
+
+grep -vw chr1:113903258:G:T prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final
 # Check for duplicate variants
-awk 'a[$1":"$3]++' prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_duplicates
+# awk 'a[$1":"$3]++' prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_duplicates
 # Drop one from the duplicate; check for the allele frequency first, and get rid of the rare variant keeping the common one
 # egrep -vw 'chr9:108126198:G:A|chr3:30641447:G:C' prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_uniq
-egrep -vw 'chr9:108126198:G:A' prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_uniq
-mv prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_uniq prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match
+# grep -vw chr9:108126198:G:A prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_uniq
+# mv prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_uniq prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match
 # Harmonize no direct match alleles
 module load R
-Rscript harmonize_alleles.R prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match
+Rscript harmonize_alleles.R prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final
 # Update the alleles
 awk '($NF==1){ print $3, $6, $7, $8, $9}' prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt
 # Extract study-specific variants
@@ -43,12 +50,12 @@ plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweigh
 
 
 # ALL_Vijayakrishnan	15
-# Allman_African_Breast	75
-# Allman_Hispanic_Breast	71 # removed chr9:108126198:G:A|chr3:30641447:G:C
-# Khera_2018_Breast	77
-# Mavaddat_2015_ER_NEG_Breast	77
+# Allman_African_Breast	75	74
+# Allman_Hispanic_Breast	71 69
+# Khera_2018_Breast	77	76
+# Mavaddat_2015_ER_NEG_Breast	77	76
 # Mavaddat_2015_ER_OVERALL_Breast	77
-# Mavaddat_2015_ER_POS_Breast	77
+# Mavaddat_2015_ER_POS_Breast	77	76
 # Mavaddat_2019_ER_NEG_Breast	313
 # Mavaddat_2019_ER_OVERALL_Breast	313
 # Mavaddat_2019_ER_POS_Breast	313
