@@ -269,6 +269,7 @@ new.set1 <- all.cancers[all.cancers$KEY %in% new.keys,]
 new.set2 <- all.cancers[all.cancers$KEY3 %in% new.keys,]
 
 new.set.all <- rbind.data.frame(new.set1, new.set2)
+library(dplyr)
 new.set.all <- distinct(new.set.all)
 
 write.table(ALL.cancers.Keys, "PRS_all_cancers_vars.txt", col.names = F, row.names = F, quote = F)
@@ -279,9 +280,7 @@ write.table(PRS.SNVS, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/
 all.cancers1 <- all.cancers
 all.cancers1$CHROM <- gsub("chr", "", all.cancers1$CHROM)
 write.table(all.cancers1[1:8], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", row.names = F, col.names = T, quote = F, sep = "\t")
-
 write.table(all.cancers1[1:8], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", row.names = F, col.names = T, quote = F, sep = "\t")
-
 
 
 ###################################################################
@@ -293,7 +292,7 @@ nrow(new.all.cancers.INDELS)
 
 new.all.cancers.SNVS <- new.set.all[!(nchar(new.set.all$REF) != 1 | nchar(new.set.all$Effect_allele) != 1),]
 nrow(new.all.cancers.SNVS)
-# 2241511
+# 315
 
 new.PRS.SNVS <- cbind.data.frame(CHROM = new.all.cancers.SNVS$CHROM, START = new.all.cancers.SNVS$POS_GRCh38-1, END = new.all.cancers.SNVS$POS_GRCh38)
 
@@ -304,61 +303,31 @@ new.PRS.SNVS <- new.PRS.SNVS[!duplicated(new.PRS.SNVS$KEY),1:3]
 write.table(new.PRS.SNVS, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/extract_batch2_SNVs_PRS.bed", row.names = F, col.names = F, quote = F, sep = "\t")
 
 
-
-
-
-####################################
-## Create PRS analysis ready file ##
-####################################
-colnames(ALL.cancers.Keys) <- "KEY"
-
-plink.final.bim <- read.table("sjlife_all_PRS_all.bim")
-# plink.final.bim <- read.table("sjlife_all_PRS_flipped.bim")
-
-sum(all.cancers$KEY %in% plink.final.bim$V2)
-sum(all.cancers$KEY3 %in% plink.final.bim$V2)
-final.set1 <- all.cancers [all.cancers$KEY %in% plink.final.bim$V2,]
-final.set1 <- cbind.data.frame(SNPId = final.set1$KEY, Effect_allele = final.set1$Effect_allele, Effect_size = final.set1$Effect_size, TYPE = final.set1$TYPE, Cancer = final.set1$Cancer)
-
-final.set2 <- all.cancers [all.cancers$KEY3 %in% plink.final.bim$V2,]
-final.set2 <- cbind.data.frame(SNPId = final.set2$KEY3, Effect_allele = final.set2$Effect_allele, Effect_size = final.set2$Effect_size, TYPE = final.set2$TYPE, Cancer = final.set2$Cancer)
-
-final.set <- rbind.data.frame(final.set1, final.set2)
-dim(final.set)
-# [1] 2239393       5
-sum(final.set$SNPId %in% plink.final.bim$V2)
-# 2239393
-
-length(unique(final.set$SNPId))
-# 1119983
-
-write.table(final.set, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/Analysis_ready_ALL_Cancers_PRS_data.txt", row.names = F, col.names = F, quote = F, sep = "\t")
-as.data.frame(table(final.set$TYPE))
-
+#################################################################################################
 # Var1    Freq  Plink
 # 1                    ALL_Vijayakrishnan      15 
-# 2                 Allman_African_Breast      75 46
-# 3                Allman_Hispanic_Breast      71 63
-# 4                     Khera_2018_Breast      77 73
-# 5           Mavaddat_2015_ER_NEG_Breast      77 73
-# 6       Mavaddat_2015_ER_OVERALL_Breast      77 73
-# 7           Mavaddat_2015_ER_POS_Breast      77 73
-# 8           Mavaddat_2019_ER_NEG_Breast     313 293
-# 9       Mavaddat_2019_ER_OVERALL_Breast     313 293
-# 10          Mavaddat_2019_ER_POS_Breast     313 293
+# 2                 Allman_African_Breast      75 
+# 3                Allman_Hispanic_Breast      71 
+# 4                     Khera_2018_Breast      77 
+# 5           Mavaddat_2015_ER_NEG_Breast      77 
+# 6       Mavaddat_2015_ER_OVERALL_Breast      77 
+# 7           Mavaddat_2015_ER_POS_Breast      77 
+# 8           Mavaddat_2019_ER_NEG_Breast     313 
+# 9       Mavaddat_2019_ER_OVERALL_Breast     313 
+# 10          Mavaddat_2019_ER_POS_Breast     313 
 # 11                     Meningioma_Claus       1 
 # 12                   Meningioma_Dobbins       2 
-# 13            MichiganWeb_ER_NEG_Breast      79 78
-# 14        MichiganWeb_ER_OVERALL_Breast 1120348 1119253
-# 15            MichiganWeb_ER_POS_Breast 1119079 1118016
-# 16            Pleiotropy_Bi_directional      21 21
-# 17             Pleiotropy_Meta_analysis      21 21
-# 18                Pleiotropy_One_cohort       9 9
-# 19           Pleiotropy_One_directional     137 133
-# 20                    Pleiotropy_PRSWEB     179 179
-# 21 Pleiotropy_Replication_prior_studies     308 300
-# 22                     Sarcoma_Machiela       6 6
-# 23                  Wang_African_Breast      98 97
+# 13            MichiganWeb_ER_NEG_Breast      79 
+# 14        MichiganWeb_ER_OVERALL_Breast 1120348 
+# 15            MichiganWeb_ER_POS_Breast 1119079 
+# 16            Pleiotropy_Bi_directional      21 
+# 17             Pleiotropy_Meta_analysis      21 
+# 18                Pleiotropy_One_cohort       9 
+# 19           Pleiotropy_One_directional     137 
+# 20                    Pleiotropy_PRSWEB     179 
+# 21 Pleiotropy_Replication_prior_studies     308 
+# 22                     Sarcoma_Machiela       6 
+# 23                  Wang_African_Breast      98 
 
 meningioma <- all.cancers [grepl("Meningioma", all.cancers$TYPE ),]
 ALL <- all.cancers [grepl("Vijay", all.cancers$TYPE ),]
@@ -374,11 +343,16 @@ head(plink.final.bim)
 plink.final.bim$KEY2 <- paste0("chr", paste(plink.final.bim$V1, plink.final.bim$V4, sep = ":"))
 
 sum(all.cancers.not.matched$KEY2 %in% plink.final.bim$KEY2)
-
+# 183
 plink.final.bim.matched2 <- plink.final.bim[plink.final.bim$KEY2 %in% all.cancers.not.matched$KEY2,]
 plink.final.bim.matched2
 
 TT <- merge(plink.final.bim.matched2, all.cancers.not.matched, by ="KEY2",  all = T)
+
+plink.final.bim.not.found <- read.table("sjlife_found_v2.bim")
+
+sum(all.cancers.not.matched$KEY %in% plink.final.bim.not.found$V2)
+sum(all.cancers.not.matched$KEY3 %in% plink.final.bim.not.found$V2)
 
 # #######################
 # ## Harmonize alleles ##
@@ -391,7 +365,10 @@ TT <- merge(plink.final.bim.matched2, all.cancers.not.matched, by ="KEY2",  all 
 # dat = read.table(args[1], header = FALSE, stringsAsFactors = FALSE)
 # # dat = read.table("Z:/ResearchHome/ClusterHome/ysapkota/Work/CAD_PRS/y", header = FALSE, stringsAsFactors = FALSE)
 
-dat <- dat.SNVs[1:1000,]
+dat <- TT[-c(1,8,9)]
+dat <-  dat[!is.na(dat$V2),]
+colnames(dat) <- paste0("V",1:14)
+dat <- dat [! (grepl("DEL", dat$V5) | grepl("DEL", dat$V6)),]
 
 ## Function to flip alleles
 flip_alleles = function(x){
