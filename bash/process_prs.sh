@@ -7,14 +7,14 @@ mkdir -p prs_out
 study=$1
 
 # Subset PRS data for each study
-awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt > prs_out/ALL_Cancers_PRS_data.txt_$study
+awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt > prs_out/ALL_Cancers_PRS_data.txt_${study}
 # Check for duplicate variants based on chr:pos
 awk 'a[$1":"$2]++' prs_out/ALL_Cancers_PRS_data.txt_$study | wc -l
 # Look for directly matching variants in the WGS data
-awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/ALL_Cancers_PRS_data.txt_$study plink_data/sjlife_all_PRS_all.bim \
+awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/ALL_Cancers_PRS_data.txt_$study plink_data/sjlife_all_PRS_all_final.bim \
 | awk '($4==$6 || $4==$7) && ($5==$6 || $5==$7)' > prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match
 # No direct match
-awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/ALL_Cancers_PRS_data.txt_$study plink_data/sjlife_all_PRS_all.bim \
+awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/ALL_Cancers_PRS_data.txt_$study plink_data/sjlife_all_PRS_all_final.bim \
 | awk '!(($4==$6 || $4==$7) && ($5==$6 || $5==$7))' | grep -v DEL > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match
 # Exclude those that are already a direct match
 awk 'NR==FNR{a[$1":"$3];next}!($1":"$3 in a){print}' prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match \
@@ -22,7 +22,7 @@ awk 'NR==FNR{a[$1":"$3];next}!($1":"$3 in a){print}' prs_out/ALL_Cancers_PRS_dat
 
 wc -l prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final
 
-grep -vw chr1:113903258:G:T prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final
+# grep -vw chr1:113903258:G:T prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final
 # Check for duplicate variants
 # awk 'a[$1":"$3]++' prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_duplicates
 # Drop one from the duplicate; check for the allele frequency first, and get rid of the rare variant keeping the common one
@@ -37,8 +37,8 @@ awk '($NF==1){ print $3, $6, $7, $8, $9}' prs_out/ALL_Cancers_PRS_data.txt_${stu
 # Extract study-specific variants
 awk '{print $2}' prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match > prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match_to_extract.txt
 module load plink/1.90b
-plink --bfile plink_data/sjlife_all_PRS_all --extract prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match_to_extract.txt --make-bed --out prs_out/${study}_direct_match
-plink --bfile plink_data/sjlife_all_PRS_all --extract prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --update-alleles prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --make-bed --out prs_out/${study}_harmonized
+plink --bfile plink_data/sjlife_all_PRS_all_final --extract prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match_to_extract.txt --make-bed --out prs_out/${study}_direct_match
+plink --bfile plink_data/sjlife_all_PRS_all_final --extract prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --update-alleles prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --make-bed --out prs_out/${study}_harmonized
 plink --bfile prs_out/${study}_direct_match --bmerge prs_out/${study}_harmonized --make-bed --out prs_out/$study
 # Update variant names
 awk '{print $2, $1":"$4}' prs_out/${study}.bim > prs_out/${study}_update_variantnames
@@ -49,6 +49,7 @@ awk '{print $1":"$2, $4, $5}' prs_out/ALL_Cancers_PRS_data.txt_$study > prs_out/
 plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweight --out prs_out/${study}_prs
 
 
+## _Significant are the ones with: grep -v N
 # ALL_Vijayakrishnan	15
 # Allman_African_Breast	75	74
 # Allman_Hispanic_Breast	71 69
@@ -59,13 +60,16 @@ plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweigh
 # Mavaddat_2019_ER_NEG_Breast	313
 # Mavaddat_2019_ER_OVERALL_Breast	313
 # Mavaddat_2019_ER_POS_Breast	313
-# Meningioma_Claus	1
-# Meningioma_Dobbins	2
-# MichiganWeb_ER_NEG_Breast	79
+# Meningioma_Claus	1 1
+# Meningioma_Dobbins	2 2
+# MichiganWeb_ER_NEG_Breast	79 78
 # MichiganWeb_ER_OVERALL_Breast	1120348
 # MichiganWeb_ER_POS_Breast	1119079
-# Pleiotropy_Bi_directional	21
-# Pleiotropy_Meta_analysis	21
+# Pleiotropy_Bi_directional_Increasing	21 21
+# Pleiotropy_Bi_directional_Increasing_Significant	15
+# Pleiotropy_Bi_directional_Decreasing	21
+# Pleiotropy_Bi_directional_Decreasing_Significant 15
+# Pleiotropy_Meta_analysis	21 20
 # Pleiotropy_One_cohort	9
 # Pleiotropy_One_directional	137
 # Pleiotropy_PRSWEB	179
@@ -142,3 +146,18 @@ plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweigh
 
 # # Write data to disc
 # write.table(dat.out, paste0(args[1], "_alleles_harmonized"), row.names = FALSE, quote = FALSE)
+
+
+
+
+
+
+
+
+
+
+
+## Additional notes:
+# Pleiotropy_Meta_analysis has two duplicate variants from different studies. We decided to use the one with the beta -0.916290732
+# chr17	7668434	G	T	-0.916290732
+# chr17	7668434	G	T	-0.400477567

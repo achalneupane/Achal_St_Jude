@@ -193,7 +193,7 @@ PRS.INDELS <- cbind.data.frame(CHROM = all.cancers.INDELS$CHROM, START = all.can
 
 all.cancers.SNVS <- all.cancers[!(nchar(all.cancers$REF) != 1 | nchar(all.cancers$Effect_allele) != 1),]
 nrow(all.cancers.SNVS)
-# 2241511
+# 2241532
 
 PRS.SNVS <- cbind.data.frame(CHROM = all.cancers.SNVS$CHROM, START = all.cancers.SNVS$POS_GRCh38-1, END = all.cancers.SNVS$POS_GRCh38)
 
@@ -223,11 +223,11 @@ all.cancers$KEY <- paste(all.cancers$CHROM, all.cancers$POS_GRCh38, all.cancers$
 all.cancers$KEY2 <- paste(all.cancers$CHROM, all.cancers$POS_GRCh38, sep = ":")
 all.cancers$KEY3 <- paste(all.cancers$CHROM, all.cancers$POS_GRCh38, all.cancers$Effect_allele, all.cancers$REF, sep = ":")
 dim(all.cancers) 
-# 2241696      11
+# 2241717      11
 
 # Unique SNPIDs
 length(unique(all.cancers$KEY))
-# 1547005
+# 1547024
 # Unique Sites
 length(unique(all.cancers$KEY2))
 # 1121120
@@ -342,14 +342,14 @@ all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,] <-
   apply(all.cancers2 [grepl("ALL_Vijayakrishnan", all.cancers2$TYPE),][i,], 2, function(x) gsub("X","A",x))  
 
 i=1
-all.cancers2 [grepl("Meningioma", all.cancers2$Cancer),][i,] <- 
-  apply(all.cancers2 [grepl("Meningioma", all.cancers2$Cancer),][i,], 2, function(x) gsub("X","A",x)) 
+all.cancers2 [grepl("Meningioma_Claus", all.cancers2$TYPE),][i,] <- 
+  apply(all.cancers2 [grepl("Meningioma_Claus", all.cancers2$TYPE),][i,], 2, function(x) gsub("X","A",x)) 
 
 
 
 
 # write.table(all.cancers1[1:8], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", row.names = F, col.names = T, quote = F, sep = "\t")
-write.table(all.cancers1[1:8], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data2.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+write.table(all.cancers2[1:8], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", row.names = F, col.names = T, quote = F, sep = "\t")
 
 
 
