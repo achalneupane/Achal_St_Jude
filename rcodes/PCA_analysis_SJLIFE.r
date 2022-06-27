@@ -3,7 +3,7 @@
 ## Date: 05/10/2022 ##
 ## Achal Neupane    ##
 ######################
-setwd("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA")
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA")
 PCA <- read.table("final-PCAS.eigenvec", header =T, stringsAsFactors=FALSE)
 dim(PCA)
 thousandG.ethnicty <- read.table("integrated_call_samples_v3.20130502.ALL.panel", header = T , stringsAsFactors = FALSE)
@@ -219,7 +219,7 @@ ggsave("SJLIFE-ALL-COHORT-3-5SD-plot.jpg", plot = SELECTED.p, device = NULL, sca
 ## Annotate SJLIFE samples by PCA ethnicity ##
 ##############################################
 # read admixture results file
-admixture.df <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/final.5.Q_header2_SJLIFE_only", header = T )
+admixture.df <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/final.5.Q_header2_SJLIFE_only", header = T )
 
 # Recode ethnicity based on 80% or hiher cutoff; if nor column value is greater than 80%, insert MIX
 admixture.df$Ethnicity.80perc <- names(admixture.df)[-1][max.col(admixture.df[-1] > 0.8)]
@@ -295,6 +295,9 @@ p
 
 ggsave("SJLIFE-ALL-Population_CLEANED_round1.jpg", plot = p, device = NULL, scale = 1, width = 10, height = 8, dpi = 600, limitsize = TRUE)
 
+EUR.only.in.1kg <- thousandG.ethnicty[thousandG.ethnicty$super_pop == "EUR",]
+EUR.only.in.1kg <- cbind.data.frame(EUR.only.in.1kg$sample, EUR.only.in.1kg$sample)
+write.table(EUR.only.in.1kg, "1KG_EUR.txt", sep ="\t", col.names = F, quote = F, row.names = F)
 #########################
 ## Cleaned PCA round 2 ##
 #########################
