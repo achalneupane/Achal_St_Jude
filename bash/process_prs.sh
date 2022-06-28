@@ -247,9 +247,15 @@ awk '{print "chr"$1"\t"$2}' > /research_jude/rgs01_jude/groups/sapkogrp/projects
 ## Extract those that needs to be rechecked
 awk -v OFS="\t" '{sub(/_.*/,"",$1)}1' Michigan_OVERALL_GrCh38.bed > Michigan_OVERALL_GrCh38_chr_only.bed
 awk 'NR==FNR{a[$1,$2];next} ($1,$2) in a' MichiganWeb_ER_OVERALL_Breast_reconfirm_variants.txt Michigan_OVERALL_GrCh38_chr_only.bed > MichiganWeb_ER_OVERALL_Breast_reconfirm_variants_GR37_Gr38.txt
+# Bed file
+awk 'BEGIN {FS=OFS="\t"}
+{
+  split($4,a,":")
+  print $0 OFS a[1] ":" a[2]-1 "-" a[2]
+}
+' MichiganWeb_ER_OVERALL_Breast_reconfirm_variants_GR37_Gr38.txt > MichiganWeb_ER_OVERALL_Breast_reconfirm_variants_GR37_Gr38_for_bed.txt
 
-
-
+awk '{print $4 $5}' MichiganWeb_ER_OVERALL_Breast_reconfirm_variants_GR37_Gr38_for_bed.txt
 
 awk 'NR==FNR{a[$2]; next} !(($1":"$2) in a)' MichiganWeb_ER_POS_Breast_varname_updated.bim  ALL_Cancers_PRS_data.txt_MichiganWeb_ER_POS_Breast
 MichiganWeb_ER_POS_Breast
@@ -259,6 +265,20 @@ awk '{print "chr"$1"\t"$2}'> /research_jude/rgs01_jude/groups/sapkogrp/projects/
 ## Extract those that needs to be rechecked
 awk -v OFS="\t" '{sub(/_.*/,"",$1)}1' Michigan_ER_POS_GrCh38.bed > Michigan_ER_POS_GrCh38_chr_only.bed
 awk 'NR==FNR{a[$1,$2];next} ($1,$2) in a' MichiganWeb_ER_POS_Breast_reconfirm_variants.txt Michigan_ER_POS_GrCh38_chr_only.bed > MichiganWeb_ER_POS_Breast_reconfirm_variants_GR37_Gr38.txt
+
+# Bed file
+awk 'BEGIN {FS=OFS="\t"}
+{
+  split($4,a,":")
+  print $0 OFS a[1] ":" a[2]-1 "-" a[2]
+}
+' MichiganWeb_ER_POS_Breast_reconfirm_variants_GR37_Gr38.txt > MichiganWeb_ER_POS_Breast_reconfirm_variants_GR37_Gr38_for_bed.txt
+
+
+
+# ## Re-doing the lift-over for the 1057 varinats from Michigan_ER_OVERALL
+# /home/aneupane/liftover/liftOver Michigan_ER_OVERALL_liftover_reconfirm.bed /home/aneupane/liftover/hg19ToHg38.over.chain Michigan_OVERALL_GrCh38_1057_vars_reconfirm.bed Michigan_OVERALL_GrCh38_1057_vars_reconfirm_unmapped.bed
+
 
 
 MichiganWeb_ER_OVERALL_Breast

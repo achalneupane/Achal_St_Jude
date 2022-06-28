@@ -338,6 +338,19 @@ export THREADS=4; \
 	"./meningioma_extract_variants_from_VCF_for_PRS.sh"; \
 done
 
+ln -s ../extract_batch3_after_PRS_calculation1.bed .
+module load bcftools/1.9
+module load plink/1.90b
+
+for VAR in $(cat extract_batch3_after_PRS_calculation1.bed); do
+echo "Doing $VAR"
+CHR="$(echo $VAR |awk -F':' '{print $1}')"
+bcftools view "MERGED.SJLIFE.1.2.GATKv3.4.VQSR.${CHR}.preQC_biallelic_renamed_ID_edited.vcf.gz ${VAR} > ./missed_vars_in_PRS_calculation/${VAR}_v5.vcf.gz"
+plink --vcf ${VAR}_v5.vcf.gz --double-id --vcf-half-call m --keep-allele-order --threads 2 --make-bed --out ./missed_vars_in_PRS_calculation/${VAR}_v5
+done
+
+
+
 ## Merge plink files
 for CHR in 1 2 3 4 5 6 7 8 9 10 11 12 14 16 18 19 22; do
 echo "PRS_chr${CHR}_v3" >> merge_list2.txt
