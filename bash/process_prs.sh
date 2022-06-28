@@ -7,7 +7,11 @@ mkdir -p prs_out
 study=$1
 
 # Subset PRS data for each study
+## remove chr1:145902073|chr4:57426897|chr6:114515866 from MichiganWeb_ER_OVERALL_Breast
+## remove chr4:57426897|chr6:114515866 from MichiganWeb_ER_POS_Breast
 awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt > prs_out/ALL_Cancers_PRS_data.txt_${study}
+# awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt | egrep -v '145902073|57426897|114515866|129989587' > prs_out/ALL_Cancers_PRS_data.txt_${study}
+# awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt | egrep -v '57426897|114515866' > prs_out/ALL_Cancers_PRS_data.txt_${study}
 # Check for duplicate variants based on chr:pos
 awk 'a[$1":"$2]++' prs_out/ALL_Cancers_PRS_data.txt_$study | wc -l
 # Look for directly matching variants in the WGS data
@@ -47,13 +51,13 @@ plink --bfile prs_out/${study}_direct_match --bmerge prs_out/${study}_harmonized
 awk '{print $2, $1":"$4}' prs_out/${study}.bim > prs_out/${study}_update_variantnames
 plink --bfile prs_out/$study --update-name prs_out/${study}_update_variantnames --make-bed --out prs_out/${study}_varname_updated
 # Create a score file
-awk '{print $1":"$2, $4, $5}' prs_out/ALL_Cancers_PRS_data.txt_$study > prs_out/${study}.prsweight
+awk '{print $1":"$2, $4, $5}' prs_out/ALL_Cancers_PRS_data.txt_$study | egrep -v 6:114515866 > prs_out/${study}.prsweight
 # Calculate PRS
 plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweight --out prs_out/${study}_prs
 
 ## _Significant are the ones with: grep -v N
-# ALL_Vijayakrishnan	15 15
-# Allman_African_Breast	75	74 
+# ALL_Vijayakrishnan	15 15 # OK
+# Allman_African_Breast	75	74
 # Allman_Hispanic_Breast	71 69
 # Khera_2018_Breast	77	76
 # Mavaddat_2015_ER_NEG_Breast	77	76
@@ -62,22 +66,22 @@ plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweigh
 # Mavaddat_2019_ER_NEG_Breast	313 294
 # Mavaddat_2019_ER_OVERALL_Breast	313 294
 # Mavaddat_2019_ER_POS_Breast	313 294
-# Meningioma_Claus	1 1
-# Meningioma_Dobbins	2 2
+# Meningioma_Claus	1 1 #OK
+# Meningioma_Dobbins	2 2 # OK
 # MichiganWeb_ER_NEG_Breast	79 78
 # MichiganWeb_ER_OVERALL_Breast	1120348 1119325
-# MichiganWeb_ER_POS_Breast	1119079
-# Pleiotropy_Bi_directional_Increasing	21 21
-# Pleiotropy_Bi_directional_Increasing_Significant	15 15
-# Pleiotropy_Bi_directional_Decreasing	21 21
-# Pleiotropy_Bi_directional_Decreasing_Significant 15 15
-# Pleiotropy_Meta_analysis	21 20
-# Pleiotropy_One_cohort	9 9
+# MichiganWeb_ER_POS_Breast	1119079 1118049
+# Pleiotropy_Bi_directional_Increasing	21 21 # OK
+# Pleiotropy_Bi_directional_Increasing_Significant	15 15 # OK
+# Pleiotropy_Bi_directional_Decreasing	21 21 # OK
+# Pleiotropy_Bi_directional_Decreasing_Significant 15 15 # OK
+# Pleiotropy_Meta_analysis	21 20 # OK
+# Pleiotropy_One_cohort	9 9 # OK
 # Pleiotropy_One_directional	137 133
 # Pleiotropy_One_directional_Significant	85 83
 # Pleiotropy_PRSWEB	179 179
 # Pleiotropy_Replication_prior_studies	308 300
-# Sarcoma_Machiela	6 6
+# Sarcoma_Machiela	6 6 # OK
 # Wang_African_Breast	98 97
 
 
@@ -201,39 +205,50 @@ Mavaddat_2019_ER_NEG_Breast
 # 5       58945885        T       C       0.0408  Mavaddat_2019_ER_NEG_Breast     Breast  Y
 # 5       79885172        G       GA      0.0804  Mavaddat_2019_ER_NEG_Breast     Breast  Y
 # 6       130020583       C       CT      0.0804  Mavaddat_2019_ER_NEG_Breast     Breast  Y
-# 6       87094101        T       C       0.0678  Mavaddat_2019_ER_NEG_Breast     Breast  Y
+# 6       87094101        T       C       0.0678  Mavaddat_2019_ER_NEG_Breast     Breast  Y ## Not found; confirmed
 # 7       91829875        A       ATT     0.0486  Mavaddat_2019_ER_NEG_Breast     Breast  Y
 # 8       127201316       CA      C       0.04    Mavaddat_2019_ER_NEG_Breast     Breast  Y
 # 11      108396675       CA      C       0.0629  Mavaddat_2019_ER_NEG_Breast     Breast  Y
 # 12      82670416        G       GA      0.0717  Mavaddat_2019_ER_NEG_Breast     Breast  Y
-# 17      30841059        T       G       0.0604  Mavaddat_2019_ER_NEG_Breast     Breast  Y
+# 17      30841059        T       G       0.0604  Mavaddat_2019_ER_NEG_Breast     Breast  Y ## Not found; confirmed, but have variant for 30841058 that do not match alleles
 # 19      19406245        C       CGGGCG  0.0577  Mavaddat_2019_ER_NEG_Breast     Breast  Y
 # 22      38187308        AAAAG   AAAAGAAAG       0.0079  Mavaddat_2019_ER_NEG_Breast     Breast  Y
 awk 'NR==FNR{a[$2]; next} !(($1":"$2) in a)' MichiganWeb_ER_NEG_Breast_varname_updated.bim  ALL_Cancers_PRS_data.txt_MichiganWeb_ER_NEG_Breast
 MichiganWeb_ER_NEG_Breast
-# 1       145790095       T       C       0.0512933143875503      MichiganWeb_ER_NEG_Breast       Breast  Y
+# 1       145790095       T       C       0.0512933143875503      MichiganWeb_ER_NEG_Breast       Breast  Y ## Replaced with chr1:145790097
 Pleiotropy_Meta_analysis has two duplicate variants from different studies. We decided to use the one with the beta -0.916290732
 # chr17	7668434	G	T	-0.916290732
 # chr17	7668434	G	T	-0.400477567
 awk 'NR==FNR{a[$2]; next} !(($1":"$2) in a)' Pleiotropy_One_directional_varname_updated.bim  ALL_Cancers_PRS_data.txt_Pleiotropy_One_directional
 Pleiotropy_One_directional
 # 17      45720982        T       TTTG    0.075801713     Pleiotropy_One_directional      Pleiotropy      Y
-# 10      46037695        T       C       0.104250021     Pleiotropy_One_directional      Pleiotropy      Y
+# 10      46037695        T       C       0.104250021     Pleiotropy_One_directional      Pleiotropy      Y ## replaced with chr 10:46037697
 # 2       200810808       C       CG      0.06720875      Pleiotropy_One_directional      Pleiotropy      N
 # 22      38185855        T       TC      0.048140375     Pleiotropy_One_directional      Pleiotropy      N
 awk 'NR==FNR{a[$2]; next} !(($1":"$2) in a)' Pleiotropy_Replication_prior_studies_varname_updated.bim  ALL_Cancers_PRS_data.txt_Pleiotropy_Replication_prior_studies
 Pleiotropy_Replication_prior_studies
-# 10      46046324        C       T       0.222743471     Pleiotropy_Replication_prior_studies    Pleiotropy      Y
+# 10      46046324        C       T       0.222743471     Pleiotropy_Replication_prior_studies    Pleiotropy      Y ## replaced with chr10:46046326
 # 9       108131271       C       CT      0.095630231     Pleiotropy_Replication_prior_studies    Pleiotropy      Y
-# 3       128027236       AT      A       0.081579987     Pleiotropy_Replication_prior_studies    Pleiotropy      Y
-# 10      46037695        T       C       0.099709844     Pleiotropy_Replication_prior_studies    Pleiotropy      Y
+# 3       128027236       AT      A       0.081579987     Pleiotropy_Replication_prior_studies    Pleiotropy      Y ## Not found; confirmed
+# 10      46037695        T       C       0.099709844     Pleiotropy_Replication_prior_studies    Pleiotropy      Y ## replaced with chr 10:46037697
 # 14      68174379        CA      C       0.080657903     Pleiotropy_Replication_prior_studies    Pleiotropy      Y
 # 2       241237728       CAT     C       0.083605584     Pleiotropy_Replication_prior_studies    Pleiotropy      Y
 # 1       150549995       C       CTG     0.079043207     Pleiotropy_Replication_prior_studies    Pleiotropy      Y
 # 6       21159817        T       TA      0.105249411     Pleiotropy_Replication_prior_studies    Pleiotropy      Y
 awk 'NR==FNR{a[$2]; next} !(($1":"$2) in a)' Wang_African_Breast_varname_updated.bim  ALL_Cancers_PRS_data.txt_Wang_African_Breast
 Wang_African_Breast
-# 1       145790095       T       C       0.040821995     Wang_African_Breast     Breast  Y
+# 1       145790095       T       C       0.040821995     Wang_African_Breast     Breast  Y ## Replaced with chr1:145790097
+
+awk 'NR==FNR{a[$2]; next} !(($1":"$2) in a)' MichiganWeb_ER_OVERALL_Breast_varname_updated.bim  ALL_Cancers_PRS_data.txt_MichiganWeb_ER_OVERALL_Breast
+MichiganWeb_ER_OVERALL_Breast
+## These are the variants that need to be re-checked
+awk 'NR==FNR{a[$2]; next} !(($1":"$2) in a)' MichiganWeb_ER_OVERALL_Breast_varname_updated.bim  ALL_Cancers_PRS_data.txt_MichiganWeb_ER_OVERALL_Breast | awk '{print "chr"$1"\t"$2}'> /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/breast/all_downloads/MichiganWeb/MichiganWeb_ER_OVERALL_Breast_reconfirm_variants.txt
+
+
+awk 'NR==FNR{a[$2]; next} !(($1":"$2) in a)' MichiganWeb_ER_POS_Breast_varname_updated.bim  ALL_Cancers_PRS_data.txt_MichiganWeb_ER_POS_Breast
+MichiganWeb_ER_OVERALL_Breast
+## These are the variants that need to be re-checked
+awk 'NR==FNR{a[$2]; next} !(($1":"$2) in a)' MichiganWeb_ER_POS_Breast_varname_updated.bim  ALL_Cancers_PRS_data.txt_MichiganWeb_ER_POS_Breast | awk '{print "chr"$1"\t"$2}'> /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/breast/all_downloads/MichiganWeb/MichiganWeb_ER_POS_Breast_reconfirm_variants.txt
 
 
 
