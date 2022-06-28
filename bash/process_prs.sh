@@ -242,14 +242,23 @@ Wang_African_Breast
 awk 'NR==FNR{a[$2]; next} !(($1":"$2) in a)' MichiganWeb_ER_OVERALL_Breast_varname_updated.bim  ALL_Cancers_PRS_data.txt_MichiganWeb_ER_OVERALL_Breast
 MichiganWeb_ER_OVERALL_Breast
 ## These are the variants that need to be re-checked
-awk 'NR==FNR{a[$2]; next} !(($1":"$2) in a)' MichiganWeb_ER_OVERALL_Breast_varname_updated.bim  ALL_Cancers_PRS_data.txt_MichiganWeb_ER_OVERALL_Breast | awk '{print "chr"$1"\t"$2}'> /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/breast/all_downloads/MichiganWeb/MichiganWeb_ER_OVERALL_Breast_reconfirm_variants.txt
+awk 'NR==FNR{a[$2]; next} !(($1":"$2) in a)' MichiganWeb_ER_OVERALL_Breast_varname_updated.bim  ALL_Cancers_PRS_data.txt_MichiganWeb_ER_OVERALL_Breast | \
+awk '{print "chr"$1"\t"$2}' > /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/breast/all_downloads/MichiganWeb/MichiganWeb_ER_OVERALL_Breast_reconfirm_variants.txt
+## Extract those that needs to be rechecked
+awk -v OFS="\t" '{sub(/_.*/,"",$1)}1' Michigan_OVERALL_GrCh38.bed > Michigan_OVERALL_GrCh38_chr_only.bed
+awk 'NR==FNR{a[$1,$2];next} ($1,$2) in a' MichiganWeb_ER_OVERALL_Breast_reconfirm_variants.txt Michigan_OVERALL_GrCh38_chr_only.bed > MichiganWeb_ER_OVERALL_Breast_reconfirm_variants_GR37_Gr38.txt
+
+
 
 
 awk 'NR==FNR{a[$2]; next} !(($1":"$2) in a)' MichiganWeb_ER_POS_Breast_varname_updated.bim  ALL_Cancers_PRS_data.txt_MichiganWeb_ER_POS_Breast
-MichiganWeb_ER_OVERALL_Breast
+MichiganWeb_ER_POS_Breast
 ## These are the variants that need to be re-checked
-awk 'NR==FNR{a[$2]; next} !(($1":"$2) in a)' MichiganWeb_ER_POS_Breast_varname_updated.bim  ALL_Cancers_PRS_data.txt_MichiganWeb_ER_POS_Breast | awk '{print "chr"$1"\t"$2}'> /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/breast/all_downloads/MichiganWeb/MichiganWeb_ER_POS_Breast_reconfirm_variants.txt
-
+awk 'NR==FNR{a[$2]; next} !(($1":"$2) in a)' MichiganWeb_ER_POS_Breast_varname_updated.bim  ALL_Cancers_PRS_data.txt_MichiganWeb_ER_POS_Breast | \
+awk '{print "chr"$1"\t"$2}'> /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/breast/all_downloads/MichiganWeb/MichiganWeb_ER_POS_Breast_reconfirm_variants.txt
+## Extract those that needs to be rechecked
+awk -v OFS="\t" '{sub(/_.*/,"",$1)}1' Michigan_ER_POS_GrCh38.bed > Michigan_ER_POS_GrCh38_chr_only.bed
+awk 'NR==FNR{a[$1,$2];next} ($1,$2) in a' MichiganWeb_ER_POS_Breast_reconfirm_variants.txt Michigan_ER_POS_GrCh38_chr_only.bed > MichiganWeb_ER_POS_Breast_reconfirm_variants_GR37_Gr38.txt
 
 
 MichiganWeb_ER_OVERALL_Breast
