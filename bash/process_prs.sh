@@ -77,10 +77,10 @@ plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweigh
 # Pleiotropy_Bi_directional_Increasing_Significant	15 15 # OK
 # Pleiotropy_Bi_directional_Decreasing	21 21 # OK
 # Pleiotropy_Bi_directional_Decreasing_Significant 15 15 # OK
-# Pleiotropy_Meta_analysis	21 20 # OK; remove one duplicate variants
+# Pleiotropy_Meta_analysis	21 20 # OK; removed one duplicate variant
 # Pleiotropy_One_cohort	9 9 # OK
 # Pleiotropy_One_directional	137 137 # OK
-# Pleiotropy_One_directional_Significant	85 83
+# Pleiotropy_One_directional_Significant	85 85
 # Pleiotropy_PRSWEB	179 179 # OK
 # Pleiotropy_Replication_prior_studies	308 308 # OK
 # Sarcoma_Machiela	6 6 # OK
