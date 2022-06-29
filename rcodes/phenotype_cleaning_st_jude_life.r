@@ -206,7 +206,16 @@ write.table(tt, "Z:/ResearchHome/Groups/sapkogrp/projects/SJLIFE_WGS/common/sjli
 
 # save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/PHENOTYPE/phenotype_cleaning.RDATA")
 
-## On 05/26/2022; we received Phenotype for Email subject: 'Attribution fraction for SN'
+###########################################################################################
+## On 05/26/2022; we received Phenotype for Email subject: 'Attribution fraction for SN' ##     
+###########################################################################################
+
+##################
+##################
+## CLINICAL SET ##
+##################
+##################
+
 #####################
 ## wgspop.sas7bdat ##
 #####################
@@ -223,38 +232,55 @@ setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PH
 # data.df$condition <- gsub("_$", "", (gsub("_+", "_",  gsub("[^A-Za-z0-9]", "_", data.df$condition))))
 # dim(data.df)
 
-
 wgspop <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/wgspop.sas7bdat")
 head(wgspop)
 
 
+demog <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/demog.sas7bdat")
+head(demog)
+demog <- demog[,c("MRN", "dob", "gender", "race", "ethnic", "agedx", "agelstcontact")]
+
+## Add SJLIFE ID
+clinical.dat <- cbind.data.frame(wgspop[match(demog$MRN, wgspop$MRN), c("sjlid")], demog)
+
 wgsdiag <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/wgsdiag.sas7bdat")
 head(wgsdiag)
 # table(wgsdiag$diaggrp)
+clinical.dat <- cbind.data.frame(clinical.dat, wgsdiag[match(clinical.dat$MRN, wgsdiag$MRN), c("diagdt", "diaggrp")])
+
+###############
+## Radiation ##
+###############
+
+## Get diagrp and diagdt
+radiation <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/radiation.sas7bdat")
+head(radiation)
+
+## Add all from radiation
+clinical.dat <- cbind.data.frame(clinical.dat, radiation[match(clinical.dat$MRN, radiation$MRN), ])
+
+#########################
+## Aubsequent Neoplasm ##
+#########################
 
 subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
 head(subneo)
 table(subneo$diaggrp)
 
-##
-
-
+############
+## Any SNs 
+############
+# Get SNs for the first time and Age at First SN (before onset)
+# For this, I will first sort the table by date
+subneo$order_letter <- 1:nrow(subneo)
+library(data.table)
+ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt)]
 ###
 
-radiation <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/radiation.sas7bdat")
-head(radiation)
-
-
-drug <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/drug.sas7bdat")
-head(drug)
-
-
-demog <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/demog.sas7bdat")
-head(demog)
-
-
-adultbmi <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.sas7bdat")
-head(adultbmi)
+#############################
+## Adult habits/ Lifestyle ##
+#############################
+## For each samples, get habits immediately after 18 years of age in agesurvey
 
 # adlthabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.sas7bdat")
 adlthabits <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.txt", header = T, sep ="\t")
@@ -281,18 +307,40 @@ for (i in 1:length(samples.sjlife)){
   lifestyle <- rbind.data.frame(lifestyle, lifestyle.tmp)
 }
 
+sum(duplicated(lifestyle$SJLIFEID))
+lifestyle$SJLIFEID[duplicated(lifestyle$SJLIFEID)]
+## Remove duplicate row
+lifestyle <- lifestyle[!duplicated(lifestyle$SJLIFEID),]
 
-## For each samples, get habits immediately after 18 years of age in agesurvey
+## Add all samples
+lifestyle <- cbind.data.frame(wgspop[,1:2], lifestyle[match(wgspop$MRN, lifestyle$mrn), ])
 
-
-
-
+#######################
+## Adolescent habits ##
+#######################
 
 adolhabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adolhabits.sas7bdat")
 head(adolhabits)
 
+###############
+## Adult BMI ##
+###############
 
-lapply(list(wgspop, wgsdiag, subneo, radiation, drug, demog, adultbmi, adolhabits, adlthabits), dim)
+adultbmi <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.sas7bdat")
+head(adultbmi)
 
+##########
+## Drug ##
+##########
+
+drug <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/drug.sas7bdat")
+head(drug)
+## Add drug to clinical data
+clinical.dat <- cbind.data.frame(clinical.dat, drug[match(clinical.dat$MRN, drug$MRN), grep("dose_any",colnames(drug))])
+
+
+
+# lapply(list(wgspop, wgsdiag, subneo, radiation, drug, demog, adultbmi, adolhabits, adlthabits), dim)
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/phenotype_cleaning_attr_fraction.RDATA")
 
 

@@ -502,9 +502,54 @@ echo "Annotated_Pathogenic_PreQC_chr${CHR}" >> merge_list.txt
 done
 plink --make-bed --merge-list merge_list.txt  --out sjlife_all_pathogenic_variants_PreQC
 ## Recode
-plink --bfile sjlife_all_pathogenic_variants_PreQC --recodeA --out sjlife_all_pathogenic_variants_PreQC_recodeA
+plink --bfile sjlife_all_pathogenic_variants_PreQC --recodeA --out sjlife_all_pathogenic_variants_PreQC_recodeA ## Use this!
 plink --bfile sjlife_all_pathogenic_variants_PreQC --recode12 --out sjlife_all_pathogenic_variants_PreQC_recode12
 plink --bfile sjlife_all_pathogenic_variants_PreQC --recodeAD --out sjlife_all_pathogenic_variants_PreQC_recodeAD
+
+#########################################################################################################
+## Similarly, extract all variants from PreQC VCF in Zhaoming and Qin's list for attributable fraction ##
+#########################################################################################################
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/genetic_data
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf.gz* .
+
+## Qin et al
+for LINE in $(cat Na_Qin_et_al_variants.txt); do
+CHR="$(echo ${LINE} |awk -F' ' '{print $3}'|tr -d " \t\n\r")"
+VAR="$(echo ${LINE} |awk -F' ' '{print $5}'|tr -d " \t\n\r")"
+ID="$(echo ${LINE} |awk -F' ' '{print $6}'|tr -d " \t\n\r")"
+echo "Doing $ID"	
+bcftools view MERGED.SJLIFE.1.2.GATKv3.4.VQSR.${CHR}.preQC_biallelic_renamed_ID_edited.vcf.gz ${VAR} > ./Na_Qin_vars/${ID}.vcf.gz
+plink --vcf ./Na_Qin_vars/${ID}.vcf.gz --double-id --vcf-half-call m --keep-allele-order --threads 2 --make-bed --out ./Na_Qin_vars/${ID}
+done
+
+## Merge all plink files
+cd Na_Qin_vars/
+ls *bim| sort -V| awk -F '\\.bim' '{print $1}' > merge_list.txt
+plink --make-bed --merge-list merge_list.txt  --out Qin_et_al_all_vars
+# Now extract only those that are in Qin's paper
+awk -F' ' '{print $6}' ../Na_Qin_et_al_variants.txt| sed '/^$/d' | grep -v ID| sort -V > qin_variant_list
+plink --bfile Qin_et_al_all_vars --extract qin_variant_list --allow-no-sex --make-bed --out Qin_et_al_all_vars_final
+plink --bfile Qin_et_al_all_vars_final --recodeA --out Qin_et_al_all_vars_final_recodeA
+
+
+## Zhaoming et al
+for LINE in $(cat Zhaoming_Wang_et_al_variants.txt); do
+CHR="$(echo ${LINE} |awk -F' ' '{print $3}'|tr -d " \t\n\r")"
+VAR="$(echo ${LINE} |awk -F' ' '{print $5}'|tr -d " \t\n\r")"
+ID="$(echo ${LINE} |awk -F' ' '{print $6}'|tr -d " \t\n\r")"
+echo "Doing $ID"	
+bcftools view MERGED.SJLIFE.1.2.GATKv3.4.VQSR.${CHR}.preQC_biallelic_renamed_ID_edited.vcf.gz ${VAR} > ./Zhaoming_Wang_vars/${ID}.vcf.gz
+plink --vcf ./Zhaoming_Wang_vars/${ID}.vcf.gz --double-id --vcf-half-call m --keep-allele-order --threads 2 --make-bed --out ./Zhaoming_Wang_vars/${ID}
+done
+
+## Merge all plink files
+cd Zhaoming_Wang_vars/
+ls *bim| sort -V| awk -F '\\.bim' '{print $1}' > merge_list.txt
+plink --make-bed --merge-list merge_list.txt  --out Zhaoming_et_al_all_vars
+# Now extract only those that are in Zhaoming's paper
+awk -F' ' '{print $6}' ../Zhaoming_Wang_et_al_variants.txt| sed '/^$/d' | grep -v ID| sort -V > Zhaoming_variant_list
+plink --bfile Zhaoming_et_al_all_vars --extract Zhaoming_variant_list --allow-no-sex --make-bed --out Zhaoming_et_al_all_vars_final
+plink --bfile Zhaoming_et_al_all_vars_final --recodeA --out Zhaoming_et_al_all_vars_final_recodeA
 
 # https://zzz.bwh.harvard.edu/plink/dataman.shtml
 # plink --file data --recodeAD
