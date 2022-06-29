@@ -10,15 +10,16 @@ study=$1
 ## remove chr1:145902073|chr4:57426897|chr6:114515866 from MichiganWeb_ER_OVERALL_Breast
 ## remove chr4:57426897|chr6:114515866 from MichiganWeb_ER_POS_Breast
 awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt > prs_out/ALL_Cancers_PRS_data.txt_${study}
-# awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt | egrep -v '145902073|57426897|114515866|129989587' > prs_out/ALL_Cancers_PRS_data.txt_${study}
-# awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt | egrep -v '57426897|114515866' > prs_out/ALL_Cancers_PRS_data.txt_${study}
+# awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt | egrep -v '145902073|57426897|114515866|129989587' > prs_out/ALL_Cancers_PRS_data.txt_${study} # MichiganWeb_ER_OVERALL_Breast
+# awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt | egrep -v '57426897|114515866' > prs_out/ALL_Cancers_PRS_data.txt_${study} # MichiganWeb_ER_POS_Breast
+# awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt | grep -v 30641447 > prs_out/ALL_Cancers_PRS_data.txt_${study}
 # Check for duplicate variants based on chr:pos
 awk 'a[$1":"$2]++' prs_out/ALL_Cancers_PRS_data.txt_$study | wc -l
 # Look for directly matching variants in the WGS data
-awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/ALL_Cancers_PRS_data.txt_$study plink_data/sjlife_all_PRS_all_final.bim \
+awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/ALL_Cancers_PRS_data.txt_$study plink_data/sjlife_all_PRS_all_final_v2.bim \
 | awk '($4==$6 || $4==$7) && ($5==$6 || $5==$7)' > prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match
 # No direct match
-awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/ALL_Cancers_PRS_data.txt_$study plink_data/sjlife_all_PRS_all_final.bim \
+awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/ALL_Cancers_PRS_data.txt_$study plink_data/sjlife_all_PRS_all_final_v2.bim \
 | awk '!(($4==$6 || $4==$7) && ($5==$6 || $5==$7))' | grep -v DEL > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match
 # Exclude those that are already a direct match
 awk 'NR==FNR{a[$1":"$3];next}!($1":"$3 in a){print}' prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match \
@@ -39,50 +40,51 @@ Rscript harmonize_alleles.R prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_
 
 # Update the alleles
 awk '($NF==1){ print $3, $6, $7, $8, $9}' prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final_alleles_harmonized > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt
+# awk '($NF==1){ print $3, $6, $7, $8, $9}' prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final_alleles_harmonized | grep -vw chr9:108126198:G:A > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt
 # grep -v chr1:145902073:G:GA prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt > prs_out/t1
 # mv prs_out/t1 prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt
 # Extract study-specific variants
 awk '{print $2}' prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match > prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match_to_extract.txt
 module load plink/1.90b
-plink --bfile plink_data/sjlife_all_PRS_all_final --extract prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match_to_extract.txt --make-bed --out prs_out/${study}_direct_match
-plink --bfile plink_data/sjlife_all_PRS_all_final --extract prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --update-alleles prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --make-bed --out prs_out/${study}_harmonized
+plink --bfile plink_data/sjlife_all_PRS_all_final_v2 --extract prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match_to_extract.txt --make-bed --out prs_out/${study}_direct_match
+plink --bfile plink_data/sjlife_all_PRS_all_final_v2 --extract prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --update-alleles prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --make-bed --out prs_out/${study}_harmonized
 plink --bfile prs_out/${study}_direct_match --bmerge prs_out/${study}_harmonized --make-bed --out prs_out/$study
 # Update variant names
 awk '{print $2, $1":"$4}' prs_out/${study}.bim > prs_out/${study}_update_variantnames
 plink --bfile prs_out/$study --update-name prs_out/${study}_update_variantnames --make-bed --out prs_out/${study}_varname_updated
 # Create a score file
-awk '{print $1":"$2, $4, $5}' prs_out/ALL_Cancers_PRS_data.txt_$study | egrep -v 6:114515866 > prs_out/${study}.prsweight
+awk '{print $1":"$2, $4, $5}' prs_out/ALL_Cancers_PRS_data.txt_$study > prs_out/${study}.prsweight
 # Calculate PRS
 plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweight --out prs_out/${study}_prs
 
 ## _Significant are the ones with: grep -v N
 # ALL_Vijayakrishnan	15 15 # OK
-# Allman_African_Breast	75	74
-# Allman_Hispanic_Breast	71 69
-# Khera_2018_Breast	77	76
-# Mavaddat_2015_ER_NEG_Breast	77	76
-# Mavaddat_2015_ER_OVERALL_Breast	77 76
-# Mavaddat_2015_ER_POS_Breast	77	76
-# Mavaddat_2019_ER_NEG_Breast	313 294
-# Mavaddat_2019_ER_OVERALL_Breast	313 294
-# Mavaddat_2019_ER_POS_Breast	313 294
+# Allman_African_Breast	75	75 # OK; dropped chr9:108126198:G:A duplicate
+# Allman_Hispanic_Breast	71 70 # chr3:30641447:G:G in PRS file; removed
+# Khera_2018_Breast	77	77 # OK
+# Mavaddat_2015_ER_NEG_Breast	77	77 # OK
+# Mavaddat_2015_ER_OVERALL_Breast	77 77 # OK
+# Mavaddat_2015_ER_POS_Breast	77	77 # OK
+# Mavaddat_2019_ER_NEG_Breast	313 306
+# Mavaddat_2019_ER_OVERALL_Breast	313 306
+# Mavaddat_2019_ER_POS_Breast	313 306
 # Meningioma_Claus	1 1 #OK
 # Meningioma_Dobbins	2 2 # OK
-# MichiganWeb_ER_NEG_Breast	79 78
-# MichiganWeb_ER_OVERALL_Breast	1120348 1119325
+# MichiganWeb_ER_NEG_Breast	79 79
+# MichiganWeb_ER_OVERALL_Breast	1120348 1119287
 # MichiganWeb_ER_POS_Breast	1119079 1118049
 # Pleiotropy_Bi_directional_Increasing	21 21 # OK
 # Pleiotropy_Bi_directional_Increasing_Significant	15 15 # OK
 # Pleiotropy_Bi_directional_Decreasing	21 21 # OK
 # Pleiotropy_Bi_directional_Decreasing_Significant 15 15 # OK
-# Pleiotropy_Meta_analysis	21 20 # OK
+# Pleiotropy_Meta_analysis	21 20 # OK; remove one duplicate variants
 # Pleiotropy_One_cohort	9 9 # OK
-# Pleiotropy_One_directional	137 133
+# Pleiotropy_One_directional	137 137 # OK
 # Pleiotropy_One_directional_Significant	85 83
-# Pleiotropy_PRSWEB	179 179
-# Pleiotropy_Replication_prior_studies	308 300
+# Pleiotropy_PRSWEB	179 179 # OK
+# Pleiotropy_Replication_prior_studies	308 308 # OK
 # Sarcoma_Machiela	6 6 # OK
-# Wang_African_Breast	98 97
+# Wang_African_Breast	98 98
 
 
 
@@ -194,15 +196,15 @@ Mavaddat_2015_ER_POS_Breast
 # chr12_GL383549v1_alt	114691	# replaced with the correct position: chr12:28002147
 awk 'NR==FNR{a[$2]; next} !(($1":"$2) in a)' Mavaddat_2019_ER_NEG_Breast_varname_updated.bim  ALL_Cancers_PRS_data.txt_Mavaddat_2019_ER_NEG_Breast
 Mavaddat_2019_ER_NEG_Breast
-# 1       145830809       CT      C       0.0126  Mavaddat_2019_ER_NEG_Breast     Breast  Y # replaced with position 145830798
+# 1       145830809       CT      C       0.0126  Mavaddat_2019_ER_NEG_Breast     Breast  Y # replaced with position 145830798; no matching allele
 # 1       204533386       TTCTGAAACAGGG   T       0.1345  Mavaddat_2019_ER_NEG_Breast     Breast  Y
-# 2       217091173       G       GA      0.0558  Mavaddat_2019_ER_NEG_Breast     Breast  Y
+# 2       217091173       G       GA      0.0558  Mavaddat_2019_ER_NEG_Breast     Breast  Y ## No matching allele
 # 3       55936749        AT      A       0.0586  Mavaddat_2019_ER_NEG_Breast     Breast  Y
 # 3       63901773        T       TTG     0.043   Mavaddat_2019_ER_NEG_Breast     Breast  Y
 # 4       125831837       AAT     A       0.0638  Mavaddat_2019_ER_NEG_Breast     Breast  Y
-# 4       83448971        TA      TAA     0.0489  Mavaddat_2019_ER_NEG_Breast     Breast  Y
+# 4       83448971        TA      TAA     0.0489  Mavaddat_2019_ER_NEG_Breast     Breast  Y ## No matching allele
 # 5       1296140 AG      A       0.1056  Mavaddat_2019_ER_NEG_Breast     Breast  Y
-# 5       58945885        T       C       0.0408  Mavaddat_2019_ER_NEG_Breast     Breast  Y
+# 5       58945885        T       C       0.0408  Mavaddat_2019_ER_NEG_Breast     Breast  Y ## No match
 # 5       79885172        G       GA      0.0804  Mavaddat_2019_ER_NEG_Breast     Breast  Y
 # 6       130020583       C       CT      0.0804  Mavaddat_2019_ER_NEG_Breast     Breast  Y
 # 6       87094101        T       C       0.0678  Mavaddat_2019_ER_NEG_Breast     Breast  Y ## Not found; confirmed
@@ -212,7 +214,7 @@ Mavaddat_2019_ER_NEG_Breast
 # 12      82670416        G       GA      0.0717  Mavaddat_2019_ER_NEG_Breast     Breast  Y
 # 17      30841059        T       G       0.0604  Mavaddat_2019_ER_NEG_Breast     Breast  Y ## Not found; confirmed, but have variant for 30841058 that do not match alleles
 # 19      19406245        C       CGGGCG  0.0577  Mavaddat_2019_ER_NEG_Breast     Breast  Y
-# 22      38187308        AAAAG   AAAAGAAAG       0.0079  Mavaddat_2019_ER_NEG_Breast     Breast  Y
+# 22      38187308        AAAAG   AAAAGAAAG       0.0079  Mavaddat_2019_ER_NEG_Breast     Breast  Y # No matching allele
 awk 'NR==FNR{a[$2]; next} !(($1":"$2) in a)' MichiganWeb_ER_NEG_Breast_varname_updated.bim  ALL_Cancers_PRS_data.txt_MichiganWeb_ER_NEG_Breast
 MichiganWeb_ER_NEG_Breast
 # 1       145790095       T       C       0.0512933143875503      MichiganWeb_ER_NEG_Breast       Breast  Y ## Replaced with chr1:145790097
@@ -224,12 +226,12 @@ Pleiotropy_One_directional
 # 17      45720982        T       TTTG    0.075801713     Pleiotropy_One_directional      Pleiotropy      Y
 # 10      46037695        T       C       0.104250021     Pleiotropy_One_directional      Pleiotropy      Y ## replaced with chr 10:46037697
 # 2       200810808       C       CG      0.06720875      Pleiotropy_One_directional      Pleiotropy      N
-# 22      38185855        T       TC      0.048140375     Pleiotropy_One_directional      Pleiotropy      N
+# 22      38185855        T       TC      0.048140375     Pleiotropy_One_directional      Pleiotropy      N 
 awk 'NR==FNR{a[$2]; next} !(($1":"$2) in a)' Pleiotropy_Replication_prior_studies_varname_updated.bim  ALL_Cancers_PRS_data.txt_Pleiotropy_Replication_prior_studies
 Pleiotropy_Replication_prior_studies
 # 10      46046324        C       T       0.222743471     Pleiotropy_Replication_prior_studies    Pleiotropy      Y ## replaced with chr10:46046326
 # 9       108131271       C       CT      0.095630231     Pleiotropy_Replication_prior_studies    Pleiotropy      Y
-# 3       128027236       AT      A       0.081579987     Pleiotropy_Replication_prior_studies    Pleiotropy      Y ## Not found; confirmed
+# 3       128027236       AT      A       0.081579987     Pleiotropy_Replication_prior_studies    Pleiotropy      Y 
 # 10      46037695        T       C       0.099709844     Pleiotropy_Replication_prior_studies    Pleiotropy      Y ## replaced with chr 10:46037697
 # 14      68174379        CA      C       0.080657903     Pleiotropy_Replication_prior_studies    Pleiotropy      Y
 # 2       241237728       CAT     C       0.083605584     Pleiotropy_Replication_prior_studies    Pleiotropy      Y
