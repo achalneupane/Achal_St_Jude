@@ -273,7 +273,7 @@ table(subneo$diaggrp)
 # Get SNs for the first time and Age at First SN (before onset)
 # For this, I will first sort the table by date
 library(data.table)
-ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt)]
+ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 
 ## Add all samples
 ANY_SNs <- cbind.data.frame(wgspop[,1:2], ANY_SNs[match(wgspop$MRN, ANY_SNs$MRN), ])
@@ -299,13 +299,13 @@ for (i in 1:length(samples.sjlife)){
   print(paste0("Doing ", i))
   dat <- adlthabits[adlthabits$SJLIFEID == samples.sjlife[i],]
   if (max(dat$agesurvey) >= 18){
-    # print("YES")
+    print("YES")
     dat2 <- dat[dat$agesurvey >= 18,]
-    lifestyle.tmp <- dat2[which(dat2$agesurvey_diff_of_dob_datecomp == min(dat2$agesurvey_diff_of_dob_datecomp)),]
-  } else {
-    # print("NO")
-    lifestyle.tmp <-  dat[which(dat$agesurvey_diff_of_dob_datecomp == max(dat$agesurvey_diff_of_dob_datecomp)),]
-    lifestyle.tmp[9:ncol(lifestyle.tmp)] <- NA
+    lifestyle.tmp <- dat2[which(dat2$agesurvey == min(dat2$agesurvey)),]
+    # } else {
+    #   print("NO")
+    #   lifestyle.tmp <-  dat[which(dat$agesurvey == max(dat$agesurvey)),]
+    #   lifestyle.tmp[9:ncol(lifestyle.tmp)] <- NA
   }
   lifestyle <- rbind.data.frame(lifestyle, lifestyle.tmp)
 }
@@ -318,6 +318,23 @@ lifestyle <- lifestyle[!duplicated(lifestyle$SJLIFEID),]
 ## Add all samples
 lifestyle <- cbind.data.frame(wgspop[,1:2], lifestyle[match(wgspop$MRN, lifestyle$mrn), ])
 lifestyle <- lifestyle[-c(3,4)]
+tt <- lifestyle
+## Recode categorical variables
+lifestyle$relation[lifestyle$relation == 1] <- "Self"
+lifestyle$relation[lifestyle$relation == 2] <- "Parent"
+lifestyle$relation[lifestyle$relation == 3] <- "Other"
+
+## Recode smoker
+lifestyle$smoker[lifestyle$smoker == 1] <- "Past"
+lifestyle$smoker[lifestyle$smoker == 2] <- "Current"
+lifestyle$smoker[lifestyle$smoker == 3] <- "Never"
+lifestyle$smoker <- ifelse(lifestyle$smoker == "Current", "Y", "N")
+
+## Recode to Y/N
+lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))][lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))] == 1 ] <- "Y"
+lifestyle[grepl("nopa|ltpa", colnames(lifestyle))][lifestyle[grepl("nopa|ltpa", colnames(lifestyle))] == 2 ] <- "N"
+lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))][lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))] == 0 ] <- "N"
+
 #######################
 ## Adolescent habits ##
 #######################
@@ -332,6 +349,18 @@ head(adolhabits)
 adultbmi <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.sas7bdat")
 head(adultbmi)
 
+## Add BMI and Nutrition to Lifestyle. Here, I am extracting the the BMI and Nutrition for the same age for each sample 
+lifestyle$BMI_KEY <- paste(lifestyle$sjlid, lifestyle$agesurvey, sep = ":")
+
+length(unique(adultbmi$sjlid))
+# 3640
+adultbmi$BMI_KEY <- paste(adultbmi$sjlid, adultbmi$AGE, sep = ":")
+sum(lifestyle$BMI_KEY %in% adultbmi$BMI_KEY)
+# 2964 
+## samples that did not match by corresponding age
+cc <- lifestyle[!lifestyle$BMI_KEY %in% adultbmi$BMI_KEY,]
+
+lifestyle <- cbind.data.frame(lifestyle, adultbmi[match(lifestyle$BMI_KEY, adultbmi$BMI_KEY), c("BMI", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")])
 ##########
 ## Drug ##
 ##########
@@ -340,6 +369,14 @@ drug <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_
 head(drug)
 ## Add drug to clinical data
 clinical.dat <- cbind.data.frame(clinical.dat, drug[match(clinical.dat$MRN, drug$MRN), grep("dose_any",colnames(drug))])
+colnames(clinical.dat)[grepl("_yn", colnames(clinical.dat))]
+# [1] "brainorheadrt_yn" "brainrt_yn"       "chestrt_yn"       "neckrt_yn"        "pelvisrt_yn"      "abdomenrt_yn"  
+# brainorheadrt_yn : 1Y, 2N; brainrt_yn: 1Y, 2N; chestrt_yn: 1Y, 2N; neckrt_yn: 1Y, 2N; pelvisrt_yn: 1Y, 2N; abdomenrt_yn: 1Y, 2N
+clinical.dat[grepl("_yn|anyrt_|AnyRT", colnames(clinical.dat))][clinical.dat[grepl("_yn|anyrt_|AnyRT", colnames(clinical.dat))] == 1 ] <- "Y"
+clinical.dat[grepl("_yn", colnames(clinical.dat))][clinical.dat[grepl("_yn", colnames(clinical.dat))] == 2 ] <- "N"
+clinical.dat[grepl("anyrt_|AnyRT", colnames(clinical.dat))][clinical.dat[grepl("anyrt_|AnyRT", colnames(clinical.dat))] == 0 ] <- "N"
+
+
 
 
 
