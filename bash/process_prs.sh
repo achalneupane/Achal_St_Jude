@@ -70,6 +70,7 @@ plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweigh
 # Mavaddat_2019_ER_POS_Breast	313 306
 # Meningioma_Claus	1 1 #OK
 # Meningioma_Dobbins	2 2 # OK
+# Meningioma 3 3 # OK
 # MichiganWeb_ER_NEG_Breast	79 79
 # MichiganWeb_ER_OVERALL_Breast	1120348 1119287
 # MichiganWeb_ER_POS_Breast	1119079 1118049
