@@ -272,9 +272,12 @@ table(subneo$diaggrp)
 ############
 # Get SNs for the first time and Age at First SN (before onset)
 # For this, I will first sort the table by date
-subneo$order_letter <- 1:nrow(subneo)
 library(data.table)
 ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt)]
+
+## Add all samples
+ANY_SNs <- cbind.data.frame(wgspop[,1:2], ANY_SNs[match(wgspop$MRN, ANY_SNs$MRN), ])
+ANY_SNs <- ANY_SNs[-c(3,4)]
 ###
 
 #############################
@@ -314,7 +317,7 @@ lifestyle <- lifestyle[!duplicated(lifestyle$SJLIFEID),]
 
 ## Add all samples
 lifestyle <- cbind.data.frame(wgspop[,1:2], lifestyle[match(wgspop$MRN, lifestyle$mrn), ])
-
+lifestyle <- lifestyle[-c(3,4)]
 #######################
 ## Adolescent habits ##
 #######################
