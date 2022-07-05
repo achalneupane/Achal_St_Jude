@@ -266,6 +266,8 @@ clinical.dat <- cbind.data.frame(clinical.dat, radiation[match(clinical.dat$MRN,
 subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
 head(subneo)
 table(subneo$diaggrp)
+# add DOB
+subneo$DOB <- demog$dob[match(subneo$MRN, demog$MRN)]
 
 ############
 ## Any SNs 
@@ -276,7 +278,7 @@ library(data.table)
 ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 
 ## Add all samples
-ANY_SNs <- cbind.data.frame(wgspop[,1:2], ANY_SNs[match(wgspop$MRN, ANY_SNs$MRN), ])
+ANY_SNs <- cbind.data.frame(wgspop[,c("MRN", "sjlid")], ANY_SNs[match(wgspop$MRN, ANY_SNs$MRN), ])
 ANY_SNs <- ANY_SNs[-c(3,4)]
 ###
 
@@ -367,11 +369,17 @@ lifestyle <- cbind.data.frame(lifestyle, adultbmi[match(lifestyle$BMI_KEY, adult
 
 drug <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/drug.sas7bdat")
 head(drug)
+
+
 ## Add drug to clinical data
 clinical.dat <- cbind.data.frame(clinical.dat, drug[match(clinical.dat$MRN, drug$MRN), grep("dose_any",colnames(drug))])
-colnames(clinical.dat)[grepl("_yn", colnames(clinical.dat))]
-# [1] "brainorheadrt_yn" "brainrt_yn"       "chestrt_yn"       "neckrt_yn"        "pelvisrt_yn"      "abdomenrt_yn"  
-# brainorheadrt_yn : 1Y, 2N; brainrt_yn: 1Y, 2N; chestrt_yn: 1Y, 2N; neckrt_yn: 1Y, 2N; pelvisrt_yn: 1Y, 2N; abdomenrt_yn: 1Y, 2N
+
+colnames(clinical.dat)[grepl("_yn|anyrt_|AnyRT", colnames(clinical.dat))]
+# [1] "AnyRT"            "anyrt_prim"       "anyrt_5"          "anyrt_10"         "brainorheadrt_yn" "brainrt_yn"       "chestrt_yn"      
+# [8] "neckrt_yn"        "pelvisrt_yn"      "abdomenrt_yn" 
+
+# anyrt: 1Y, 0N;  brainorheadrt_yn : 1Y, 2N; brainrt_yn: 1Y, 2N; chestrt_yn: 1Y, 2N; neckrt_yn: 1Y, 2N; pelvisrt_yn: 1Y, 2N; abdomenrt_yn: 1Y, 2N
+
 clinical.dat[grepl("_yn|anyrt_|AnyRT", colnames(clinical.dat))][clinical.dat[grepl("_yn|anyrt_|AnyRT", colnames(clinical.dat))] == 1 ] <- "Y"
 clinical.dat[grepl("_yn", colnames(clinical.dat))][clinical.dat[grepl("_yn", colnames(clinical.dat))] == 2 ] <- "N"
 clinical.dat[grepl("anyrt_|AnyRT", colnames(clinical.dat))][clinical.dat[grepl("anyrt_|AnyRT", colnames(clinical.dat))] == 0 ] <- "N"
