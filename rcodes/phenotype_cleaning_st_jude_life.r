@@ -269,10 +269,13 @@ table(subneo$diaggrp)
 # add DOB
 subneo$DOB <- demog$dob[match(subneo$MRN, demog$MRN)]
 
+library(lubridate)
+subneo$AGE.exact <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
+subneo$AGE <- floor(subneo$AGE.exact)
 ############
 ## Any SNs 
 ############
-# Get SNs for the first time and Age at First SN (before onset)
+# Get SNs for the first time and Age at First SN.
 # For this, I will first sort the table by date
 library(data.table)
 ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
@@ -281,6 +284,8 @@ ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decre
 ANY_SNs <- cbind.data.frame(wgspop[,c("MRN", "sjlid")], ANY_SNs[match(wgspop$MRN, ANY_SNs$MRN), ])
 ANY_SNs <- ANY_SNs[-c(3,4)]
 ###
+
+
 
 #############################
 ## Adult habits/ Lifestyle ##
