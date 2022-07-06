@@ -374,8 +374,8 @@ table(subneo$diaggrp)
 subneo$DOB <- demog$dob[match(subneo$MRN, demog$MRN)]
 
 library(lubridate)
-subneo$AGE.exact.SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
-subneo$AGE.SN <- floor(subneo$AGE.exact.SN)
+subneo$AGE.exact.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
+subneo$AGE.ANY_SN <- floor(subneo$AGE.exact.ANY_SN)
 ############
 ## Any SNs 
 ############
@@ -391,7 +391,13 @@ ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decre
 
 PHENO.ANY_SN <- clinical.dat
 PHENO.ANY_SN$ANY_SN <- ifelse(PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, "Y", "N")
-PHENO.ANY_SN$ANY_SN_Diagnosis_Age <- ANY_SNs$AGE.SN[match(PHENO.ANY_SN$sjlid, ANY_SNs$sjli)]
+PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ANY_SNs[match(PHENO.ANY_SN$sjlid, ANY_SNs$sjli), c("gradedt", "AGE.ANY_SN")])
+
+## Merge lifestyle
+PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, lifestyle[match(PHENO.ANY_SN$sjlid, lifestyle$SJLIFEID),c("datecomp", "agesurvey", "relation", "smoker", "nopa", "ltpa", "drk5", "bingedrink", "heavydrink", "riskydrink")])
+PHENO.ANY_SN[PHENO.ANY_SN$ANY_SN == "Y", "AGE.ANY_SN"] >=  PHENO.ANY_SN[PHENO.ANY_SN$ANY_SN == "Y", "agesurvey"]
+
+# IF gradedt (date of SN diagnosis) is older than compdate, 
 
 
 #############
