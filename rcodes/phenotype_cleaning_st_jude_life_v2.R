@@ -296,9 +296,9 @@ lifestyle$SJLIFEID[duplicated(lifestyle$SJLIFEID)]
 lifestyle <- lifestyle[!duplicated(lifestyle$SJLIFEID),]
 
 ## Add all samples
-lifestyle <- cbind.data.frame(wgspop[,1:2], lifestyle[match(wgspop$MRN, lifestyle$mrn), ])
-lifestyle <- lifestyle[-c(3,4)]
-tt <- lifestyle
+# lifestyle <- cbind.data.frame(wgspop[,1:2], lifestyle[match(wgspop$MRN, lifestyle$mrn), ])
+# lifestyle <- lifestyle[-c(3,4)]
+# tt <- lifestyle
 ## Recode categorical variables
 lifestyle$relation[lifestyle$relation == 1] <- "Self"
 lifestyle$relation[lifestyle$relation == 2] <- "Parent"
