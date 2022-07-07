@@ -12,6 +12,7 @@ library(benchmarkme)
 library(dplyr)
 library(plyr)
 library(data.table)
+library (birk)
 # benchmarkme::get_ram()
 all.sas.files <- list.files()
 
@@ -315,6 +316,13 @@ lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink", colname
 lifestyle[grepl("nopa|ltpa", colnames(lifestyle))][lifestyle[grepl("nopa|ltpa", colnames(lifestyle))] == 2 ] <- "N"
 lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))][lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))] == 0 ] <- "N"
 
+# change the format of dates YYYY-MM-DD
+lifestyle$datecomp <- gsub("\\/", "-", lifestyle$datecomp)
+lifestyle$datecomp <- paste(sapply(strsplit(lifestyle$datecomp, "-"), `[`, 3), sapply(strsplit(lifestyle$datecomp, "-"), `[`, 1), sapply(strsplit(lifestyle$datecomp, "-"), `[`, 2), sep ="-")
+
+lifestyle$dob <- gsub("\\/", "-", lifestyle$dob)
+lifestyle$dob <- paste(sapply(strsplit(lifestyle$dob, "-"), `[`, 3), sapply(strsplit(lifestyle$dob, "-"), `[`, 1), sapply(strsplit(lifestyle$dob, "-"), `[`, 2), sep ="-")
+
 #######################
 ## Adolescent habits ##
 #######################
@@ -395,9 +403,24 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ANY_SNs[match(PHENO.ANY_SN$sjlid,
 
 ## Merge lifestyle
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, lifestyle[match(PHENO.ANY_SN$sjlid, lifestyle$SJLIFEID),c("datecomp", "agesurvey", "relation", "smoker", "nopa", "ltpa", "drk5", "bingedrink", "heavydrink", "riskydrink")])
-PHENO.ANY_SN[PHENO.ANY_SN$ANY_SN == "Y", "AGE.ANY_SN"] >=  PHENO.ANY_SN[PHENO.ANY_SN$ANY_SN == "Y", "agesurvey"]
 
-# IF gradedt (date of SN diagnosis) is older than compdate, 
+# If ANY_SN is Yes and the survey date of lifestyle (datecomp) is later than the SN grade
+# date (gradedt), then the lifestyle variables for those samples will be
+# irrelevant
+PHENO.ANY_SN[which(PHENO.ANY_SN[PHENO.ANY_SN$ANY_SN == "Y", "datecomp"] >  PHENO.ANY_SN[PHENO.ANY_SN$ANY_SN == "Y", "gradedt"]), c("smoker", "nopa", "ltpa", "drk5", "bingedrink", "heavydrink", "riskydrink")] <- NA
+
+# Now adding BMI and nutrition; extracting the BMI values immediately before or on the date of SN gradedt
+adultbmi.wanted <- {}
+for (i in 1:length(PHENO.ANY_SN$sjlid)){
+  tmp.adultbmi <- adultbmi[adultbmi$sjlid %in% PHENO.ANY_SN$sjlid[i], c("sjlid", "DateVisitStart", "BMI", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")]
+  tmp.adultbmi <- tmp.adultbmi [tmp.adultbmi$DateVisitStart < PHENO.ANY_SN$gradedt[i],]
+# If there are multiple dates, I will take the closest date to (on or before) gradedt
+  print(paste0(i, "--", nrow(tmp.adultbmi)))
+  tmp.adultbmi <- tmp.adultbmi [which.closest(tmp.adultbmi$DateVisitStart, PHENO.ANY_SN$gradedt[i]),]
+  adultbmi.wanted <- rbind.data.frame(adultbmi.wanted,tmp.adultbmi)
+}
+PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, adultbmi.wanted[match(PHENO.ANY_SN$sjlid, adultbmi.wanted$sjlid), c("DateVisitStart", "BMI", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")])
+PHENO.ANY_SN$obesity <- ifelse(PHENO.ANY_SN$BMI >= 30, "Y", "N")
 
 
 #############
