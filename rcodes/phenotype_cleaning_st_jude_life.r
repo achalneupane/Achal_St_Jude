@@ -12,6 +12,7 @@ library(benchmarkme)
 library(dplyr)
 library(plyr)
 library(data.table)
+library (birk)
 # benchmarkme::get_ram()
 all.sas.files <- list.files()
 
