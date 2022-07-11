@@ -564,7 +564,7 @@ plink --bfile Zhaoming_et_al_all_vars_final --recodeA --out Zhaoming_et_al_all_v
 # n otherwords, the default for the additive recoding is to count the number of minor alleles per person. The --recodeAD option produces both an additive and dominance coding: use --recodeA instead to skip the SNP_HET coding.
 # The --recodeAD option saves the data to a single file
 
-## Therefore, --recodeA is the right option to get the carriers
+## Therefore, --recodeA is the right option to get the carriers; homozygous reference is coded as 0; heterozygous is coded as 1; homozygous alternate is coded as 2
 ####################################################################
 ## check variants from  SNPeff in Zhaoming and Qin et al's papers ##
 ####################################################################

@@ -1,4 +1,12 @@
 
+library(haven)
+library(benchmarkme)
+library(dplyr)
+library(plyr)
+library(data.table)
+library (birk)
+# benchmarkme::get_ram()
+
 
 ###########################################################################################
 ## On 05/26/2022; we received Phenotype for Email subject: 'Attribution fraction for SN' ##     
@@ -54,94 +62,94 @@ head(radiation)
 clinical.dat <- cbind.data.frame(clinical.dat, radiation[match(clinical.dat$MRN, radiation$MRN), ])
 
 
-#############################
-## Adult habits/ Lifestyle ##
-#############################
-## For each samples, get habits immediately after 18 years of age in agesurvey
-
-# adlthabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.sas7bdat")
-adlthabits <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.txt", header = T, sep ="\t")
-head(adlthabits)
-# remove duplicated rows
-adlthabits <- distinct(adlthabits)
-adlthabits$agesurvey <- floor(adlthabits$agesurvey_diff_of_dob_datecomp)
-
-samples.sjlife <- unique(adlthabits$SJLIFEID)
-
-lifestyle <- {}
-for (i in 1:length(samples.sjlife)){
-  print(paste0("Doing ", i))
-  dat <- adlthabits[adlthabits$SJLIFEID == samples.sjlife[i],]
-  if (max(dat$agesurvey) >= 18){
-    print("YES")
-    dat2 <- dat[dat$agesurvey >= 18,]
-    lifestyle.tmp <- dat2[which(dat2$agesurvey == min(dat2$agesurvey)),]
-    # } else {
-    #   print("NO")
-    #   lifestyle.tmp <-  dat[which(dat$agesurvey == max(dat$agesurvey)),]
-    #   lifestyle.tmp[9:ncol(lifestyle.tmp)] <- NA
-  }
-  lifestyle <- rbind.data.frame(lifestyle, lifestyle.tmp)
-}
-
-sum(duplicated(lifestyle$SJLIFEID))
-lifestyle$SJLIFEID[duplicated(lifestyle$SJLIFEID)]
-## Remove duplicate row
-lifestyle <- lifestyle[!duplicated(lifestyle$SJLIFEID),]
-
-## Add all samples
-# lifestyle <- cbind.data.frame(wgspop[,1:2], lifestyle[match(wgspop$MRN, lifestyle$mrn), ])
-# lifestyle <- lifestyle[-c(3,4)]
-# tt <- lifestyle
-## Recode categorical variables
-lifestyle$relation[lifestyle$relation == 1] <- "Self"
-lifestyle$relation[lifestyle$relation == 2] <- "Parent"
-lifestyle$relation[lifestyle$relation == 3] <- "Other"
-
-## Recode smoker
-lifestyle$smoker[lifestyle$smoker == 1] <- "Past"
-lifestyle$smoker[lifestyle$smoker == 2] <- "Current"
-lifestyle$smoker[lifestyle$smoker == 3] <- "Never"
-lifestyle$smoker <- ifelse(lifestyle$smoker == "Current", "Y", "N")
-
-## Recode to Y/N
-lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))][lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))] == 1 ] <- "Y"
-lifestyle[grepl("nopa|ltpa", colnames(lifestyle))][lifestyle[grepl("nopa|ltpa", colnames(lifestyle))] == 2 ] <- "N"
-lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))][lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))] == 0 ] <- "N"
-
-# change the format of dates YYYY-MM-DD
-lifestyle$datecomp <- gsub("\\/", "-", lifestyle$datecomp)
-lifestyle$datecomp <- paste(sapply(strsplit(lifestyle$datecomp, "-"), `[`, 3), sapply(strsplit(lifestyle$datecomp, "-"), `[`, 1), sapply(strsplit(lifestyle$datecomp, "-"), `[`, 2), sep ="-")
-
-lifestyle$dob <- gsub("\\/", "-", lifestyle$dob)
-lifestyle$dob <- paste(sapply(strsplit(lifestyle$dob, "-"), `[`, 3), sapply(strsplit(lifestyle$dob, "-"), `[`, 1), sapply(strsplit(lifestyle$dob, "-"), `[`, 2), sep ="-")
-
-#######################
-## Adolescent habits ##
-#######################
-
-adolhabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adolhabits.sas7bdat")
-head(adolhabits)
-
-###############
-## Adult BMI ##
-###############
-
-adultbmi <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.sas7bdat")
-head(adultbmi)
-
-## Add BMI and Nutrition to Lifestyle. Here, I am extracting the the BMI and Nutrition for the same age for each sample 
-lifestyle$BMI_KEY <- paste(lifestyle$sjlid, lifestyle$agesurvey, sep = ":")
-
-length(unique(adultbmi$sjlid))
-# 3640
-adultbmi$BMI_KEY <- paste(adultbmi$sjlid, adultbmi$AGE, sep = ":")
-sum(lifestyle$BMI_KEY %in% adultbmi$BMI_KEY)
-# 2964 
-## samples that did not match by corresponding age
-cc <- lifestyle[!lifestyle$BMI_KEY %in% adultbmi$BMI_KEY,]
-
-lifestyle <- cbind.data.frame(lifestyle, adultbmi[match(lifestyle$BMI_KEY, adultbmi$BMI_KEY), c("BMI", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")])
+# #############################
+# ## Adult habits/ Lifestyle ##
+# #############################
+# ## For each samples, get habits immediately after 18 years of age in agesurvey
+# 
+# # adlthabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.sas7bdat")
+# adlthabits <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.txt", header = T, sep ="\t")
+# head(adlthabits)
+# # remove duplicated rows
+# adlthabits <- distinct(adlthabits)
+# adlthabits$agesurvey <- floor(adlthabits$agesurvey_diff_of_dob_datecomp)
+# 
+# samples.sjlife <- unique(adlthabits$SJLIFEID)
+# 
+# lifestyle <- {}
+# for (i in 1:length(samples.sjlife)){
+#   print(paste0("Doing ", i))
+#   dat <- adlthabits[adlthabits$SJLIFEID == samples.sjlife[i],]
+#   if (max(dat$agesurvey) >= 18){
+#     print("YES")
+#     dat2 <- dat[dat$agesurvey >= 18,]
+#     lifestyle.tmp <- dat2[which(dat2$agesurvey == min(dat2$agesurvey)),]
+#     # } else {
+#     #   print("NO")
+#     #   lifestyle.tmp <-  dat[which(dat$agesurvey == max(dat$agesurvey)),]
+#     #   lifestyle.tmp[9:ncol(lifestyle.tmp)] <- NA
+#   }
+#   lifestyle <- rbind.data.frame(lifestyle, lifestyle.tmp)
+# }
+# 
+# sum(duplicated(lifestyle$SJLIFEID))
+# lifestyle$SJLIFEID[duplicated(lifestyle$SJLIFEID)]
+# ## Remove duplicate row
+# lifestyle <- lifestyle[!duplicated(lifestyle$SJLIFEID),]
+# 
+# ## Add all samples
+# # lifestyle <- cbind.data.frame(wgspop[,1:2], lifestyle[match(wgspop$MRN, lifestyle$mrn), ])
+# # lifestyle <- lifestyle[-c(3,4)]
+# # tt <- lifestyle
+# ## Recode categorical variables
+# lifestyle$relation[lifestyle$relation == 1] <- "Self"
+# lifestyle$relation[lifestyle$relation == 2] <- "Parent"
+# lifestyle$relation[lifestyle$relation == 3] <- "Other"
+# 
+# ## Recode smoker
+# lifestyle$smoker[lifestyle$smoker == 1] <- "Past"
+# lifestyle$smoker[lifestyle$smoker == 2] <- "Current"
+# lifestyle$smoker[lifestyle$smoker == 3] <- "Never"
+# lifestyle$smoker <- ifelse(lifestyle$smoker == "Current", 1, 0)
+# 
+# ## Recode to Y/N
+# lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))][lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))] == 1 ] <- 1
+# lifestyle[grepl("nopa|ltpa", colnames(lifestyle))][lifestyle[grepl("nopa|ltpa", colnames(lifestyle))] == 2 ] <- 0
+# lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))][lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))] == 0 ] <- 0
+# 
+# # change the format of dates YYYY-MM-DD
+# lifestyle$datecomp <- gsub("\\/", "-", lifestyle$datecomp)
+# lifestyle$datecomp <- paste(sapply(strsplit(lifestyle$datecomp, "-"), `[`, 3), sapply(strsplit(lifestyle$datecomp, "-"), `[`, 1), sapply(strsplit(lifestyle$datecomp, "-"), `[`, 2), sep ="-")
+# 
+# lifestyle$dob <- gsub("\\/", "-", lifestyle$dob)
+# lifestyle$dob <- paste(sapply(strsplit(lifestyle$dob, "-"), `[`, 3), sapply(strsplit(lifestyle$dob, "-"), `[`, 1), sapply(strsplit(lifestyle$dob, "-"), `[`, 2), sep ="-")
+# 
+# #######################
+# ## Adolescent habits ##
+# #######################
+# 
+# adolhabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adolhabits.sas7bdat")
+# head(adolhabits)
+# 
+# ###############
+# ## Adult BMI ##
+# ###############
+# 
+# adultbmi <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.sas7bdat")
+# head(adultbmi)
+# 
+# ## Add BMI and Nutrition to Lifestyle. Here, I am extracting the the BMI and Nutrition for the same age for each sample 
+# lifestyle$BMI_KEY <- paste(lifestyle$SJLIFEID, lifestyle$agesurvey, sep = ":")
+# 
+# length(unique(adultbmi$sjlid))
+# # 3640
+# adultbmi$BMI_KEY <- paste(adultbmi$sjlid, adultbmi$AGE, sep = ":")
+# sum(lifestyle$BMI_KEY %in% adultbmi$BMI_KEY)
+# # 2964 
+# ## samples that did not match by corresponding age
+# cc <- lifestyle[!lifestyle$BMI_KEY %in% adultbmi$BMI_KEY,]
+# 
+# lifestyle <- cbind.data.frame(lifestyle, adultbmi[match(lifestyle$BMI_KEY, adultbmi$BMI_KEY), c("BMI", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")])
 ##########
 ## Drug ##
 ##########
@@ -159,11 +167,28 @@ colnames(clinical.dat)[grepl("_yn|anyrt_|AnyRT", colnames(clinical.dat))]
 
 # anyrt: 1Y, 0N;  brainorheadrt_yn : 1Y, 2N; brainrt_yn: 1Y, 2N; chestrt_yn: 1Y, 2N; neckrt_yn: 1Y, 2N; pelvisrt_yn: 1Y, 2N; abdomenrt_yn: 1Y, 2N
 
-clinical.dat[grepl("_yn|anyrt_|AnyRT", colnames(clinical.dat))][clinical.dat[grepl("_yn|anyrt_|AnyRT", colnames(clinical.dat))] == 1 ] <- "Y"
-clinical.dat[grepl("_yn", colnames(clinical.dat))][clinical.dat[grepl("_yn", colnames(clinical.dat))] == 2 ] <- "N"
-clinical.dat[grepl("anyrt_|AnyRT", colnames(clinical.dat))][clinical.dat[grepl("anyrt_|AnyRT", colnames(clinical.dat))] == 0 ] <- "N"
+clinical.dat[grepl("_yn|anyrt_|AnyRT", colnames(clinical.dat))][clinical.dat[grepl("_yn|anyrt_|AnyRT", colnames(clinical.dat))] == 1 ] <- 1
+clinical.dat[grepl("_yn", colnames(clinical.dat))][clinical.dat[grepl("_yn", colnames(clinical.dat))] == 2 ] <- 0
+clinical.dat[grepl("anyrt_|AnyRT", colnames(clinical.dat))][clinical.dat[grepl("anyrt_|AnyRT", colnames(clinical.dat))] == 0 ] <- 0
 
+########################
+## Merge Genetic data ##
+########################
+QIN_vars <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/genetic_data/Na_Qin_vars/Qin_et_al_all_vars_final_recodeA.raw", header = T)
+QIN_vars <- QIN_vars[-grep("FID|PAT|MAT|SEX|PHENOTYPE", colnames(QIN_vars))]
+QIN_vars$Qin_Non.Ref.Counts <- rowSums(QIN_vars[-1]) 
+clinical.dat$Qin_Non.Ref.Counts <- QIN_vars$Qin_Non.Ref.Counts [match(clinical.dat$sjlid, QIN_vars$IID)]
+clinical.dat$QIN_carriers <- ifelse(clinical.dat$Qin_Non.Ref.Counts > 0, 1, 0)
 
+Zhaoming_vars <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/genetic_data/Zhaoming_Wang_vars/Zhaoming_et_al_all_vars_final_recodeA.raw", header = T)
+Zhaoming_vars <- Zhaoming_vars[-grep("FID|PAT|MAT|SEX|PHENOTYPE", colnames(Zhaoming_vars))]
+Zhaoming_vars$Zhaoming_Non.Ref.Counts <- rowSums(Zhaoming_vars[-1]) 
+clinical.dat$Zhaoming_Non.Ref.Counts <- Zhaoming_vars$Zhaoming_Non.Ref.Counts [match(clinical.dat$sjlid, Zhaoming_vars$IID)]
+clinical.dat$Zhaoming_carriers <- ifelse(clinical.dat$Zhaoming_Non.Ref.Counts > 0, 1, 0)
+
+# test <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/genetic_data/test.txt", header =T, check.names = F,   colClasses = c("character"))
+# test <- as.data.frame(t(test))
+# test$row.NAMES <- as.character(rownames(test))
 #########################
 ## Subsequent Neoplasm ##
 #########################
@@ -191,29 +216,35 @@ ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decre
 # ###
 
 PHENO.ANY_SN <- clinical.dat
-PHENO.ANY_SN$ANY_SN <- ifelse(PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, "Y", "N")
+PHENO.ANY_SN$ANY_SN <- ifelse(PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 1, 0)
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ANY_SNs[match(PHENO.ANY_SN$sjlid, ANY_SNs$sjli), c("gradedt", "AGE.ANY_SN")])
 
-## Merge lifestyle
-PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, lifestyle[match(PHENO.ANY_SN$sjlid, lifestyle$SJLIFEID),c("datecomp", "agesurvey", "relation", "smoker", "nopa", "ltpa", "drk5", "bingedrink", "heavydrink", "riskydrink")])
+# Add ethnicity
+# # /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA
+# SJLIFE_EUR_Per_PCA.txt
+# SJLIFE_AFR_Per_PCA.txt
+# SJLIFE_EAS_Per_PCA.txt
 
-# If ANY_SN is Yes and the survey date of lifestyle (datecomp) is later than the SN grade
-# date (gradedt), then the lifestyle variables for those samples will be
-# irrelevant
-PHENO.ANY_SN[which(PHENO.ANY_SN[PHENO.ANY_SN$ANY_SN == "Y", "datecomp"] >  PHENO.ANY_SN[PHENO.ANY_SN$ANY_SN == "Y", "gradedt"]), c("smoker", "nopa", "ltpa", "drk5", "bingedrink", "heavydrink", "riskydrink")] <- NA
-
-# Now adding BMI and nutrition; extracting the BMI values immediately before or on the date of SN gradedt
-adultbmi.wanted <- {}
-for (i in 1:length(PHENO.ANY_SN$sjlid)){
-  tmp.adultbmi <- adultbmi[adultbmi$sjlid %in% PHENO.ANY_SN$sjlid[i], c("sjlid", "DateVisitStart", "BMI", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")]
-  tmp.adultbmi <- tmp.adultbmi [tmp.adultbmi$DateVisitStart < PHENO.ANY_SN$gradedt[i],]
-# If there are multiple dates, I will take the closest date to (on or before) gradedt
-  print(paste0(i, "--", nrow(tmp.adultbmi)))
-  tmp.adultbmi <- tmp.adultbmi [which.closest(tmp.adultbmi$DateVisitStart, PHENO.ANY_SN$gradedt[i]),]
-  adultbmi.wanted <- rbind.data.frame(adultbmi.wanted,tmp.adultbmi)
-}
-PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, adultbmi.wanted[match(PHENO.ANY_SN$sjlid, adultbmi.wanted$sjlid), c("DateVisitStart", "BMI", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")])
-PHENO.ANY_SN$obesity <- ifelse(PHENO.ANY_SN$BMI >= 30, "Y", "N")
+# ## Merge lifestyle
+# PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, lifestyle[match(PHENO.ANY_SN$sjlid, lifestyle$SJLIFEID),c("datecomp", "agesurvey", "relation", "smoker", "nopa", "ltpa", "drk5", "bingedrink", "heavydrink", "riskydrink")])
+# 
+# # If ANY_SN is Yes and the survey date of lifestyle (datecomp) is later than the SN grade
+# # date (gradedt), then the lifestyle variables for those samples will be
+# # irrelevant
+# PHENO.ANY_SN[which(PHENO.ANY_SN[PHENO.ANY_SN$ANY_SN == 1, "datecomp"] >  PHENO.ANY_SN[PHENO.ANY_SN$ANY_SN == 1, "gradedt"]), c("smoker", "nopa", "ltpa", "drk5", "bingedrink", "heavydrink", "riskydrink")] <- NA
+# 
+# # Now adding BMI and nutrition; extracting the BMI values immediately before or on the date of SN gradedt
+# adultbmi.wanted <- {}
+# for (i in 1:length(PHENO.ANY_SN$sjlid)){
+#   tmp.adultbmi <- adultbmi[adultbmi$sjlid %in% PHENO.ANY_SN$sjlid[i], c("sjlid", "DateVisitStart", "BMI", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")]
+#   tmp.adultbmi <- tmp.adultbmi [tmp.adultbmi$DateVisitStart < PHENO.ANY_SN$gradedt[i],]
+# # If there are multiple dates, I will take the closest date to (on or before) gradedt
+#   print(paste0(i, "--", nrow(tmp.adultbmi)))
+#   tmp.adultbmi <- tmp.adultbmi [which.closest(tmp.adultbmi$DateVisitStart, PHENO.ANY_SN$gradedt[i]),]
+#   adultbmi.wanted <- rbind.data.frame(adultbmi.wanted,tmp.adultbmi)
+# }
+# PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, adultbmi.wanted[match(PHENO.ANY_SN$sjlid, adultbmi.wanted$sjlid), c("DateVisitStart", "BMI", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")])
+# PHENO.ANY_SN$obesity <- ifelse(PHENO.ANY_SN$BMI >= 30, 1, 0)
 
 
 #############
@@ -273,6 +304,11 @@ table(SARCOMA$diaggrp)
 
 
 
+#################################################################################################
+####################################### ANALYSIS ################################################
+#################################################################################################
+mod1 <- lm(PHENO.ANY_SN$ANY_SN ~ PHENO.ANY_SN$Zhaoming_carriers)
+summary(mod1)
 
 # lapply(list(wgspop, wgsdiag, subneo, radiation, drug, demog, adultbmi, adolhabits, adlthabits), dim)
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/phenotype_cleaning_attr_fraction.RDATA")
