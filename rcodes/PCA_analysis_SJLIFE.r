@@ -301,7 +301,7 @@ write.table(EUR.only.in.1kg, "1KG_EUR.txt", sep ="\t", col.names = F, quote = F,
 #########################
 ## Cleaned PCA round 2 ##
 #########################
-## PCA round2 (per ethnicity of PCA)
+## PCA round2 (per ethnicity of PCA); Extracting FID and IID columns based on PCA ethnicity
 Wanted.Ethnicity <- "EUR"
 WANTED.type <- cbind.data.frame(admixture.df$INDIVIDUAL[grepl(Wanted.Ethnicity, admixture.df$Ethnicity.PCA)],admixture.df$INDIVIDUAL[grepl(Wanted.Ethnicity, admixture.df$Ethnicity.PCA)])
 write.table(WANTED.type, "SJLIFE_EUR_Per_PCA.txt", sep ="\t", col.names = F, quote = F, row.names = F)

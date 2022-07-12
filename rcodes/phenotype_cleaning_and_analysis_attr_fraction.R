@@ -5,6 +5,7 @@ library(dplyr)
 library(plyr)
 library(data.table)
 library (birk)
+library(gtools)
 # benchmarkme::get_ram()
 
 
@@ -167,9 +168,9 @@ colnames(clinical.dat)[grepl("_yn|anyrt_|AnyRT", colnames(clinical.dat))]
 
 # anyrt: 1Y, 0N;  brainorheadrt_yn : 1Y, 2N; brainrt_yn: 1Y, 2N; chestrt_yn: 1Y, 2N; neckrt_yn: 1Y, 2N; pelvisrt_yn: 1Y, 2N; abdomenrt_yn: 1Y, 2N
 
-clinical.dat[grepl("_yn|anyrt_|AnyRT", colnames(clinical.dat))][clinical.dat[grepl("_yn|anyrt_|AnyRT", colnames(clinical.dat))] == 1 ] <- 1
-clinical.dat[grepl("_yn", colnames(clinical.dat))][clinical.dat[grepl("_yn", colnames(clinical.dat))] == 2 ] <- 0
-clinical.dat[grepl("anyrt_|AnyRT", colnames(clinical.dat))][clinical.dat[grepl("anyrt_|AnyRT", colnames(clinical.dat))] == 0 ] <- 0
+clinical.dat[grepl("_yn|anyrt_|AnyRT", colnames(clinical.dat))][clinical.dat[grepl("_yn|anyrt_|AnyRT", colnames(clinical.dat))] == 1 ] <- "Y"
+clinical.dat[grepl("_yn", colnames(clinical.dat))][clinical.dat[grepl("_yn", colnames(clinical.dat))] == 2 ] <- "N"
+clinical.dat[grepl("anyrt_|AnyRT", colnames(clinical.dat))][clinical.dat[grepl("anyrt_|AnyRT", colnames(clinical.dat))] == 0 ] <- "N"
 
 ########################
 ## Merge Genetic data ##
@@ -178,13 +179,23 @@ QIN_vars <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common
 QIN_vars <- QIN_vars[-grep("FID|PAT|MAT|SEX|PHENOTYPE", colnames(QIN_vars))]
 QIN_vars$Qin_Non.Ref.Counts <- rowSums(QIN_vars[-1]) 
 clinical.dat$Qin_Non.Ref.Counts <- QIN_vars$Qin_Non.Ref.Counts [match(clinical.dat$sjlid, QIN_vars$IID)]
-clinical.dat$QIN_carriers <- ifelse(clinical.dat$Qin_Non.Ref.Counts > 0, 1, 0)
+clinical.dat$Qin_carriers <- ifelse(clinical.dat$Qin_Non.Ref.Counts > 0, "Y", "N")
 
 Zhaoming_vars <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/genetic_data/Zhaoming_Wang_vars/Zhaoming_et_al_all_vars_final_recodeA.raw", header = T)
 Zhaoming_vars <- Zhaoming_vars[-grep("FID|PAT|MAT|SEX|PHENOTYPE", colnames(Zhaoming_vars))]
 Zhaoming_vars$Zhaoming_Non.Ref.Counts <- rowSums(Zhaoming_vars[-1]) 
 clinical.dat$Zhaoming_Non.Ref.Counts <- Zhaoming_vars$Zhaoming_Non.Ref.Counts [match(clinical.dat$sjlid, Zhaoming_vars$IID)]
-clinical.dat$Zhaoming_carriers <- ifelse(clinical.dat$Zhaoming_Non.Ref.Counts > 0, 1, 0)
+clinical.dat$Zhaoming_carriers <- ifelse(clinical.dat$Zhaoming_Non.Ref.Counts > 0, "Y", "N")
+
+# Add ethnicity from PCA
+EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA/SJLIFE_EUR_Per_PCA.txt", stringsAsFactors = F, header = F)
+AFR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA/SJLIFE_AFR_Per_PCA.txt", stringsAsFactors = F, header = F)
+EAS <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA/SJLIFE_EAS_Per_PCA.txt", stringsAsFactors = F, header = F)
+sum((clinical.dat$sjlid %in% EUR$V1))
+
+clinical.dat$PCA.ethnicity <- ifelse(clinical.dat$sjlid %in% EUR$V1, "EUR", "")
+clinical.dat$PCA.ethnicity[!grepl("EUR", clinical.dat$PCA.ethnicity)]    <- ifelse(clinical.dat$sjlid[!grepl("EUR", clinical.dat$PCA.ethnicity)] %in% AFR$V1, "AFR", "")
+clinical.dat$PCA.ethnicity[!grepl("EUR|AFR", clinical.dat$PCA.ethnicity)]    <- ifelse(clinical.dat$sjlid[!grepl("EUR|AFR", clinical.dat$PCA.ethnicity)] %in% EAS$V1, "EAS", "")
 
 # test <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/genetic_data/test.txt", header =T, check.names = F,   colClasses = c("character"))
 # test <- as.data.frame(t(test))
@@ -216,14 +227,12 @@ ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decre
 # ###
 
 PHENO.ANY_SN <- clinical.dat
-PHENO.ANY_SN$ANY_SN <- ifelse(PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 1, 0)
+PHENO.ANY_SN$ANY_SN <- ifelse(PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, "Y", "N")
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ANY_SNs[match(PHENO.ANY_SN$sjlid, ANY_SNs$sjli), c("gradedt", "AGE.ANY_SN")])
 
-# Add ethnicity
-# # /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA
-# SJLIFE_EUR_Per_PCA.txt
-# SJLIFE_AFR_Per_PCA.txt
-# SJLIFE_EAS_Per_PCA.txt
+# Found two duplicate samples with exact same values, removing them
+PHENO.ANY_SN <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$sjlid),]
+
 
 # ## Merge lifestyle
 # PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, lifestyle[match(PHENO.ANY_SN$sjlid, lifestyle$SJLIFEID),c("datecomp", "agesurvey", "relation", "smoker", "nopa", "ltpa", "drk5", "bingedrink", "heavydrink", "riskydrink")])
@@ -231,7 +240,7 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ANY_SNs[match(PHENO.ANY_SN$sjlid,
 # # If ANY_SN is Yes and the survey date of lifestyle (datecomp) is later than the SN grade
 # # date (gradedt), then the lifestyle variables for those samples will be
 # # irrelevant
-# PHENO.ANY_SN[which(PHENO.ANY_SN[PHENO.ANY_SN$ANY_SN == 1, "datecomp"] >  PHENO.ANY_SN[PHENO.ANY_SN$ANY_SN == 1, "gradedt"]), c("smoker", "nopa", "ltpa", "drk5", "bingedrink", "heavydrink", "riskydrink")] <- NA
+# PHENO.ANY_SN[which(PHENO.ANY_SN[PHENO.ANY_SN$ANY_SN == "Y, "datecomp"] >  PHENO.ANY_SN[PHENO.ANY_SN$ANY_SN == "Y", "gradedt"]), c("smoker", "nopa", "ltpa", "drk5", "bingedrink", "heavydrink", "riskydrink")] <- NA
 # 
 # # Now adding BMI and nutrition; extracting the BMI values immediately before or on the date of SN gradedt
 # adultbmi.wanted <- {}
@@ -244,7 +253,7 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ANY_SNs[match(PHENO.ANY_SN$sjlid,
 #   adultbmi.wanted <- rbind.data.frame(adultbmi.wanted,tmp.adultbmi)
 # }
 # PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, adultbmi.wanted[match(PHENO.ANY_SN$sjlid, adultbmi.wanted$sjlid), c("DateVisitStart", "BMI", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")])
-# PHENO.ANY_SN$obesity <- ifelse(PHENO.ANY_SN$BMI >= 30, 1, 0)
+# PHENO.ANY_SN$obesity <- ifelse(PHENO.ANY_SN$BMI >= 30, "Y", "N")
 
 
 #############
@@ -307,8 +316,80 @@ table(SARCOMA$diaggrp)
 #################################################################################################
 ####################################### ANALYSIS ################################################
 #################################################################################################
-mod1 <- lm(PHENO.ANY_SN$ANY_SN ~ PHENO.ANY_SN$Zhaoming_carriers)
+################################
+## Replicating Zhaoming et al ##
+################################
+colnames(PHENO.ANY_SN)
+
+# PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "gender", "agedx", "AnyRT", "anyrt_prim", "anyrt_5", "anyrt_10", "brainorheadrt_yn",
+#                                "brainrt_yn", "maxseg1dose", "maxseg2dose", "maxseg3dose", "maxseg4dose", "maxsegrtdose", "chestrt_yn",
+#                                "maxchestrtdose", "neckrt_yn", "maxneckrtdose", "pelvisrt_yn", "maxpelvisrtdose", "abdomenrt_yn", "maxabdrtdose",
+#                                "aa_class_dose_any", "aa_hvymtl_dose_any", "carbo_dose_any", "cisplat_dose_any", "cisplateq_dose_any",
+#                                "epitxn_dose_any", "Qin_carriers", "Zhaoming_carriers",
+#                                "PCA.ethnicity", "ANY_SN", "AGE.ANY_SN" )]
+
+
+PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "gender", "agedx", "brainrt_yn", "chestrt_yn", "neckrt_yn", "pelvisrt_yn", "abdomenrt_yn", 
+                               "aa_class_dose_any", "epitxn_dose_any", "Zhaoming_carriers", "PCA.ethnicity", "ANY_SN", "AGE.ANY_SN")]
+
+PHENO.ANY_SN$ANY_SN <- factor(PHENO.ANY_SN$ANY_SN)
+
+## Gene mutation
+PHENO.ANY_SN$Zhaoming_carriers <- factor(PHENO.ANY_SN$Zhaoming_carriers, levels = c("N", "Y"))
+
+## Age at diagnosis
+PHENO.ANY_SN$agedx <- floor(PHENO.ANY_SN$agedx)
+PHENO.ANY_SN$AGE_AT_DIAGNOSIS <- PHENO.ANY_SN$agedx
+PHENO.ANY_SN$AGE_AT_DIAGNOSIS[PHENO.ANY_SN$agedx >= 0 & PHENO.ANY_SN$agedx <= 4 ] <- "0-4"
+PHENO.ANY_SN$AGE_AT_DIAGNOSIS[PHENO.ANY_SN$agedx >= 5 & PHENO.ANY_SN$agedx <= 9 ] <- "5-9"
+PHENO.ANY_SN$AGE_AT_DIAGNOSIS[PHENO.ANY_SN$agedx >= 10 & PHENO.ANY_SN$agedx <= 14 ] <- "10-14"
+PHENO.ANY_SN$AGE_AT_DIAGNOSIS[PHENO.ANY_SN$agedx >= 15 ] <- "≥15"
+PHENO.ANY_SN$AGE_AT_DIAGNOSIS <- factor(PHENO.ANY_SN$AGE_AT_DIAGNOSIS, levels = c("0-4", "5-9", "10-14", "≥15")) # first level will be treated as reference
+# PHENO.ANY_SN$AGE_AT_DIAGNOSIS <- relevel(PHENO.ANY_SN$AGE_AT_DIAGNOSIS, ref = "0-4")
+
+## Sex
+PHENO.ANY_SN$gender <- factor(PHENO.ANY_SN$gender, levels = c("Male", "Female"))
+
+## Radiation
+PHENO.ANY_SN$brainrt_yn <- factor(PHENO.ANY_SN$brainrt_yn, levels = c("N", "Y"))
+PHENO.ANY_SN$neckrt_yn <- factor(PHENO.ANY_SN$neckrt_yn, levels = c("N", "Y"))
+PHENO.ANY_SN$chestrt_yn <- factor(PHENO.ANY_SN$chestrt_yn, levels = c("N", "Y"))
+PHENO.ANY_SN$abdomenrt_yn <- factor(PHENO.ANY_SN$abdomenrt_yn, levels = c("N", "Y"))
+PHENO.ANY_SN$pelvisrt_yn <- factor(PHENO.ANY_SN$pelvisrt_yn, levels = c("N", "Y"))
+
+## Alkylating agents
+PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any == 0] <- "None"
+PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any > 0 & PHENO.ANY_SN$aa_class_dose_any <= 6617] <- "1st"
+PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any > 6617 & PHENO.ANY_SN$aa_class_dose_any <= 10500] <- "2nd"
+PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any > 10500] <- "3rd"
+PHENO.ANY_SN$Alkylating_agent <- factor(PHENO.ANY_SN$Alkylating_agent, levels = c("None", "1st", "2nd", "3rd"))
+
+## Anthracyclines
+
+
+## Epidophyllotoxin
+PHENO.ANY_SN$Epidophyllotoxin [PHENO.ANY_SN$epitxn_dose_any == 0] <- "None"
+PHENO.ANY_SN$Epidophyllotoxin [PHENO.ANY_SN$epitxn_dose_any > 0 & PHENO.ANY_SN$epitxn_dose_any <= 1588] <- "1st"
+PHENO.ANY_SN$Epidophyllotoxin [PHENO.ANY_SN$epitxn_dose_any > 1588 & PHENO.ANY_SN$epitxn_dose_any <= 6704] <- "2nd"
+PHENO.ANY_SN$Epidophyllotoxin [PHENO.ANY_SN$epitxn_dose_any > 6704] <- "3rd"
+PHENO.ANY_SN$Epidophyllotoxin <- factor(PHENO.ANY_SN$Epidophyllotoxin, levels = c("None", "1st", "2nd", "3rd"))
+
+
+
+PHENO.ANY_SN.EUR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'EUR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN))]
+
+
+
+mod1 <- glm(ANY_SN ~ Qin_carriers + gender + agedx + AnyRT + maxseg1dose, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+
+mod1 <- glm(ANY_SN ~ . , family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 summary(mod1)
+
+mod1 <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_DIAGNOSIS + gender + brainrt_yn + neckrt_yn + chestrt_yn + abdomenrt_yn + pelvisrt_yn + Alkylating_agent + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+summary(mod1)
+
+
+
 
 # lapply(list(wgspop, wgsdiag, subneo, radiation, drug, demog, adultbmi, adolhabits, adlthabits), dim)
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/phenotype_cleaning_attr_fraction.RDATA")
