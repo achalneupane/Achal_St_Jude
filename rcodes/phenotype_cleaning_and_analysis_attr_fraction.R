@@ -242,12 +242,41 @@ sum(QIN_vars$IID %in% clinical.dat$sjlid)
 subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
 head(subneo)
 table(subneo$diaggrp)
+
+# add diagnosis date 
+subneo$diagdt <-  clinical.dat$diagdt [match(subneo$sjlid , clinical.dat$sjlid)]
+subneo$agedx <-  clinical.dat$agedx [match(subneo$sjlid , clinical.dat$sjlid)]
 # add DOB
 subneo$DOB <- demog$dob[match(subneo$MRN, demog$MRN)]
 
 library(lubridate)
-subneo$AGE.exact.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
-subneo$AGE.ANY_SN <- floor(subneo$AGE.exact.ANY_SN)
+subneo$AGE.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
+# subneo$AGE.exact.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
+# subneo$AGE.ANY_SN <- floor(subneo$AGE.exact.ANY_SN)
+
+library(lubridate)
+subneo$AGE.ANY_SN.after.childhood.cancer <- time_length(interval(as.Date(subneo$diagdt), as.Date(subneo$gradedt)), "years")
+# subneo$AGE.ANY_SN.after.childhood.cancer <- floor(subneo$AGE.exact.ANY_SN.after.childhood.cancer)
+
+subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subneo$agedx
+
+
+########################################
+# How many SNs after 5 years
+subneo.after5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5,]
+length(unique(subneo.after5$sjlid))
+# 619
+subneo.after5.sjlife1 <- subneo.after5[subneo.after5$sjlid %in% sjlife1.samples$V1,]
+length(unique(subneo.after5.sjlife1$sjlid))
+# 562
+
+subneo.after5.sjlife2 <- subneo.after5[subneo.after5$sjlid %in% sjlife2.samples$V1,]
+length(unique(subneo.after5.sjlife2$sjlid))
+# 45
+
+subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
+dim(subneo.within5)
+# 24
 ############
 ## Any SNs 
 ############
@@ -256,6 +285,7 @@ subneo$AGE.ANY_SN <- floor(subneo$AGE.exact.ANY_SN)
 library(data.table)
 ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 
+ANY_SNs <- ANY_SNs[!ANY_SNs$sjlid %in% subneo.within5$sjlid,]
 # ## Add all samples
 # ANY_SNs <- cbind.data.frame(wgspop[,c("MRN", "sjlid")], ANY_SNs[match(wgspop$MRN, ANY_SNs$MRN), ])
 # ANY_SNs <- ANY_SNs[-c(3,4)]
@@ -356,7 +386,7 @@ table(SARCOMA$diaggrp)
 ################################
 colnames(PHENO.ANY_SN)
 
-# PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "gender", "agedx", "AnyRT", "anyrt_prim", "anyrt_5", "anyrt_10", "brainorheadrt_yn",
+# PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "gender", "agedx", "agelstcontact", "AnyRT", "anyrt_prim", "anyrt_5", "anyrt_10", "brainorheadrt_yn",
 #                                "brainrt_yn", "maxseg1dose", "maxseg2dose", "maxseg3dose", "maxseg4dose", "maxsegrtdose", "chestrt_yn",
 #                                "maxchestrtdose", "neckrt_yn", "maxneckrtdose", "pelvisrt_yn", "maxpelvisrtdose", "abdomenrt_yn", "maxabdrtdose",
 #                                "aa_class_dose_any", "aa_hvymtl_dose_any", "carbo_dose_any", "cisplat_dose_any", "cisplateq_dose_any",
@@ -364,7 +394,7 @@ colnames(PHENO.ANY_SN)
 #                                "PCA.ethnicity", "ANY_SN", "AGE.ANY_SN" )]
 
 
-PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "gender", "agedx", "brainrt_yn", "chestrt_yn", "neckrt_yn", "pelvisrt_yn", "abdomenrt_yn", 
+PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "gender", "agedx", "agelstcontact", "brainrt_yn", "chestrt_yn", "neckrt_yn", "pelvisrt_yn", "abdomenrt_yn", 
                                "aa_class_dose_any", "epitxn_dose_any", "Zhaoming_carriers", "PCA.ethnicity", "ANY_SN", "AGE.ANY_SN")]
 
 PHENO.ANY_SN$ANY_SN <- factor(PHENO.ANY_SN$ANY_SN)
@@ -373,14 +403,22 @@ PHENO.ANY_SN$ANY_SN <- factor(PHENO.ANY_SN$ANY_SN)
 PHENO.ANY_SN$Zhaoming_carriers <- factor(PHENO.ANY_SN$Zhaoming_carriers, levels = c("N", "Y"))
 
 ## Age at diagnosis
-PHENO.ANY_SN$agedx <- floor(PHENO.ANY_SN$agedx)
-PHENO.ANY_SN$AGE_AT_DIAGNOSIS <- PHENO.ANY_SN$agedx
-PHENO.ANY_SN$AGE_AT_DIAGNOSIS[PHENO.ANY_SN$agedx >= 0 & PHENO.ANY_SN$agedx <= 4 ] <- "0-4"
-PHENO.ANY_SN$AGE_AT_DIAGNOSIS[PHENO.ANY_SN$agedx >= 5 & PHENO.ANY_SN$agedx <= 9 ] <- "5-9"
-PHENO.ANY_SN$AGE_AT_DIAGNOSIS[PHENO.ANY_SN$agedx >= 10 & PHENO.ANY_SN$agedx <= 14 ] <- "10-14"
-PHENO.ANY_SN$AGE_AT_DIAGNOSIS[PHENO.ANY_SN$agedx >= 15 ] <- "≥15"
-PHENO.ANY_SN$AGE_AT_DIAGNOSIS <- factor(PHENO.ANY_SN$AGE_AT_DIAGNOSIS, levels = c("0-4", "5-9", "10-14", "≥15")) # first level will be treated as reference
+# PHENO.ANY_SN$agedx <- floor(PHENO.ANY_SN$agedx)
+PHENO.ANY_SN$AGE_AT_DIAGNOSIS[PHENO.ANY_SN$agedx >= 0 & PHENO.ANY_SN$agedx < 5 ] <- "0-4"
+PHENO.ANY_SN$AGE_AT_DIAGNOSIS[PHENO.ANY_SN$agedx >= 5 & PHENO.ANY_SN$agedx < 10 ] <- "5-9"
+PHENO.ANY_SN$AGE_AT_DIAGNOSIS[PHENO.ANY_SN$agedx >= 10 & PHENO.ANY_SN$agedx < 15 ] <- "10-14"
+PHENO.ANY_SN$AGE_AT_DIAGNOSIS[PHENO.ANY_SN$agedx >= 15 ] <- ">=15"
+PHENO.ANY_SN$AGE_AT_DIAGNOSIS <- factor(PHENO.ANY_SN$AGE_AT_DIAGNOSIS, levels = c("0-4", "5-9", "10-14", ">=15")) # first level will be treated as reference
 # PHENO.ANY_SN$AGE_AT_DIAGNOSIS <- relevel(PHENO.ANY_SN$AGE_AT_DIAGNOSIS, ref = "0-4")
+
+## Age at last contact
+PHENO.ANY_SN$AGE_AT_LAST_CONTACT[PHENO.ANY_SN$agelstcontact >= 0 & PHENO.ANY_SN$agelstcontact < 25 ] <- "0-24"
+PHENO.ANY_SN$AGE_AT_LAST_CONTACT[PHENO.ANY_SN$agelstcontact >= 25 & PHENO.ANY_SN$agelstcontact < 35 ] <- "25-34"
+PHENO.ANY_SN$AGE_AT_LAST_CONTACT[PHENO.ANY_SN$agelstcontact >= 35 & PHENO.ANY_SN$agelstcontact < 45 ] <- "35-44"
+PHENO.ANY_SN$AGE_AT_LAST_CONTACT[PHENO.ANY_SN$agelstcontact >= 45 ] <- ">=45"
+PHENO.ANY_SN$AGE_AT_LAST_CONTACT <- factor(PHENO.ANY_SN$AGE_AT_LAST_CONTACT, levels = c("0-24", "25-34", "35-44", ">=45")) # first level will be treated as reference
+
+
 
 ## Sex
 PHENO.ANY_SN$gender <- factor(PHENO.ANY_SN$gender, levels = c("Male", "Female"))
@@ -413,12 +451,12 @@ PHENO.ANY_SN$Epidophyllotoxin <- factor(PHENO.ANY_SN$Epidophyllotoxin, levels = 
 PHENO.ANY_SN.EUR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'EUR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN))]
 
 
-
-mod1 <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+## SJLIFE (ALL)
+mod1 <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
 
-
-mod1.EUR <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+## SJLIFE (EUR)
+mod1.EUR <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 summary(mod1.EUR)
 
 
@@ -427,17 +465,45 @@ prevalence.counts <- sum(Zhaoming_vars$Zhaoming_Non.Ref.Counts > 0)
 prop.test(prevalence.counts, 4507)
 
 #########################################
-## Sjlife sample list (used by Zhaoming); checking only in these samples
+## Sjlife 1 sample list (used by Zhaoming); checking only in these samples
 sjlife1.samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife_1/sample_list.txt")
 PHENO.ANY_SN.sjlife1 <- PHENO.ANY_SN[PHENO.ANY_SN$sjlid %in% sjlife1.samples$V1,]
 PHENO.ANY_SN.sjlife1.EUR <- PHENO.ANY_SN.sjlife1[PHENO.ANY_SN.sjlife1$PCA.ethnicity == 'EUR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN.sjlife1))]
 
-mod.sjlife1 <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN.sjlife1)
+mod.sjlife1 <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN.sjlife1)
 summary(mod.sjlife1)
 
-mod.sjlife1.EUR <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN.sjlife1.EUR)
+mod.sjlife1.EUR <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN.sjlife1.EUR)
 summary(mod.sjlife1.EUR)
 
+#########################################
+## Sjlife 2 sample list (used by Zhaoming); checking only in these samples
+sjlife2.samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife_2/sample_list.txt")
+PHENO.ANY_SN.sjlife2 <- PHENO.ANY_SN[PHENO.ANY_SN$sjlid %in% sjlife1.samples$V1,]
+PHENO.ANY_SN.sjlife2.EUR <- PHENO.ANY_SN.sjlife2[PHENO.ANY_SN.sjlife2$PCA.ethnicity == 'EUR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN.sjlife2))]
+
+mod.sjlife2 <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN.sjlife2)
+summary(mod.sjlife2)
+
+mod.sjlife2.EUR <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN.sjlife2.EUR)
+summary(mod.sjlife2.EUR)
+
+########################################
+## cross tab of categorical variables
+library(expss)
+
+CROSS_CASES.df <- PHENO.ANY_SN[c("ANY_SN", "Zhaoming_carriers" , "AGE_AT_LAST_CONTACT", "AGE_AT_DIAGNOSIS", "gender", "brainrt_yn", "chestrt_yn", "abdomenrt_yn", "Epidophyllotoxin")]
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df,
+             ANY_SN = "ANY_SN", Zhaoming_carriers = "Zhaoming_carriers", AGE_AT_LAST_CONTACT = "AGE_AT_LAST_CONTACT",
+             AGE_AT_DIAGNOSIS = "AGE_AT_DIAGNOSIS", gender = "gender", brainrt_yn  = "brainrt_yn", chestrt_yn = "chestrt_yn", abdomenrt_yn = "abdomenrt_yn", Epidophyllotoxin = "Epidophyllotoxin")
+
+CROSS_CASES.df %>%
+cross_cases(ANY_SN, list(Zhaoming_carriers , AGE_AT_LAST_CONTACT, AGE_AT_DIAGNOSIS, gender, brainrt_yn, chestrt_yn, abdomenrt_yn, Epidophyllotoxin))
+# cross_cases(PHENO.ANY_SN, ANY_SN, list(Zhaoming_carriers , AGE_AT_LAST_CONTACT, AGE_AT_DIAGNOSIS, gender, brainrt_yn, chestrt_yn, abdomenrt_yn, Epidophyllotoxin))
+
+
+########################################
+## Checking prevalence
 # also checking prevalence
 Zhaoming_vars.sjlife1 <- Zhaoming_vars[Zhaoming_vars$IID %in% sjlife1.samples$V1,]
 table(ifelse(Zhaoming_vars.sjlife1$Zhaoming_Non.Ref.Counts > 0, "Y", "N"))
@@ -445,9 +511,6 @@ table(ifelse(Zhaoming_vars.sjlife1$Zhaoming_Non.Ref.Counts > 0, "Y", "N"))
 # 2664  322 
 
 prop.test(375,4132,correct=FALSE)
-
-
-########################################
 
 
 
