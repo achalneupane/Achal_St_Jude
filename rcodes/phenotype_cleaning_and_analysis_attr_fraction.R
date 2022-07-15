@@ -397,12 +397,13 @@ colnames(PHENO.ANY_SN)
 
 
 PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "gender", "agedx", "agelstcontact", "brainrt_yn", "chestrt_yn", "neckrt_yn", "pelvisrt_yn", "abdomenrt_yn", 
-                               "aa_class_dose_any", "epitxn_dose_any", "Zhaoming_carriers", "PCA.ethnicity", "ANY_SN", "AGE.ANY_SN")]
+                               "aa_class_dose_any", "epitxn_dose_any", "cisplat_dose_any", "aa_hvymtl_dose_any", "Zhaoming_carriers", "Qin_carriers", "PCA.ethnicity", "ANY_SN", "AGE.ANY_SN")]
 
 PHENO.ANY_SN$ANY_SN <- factor(PHENO.ANY_SN$ANY_SN)
 
 ## Gene mutation
 PHENO.ANY_SN$Zhaoming_carriers <- factor(PHENO.ANY_SN$Zhaoming_carriers, levels = c("N", "Y"))
+PHENO.ANY_SN$Qin_carriers <- factor(PHENO.ANY_SN$Qin_carriers, levels = c("N", "Y"))
 
 ## Age at diagnosis
 # PHENO.ANY_SN$agedx <- floor(PHENO.ANY_SN$agedx)
@@ -439,6 +440,15 @@ PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any > 6617 & PHENO.ANY
 PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any > 10500] <- "3rd"
 PHENO.ANY_SN$Alkylating_agent <- factor(PHENO.ANY_SN$Alkylating_agent, levels = c("None", "1st", "2nd", "3rd"))
 
+## Alkylating agens YN
+PHENO.ANY_SN$Alkylating_agent_yn <-  factor(ifelse(PHENO.ANY_SN$aa_class_dose_any == 0, "N", "Y"))
+
+## Platinum agents
+PHENO.ANY_SN$cisplat_dose_any_yn <- factor(ifelse(PHENO.ANY_SN$cisplat_dose_any == 0, "N", "Y"))
+
+## Heavy metals
+PHENO.ANY_SN$aa_hvymtl_dose_any_yn <- factor(ifelse(PHENO.ANY_SN$aa_hvymtl_dose_any == 0, "N", "Y"))
+
 ## Anthracyclines
 
 
@@ -452,12 +462,16 @@ PHENO.ANY_SN$Epidophyllotoxin <- factor(PHENO.ANY_SN$Epidophyllotoxin, levels = 
 
 PHENO.ANY_SN.EUR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'EUR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN))]
 
-
+########################################
+## MODEL TEST for Zhaoming's variants ##
+########################################
 ## SJLIFE (ALL)
+# mod1 <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin + Alkylating_agent_yn + cisplat_dose_any_yn + aa_hvymtl_dose_any_yn, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 mod1 <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
 
 ## SJLIFE (EUR)
+# mod1.EUR <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin + Alkylating_agent_yn + cisplat_dose_any_yn + aa_hvymtl_dose_any_yn, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 mod1.EUR <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 summary(mod1.EUR)
 
@@ -466,6 +480,31 @@ summary(mod1.EUR)
 prevalence.counts <- sum(Zhaoming_vars$Zhaoming_Non.Ref.Counts > 0)
 prop.test(prevalence.counts, 4507)
 
+
+###################################
+## MODEL TEST for Qin's variants ##
+###################################
+## SJLIFE (ALL)
+# mod1 <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin + Alkylating_agent_yn + cisplat_dose_any_yn + aa_hvymtl_dose_any_yn, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+mod1 <- glm(ANY_SN ~ Qin_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+summary(mod1)
+
+## SJLIFE (EUR)
+# mod1.EUR <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin + Alkylating_agent_yn + cisplat_dose_any_yn + aa_hvymtl_dose_any_yn, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+mod1.EUR <- glm(ANY_SN ~ Qin_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+summary(mod1.EUR)
+
+
+
+
+
+
+#########################################
+#########################################
+#########################################
+#########################################
+#########################################
+#########################################
 #########################################
 ## Sjlife 1 sample list (used by Zhaoming); checking only in these samples
 sjlife1.samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife_1/sample_list.txt")
