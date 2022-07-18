@@ -181,9 +181,71 @@ clinical.dat[grepl("anyrt_|AnyRT", colnames(clinical.dat))][clinical.dat[grepl("
 
 QIN_vars <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/genetic_data/Na_Qin_vars/Qin_et_al_all_vars_final_recodeA.raw", header = T)
 QIN_vars <- QIN_vars[-grep("FID|PAT|MAT|SEX|PHENOTYPE", colnames(QIN_vars))]
+colnames(QIN_vars) <- str_split(gsub("\\.", ":", colnames(QIN_vars)), "_", simplify=T)[,1]
+## Qin's Pathways
+QIN.Pathways <- read.delim("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Yadav_Sapkota/additional_papers/Na_Qin_Pathogenic Germline Mutations in DNA Repair Genes in Combination With Cancer Treatment Exposures/Qin_variant_pathways.txt", header = T)
+QIN.Pathways <- QIN.Pathways[QIN.Pathways$MATCH_YN == "Y",]
+
+# HR pathway
+HR.pathways <- QIN.Pathways[grepl("HR", QIN.Pathways$DNA_Repair_Pathway),]
+HR.pathways <- HR.pathways[!duplicated(HR.pathways$VarKEY_IN_SJLIFE),]
+HR.pathways <- QIN_vars[c(1,which(colnames(QIN_vars) %in% HR.pathways$VarKEY_IN_SJLIFE))]
+
+HR.pathways$Qin_Non.Ref.Counts <- rowSums(HR.pathways[-1]) 
+clinical.dat$Qin_Non.Ref.Counts.HR.pathways <- HR.pathways$Qin_Non.Ref.Counts [match(clinical.dat$sjlid, HR.pathways$IID)]
+clinical.dat$Qin_carriers.HR.pathways <- factor(ifelse(clinical.dat$Qin_Non.Ref.Counts.HR.pathways == 0, "N", "Y"))
+
+# FA Pathway
+FA.pathways <- QIN.Pathways[grepl("FA", QIN.Pathways$DNA_Repair_Pathway),]
+FA.pathways <- FA.pathways[!duplicated(FA.pathways$VarKEY_IN_SJLIFE),]
+FA.pathways <- QIN_vars[c(1,which(colnames(QIN_vars) %in% FA.pathways$VarKEY_IN_SJLIFE))]
+
+FA.pathways$Qin_Non.Ref.Counts <- rowSums(FA.pathways[-1]) 
+clinical.dat$Qin_Non.Ref.Counts.FA.pathways <- FA.pathways$Qin_Non.Ref.Counts [match(clinical.dat$sjlid, FA.pathways$IID)]
+clinical.dat$Qin_carriers.FA.pathways <- factor(ifelse(clinical.dat$Qin_Non.Ref.Counts.FA.pathways == 0, "N", "Y"))
+
+# MMR Pathway
+MMR.pathways <- QIN.Pathways[grepl("MMR", QIN.Pathways$DNA_Repair_Pathway),]
+MMR.pathways <- MMR.pathways[!duplicated(MMR.pathways$VarKEY_IN_SJLIFE),]
+MMR.pathways <- QIN_vars[c(1,which(colnames(QIN_vars) %in% MMR.pathways$VarKEY_IN_SJLIFE))]
+
+MMR.pathways$Qin_Non.Ref.Counts <- rowSums(MMR.pathways[-1]) 
+clinical.dat$Qin_Non.Ref.Counts.MMR.pathways <- MMR.pathways$Qin_Non.Ref.Counts [match(clinical.dat$sjlid, MMR.pathways$IID)]
+clinical.dat$Qin_carriers.MMR.pathways <- factor(ifelse(clinical.dat$Qin_Non.Ref.Counts.MMR.pathways == 0, "N", "Y"))
+
+# BER Pathway
+BER.pathways <- QIN.Pathways[grepl("BER", QIN.Pathways$DNA_Repair_Pathway),]
+BER.pathways <- BER.pathways[!duplicated(BER.pathways$VarKEY_IN_SJLIFE),]
+BER.pathways <- QIN_vars[c(1,which(colnames(QIN_vars) %in% BER.pathways$VarKEY_IN_SJLIFE))]
+
+BER.pathways$Qin_Non.Ref.Counts <- rowSums(BER.pathways[-1]) 
+clinical.dat$Qin_Non.Ref.Counts.BER.pathways <- BER.pathways$Qin_Non.Ref.Counts [match(clinical.dat$sjlid, BER.pathways$IID)]
+clinical.dat$Qin_carriers.BER.pathways <- factor(ifelse(clinical.dat$Qin_Non.Ref.Counts.BER.pathways == 0, "N", "Y"))
+
+# NER Pathway
+NER.pathways <- QIN.Pathways[grepl("NER", QIN.Pathways$DNA_Repair_Pathway),]
+NER.pathways <- NER.pathways[!duplicated(NER.pathways$VarKEY_IN_SJLIFE),]
+NER.pathways <- QIN_vars[c(1,which(colnames(QIN_vars) %in% NER.pathways$VarKEY_IN_SJLIFE))]
+
+NER.pathways$Qin_Non.Ref.Counts <- rowSums(NER.pathways[-1]) 
+clinical.dat$Qin_Non.Ref.Counts.NER.pathways <- NER.pathways$Qin_Non.Ref.Counts [match(clinical.dat$sjlid, NER.pathways$IID)]
+clinical.dat$Qin_carriers.NER.pathways <- factor(ifelse(clinical.dat$Qin_Non.Ref.Counts.NER.pathways == 0, "N", "Y"))
+
+# NHEJ Pathway
+NHEJ.pathways <- QIN.Pathways[grepl("NHEJ", QIN.Pathways$DNA_Repair_Pathway),]
+NHEJ.pathways <- NHEJ.pathways[!duplicated(NHEJ.pathways$VarKEY_IN_SJLIFE),]
+NHEJ.pathways <- QIN_vars[c(1,which(colnames(QIN_vars) %in% NHEJ.pathways$VarKEY_IN_SJLIFE))]
+
+NHEJ.pathways$Qin_Non.Ref.Counts <- rowSums(NHEJ.pathways[-1]) 
+clinical.dat$Qin_Non.Ref.Counts.NHEJ.pathways <- NHEJ.pathways$Qin_Non.Ref.Counts [match(clinical.dat$sjlid, NHEJ.pathways$IID)]
+clinical.dat$Qin_carriers.NHEJ.pathways <- factor(ifelse(clinical.dat$Qin_Non.Ref.Counts.NHEJ.pathways == 0, "N", "Y"))
+
 QIN_vars$Qin_Non.Ref.Counts <- rowSums(QIN_vars[-1]) 
 clinical.dat$Qin_Non.Ref.Counts <- QIN_vars$Qin_Non.Ref.Counts [match(clinical.dat$sjlid, QIN_vars$IID)]
-clinical.dat$Qin_carriers <- ifelse(clinical.dat$Qin_Non.Ref.Counts > 0, "Y", "N")
+clinical.dat$Qin_carriers <- factor(ifelse(clinical.dat$Qin_Non.Ref.Counts == 0, "N", "Y"))
+
+
+
 
 
 Zhaoming_vars <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/genetic_data/Zhaoming_Wang_vars/Zhaoming_et_al_all_vars_final_recodeA.raw", header = T)
@@ -216,7 +278,7 @@ Zhaoming_vars <- Zhaoming_vars[c(1,which(colnames(Zhaoming_vars) %in% search_lis
 Zhaoming_vars$Zhaoming_Non.Ref.Counts <- rowSums(Zhaoming_vars[-1]) 
 
 clinical.dat$Zhaoming_Non.Ref.Counts <- Zhaoming_vars$Zhaoming_Non.Ref.Counts [match(clinical.dat$sjlid, Zhaoming_vars$IID)]
-clinical.dat$Zhaoming_carriers <- ifelse(clinical.dat$Zhaoming_Non.Ref.Counts > 0, "Y", "N")
+clinical.dat$Zhaoming_carriers <- factor(ifelse(clinical.dat$Zhaoming_Non.Ref.Counts == 0, "N", "Y"))
 
 
 # Add ethnicity from PCA
@@ -391,6 +453,7 @@ table(SARCOMA$diaggrp)
 ## Replicating Zhaoming et al ##
 ################################
 colnames(PHENO.ANY_SN)
+saved.PHENO.ANY_SN <- PHENO.ANY_SN
 
 # PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "gender", "agedx", "agelstcontact", "AnyRT", "anyrt_prim", "anyrt_5", "anyrt_10", "brainorheadrt_yn",
 #                                "brainrt_yn", "maxseg1dose", "maxseg2dose", "maxseg3dose", "maxseg4dose", "maxsegrtdose", "chestrt_yn",
@@ -405,14 +468,11 @@ colnames(PHENO.ANY_SN)
 
 PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "gender", "agedx", "agelstcontact", "brainrt_yn", "maxsegrtdose", "chestrt_yn", "maxchestrtdose", "neckrt_yn", 
                                "maxneckrtdose", "pelvisrt_yn", "maxpelvisrtdose","abdomenrt_yn", "maxabdrtdose", "aa_class_dose_any", "epitxn_dose_any",
-                               "cisplat_dose_any", "aa_hvymtl_dose_any", "Zhaoming_carriers", "Qin_carriers", "PCA.ethnicity", "ANY_SN", "AGE.ANY_SN")]
+                               "cisplat_dose_any", "aa_hvymtl_dose_any", "Zhaoming_carriers", "Qin_carriers", "Qin_carriers.HR.pathways", "Qin_carriers.FA.pathways",
+                               "Qin_carriers.MMR.pathways", "Qin_carriers.BER.pathways", "Qin_carriers.NER.pathways" , "PCA.ethnicity", "ANY_SN", "AGE.ANY_SN")]
 
 
-PHENO.ANY_SN$ANY_SN <- factor(PHENO.ANY_SN$ANY_SN)
-
-## Gene mutation
-PHENO.ANY_SN$Zhaoming_carriers <- factor(PHENO.ANY_SN$Zhaoming_carriers, levels = c("N", "Y"))
-PHENO.ANY_SN$Qin_carriers <- factor(PHENO.ANY_SN$Qin_carriers, levels = c("N", "Y"))
+PHENO.ANY_SN$ANY_SN <- factor(PHENO.ANY_SN$ANY_SN, levels = c("N", "Y"))
 
 ## Age at diagnosis
 # PHENO.ANY_SN$agedx <- floor(PHENO.ANY_SN$agedx)
