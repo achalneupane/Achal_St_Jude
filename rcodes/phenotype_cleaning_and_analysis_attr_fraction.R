@@ -449,15 +449,15 @@ PHENO.ANY_SN$maxsegrtdose [PHENO.ANY_SN$maxsegrtdose >= 18 & PHENO.ANY_SN$maxseg
 PHENO.ANY_SN$maxsegrtdose [PHENO.ANY_SN$maxsegrtdose >= 30] <- ">=30"
 
 
-## Alkylating agents
-AlkylatingTert = quantile(PHENO.ANY_SN$aa_class_dose_any, c(0, 1/3, 2/3), na.rm = T)
+## Alkylating agents (tertiles)
+AlkylatingTert = quantile(PHENO.ANY_SN$aa_class_dose_any[PHENO.ANY_SN$aa_class_dose_any !=0], c(1/3, 2/3), na.rm = T)
 PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any == 0] <- "None"
-PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any > 0 & PHENO.ANY_SN$aa_class_dose_any <= 6617] <- "1st"
-PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any > 6617 & PHENO.ANY_SN$aa_class_dose_any <= 10500] <- "2nd"
-PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any > 10500] <- "3rd"
+PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any > 0 & PHENO.ANY_SN$aa_class_dose_any <= 5600.699] <- "1st"
+PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any > 5600.699 & PHENO.ANY_SN$aa_class_dose_any <= 10497.917] <- "2nd"
+PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any > 10497.917] <- "3rd"
 PHENO.ANY_SN$Alkylating_agent <- factor(PHENO.ANY_SN$Alkylating_agent, levels = c("None", "1st", "2nd", "3rd"))
 
-## Alkylating agens YN
+## Alkylating agents YN
 PHENO.ANY_SN$Alkylating_agent_yn <-  factor(ifelse(PHENO.ANY_SN$aa_class_dose_any == 0, "N", "Y"))
 
 ## Platinum agents
