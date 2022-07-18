@@ -6,6 +6,9 @@ library(plyr)
 library(data.table)
 library (birk)
 library(gtools)
+library(stringr)
+# library(tidyverse)
+library(lubridate)
 # benchmarkme::get_ram()
 
 
@@ -249,12 +252,10 @@ subneo$agedx <-  clinical.dat$agedx [match(subneo$sjlid , clinical.dat$sjlid)]
 # add DOB
 subneo$DOB <- demog$dob[match(subneo$MRN, demog$MRN)]
 
-library(lubridate)
 subneo$AGE.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
 # subneo$AGE.exact.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
 # subneo$AGE.ANY_SN <- floor(subneo$AGE.exact.ANY_SN)
 
-library(lubridate)
 subneo$AGE.ANY_SN.after.childhood.cancer <- time_length(interval(as.Date(subneo$diagdt), as.Date(subneo$gradedt)), "years")
 # subneo$AGE.ANY_SN.after.childhood.cancer <- floor(subneo$AGE.exact.ANY_SN.after.childhood.cancer)
 
@@ -263,6 +264,9 @@ subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subne
 
 ########################################
 # How many SNs after 5 years
+sjlife1.samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife_1/sample_list.txt")
+sjlife2.samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife_2/sample_list.txt")
+
 subneo.after5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5,]
 length(unique(subneo.after5$sjlid))
 # 619
@@ -396,8 +400,13 @@ colnames(PHENO.ANY_SN)
 #                                "PCA.ethnicity", "ANY_SN", "AGE.ANY_SN" )]
 
 
-PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "gender", "agedx", "agelstcontact", "brainrt_yn", "chestrt_yn", "neckrt_yn", "pelvisrt_yn", "abdomenrt_yn", 
-                               "aa_class_dose_any", "epitxn_dose_any", "cisplat_dose_any", "aa_hvymtl_dose_any", "Zhaoming_carriers", "Qin_carriers", "PCA.ethnicity", "ANY_SN", "AGE.ANY_SN")]
+# PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "gender", "agedx", "agelstcontact", "brainrt_yn", "chestrt_yn", "neckrt_yn", "pelvisrt_yn", "abdomenrt_yn", 
+#                                "aa_class_dose_any", "epitxn_dose_any", "cisplat_dose_any", "aa_hvymtl_dose_any", "Zhaoming_carriers", "Qin_carriers", "PCA.ethnicity", "ANY_SN", "AGE.ANY_SN")]
+
+PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "gender", "agedx", "agelstcontact", "brainrt_yn", "maxsegrtdose", "chestrt_yn", "maxchestrtdose", "neckrt_yn", 
+                               "maxneckrtdose", "pelvisrt_yn", "maxpelvisrtdose","abdomenrt_yn", "maxabdrtdose", "aa_class_dose_any", "epitxn_dose_any",
+                               "cisplat_dose_any", "aa_hvymtl_dose_any", "Zhaoming_carriers", "Qin_carriers", "PCA.ethnicity", "ANY_SN", "AGE.ANY_SN")]
+
 
 PHENO.ANY_SN$ANY_SN <- factor(PHENO.ANY_SN$ANY_SN)
 
@@ -433,7 +442,15 @@ PHENO.ANY_SN$chestrt_yn <- factor(PHENO.ANY_SN$chestrt_yn, levels = c("N", "Y"))
 PHENO.ANY_SN$abdomenrt_yn <- factor(PHENO.ANY_SN$abdomenrt_yn, levels = c("N", "Y"))
 PHENO.ANY_SN$pelvisrt_yn <- factor(PHENO.ANY_SN$pelvisrt_yn, levels = c("N", "Y"))
 
+#Radiation dose
+PHENO.ANY_SN$maxsegrtdose [PHENO.ANY_SN$maxsegrtdose == 0]<- "None"
+PHENO.ANY_SN$maxsegrtdose [PHENO.ANY_SN$maxsegrtdose > 0 & PHENO.ANY_SN$maxsegrtdose < 18] <- ">0 to <18"
+PHENO.ANY_SN$maxsegrtdose [PHENO.ANY_SN$maxsegrtdose >= 18 & PHENO.ANY_SN$maxsegrtdose <= 29] <- "18-29"
+PHENO.ANY_SN$maxsegrtdose [PHENO.ANY_SN$maxsegrtdose >= 30] <- ">=30"
+
+
 ## Alkylating agents
+AlkylatingTert = quantile(PHENO.ANY_SN$aa_class_dose_any, c(0, 1/3, 2/3), na.rm = T)
 PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any == 0] <- "None"
 PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any > 0 & PHENO.ANY_SN$aa_class_dose_any <= 6617] <- "1st"
 PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any > 6617 & PHENO.ANY_SN$aa_class_dose_any <= 10500] <- "2nd"
@@ -507,7 +524,6 @@ summary(mod1.EUR)
 #########################################
 #########################################
 ## Sjlife 1 sample list (used by Zhaoming); checking only in these samples
-sjlife1.samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife_1/sample_list.txt")
 PHENO.ANY_SN.sjlife1 <- PHENO.ANY_SN[PHENO.ANY_SN$sjlid %in% sjlife1.samples$V1,]
 PHENO.ANY_SN.sjlife1.EUR <- PHENO.ANY_SN.sjlife1[PHENO.ANY_SN.sjlife1$PCA.ethnicity == 'EUR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN.sjlife1))]
 
@@ -519,7 +535,6 @@ summary(mod.sjlife1.EUR)
 
 #########################################
 ## Sjlife 2 sample list (used by Zhaoming); checking only in these samples
-sjlife2.samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife_2/sample_list.txt")
 PHENO.ANY_SN.sjlife2 <- PHENO.ANY_SN[PHENO.ANY_SN$sjlid %in% sjlife1.samples$V1,]
 PHENO.ANY_SN.sjlife2.EUR <- PHENO.ANY_SN.sjlife2[PHENO.ANY_SN.sjlife2$PCA.ethnicity == 'EUR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN.sjlife2))]
 
