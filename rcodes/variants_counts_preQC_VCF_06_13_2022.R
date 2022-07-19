@@ -198,6 +198,9 @@ load("SNPEFF_clinvar_metaSVM_from_R_filtering_process_PreQC_VCF.RData")
 # TITN: chr2:178525989-178807423
 # BAG3: chr10:119651380-119677819
 
+###################################
+## With Clinvar and MetaSVM only ##
+###################################
 
 ## TITN
 clinvar.CHR2 <- CLINVAR.unique[grepl("^chr2$", CLINVAR.unique$CHROM),]
@@ -226,7 +229,7 @@ BAG3_TITN <- rbind.data.frame(BAG3.df,TITN.df)
 
 BAG3_TITN_BED <- cbind.data.frame(BAG3_TITN$CHROM, BAG3_TITN$POS-1, BAG3_TITN$POS)
 
-write.table(BAG3_TITN, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/TTN_BAG3_list_LP.txt", quote = F, col.names = T, sep = "\t")
+# write.table(BAG3_TITN, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/TTN_BAG3_list_LP.txt", quote = F, col.names = T, sep = "\t")
 
 TITN <- BAG3_TITN_BED[BAG3_TITN_BED$`BAG3_TITN$CHROM` == "chr2",]
 TITN <- distinct(TITN)
@@ -234,8 +237,8 @@ TITN <- distinct(TITN)
 BAG3 <- BAG3_TITN_BED[BAG3_TITN_BED$`BAG3_TITN$CHROM` == "chr10",]
 BAG3 <- distinct(BAG3)
 
-write.table(TITN, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/TTN_LP.bed", quote = F, col.names = F, sep = "\t", row.names = F)
-write.table(BAG3, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/BAG3_LP.bed", quote = F, col.names = F, sep = "\t", row.names = F)
+write.table(TITN, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/TTN_LP_clinvar_metaSVM.bed", quote = F, col.names = F, sep = "\t", row.names = F)
+write.table(BAG3, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/BAG3_LP_clinvar_metaSVM.bed", quote = F, col.names = F, sep = "\t", row.names = F)
 
 
 TITN_VCF.extracted <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/TTN_VCF.txt", header = F)
@@ -256,20 +259,19 @@ TITN_BAG3.df$FULLKEY2 <- paste0("chr", TITN_BAG3.df$SNP, ":", TITN_BAG3.df$A1, "
 
 # READ annotation VCF
 chr2_178 <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/chr2_178_list.txt", header = T)
-chr10_1196 <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/chr10_1196_list.txt", header = T)
+chr10_119 <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/chr10_119_list.txt", header = T)
 
-chr2_10 <- rbind.data.frame(chr2_178, chr10_1196)
+chr2_10 <- rbind.data.frame(chr2_178, chr10_119)
 
 chr2_10$KEY <- paste0(chr2_10$CHROM,":",  chr2_10$POS)
 chr2_10$FULLKEY1 <- paste0(chr2_10$CHROM,":",  chr2_10$POS, ":", chr2_10$REF, ":", chr2_10$ALT)
 
-BAG3_TITN$SNP <- paste0(BAG3_TITN$CHROM, ":", BAG3_TITN$POS)
 sum(TITN_BAG3.df$KEY %in% chr2_10$KEY)
-# 1370
+# 2601
 sum(TITN_BAG3.df$FULLKEY1 %in% chr2_10$FULLKEY1)
-# 1208
+# 2302
 sum(TITN_BAG3.df$FULLKEY2 %in% chr2_10$FULLKEY1)
-# 170
+# 318
 TITN_BAG3.df1 <- cbind(TITN_BAG3.df, chr2_10[match(TITN_BAG3.df$FULLKEY1, chr2_10$FULLKEY1),c("ANN....IMPACT", "ANN....FEATURE", "ANN....EFFECT")])
 TITN_BAG3.df1 <-TITN_BAG3.df1[!is.na(TITN_BAG3.df1$ANN....IMPACT),]
 
@@ -283,3 +285,66 @@ TITN_BAG3.df <- cbind.data.frame(TITN_BAG3.df, TITN_BAG3.df3[match(TITN_BAG3.df$
 
 write.table(TITN_BAG3.df, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/Yadav_TITN_BAG3_list.txt", quote = F, col.names = T, sep = "\t", row.names = F)
 
+
+###################################
+## With Clinvar, MetaSVM and LoF ##
+###################################
+## TITN
+clinvar.CHR2 <- CLINVAR.unique[grepl("^chr2$", CLINVAR.unique$CHROM),]
+clinvar.CHR2$POS <- as.numeric(clinvar.CHR2$POS)
+clinvar.CHR2 <- clinvar.CHR2[clinvar.CHR2$POS >= 178525989 & clinvar.CHR2$POS <= 178807423,]
+
+MetaSVM.CHR2 <- MetaSVM.unique[grepl("^chr2$", MetaSVM.unique$CHROM),]
+MetaSVM.CHR2$POS <- as.numeric(MetaSVM.CHR2$POS)
+MetaSVM.CHR2 <- MetaSVM.CHR2[MetaSVM.CHR2$POS >= 178525989 & MetaSVM.CHR2$POS <= 178807423,]
+
+LoF.CHR2 <- LoF.unique[grepl("^chr2$", LoF.unique$CHROM),]
+LoF.CHR2$POS <- as.numeric(LoF.CHR2$POS)
+LoF.CHR2 <- LoF.CHR2[LoF.CHR2$POS >= 178525989 & LoF.CHR2$POS <= 178807423,]
+
+TITN.df <- rbind.data.frame(clinvar.CHR2, MetaSVM.CHR2, LoF.CHR2)
+
+## BAG3
+clinvar.CHR10 <- CLINVAR.unique[grepl("^chr10$", CLINVAR.unique$CHROM),]
+clinvar.CHR10$POS <- as.numeric(clinvar.CHR10$POS)
+clinvar.CHR10 <- clinvar.CHR10[clinvar.CHR10$POS >= 119651380 & clinvar.CHR10$POS <= 119677819,]
+
+MetaSVM.CHR10 <- MetaSVM.unique[grepl("^chr10$", MetaSVM.unique$CHROM),]
+MetaSVM.CHR10$POS <- as.numeric(MetaSVM.CHR10$POS)
+MetaSVM.CHR10 <- MetaSVM.CHR10[MetaSVM.CHR10$POS >= 119651380 & MetaSVM.CHR10$POS <= 119677819,]
+
+LoF.CHR10 <- LoF.unique[grepl("^chr10$", LoF.unique$CHROM),]
+LoF.CHR10$POS <- as.numeric(LoF.CHR10$POS)
+LoF.CHR10 <- LoF.CHR10[LoF.CHR10$POS >= 119651380 & LoF.CHR10$POS <= 119677819,]
+
+BAG3.df <- rbind.data.frame(clinvar.CHR10, MetaSVM.CHR10, LoF.CHR10)
+
+
+BAG3_TITN <- rbind.data.frame(BAG3.df,TITN.df)
+
+# BAG3_TITN$SNP <- paste0(BAG3_TITN$CHROM, ":", BAG3_TITN$POS)
+
+write.table(BAG3_TITN, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/TTN_BAG3_list_LP.txt", quote = F, col.names = T, sep = "\t")
+
+BAG3_TITN_BED <- cbind.data.frame(BAG3_TITN$CHROM, BAG3_TITN$POS-1, BAG3_TITN$POS)
+
+TITN <- BAG3_TITN_BED[BAG3_TITN_BED$`BAG3_TITN$CHROM` == "chr2",]
+TITN <- distinct(TITN)
+
+BAG3 <- BAG3_TITN_BED[BAG3_TITN_BED$`BAG3_TITN$CHROM` == "chr10",]
+BAG3 <- distinct(BAG3)
+
+write.table(TITN, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/TTN_LP_clinvar_metaSVM_LoF.bed", quote = F, col.names = F, sep = "\t", row.names = F)
+write.table(BAG3, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/BAG3_LP_clinvar_metaSVM_LoF.bed", quote = F, col.names = F, sep = "\t", row.names = F)
+
+
+TITN_VCF.extracted <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/TTN_LP_clinvar_metaSVM_LoF_v3.txt", header = F)
+TITN_VCF.extracted$V1[!TITN_VCF.extracted$V1 %in% unique(TITN.df$KEY)]
+
+unique(TITN.df$KEY)[unique(TITN.df$KEY) %in% TITN_VCF.extracted$V1]
+TITN_VCF.extracted$V1[duplicated(TITN_VCF.extracted$V1)]
+
+
+
+BAG3_VCF.extracted <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/BAG3_VCF_clinvar_metaSVM_LoF_vars.txt", header = F)
+BAG3_VCF.extracted$V1[!BAG3_VCF.extracted$V1 %in% unique(BAG3.df$KEY)]
