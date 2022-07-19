@@ -190,8 +190,7 @@ vars.to.extract.from.VCF <- Predicted.vars.inVCF.Unique[!duplicated(Predicted.va
 vars.to.extract.from.VCF.bed <- cbind.data.frame(CHROM = vars.to.extract.from.VCF$CHROM, START = as.numeric(vars.to.extract.from.VCF$POS) -1, END = vars.to.extract.from.VCF$POS)
 write.table(vars.to.extract.from.VCF.bed, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/annotated_variants/annotated_vars_from_PreQC_VCF_Clinvar_MetaSVM_LoF/Variants_from_annotation_Clinvar_MetaSVM_LoF_PreQC.bed", row.names = FALSE, quote = FALSE, col.names = F, sep = "\t")
 
-# save.image("SNPEFF_clinvar_metaSVM_from_R_filtering_process_PreQC_VCF.RData")
-load("SNPEFF_clinvar_metaSVM_from_R_filtering_process_PreQC_VCF.RData")
+
 
 
 ## TTN and BAG 3 L/PL variants
@@ -348,3 +347,8 @@ TITN_VCF.extracted$V1[duplicated(TITN_VCF.extracted$V1)]
 
 BAG3_VCF.extracted <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/BAG3_VCF_clinvar_metaSVM_LoF_vars.txt", header = F)
 BAG3_VCF.extracted$V1[!BAG3_VCF.extracted$V1 %in% unique(BAG3.df$KEY)]
+
+
+
+# save.image("SNPEFF_clinvar_metaSVM_from_R_filtering_process_PreQC_VCF.RData")
+load("SNPEFF_clinvar_metaSVM_from_R_filtering_process_PreQC_VCF.RData")
