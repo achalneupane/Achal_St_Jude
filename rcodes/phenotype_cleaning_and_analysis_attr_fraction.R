@@ -286,6 +286,7 @@ EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjli
 AFR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA/SJLIFE_AFR_Per_PCA.txt", stringsAsFactors = F, header = F)
 EAS <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA/SJLIFE_EAS_Per_PCA.txt", stringsAsFactors = F, header = F)
 sum((clinical.dat$sjlid %in% EUR$V1))
+# 3358
 
 clinical.dat$PCA.ethnicity <- ifelse(clinical.dat$sjlid %in% EUR$V1, "EUR", "")
 clinical.dat$PCA.ethnicity[!grepl("EUR", clinical.dat$PCA.ethnicity)]    <- ifelse(clinical.dat$sjlid[!grepl("EUR", clinical.dat$PCA.ethnicity)] %in% AFR$V1, "AFR", "")
@@ -502,11 +503,20 @@ PHENO.ANY_SN$chestrt_yn <- factor(PHENO.ANY_SN$chestrt_yn, levels = c("N", "Y"))
 PHENO.ANY_SN$abdomenrt_yn <- factor(PHENO.ANY_SN$abdomenrt_yn, levels = c("N", "Y"))
 PHENO.ANY_SN$pelvisrt_yn <- factor(PHENO.ANY_SN$pelvisrt_yn, levels = c("N", "Y"))
 
-#Radiation dose
-PHENO.ANY_SN$maxsegrtdose [PHENO.ANY_SN$maxsegrtdose == 0]<- "None"
-PHENO.ANY_SN$maxsegrtdose [PHENO.ANY_SN$maxsegrtdose > 0 & PHENO.ANY_SN$maxsegrtdose < 18] <- ">0 to <18"
-PHENO.ANY_SN$maxsegrtdose [PHENO.ANY_SN$maxsegrtdose >= 18 & PHENO.ANY_SN$maxsegrtdose <= 29] <- "18-29"
-PHENO.ANY_SN$maxsegrtdose [PHENO.ANY_SN$maxsegrtdose >= 30] <- ">=30"
+## Radiation dose
+PHENO.ANY_SN$maxsegrtdose.category <- cut(PHENO.ANY_SN$maxsegrtdose, breaks = c(0, 200, 1800, 2999, max(PHENO.ANY_SN$maxsegrtdose, na.rm = T)),
+    labels = c("None", ">0-<18", "18-29", ">=30"),
+    include.lowest = TRUE)
+levels(PHENO.ANY_SN$maxsegrtdose.category) <- c(levels(PHENO.ANY_SN$maxsegrtdose.category), "Unknown")
+PHENO.ANY_SN$maxsegrtdose.category [is.na(PHENO.ANY_SN$maxsegrtdose)] <- "Unknown"
+# ## Sanity check
+# # tt <- PHENO.ANY_SN[c("maxsegrtdose", "maxsegrtdose.category")]
+# # sum(is.na(PHENO.ANY_SN$maxsegrtdose.category ))
+# # cc <- tt[tt$maxsegrtdose < 200,]
+# # cc <- tt[tt$maxsegrtdose >= 2999 ,]
+# # cc <- tt[is.na(tt$maxsegrtdose),]
+# # is.na(PHENO.ANY_SN$maxsegrtdose.category)
+
 
 
 ## Alkylating agents (tertiles)
