@@ -503,9 +503,12 @@ PHENO.ANY_SN$chestrt_yn <- factor(PHENO.ANY_SN$chestrt_yn, levels = c("N", "Y"))
 PHENO.ANY_SN$abdomenrt_yn <- factor(PHENO.ANY_SN$abdomenrt_yn, levels = c("N", "Y"))
 PHENO.ANY_SN$pelvisrt_yn <- factor(PHENO.ANY_SN$pelvisrt_yn, levels = c("N", "Y"))
 
-## Radiation dose
-PHENO.ANY_SN$maxsegrtdose.category <- cut(PHENO.ANY_SN$maxsegrtdose, breaks = c(0, 200, 1800, 2999, max(PHENO.ANY_SN$maxsegrtdose, na.rm = T)),
-    labels = c("None", ">0-<18", "18-29", ">=30"),
+####################
+## Radiation dose ##
+####################
+## Maxsegrtdose (Cranial RT)
+PHENO.ANY_SN$maxsegrtdose.category <- cut(PHENO.ANY_SN$maxsegrtdose, breaks = c(0, 200, 1799, 2999, max(PHENO.ANY_SN$maxsegrtdose, na.rm = T)),
+    labels = c("None", ">0-<18", ">=18-<30", ">=30"),
     include.lowest = TRUE)
 levels(PHENO.ANY_SN$maxsegrtdose.category) <- c(levels(PHENO.ANY_SN$maxsegrtdose.category), "Unknown")
 PHENO.ANY_SN$maxsegrtdose.category [is.na(PHENO.ANY_SN$maxsegrtdose)] <- "Unknown"
@@ -517,26 +520,66 @@ PHENO.ANY_SN$maxsegrtdose.category [is.na(PHENO.ANY_SN$maxsegrtdose)] <- "Unknow
 # # cc <- tt[is.na(tt$maxsegrtdose),]
 # # is.na(PHENO.ANY_SN$maxsegrtdose.category)
 
+## Abdomen RT
+PHENO.ANY_SN$maxabdrtdose.category <- cut(PHENO.ANY_SN$maxabdrtdose, breaks = c(0, 200, 2999, max(PHENO.ANY_SN$maxabdrtdose, na.rm = T)),
+                                          labels = c("None", ">0-<30", ">=30"),
+                                          include.lowest = TRUE)
+levels(PHENO.ANY_SN$maxabdrtdose.category) <- c(levels(PHENO.ANY_SN$maxabdrtdose.category), "Unknown")
+PHENO.ANY_SN$maxabdrtdose.category [is.na(PHENO.ANY_SN$maxabdrtdose)] <- "Unknown"
+
+## Pelvis RT
+PHENO.ANY_SN$maxpelvisrtdose.category <- cut(PHENO.ANY_SN$maxpelvisrtdose, breaks = c(0, 200, 1999, max(PHENO.ANY_SN$maxpelvisrtdose, na.rm = T)),
+                                          labels = c("None", ">0-<20", ">=20"),
+                                          include.lowest = TRUE)
+levels(PHENO.ANY_SN$maxpelvisrtdose.category) <- c(levels(PHENO.ANY_SN$maxpelvisrtdose.category), "Unknown")
+PHENO.ANY_SN$maxpelvisrtdose.category [is.na(PHENO.ANY_SN$maxpelvisrtdose)] <- "Unknown"
+
+## Chest RT
+PHENO.ANY_SN$maxchestrtdose.category <- cut(PHENO.ANY_SN$maxchestrtdose, breaks = c(0, 200, 1999, max(PHENO.ANY_SN$maxchestrtdose, na.rm = T)),
+                                             labels = c("None", ">0-<20", ">=20"),
+                                             include.lowest = TRUE)
+levels(PHENO.ANY_SN$maxchestrtdose.category) <- c(levels(PHENO.ANY_SN$maxchestrtdose.category), "Unknown")
+PHENO.ANY_SN$maxchestrtdose.category [is.na(PHENO.ANY_SN$maxchestrtdose)] <- "Unknown"
 
 
-## Alkylating agents (tertiles)
-AlkylatingTert = quantile(PHENO.ANY_SN$aa_class_dose_any[PHENO.ANY_SN$aa_class_dose_any !=0], c(1/3, 2/3), na.rm = T)
-PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any == 0] <- "None"
-PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any > 0 & PHENO.ANY_SN$aa_class_dose_any <= 5600.699] <- "1st"
-PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any > 5600.699 & PHENO.ANY_SN$aa_class_dose_any <= 10497.917] <- "2nd"
-PHENO.ANY_SN$Alkylating_agent [PHENO.ANY_SN$aa_class_dose_any > 10497.917] <- "3rd"
-PHENO.ANY_SN$Alkylating_agent <- factor(PHENO.ANY_SN$Alkylating_agent, levels = c("None", "1st", "2nd", "3rd"))
+## Neck RT
+PHENO.ANY_SN$maxneckrtdose.category <- cut(PHENO.ANY_SN$maxneckrtdose, breaks = c(0, 200, 1099, 1999, 2999, max(PHENO.ANY_SN$maxneckrtdose, na.rm = T)),
+                                          labels = c("None", ">0-<11", ">=11-<20", ">=20-<30", ">=30"),
+                                          include.lowest = TRUE)
+levels(PHENO.ANY_SN$maxneckrtdose.category) <- c(levels(PHENO.ANY_SN$maxneckrtdose.category), "Unknown")
+PHENO.ANY_SN$maxneckrtdose.category [is.na(PHENO.ANY_SN$maxneckrtdose)] <- "Unknown"
 
-## Alkylating agents YN
+
+
+
+## Alkylating agents (Y/N and Tertiles)
 PHENO.ANY_SN$Alkylating_agent_yn <-  factor(ifelse(PHENO.ANY_SN$aa_class_dose_any == 0, "N", "Y"))
 
-## Platinum agents
+TERT = unname(quantile(PHENO.ANY_SN$aa_class_dose_any[PHENO.ANY_SN$aa_class_dose_any !=0], c(1/3, 2/3, 1), na.rm = T))
+PHENO.ANY_SN$Alkylating_agent.category <- cut(PHENO.ANY_SN$aa_class_dose_any, breaks = c(0, 0.001, TERT),
+                                              labels = c("None", "1st", "2nd", "3rd"),
+                                              include.lowest = TRUE)
+
+
+## Platinum agents (Y/N and Tertiles)
 PHENO.ANY_SN$cisplat_dose_any_yn <- factor(ifelse(PHENO.ANY_SN$cisplat_dose_any == 0, "N", "Y"))
 
-## Heavy metals
+TERT = unname(quantile(PHENO.ANY_SN$cisplat_dose_any[PHENO.ANY_SN$cisplat_dose_any !=0], c(1/3, 2/3, 1), na.rm = T))
+PHENO.ANY_SN$cisplat_dose_any.category <- cut(PHENO.ANY_SN$cisplat_dose_any, breaks = c(0, 0.001, TERT),
+                                              labels = c("None", "1st", "2nd", "3rd"),
+                                              include.lowest = TRUE)
+
+
+## Heavy metals (Y/N and Tertiles)
 PHENO.ANY_SN$aa_hvymtl_dose_any_yn <- factor(ifelse(PHENO.ANY_SN$aa_hvymtl_dose_any == 0, "N", "Y"))
 
-## Anthracyclines
+TERT = unname(quantile(PHENO.ANY_SN$aa_hvymtl_dose_any[PHENO.ANY_SN$aa_hvymtl_dose_any !=0], c(1/3, 2/3, 1), na.rm = T))
+PHENO.ANY_SN$aa_hvymtl_dose_any.category <- cut(PHENO.ANY_SN$aa_hvymtl_dose_any, breaks = c(0, 0.001, TERT),
+                                              labels = c("None", "1st", "2nd", "3rd"),
+                                              include.lowest = TRUE)
+
+
+## Anthracyclines (Y/N and Tertiles)
 
 
 ## Epidophyllotoxin
