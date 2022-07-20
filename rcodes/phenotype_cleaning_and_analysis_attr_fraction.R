@@ -470,7 +470,7 @@ saved.PHENO.ANY_SN <- PHENO.ANY_SN
 PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "gender", "agedx", "agelstcontact", "brainrt_yn", "maxsegrtdose", "chestrt_yn", "maxchestrtdose", "neckrt_yn", 
                                "maxneckrtdose", "pelvisrt_yn", "maxpelvisrtdose","abdomenrt_yn", "maxabdrtdose", "aa_class_dose_any", "epitxn_dose_any",
                                "cisplat_dose_any", "aa_hvymtl_dose_any", "Zhaoming_carriers", "Qin_carriers", "Qin_carriers.HR.pathways", "Qin_carriers.FA.pathways",
-                               "Qin_carriers.MMR.pathways", "Qin_carriers.BER.pathways", "Qin_carriers.NER.pathways" , "PCA.ethnicity", "ANY_SN", "AGE.ANY_SN")]
+                               "Qin_carriers.MMR.pathways", "Qin_carriers.BER.pathways", "Qin_carriers.NER.pathways", "Qin_carriers.NHEJ.pathways", "PCA.ethnicity", "ANY_SN", "AGE.ANY_SN")]
 
 
 PHENO.ANY_SN$ANY_SN <- factor(PHENO.ANY_SN$ANY_SN, levels = c("N", "Y"))
@@ -484,12 +484,34 @@ PHENO.ANY_SN$AGE_AT_DIAGNOSIS[PHENO.ANY_SN$agedx >= 15 ] <- ">=15"
 PHENO.ANY_SN$AGE_AT_DIAGNOSIS <- factor(PHENO.ANY_SN$AGE_AT_DIAGNOSIS, levels = c("0-4", "5-9", "10-14", ">=15")) # first level will be treated as reference
 # PHENO.ANY_SN$AGE_AT_DIAGNOSIS <- relevel(PHENO.ANY_SN$AGE_AT_DIAGNOSIS, ref = "0-4")
 
+# PHENO.ANY_SN$AGE_AT_DIAGNOSIS.1 <- cut(PHENO.ANY_SN$agedx, breaks = c(0, 4.9999, 9.9999, 14.9999, max(PHENO.ANY_SN$agedx, na.rm = T)),
+#                                           labels = c("0-4", "5-9", "10-14", ">=15"),
+#                                           include.lowest = TRUE)
+
+
+
 ## Age at last contact
 PHENO.ANY_SN$AGE_AT_LAST_CONTACT[PHENO.ANY_SN$agelstcontact >= 0 & PHENO.ANY_SN$agelstcontact < 25 ] <- "0-24"
 PHENO.ANY_SN$AGE_AT_LAST_CONTACT[PHENO.ANY_SN$agelstcontact >= 25 & PHENO.ANY_SN$agelstcontact < 35 ] <- "25-34"
 PHENO.ANY_SN$AGE_AT_LAST_CONTACT[PHENO.ANY_SN$agelstcontact >= 35 & PHENO.ANY_SN$agelstcontact < 45 ] <- "35-44"
 PHENO.ANY_SN$AGE_AT_LAST_CONTACT[PHENO.ANY_SN$agelstcontact >= 45 ] <- ">=45"
 PHENO.ANY_SN$AGE_AT_LAST_CONTACT <- factor(PHENO.ANY_SN$AGE_AT_LAST_CONTACT, levels = c("0-24", "25-34", "35-44", ">=45")) # first level will be treated as reference
+
+
+## Age at last contact (cubic spline)
+PHENO.ANY_SN$AGE_AT_LAST_CONTACT[PHENO.ANY_SN$agelstcontact >= 0 & PHENO.ANY_SN$agelstcontact < 25 ] <- "0-24"
+
+
+breaks = seq(5, 95, 22.5)
+
+cp = quantile(pheno$agelstcontact, breaks/100)
+
+cs = cubic_spline(pheno$agelstcontact, knots = cp)
+
+
+
+# Merge cs to your original data.frame and adjust in the logistic regression
+
 
 
 
@@ -583,11 +605,12 @@ PHENO.ANY_SN$aa_hvymtl_dose_any.category <- cut(PHENO.ANY_SN$aa_hvymtl_dose_any,
 
 
 ## Epidophyllotoxin
-PHENO.ANY_SN$Epidophyllotoxin [PHENO.ANY_SN$epitxn_dose_any == 0] <- "None"
-PHENO.ANY_SN$Epidophyllotoxin [PHENO.ANY_SN$epitxn_dose_any > 0 & PHENO.ANY_SN$epitxn_dose_any <= 1588] <- "1st"
-PHENO.ANY_SN$Epidophyllotoxin [PHENO.ANY_SN$epitxn_dose_any > 1588 & PHENO.ANY_SN$epitxn_dose_any <= 6704] <- "2nd"
-PHENO.ANY_SN$Epidophyllotoxin [PHENO.ANY_SN$epitxn_dose_any > 6704] <- "3rd"
-PHENO.ANY_SN$Epidophyllotoxin <- factor(PHENO.ANY_SN$Epidophyllotoxin, levels = c("None", "1st", "2nd", "3rd"))
+PHENO.ANY_SN$epitxn_dose_any_yn <- factor(ifelse(PHENO.ANY_SN$epitxn_dose_any == 0, "N", "Y"))
+
+TERT = unname(quantile(PHENO.ANY_SN$epitxn_dose_any[PHENO.ANY_SN$epitxn_dose_any !=0], c(1/3, 2/3, 1), na.rm = T))
+PHENO.ANY_SN$epitxn_dose_any.category <- cut(PHENO.ANY_SN$epitxn_dose_any, breaks = c(0, 0.001, TERT),
+                                                labels = c("None", "1st", "2nd", "3rd"),
+                                                include.lowest = TRUE)
 
 
 PHENO.ANY_SN.EUR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'EUR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN))]
@@ -597,12 +620,12 @@ PHENO.ANY_SN.EUR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'EUR', -grep("sjl
 ########################################
 ## SJLIFE (ALL)
 # mod1 <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin + Alkylating_agent_yn + cisplat_dose_any_yn + aa_hvymtl_dose_any_yn, family = binomial(link = "logit"), data = PHENO.ANY_SN)
-mod1 <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+mod1 <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
 
 ## SJLIFE (EUR)
 # mod1.EUR <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin + Alkylating_agent_yn + cisplat_dose_any_yn + aa_hvymtl_dose_any_yn, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
-mod1.EUR <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+mod1.EUR <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 summary(mod1.EUR)
 
 
@@ -614,15 +637,19 @@ prop.test(prevalence.counts, 4507)
 ###################################
 ## MODEL TEST for Qin's variants ##
 ###################################
-## SJLIFE (ALL)
+####################
+## 1. HR Pathways ##
+####################
+## SJLIFE (ALL) 
 # mod1 <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin + Alkylating_agent_yn + cisplat_dose_any_yn + aa_hvymtl_dose_any_yn, family = binomial(link = "logit"), data = PHENO.ANY_SN)
-mod1 <- glm(ANY_SN ~ Qin_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+mod1 <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
 
 ## SJLIFE (EUR)
 # mod1.EUR <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin + Alkylating_agent_yn + cisplat_dose_any_yn + aa_hvymtl_dose_any_yn, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
-mod1.EUR <- glm(ANY_SN ~ Qin_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+mod1.EUR <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 summary(mod1.EUR)
+
 
 
 
@@ -656,6 +683,18 @@ summary(mod.sjlife2)
 
 mod.sjlife2.EUR <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin, family = binomial(link = "logit"), data = PHENO.ANY_SN.sjlife2.EUR)
 summary(mod.sjlife2.EUR)
+
+#########################################
+
+## Sjlife 1 sample list (used by Qin); checking only in these samples
+PHENO.ANY_SN.sjlife1 <- PHENO.ANY_SN[PHENO.ANY_SN$sjlid %in% sjlife1.samples$V1,]
+PHENO.ANY_SN.sjlife1.EUR <- PHENO.ANY_SN.sjlife1[PHENO.ANY_SN.sjlife1$PCA.ethnicity == 'EUR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN.sjlife1))]
+
+mod.sjlife1 <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.sjlife1)
+summary(mod.sjlife1)
+
+mod.sjlife1.EUR <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.sjlife1.EUR)
+summary(mod.sjlife1.EUR)
 
 ########################################
 ## cross tab of categorical variables
