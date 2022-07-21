@@ -270,6 +270,7 @@ sum(unique(search_list$KEY.varID) %in% unique(tableA4$FULLKEY))
 # 148
 search_list <- search_list[search_list$KEY.varID %in% tableA4$FULLKEY,]
 
+
 # sum(tableA4$Gene %in% tableA10$Gene)
 # sum(tableA4$FULLKEY %in% tableA10$FULLKEY)
 
@@ -656,6 +657,47 @@ summary(mod1)
 mod1.EUR <- glm(ANY_SN ~ Qin_carriers + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 summary(mod1.EUR)
 
+## Prevalence
+prevalence.counts <- sum(QIN_vars$Qin_Non.Ref.Counts > 0)
+prop.test(prevalence.counts, 4507)
+# SJLIFE (10.89% prevalence; 95% CI, 10% to 11.8%)
+# QIN: (11.5% prevalence; 95% CI, 10.6% to 12.5%)
+
+## Prevalence HR pathways
+prevalence.counts <- sum(PHENO.ANY_SN$Qin_carriers.HR.pathways == "Y", na.rm = T)
+prop.test(prevalence.counts, 4507)
+# SJLIFE: (3.9% prevalence; 95% CI, 3.4% to 4.5%)
+# QIN: (4.2% prevalence; 95% CI, 3.6% to 4.8%)
+
+## Prevalence MMR pathways
+prevalence.counts <- sum(PHENO.ANY_SN$Qin_carriers.MMR.pathways == "Y", na.rm = T)
+prop.test(prevalence.counts, 4507)
+# SJLIFE: (0.7% prevalence; 95% CI, 0.4% to 1.0%)
+# QIN: (0.8% prevalence; 95% CI, 0.6% to 1.1%)
+
+## Prevalence NER pathways
+prevalence.counts <- sum(PHENO.ANY_SN$Qin_carriers.NER.pathways == "Y", na.rm = T)
+prop.test(prevalence.counts, 4507)
+# SJLIFE: (2.04% prevalence; 95% CI, 1.65% to 2.5%)
+# QIN:  (2.2% prevalence; 95% CI, 1.8% to 2.7%)
+
+## Prevalence FA pathways
+prevalence.counts <- sum(PHENO.ANY_SN$Qin_carriers.FA.pathways == "Y", na.rm = T)
+prop.test(prevalence.counts, 4507)
+# SJLIFE: (2.9% prevalence; 95% CI, 2.48% to 3.49%)
+# QIN:  ( 3.2% prevalence; 95% CI, 2.7% to 3.7%)
+
+## Prevalence NHEJ pathways
+prevalence.counts <- sum(PHENO.ANY_SN$Qin_carriers.NHEJ.pathways == "Y", na.rm = T)
+prop.test(prevalence.counts, 4507)
+# SJLIFE: (0.5% prevalence; 95% CI, 0.3% to 0.7%)
+# QIN:  ( 0.6% prevalence; 95% CI, 0.4% to 0.9%)
+
+## Prevalence BER pathways
+prevalence.counts <- sum(PHENO.ANY_SN$Qin_carriers.BER.pathways == "Y", na.rm = T)
+prop.test(prevalence.counts, 4507)
+# SJLIFE: (2.4% prevalence; 95% CI, 2.0% to 2.9%)
+# QIN:  ( 2.5% prevalence; 95% CI, 2.1% to 3.0%)
 
 
 ####################
