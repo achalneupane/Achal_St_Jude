@@ -164,7 +164,7 @@ head(drug)
 # drug$cisplat_dose_any
 
 ## Add drug to clinical data
-clinical.dat <- cbind.data.frame(clinical.dat, drug[match(clinical.dat$MRN, drug$MRN), grep("dose_any",colnames(drug))])
+clinical.dat <- cbind.data.frame(clinical.dat, drug[match(clinical.dat$MRN, drug$MRN), grep("dose_any|_5",colnames(drug))])
 
 colnames(clinical.dat)[grepl("_yn|anyrt_|AnyRT", colnames(clinical.dat))]
 # [1] "AnyRT"            "anyrt_prim"       "anyrt_5"          "anyrt_10"         "brainorheadrt_yn" "brainrt_yn"       "chestrt_yn"      
@@ -184,13 +184,18 @@ QIN_vars <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common
 QIN_vars <- QIN_vars[-grep("FID|PAT|MAT|SEX|PHENOTYPE", colnames(QIN_vars))]
 colnames(QIN_vars) <- str_split(gsub("\\.", ":", colnames(QIN_vars)), "_", simplify=T)[,1]
 ## Qin's Pathways
-QIN.Pathways <- read.delim("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Yadav_Sapkota/additional_papers/Na_Qin_Pathogenic Germline Mutations in DNA Repair Genes in Combination With Cancer Treatment Exposures/Qin_variant_pathways.txt", header = T)
+QIN.Pathways <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Additional_files/Qin_variant_pathways.txt", header = T)
 QIN.Pathways <- QIN.Pathways[QIN.Pathways$MATCH_YN == "Y",]
 
 # HR pathway
 HR.pathways <- QIN.Pathways[grepl("HR", QIN.Pathways$DNA_Repair_Pathway),]
 HR.pathways <- HR.pathways[!duplicated(HR.pathways$VarKEY_IN_SJLIFE),]
 HR.pathways <- QIN_vars[c(1,which(colnames(QIN_vars) %in% HR.pathways$VarKEY_IN_SJLIFE))]
+# variants in SJLIFE
+ncol(HR.pathways)-1
+# 154
+# variants in QIN
+# 157
 
 HR.pathways$Qin_Non.Ref.Counts <- rowSums(HR.pathways[-1]) 
 clinical.dat$Qin_Non.Ref.Counts.HR.pathways <- HR.pathways$Qin_Non.Ref.Counts [match(clinical.dat$sjlid, HR.pathways$IID)]
@@ -200,6 +205,11 @@ clinical.dat$Qin_carriers.HR.pathways <- factor(ifelse(clinical.dat$Qin_Non.Ref.
 FA.pathways <- QIN.Pathways[grepl("FA", QIN.Pathways$DNA_Repair_Pathway),]
 FA.pathways <- FA.pathways[!duplicated(FA.pathways$VarKEY_IN_SJLIFE),]
 FA.pathways <- QIN_vars[c(1,which(colnames(QIN_vars) %in% FA.pathways$VarKEY_IN_SJLIFE))]
+# variants in SJLIFE
+ncol(FA.pathways)-1
+# 101
+# variants in QIN
+# 104
 
 FA.pathways$Qin_Non.Ref.Counts <- rowSums(FA.pathways[-1]) 
 clinical.dat$Qin_Non.Ref.Counts.FA.pathways <- FA.pathways$Qin_Non.Ref.Counts [match(clinical.dat$sjlid, FA.pathways$IID)]
@@ -209,6 +219,11 @@ clinical.dat$Qin_carriers.FA.pathways <- factor(ifelse(clinical.dat$Qin_Non.Ref.
 MMR.pathways <- QIN.Pathways[grepl("MMR", QIN.Pathways$DNA_Repair_Pathway),]
 MMR.pathways <- MMR.pathways[!duplicated(MMR.pathways$VarKEY_IN_SJLIFE),]
 MMR.pathways <- QIN_vars[c(1,which(colnames(QIN_vars) %in% MMR.pathways$VarKEY_IN_SJLIFE))]
+# variants in SJLIFE
+ncol(MMR.pathways)-1
+# 28
+# variants in QIN
+# 30
 
 MMR.pathways$Qin_Non.Ref.Counts <- rowSums(MMR.pathways[-1]) 
 clinical.dat$Qin_Non.Ref.Counts.MMR.pathways <- MMR.pathways$Qin_Non.Ref.Counts [match(clinical.dat$sjlid, MMR.pathways$IID)]
@@ -218,6 +233,12 @@ clinical.dat$Qin_carriers.MMR.pathways <- factor(ifelse(clinical.dat$Qin_Non.Ref
 BER.pathways <- QIN.Pathways[grepl("BER", QIN.Pathways$DNA_Repair_Pathway),]
 BER.pathways <- BER.pathways[!duplicated(BER.pathways$VarKEY_IN_SJLIFE),]
 BER.pathways <- QIN_vars[c(1,which(colnames(QIN_vars) %in% BER.pathways$VarKEY_IN_SJLIFE))]
+# variants in SJLIFE
+ncol(BER.pathways)-1
+# 66
+# variants in QIN
+# 67
+
 
 BER.pathways$Qin_Non.Ref.Counts <- rowSums(BER.pathways[-1]) 
 clinical.dat$Qin_Non.Ref.Counts.BER.pathways <- BER.pathways$Qin_Non.Ref.Counts [match(clinical.dat$sjlid, BER.pathways$IID)]
@@ -227,6 +248,11 @@ clinical.dat$Qin_carriers.BER.pathways <- factor(ifelse(clinical.dat$Qin_Non.Ref
 NER.pathways <- QIN.Pathways[grepl("NER", QIN.Pathways$DNA_Repair_Pathway),]
 NER.pathways <- NER.pathways[!duplicated(NER.pathways$VarKEY_IN_SJLIFE),]
 NER.pathways <- QIN_vars[c(1,which(colnames(QIN_vars) %in% NER.pathways$VarKEY_IN_SJLIFE))]
+# variants in SJLIFE
+ncol(NER.pathways)-1
+# 73
+# variants in QIN
+# 76
 
 NER.pathways$Qin_Non.Ref.Counts <- rowSums(NER.pathways[-1]) 
 clinical.dat$Qin_Non.Ref.Counts.NER.pathways <- NER.pathways$Qin_Non.Ref.Counts [match(clinical.dat$sjlid, NER.pathways$IID)]
@@ -236,6 +262,11 @@ clinical.dat$Qin_carriers.NER.pathways <- factor(ifelse(clinical.dat$Qin_Non.Ref
 NHEJ.pathways <- QIN.Pathways[grepl("NHEJ", QIN.Pathways$DNA_Repair_Pathway),]
 NHEJ.pathways <- NHEJ.pathways[!duplicated(NHEJ.pathways$VarKEY_IN_SJLIFE),]
 NHEJ.pathways <- QIN_vars[c(1,which(colnames(QIN_vars) %in% NHEJ.pathways$VarKEY_IN_SJLIFE))]
+# variants in SJLIFE
+ncol(NHEJ.pathways)-1
+# 18
+# variants in QIN
+# 18
 
 NHEJ.pathways$Qin_Non.Ref.Counts <- rowSums(NHEJ.pathways[-1]) 
 clinical.dat$Qin_Non.Ref.Counts.NHEJ.pathways <- NHEJ.pathways$Qin_Non.Ref.Counts [match(clinical.dat$sjlid, NHEJ.pathways$IID)]
@@ -363,7 +394,7 @@ ANY_SNs <- ANY_SNs[!ANY_SNs$sjlid %in% subneo.within5$sjlid,]
 # ###
 
 PHENO.ANY_SN <- clinical.dat
-PHENO.ANY_SN$ANY_SN <- ifelse(PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, "Y", "N")
+PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ANY_SNs[match(PHENO.ANY_SN$sjlid, ANY_SNs$sjli), c("gradedt", "AGE.ANY_SN")])
 
 # Found two duplicate samples with exact same values, removing them
@@ -455,9 +486,19 @@ table(SARCOMA$diaggrp)
 ################################
 ## Replicating Zhaoming et al ##
 ################################
+## Confirming that I am only taking survivors for the analysis
+wgs.pop.sjlife <- wgspop[grepl("SJLIFE", wgspop$wgs_cohort),]
+PHENO.ANY_SN <- PHENO.ANY_SN[PHENO.ANY_SN$sjlid %in% wgs.pop.sjlife$sjlid,]
+
 colnames(PHENO.ANY_SN)
 saved.PHENO.ANY_SN <- PHENO.ANY_SN
 
+
+###################################################
+
+## How many neoplasms?
+sum(subneo$sjlid %in% check.survivors$sjlid)
+# 1731
 # PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "gender", "agedx", "agelstcontact", "AnyRT", "anyrt_prim", "anyrt_5", "anyrt_10", "brainorheadrt_yn",
 #                                "brainrt_yn", "maxseg1dose", "maxseg2dose", "maxseg3dose", "maxseg4dose", "maxsegrtdose", "chestrt_yn",
 #                                "maxchestrtdose", "neckrt_yn", "maxneckrtdose", "pelvisrt_yn", "maxpelvisrtdose", "abdomenrt_yn", "maxabdrtdose",
@@ -469,13 +510,11 @@ saved.PHENO.ANY_SN <- PHENO.ANY_SN
 # PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "gender", "agedx", "agelstcontact", "brainrt_yn", "chestrt_yn", "neckrt_yn", "pelvisrt_yn", "abdomenrt_yn", 
 #                                "aa_class_dose_any", "epitxn_dose_any", "cisplat_dose_any", "aa_hvymtl_dose_any", "Zhaoming_carriers", "Qin_carriers", "PCA.ethnicity", "ANY_SN", "AGE.ANY_SN")]
 
-PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "gender", "agedx", "agelstcontact", "brainrt_yn", "maxsegrtdose", "chestrt_yn", "maxchestrtdose", "anthra_jco_dose_any","neckrt_yn", 
-                               "maxneckrtdose", "pelvisrt_yn", "maxpelvisrtdose","abdomenrt_yn", "maxabdrtdose", "aa_class_dose_any", "epitxn_dose_any",
-                               "cisplat_dose_any", "aa_hvymtl_dose_any", "Zhaoming_carriers", "Qin_carriers", "Qin_carriers.HR.pathways", "Qin_carriers.FA.pathways",
+PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "MRN", "gender", "agedx", "diaggrp", "agelstcontact", "AnyRT", "anyrt_5", "brainrt_yn", "maxsegrtdose", "chestrt_yn", "maxchestrtdose", "anthra_jco_dose_any", "anthra_jco_dose_5","neckrt_yn", 
+                               "maxneckrtdose", "pelvisrt_yn", "maxpelvisrtdose","abdomenrt_yn", "maxabdrtdose", "aa_class_dose_any", "aa_class_dose_5", "epitxn_dose_any", "epitxn_dose_5",
+                               "cisplat_dose_any", "cisplateq_dose_5", "aa_hvymtl_dose_any", "aa_hvymtl_dose_5", "Zhaoming_carriers", "Qin_carriers", "Qin_carriers.HR.pathways", "Qin_carriers.FA.pathways",
                                "Qin_carriers.MMR.pathways", "Qin_carriers.BER.pathways", "Qin_carriers.NER.pathways", "Qin_carriers.NHEJ.pathways", "PCA.ethnicity", "ANY_SN", "AGE.ANY_SN")]
 
-
-PHENO.ANY_SN$ANY_SN <- factor(PHENO.ANY_SN$ANY_SN, levels = c("N", "Y"))
 
 ## Age at diagnosis
 # PHENO.ANY_SN$agedx <- floor(PHENO.ANY_SN$agedx)
@@ -576,12 +615,21 @@ PHENO.ANY_SN$maxneckrtdose.category [is.na(PHENO.ANY_SN$maxneckrtdose)] <- "Unkn
 
 
 ## Alkylating agents (Y/N and Tertiles)
-PHENO.ANY_SN$Alkylating_agent_yn <-  factor(ifelse(PHENO.ANY_SN$aa_class_dose_any == 0, "N", "Y"))
+PHENO.ANY_SN$aa_class_dose_any_yn <-  factor(ifelse(PHENO.ANY_SN$aa_class_dose_any == 0, "N", "Y"))
 
 TERT = unname(quantile(PHENO.ANY_SN$aa_class_dose_any[PHENO.ANY_SN$aa_class_dose_any !=0], c(1/3, 2/3, 1), na.rm = T))
-PHENO.ANY_SN$Alkylating_agent.category <- cut(PHENO.ANY_SN$aa_class_dose_any, breaks = c(0, 0.001, TERT),
+PHENO.ANY_SN$aa_class_dose_any_yn.category <- cut(PHENO.ANY_SN$aa_class_dose_any, breaks = c(0, 0.001, TERT),
                                               labels = c("None", "1st", "2nd", "3rd"),
                                               include.lowest = TRUE)
+
+
+PHENO.ANY_SN$aa_class_dose_5_yn <-  factor(ifelse(PHENO.ANY_SN$aa_class_dose_5 == 0, "N", "Y"))
+
+TERT = unname(quantile(PHENO.ANY_SN$aa_class_dose_5[PHENO.ANY_SN$aa_class_dose_5 !=0], c(1/3, 2/3, 1), na.rm = T))
+PHENO.ANY_SN$aa_class_dose_5.category <- cut(PHENO.ANY_SN$aa_class_dose_5, breaks = c(0, 0.001, TERT),
+                                              labels = c("None", "1st", "2nd", "3rd"),
+                                              include.lowest = TRUE)
+
 
 
 ## Platinum agents (Y/N and Tertiles)
@@ -589,6 +637,13 @@ PHENO.ANY_SN$cisplat_dose_any_yn <- factor(ifelse(PHENO.ANY_SN$cisplat_dose_any 
 
 TERT = unname(quantile(PHENO.ANY_SN$cisplat_dose_any[PHENO.ANY_SN$cisplat_dose_any !=0], c(1/3, 2/3, 1), na.rm = T))
 PHENO.ANY_SN$cisplat_dose_any.category <- cut(PHENO.ANY_SN$cisplat_dose_any, breaks = c(0, 0.001, TERT),
+                                              labels = c("None", "1st", "2nd", "3rd"),
+                                              include.lowest = TRUE)
+
+PHENO.ANY_SN$cisplateq_dose_5_yn <- factor(ifelse(PHENO.ANY_SN$cisplateq_dose_5 == 0, "N", "Y"))
+
+TERT = unname(quantile(PHENO.ANY_SN$cisplateq_dose_5[PHENO.ANY_SN$cisplateq_dose_5 !=0], c(1/3, 2/3, 1), na.rm = T))
+PHENO.ANY_SN$cisplateq_dose_5.category <- cut(PHENO.ANY_SN$cisplateq_dose_5, breaks = c(0, 0.001, TERT),
                                               labels = c("None", "1st", "2nd", "3rd"),
                                               include.lowest = TRUE)
 
@@ -602,6 +657,14 @@ PHENO.ANY_SN$aa_hvymtl_dose_any.category <- cut(PHENO.ANY_SN$aa_hvymtl_dose_any,
                                               include.lowest = TRUE)
 
 
+PHENO.ANY_SN$aa_hvymtl_dose_5_yn <- factor(ifelse(PHENO.ANY_SN$aa_hvymtl_dose_5 == 0, "N", "Y"))
+
+TERT = unname(quantile(PHENO.ANY_SN$aa_hvymtl_dose_5[PHENO.ANY_SN$aa_hvymtl_dose_5 !=0], c(1/3, 2/3, 1), na.rm = T))
+PHENO.ANY_SN$aa_hvymtl_dose_5.category <- cut(PHENO.ANY_SN$aa_hvymtl_dose_5, breaks = c(0, 0.001, TERT),
+                                                labels = c("None", "1st", "2nd", "3rd"),
+                                                include.lowest = TRUE)
+
+
 ## Anthracyclines (Y/N and Tertiles)
 PHENO.ANY_SN$anthra_jco_dose_any_yn <- factor(ifelse(PHENO.ANY_SN$anthra_jco_dose_any == 0, "N", "Y"))
 
@@ -609,6 +672,14 @@ TERT = unname(quantile(PHENO.ANY_SN$anthra_jco_dose_any[PHENO.ANY_SN$anthra_jco_
 PHENO.ANY_SN$anthra_jco_dose_any.category <- cut(PHENO.ANY_SN$anthra_jco_dose_any, breaks = c(0, 0.001, TERT),
                                                 labels = c("None", "1st", "2nd", "3rd"),
                                                 include.lowest = TRUE)
+
+
+PHENO.ANY_SN$anthra_jco_dose_5_yn <- factor(ifelse(PHENO.ANY_SN$anthra_jco_dose_5 == 0, "N", "Y"))
+
+TERT = unname(quantile(PHENO.ANY_SN$anthra_jco_dose_5[PHENO.ANY_SN$anthra_jco_dose_5 !=0], c(1/3, 2/3, 1), na.rm = T))
+PHENO.ANY_SN$anthra_jco_dose_5.category <- cut(PHENO.ANY_SN$anthra_jco_dose_5, breaks = c(0, 0.001, TERT),
+                                                 labels = c("None", "1st", "2nd", "3rd"),
+                                                 include.lowest = TRUE)
 
 ## Epidophyllotoxin
 PHENO.ANY_SN$epitxn_dose_any_yn <- factor(ifelse(PHENO.ANY_SN$epitxn_dose_any == 0, "N", "Y"))
@@ -619,18 +690,26 @@ PHENO.ANY_SN$epitxn_dose_any.category <- cut(PHENO.ANY_SN$epitxn_dose_any, break
                                                 include.lowest = TRUE)
 
 
+PHENO.ANY_SN$epitxn_dose_5_yn <- factor(ifelse(PHENO.ANY_SN$epitxn_dose_5 == 0, "N", "Y"))
+
+TERT = unname(quantile(PHENO.ANY_SN$epitxn_dose_5[PHENO.ANY_SN$epitxn_dose_5 !=0], c(1/3, 2/3, 1), na.rm = T))
+PHENO.ANY_SN$epitxn_dose_5.category <- cut(PHENO.ANY_SN$epitxn_dose_5, breaks = c(0, 0.001, TERT),
+                                             labels = c("None", "1st", "2nd", "3rd"),
+                                             include.lowest = TRUE)
+
+
 PHENO.ANY_SN.EUR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'EUR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN))]
 
 ########################################
 ## MODEL TEST for Zhaoming's variants ##
 ########################################
 ## SJLIFE (ALL)
-# mod1 <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin + Alkylating_agent_yn + cisplat_dose_any_yn + aa_hvymtl_dose_any_yn, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+# mod1 <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin + aa_class_dose_any_yn + cisplat_dose_any_yn + aa_hvymtl_dose_any_yn, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 mod1 <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
 
 ## SJLIFE (EUR)
-# mod1.EUR <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin + Alkylating_agent_yn + cisplat_dose_any_yn + aa_hvymtl_dose_any_yn, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+# mod1.EUR <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin + aa_class_dose_any_yn + cisplat_dose_any_yn + aa_hvymtl_dose_any_yn, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 mod1.EUR <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 summary(mod1.EUR)
 
@@ -645,15 +724,36 @@ prop.test(prevalence.counts, 4507)
 ###################################
 
 ###########################
-## 1. Qin carriers (all) ##
+## 1. Qin baseline model ##
 ###########################
 ## SJLIFE (ALL) 
-# mod1 <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin + Alkylating_agent_yn + cisplat_dose_any_yn + aa_hvymtl_dose_any_yn, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+mod1 <- glm(ANY_SN ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+summary(mod1)
+estimates <- as.data.frame(summary(mod1)$coefficients)[c(1,2)]
+estimates$Estimate <- as.numeric(estimates$Estimate)
+estimates$RR <- round(exp(estimates$Estimate),2)
+## CI
+# exp(5.319e-01-(1.96*1.009e-01))
+# exp(5.319e-01+(1.96*1.009e-01))
+estimates$S.error <- as.numeric(as.character(estimates$`Std. Error`))
+CI <-  paste0("(", paste0(round(exp(estimates$Estimate - (1.96*estimates$S.error)),1), " to ", round(exp(estimates$Estimate + (1.96*estimates$S.error)),1)),")")
+
+estimates$RR <- paste(estimates$RR, CI, sep = " ")
+write.table(estimates, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Additional_files/estimates_Qin.txt", sep = "\t", col.names = T, row.names = T, quote = F)
+
+## SJLIFE (EUR)
+mod1.EUR <- glm(ANY_SN ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+summary(mod1.EUR)
+
+
+###########################
+## 2. Qin carriers (all) ##
+###########################
+## SJLIFE (ALL) 
 mod1 <- glm(ANY_SN ~ Qin_carriers + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
 
 ## SJLIFE (EUR)
-# mod1.EUR <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin + Alkylating_agent_yn + cisplat_dose_any_yn + aa_hvymtl_dose_any_yn, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 mod1.EUR <- glm(ANY_SN ~ Qin_carriers + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 summary(mod1.EUR)
 
@@ -701,15 +801,15 @@ prop.test(prevalence.counts, 4507)
 
 
 ####################
-## 2. HR Pathways ##
+## 3. HR Pathways ##
 ####################
 ## SJLIFE (ALL) 
-# mod1 <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin + Alkylating_agent_yn + cisplat_dose_any_yn + aa_hvymtl_dose_any_yn, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+
+
 mod1 <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
 
 ## SJLIFE (EUR)
-# mod1.EUR <- glm(ANY_SN ~ Zhaoming_carriers + AGE_AT_LAST_CONTACT + AGE_AT_DIAGNOSIS + gender + brainrt_yn + chestrt_yn + abdomenrt_yn + Epidophyllotoxin + Alkylating_agent_yn + cisplat_dose_any_yn + aa_hvymtl_dose_any_yn, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 mod1.EUR <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 summary(mod1.EUR)
 
@@ -798,6 +898,93 @@ table(ifelse(Zhaoming_vars.sjlife1$Zhaoming_Non.Ref.Counts > 0, "Y", "N"))
 prop.test(375,4132,correct=FALSE)
 
 
+
+
+
+##################################
+## Sanity check with Qin's data ##
+##################################
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/phenotype_cleaning_attr_fraction.RDATA")
+pheno.crosscheck <- PHENO.ANY_SN
+pheno.crosscheck <- pheno.crosscheck[mixedorder(pheno.crosscheck$sjlid),]
+qi.df <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_from_Qi_Liu/toyadav.sas7bdat")
+qi.df <- qi.df[mixedorder(qi.df$sjlid),]
+head(qi.df)
+qi.df.unique <- qi.df[!duplicated(qi.df$sjlid),]
+# length(unique(qi.df.unique$sjlid))
+# # 4402
+# sum(pheno.crosscheck$sjlid %in% qi.df.unique$sjlid)
+# # 4402
+# qi.df <- qi.df[!duplicated(qi.df$sjlid),]
+table(qi.df$MutationStatus)
+table(qi.df$sn)
+# 1263
+
+qi.df.SN <- qi.df[grepl(1, qi.df$sn),]
+dim(qi.df.SN)
+# 1263
+# Keeping unique rows
+qi.df.SN <- distinct(qi.df.SN)
+dim(qi.df.SN)
+
+
+
+qi.df.not.SN <- qi.df[!grepl(1, qi.df$sn),]
+dim(qi.df.not.SN)
+# 3911
+# 4402-3911 = 491
+
+# Extracting SNs for the first time from Qi's data
+qi.df.SN.filtered <- setDT(qi.df.SN)[,.SD[which.min(evaldt)],by=sjlid][order(evaldt, decreasing = FALSE)]
+dim(qi.df.SN.filtered)
+
+# Now merge back the data with SN and without SN 
+qi.df.final <- rbind.data.frame(qi.df.not.SN, qi.df.SN.filtered)
+dim(qi.df.final)
+qi.df.final <- qi.df.final[mixedorder(qi.df.final$sjlid),]
+
+paste0(as.numeric(table(qi.df.final$anyrt_5)[2]), ", ", as.numeric(table(pheno.crosscheck$anyrt_5)[2])) # anyrt_5
+# "2169, 2174"
+paste0(as.numeric(table(qi.df.final$brainrt_yn)[2]), ", ", as.numeric(table(pheno.crosscheck$brainrt_yn)[2])) # Brain
+# "858, 1095"
+paste0(as.numeric(table(qi.df.final$neckrt_yn)[2]), ", ", as.numeric(table(pheno.crosscheck$neckrt_yn)[2])) # Neck
+# "601, 797"
+paste0(as.numeric(table(qi.df.final$chest_yn)[2]), ", ", as.numeric(table(pheno.crosscheck$chestrt_yn)[2])) # Chest
+# 628, 861
+paste0(as.numeric(table(qi.df.final$abdomenrt_yn)[2]), ", ", as.numeric(table(pheno.crosscheck$abdomenrt_yn)[2])) # Abdomen
+# "567, 790"
+paste0(as.numeric(table(qi.df.final$pelvis_yn)[2]), ", ", as.numeric(table(pheno.crosscheck$pelvisrt_yn)[2])) # Pelvis
+# "506, 688"
+paste0(as.numeric(table(qi.df.final$aaclassic_5 ==1)[2]), ", ", as.numeric(table(pheno.crosscheck$aa_class_dose_5_yn)[2])) # Alkylating_5
+# "2480, 2473"
+
+
+paste0(as.numeric(table(qi.df.final$anthracyclines_5 > 0)[2]), ", ", as.numeric(table(pheno.crosscheck$anthra_jco_dose_5_yn)[2])) # Anthracyclines_5
+# "2455, 2451"
+paste0(as.numeric(table(qi.df.final$epipodophyllotoxins_5 > 0)[2]), ", ", as.numeric(table(pheno.crosscheck$epitxn_dose_5_yn)[2])) # Epipodophyllotoxins_5
+# "1496, 1488"
+
+# Age at diagnosis
+paste0(paste0(paste0( median(qi.df.final$agedx),  " (", paste0( quantile(qi.df.final$agedx, 1 / 4), "−",
+    quantile(qi.df.final$agedx, 3 / 4)), ")" )), ", ", paste0(paste0(
+      round(median(pheno.crosscheck$agedx), 2), " (", paste0(round(quantile( pheno.crosscheck$agedx, 1 / 4 ), 2), "−",
+        round(quantile( pheno.crosscheck$agedx, 3 / 4), 2), ")")))) 
+# "6.275 (2.79−12.525), 6.28 (2.79−12.52)"
+
+
+table(qi.df.final$diaggrp == pheno.crosscheck$diaggrp)
+# FALSE  TRUE 
+# 1087  3315
+
+pheno.crosscheck.SN.491 <- pheno.crosscheck[pheno.crosscheck$sjlid %in%  qi.df.SN.filtered$sjlid,]
+pheno.crosscheck.SN.491 <- pheno.crosscheck.SN.491[mixedorder(pheno.crosscheck.SN.491$sjlid),]
+table(pheno.crosscheck.SN.491$diaggrp == qi.df.SN.filtered$diaggrp)
+# FALSE  TRUE 
+# 376   115 
+
+pheno.crosscheck.not.SN <- pheno.crosscheck[pheno.crosscheck$sjlid %in%  qi.df.not.SN$sjlid,]
+pheno.crosscheck.not.SN <- pheno.crosscheck.not.SN[mixedorder(pheno.crosscheck.not.SN$sjlid),]
+table(pheno.crosscheck.not.SN$diaggrp == qi.df.not.SN$diaggrp)
 
 # lapply(list(wgspop, wgsdiag, subneo, radiation, drug, demog, adultbmi, adolhabits, adlthabits), dim)
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/phenotype_cleaning_attr_fraction.RDATA")
