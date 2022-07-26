@@ -814,8 +814,31 @@ mod1.EUR <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AG
 summary(mod1.EUR)
 
 
+#####################
+## 4. MMR Pathways ##
+#####################
+mod1 <- glm(ANY_SN ~ Qin_carriers.MMR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+summary(mod1)
 
+# tt <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$Qin_carriers.MMR.pathways),]
+## SJL5450006 seems to be missing in genetic data
 
+# tt <- tt[c("ANY_SN", "Qin_carriers.MMR.pathways", "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", "AGE_AT_DIAGNOSIS", "gender", "maxsegrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category", "epitxn_dose_any.category")]
+# 
+# mod1 <- glm(ANY_SN ~ Qin_carriers.MMR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_any.category, family = binomial(link = "logit"), data = tt)
+# summary(mod1)
+
+# sum(is.na(tt$Qin_carriers.MMR.pathways))
+# sum(is.na(tt$AGE_AT_LAST_CONTACT.cs1))
+# sum(is.na(tt$AGE_AT_LAST_CONTACT.cs2))
+# sum(is.na(tt$AGE_AT_LAST_CONTACT.cs3))
+# sum(is.na(tt$AGE_AT_LAST_CONTACT.cs4))
+# sum(is.na(tt$AGE_AT_DIAGNOSIS))
+# sum(is.na(tt$gender))
+# sum(is.na(tt$maxsegrtdose.category))
+# sum(is.na(tt$maxabdrtdose.category))
+# sum(is.na(tt$maxchestrtdose.category))
+# sum(is.na(tt$epitxn_dose_any.category))
 
 
 
@@ -975,6 +998,11 @@ paste0(paste0(paste0( median(qi.df.final$agedx),  " (", paste0( quantile(qi.df.f
 table(qi.df.final$diaggrp == pheno.crosscheck$diaggrp)
 # FALSE  TRUE 
 # 1087  3315
+
+table(qi.df.final$epitxn_dose)
+sum(is.na(qi.df.final$epipodophyllotoxins_5))
+# 10 
+qi.df.final[is.na(qi.df.final$epipodophyllotoxins_5),c("sjlid", "epipodophyllotoxins_5")]
 
 pheno.crosscheck.SN.491 <- pheno.crosscheck[pheno.crosscheck$sjlid %in%  qi.df.SN.filtered$sjlid,]
 pheno.crosscheck.SN.491 <- pheno.crosscheck.SN.491[mixedorder(pheno.crosscheck.SN.491$sjlid),]
