@@ -6,6 +6,20 @@ load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHE
 ## Subsequent Neoplasm ##
 #########################
 
+library(haven)
+library(benchmarkme)
+library(dplyr)
+library(plyr)
+library(data.table)
+library (birk)
+library(gtools)
+library(stringr)
+# library(tidyverse)
+library(lubridate)
+# benchmarkme::get_ram()
+
+
+
 subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
 head(subneo)
 table(subneo$diaggrp)
@@ -20,9 +34,9 @@ subneo$AGE.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gr
 # subneo$AGE.exact.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
 # subneo$AGE.ANY_SN <- floor(subneo$AGE.exact.ANY_SN)
 
+## These two dates should be the (almost) same
 subneo$AGE.ANY_SN.after.childhood.cancer <- time_length(interval(as.Date(subneo$diagdt), as.Date(subneo$gradedt)), "years")
 # subneo$AGE.ANY_SN.after.childhood.cancer <- floor(subneo$AGE.exact.ANY_SN.after.childhood.cancer)
-
 subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subneo$agedx
 
 
@@ -31,13 +45,6 @@ subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subne
 subneo.after5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5,]
 length(unique(subneo.after5$sjlid))
 # 619
-subneo.after5.sjlife1 <- subneo.after5[subneo.after5$sjlid %in% sjlife1.samples$V1,]
-length(unique(subneo.after5.sjlife1$sjlid))
-# 562
-
-subneo.after5.sjlife2 <- subneo.after5[subneo.after5$sjlid %in% sjlife2.samples$V1,]
-length(unique(subneo.after5.sjlife2$sjlid))
-# 45
 
 subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
 dim(subneo.within5)
@@ -55,6 +62,9 @@ ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decre
 ANY_SNs <- ANY_SNs[!ANY_SNs$sjlid %in% subneo.within5$sjlid,]
 dim(ANY_SNs)
 # 612
+PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
+# PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ANY_SNs[match(PHENO.ANY_SN$sjlid, ANY_SNs$sjlid), c("gradedt", "AGE.ANY_SN")])
+
 ##############
 ## Any SMNs ##
 ##############
@@ -69,6 +79,9 @@ table(SMNs$diaggrp)
 SMNs <- SMNs[!SMNs$sjlid %in% subneo.within5$sjlid,]
 nrow(SMNs)
 # 459
+PHENO.ANY_SN$SMNs <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% SMNs$sjlid, 0, 1))
+# PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, SMNs[match(PHENO.ANY_SN$sjlid, SMNs$sjlid), c("gradedt", "AGE.ANY_SN")])
+
 ###########
 ## NMSCs ##
 ###########
@@ -83,6 +96,8 @@ table(NMSCs$diaggrp)
 NMSCs <- NMSCs[!NMSCs$sjlid %in% subneo.within5$sjlid,]
 nrow(NMSCs)
 # 252
+PHENO.ANY_SN$NMSCs <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% NMSCs$sjlid, 0, 1))
+# PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, NMSCs[match(PHENO.ANY_SN$sjlid, NMSCs$sjlid), c("gradedt", "AGE.ANY_SN")])
 
 ###################
 ## Breast cancer ##
@@ -95,6 +110,8 @@ nrow(THYROIDcancer)
 BREASTcancer <- BREASTcancer[!BREASTcancer$sjlid %in% subneo.within5$sjlid,]
 nrow(BREASTcancer)
 # 77
+PHENO.ANY_SN$BREASTcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% BREASTcancer$sjlid, 0, 1))
+# PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, BREASTcancer[match(PHENO.ANY_SN$sjlid, BREASTcancer$sjlid), c("gradedt", "AGE.ANY_SN")])
 
 ##################
 ## Thyroid cancer
@@ -105,6 +122,9 @@ nrow(THYROIDcancer)
 # Removing samples with SNs within 5 years of childhood cancer
 THYROIDcancer <- THYROIDcancer[!THYROIDcancer$sjlid %in% subneo.within5$sjlid,]
 nrow(THYROIDcancer)
+# 86
+PHENO.ANY_SN$THYROIDcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% THYROIDcancer$sjlid, 0, 1))
+# PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, THYROIDcancer[match(PHENO.ANY_SN$sjlid, THYROIDcancer$sjlid), c("gradedt", "AGE.ANY_SN")])
 
 
 ###############
@@ -117,6 +137,9 @@ nrow(MENINGIOMA)
 # Removing samples with SNs within 5 years of childhood cancer
 MENINGIOMA <- MENINGIOMA[!MENINGIOMA$sjlid %in% subneo.within5$sjlid,]
 nrow(MENINGIOMA)
+# 150
+PHENO.ANY_SN$MENINGIOMA <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% MENINGIOMA$sjlid, 0, 1))
+# PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, MENINGIOMA[match(PHENO.ANY_SN$sjlid, MENINGIOMA$sjlid), c("gradedt", "AGE.ANY_SN")])
 
 #############
 ## Sarcoma ##
@@ -129,15 +152,8 @@ nrow(SARCOMA)
 SARCOMA <- SARCOMA[!SARCOMA$sjlid %in% subneo.within5$sjlid,]
 nrow(SARCOMA)
 # 33
-
-#####################
-## Add SN variable ##
-#####################
-# 1. Any SN
-
-PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
-PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ANY_SNs[match(PHENO.ANY_SN$sjlid, ANY_SNs$sjli), c("gradedt", "AGE.ANY_SN")])
-
+PHENO.ANY_SN$SARCOMA <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% SARCOMA$sjlid, 0, 1))
+# PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, SARCOMA[match(PHENO.ANY_SN$sjlid, SARCOMA$sjlid), c("gradedt", "AGE.ANY_SN")])
 
 
 ########################################
