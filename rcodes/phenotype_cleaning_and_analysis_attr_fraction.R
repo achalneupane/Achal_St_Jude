@@ -570,8 +570,8 @@ PHENO.ANY_SN$pelvisrt_yn <- factor(PHENO.ANY_SN$pelvisrt_yn, levels = c("N", "Y"
 ####################
 ## Maxsegrtdose (Cranial RT)
 PHENO.ANY_SN$maxsegrtdose.category <- cut(PHENO.ANY_SN$maxsegrtdose, breaks = c(0, 200, 1799, 2999, max(PHENO.ANY_SN$maxsegrtdose, na.rm = T)),
-    labels = c("None", ">0-<18", ">=18-<30", ">=30"),
-    include.lowest = TRUE)
+                                          labels = c("None", ">0-<18", ">=18-<30", ">=30"),
+                                          include.lowest = TRUE)
 levels(PHENO.ANY_SN$maxsegrtdose.category) <- c(levels(PHENO.ANY_SN$maxsegrtdose.category), "Unknown")
 PHENO.ANY_SN$maxsegrtdose.category [is.na(PHENO.ANY_SN$maxsegrtdose)] <- "Unknown"
 # ## Sanity check
@@ -591,23 +591,23 @@ PHENO.ANY_SN$maxabdrtdose.category [is.na(PHENO.ANY_SN$maxabdrtdose)] <- "Unknow
 
 ## Pelvis RT
 PHENO.ANY_SN$maxpelvisrtdose.category <- cut(PHENO.ANY_SN$maxpelvisrtdose, breaks = c(0, 200, 1999, max(PHENO.ANY_SN$maxpelvisrtdose, na.rm = T)),
-                                          labels = c("None", ">0-<20", ">=20"),
-                                          include.lowest = TRUE)
+                                             labels = c("None", ">0-<20", ">=20"),
+                                             include.lowest = TRUE)
 levels(PHENO.ANY_SN$maxpelvisrtdose.category) <- c(levels(PHENO.ANY_SN$maxpelvisrtdose.category), "Unknown")
 PHENO.ANY_SN$maxpelvisrtdose.category [is.na(PHENO.ANY_SN$maxpelvisrtdose)] <- "Unknown"
 
 ## Chest RT
 PHENO.ANY_SN$maxchestrtdose.category <- cut(PHENO.ANY_SN$maxchestrtdose, breaks = c(0, 200, 1999, max(PHENO.ANY_SN$maxchestrtdose, na.rm = T)),
-                                             labels = c("None", ">0-<20", ">=20"),
-                                             include.lowest = TRUE)
+                                            labels = c("None", ">0-<20", ">=20"),
+                                            include.lowest = TRUE)
 levels(PHENO.ANY_SN$maxchestrtdose.category) <- c(levels(PHENO.ANY_SN$maxchestrtdose.category), "Unknown")
 PHENO.ANY_SN$maxchestrtdose.category [is.na(PHENO.ANY_SN$maxchestrtdose)] <- "Unknown"
 
 
 ## Neck RT
 PHENO.ANY_SN$maxneckrtdose.category <- cut(PHENO.ANY_SN$maxneckrtdose, breaks = c(0, 200, 1099, 1999, 2999, max(PHENO.ANY_SN$maxneckrtdose, na.rm = T)),
-                                          labels = c("None", ">0-<11", ">=11-<20", ">=20-<30", ">=30"),
-                                          include.lowest = TRUE)
+                                           labels = c("None", ">0-<11", ">=11-<20", ">=20-<30", ">=30"),
+                                           include.lowest = TRUE)
 levels(PHENO.ANY_SN$maxneckrtdose.category) <- c(levels(PHENO.ANY_SN$maxneckrtdose.category), "Unknown")
 PHENO.ANY_SN$maxneckrtdose.category [is.na(PHENO.ANY_SN$maxneckrtdose)] <- "Unknown"
 
@@ -619,8 +619,8 @@ PHENO.ANY_SN$aa_class_dose_any_yn <-  factor(ifelse(PHENO.ANY_SN$aa_class_dose_a
 
 TERT = unname(quantile(PHENO.ANY_SN$aa_class_dose_any[PHENO.ANY_SN$aa_class_dose_any !=0], c(1/3, 2/3, 1), na.rm = T))
 PHENO.ANY_SN$aa_class_dose_any.category <- cut(PHENO.ANY_SN$aa_class_dose_any, breaks = c(0, 0.001, TERT),
-                                              labels = c("None", "1st", "2nd", "3rd"),
-                                              include.lowest = TRUE)
+                                               labels = c("None", "1st", "2nd", "3rd"),
+                                               include.lowest = TRUE)
 levels(PHENO.ANY_SN$aa_class_dose_any.category) <- c(levels(PHENO.ANY_SN$aa_class_dose_any.category), "Unknown")
 PHENO.ANY_SN$aa_class_dose_any.category [is.na(PHENO.ANY_SN$aa_class_dose_any.category)] <- "Unknown"
 
@@ -629,8 +629,8 @@ PHENO.ANY_SN$aa_class_dose_5_yn <-  factor(ifelse(PHENO.ANY_SN$aa_class_dose_5 =
 
 TERT = unname(quantile(PHENO.ANY_SN$aa_class_dose_5[PHENO.ANY_SN$aa_class_dose_5 !=0], c(1/3, 2/3, 1), na.rm = T))
 PHENO.ANY_SN$aa_class_dose_5.category <- cut(PHENO.ANY_SN$aa_class_dose_5, breaks = c(0, 0.001, TERT),
-                                              labels = c("None", "1st", "2nd", "3rd"),
-                                              include.lowest = TRUE)
+                                             labels = c("None", "1st", "2nd", "3rd"),
+                                             include.lowest = TRUE)
 levels(PHENO.ANY_SN$aa_class_dose_5.category) <- c(levels(PHENO.ANY_SN$aa_class_dose_5.category), "Unknown")
 PHENO.ANY_SN$aa_class_dose_5.category [is.na(PHENO.ANY_SN$aa_class_dose_5.category)] <- "Unknown"
 
@@ -661,8 +661,8 @@ PHENO.ANY_SN$aa_hvymtl_dose_any_yn <- factor(ifelse(PHENO.ANY_SN$aa_hvymtl_dose_
 
 TERT = unname(quantile(PHENO.ANY_SN$aa_hvymtl_dose_any[PHENO.ANY_SN$aa_hvymtl_dose_any !=0], c(1/3, 2/3, 1), na.rm = T))
 PHENO.ANY_SN$aa_hvymtl_dose_any.category <- cut(PHENO.ANY_SN$aa_hvymtl_dose_any, breaks = c(0, 0.001, TERT),
-                                              labels = c("None", "1st", "2nd", "3rd"),
-                                              include.lowest = TRUE)
+                                                labels = c("None", "1st", "2nd", "3rd"),
+                                                include.lowest = TRUE)
 levels(PHENO.ANY_SN$aa_hvymtl_dose_any.category) <- c(levels(PHENO.ANY_SN$aa_hvymtl_dose_any.category), "Unknown")
 PHENO.ANY_SN$aa_hvymtl_dose_any.category [is.na(PHENO.ANY_SN$aa_hvymtl_dose_any.category)] <- "Unknown"
 
@@ -671,8 +671,8 @@ PHENO.ANY_SN$aa_hvymtl_dose_5_yn <- factor(ifelse(PHENO.ANY_SN$aa_hvymtl_dose_5 
 
 TERT = unname(quantile(PHENO.ANY_SN$aa_hvymtl_dose_5[PHENO.ANY_SN$aa_hvymtl_dose_5 !=0], c(1/3, 2/3, 1), na.rm = T))
 PHENO.ANY_SN$aa_hvymtl_dose_5.category <- cut(PHENO.ANY_SN$aa_hvymtl_dose_5, breaks = c(0, 0.001, TERT),
-                                                labels = c("None", "1st", "2nd", "3rd"),
-                                                include.lowest = TRUE)
+                                              labels = c("None", "1st", "2nd", "3rd"),
+                                              include.lowest = TRUE)
 levels(PHENO.ANY_SN$aa_hvymtl_dose_5.category) <- c(levels(PHENO.ANY_SN$aa_hvymtl_dose_5.category), "Unknown")
 PHENO.ANY_SN$aa_hvymtl_dose_5.category [is.na(PHENO.ANY_SN$aa_hvymtl_dose_5.category)] <- "Unknown"
 
@@ -682,8 +682,8 @@ PHENO.ANY_SN$anthra_jco_dose_any_yn <- factor(ifelse(PHENO.ANY_SN$anthra_jco_dos
 
 TERT = unname(quantile(PHENO.ANY_SN$anthra_jco_dose_any[PHENO.ANY_SN$anthra_jco_dose_any !=0], c(1/3, 2/3, 1), na.rm = T))
 PHENO.ANY_SN$anthra_jco_dose_any.category <- cut(PHENO.ANY_SN$anthra_jco_dose_any, breaks = c(0, 0.001, TERT),
-                                                labels = c("None", "1st", "2nd", "3rd"),
-                                                include.lowest = TRUE)
+                                                 labels = c("None", "1st", "2nd", "3rd"),
+                                                 include.lowest = TRUE)
 levels(PHENO.ANY_SN$anthra_jco_dose_any.category) <- c(levels(PHENO.ANY_SN$anthra_jco_dose_any.category), "Unknown")
 PHENO.ANY_SN$anthra_jco_dose_any.category [is.na(PHENO.ANY_SN$anthra_jco_dose_any.category)] <- "Unknown"
 
@@ -692,8 +692,8 @@ PHENO.ANY_SN$anthra_jco_dose_5_yn <- factor(ifelse(PHENO.ANY_SN$anthra_jco_dose_
 
 TERT = unname(quantile(PHENO.ANY_SN$anthra_jco_dose_5[PHENO.ANY_SN$anthra_jco_dose_5 !=0], c(1/3, 2/3, 1), na.rm = T))
 PHENO.ANY_SN$anthra_jco_dose_5.category <- cut(PHENO.ANY_SN$anthra_jco_dose_5, breaks = c(0, 0.001, TERT),
-                                                 labels = c("None", "1st", "2nd", "3rd"),
-                                                 include.lowest = TRUE)
+                                               labels = c("None", "1st", "2nd", "3rd"),
+                                               include.lowest = TRUE)
 levels(PHENO.ANY_SN$anthra_jco_dose_5.category) <- c(levels(PHENO.ANY_SN$anthra_jco_dose_5.category), "Unknown")
 PHENO.ANY_SN$anthra_jco_dose_5.category [is.na(PHENO.ANY_SN$anthra_jco_dose_5.category)] <- "Unknown"
 
@@ -703,8 +703,8 @@ PHENO.ANY_SN$epitxn_dose_any_yn <- factor(ifelse(PHENO.ANY_SN$epitxn_dose_any ==
 
 TERT = unname(quantile(PHENO.ANY_SN$epitxn_dose_any[PHENO.ANY_SN$epitxn_dose_any !=0], c(1/3, 2/3, 1), na.rm = T))
 PHENO.ANY_SN$epitxn_dose_any.category <- cut(PHENO.ANY_SN$epitxn_dose_any, breaks = c(0, 0.001, TERT),
-                                                labels = c("None", "1st", "2nd", "3rd"),
-                                                include.lowest = TRUE)
+                                             labels = c("None", "1st", "2nd", "3rd"),
+                                             include.lowest = TRUE)
 levels(PHENO.ANY_SN$epitxn_dose_any.category) <- c(levels(PHENO.ANY_SN$epitxn_dose_any.category), "Unknown")
 PHENO.ANY_SN$epitxn_dose_any.category [is.na(PHENO.ANY_SN$epitxn_dose_any.category)] <- "Unknown"
 
@@ -713,8 +713,8 @@ PHENO.ANY_SN$epitxn_dose_5_yn <- factor(ifelse(PHENO.ANY_SN$epitxn_dose_5 == 0, 
 
 TERT = unname(quantile(PHENO.ANY_SN$epitxn_dose_5[PHENO.ANY_SN$epitxn_dose_5 !=0], c(1/3, 2/3, 1), na.rm = T))
 PHENO.ANY_SN$epitxn_dose_5.category <- cut(PHENO.ANY_SN$epitxn_dose_5, breaks = c(0, 0.001, TERT),
-                                             labels = c("None", "1st", "2nd", "3rd"),
-                                             include.lowest = TRUE)
+                                           labels = c("None", "1st", "2nd", "3rd"),
+                                           include.lowest = TRUE)
 levels(PHENO.ANY_SN$epitxn_dose_5.category) <- c(levels(PHENO.ANY_SN$epitxn_dose_5.category), "Unknown")
 PHENO.ANY_SN$epitxn_dose_5.category [is.na(PHENO.ANY_SN$epitxn_dose_5.category)] <- "Unknown"
 
@@ -909,11 +909,11 @@ library(expss)
 
 CROSS_CASES.df <- PHENO.ANY_SN[c("ANY_SN", "Zhaoming_carriers" , "AGE_AT_LAST_CONTACT", "AGE_AT_DIAGNOSIS", "gender", "brainrt_yn", "chestrt_yn", "abdomenrt_yn", "Epidophyllotoxin")]
 CROSS_CASES.df <- apply_labels(CROSS_CASES.df,
-             ANY_SN = "ANY_SN", Zhaoming_carriers = "Zhaoming_carriers", AGE_AT_LAST_CONTACT = "AGE_AT_LAST_CONTACT",
-             AGE_AT_DIAGNOSIS = "AGE_AT_DIAGNOSIS", gender = "gender", brainrt_yn  = "brainrt_yn", chestrt_yn = "chestrt_yn", abdomenrt_yn = "abdomenrt_yn", Epidophyllotoxin = "Epidophyllotoxin")
+                               ANY_SN = "ANY_SN", Zhaoming_carriers = "Zhaoming_carriers", AGE_AT_LAST_CONTACT = "AGE_AT_LAST_CONTACT",
+                               AGE_AT_DIAGNOSIS = "AGE_AT_DIAGNOSIS", gender = "gender", brainrt_yn  = "brainrt_yn", chestrt_yn = "chestrt_yn", abdomenrt_yn = "abdomenrt_yn", Epidophyllotoxin = "Epidophyllotoxin")
 
 CROSS_CASES.df %>%
-cross_cases(ANY_SN, list(Zhaoming_carriers , AGE_AT_LAST_CONTACT, AGE_AT_DIAGNOSIS, gender, brainrt_yn, chestrt_yn, abdomenrt_yn, Epidophyllotoxin))
+  cross_cases(ANY_SN, list(Zhaoming_carriers , AGE_AT_LAST_CONTACT, AGE_AT_DIAGNOSIS, gender, brainrt_yn, chestrt_yn, abdomenrt_yn, Epidophyllotoxin))
 # cross_cases(PHENO.ANY_SN, ANY_SN, list(Zhaoming_carriers , AGE_AT_LAST_CONTACT, AGE_AT_DIAGNOSIS, gender, brainrt_yn, chestrt_yn, abdomenrt_yn, Epidophyllotoxin))
 
 
@@ -1009,11 +1009,11 @@ paste0(table(qi.df.final$epipodophyllotoxins_5 > 0)[2], ", ", table(pheno.crossc
 # "1496, 1488"
 
 # Age at diagnosis
-paste0(paste0(paste0( median(qi.df.final$agedx),  " (", paste0( quantile(qi.df.final$agedx, 1 / 4), "−",
-    quantile(qi.df.final$agedx, 3 / 4)), ")" )), ", ", paste0(paste0(
-      round(median(pheno.crosscheck$agedx), 2), " (", paste0(round(quantile( pheno.crosscheck$agedx, 1 / 4 ), 2), "−",
+paste0(paste0(paste0( median(qi.df.final$agedx),  " (", paste0( quantile(qi.df.final$agedx, 1 / 4), "???",
+        quantile(qi.df.final$agedx, 3 / 4)), ")" )), ", ", paste0(paste0(
+        round(median(pheno.crosscheck$agedx), 2), " (", paste0(round(quantile( pheno.crosscheck$agedx, 1 / 4 ), 2), "???",
         round(quantile( pheno.crosscheck$agedx, 3 / 4), 2), ")")))) 
-# "6.275 (2.79−12.525), 6.28 (2.79−12.52)"
+# "6.275 (2.79???12.525), 6.28 (2.79???12.52)"
 
 
 table(qi.df.final$diaggrp == pheno.crosscheck$diaggrp)

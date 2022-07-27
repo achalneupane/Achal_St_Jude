@@ -564,6 +564,26 @@ plink --bfile Zhaoming_et_al_all_vars_final --recodeA --out Zhaoming_et_al_all_v
 # n otherwords, the default for the additive recoding is to count the number of minor alleles per person. The --recodeAD option produces both an additive and dominance coding: use --recodeA instead to skip the SNP_HET coding.
 # The --recodeAD option saves the data to a single file
 
+
+##################################
+## Extract P/LP in TTN and BAG3 ##
+##################################
+module load bcftools
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3
+bcftools view -Oz MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr2.preQC_biallelic_renamed_ID_edited.vcf.gz -R TTN_LP.bed > TTN_LP.vcf.gz
+bcftools view -Oz MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr10.preQC_biallelic_renamed_ID_edited.vcf.gz -R BAG3_LP.bed > BAG3_LP.vcf.gz
+
+########################
+## Hallmark of cancer ##
+########################
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/genetic_data/hallmark_of_cancer
+module load bcftools/1.9
+module load plink/1.90b
+
+
+
+
+
 ## Therefore, --recodeA is the right option to get the carriers; homozygous reference is coded as 0; heterozygous is coded as 1; homozygous alternate is coded as 2
 ####################################################################
 ## check variants from  SNPeff in Zhaoming and Qin et al's papers ##

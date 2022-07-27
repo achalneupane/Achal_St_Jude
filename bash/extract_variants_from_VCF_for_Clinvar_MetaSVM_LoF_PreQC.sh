@@ -1,4 +1,7 @@
 #!/usr/bin/bash
+##############################
+## All P/LP from Pre-QC VCF ##
+##############################
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/annotated_variants/annotated_vars_from_PreQC_VCF_Clinvar_MetaSVM_LoF
 
 module load bcftools/1.9
