@@ -5,7 +5,10 @@ load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHE
 ##############
 ## ADD P/LP ##
 ##############
-# 1. Hallmark of Cancer
+# 1. Variable with carriers status for Zhaoming and Qin's variants have been already added in 1_demographics.r
+
+# 2. Hallmark of Cancer
+
 
 
 #########################
