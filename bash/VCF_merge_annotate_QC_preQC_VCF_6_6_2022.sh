@@ -576,9 +576,7 @@ bcftools view -Oz MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr10.preQC_biallelic_renamed_
 ########################
 ## Hallmark of cancer ##
 ########################
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/genetic_data/hallmark_of_cancer
-module load bcftools/1.9
-module load plink/1.90b
+# Used R code 2_genetic_data_P_LP.R
 
 
 
