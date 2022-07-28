@@ -1,7 +1,7 @@
 #########################
 ## Load Phenotype data ##
 #########################
-# Note: I had to run this on HPC. The datasets are too big to handle
+# Note: I had to run this on HPC. The datasets are too big to handle; Some of the variables loaded here are derived from this code: variants_counts_preQC_VCF_06_13_2022.R
 
 library(data.table)
 library(stringr)
@@ -23,7 +23,11 @@ P_LP.extracted <- P_LP.extracted[-grep("FID|PAT|MAT|SEX|PHENOTYPE", colnames(P_L
 # edit column names
 colnames(P_LP.extracted) <- str_split(gsub("\\.", ":", colnames(P_LP.extracted)), "_", simplify=T)[,1]
 
-
+################################
+## Zhaoming and Qins variants ##
+################################
+zhaoming.qin.variants <- unique(c(colnames(Zhaoming_vars), colnames(QIN_vars)))
+zhaoming.qin.variants <- zhaoming.qin.variants[grepl("^chr", zhaoming.qin.variants)]
 ##############
 ## ADD P/LP ##
 ##############
@@ -33,9 +37,9 @@ colnames(P_LP.extracted) <- str_split(gsub("\\.", ":", colnames(P_LP.extracted))
 
 # 3. All P/LP
 
-#################################
-## 2. Hallmark of Cancer genes ##
-#################################
+##################################
+## 2.a Hallmark of Cancer genes ##
+##################################
 ## 1. With CliniVar and LOF
 # hallmark.cancer <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/41467_2020_16293_MOESM4_ESM.txt", sep = "\t")
 hallmark.cancer <- read.delim("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/41467_2020_16293_MOESM4_ESM.txt", sep = "\t")
@@ -94,19 +98,114 @@ hallmark.cancer.clinvar.LoF.MetaSVM.PL <- cbind.data.frame(IID = hallmark.cancer
                                                            hallmark.cancer.clinvar.LoF.MetaSVM_carriers = hallmark.cancer.clinvar.LoF.MetaSVM.PL$hallmark.cancer.clinvar.LoF.MetaSVM_carriers)
 
 
-
-
-
 hallmark.of.cancer.carriers <- cbind.data.frame(hallmark.cancer.clinvar.LoF.PL, hallmark.cancer.clinvar.LoF.MetaSVM.PL[match(hallmark.cancer.clinvar.LoF.PL$IID, hallmark.cancer.clinvar.LoF.MetaSVM.PL$IID),-1])
 
 
-#####################################
-## 3. Pathogenic/Likely Pathogenic ##
-#####################################
+###########################################
+## 2.b Without zhaoming and Qin variants ##
+###########################################
+## 1. With CliniVar and LOF
+# hallmark.cancer <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/41467_2020_16293_MOESM4_ESM.txt", sep = "\t")
+hallmark.cancer <- read.delim("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/41467_2020_16293_MOESM4_ESM.txt", sep = "\t")
+dim(hallmark.cancer)
+# 1558
+sum(CLINVAR.unique$`ANN[*].GENE` %in% hallmark.cancer$Adaptive_immunity)
+# 622
+hallmark.cancer.clinvar <- CLINVAR.unique[CLINVAR.unique$`ANN[*].GENE` %in% hallmark.cancer$Adaptive_immunity,]
+
+sum(LoF.unique$`ANN[*].GENE` %in% hallmark.cancer$Adaptive_immunity)
+# 21172
+hallmark.cancer.LoF <- LoF.unique[LoF.unique$`ANN[*].GENE` %in% hallmark.cancer$Adaptive_immunity,]
+hallmark.cancer.clinvar.LoF <- rbind.data.frame(hallmark.cancer.clinvar, hallmark.cancer.LoF)
+dim(hallmark.cancer.clinvar.LoF)
+# 21794
+hallmark.cancer.clinvar.LoF <- hallmark.cancer.clinvar.LoF[!duplicated(hallmark.cancer.clinvar.LoF$KEY),]
+dim(hallmark.cancer.clinvar.LoF)
+# 21367
+
+sum(hallmark.cancer.clinvar.LoF$KEY %in% colnames(P_LP.extracted))
+# 21367
+
+
+hallmark.cancer.clinvar.LoF.PL <- P_LP.extracted[c(1, which(colnames(P_LP.extracted) %in% hallmark.cancer.clinvar.LoF$KEY))]
+
+## Exclude Zhaoming's and Qin's variants
+hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants <- hallmark.cancer.clinvar.LoF.PL[!colnames(hallmark.cancer.clinvar.LoF.PL) %in% zhaoming.qin.variants]
+
+hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.without.Zhaoming.Qin_variants.Non.Ref.Counts <- rowSums(hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants[!(colnames(hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants) %in% "IID")], na.rm = T) 
+hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.without.Zhaoming.Qin.variants_carriers <- factor(ifelse(hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.without.Zhaoming.Qin_variants.Non.Ref.Counts == 0, "N", "Y"))
+hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.without.Zhaoming.Qin.variants_carriers  <- factor(hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.without.Zhaoming.Qin.variants_carriers, levels = c("N", "Y"))
+hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants <- cbind.data.frame(IID = hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants$IID,
+                                                   hallmark.cancer.clinvar.LoF.without.Zhaoming.Qin_variants.Non.Ref.Counts = hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.without.Zhaoming.Qin_variants.Non.Ref.Counts, 
+                                                   hallmark.cancer.clinvar.LoF.without.Zhaoming.Qin.variants_carriers = hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.without.Zhaoming.Qin.variants_carriers)
+
+
+
+# 2. With CliniVar, LoF and MetaSVM
+sum(MetaSVM.unique$`ANN[*].GENE` %in% hallmark.cancer$Adaptive_immunity)
+# 10311
+hallmark.cancer.MetaSVM <- MetaSVM.unique[MetaSVM.unique$`ANN[*].GENE` %in% hallmark.cancer$Adaptive_immunity,]
+
+##
+hallmark.cancer.clinvar.LoF.MetaSVM <- rbind.data.frame(hallmark.cancer.clinvar, hallmark.cancer.LoF,hallmark.cancer.MetaSVM)
+dim(hallmark.cancer.clinvar.LoF.MetaSVM)
+# 32105
+hallmark.cancer.clinvar.LoF.MetaSVM <- hallmark.cancer.clinvar.LoF.MetaSVM[!duplicated(hallmark.cancer.clinvar.LoF.MetaSVM$KEY),]
+dim(hallmark.cancer.clinvar.LoF.MetaSVM)
+# 31117
+
+sum(hallmark.cancer.clinvar.LoF.MetaSVM$KEY %in% colnames(P_LP.extracted))
+# 31117
+hallmark.cancer.clinvar.LoF.MetaSVM.PL <- P_LP.extracted[c(1, which(colnames(P_LP.extracted) %in% hallmark.cancer.clinvar.LoF.MetaSVM$KEY))]
+
+## Exclude Zhaoming's and Qin's variants
+hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants <- hallmark.cancer.clinvar.LoF.MetaSVM.PL[!colnames(hallmark.cancer.clinvar.LoF.MetaSVM.PL) %in% zhaoming.qin.variants]
+
+hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.MetaSVM.without.Zhaoming.Qin_variants.Non.Ref.Counts <- rowSums(hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants[!(colnames(hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants) %in% "IID")], na.rm = T) 
+hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.MetaSVM.without.Zhaoming.Qin.variants_carriers <- factor(ifelse(hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.MetaSVM.without.Zhaoming.Qin_variants.Non.Ref.Counts == 0, "N", "Y"))
+hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.MetaSVM.without.Zhaoming.Qin.variants_carriers  <- factor(hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.MetaSVM.without.Zhaoming.Qin.variants_carriers, levels = c("N", "Y"))
+hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants <- cbind.data.frame(IID = hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants$IID,
+                                                                                 hallmark.cancer.clinvar.LoF.MetaSVM.without.Zhaoming.Qin_variants.Non.Ref.Counts = hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.MetaSVM.without.Zhaoming.Qin_variants.Non.Ref.Counts, 
+                                                                                 hallmark.cancer.clinvar.LoF.MetaSVM.without.Zhaoming.Qin.variants_carriers = hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.MetaSVM.without.Zhaoming.Qin.variants_carriers)
 
 
 
 
+
+hallmark.of.cancer_without.zhaoming.qin.variants.carriers <- cbind.data.frame(hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants, hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants[match(hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants$IID, hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants$IID),-1])
+
+hallmark.of.cancer.carriers <- cbind.data.frame(hallmark.of.cancer.carriers, hallmark.of.cancer_without.zhaoming.qin.variants.carriers[match(hallmark.of.cancer.carriers$IID, hallmark.of.cancer_without.zhaoming.qin.variants.carriers$IID),-1])
+
+
+
+######################################
+## 3.a Pathogenic/Likely Pathogenic ##
+######################################
+# 1. Clinvar and LoF
+All.P.LP.clinvars.LoF <- unique(c(CLINVAR.unique$KEY, LoF.unique$KEY))
+sum(All.P.LP.clinvars.LoF %in% colnames(P_LP.extracted))
+# 318253
+All.P.LP.clinvars.LoF <- P_LP.extracted[c(1, which(colnames(P_LP.extracted) %in% All.P.LP.clinvars.LoF))]
+All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF.Non.Ref.Counts <- rowSums(All.P.LP.clinvars.LoF[!(colnames(All.P.LP.clinvars.LoF) %in% "IID")], na.rm = T) 
+All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF_carriers <- factor(ifelse(All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF.Non.Ref.Counts == 0, "N", "Y"))
+All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF_carriers  <- factor(All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF_carriers, levels = c("N", "Y"))
+
+# 2. Clinvar, LoF and MetaSVM                          
+All.P.LP.clinvars.LoF <- unique(c(CLINVAR.unique$KEY, LoF.unique$KEY, MetaSVM.unique$KEY))
+sum(All.P.LP.clinvars.LoF %in% colnames(P_LP.extracted))
+# 318253
+All.P.LP.clinvars.LoF <- P_LP.extracted[c(1, which(colnames(P_LP.extracted) %in% All.P.LP.clinvars.LoF))]
+All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF.Non.Ref.Counts <- rowSums(All.P.LP.clinvars.LoF[!(colnames(All.P.LP.clinvars.LoF) %in% "IID")], na.rm = T) 
+All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF_carriers <- factor(ifelse(All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF.Non.Ref.Counts == 0, "N", "Y"))
+All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF_carriers  <- factor(All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF_carriers, levels = c("N", "Y"))
+
+
+
+
+################################################
+## Without any previously identified variants ##
+################################################
+# This is after removing Zhaoming, Qin's and Hallmark of cancer variants
 
 
 #########################
