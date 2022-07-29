@@ -19,6 +19,12 @@ PHENO.ANY_SN$Meningiom_Claus_PRS <-  meningioma_Claus$SCORE [match(PHENO.ANY_SN$
 Meningioma_Dobbins <- read.table("Meningioma_Dobbins_prs.profile", header = T)
 PHENO.ANY_SN$Meningioma_Dobbins_PRS <-  Meningioma_Dobbins$SCORE [match(PHENO.ANY_SN$sjlid, Meningioma_Dobbins$IID)]
 
+
+## Meningioma_prs.profile
+Meningioma <- read.table("Meningioma_prs.profile", header = T)
+PHENO.ANY_SN$Meningioma <-  Meningioma_Dobbins$SCORE [match(PHENO.ANY_SN$sjlid, Meningioma$IID)]
+
+
 ## Pleiotropy_Bi_directional_Increasing_prs.profile
 Pleiotropy_Bi_directional_Increasing <- read.table("Pleiotropy_Bi_directional_Increasing_prs.profile", header = T)
 PHENO.ANY_SN$Pleiotropy_Bi_directional_Increasing_PRS <-  Pleiotropy_Bi_directional_Increasing$SCORE [match(PHENO.ANY_SN$sjlid, Pleiotropy_Bi_directional_Increasing$IID)]
@@ -44,14 +50,114 @@ Pleiotropy_Meta_analysis <- read.table("Pleiotropy_Meta_analysis_prs.profile", h
 PHENO.ANY_SN$Pleiotropy_Meta_analysis_PRS <-  Pleiotropy_Meta_analysis$SCORE [match(PHENO.ANY_SN$sjlid, Pleiotropy_Meta_analysis$IID)]
 
 ## Pleiotropy_One_cohort_prs.profile
-Pleiotropy_Meta_analysis <- read.table("Pleiotropy_One_cohort_prs.profile", header = T)
-PHENO.ANY_SN$Pleiotropy_Meta_analysis_PRS <-  Pleiotropy_Meta_analysis$SCORE [match(PHENO.ANY_SN$sjlid, Pleiotropy_Meta_analysis$IID)]
+Pleiotropy_One_cohort <- read.table("Pleiotropy_One_cohort_prs.profile", header = T)
+PHENO.ANY_SN$Pleiotropy_One_cohort_PRS <-  Pleiotropy_One_cohort$SCORE [match(PHENO.ANY_SN$sjlid, Pleiotropy_One_cohort$IID)]
+
+
+## Pleiotropy_PRSWEB_prs.profile
+Pleiotropy_PRSWEB <- read.table("Pleiotropy_PRSWEB_prs.profile", header = T)
+PHENO.ANY_SN$Pleiotropy_PRSWEB_PRS <-  Pleiotropy_PRSWEB$SCORE [match(PHENO.ANY_SN$sjlid, Pleiotropy_PRSWEB$IID)]
+
+
+## Pleiotropy_One_directional_prs.profile
+Pleiotropy_One_directional <- read.table("Pleiotropy_One_directional_prs.profile", header = T)
+PHENO.ANY_SN$Pleiotropy_One_directional_PRS <-  Pleiotropy_One_directional$SCORE [match(PHENO.ANY_SN$sjlid, Pleiotropy_One_directional$IID)]
+
+
+## Pleiotropy_One_directional_Significant_prs.profile
+Pleiotropy_One_directional_Significant <- read.table("Pleiotropy_One_directional_Significant_prs.profile", header = T)
+PHENO.ANY_SN$Pleiotropy_One_directional_Significant_PRS <-  Pleiotropy_One_directional_Significant$SCORE [match(PHENO.ANY_SN$sjlid, Pleiotropy_One_directional_Significant$IID)]
+
+
+## Pleiotropy_Replication_prior_studies_prs.profile
+Pleiotropy_Replication_prior_studies <- read.table("Pleiotropy_Replication_prior_studies_prs.profile", header = T)
+PHENO.ANY_SN$Pleiotropy_Replication_prior_studies_PRS <-  Pleiotropy_Replication_prior_studies$SCORE [match(PHENO.ANY_SN$sjlid, Pleiotropy_Replication_prior_studies$IID)]
+
+
+## Sarcoma_Machiela_prs.profile
+Sarcoma_Machiela <- read.table("Sarcoma_Machiela_prs.profile", header = T)
+PHENO.ANY_SN$Sarcoma_Machiela_PRS <-  Sarcoma_Machiela$SCORE [match(PHENO.ANY_SN$sjlid, Sarcoma_Machiela$IID)]
+
+
+## ALL_Vijayakrishnan_prs.profile
+ALL_Vijayakrishnan <- read.table("ALL_Vijayakrishnan_prs.profile", header = T)
+PHENO.ANY_SN$ALL_Vijayakrishnan_PRS <-  ALL_Vijayakrishnan$SCORE [match(PHENO.ANY_SN$sjlid, ALL_Vijayakrishnan$IID)]
+
+
+## Allman_African_Breast_prs.profile
+Allman_African_Breast <- read.table("Allman_African_Breast_prs.profile", header = T)
+PHENO.ANY_SN$Allman_African_Breast_PRS <-  Allman_African_Breast$SCORE [match(PHENO.ANY_SN$sjlid, Allman_African_Breast$IID)]
+
+# Allman_Hispanic_Breast_prs.profile
+Allman_Hispanic_Breast <- read.table("Allman_Hispanic_Breast_prs.profile", header = T)
+PHENO.ANY_SN$Allman_Hispanic_Breast_PRS <-  Allman_Hispanic_Breast$SCORE [match(PHENO.ANY_SN$sjlid, Allman_Hispanic_Breast$IID)]
+
+## Khera_2018_Breast_prs.profile
+Khera_2018_Breast <- read.table("Khera_2018_Breast_prs.profile", header = T)
+PHENO.ANY_SN$Khera_2018_Breast_PRS <-  Khera_2018_Breast$SCORE [match(PHENO.ANY_SN$sjlid, Khera_2018_Breast$IID)]
+
+
+## Mavaddat_2015_ER_NEG_Breast_prs.profile
+Mavaddat_2015_ER_NEG_Breast <- read.table("Mavaddat_2015_ER_NEG_Breast_prs.profile", header = T)
+PHENO.ANY_SN$Mavaddat_2015_ER_NEG_Breast_PRS <-  Mavaddat_2015_ER_NEG_Breast$SCORE [match(PHENO.ANY_SN$sjlid, Mavaddat_2015_ER_NEG_Breast$IID)]
+
+
+## Mavaddat_2015_ER_POS_Breast_prs.profile
+Mavaddat_2015_ER_POS_Breast <- read.table("Mavaddat_2015_ER_POS_Breast_prs.profile", header = T)
+PHENO.ANY_SN$Mavaddat_2015_ER_POS_Breast_PRS <-  Mavaddat_2015_ER_POS_Breast$SCORE [match(PHENO.ANY_SN$sjlid, Mavaddat_2015_ER_POS_Breast$IID)]
+
+
+## Mavaddat_2015_ER_OVERALL_Breast_prs.profile
+Mavaddat_2015_ER_OVERALL_Breast <- read.table("Mavaddat_2015_ER_OVERALL_Breast_prs.profile", header = T)
+PHENO.ANY_SN$Mavaddat_2015_ER_OVERALL_Breast_PRS <-  Mavaddat_2015_ER_OVERALL_Breast$SCORE [match(PHENO.ANY_SN$sjlid, Mavaddat_2015_ER_OVERALL_Breast$IID)]
+
+
+## Mavaddat_2019_ER_NEG_Breast_prs.profile
+Mavaddat_2019_ER_NEG_Breast <- read.table("Mavaddat_2019_ER_NEG_Breast_prs.profile", header = T)
+PHENO.ANY_SN$Mavaddat_2019_ER_NEG_Breast_PRS <-  Mavaddat_2019_ER_NEG_Breast$SCORE [match(PHENO.ANY_SN$sjlid, Mavaddat_2019_ER_NEG_Breast$IID)]
+
+
+## Mavaddat_2019_ER_POS_Breast_prs.profile
+Mavaddat_2019_ER_POS_Breast <- read.table("Mavaddat_2019_ER_POS_Breast_prs.profile", header = T)
+PHENO.ANY_SN$Mavaddat_2019_ER_POS_Breast_PRS <-  Mavaddat_2019_ER_POS_Breast$SCORE [match(PHENO.ANY_SN$sjlid, Mavaddat_2019_ER_POS_Breast$IID)]
+
+
+## Mavaddat_2019_ER_OVERALL_Breast_prs.profile
+Mavaddat_2019_ER_OVERALL_Breast <- read.table("Mavaddat_2019_ER_OVERALL_Breast_prs.profile", header = T)
+PHENO.ANY_SN$Mavaddat_2019_ER_OVERALL_Breast_PRS <-  Mavaddat_2019_ER_OVERALL_Breast$SCORE [match(PHENO.ANY_SN$sjlid, Mavaddat_2019_ER_OVERALL_Breast$IID)]
+
+
+## MichiganWeb_ER_NEG_Breast_prs.profile
+MichiganWeb_ER_NEG_Breast <- read.table("MichiganWeb_ER_NEG_Breast_prs.profile", header = T)
+PHENO.ANY_SN$MichiganWeb_ER_NEG_Breast_PRS <-  MichiganWeb_ER_NEG_Breast$SCORE [match(PHENO.ANY_SN$sjlid, MichiganWeb_ER_NEG_Breast$IID)]
+
+
+## MichiganWeb_ER_POS_Breast_prs.profile
+MichiganWeb_ER_POS_Breast <- read.table("MichiganWeb_ER_POS_Breast_prs.profile", header = T)
+PHENO.ANY_SN$MichiganWeb_ER_POS_Breast_PRS <-  MichiganWeb_ER_POS_Breast$SCORE [match(PHENO.ANY_SN$sjlid, MichiganWeb_ER_POS_Breast$IID)]
+
+
+## MichiganWeb_ER_OVERALL_Breast_prs.profile
+MichiganWeb_ER_OVERALL_Breast <- read.table("MichiganWeb_ER_OVERALL_Breast_prs.profile", header = T)
+PHENO.ANY_SN$MichiganWeb_ER_OVERALL_Breast_PRS <-  MichiganWeb_ER_OVERALL_Breast$SCORE [match(PHENO.ANY_SN$sjlid, MichiganWeb_ER_OVERALL_Breast$IID)]
+
+
+## Wang_African_Breast_prs.profile
+Wang_African_Breast <- read.table("Wang_African_Breast_prs.profile", header = T)
+PHENO.ANY_SN$Wang_African_Breast_PRS <-  Wang_African_Breast$SCORE [match(PHENO.ANY_SN$sjlid, Wang_African_Breast$IID)]
+
+
+
+
+
+
 
 
 #########################
 ## Extract Ethnicities ##
 #########################
 PHENO.ANY_SN.EUR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'EUR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN))]
+PHENO.ANY_SN.AFR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'AFR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN))]
 
 
 
