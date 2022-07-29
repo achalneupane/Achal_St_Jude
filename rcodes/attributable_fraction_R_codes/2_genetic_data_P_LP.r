@@ -37,6 +37,9 @@ zhaoming.qin.variants <- zhaoming.qin.variants[grepl("^chr", zhaoming.qin.varian
 
 # 3. All P/LP
 
+# Abbreviations: 
+# hallmark.cancer.clinvar.LoF=H.C.Clin.LoF
+# without.Zhaoming.Qin = WO.Zhao.Qin
 ##################################
 ## 2.a Hallmark of Cancer genes ##
 ##################################
@@ -52,23 +55,23 @@ hallmark.cancer.clinvar <- CLINVAR.unique[CLINVAR.unique$`ANN[*].GENE` %in% hall
 sum(LoF.unique$`ANN[*].GENE` %in% hallmark.cancer$Adaptive_immunity)
 # 21172
 hallmark.cancer.LoF <- LoF.unique[LoF.unique$`ANN[*].GENE` %in% hallmark.cancer$Adaptive_immunity,]
-hallmark.cancer.clinvar.LoF <- rbind.data.frame(hallmark.cancer.clinvar, hallmark.cancer.LoF)
-dim(hallmark.cancer.clinvar.LoF)
+H.C.Clin.LoF <- rbind.data.frame(hallmark.cancer.clinvar, hallmark.cancer.LoF)
+dim(H.C.Clin.LoF)
 # 21794
-hallmark.cancer.clinvar.LoF <- hallmark.cancer.clinvar.LoF[!duplicated(hallmark.cancer.clinvar.LoF$KEY),]
-dim(hallmark.cancer.clinvar.LoF)
+H.C.Clin.LoF <- H.C.Clin.LoF[!duplicated(H.C.Clin.LoF$KEY),]
+dim(H.C.Clin.LoF)
 # 21367
 
-sum(hallmark.cancer.clinvar.LoF$KEY %in% colnames(P_LP.extracted))
+sum(H.C.Clin.LoF$KEY %in% colnames(P_LP.extracted))
 # 21367
-hallmark.cancer.clinvar.LoF.PL <- P_LP.extracted[c(1, which(colnames(P_LP.extracted) %in% hallmark.cancer.clinvar.LoF$KEY))]
+H.C.Clin.LoF.PL <- P_LP.extracted[c(1, which(colnames(P_LP.extracted) %in% H.C.Clin.LoF$KEY))]
 
-hallmark.cancer.clinvar.LoF.PL$hallmark.cancer.clinvar.LoF.Non.Ref.Counts <- rowSums(hallmark.cancer.clinvar.LoF.PL[!(colnames(hallmark.cancer.clinvar.LoF.PL) %in% "IID")], na.rm = T) 
-hallmark.cancer.clinvar.LoF.PL$hallmark.cancer.clinvar.LoF_carriers <- factor(ifelse(hallmark.cancer.clinvar.LoF.PL$hallmark.cancer.clinvar.LoF.Non.Ref.Counts == 0, "N", "Y"))
-hallmark.cancer.clinvar.LoF.PL$hallmark.cancer.clinvar.LoF_carriers  <- factor(hallmark.cancer.clinvar.LoF.PL$hallmark.cancer.clinvar.LoF_carriers, levels = c("N", "Y"))
-hallmark.cancer.clinvar.LoF.PL <- cbind.data.frame(IID = hallmark.cancer.clinvar.LoF.PL$IID,
-                                                           hallmark.cancer.clinvar.LoF.Non.Ref.Counts = hallmark.cancer.clinvar.LoF.PL$hallmark.cancer.clinvar.LoF.Non.Ref.Counts, 
-                                                           hallmark.cancer.clinvar.LoF_carriers = hallmark.cancer.clinvar.LoF.PL$hallmark.cancer.clinvar.LoF_carriers)
+H.C.Clin.LoF.PL$H.C.Clin.LoF.Non.Ref.Counts <- rowSums(H.C.Clin.LoF.PL[!(colnames(H.C.Clin.LoF.PL) %in% "IID")], na.rm = T) 
+H.C.Clin.LoF.PL$H.C.Clin.LoF_carriers <- factor(ifelse(H.C.Clin.LoF.PL$H.C.Clin.LoF.Non.Ref.Counts == 0, "N", "Y"))
+H.C.Clin.LoF.PL$H.C.Clin.LoF_carriers  <- factor(H.C.Clin.LoF.PL$H.C.Clin.LoF_carriers, levels = c("N", "Y"))
+H.C.Clin.LoF.PL <- cbind.data.frame(IID = H.C.Clin.LoF.PL$IID,
+                                                           H.C.Clin.LoF.Non.Ref.Counts = H.C.Clin.LoF.PL$H.C.Clin.LoF.Non.Ref.Counts, 
+                                                           H.C.Clin.LoF_carriers = H.C.Clin.LoF.PL$H.C.Clin.LoF_carriers)
 
 
 
@@ -78,27 +81,27 @@ sum(MetaSVM.unique$`ANN[*].GENE` %in% hallmark.cancer$Adaptive_immunity)
 hallmark.cancer.MetaSVM <- MetaSVM.unique[MetaSVM.unique$`ANN[*].GENE` %in% hallmark.cancer$Adaptive_immunity,]
 
 ##
-hallmark.cancer.clinvar.LoF.MetaSVM <- rbind.data.frame(hallmark.cancer.clinvar, hallmark.cancer.LoF,hallmark.cancer.MetaSVM)
-dim(hallmark.cancer.clinvar.LoF.MetaSVM)
+H.C.Clin.LoF.MetaSVM <- rbind.data.frame(hallmark.cancer.clinvar, hallmark.cancer.LoF,hallmark.cancer.MetaSVM)
+dim(H.C.Clin.LoF.MetaSVM)
 # 32105
-hallmark.cancer.clinvar.LoF.MetaSVM <- hallmark.cancer.clinvar.LoF.MetaSVM[!duplicated(hallmark.cancer.clinvar.LoF.MetaSVM$KEY),]
-dim(hallmark.cancer.clinvar.LoF.MetaSVM)
+H.C.Clin.LoF.MetaSVM <- H.C.Clin.LoF.MetaSVM[!duplicated(H.C.Clin.LoF.MetaSVM$KEY),]
+dim(H.C.Clin.LoF.MetaSVM)
 # 31117
 
-sum(hallmark.cancer.clinvar.LoF.MetaSVM$KEY %in% colnames(P_LP.extracted))
+sum(H.C.Clin.LoF.MetaSVM$KEY %in% colnames(P_LP.extracted))
 # 31117
-hallmark.cancer.clinvar.LoF.MetaSVM.PL <- P_LP.extracted[c(1, which(colnames(P_LP.extracted) %in% hallmark.cancer.clinvar.LoF.MetaSVM$KEY))]
+H.C.Clin.LoF.MetaSVM.PL <- P_LP.extracted[c(1, which(colnames(P_LP.extracted) %in% H.C.Clin.LoF.MetaSVM$KEY))]
 
-hallmark.cancer.clinvar.LoF.MetaSVM.PL$hallmark.cancer.clinvar.LoF.MetaSVM.Non.Ref.Counts <- rowSums(hallmark.cancer.clinvar.LoF.MetaSVM.PL[!(colnames(hallmark.cancer.clinvar.LoF.MetaSVM.PL) %in% "IID")], na.rm = T) 
-hallmark.cancer.clinvar.LoF.MetaSVM.PL$hallmark.cancer.clinvar.LoF.MetaSVM_carriers <- factor(ifelse(hallmark.cancer.clinvar.LoF.MetaSVM.PL$hallmark.cancer.clinvar.LoF.MetaSVM.Non.Ref.Counts == 0, "N", "Y"))
-hallmark.cancer.clinvar.LoF.MetaSVM.PL$hallmark.cancer.clinvar.LoF.MetaSVM_carriers  <- factor(hallmark.cancer.clinvar.LoF.MetaSVM.PL$hallmark.cancer.clinvar.LoF.MetaSVM_carriers, levels = c("N", "Y"))
+H.C.Clin.LoF.MetaSVM.PL$H.C.Clin.LoF.MetaSVM.Non.Ref.Counts <- rowSums(H.C.Clin.LoF.MetaSVM.PL[!(colnames(H.C.Clin.LoF.MetaSVM.PL) %in% "IID")], na.rm = T) 
+H.C.Clin.LoF.MetaSVM.PL$H.C.Clin.LoF.MetaSVM_carriers <- factor(ifelse(H.C.Clin.LoF.MetaSVM.PL$H.C.Clin.LoF.MetaSVM.Non.Ref.Counts == 0, "N", "Y"))
+H.C.Clin.LoF.MetaSVM.PL$H.C.Clin.LoF.MetaSVM_carriers  <- factor(H.C.Clin.LoF.MetaSVM.PL$H.C.Clin.LoF.MetaSVM_carriers, levels = c("N", "Y"))
 
-hallmark.cancer.clinvar.LoF.MetaSVM.PL <- cbind.data.frame(IID = hallmark.cancer.clinvar.LoF.MetaSVM.PL$IID,
-                                                           hallmark.cancer.clinvar.LoF.MetaSVM.Non.Ref.Counts = hallmark.cancer.clinvar.LoF.MetaSVM.PL$hallmark.cancer.clinvar.LoF.MetaSVM.Non.Ref.Counts, 
-                                                           hallmark.cancer.clinvar.LoF.MetaSVM_carriers = hallmark.cancer.clinvar.LoF.MetaSVM.PL$hallmark.cancer.clinvar.LoF.MetaSVM_carriers)
+H.C.Clin.LoF.MetaSVM.PL <- cbind.data.frame(IID = H.C.Clin.LoF.MetaSVM.PL$IID,
+                                                           H.C.Clin.LoF.MetaSVM.Non.Ref.Counts = H.C.Clin.LoF.MetaSVM.PL$H.C.Clin.LoF.MetaSVM.Non.Ref.Counts, 
+                                                           H.C.Clin.LoF.MetaSVM_carriers = H.C.Clin.LoF.MetaSVM.PL$H.C.Clin.LoF.MetaSVM_carriers)
 
 
-hallmark.of.cancer.carriers <- cbind.data.frame(hallmark.cancer.clinvar.LoF.PL, hallmark.cancer.clinvar.LoF.MetaSVM.PL[match(hallmark.cancer.clinvar.LoF.PL$IID, hallmark.cancer.clinvar.LoF.MetaSVM.PL$IID),-1])
+hallmark.of.cancer.carriers <- cbind.data.frame(H.C.Clin.LoF.PL, H.C.Clin.LoF.MetaSVM.PL[match(H.C.Clin.LoF.PL$IID, H.C.Clin.LoF.MetaSVM.PL$IID),-1])
 
 
 ###########################################
@@ -116,28 +119,28 @@ hallmark.cancer.clinvar <- CLINVAR.unique[CLINVAR.unique$`ANN[*].GENE` %in% hall
 sum(LoF.unique$`ANN[*].GENE` %in% hallmark.cancer$Adaptive_immunity)
 # 21172
 hallmark.cancer.LoF <- LoF.unique[LoF.unique$`ANN[*].GENE` %in% hallmark.cancer$Adaptive_immunity,]
-hallmark.cancer.clinvar.LoF <- rbind.data.frame(hallmark.cancer.clinvar, hallmark.cancer.LoF)
-dim(hallmark.cancer.clinvar.LoF)
+H.C.Clin.LoF <- rbind.data.frame(hallmark.cancer.clinvar, hallmark.cancer.LoF)
+dim(H.C.Clin.LoF)
 # 21794
-hallmark.cancer.clinvar.LoF <- hallmark.cancer.clinvar.LoF[!duplicated(hallmark.cancer.clinvar.LoF$KEY),]
-dim(hallmark.cancer.clinvar.LoF)
+H.C.Clin.LoF <- H.C.Clin.LoF[!duplicated(H.C.Clin.LoF$KEY),]
+dim(H.C.Clin.LoF)
 # 21367
 
-sum(hallmark.cancer.clinvar.LoF$KEY %in% colnames(P_LP.extracted))
+sum(H.C.Clin.LoF$KEY %in% colnames(P_LP.extracted))
 # 21367
 
 
-hallmark.cancer.clinvar.LoF.PL <- P_LP.extracted[c(1, which(colnames(P_LP.extracted) %in% hallmark.cancer.clinvar.LoF$KEY))]
+H.C.Clin.LoF.PL <- P_LP.extracted[c(1, which(colnames(P_LP.extracted) %in% H.C.Clin.LoF$KEY))]
 
 ## Exclude Zhaoming's and Qin's variants
-hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants <- hallmark.cancer.clinvar.LoF.PL[!colnames(hallmark.cancer.clinvar.LoF.PL) %in% zhaoming.qin.variants]
+H.C.Clin.LoF.PL.WO.Zhao.Qin.variants <- H.C.Clin.LoF.PL[!colnames(H.C.Clin.LoF.PL) %in% zhaoming.qin.variants]
 
-hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.without.Zhaoming.Qin_variants.Non.Ref.Counts <- rowSums(hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants[!(colnames(hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants) %in% "IID")], na.rm = T) 
-hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.without.Zhaoming.Qin.variants_carriers <- factor(ifelse(hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.without.Zhaoming.Qin_variants.Non.Ref.Counts == 0, "N", "Y"))
-hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.without.Zhaoming.Qin.variants_carriers  <- factor(hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.without.Zhaoming.Qin.variants_carriers, levels = c("N", "Y"))
-hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants <- cbind.data.frame(IID = hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants$IID,
-                                                   hallmark.cancer.clinvar.LoF.without.Zhaoming.Qin_variants.Non.Ref.Counts = hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.without.Zhaoming.Qin_variants.Non.Ref.Counts, 
-                                                   hallmark.cancer.clinvar.LoF.without.Zhaoming.Qin.variants_carriers = hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.without.Zhaoming.Qin.variants_carriers)
+H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts <- rowSums(H.C.Clin.LoF.PL.WO.Zhao.Qin.variants[!(colnames(H.C.Clin.LoF.PL.WO.Zhao.Qin.variants) %in% "IID")], na.rm = T) 
+H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.WO.Zhao.Qin.variants_carriers <- factor(ifelse(H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts == 0, "N", "Y"))
+H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.WO.Zhao.Qin.variants_carriers  <- factor(H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.WO.Zhao.Qin.variants_carriers, levels = c("N", "Y"))
+H.C.Clin.LoF.PL.WO.Zhao.Qin.variants <- cbind.data.frame(IID = H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$IID,
+                                                   H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts = H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts, 
+                                                   H.C.Clin.LoF.WO.Zhao.Qin.variants_carriers = H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.WO.Zhao.Qin.variants_carriers)
 
 
 
@@ -147,34 +150,34 @@ sum(MetaSVM.unique$`ANN[*].GENE` %in% hallmark.cancer$Adaptive_immunity)
 hallmark.cancer.MetaSVM <- MetaSVM.unique[MetaSVM.unique$`ANN[*].GENE` %in% hallmark.cancer$Adaptive_immunity,]
 
 ##
-hallmark.cancer.clinvar.LoF.MetaSVM <- rbind.data.frame(hallmark.cancer.clinvar, hallmark.cancer.LoF,hallmark.cancer.MetaSVM)
-dim(hallmark.cancer.clinvar.LoF.MetaSVM)
+H.C.Clin.LoF.MetaSVM <- rbind.data.frame(hallmark.cancer.clinvar, hallmark.cancer.LoF,hallmark.cancer.MetaSVM)
+dim(H.C.Clin.LoF.MetaSVM)
 # 32105
-hallmark.cancer.clinvar.LoF.MetaSVM <- hallmark.cancer.clinvar.LoF.MetaSVM[!duplicated(hallmark.cancer.clinvar.LoF.MetaSVM$KEY),]
-dim(hallmark.cancer.clinvar.LoF.MetaSVM)
+H.C.Clin.LoF.MetaSVM <- H.C.Clin.LoF.MetaSVM[!duplicated(H.C.Clin.LoF.MetaSVM$KEY),]
+dim(H.C.Clin.LoF.MetaSVM)
 # 31117
 
-sum(hallmark.cancer.clinvar.LoF.MetaSVM$KEY %in% colnames(P_LP.extracted))
+sum(H.C.Clin.LoF.MetaSVM$KEY %in% colnames(P_LP.extracted))
 # 31117
-hallmark.cancer.clinvar.LoF.MetaSVM.PL <- P_LP.extracted[c(1, which(colnames(P_LP.extracted) %in% hallmark.cancer.clinvar.LoF.MetaSVM$KEY))]
+H.C.Clin.LoF.MetaSVM.PL <- P_LP.extracted[c(1, which(colnames(P_LP.extracted) %in% H.C.Clin.LoF.MetaSVM$KEY))]
 
 ## Exclude Zhaoming's and Qin's variants
-hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants <- hallmark.cancer.clinvar.LoF.MetaSVM.PL[!colnames(hallmark.cancer.clinvar.LoF.MetaSVM.PL) %in% zhaoming.qin.variants]
+H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants <- H.C.Clin.LoF.MetaSVM.PL[!colnames(H.C.Clin.LoF.MetaSVM.PL) %in% zhaoming.qin.variants]
 
-hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.MetaSVM.without.Zhaoming.Qin_variants.Non.Ref.Counts <- rowSums(hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants[!(colnames(hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants) %in% "IID")], na.rm = T) 
-hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.MetaSVM.without.Zhaoming.Qin.variants_carriers <- factor(ifelse(hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.MetaSVM.without.Zhaoming.Qin_variants.Non.Ref.Counts == 0, "N", "Y"))
-hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.MetaSVM.without.Zhaoming.Qin.variants_carriers  <- factor(hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.MetaSVM.without.Zhaoming.Qin.variants_carriers, levels = c("N", "Y"))
-hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants <- cbind.data.frame(IID = hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants$IID,
-                                                                                 hallmark.cancer.clinvar.LoF.MetaSVM.without.Zhaoming.Qin_variants.Non.Ref.Counts = hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.MetaSVM.without.Zhaoming.Qin_variants.Non.Ref.Counts, 
-                                                                                 hallmark.cancer.clinvar.LoF.MetaSVM.without.Zhaoming.Qin.variants_carriers = hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants$hallmark.cancer.clinvar.LoF.MetaSVM.without.Zhaoming.Qin.variants_carriers)
-
-
+H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts <- rowSums(H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants[!(colnames(H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants) %in% "IID")], na.rm = T) 
+H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin.variants_carriers <- factor(ifelse(H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts == 0, "N", "Y"))
+H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin.variants_carriers  <- factor(H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin.variants_carriers, levels = c("N", "Y"))
+H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants <- cbind.data.frame(IID = H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$IID,
+                                                                                 H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts = H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts, 
+                                                                                 H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin.variants_carriers = H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin.variants_carriers)
 
 
 
-hallmark.of.cancer_without.zhaoming.qin.variants.carriers <- cbind.data.frame(hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants, hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants[match(hallmark.cancer.clinvar.LoF.PL.without.Zhaoming.Qin.variants$IID, hallmark.cancer.clinvar.LoF.MetaSVM.PL.without.Zhaoming.Qin.variants$IID),-1])
 
-hallmark.of.cancer.carriers <- cbind.data.frame(hallmark.of.cancer.carriers, hallmark.of.cancer_without.zhaoming.qin.variants.carriers[match(hallmark.of.cancer.carriers$IID, hallmark.of.cancer_without.zhaoming.qin.variants.carriers$IID),-1])
+
+hallmark.of.cancer_WO.Zhao.Qin.variants.carriers <- cbind.data.frame(H.C.Clin.LoF.PL.WO.Zhao.Qin.variants, H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants[match(H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$IID, H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$IID),-1])
+
+hallmark.of.cancer.carriers <- cbind.data.frame(hallmark.of.cancer.carriers, hallmark.of.cancer_WO.Zhao.Qin.variants.carriers[match(hallmark.of.cancer.carriers$IID, hallmark.of.cancer_WO.Zhao.Qin.variants.carriers$IID),-1])
 
 
 
@@ -189,15 +192,17 @@ All.P.LP.clinvars.LoF <- P_LP.extracted[c(1, which(colnames(P_LP.extracted) %in%
 All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF.Non.Ref.Counts <- rowSums(All.P.LP.clinvars.LoF[!(colnames(All.P.LP.clinvars.LoF) %in% "IID")], na.rm = T) 
 All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF_carriers <- factor(ifelse(All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF.Non.Ref.Counts == 0, "N", "Y"))
 All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF_carriers  <- factor(All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF_carriers, levels = c("N", "Y"))
+All.P.LP.clinvars.LoF <- cbind.data.frame(All.P.LP.clinvars.LoF$IID, All.P.LP.clin.LoF_carriers = All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF_carriers)
+
 
 # 2. Clinvar, LoF and MetaSVM                          
-All.P.LP.clinvars.LoF <- unique(c(CLINVAR.unique$KEY, LoF.unique$KEY, MetaSVM.unique$KEY))
-sum(All.P.LP.clinvars.LoF %in% colnames(P_LP.extracted))
-# 318253
-All.P.LP.clinvars.LoF <- P_LP.extracted[c(1, which(colnames(P_LP.extracted) %in% All.P.LP.clinvars.LoF))]
-All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF.Non.Ref.Counts <- rowSums(All.P.LP.clinvars.LoF[!(colnames(All.P.LP.clinvars.LoF) %in% "IID")], na.rm = T) 
-All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF_carriers <- factor(ifelse(All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF.Non.Ref.Counts == 0, "N", "Y"))
-All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF_carriers  <- factor(All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF_carriers, levels = c("N", "Y"))
+All.P.LP.clinvars.LoF.MetaSVM <- unique(c(CLINVAR.unique$KEY, LoF.unique$KEY, MetaSVM.unique$KEY))
+sum(All.P.LP.clinvars.LoF.MetaSVM %in% colnames(P_LP.extracted))
+# 397036
+All.P.LP.clinvars.LoF.MetaSVM <- P_LP.extracted[c(1, which(colnames(P_LP.extracted) %in% All.P.LP.clinvars.LoF.MetaSVM))]
+All.P.LP.clinvars.LoF.MetaSVM$All.P.LP.clinvars.LoF.MetaSVM.Non.Ref.Counts <- rowSums(All.P.LP.clinvars.LoF.MetaSVM[!(colnames(All.P.LP.clinvars.LoF.MetaSVM) %in% "IID")], na.rm = T) 
+All.P.LP.clinvars.LoF.MetaSVM$All.P.LP.clinvars.LoF.MetaSVM_carriers <- factor(ifelse(All.P.LP.clinvars.LoF.MetaSVM$All.P.LP.clinvars.LoF.MetaSVM.Non.Ref.Counts == 0, "N", "Y"))
+All.P.LP.clinvars.LoF.MetaSVM$All.P.LP.clinvars.LoF.MetaSVM_carriers  <- factor(All.P.LP.clinvars.LoF.MetaSVM$All.P.LP.clinvars.LoF.MetaSVM_carriers, levels = c("N", "Y"))
 
 
 
