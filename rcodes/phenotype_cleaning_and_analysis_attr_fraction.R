@@ -496,9 +496,6 @@ saved.PHENO.ANY_SN <- PHENO.ANY_SN
 
 ###################################################
 
-## How many neoplasms?
-sum(subneo$sjlid %in% check.survivors$sjlid)
-# 1731
 # PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "gender", "agedx", "agelstcontact", "AnyRT", "anyrt_prim", "anyrt_5", "anyrt_10", "brainorheadrt_yn",
 #                                "brainrt_yn", "maxseg1dose", "maxseg2dose", "maxseg3dose", "maxseg4dose", "maxsegrtdose", "chestrt_yn",
 #                                "maxchestrtdose", "neckrt_yn", "maxneckrtdose", "pelvisrt_yn", "maxpelvisrtdose", "abdomenrt_yn", "maxabdrtdose",
@@ -827,7 +824,16 @@ prop.test(prevalence.counts, 4507)
 ## SJLIFE (ALL) 
 mod1 <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
-
+estimates <- as.data.frame(summary(mod1)$coefficients)[c(1,2)]
+estimates$Estimate <- as.numeric(estimates$Estimate)
+estimates$OR <- round(exp(estimates$Estimate),2)
+## CI
+# exp(5.319e-01-(1.96*1.009e-01))
+# exp(5.319e-01+(1.96*1.009e-01))
+estimates$S.error <- as.numeric(as.character(estimates$`Std. Error`))
+CI <-  paste0("(", paste0(round(exp(estimates$Estimate - (1.96*estimates$S.error)),1), " to ", round(exp(estimates$Estimate + (1.96*estimates$S.error)),1)),")")
+estimates$OR <- paste(estimates$OR, CI, sep = " ")
+estimates
 
 
 ## SJLIFE (EUR)

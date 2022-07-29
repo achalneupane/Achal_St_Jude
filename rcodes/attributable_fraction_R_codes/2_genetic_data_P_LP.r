@@ -6,7 +6,7 @@
 library(data.table)
 library(stringr)
 
-setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/annotated_variants/annotated_vars_from_PreQC_VCF_Clinvar_MetaSVM_LoF")
+# setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/annotated_variants/annotated_vars_from_PreQC_VCF_Clinvar_MetaSVM_LoF")
 
 # load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/1_demographics.RDATA")
 load("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/1_demographics.RDATA")
@@ -71,8 +71,8 @@ H.C.Clin.LoF.PL$H.C.Clin.LoF.Non.Ref.Counts <- rowSums(H.C.Clin.LoF.PL[!(colname
 H.C.Clin.LoF.PL$H.C.Clin.LoF_carriers <- factor(ifelse(H.C.Clin.LoF.PL$H.C.Clin.LoF.Non.Ref.Counts == 0, "N", "Y"))
 H.C.Clin.LoF.PL$H.C.Clin.LoF_carriers  <- factor(H.C.Clin.LoF.PL$H.C.Clin.LoF_carriers, levels = c("N", "Y"))
 H.C.Clin.LoF.PL <- cbind.data.frame(IID = H.C.Clin.LoF.PL$IID,
-                                                           H.C.Clin.LoF.Non.Ref.Counts = H.C.Clin.LoF.PL$H.C.Clin.LoF.Non.Ref.Counts, 
-                                                           H.C.Clin.LoF_carriers = H.C.Clin.LoF.PL$H.C.Clin.LoF_carriers)
+                        H.C.Clin.LoF.Non.Ref.Counts = H.C.Clin.LoF.PL$H.C.Clin.LoF.Non.Ref.Counts, 
+                        H.C.Clin.LoF_carriers = H.C.Clin.LoF.PL$H.C.Clin.LoF_carriers)
 
 
 
@@ -98,8 +98,8 @@ H.C.Clin.LoF.MetaSVM.PL$H.C.Clin.LoF.MetaSVM_carriers <- factor(ifelse(H.C.Clin.
 H.C.Clin.LoF.MetaSVM.PL$H.C.Clin.LoF.MetaSVM_carriers  <- factor(H.C.Clin.LoF.MetaSVM.PL$H.C.Clin.LoF.MetaSVM_carriers, levels = c("N", "Y"))
 
 H.C.Clin.LoF.MetaSVM.PL <- cbind.data.frame(IID = H.C.Clin.LoF.MetaSVM.PL$IID,
-                                                           H.C.Clin.LoF.MetaSVM.Non.Ref.Counts = H.C.Clin.LoF.MetaSVM.PL$H.C.Clin.LoF.MetaSVM.Non.Ref.Counts, 
-                                                           H.C.Clin.LoF.MetaSVM_carriers = H.C.Clin.LoF.MetaSVM.PL$H.C.Clin.LoF.MetaSVM_carriers)
+                                H.C.Clin.LoF.MetaSVM.Non.Ref.Counts = H.C.Clin.LoF.MetaSVM.PL$H.C.Clin.LoF.MetaSVM.Non.Ref.Counts, 
+                                H.C.Clin.LoF.MetaSVM_carriers = H.C.Clin.LoF.MetaSVM.PL$H.C.Clin.LoF.MetaSVM_carriers)
 
 
 hallmark.of.cancer.carriers <- cbind.data.frame(H.C.Clin.LoF.PL, H.C.Clin.LoF.MetaSVM.PL[match(H.C.Clin.LoF.PL$IID, H.C.Clin.LoF.MetaSVM.PL$IID),-1])
@@ -140,8 +140,8 @@ H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.C
 H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.WO.Zhao.Qin.variants_carriers <- factor(ifelse(H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts == 0, "N", "Y"))
 H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.WO.Zhao.Qin.variants_carriers  <- factor(H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.WO.Zhao.Qin.variants_carriers, levels = c("N", "Y"))
 H.C.Clin.LoF.PL.WO.Zhao.Qin.variants <- cbind.data.frame(IID = H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$IID,
-                                                   H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts = H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts, 
-                                                   H.C.Clin.LoF.WO.Zhao.Qin.variants_carriers = H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.WO.Zhao.Qin.variants_carriers)
+                                             H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts = H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts, 
+                                             H.C.Clin.LoF.WO.Zhao.Qin.variants_carriers = H.C.Clin.LoF.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.WO.Zhao.Qin.variants_carriers)
 
 
 
@@ -169,8 +169,8 @@ H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_va
 H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin.variants_carriers <- factor(ifelse(H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts == 0, "N", "Y"))
 H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin.variants_carriers  <- factor(H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin.variants_carriers, levels = c("N", "Y"))
 H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants <- cbind.data.frame(IID = H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$IID,
-                                                                                 H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts = H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts, 
-                                                                                 H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin.variants_carriers = H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin.variants_carriers)
+                                                     H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts = H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts, 
+                                                     H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin.variants_carriers = H.C.Clin.LoF.MetaSVM.PL.WO.Zhao.Qin.variants$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin.variants_carriers)
 
 
 

@@ -22,7 +22,7 @@ PHENO.ANY_SN$Meningioma_Dobbins_PRS <-  Meningioma_Dobbins$SCORE [match(PHENO.AN
 
 ## Meningioma_prs.profile
 Meningioma <- read.table("Meningioma_prs.profile", header = T)
-PHENO.ANY_SN$Meningioma <-  Meningioma_Dobbins$SCORE [match(PHENO.ANY_SN$sjlid, Meningioma$IID)]
+PHENO.ANY_SN$Meningioma_PRS <-  Meningioma_Dobbins$SCORE [match(PHENO.ANY_SN$sjlid, Meningioma$IID)]
 
 
 ## Pleiotropy_Bi_directional_Increasing_prs.profile
@@ -146,13 +146,14 @@ PHENO.ANY_SN$MichiganWeb_ER_OVERALL_Breast_PRS <-  MichiganWeb_ER_OVERALL_Breast
 Wang_African_Breast <- read.table("Wang_African_Breast_prs.profile", header = T)
 PHENO.ANY_SN$Wang_African_Breast_PRS <-  Wang_African_Breast$SCORE [match(PHENO.ANY_SN$sjlid, Wang_African_Breast$IID)]
 
+colnames(PHENO.ANY_SN)
 
+saved.PHENO.ANY_SN <- PHENO.ANY_SN
 
-
-PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "MRN", "gender", "dob", "diagdt", "agedx", "diaggrp", "agelstcontact", "AnyRT", "anyrt_5", "brainrt_yn", "maxsegrtdose", "chestrt_yn", "maxchestrtdose", "anthra_jco_dose_any", "anthra_jco_dose_5","neckrt_yn", 
-                               "maxneckrtdose", "pelvisrt_yn", "maxpelvisrtdose","abdomenrt_yn", "maxabdrtdose", "aa_class_dose_any", "aa_class_dose_5", "epitxn_dose_any", "epitxn_dose_5",
-                               "cisplat_dose_any", "cisplateq_dose_5", "aa_hvymtl_dose_any", "aa_hvymtl_dose_5", "Zhaoming_carriers", "Qin_carriers", "Qin_carriers.HR.pathways", "Qin_carriers.FA.pathways",
-                               "Qin_carriers.MMR.pathways", "Qin_carriers.BER.pathways", "Qin_carriers.NER.pathways", "Qin_carriers.NHEJ.pathways", "PCA.ethnicity")]
+# PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "MRN", "gender", "dob", "diagdt", "agedx", "diaggrp", "agelstcontact", "AnyRT", "anyrt_5", "brainrt_yn", "maxsegrtdose", "chestrt_yn", "maxchestrtdose", "anthra_jco_dose_any", "anthra_jco_dose_5","neckrt_yn", 
+#                                "maxneckrtdose", "pelvisrt_yn", "maxpelvisrtdose","abdomenrt_yn", "maxabdrtdose", "aa_class_dose_any", "aa_class_dose_5", "epitxn_dose_any", "epitxn_dose_5",
+#                                "cisplat_dose_any", "cisplateq_dose_5", "aa_hvymtl_dose_any", "aa_hvymtl_dose_5", "Zhaoming_carriers", "Qin_carriers", "Qin_carriers.HR.pathways", "Qin_carriers.FA.pathways",
+#                                "Qin_carriers.MMR.pathways", "Qin_carriers.BER.pathways", "Qin_carriers.NER.pathways", "Qin_carriers.NHEJ.pathways", "PCA.ethnicity")]
 
 
 

@@ -1,7 +1,7 @@
 #########################
 ## Load Phenotype data ##
 #########################
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/1_demographics.RDATA")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores.RDATA")
 #########################
 ## Subsequent Neoplasm ##
 #########################
@@ -25,12 +25,31 @@ load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHE
 subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
 head(subneo)
 table(subneo$diaggrp)
+dim(subneo)
+# 1731 9
+
+# clinical.dat.4402 <- clinical.dat[clinical.dat$sjlid %in% PHENO.ANY_SN$sjlid,]
+# clinical.dat.4402$sjlid[duplicated(clinical.dat.4402$sjlid)]
+# clinical.dat.4402 <- clinical.dat.4402[!duplicated(clinical.dat.4402$sjlid),]
+# clinical.dat.4402 <- clinical.dat.4402[mixedorder(clinical.dat.4402$sjlid),]
+
+
+# PHENO.ANY_SN <- PHENO.ANY_SN[mixedorder(PHENO.ANY_SN$sjlid),]
+
+# table(clinical.dat.4402$sjlid == PHENO.ANY_SN$sjlid)
+# table(clinical.dat.4402$diagdt == PHENO.ANY_SN$diagdt)
+# table(clinical.dat.4402$agedx == PHENO.ANY_SN$agedx)
+# table(clinical.dat.4402$dob == PHENO.ANY_SN$dob)
+# table(clinical.dat$MRN == PHENO.ANY_SN$MRN)
 
 # add diagnosis date 
-subneo$diagdt <-  clinical.dat$diagdt [match(subneo$sjlid , clinical.dat$sjlid)]
-subneo$agedx <-  clinical.dat$agedx [match(subneo$sjlid , clinical.dat$sjlid)]
+subneo$diagdt <-  PHENO.ANY_SN$diagdt [match(subneo$sjlid , PHENO.ANY_SN$sjlid)]
+subneo$agedx <-  PHENO.ANY_SN$agedx [match(subneo$sjlid , PHENO.ANY_SN$sjlid)]
 # add DOB
-subneo$DOB <- demog$dob[match(subneo$MRN, demog$MRN)]
+# demog <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/demog.sas7bdat")
+# head(demog)
+# demog <- demog[,c("MRN", "dob", "gender", "race", "ethnic", "agedx", "agelstcontact")]
+subneo$DOB <- PHENO.ANY_SN$dob[match(subneo$sjlid, PHENO.ANY_SN$sjlid)]
 
 subneo$AGE.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
 # subneo$AGE.exact.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
@@ -46,11 +65,11 @@ subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subne
 # How many SNs after 5 years
 subneo.after5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5,]
 length(unique(subneo.after5$sjlid))
-# 619
+# 613
 
 subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
-dim(subneo.within5)
-# 24
+sum(!duplicated(subneo.within5$sjlid))
+# 23
 #############
 ## Any SNs ##
 #############
@@ -63,7 +82,7 @@ ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decre
 # Removing samples with with SN within the 5 years of childhood cancer
 ANY_SNs <- ANY_SNs[!ANY_SNs$sjlid %in% subneo.within5$sjlid,]
 dim(ANY_SNs)
-# 612
+# 613
 PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
 # PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ANY_SNs[match(PHENO.ANY_SN$sjlid, ANY_SNs$sjlid), c("gradedt", "AGE.ANY_SN")])
 
@@ -291,7 +310,7 @@ estimates$OR <- round(exp(estimates$Estimate),2)
 estimates$S.error <- as.numeric(as.character(estimates$`Std. Error`))
 CI <-  paste0("(", paste0(round(exp(estimates$Estimate - (1.96*estimates$S.error)),1), " to ", round(exp(estimates$Estimate + (1.96*estimates$S.error)),1)),")")
 estimates$OR <- paste(estimates$OR, CI, sep = " ")
-
+estimates
 
 ## SJLIFE (EUR)
 mod1.EUR <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
