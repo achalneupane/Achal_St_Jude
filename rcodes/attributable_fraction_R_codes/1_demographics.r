@@ -212,7 +212,45 @@ clinical.dat$Zhaoming_Non.Ref.Counts <- Zhaoming_vars$Zhaoming_Non.Ref.Counts [m
 clinical.dat$Zhaoming_carriers <- factor(ifelse(clinical.dat$Zhaoming_Non.Ref.Counts == 0, "N", "Y"))
 
 
-# Add ethnicity from PCA
+##########################################################################
+## Also create a variable with Qin but without Zhaomings and Vice Versa ##
+##########################################################################
+## 1. Carriers of Qin variants not in Zhaoming
+# Overlapping variants in Qin Vs Zhaoming
+sum(colnames(QIN_vars)[-1] %in% colnames(Zhaoming_vars)[-1])
+# 37
+
+Qin_vars_without_Zhaoming <- colnames(QIN_vars)[!colnames(QIN_vars) %in% colnames(Zhaoming_vars)]
+Qin_vars_without_Zhaoming <- Qin_vars_without_Zhaoming[grepl("^chr", Qin_vars_without_Zhaoming)]
+
+length(Qin_vars_without_Zhaoming)
+# 349
+Qin_without_Zhaoming_vars <- QIN_vars[c(1,which(colnames(QIN_vars) %in% Qin_vars_without_Zhaoming))]
+Qin_without_Zhaoming_vars$Qin_without_Zhaoming_vars.Non.Ref.Counts <- rowSums(Qin_without_Zhaoming_vars[!(colnames(Qin_without_Zhaoming_vars) %in% "IID")], na.rm = T) 
+
+clinical.dat$Qin_without_Zhaoming_vars.Non.Ref.Counts <- Qin_without_Zhaoming_vars$Qin_without_Zhaoming_vars.Non.Ref.Counts [match(clinical.dat$sjlid, Qin_without_Zhaoming_vars$IID)]
+clinical.dat$Qin_without_Zhaoming_vars_carriers <- factor(ifelse(clinical.dat$Qin_without_Zhaoming_vars.Non.Ref.Counts == 0, "N", "Y"))
+
+
+## 2. Carriers of Zhaoming variants not in Qin
+# Overlapping variants in Qin Vs Zhaoming
+sum(colnames(Zhaoming_vars)[-1] %in% colnames(QIN_vars)[-1])
+# 37
+
+Zhaoming_vars_without_Qin <- colnames(Zhaoming_vars)[!colnames(Zhaoming_vars) %in% colnames(QIN_vars)]
+Zhaoming_vars_without_Qin <- Zhaoming_vars_without_Qin[grepl("^chr", Zhaoming_vars_without_Qin)]
+length(Zhaoming_vars_without_Qin)
+# 107
+Zhaoming_without_Qin_vars <- Zhaoming_vars[c(1,which(colnames(Zhaoming_vars) %in% Zhaoming_vars_without_Qin))]
+Zhaoming_without_Qin_vars$Zhaoming_without_Qin_vars.Non.Ref.Counts <- rowSums(Zhaoming_without_Qin_vars[!(colnames(Zhaoming_without_Qin_vars) %in% "IID")], na.rm = T) 
+
+clinical.dat$Zhaoming_without_Qin_vars.Non.Ref.Counts <- Zhaoming_without_Qin_vars$Zhaoming_without_Qin_vars.Non.Ref.Counts [match(clinical.dat$sjlid, Zhaoming_without_Qin_vars$IID)]
+clinical.dat$Zhaoming_without_Qin_vars_carriers <- factor(ifelse(clinical.dat$Zhaoming_without_Qin_vars.Non.Ref.Counts == 0, "N", "Y"))
+
+
+############################
+## Add ethnicity from PCA ##
+############################
 EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA/SJLIFE_EUR_Per_PCA.txt", stringsAsFactors = F, header = F)
 AFR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA/SJLIFE_AFR_Per_PCA.txt", stringsAsFactors = F, header = F)
 EAS <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA/SJLIFE_EAS_Per_PCA.txt", stringsAsFactors = F, header = F)
@@ -225,13 +263,12 @@ clinical.dat$PCA.ethnicity[!grepl("EUR|AFR", clinical.dat$PCA.ethnicity)]    <- 
 
 
 dim(QIN_vars)
+# 4507
 dim(clinical.dat)
-
+# 4507
 sum(QIN_vars$IID %in% clinical.dat$sjlid)
 # 4401
-# test <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/genetic_data/test.txt", header =T, check.names = F,   colClasses = c("character"))
-# test <- as.data.frame(t(test))
-# test$row.NAMES <- as.character(rownames(test))
+
 
 
 PHENO.ANY_SN <- clinical.dat
@@ -253,11 +290,11 @@ saved.PHENO.ANY_SN <- PHENO.ANY_SN
 
 
 ###################################################
-
-PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "MRN", "gender", "agedx", "diaggrp", "agelstcontact", "AnyRT", "anyrt_5", "brainrt_yn", "maxsegrtdose", "chestrt_yn", "maxchestrtdose", "anthra_jco_dose_any", "anthra_jco_dose_5","neckrt_yn", 
-                               "maxneckrtdose", "pelvisrt_yn", "maxpelvisrtdose","abdomenrt_yn", "maxabdrtdose", "aa_class_dose_any", "aa_class_dose_5", "epitxn_dose_any", "epitxn_dose_5",
-                               "cisplat_dose_any", "cisplateq_dose_5", "aa_hvymtl_dose_any", "aa_hvymtl_dose_5", "Zhaoming_carriers", "Qin_carriers", "Qin_carriers.HR.pathways", "Qin_carriers.FA.pathways",
-                               "Qin_carriers.MMR.pathways", "Qin_carriers.BER.pathways", "Qin_carriers.NER.pathways", "Qin_carriers.NHEJ.pathways", "PCA.ethnicity")]
+# 
+# PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "MRN", "gender", "agedx", "diaggrp", "agelstcontact", "AnyRT", "anyrt_5", "brainrt_yn", "maxsegrtdose", "chestrt_yn", "maxchestrtdose", "anthra_jco_dose_any", "anthra_jco_dose_5","neckrt_yn", 
+#                                "maxneckrtdose", "pelvisrt_yn", "maxpelvisrtdose","abdomenrt_yn", "maxabdrtdose", "aa_class_dose_any", "aa_class_dose_5", "epitxn_dose_any", "epitxn_dose_5",
+#                                "cisplat_dose_any", "cisplateq_dose_5", "aa_hvymtl_dose_any", "aa_hvymtl_dose_5", "Zhaoming_carriers", "Qin_carriers", "Qin_carriers.HR.pathways", "Qin_carriers.FA.pathways",
+#                                "Qin_carriers.MMR.pathways", "Qin_carriers.BER.pathways", "Qin_carriers.NER.pathways", "Qin_carriers.NHEJ.pathways", "PCA.ethnicity")]
 
 
 ## Age at diagnosis

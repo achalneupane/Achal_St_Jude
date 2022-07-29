@@ -28,6 +28,7 @@ colnames(P_LP.extracted) <- str_split(gsub("\\.", ":", colnames(P_LP.extracted))
 ################################
 zhaoming.qin.variants <- unique(c(colnames(Zhaoming_vars), colnames(QIN_vars)))
 zhaoming.qin.variants <- zhaoming.qin.variants[grepl("^chr", zhaoming.qin.variants)]
+
 ##############
 ## ADD P/LP ##
 ##############
