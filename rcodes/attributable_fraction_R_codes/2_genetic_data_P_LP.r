@@ -192,7 +192,7 @@ All.P.LP.clinvars.LoF <- P_LP.extracted[c(1, which(colnames(P_LP.extracted) %in%
 All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF.Non.Ref.Counts <- rowSums(All.P.LP.clinvars.LoF[!(colnames(All.P.LP.clinvars.LoF) %in% "IID")], na.rm = T) 
 All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF_carriers <- factor(ifelse(All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF.Non.Ref.Counts == 0, "N", "Y"))
 All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF_carriers  <- factor(All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF_carriers, levels = c("N", "Y"))
-All.P.LP.clinvars.LoF <- cbind.data.frame(All.P.LP.clinvars.LoF$IID, All.P.LP.clin.LoF_carriers = All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF_carriers)
+All.P.LP.clinvars.LoF <- cbind.data.frame(IID = All.P.LP.clinvars.LoF$IID, All.P.LP.clinvars.LoF.Non.Ref.Counts = All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF.Non.Ref.Counts, All.P.LP.clin.LoF_carriers = All.P.LP.clinvars.LoF$All.P.LP.clinvars.LoF_carriers)
 
 
 # 2. Clinvar, LoF and MetaSVM                          
@@ -203,22 +203,52 @@ All.P.LP.clinvars.LoF.MetaSVM <- P_LP.extracted[c(1, which(colnames(P_LP.extract
 All.P.LP.clinvars.LoF.MetaSVM$All.P.LP.clinvars.LoF.MetaSVM.Non.Ref.Counts <- rowSums(All.P.LP.clinvars.LoF.MetaSVM[!(colnames(All.P.LP.clinvars.LoF.MetaSVM) %in% "IID")], na.rm = T) 
 All.P.LP.clinvars.LoF.MetaSVM$All.P.LP.clinvars.LoF.MetaSVM_carriers <- factor(ifelse(All.P.LP.clinvars.LoF.MetaSVM$All.P.LP.clinvars.LoF.MetaSVM.Non.Ref.Counts == 0, "N", "Y"))
 All.P.LP.clinvars.LoF.MetaSVM$All.P.LP.clinvars.LoF.MetaSVM_carriers  <- factor(All.P.LP.clinvars.LoF.MetaSVM$All.P.LP.clinvars.LoF.MetaSVM_carriers, levels = c("N", "Y"))
+All.P.LP.clinvars.LoF.MetaSVM  <- cbind.data.frame(IID = All.P.LP.clinvars.LoF.MetaSVM$IID, All.P.LP.clinvars.LoF.MetaSVM.Non.Ref.Counts = All.P.LP.clinvars.LoF.MetaSVM$All.P.LP.clinvars.LoF.MetaSVM.Non.Ref.Counts, All.P.LP.clin.LoF.MetaSVM_carriers = All.P.LP.clinvars.LoF.MetaSVM$All.P.LP.clinvars.LoF.MetaSVM_carriers)
+
+All.P.LP <- cbind.data.frame(All.P.LP.clinvars.LoF, All.P.LP.clinvars.LoF.MetaSVM[match(All.P.LP.clinvars.LoF$IID, All.P.LP.clinvars.LoF.MetaSVM$IID),-1])
+
+####################################################################
+## 3.b Pathogenic/Likely Pathogenic without any previous variants ##
+####################################################################
+# 1. Clinvar and LoF
+All.P.LP.clinvars.LoF.WO.Prior.vars <- unique(c(CLINVAR.unique$KEY, LoF.unique$KEY))
+All.P.LP.clinvars.LoF.WO.Prior.vars <- All.P.LP.clinvars.LoF.WO.Prior.vars[!All.P.LP.clinvars.LoF.WO.Prior.vars %in% unique(c(colnames(H.C.Clin.LoF.PL), zhaoming.qin.variants))]
+sum(All.P.LP.clinvars.LoF.WO.Prior.vars %in% colnames(P_LP.extracted))
+# 296620
+
+All.P.LP.clinvars.LoF.WO.Prior.vars <- P_LP.extracted[c(1, which(colnames(P_LP.extracted) %in% All.P.LP.clinvars.LoF.WO.Prior.vars))]
+All.P.LP.clinvars.LoF.WO.Prior.vars$All.P.LP.clinvars.LoF.WO.Prior.vars.Non.Ref.Counts <- rowSums(All.P.LP.clinvars.LoF.WO.Prior.vars[!(colnames(All.P.LP.clinvars.LoF.WO.Prior.vars) %in% "IID")], na.rm = T) 
+All.P.LP.clinvars.LoF.WO.Prior.vars$All.P.LP.clinvars.LoF.WO.Prior.vars_carriers <- factor(ifelse(All.P.LP.clinvars.LoF.WO.Prior.vars$All.P.LP.clinvars.LoF.WO.Prior.vars.Non.Ref.Counts == 0, "N", "Y"))
+All.P.LP.clinvars.LoF.WO.Prior.vars$All.P.LP.clinvars.LoF.WO.Prior.vars_carriers  <- factor(All.P.LP.clinvars.LoF.WO.Prior.vars$All.P.LP.clinvars.LoF.WO.Prior.vars_carriers, levels = c("N", "Y"))
+All.P.LP.clinvars.LoF.WO.Prior.vars <- cbind.data.frame(IID = All.P.LP.clinvars.LoF.WO.Prior.vars$IID, All.P.LP.clinvars.LoF.WO.Prior.vars.Non.Ref.Counts = All.P.LP.clinvars.LoF.WO.Prior.vars$All.P.LP.clinvars.LoF.WO.Prior.vars.Non.Ref.Counts, All.P.LP.clinvars.LoF.WO.Prior.vars_carriers = All.P.LP.clinvars.LoF.WO.Prior.vars$All.P.LP.clinvars.LoF.WO.Prior.vars_carriers)
 
 
 
 
-################################################
-## Without any previously identified variants ##
-################################################
-# This is after removing Zhaoming, Qin's and Hallmark of cancer variants
+
+# 2. Clinvar, LoF and MetaSVM        
+All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars <- unique(c(CLINVAR.unique$KEY, LoF.unique$KEY, MetaSVM.unique$KEY))
+All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars <- All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars[!All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars %in% unique(c(colnames(H.C.Clin.LoF.MetaSVM.PL), zhaoming.qin.variants))]
+sum(All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars %in% colnames(P_LP.extracted))
+# 365650
+
+All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars <- P_LP.extracted[c(1, which(colnames(P_LP.extracted) %in% All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars))]
+All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars$All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts <- rowSums(All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars[!(colnames(All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars) %in% "IID")], na.rm = T) 
+All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars$All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars_carriers <- factor(ifelse(All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars$All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts == 0, "N", "Y"))
+All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars$All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars_carriers  <- factor(All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars$All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars_carriers, levels = c("N", "Y"))
+All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars <- cbind.data.frame(IID = All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars$IID, All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts = All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars$All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts, All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars_carriers = All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars$All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars_carriers)
 
 
-#########################
-## Extract Ethnicities ##
-#########################
-PHENO.ANY_SN.EUR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'EUR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN))]
+All.P.LP.WO.Prior.vars <- cbind.data.frame(All.P.LP.clinvars.LoF.WO.Prior.vars, All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars[match(All.P.LP.clinvars.LoF.WO.Prior.vars$IID, All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars$IID),-1])
 
 
-# lapply(list(wgspop, wgsdiag, subneo, radiation, drug, demog, adultbmi, adolhabits, adlthabits), dim)
-# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/demographic.RDATA")
-save.image("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/demographic.RDATA")
+All.P.LP.carriers <- cbind.data.frame(All.P.LP, All.P.LP.WO.Prior.vars[match(All.P.LP$IID, All.P.LP.WO.Prior.vars$IID), -1])
+
+final.genetic.data <- cbind.data.frame(hallmark.of.cancer.carriers, All.P.LP.carriers[match(hallmark.of.cancer.carriers$IID, All.P.LP.carriers$IID), -1])
+
+
+# Merge this to Phenotype
+PHENO.ANY_SN.with.genetic.data <- cbind.data.frame(PHENO.ANY_SN, final.genetic.data[match(PHENO.ANY_SN$sjlid, final.genetic.data$IID), -1])
+
+## Save RDS
+saveRDS(PHENO.ANY_SN.with.genetic.data, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/2_genetic_data_P_LP.rds")
