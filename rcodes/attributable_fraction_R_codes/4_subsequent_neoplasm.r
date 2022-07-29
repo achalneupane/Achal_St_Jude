@@ -83,6 +83,12 @@ ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decre
 ANY_SNs <- ANY_SNs[!ANY_SNs$sjlid %in% subneo.within5$sjlid,]
 dim(ANY_SNs)
 # 613
+
+## Checking with Qi's data
+# sum(ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid)
+ANY_SNs <- ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid
+
+
 PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
 # PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ANY_SNs[match(PHENO.ANY_SN$sjlid, ANY_SNs$sjlid), c("gradedt", "AGE.ANY_SN")])
 
