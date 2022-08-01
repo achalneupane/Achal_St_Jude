@@ -82,9 +82,9 @@ adlthabits <- distinct(adlthabits)
 ## Get DOB
 adlthabits$DOB <- PHENO.ANY_SN$dob [match(adlthabits$SJLIFEID, PHENO.ANY_SN$sjlid)]
 adlthabits <- adlthabits[!is.na(adlthabits$DOB),]
+# change the format of dates YYYY-MM-DD
 adlthabits$datecomp <- paste(sapply(strsplit(adlthabits$datecomp, "\\/"), `[`, 3), sapply(strsplit(adlthabits$datecomp, "\\/"), `[`, 1), sapply(strsplit(adlthabits$datecomp, "\\/"), `[`, 2), sep = "-")
 adlthabits$agesurvey <- time_length(interval(as.Date(adlthabits$DOB), as.Date(adlthabits$datecomp)), "years")
-
 # adlthabits$agesurvey <- floor(adlthabits$agesurvey_diff_of_dob_datecomp)
 
 samples.sjlife <- unique(adlthabits$SJLIFEID)
@@ -96,11 +96,7 @@ for (i in 1:length(samples.sjlife)){
   if (max(dat$agesurvey) >= 18){
     print("YES")
     dat2 <- dat[dat$agesurvey >= 18,]
-    lifestyle.tmp <- dat2[which(dat2$agesurvey == min(dat2$agesurvey)),]
-    # } else {
-    #   print("NO")
-    #   lifestyle.tmp <-  dat[which(dat$agesurvey == max(dat$agesurvey)),]
-    #   lifestyle.tmp[9:ncol(lifestyle.tmp)] <- NA
+    lifestyle.tmp <- dat2[which(dat2$agesurvey == min(dat2$agesurvey)),] # Keep the earliest age after 18 years
   }
   lifestyle <- rbind.data.frame(lifestyle, lifestyle.tmp)
 }
@@ -123,26 +119,24 @@ lifestyle$relation[lifestyle$relation == 3] <- "Other"
 lifestyle$smoker[lifestyle$smoker == 1] <- "Past"
 lifestyle$smoker[lifestyle$smoker == 2] <- "Current"
 lifestyle$smoker[lifestyle$smoker == 3] <- "Never"
-lifestyle$smoker <- ifelse(lifestyle$smoker == "Current", 1, 0)
+lifestyle$smoker_current_yn <- factor(ifelse(lifestyle$smoker != "Current", "N", "Y"))
+lifestyle$smoker_ever_yn <- factor(ifelse(grepl("Never", lifestyle$smoker), "N", "Y"))
 
-## Recode to Y/N
-lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))][lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))] == 1 ] <- 1
-lifestyle[grepl("nopa|ltpa", colnames(lifestyle))][lifestyle[grepl("nopa|ltpa", colnames(lifestyle))] == 2 ] <- 0
-lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))][lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))] == 0 ] <- 0
+## Recode 1/2 or 0/1 to Y/N
+lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink|ltpaw|wtlt|vpa10|yoga", 
+                colnames(lifestyle))][lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink|ltpaw|wtlt|vpa10|yoga", 
+                                                      colnames(lifestyle))] == 1 ] <- "Y"
 
-# change the format of dates YYYY-MM-DD
-lifestyle$datecomp <- gsub("\\/", "-", lifestyle$datecomp)
-lifestyle$datecomp <- paste(sapply(strsplit(lifestyle$datecomp, "-"), `[`, 3), sapply(strsplit(lifestyle$datecomp, "-"), `[`, 1), sapply(strsplit(lifestyle$datecomp, "-"), `[`, 2), sep ="-")
+lifestyle[grepl("nopa|ltpa|ltpaw|wtlt|vpa10|yoga", colnames(lifestyle))][lifestyle[grepl("nopa|ltpa|ltpaw|wtlt|vpa10|yoga", colnames(lifestyle))] == 2 ] <- "N"
 
-lifestyle$dob <- gsub("\\/", "-", lifestyle$dob)
-lifestyle$dob <- paste(sapply(strsplit(lifestyle$dob, "-"), `[`, 3), sapply(strsplit(lifestyle$dob, "-"), `[`, 1), sapply(strsplit(lifestyle$dob, "-"), `[`, 2), sep ="-")
+lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))][lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))] == 0 ] <- "N"
 
 #######################
 ## Adolescent habits ##
 #######################
-
-adolhabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adolhabits.sas7bdat")
-head(adolhabits)
+# 
+# adolhabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adolhabits.sas7bdat")
+# head(adolhabits)
 
 ###############
 ## Adult BMI ##
@@ -151,8 +145,10 @@ head(adolhabits)
 adultbmi <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.sas7bdat")
 head(adultbmi)
 
+lifestyle$agesurvey_floor <- floor(lifestyle$agesurvey)
+
 ## Add BMI and Nutrition to Lifestyle. Here, I am extracting the the BMI and Nutrition for the same age for each sample
-lifestyle$BMI_KEY <- paste(lifestyle$SJLIFEID, lifestyle$agesurvey, sep = ":")
+lifestyle$BMI_KEY <- paste(lifestyle$SJLIFEID, lifestyle$agesurvey_floor, sep = ":")
 
 length(unique(adultbmi$sjlid))
 # 3640
@@ -161,14 +157,7 @@ sum(lifestyle$BMI_KEY %in% adultbmi$BMI_KEY)
 # 2964
 ## samples that did not match by corresponding age
 cc <- lifestyle[!lifestyle$BMI_KEY %in% adultbmi$BMI_KEY,]
-
 lifestyle <- cbind.data.frame(lifestyle, adultbmi[match(lifestyle$BMI_KEY, adultbmi$BMI_KEY), c("BMI", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")])
-
-
-
-
-
-
 
 
 #########################

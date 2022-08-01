@@ -1055,6 +1055,6 @@ pheno.crosscheck.not.SN <- pheno.crosscheck.not.SN[mixedorder(pheno.crosscheck.n
 table(pheno.crosscheck.not.SN$diaggrp == qi.df.not.SN$diaggrp)
 
 # lapply(list(wgspop, wgsdiag, subneo, radiation, drug, demog, adultbmi, adolhabits, adlthabits), dim)
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/phenotype_cleaning_attr_fraction.RDATA")
+# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/phenotype_cleaning_attr_fraction.RDATA")
 
 
