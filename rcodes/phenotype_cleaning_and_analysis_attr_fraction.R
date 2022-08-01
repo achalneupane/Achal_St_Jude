@@ -744,8 +744,10 @@ prop.test(prevalence.counts, 4507)
 ###########################
 ## 1. Qin baseline model ##
 ###########################
+## Checking with Qi's data
+# sum(ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid)
 ## SJLIFE (ALL) 
-mod1 <- glm(ANY_SN ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+mod1 <- glm(ANY_SN ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
 estimates <- as.data.frame(summary(mod1)$coefficients)[c(1,2)]
 estimates$Estimate <- as.numeric(estimates$Estimate)
@@ -757,6 +759,7 @@ estimates$S.error <- as.numeric(as.character(estimates$`Std. Error`))
 CI <-  paste0("(", paste0(round(exp(estimates$Estimate - (1.96*estimates$S.error)),1), " to ", round(exp(estimates$Estimate + (1.96*estimates$S.error)),1)),")")
 
 estimates$RR <- paste(estimates$RR, CI, sep = " ")
+
 write.table(estimates, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Additional_files/estimates_Qin.txt", sep = "\t", col.names = T, row.names = T, quote = F)
 
 ## SJLIFE (EUR)
@@ -821,8 +824,16 @@ prop.test(prevalence.counts, 4507)
 ####################
 ## 3. HR Pathways ##
 ####################
+## Checking with Qi's data
+# sum(ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid)
+ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+ANY_SNs <- ANY_SNs[ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid,]
+dim(ANY_SNs)
+# 491
+PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
+
 ## SJLIFE (ALL) 
-mod1 <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+mod1 <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
 estimates <- as.data.frame(summary(mod1)$coefficients)[c(1,2)]
 estimates$Estimate <- as.numeric(estimates$Estimate)
@@ -834,6 +845,8 @@ estimates$S.error <- as.numeric(as.character(estimates$`Std. Error`))
 CI <-  paste0("(", paste0(round(exp(estimates$Estimate - (1.96*estimates$S.error)),1), " to ", round(exp(estimates$Estimate + (1.96*estimates$S.error)),1)),")")
 estimates$OR <- paste(estimates$OR, CI, sep = " ")
 estimates
+
+write.table(estimates, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Additional_files/estimates_Qin.txt", sep = "\t", col.names = T, row.names = T, quote = F)
 
 
 ## SJLIFE (EUR)
