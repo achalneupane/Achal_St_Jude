@@ -92,3 +92,28 @@ table(pheno.crosscheck.not.SN$diaggrp == qi.df.not.SN$diaggrp)
 qi.df.breast <- qi.df[grepl("breast", qi.df$snsubgrp, ignore.case = T),]
 qi.df.BREAST.filtered <- setDT(qi.df.breast)[,.SD[which.min(evaldt)],by=sjlid][order(evaldt, decreasing = FALSE)]
 dim(qi.df.BREAST.filtered)
+# 57
+
+## Qi's NMSCs data
+qi.df.NMSC <- qi.df[grepl("basal cell|squamous cell", qi.df$snsubgrp, ignore.case = T),]
+qi.df.NMSC.filtered <- setDT(qi.df.NMSC)[,.SD[which.min(evaldt)],by=sjlid][order(evaldt, decreasing = FALSE)]
+dim(qi.df.NMSC.filtered)
+# 207 
+
+## Qi's Thyroid data
+qi.df.THYROID <- qi.df[grepl("thyroid", qi.df$snsubgrp, ignore.case = T),]
+qi.df.THYROID.filtered <- setDT(qi.df.THYROID)[,.SD[which.min(evaldt)],by=sjlid][order(evaldt, decreasing = FALSE)]
+dim(qi.df.THYROID.filtered)
+# 72
+
+## Qi's Meningioma data
+qi.df.MENINGIOMA <- qi.df[grepl("meningioma", qi.df$snsubgrp, ignore.case = T),]
+qi.df.MENINGIOMA.filtered <- setDT(qi.df.MENINGIOMA)[,.SD[which.min(evaldt)],by=sjlid][order(evaldt, decreasing = FALSE)]
+dim(qi.df.MENINGIOMA.filtered)
+# 120
+
+## Qi's Sarcoma data
+qi.df.SARCOMA <- qi.df[grepl("sarcoma", qi.df$snsubgrp, ignore.case = T),]
+qi.df.SARCOMA.filtered <- setDT(qi.df.SARCOMA)[,.SD[which.min(evaldt)],by=sjlid][order(evaldt, decreasing = FALSE)]
+dim(qi.df.SARCOMA.filtered)
+# 24

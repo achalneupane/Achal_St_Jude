@@ -53,21 +53,17 @@ length(unique(subneo.after5$sjlid))
 subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
 sum(!duplicated(subneo.within5$sjlid))
 # 22
+## Sarcoma ##
 #############
-## Any SNs ##
-#############
-# Get SNs for the first time and Age at First SN.
-# For this, I will first sort the table by date
-library(data.table)
-ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
-
-
-# Removing samples with with SN within the 5 years of childhood cancer
-ANY_SNs <- ANY_SNs[!ANY_SNs$sjlid %in% subneo.within5$sjlid,]
-dim(ANY_SNs)
-# 605
-
-PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
+SARCOMA <- subneo[grepl("sarcoma", subneo$diag, ignore.case = T),]
+SARCOMA <- setDT(SARCOMA)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+nrow(SARCOMA)
+# 35
+# Removing samples with SNs within 5 years of childhood cancer
+SARCOMA <- SARCOMA[!SARCOMA$sjlid %in% subneo.within5$sjlid,]
+nrow(SARCOMA)
+# 32
+PHENO.ANY_SN$SARCOMA <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% SARCOMA$sjlid, 0, 1))
 
 #############################
 ## Add Lifestyle variables ##
@@ -115,7 +111,7 @@ prop.test(prevalence.counts, 4507)
 ## 1. Qin baseline model ##
 ###########################
 ## SJLIFE (ALL) 
-mod1 <- glm(ANY_SN ~ Qin_carriers + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+mod1 <- glm(SARCOMA ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + gender + aa_class_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
 estimates <- as.data.frame(summary(mod1)$coefficients)[c(1,2)]
 estimates$Estimate <- as.numeric(estimates$Estimate)
@@ -131,7 +127,7 @@ estimates
 write.table(estimates, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Additional_files/estimates_Qin.txt", sep = "\t", col.names = T, row.names = T, quote = F)
 
 ## SJLIFE (EUR)
-mod1.EUR <- glm(ANY_SN ~ Qin_carriers + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+mod1.EUR <- glm(SARCOMA ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + gender + aa_class_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 summary(mod1.EUR)
 
 
@@ -139,11 +135,11 @@ summary(mod1.EUR)
 ## 2. Qin carriers (all) ##
 ###########################
 ## SJLIFE (ALL) 
-mod1 <- glm(ANY_SN ~ Qin_carriers + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+mod1 <- glm(SARCOMA ~ Qin_carriers + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + gender + aa_class_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
 
 ## SJLIFE (EUR)
-mod1.EUR <- glm(ANY_SN ~ Qin_carriers + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+mod1.EUR <- glm(SARCOMA ~ Qin_carriers + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + gender + aa_class_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 summary(mod1.EUR)
 
 ####################
@@ -151,15 +147,15 @@ summary(mod1.EUR)
 ####################
 ## SJLIFE (ALL) 
 ## Checking with Qi's data
-# sum(ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid)
-ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
-ANY_SNs <- ANY_SNs[ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid,]
-dim(ANY_SNs)
-# 491
-PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
+# sum(SARCOMA$sjlid %in% qi.df.SARCOMA.filtered$sjlid)
+SARCOMA <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+SARCOMA <- SARCOMA[SARCOMA$sjlid %in% qi.df.SARCOMA.filtered$sjlid,]
+dim(SARCOMA)
+# 24
+PHENO.ANY_SN$SARCOMA <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% SARCOMA$sjlid, 0, 1))
 
 ## SJLIFE (ALL) 
-mod1 <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+mod1 <- glm(SARCOMA ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + gender + aa_class_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
 estimates <- as.data.frame(summary(mod1)$coefficients)[c(1,2)]
 estimates$Estimate <- as.numeric(estimates$Estimate)
@@ -173,7 +169,7 @@ estimates$OR <- paste(estimates$OR, CI, sep = " ")
 estimates
 
 ## SJLIFE (EUR)
-mod1.EUR <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+mod1.EUR <- glm(SARCOMA ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + gender + aa_class_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 summary(mod1.EUR)
 
 

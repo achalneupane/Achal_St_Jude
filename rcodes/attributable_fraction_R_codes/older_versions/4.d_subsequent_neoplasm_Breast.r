@@ -148,7 +148,7 @@ summary(mod1.EUR)
 ####################
 ## SJLIFE (ALL) 
 ## Checking with Qi's data
-# sum(ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid)
+# sum(ANY_SNs$sjlid %in% qi.df.BREAST.filtered$sjlid)
 BREASTcancer <- subneo[grepl("breast", subneo$diag, ignore.case = T),]
 BREASTcancer <- setDT(BREASTcancer)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 BREASTcancer <- BREASTcancer[BREASTcancer$sjlid %in% qi.df.BREAST.filtered$sjlid,]
