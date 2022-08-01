@@ -28,20 +28,6 @@ table(subneo$diaggrp)
 dim(subneo)
 # 1731 9
 
-# clinical.dat.4402 <- clinical.dat[clinical.dat$sjlid %in% PHENO.ANY_SN$sjlid,]
-# clinical.dat.4402$sjlid[duplicated(clinical.dat.4402$sjlid)]
-# clinical.dat.4402 <- clinical.dat.4402[!duplicated(clinical.dat.4402$sjlid),]
-# clinical.dat.4402 <- clinical.dat.4402[mixedorder(clinical.dat.4402$sjlid),]
-
-
-# PHENO.ANY_SN <- PHENO.ANY_SN[mixedorder(PHENO.ANY_SN$sjlid),]
-
-# table(clinical.dat.4402$sjlid == PHENO.ANY_SN$sjlid)
-# table(clinical.dat.4402$diagdt == PHENO.ANY_SN$diagdt)
-# table(clinical.dat.4402$agedx == PHENO.ANY_SN$agedx)
-# table(clinical.dat.4402$dob == PHENO.ANY_SN$dob)
-# table(clinical.dat$MRN == PHENO.ANY_SN$MRN)
-
 subneo <- subneo[subneo$sjlid %in% PHENO.ANY_SN$sjlid ,]
 dim(subneo)
 # 1717
@@ -49,18 +35,12 @@ dim(subneo)
 subneo$diagdt <-  PHENO.ANY_SN$diagdt [match(subneo$sjlid , PHENO.ANY_SN$sjlid)]
 subneo$agedx <-  PHENO.ANY_SN$agedx [match(subneo$sjlid , PHENO.ANY_SN$sjlid)]
 # add DOB
-# demog <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/demog.sas7bdat")
-# head(demog)
-# demog <- demog[,c("MRN", "dob", "gender", "race", "ethnic", "agedx", "agelstcontact")]
 subneo$DOB <- PHENO.ANY_SN$dob[match(subneo$sjlid, PHENO.ANY_SN$sjlid)]
 
 subneo$AGE.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
-# subneo$AGE.exact.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
-# subneo$AGE.ANY_SN <- floor(subneo$AGE.exact.ANY_SN)
 
 ## These two dates should be the (almost) same
 subneo$AGE.ANY_SN.after.childhood.cancer <- time_length(interval(as.Date(subneo$diagdt), as.Date(subneo$gradedt)), "years")
-# subneo$AGE.ANY_SN.after.childhood.cancer <- floor(subneo$AGE.exact.ANY_SN.after.childhood.cancer)
 subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subneo$agedx
 
 
@@ -72,7 +52,7 @@ length(unique(subneo.after5$sjlid))
 
 subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
 sum(!duplicated(subneo.within5$sjlid))
-# 23
+# 22
 #############
 ## Any SNs ##
 #############
@@ -87,14 +67,7 @@ ANY_SNs <- ANY_SNs[!ANY_SNs$sjlid %in% subneo.within5$sjlid,]
 dim(ANY_SNs)
 # 605
 
-## Checking with Qi's data
-# sum(ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid)
-ANY_SNs <- ANY_SNs[ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid,]
-dim(ANY_SNs)
-
 PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
-# PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ANY_SNs[match(PHENO.ANY_SN$sjlid, ANY_SNs$sjlid), c("gradedt", "AGE.ANY_SN")])
-
 
 #########################
 ## Extract Ethnicities ##
