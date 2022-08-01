@@ -87,3 +87,8 @@ table(pheno.crosscheck.SN.491$diaggrp == qi.df.SN.filtered$diaggrp)
 pheno.crosscheck.not.SN <- pheno.crosscheck[pheno.crosscheck$sjlid %in%  qi.df.not.SN$sjlid,]
 pheno.crosscheck.not.SN <- pheno.crosscheck.not.SN[mixedorder(pheno.crosscheck.not.SN$sjlid),]
 table(pheno.crosscheck.not.SN$diaggrp == qi.df.not.SN$diaggrp)
+
+## Qi's breast cancer data
+qi.df.breast <- qi.df[grepl("breast", qi.df$snsubgrp, ignore.case = T),]
+qi.df.BREAST.filtered <- setDT(qi.df.breast)[,.SD[which.min(evaldt)],by=sjlid][order(evaldt, decreasing = FALSE)]
+dim(qi.df.BREAST.filtered)

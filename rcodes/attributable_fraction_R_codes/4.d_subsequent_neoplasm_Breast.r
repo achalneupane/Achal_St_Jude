@@ -53,21 +53,19 @@ length(unique(subneo.after5$sjlid))
 subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
 sum(!duplicated(subneo.within5$sjlid))
 # 22
-##############
-## Any SMNs ##
-##############
-# This will include any SNs excluding NMSCs
-SMNs <- subneo[!grepl("basal cell|squamous cell", subneo$diag, ignore.case = T),]
-SMNs <- setDT(SMNs)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
-nrow(SMNs)
-# 476
-table(SMNs$diaggrp)
-
+###################
+## Breast cancer ##
+###################
+BREASTcancer <- subneo[grepl("breast", subneo$diag, ignore.case = T),]
+BREASTcancer <- setDT(BREASTcancer)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+nrow(BREASTcancer)
+# 78
+table(NMSCs$diaggrp)
 # Removing samples with SNs within 5 years of childhood cancer
-SMNs <- SMNs[!SMNs$sjlid %in% subneo.within5$sjlid,]
-nrow(SMNs)
-# 454
-PHENO.ANY_SN$SMN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% SMNs$sjlid, 0, 1))
+BREASTcancer <- BREASTcancer[!BREASTcancer$sjlid %in% subneo.within5$sjlid,]
+nrow(BREASTcancer)
+# 76
+PHENO.ANY_SN$BREASTcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% BREASTcancer$sjlid, 0, 1))
 
 #############################
 ## Add Lifestyle variables ##
@@ -86,20 +84,18 @@ PHENO.ANY_SN$SMN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% SMNs$sjlid, 0, 1))
 PHENO.ANY_SN.EUR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'EUR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN))]
 PHENO.ANY_SN.AFR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'AFR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN))]
 
-
 #################
 ## MODEL TESTS ##
 #################
 
-#######################################
-## 1. Qin baseline model for ANY SMNs##
-#######################################
+###########################
+## 1. Qin baseline model ##
+###########################
 ## SJLIFE (ALL) 
-mod1 <- glm(SMN ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+mod1 <- glm(BREASTcancer ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + maxchestrtdose.category + anthra_jco_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
 
 ## SJLIFE (EUR)
-mod1.EUR <- glm(SMN ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+mod1.EUR <- glm(BREASTcancer ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + maxchestrtdose.category + anthra_jco_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 summary(mod1.EUR)
-
 

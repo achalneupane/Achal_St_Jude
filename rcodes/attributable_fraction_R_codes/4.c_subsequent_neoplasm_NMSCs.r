@@ -95,66 +95,10 @@ PHENO.ANY_SN.AFR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'AFR', -grep("sjl
 ## 1. Qin baseline model ##
 ###########################
 ## SJLIFE (ALL) 
-mod1 <- glm(NMSC ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+mod1 <- glm(NMSC ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + gender + maxsegrtdose.category + maxabdrtdose.category + maxpelvisrtdose.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
 
 ## SJLIFE (EUR)
-mod1.EUR <- glm(NMSC ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+mod1.EUR <- glm(NMSC ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + gender + maxsegrtdose.category + maxabdrtdose.category + maxpelvisrtdose.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 summary(mod1.EUR)
-
-
-###########################
-## 2. Qin carriers (all) ##
-###########################
-## SJLIFE (ALL) 
-mod1 <- glm(NMSC ~ Qin_carriers + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
-summary(mod1)
-
-## SJLIFE (EUR)
-mod1.EUR <- glm(NMSC ~ Qin_carriers + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
-summary(mod1.EUR)
-
-####################
-## 3. HR Pathways ##
-####################
-## SJLIFE (ALL)
-## SJLIFE (ALL) 
-## Checking with Qi's data
-# sum(ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid)
-NMSCs <- subneo[grepl("basal cell|squamous cell", subneo$diag, ignore.case = T),]
-NMSCs <- setDT(SMNs)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
-nrow(NMSCs)
-# 367
-NMSCs <- NMSCs[NMSCs$sjlid %in% qi.df.SN.filtered$sjlid,]
-dim(NMSCs)
-# 367
-PHENO.ANY_SN$NMSC <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% NMSCs$sjlid, 0, 1))
-
-## SJLIFE (ALL) 
-mod1 <- glm(NMSC ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + gender + maxsegrtdose.category + maxabdrtdose.category + maxpelvisrtdose.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
-summary(mod1)
-estimates <- as.data.frame(summary(mod1)$coefficients)[c(1,2)]
-estimates$Estimate <- as.numeric(estimates$Estimate)
-estimates$OR <- round(exp(estimates$Estimate),2)
-## CI
-# exp(5.319e-01-(1.96*1.009e-01))
-# exp(5.319e-01+(1.96*1.009e-01))
-estimates$S.error <- as.numeric(as.character(estimates$`Std. Error`))
-CI <-  paste0("(", paste0(round(exp(estimates$Estimate - (1.96*estimates$S.error)),1), " to ", round(exp(estimates$Estimate + (1.96*estimates$S.error)),1)),")")
-estimates$OR <- paste(estimates$OR, CI, sep = " ")
-estimates
-
-## SJLIFE (EUR)
-mod1.EUR <- glm(NMSC ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + gender + maxsegrtdose.category + maxabdrtdose.category + maxpelvisrtdose.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
-summary(mod1.EUR)
-
-
-#####################
-## 4. MMR Pathways ##
-#####################
-mod1 <- glm(NMSC ~ Qin_carriers.MMR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
-summary(mod1)
-
-
-
 
