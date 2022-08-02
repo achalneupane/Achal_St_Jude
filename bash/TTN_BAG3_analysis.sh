@@ -1,5 +1,6 @@
 #!/bin/bash
 
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3
 # To calculate maf, use sjlife.fam on /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3. Use pheno/sjlife_ttn_bag3.pheno
 awk '{print $1"\t"$2}' pheno/sjlife_ttn_bag3.pheno > samples_for_maf.txt
 
@@ -9,5 +10,34 @@ plink --bfile sjlife --keep samples_for_maf.txt --freq --out sjlife.freq.out
 # First removing trailing spaces in the file, then removing chr
 awk '{ for(i=1;i<=NF;i++){if(i==NF){printf("%s\n",$NF);}else {printf("%s\t",$i)}}}' sjlife.freq.out.frq | awk -F " " '{gsub(/chr/, "", $2); print}' OFS="\t" > sjlife.freq.out.frq_edited1
 
-awk -F'\t' '{print $0 FS $2":"$4":"$3; exit}' Summary_results_AN.txt
-awk -F'\t' '{print $0"\t"$2}' Summary_results_AN.txt
+# USE R code TITN_BAG3.r
+# Chunk 1.
+
+# LD calculation with plink; https://zzz.bwh.harvard.edu/plink/ld.shtml; see, "Alternatively, it is possible to add the --matrix option, which creates a matrix of LD values rather than a list: in this case, all SNP pairs are calculated and reported, even for SNPs on different chromosomes"
+# Also: https://www.biostars.org/p/268141/
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64
+ln -s ../../samples_for_maf.txt
+plink --r2 --bfile sjlife --extract samplesnp.list --keep samples_for_maf.txt --matrix --out samplesnp
+## samplesnp.list
+# chr2:178802888:A:G
+# chr2:178803079:C:T
+# chr2:178804123:G:A
+# ...
+
+
+# ## Master file: <samplesnp>
+# z;ld;snp;config;cred;log;k;n_samples
+# samplesnp.z;samplesnp.ld;samplesnp.snp;samplesnp.config;samplesnp.cred;samplesnp_finemap.log;samplesnp.k;1645
+z;ld;snp;config;cred;log;n_samples
+samplesnp.z;samplesnp.ld;samplesnp.snp;samplesnp.config;samplesnp.cred;samplesnp_finemap.log;1645
+
+./finemap_v1.4.1_x86_64 --sss --in-files samplesnp --dataset 1
+
+
+
+# I was getting errors with the file format, so I had to run dos2unix
+# chmod 777 *
+# dos2unix samplesnp.z
+
+
+# Additionally, .z file shoul have maf in specific form. I was getting this error: "Error : Expected a floating point value greater than 0.0 and smaller or equal than 0.5 in line 3 column 6 of file 'samplesnp.z'!"
