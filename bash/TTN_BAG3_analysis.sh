@@ -4,12 +4,6 @@ cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_
 # To calculate maf, use sjlife.fam on /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3. Use pheno/sjlife_ttn_bag3.pheno
 awk '{print $1"\t"$2}' pheno/sjlife_ttn_bag3.pheno > samples_for_maf.txt
 
-module load plink/1.90b
-plink --bfile sjlife --keep samples_for_maf.txt --freq --out sjlife.freq.out
-
-# First removing trailing spaces in the file, then removing chr
-awk '{ for(i=1;i<=NF;i++){if(i==NF){printf("%s\n",$NF);}else {printf("%s\t",$i)}}}' sjlife.freq.out.frq | awk -F " " '{gsub(/chr/, "", $2); print}' OFS="\t" > sjlife.freq.out.frq_edited1
-
 # USE R code TITN_BAG3.r
 # Chunk 1.
 
@@ -17,12 +11,51 @@ awk '{ for(i=1;i<=NF;i++){if(i==NF){printf("%s\n",$NF);}else {printf("%s\t",$i)}
 # Also: https://www.biostars.org/p/268141/
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64
 ln -s ../../samples_for_maf.txt
+
+awk '{$2 = "chr"$1":"$4; print}' sjlife.bim > sjlife_edited.bim
+
+module load plink/1.90b
+plink --bfile sjlife --bim sjlife.bim --extract samplesnp.list --keep samples_for_maf.txt --make-bed --out samplesnp.dat
+
+plink --bfile samplesnp.dat --keep samples_for_maf.txt --freq --out sjlife.freq.out
+
+# NOt sure how to handle grep 10:119485655:A:ATATTTTATTTTATTT sjlife.freq.out.frq
+
+
+# First removing trailing spaces in the file, then removing chr
+awk '{ for(i=1;i<=NF;i++){if(i==NF){printf("%s\n",$NF);}else {printf("%s\t",$i)}}}' sjlife.freq.out.frq | awk -F " " '{gsub(/chr/, "", $2); print}' OFS="\t" > sjlife.freq.out.frq_edited1
+
+
 plink --r2 --bfile sjlife --extract samplesnp.list --keep samples_for_maf.txt --matrix --out samplesnp
 ## samplesnp.list
 # chr2:178802888:A:G
 # chr2:178803079:C:T
 # chr2:178804123:G:A
 # ...
+# NOTE: The order changes to the chr and position order in the SNP list. So, the summary statistics needs to be updated to maintain the order as in plink subset. 
+
+# test1.list
+# chr2:178313079:G:A
+# chr2:178313658:T:C
+# chr2:178313672:C:A
+# chr2:178313675:A:G
+# chr2:178313779:A:G
+# chr2:178313920:A:G
+# chr2:178314290:C:T
+# chr2:178314441:T:C
+
+
+# test2.list
+# chr2:178313079:G:A
+# chr2:178313658:T:C
+# chr2:178314441:T:C
+# chr2:178313920:A:G
+# chr2:178313672:C:A
+# chr2:178313675:A:G
+# chr2:178313779:A:G
+# chr2:178314290:C:T
+
+
 
 
 # ## Master file: <samplesnp>
