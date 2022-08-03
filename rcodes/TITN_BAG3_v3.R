@@ -21,15 +21,6 @@ sjlife.bim$V2 <- gsub("chr", "", sjlife.bim$V2)
 sjlife.bim <- sjlife.bim[sjlife.bim$KEY %in% gwas.dat$SNP,]
 sjlife.bim$V2[duplicated(sjlife.bim$KEY)]
 
-## checked dbSNP and these seem to be the real ones
-# 10:119588327:TTTTC:T
-# 10:119427920:ATCACTGCCATCATCAGCC:A # matches A1 and A2 as in summary stat
-# 10:119485655:A:ATATTTTATTTTATTT
-# 10:119528844:T:TAATA; maf 0.07029 # matches A1 and A2 as in summary stat
-# 10:119614280:A:AAAAT; 
-# 10:119614280:A:AAAAT;10:119614280:A:AAAATAAATAAAT     AAAAT     A       0.1388  3270
-## There are variants 
-
 
 # As per email with Yadav on 08/03/2022, I am deleting 10:119614280
 # and 10:119485655 from the list. I am also going to swap alleles for
@@ -132,5 +123,8 @@ table(gwas.dat$rsid == samplesnp.dat.bim$V2)
 
 # Write data.z file for FINEMAP
 write.table(gwas.dat, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp.z", quote = F, row.names = F, col.names = T, sep = " ")
+
+
+
 
 
