@@ -125,6 +125,3 @@ table(gwas.dat$rsid == samplesnp.dat.bim$V2)
 write.table(gwas.dat, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp.z", quote = F, row.names = F, col.names = T, sep = " ")
 
 
-
-
-

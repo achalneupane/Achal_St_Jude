@@ -67,8 +67,8 @@ samplesnp.z;samplesnp.ld;samplesnp.snp;samplesnp.config;samplesnp.cred;samplesnp
 # I was getting errors with the file format, so I had to run dos2unix
 # chmod 777 *
 # dos2unix samplesnp.z
-./finemap_v1.4.1_x86_64 --sss --in-files samplesnp --dataset 1
 
+./finemap_v1.4.1_x86_64 --sss --log --n-causal-snps 2 --in-files samplesnp
 
 
 
