@@ -31,7 +31,7 @@ sjlife.bim$V2[duplicated(sjlife.bim$KEY)]
 ## There are variants 
 
 
-# As per email with Dr. Sapkota on 08/03/2022, I am deleting 10:119614280
+# As per email with Yadav on 08/03/2022, I am deleting 10:119614280
 # and 10:119485655 from the list. I am also going to swap alleles for
 # 10:119427920 so that minor alleles correspond to the effect estimate.
 
