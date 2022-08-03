@@ -31,8 +31,7 @@ sjlife.bim$V2[duplicated(sjlife.bim$KEY)]
 ## There are variants 
 
 
-
-# Based on the conversation with Yadav on 08/03/2022, I am deleting 10:119614280
+# As per email with Dr. Sapkota on 08/03/2022, I am deleting 10:119614280
 # and 10:119485655 from the list. I am also going to swap alleles for
 # 10:119427920 so that minor alleles correspond to the effect estimate.
 
@@ -82,7 +81,7 @@ gwas.dat$maf <- freq.dat$MAF[match(gwas.dat$V2, freq.dat$SNP)]
 
 
 gwas.dat <- cbind.data.frame(rsid=gwas.dat$V2, SNP=gwas.dat$SNP, chromosome=gwas.dat$CHR, position=gwas.dat$BP, 
-                             allele1 = gwas.dat$A1, allele2 = gwas.dat$A2, maf = gwas.dat$maf, OR_95percent_CI_SJLIFE = gwas.dat$OR_95percent_CI_SJLIFE, P=gwas.dat$P_SJLIFE)
+                             allele1 = gwas.dat$A1, allele2 = gwas.dat$A2, maf = gwas.dat$maf, OR_95percent_CI_SJLIFE = gwas.dat$OR_95percent_CI_SJLIFE)
 
 gwas.dat$OR <- as.numeric(sapply(strsplit(gwas.dat$OR_95percent_CI_SJLIFE, " "), `[`, 1))
 
@@ -101,7 +100,7 @@ gwas.dat$beta.SE <- (gwas.dat$upperCI.beta - gwas.dat$beta)/1.96
 
 
 # swap allele for this variant and change the sign of beta 
-sum(gwas.dat$rsid == "10:119427920:ATCACTGCCATCATCAGCC:A")
+gwas.dat$rsid == "10:119427920:ATCACTGCCATCATCAGCC:A"
 
 gwas.dat[gwas.dat$rsid == "10:119427920:ATCACTGCCATCATCAGCC:A", c("allele1", "allele2")] <- gwas.dat[gwas.dat$rsid == "10:119427920:ATCACTGCCATCATCAGCC:A", c("allele2", "allele1")]
 
@@ -117,7 +116,7 @@ gwas.dat$maf[gwas.dat$maf > 0.5] <- 1-gwas.dat$maf[gwas.dat$maf > 0.5] # Finally
 
 ## Now Keep only the the required columns
 gwas.dat <- cbind.data.frame(rsid=gwas.dat$rsid, chromosome=gwas.dat$chromosome, position=gwas.dat$position, 
-                             allele1 = gwas.dat$allele1, allele2 = gwas.dat$allele2, maf = gwas.dat$maf, beta = gwas.dat$beta, se = gwas.dat$beta.SE, P=gwas.dat$P)
+                             allele1 = gwas.dat$allele1, allele2 = gwas.dat$allele2, maf = gwas.dat$maf, beta = gwas.dat$beta, se = gwas.dat$beta.SE)
 
 
 # Now sort this summary stat in the same order as Plink
@@ -132,7 +131,6 @@ table(gwas.dat$rsid == samplesnp.dat.bim$V2)
 # 2599 
 
 # Write data.z file for FINEMAP
-write.table(gwas.dat[-grep("^P$", colnames(gwas.dat))], "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp.z", quote = F, row.names = F, col.names = T, sep = " ")
-# cat(gwas.dat$P, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp.k")
+write.table(gwas.dat, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp.z", quote = F, row.names = F, col.names = T, sep = " ")
 
 
