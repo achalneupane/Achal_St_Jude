@@ -68,6 +68,8 @@ samplesnp.z;samplesnp.ld;samplesnp.snp;samplesnp.config;samplesnp.cred;samplesnp
 # chmod 777 *
 # dos2unix samplesnp.z
 
+./finemap_v1.4.1_x86_64 --sss --log --in-files samplesnp --dataset 1
+# ./finemap_v1.4.1_x86_64 --sss --log --n-causal-snps 2 --in-files samplesnp
 ./finemap_v1.4.1_x86_64 --sss --log --n-causal-snps 2 --in-files samplesnp
 
 

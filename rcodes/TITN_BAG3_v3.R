@@ -124,4 +124,17 @@ table(gwas.dat$rsid == samplesnp.dat.bim$V2)
 # Write data.z file for FINEMAP
 write.table(gwas.dat, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp.z", quote = F, row.names = F, col.names = T, sep = " ")
 
+sum(gwas.dat$maf < 0.01)
+# 58
+
+## First only keep those with maf >1 %; then separate the summary statistics for TITN and BAG3 and 
+gwas.dat.maf.gt.1perc <- gwas.dat[!gwas.dat$maf < 0.01,]
+
+gwas.dat.maf.gt.1perc.TITN <- gwas.dat.maf.gt.1perc[grepl("2", gwas.dat.maf.gt.1perc$chromosome),]
+gwas.dat.maf.gt.1perc.BAG3 <- gwas.dat.maf.gt.1perc[grepl("10", gwas.dat.maf.gt.1perc$chromosome),]
+
+
+write.table(gwas.dat.maf.gt.1perc.TITN, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp_TITN_gt_MAF_1_perc.z", quote = F, row.names = F, col.names = T, sep = " ")
+write.table(gwas.dat.maf.gt.1perc.BAG3, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp_BAG3_gt_MAF_1_perc.z", quote = F, row.names = F, col.names = T, sep = " ")
+
 
