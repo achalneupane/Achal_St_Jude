@@ -121,8 +121,8 @@ table(gwas.dat$rsid == samplesnp.dat.bim$V2)
 # TRUE 
 # 2599 
 
-# Write data.z file for FINEMAP
-write.table(gwas.dat, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp.z", quote = F, row.names = F, col.names = T, sep = " ")
+# # Write data.z file for FINEMAP
+# write.table(gwas.dat, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp.z", quote = F, row.names = F, col.names = T, sep = " ")
 
 sum(gwas.dat$maf < 0.01)
 # 58
@@ -134,7 +134,44 @@ gwas.dat.maf.gt.1perc.TITN <- gwas.dat.maf.gt.1perc[grepl("2", gwas.dat.maf.gt.1
 gwas.dat.maf.gt.1perc.BAG3 <- gwas.dat.maf.gt.1perc[grepl("10", gwas.dat.maf.gt.1perc$chromosome),]
 
 
+
+write.table(as.data.frame(gwas.dat.maf.gt.1perc.TITN$rsid), "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp_TITN_gt_MAF_1_perc_vars.list", quote = F, row.names = F, col.names = F, sep = " ")
+write.table(as.data.frame(gwas.dat.maf.gt.1perc.BAG3$rsid), "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp_BAG3_gt_MAF_1_perc_vats.list", quote = F, row.names = F, col.names = F, sep = " ")
+
+
+# After extracting these variants from plink, I am re-ordering the summary stat
+# to match the order of varinats in plink. This is to ensure LD and summary stat
+# have same variant order
+
+samplesnp_TITN_gt_MAF_1_perc_vars.dat.bim <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp_TITN_gt_MAF_1_perc_vars.dat.bim")
+gwas.dat.maf.gt.1perc.TITN <- gwas.dat.maf.gt.1perc.TITN[match(samplesnp_TITN_gt_MAF_1_perc_vars.dat.bim$V2, gwas.dat.maf.gt.1perc.TITN$rsid),]
+table(gwas.dat.maf.gt.1perc.TITN$rsid == samplesnp_TITN_gt_MAF_1_perc_vars.dat.bim$V2)
+# TRUE 
+# 947 
+
+samplesnp_BAG3_gt_MAF_1_perc_vars.dat.bim <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp_BAG3_gt_MAF_1_perc_vars.dat.bim")
+gwas.dat.maf.gt.1perc.BAG3 <- gwas.dat.maf.gt.1perc.BAG3[match(samplesnp_BAG3_gt_MAF_1_perc_vars.dat.bim$V2, gwas.dat.maf.gt.1perc.BAG3$rsid),]
+table(gwas.dat.maf.gt.1perc.BAG3$rsid == samplesnp_BAG3_gt_MAF_1_perc_vars.dat.bim$V2)
+# TRUE 
+# 1594 
+
 write.table(gwas.dat.maf.gt.1perc.TITN, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp_TITN_gt_MAF_1_perc.z", quote = F, row.names = F, col.names = T, sep = " ")
 write.table(gwas.dat.maf.gt.1perc.BAG3, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp_BAG3_gt_MAF_1_perc.z", quote = F, row.names = F, col.names = T, sep = " ")
 
+
+
+
+
+## Input summary stat file for COJO analysis 
+TITN.COJO <- cbind.data.frame(SNP=gwas.dat.maf.gt.1perc.TITN$rsid, A1=gwas.dat.maf.gt.1perc.TITN$allele1, A2=gwas.dat.maf.gt.1perc.TITN$allele2, 
+                              freq=gwas.dat.maf.gt.1perc.TITN$maf, b=gwas.dat.maf.gt.1perc.TITN$beta, se=gwas.dat.maf.gt.1perc.TITN$se, p=gwas.dat.maf.gt.1perc.TITN$P)
+TITN.COJO$N <- 1645
+
+BAG3.COJO <- cbind.data.frame(SNP=gwas.dat.maf.gt.1perc.BAG3$rsid, A1=gwas.dat.maf.gt.1perc.BAG3$allele1, A2=gwas.dat.maf.gt.1perc.BAG3$allele2, 
+                              freq=gwas.dat.maf.gt.1perc.BAG3$maf, b=gwas.dat.maf.gt.1perc.BAG3$beta, se=gwas.dat.maf.gt.1perc.BAG3$se, p=gwas.dat.maf.gt.1perc.BAG3$P)
+BAG3.COJO$N <- 1645
+
+## COJO files
+write.table(TITN.COJO, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/cojo_test/samplesnp_TITN_gt_MAF_1_perc_vars.ma", quote = F, row.names = F, col.names = F, sep = " ")
+write.table(BAG3.COJO, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/cojo_test/samplesnp_BAG3_gt_MAF_1_perc_vats.ma", quote = F, row.names = F, col.names = F, sep = " ")
 
