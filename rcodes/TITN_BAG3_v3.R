@@ -159,9 +159,6 @@ write.table(gwas.dat.maf.gt.1perc.TITN, "Z:/ResearchHome/Groups/sapkogrp/project
 write.table(gwas.dat.maf.gt.1perc.BAG3, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp_BAG3_gt_MAF_1_perc.z", quote = F, row.names = F, col.names = T, sep = " ")
 
 
-
-
-
 ## Input summary stat file for COJO analysis 
 TITN.COJO <- cbind.data.frame(SNP=gwas.dat.maf.gt.1perc.TITN$rsid, A1=gwas.dat.maf.gt.1perc.TITN$allele1, A2=gwas.dat.maf.gt.1perc.TITN$allele2, 
                               freq=gwas.dat.maf.gt.1perc.TITN$maf, b=gwas.dat.maf.gt.1perc.TITN$beta, se=gwas.dat.maf.gt.1perc.TITN$se, p=gwas.dat.maf.gt.1perc.TITN$P)
@@ -175,3 +172,25 @@ BAG3.COJO$N <- 1645
 write.table(TITN.COJO, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/cojo_test/samplesnp_TITN_gt_MAF_1_perc_vars.ma", quote = F, row.names = F, col.names = F, sep = " ")
 write.table(BAG3.COJO, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/cojo_test/samplesnp_BAG3_gt_MAF_1_perc_vats.ma", quote = F, row.names = F, col.names = F, sep = " ")
 
+
+
+#########################
+## Reading the results ##
+#########################
+# Assuming 1 causal
+samplesnp_TITN_gt_MAF_1_perc.snp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/assuming_1_causal_SNP/samplesnp_TITN_gt_MAF_1_perc.snp", header = T)
+dim(samplesnp_TITN_gt_MAF_1_perc.snp)
+# 947
+
+
+samplesnp_BAG3_gt_MAF_1_perc.snp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/assuming_1_causal_SNP/samplesnp_BAG3_gt_MAF_1_perc.snp", header = T)
+dim(samplesnp_BAG3_gt_MAF_1_perc.snp)
+
+
+# Without assumption for causal SNPs
+samplesnp_TITN_gt_MAF_1_perc.snp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/without_assumption_4_causal_SNP/samplesnp_TITN_gt_MAF_1_perc.snp", header = T)
+dim(samplesnp_TITN_gt_MAF_1_perc.snp)
+
+
+samplesnp_BAG3_gt_MAF_1_perc.snp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/without_assumption_4_causal_SNP/samplesnp_BAG3_gt_MAF_1_perc.snp", header = T)
+dim(samplesnp_BAG3_gt_MAF_1_perc.snp)

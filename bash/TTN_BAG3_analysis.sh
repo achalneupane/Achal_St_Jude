@@ -124,7 +124,10 @@ dos2unix samplesnp_BAG3_gt_MAF_1_perc.z
 #################
 ## Run FINEMAP ##
 #################
-## Assuming causal SNP to be 1
+## >>>>>>>>>>> Assuming 1 causal SNP
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/
+# Results are moved here: /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/
+
 ./finemap_v1.4.1_x86_64 --sss --log --n-causal-snps 1 --in-files samplesnp_TITN_gt_MAF_1_perc
 # - Number of GWAS samples           : 1645
 # - Number of SNPs                   : 947
@@ -154,9 +157,9 @@ dos2unix samplesnp_BAG3_gt_MAF_1_perc.z
 # - Post-Pr(# of causal SNPs is k)   :
 #   (0 -> 0)
 #    1 -> 1
+mv *.cred1 *.bf1 *.config *.snp *.log_sss /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/assuming_1_causal_SNP/
 
-
-## Without any asumption for the number of causal SNP
+## >>>>>>>>>>> Without any asumptions for the number of causal SNP
 ./finemap_v1.4.1_x86_64 --sss --log --in-files samplesnp_TITN_gt_MAF_1_perc --dataset 1
 # - Number of GWAS samples           : 1645
 # - Number of SNPs                   : 947
@@ -203,8 +206,10 @@ dos2unix samplesnp_BAG3_gt_MAF_1_perc.z
 #    4 -> 0
 #    5 -> 0
 
+mv *.cred1 *.bf1 *.config *.snp *.log_sss /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/without_assumption_4_causal_SNP
 
-## Configuring each SNP of interest
+
+## >>>>>>>>>>> Configuring each SNP of interest
 # Note: log10bf column contains the log10 Bayes factors. The Bayes factor quantifies the evidence that the i-{th} SNP is causal with log10 Bayes factors greater than 2 reporting considerable evidence
 ./finemap_v1.4.1_x86_64 --config --in-files samplesnp_TITN_gt_MAF_1_perc --dataset 1 --rsids chr2:178562809:T:C
 # - SNPs in causal configuration     : chr2:178562809:T:C
@@ -219,7 +224,6 @@ dos2unix samplesnp_BAG3_gt_MAF_1_perc.z
 # - Posterior SD of causal effects   : 0.0378961
 # ------------------------------------
 # - Regional SNP heritability        : 0.00274 (SD: 0.00217 ; 95% CI: [8.41e-05,0.00823])
-
 
 
 ./finemap_v1.4.1_x86_64 --config --in-files samplesnp_BAG3_gt_MAF_1_perc --dataset 1 --rsids chr10:119670121:T:C
@@ -237,3 +241,6 @@ dos2unix samplesnp_BAG3_gt_MAF_1_perc.z
 # - Regional SNP heritability        : 0.00224 (SD: 0.00197 ; 95% CI: [1.42e-05,0.0072])
 
 # - Run time                         : 0 hours, 0 minutes, 0 seconds
+
+
+
