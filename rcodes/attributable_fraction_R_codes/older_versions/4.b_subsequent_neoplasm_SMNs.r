@@ -174,7 +174,4 @@ CI <-  paste0("(", paste0(round(exp(estimates$Estimate - (1.96*estimates$S.error
 estimates$OR <- paste(estimates$OR, CI, sep = " ")
 estimates
 
-## SJLIFE (EUR)
-mod1.EUR <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_any.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
-summary(mod1.EUR)
 

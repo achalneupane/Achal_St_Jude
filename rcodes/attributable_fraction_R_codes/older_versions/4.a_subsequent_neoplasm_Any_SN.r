@@ -177,3 +177,155 @@ mod1.EUR <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AG
 summary(mod1.EUR)
 
 
+####################
+## 3. FA Pathways ##
+####################
+## SJLIFE (ALL) 
+## Checking with Qi's data
+# sum(ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid)
+ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+ANY_SNs <- ANY_SNs[ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid,]
+dim(ANY_SNs)
+# 491
+PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
+
+## SJLIFE (ALL) 
+mod1 <- glm(ANY_SN ~ Qin_carriers.FA.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+summary(mod1)
+estimates <- as.data.frame(summary(mod1)$coefficients)[c(1,2)]
+estimates$Estimate <- as.numeric(estimates$Estimate)
+estimates$OR <- round(exp(estimates$Estimate),2)
+## CI
+# exp(5.319e-01-(1.96*1.009e-01))
+# exp(5.319e-01+(1.96*1.009e-01))
+estimates$S.error <- as.numeric(as.character(estimates$`Std. Error`))
+CI <-  paste0("(", paste0(round(exp(estimates$Estimate - (1.96*estimates$S.error)),1), " to ", round(exp(estimates$Estimate + (1.96*estimates$S.error)),1)),")")
+estimates$OR <- paste(estimates$OR, CI, sep = " ")
+estimates
+
+## SJLIFE (EUR)
+mod1.EUR <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+summary(mod1.EUR)
+
+
+####################
+## 3. MMR Pathways ##
+####################
+## SJLIFE (ALL) 
+## Checking with Qi's data
+# sum(ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid)
+ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+ANY_SNs <- ANY_SNs[ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid,]
+dim(ANY_SNs)
+# 491
+PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
+
+## SJLIFE (ALL) 
+mod1 <- glm(ANY_SN ~ Qin_carriers.MMR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+summary(mod1)
+estimates <- as.data.frame(summary(mod1)$coefficients)[c(1,2)]
+estimates$Estimate <- as.numeric(estimates$Estimate)
+estimates$OR <- round(exp(estimates$Estimate),2)
+## CI
+# exp(5.319e-01-(1.96*1.009e-01))
+# exp(5.319e-01+(1.96*1.009e-01))
+estimates$S.error <- as.numeric(as.character(estimates$`Std. Error`))
+CI <-  paste0("(", paste0(round(exp(estimates$Estimate - (1.96*estimates$S.error)),1), " to ", round(exp(estimates$Estimate + (1.96*estimates$S.error)),1)),")")
+estimates$OR <- paste(estimates$OR, CI, sep = " ")
+estimates
+
+## SJLIFE (EUR)
+mod1.EUR <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+summary(mod1.EUR)
+
+####################
+## 3. BER Pathways ##
+####################
+## SJLIFE (ALL) 
+## Checking with Qi's data
+# sum(ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid)
+ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+ANY_SNs <- ANY_SNs[ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid,]
+dim(ANY_SNs)
+# 491
+PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
+
+## SJLIFE (ALL) 
+mod1 <- glm(ANY_SN ~ Qin_carriers.BER.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+summary(mod1)
+estimates <- as.data.frame(summary(mod1)$coefficients)[c(1,2)]
+estimates$Estimate <- as.numeric(estimates$Estimate)
+estimates$OR <- round(exp(estimates$Estimate),2)
+## CI
+# exp(5.319e-01-(1.96*1.009e-01))
+# exp(5.319e-01+(1.96*1.009e-01))
+estimates$S.error <- as.numeric(as.character(estimates$`Std. Error`))
+CI <-  paste0("(", paste0(round(exp(estimates$Estimate - (1.96*estimates$S.error)),1), " to ", round(exp(estimates$Estimate + (1.96*estimates$S.error)),1)),")")
+estimates$OR <- paste(estimates$OR, CI, sep = " ")
+estimates
+
+## SJLIFE (EUR)
+mod1.EUR <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+summary(mod1.EUR)
+
+
+####################
+## 3. NER Pathways ##
+####################
+## SJLIFE (ALL) 
+## Checking with Qi's data
+# sum(ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid)
+ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+ANY_SNs <- ANY_SNs[ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid,]
+dim(ANY_SNs)
+# 491
+PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
+
+## SJLIFE (ALL) 
+mod1 <- glm(ANY_SN ~ Qin_carriers.NER.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+summary(mod1)
+estimates <- as.data.frame(summary(mod1)$coefficients)[c(1,2)]
+estimates$Estimate <- as.numeric(estimates$Estimate)
+estimates$OR <- round(exp(estimates$Estimate),2)
+## CI
+# exp(5.319e-01-(1.96*1.009e-01))
+# exp(5.319e-01+(1.96*1.009e-01))
+estimates$S.error <- as.numeric(as.character(estimates$`Std. Error`))
+CI <-  paste0("(", paste0(round(exp(estimates$Estimate - (1.96*estimates$S.error)),1), " to ", round(exp(estimates$Estimate + (1.96*estimates$S.error)),1)),")")
+estimates$OR <- paste(estimates$OR, CI, sep = " ")
+estimates
+
+## SJLIFE (EUR)
+mod1.EUR <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+summary(mod1.EUR)
+
+
+####################
+## 3. NHEJ Pathways ##
+####################
+## SJLIFE (ALL) 
+## Checking with Qi's data
+# sum(ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid)
+ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+ANY_SNs <- ANY_SNs[ANY_SNs$sjlid %in% qi.df.SN.filtered$sjlid,]
+dim(ANY_SNs)
+# 491
+PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
+
+## SJLIFE (ALL) 
+mod1 <- glm(ANY_SN ~ Qin_carriers.NHEJ.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+summary(mod1)
+estimates <- as.data.frame(summary(mod1)$coefficients)[c(1,2)]
+estimates$Estimate <- as.numeric(estimates$Estimate)
+estimates$OR <- round(exp(estimates$Estimate),2)
+## CI
+# exp(5.319e-01-(1.96*1.009e-01))
+# exp(5.319e-01+(1.96*1.009e-01))
+estimates$S.error <- as.numeric(as.character(estimates$`Std. Error`))
+CI <-  paste0("(", paste0(round(exp(estimates$Estimate - (1.96*estimates$S.error)),1), " to ", round(exp(estimates$Estimate + (1.96*estimates$S.error)),1)),")")
+estimates$OR <- paste(estimates$OR, CI, sep = " ")
+estimates
+
+## SJLIFE (EUR)
+mod1.EUR <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+summary(mod1.EUR)
