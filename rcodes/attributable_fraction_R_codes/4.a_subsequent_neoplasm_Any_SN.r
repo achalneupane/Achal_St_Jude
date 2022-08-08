@@ -184,19 +184,65 @@ summary(mod1)
 ## Attributable fraction of Any SNs ##
 ######################################
 
-# Pleiotropy_PRSWEB_PRS.decile.category # error
-# Pleiotropy_Bi_directional_Decreasing_PRS.decile.category
-# Pleiotropy_Bi_directional_Increasing_PRS.decile.category
+# Pleiotropy_Bi_directional_Increasing_PRS.decile.category +
+# Pleiotropy_Bi_directional_Decreasing_PRS.decile.category +
+# Pleiotropy_Meta_analysis_PRS.decile.category +
+# Pleiotropy_PRSWEB_PRS.decile.category +
+# Pleiotropy_One_directional_PRS.decile.category +
+
+# Pleiotropy_Bi_directional_Increasing_PRS.tertile.category +
+# Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category +
+# Pleiotropy_Meta_analysis_PRS.tertile.category +
+# Pleiotropy_PRSWEB_PRS.tertile.category +
+# Pleiotropy_One_directional_PRS.tertile.category +
+
+
+
 # H.C.Clin.LoF.MetaSVM.Non.Ref.Counts
 # H.C.Clin.LoF.Non.Ref.Counts
 # H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts
 
+
+
+# We also considered bidirectional pleiotropic associations, wherein the same
+# allele for a given variant was associated with an increased risk for some
+# cancers but a decreased risk for others.
+
+# For any pair of cancers associated with the same variant, the type of
+# association falls in one of three categories: (1) SNPs identified in the
+# one-directional analysis, where all associations are in the same direction;
+# (2) SNPs identified in the bidirectional analysis, where both cancers in the
+# pair are associated in the same direction (both risk increasing or both risk
+# decreasing), even though at least one other cancer is associated in the
+# opposite direction; and (3) SNPs identified in the bidirectional analysis,
+# where the pair of cancers are associated in opposite directions (one risk
+# increasing and one risk decreasing).
+
+
 ## Predicted prevalence of ANY_SN
 dat_all = PHENO.ANY_SN
 # Fit the model - this needs to be the final model with all the variables of interest
+# fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_carriers + H.C.Clin.LoF.MetaSVM.Non.Ref.Counts + H.C.Clin.LoF.Non.Ref.Counts + 
+#                 H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts + 
+#                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+#                 Pleiotropy_Bi_directional_Increasing_PRS.decile.category +
+#                 Pleiotropy_Bi_directional_Decreasing_PRS.decile.category +
+#                 Pleiotropy_Meta_analysis_PRS.decile.category +
+#                 Pleiotropy_PRSWEB_PRS.decile.category +
+#                 Pleiotropy_One_directional_PRS.decile.category +
+#                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+#                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+#               data = dat_all)
+
+
 fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_carriers + H.C.Clin.LoF.MetaSVM.Non.Ref.Counts + H.C.Clin.LoF.Non.Ref.Counts + 
+                H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts + 
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-                Pleiotropy_Bi_directional_Increasing_PRS.decile.category +
+                Pleiotropy_Bi_directional_Increasing_PRS.tertile.category +
+                Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category +
+                Pleiotropy_Meta_analysis_PRS.tertile.category +
+                Pleiotropy_PRSWEB_PRS.tertile.category +
+                Pleiotropy_One_directional_PRS.tertile.category +
                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
@@ -216,41 +262,120 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 print(af_by_tx)
-# paste0(round(af_by_tx *100, 2), "%")
 
-## P/LP
+## maxsegrtdose.category
+dat_tx = dat_all
+dat_tx$maxsegrtdose.category = "None"
+dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
+
+N_all = sum(dat_all$pred_all, na.rm = TRUE)
+N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
+af_by_tx = (N_all - N_no_tx) / N_all
+print(af_by_tx)
+# 0.2017523
+
+## maxabdrtdose.category
+dat_tx = dat_all
+dat_tx$maxabdrtdose.category = "None"
+dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
+
+N_all = sum(dat_all$pred_all, na.rm = TRUE)
+N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
+af_by_tx = (N_all - N_no_tx) / N_all
+print(af_by_tx)
+# 0.07492755
+
+
+dat_tx$maxchestrtdose.category = dat_tx$epitxn_dose_5.category
+
+## maxchestrtdose.category
+dat_tx = dat_all
+dat_tx$maxchestrtdose.category = "None"
+dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
+
+N_all = sum(dat_all$pred_all, na.rm = TRUE)
+N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
+af_by_tx = (N_all - N_no_tx) / N_all
+print(af_by_tx)
+# 0.1633049
+
+## epitxn_dose_5.category
+dat_tx = dat_all
+dat_tx$epitxn_dose_5.category = "None"
+dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
+
+N_all = sum(dat_all$pred_all, na.rm = TRUE)
+N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
+af_by_tx = (N_all - N_no_tx) / N_all
+print(af_by_tx)
+# 0.04914264
+
+## P/LP Zhaoming
 dat_plp = dat_all
 dat_plp$Zhaoming_carriers = "N"
 
 dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
 N_no_plp = sum(dat_all$pred_no_plp, na.rm = TRUE)
-af_by_plp = (N_all - N_no_plp) / N_all
-print(af_by_plp)
+af_by_plp_Zhaoming = (N_all - N_no_plp) / N_all
+print(af_by_plp_Zhaoming)
+
+
+## P/LP Qin
+dat_plp = dat_all
+dat_plp$Qin_carriers = "N"
+
+dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
+N_no_plp = sum(dat_all$pred_no_plp, na.rm = TRUE)
+af_by_plp_Qin = (N_all - N_no_plp) / N_all
+print(af_by_plp_Qin)
+
 
 # # H.C.Clin.LoF.Non.Ref.Counts
-# dat_plp = dat_all
-# dat_plp$H.C.Clin.LoF.Non.Ref.Counts = 0
-# 
-# dat_all$pred_no_H.C.Clin.LoF.Non.Ref.Counts = predict(fit_all, newdata = dat_plp, type = "response")
-# N_no_pred_no_H.C.Clin.LoF.Non.Ref.Counts = sum(dat_all$pred_no_H.C.Clin.LoF.Non.Ref.Counts, na.rm = TRUE)
-# af_by_H.C.Clin.LoF.Non.Ref.Counts = (N_all - N_no_pred_no_H.C.Clin.LoF.Non.Ref.Counts) / N_all
-# print(af_by_H.C.Clin.LoF.Non.Ref.Counts)
-
-
-# Pleiotropy_Bi_directional_Increasing_Sig_PRS
 dat_plp = dat_all
-dat_plp$Pleiotropy_Bi_directional_Increasing_Sig_PRS = 0
+dat_plp$H.C.Clin.LoF.Non.Ref.Counts = 0
 
-dat_all$pred_no_Pleiotropy_Bi_directional_Increasing_Sig_PRS = predict(fit_all, newdata = dat_plp, type = "response")
-N_no_pred_no_Pleiotropy_Bi_directional_Increasing_Sig_PRS = sum(dat_all$pred_no_Pleiotropy_Bi_directional_Increasing_Sig_PRS, na.rm = TRUE)
-af_by_Pleiotropy_Bi_directional_Increasing_Sig_PRS = (N_all - N_no_pred_no_Pleiotropy_Bi_directional_Increasing_Sig_PRS) / N_all
-print(af_by_Pleiotropy_Bi_directional_Increasing_Sig_PRS)
+dat_all$pred_no_H.C.Clin.LoF.Non.Ref.Counts = predict(fit_all, newdata = dat_plp, type = "response")
+N_no_pred_no_H.C.Clin.LoF.Non.Ref.Counts = sum(dat_all$pred_no_H.C.Clin.LoF.Non.Ref.Counts, na.rm = TRUE)
+af_by_H.C.Clin.LoF.Non.Ref.Counts = (N_all - N_no_pred_no_H.C.Clin.LoF.Non.Ref.Counts) / N_all
+print(af_by_H.C.Clin.LoF.Non.Ref.Counts)
+# -2.153046
 
-# Pleiotropy_Bi_directional_Decreasing_Sig_PRS
+
+# # H.C.Clin.LoF.Non.Ref.Counts
 dat_plp = dat_all
-dat_plp$Pleiotropy_Bi_directional_Decreasing_Sig_PRS = 0
+dat_plp$H.C.Clin.LoF.Non.Ref.Counts = 0
 
-dat_all$pred_no_Pleiotropy_Bi_directional_Decreasing_Sig_PRS = predict(fit_all, newdata = dat_plp, type = "response")
-N_no_pred_no_Pleiotropy_Bi_directional_Decreasing_Sig_PRS = sum(dat_all$pred_no_Pleiotropy_Bi_directional_Decreasing_Sig_PRS, na.rm = TRUE)
-af_by_Pleiotropy_Bi_directional_Decreasing_Sig_PRS = (N_all - N_no_pred_no_Pleiotropy_Bi_directional_Decreasing_Sig_PRS) / N_all
-print(af_by_Pleiotropy_Bi_directional_Decreasing_Sig_PRS)
+dat_all$pred_no_H.C.Clin.LoF.Non.Ref.Counts = predict(fit_all, newdata = dat_plp, type = "response")
+N_no_pred_no_H.C.Clin.LoF.Non.Ref.Counts = sum(dat_all$pred_no_H.C.Clin.LoF.Non.Ref.Counts, na.rm = TRUE)
+af_by_H.C.Clin.LoF.Non.Ref.Counts = (N_all - N_no_pred_no_H.C.Clin.LoF.Non.Ref.Counts) / N_all
+print(af_by_H.C.Clin.LoF.Non.Ref.Counts)
+# -2.153046
+
+
+dat_plp = dat_all
+dat_plp$H.C.Clin.LoF.MetaSVM.Non.Ref.Counts = dat_plp$H.C.Clin.LoF.Non.Ref.Counts = dat_plp$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts = 0
+
+dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
+N_no_plp = sum(dat_all$pred_no_plp, na.rm = TRUE)
+af_by_plp_all.HC.counts = (N_all - N_no_plp) / N_all
+print(af_by_plp_all.HC.counts)
+# -2.849201
+#########
+## PRS ##
+#########
+dat_prs = dat_all
+dat_prs$Pleiotropy_Bi_directional_Increasing_PRS.decile.category = dat_prs$Pleiotropy_Bi_directional_Decreasing_PRS.decile.category = dat_prs$Pleiotropy_Meta_analysis_PRS.decile.category = dat_prs$Pleiotropy_PRSWEB_PRS.decile.category = dat_prs$Pleiotropy_One_directional_PRS.decile.category = "None"
+
+dat_all$pred_no_Pleiotropy_PRS = predict(fit_all, newdata = dat_prs, type = "response")
+N_no_Pleiotropy_PRS = sum(dat_all$pred_no_Pleiotropy_PRS, na.rm = TRUE)
+af_by_Pleiotropy_PRS.decile = (N_all - N_no_Pleiotropy_PRS) / N_all
+print(af_by_Pleiotropy_PRS)
+
+
+dat_prs = dat_all
+dat_prs$Pleiotropy_Bi_directional_Increasing_PRS.tertile.category = dat_prs$Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category = dat_prs$Pleiotropy_Meta_analysis_PRS.tertile.category = dat_prs$Pleiotropy_PRSWEB_PRS.tertile.category = dat_prs$Pleiotropy_One_directional_PRS.tertile.category = "None"
+
+dat_all$pred_no_Pleiotropy_PRS = predict(fit_all, newdata = dat_prs, type = "response")
+N_no_Pleiotropy_PRS = sum(dat_all$pred_no_Pleiotropy_PRS, na.rm = TRUE)
+af_by_Pleiotropy_PRS.tertile = (N_all - N_no_Pleiotropy_PRS) / N_all
+print(af_by_Pleiotropy_PRS.tertile)

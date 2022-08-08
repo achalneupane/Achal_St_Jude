@@ -174,11 +174,17 @@ TERT = unname(quantile(PHENO.ANY_SN[PRS.to.categorize[i]][PHENO.ANY_SN[PRS.to.ca
 if(sum(duplicated(TERT)) > 0) next
 print(TERT)
 print (i)
-PHENO.ANY_SN$tmp.tert.category[PHENO.ANY_SN[PRS.to.categorize[i]] ==0| is.na(PHENO.ANY_SN[,PRS.to.categorize[i]])] <- "None"
-PHENO.ANY_SN$tmp.tert.category[!grepl("None", PHENO.ANY_SN$tmp.tert.category)] <- as.character(cut(PHENO.ANY_SN[,PRS.to.categorize[i]][!grepl("None", PHENO.ANY_SN$tmp.tert.category)], breaks = c(0, TERT),
-                                           labels = c("1st", "2nd", "3rd"),
-                                           include.lowest = TRUE))
-PHENO.ANY_SN$tmp.tert.category <- factor(PHENO.ANY_SN$tmp.tert.category, levels = c("None", "1st", "2nd", "3rd"))
+# PHENO.ANY_SN$tmp.tert.category[PHENO.ANY_SN[PRS.to.categorize[i]] ==0| is.na(PHENO.ANY_SN[,PRS.to.categorize[i]])] <- "None"
+# PHENO.ANY_SN$tmp.tert.category[is.na(PHENO.ANY_SN[,PRS.to.categorize[i]])] <- "None"
+# PHENO.ANY_SN$tmp.tert.category[!grepl("None", PHENO.ANY_SN$tmp.tert.category)] <- as.character(cut(PHENO.ANY_SN[,PRS.to.categorize[i]][!grepl("None", PHENO.ANY_SN$tmp.tert.category)], breaks = c(0, TERT),
+#                                            labels = c("1st", "2nd", "3rd"),
+#                                            include.lowest = TRUE))
+
+PHENO.ANY_SN$tmp.tert.category <- as.character(cut(PHENO.ANY_SN[,PRS.to.categorize[i]], breaks = c(0, TERT),
+                                                                                                   labels = c("1st", "2nd", "3rd"),
+                                                                                                   include.lowest = TRUE))
+
+PHENO.ANY_SN$tmp.tert.category <- factor(PHENO.ANY_SN$tmp.tert.category, levels = c("1st", "2nd", "3rd"))
 colnames(PHENO.ANY_SN)[colnames(PHENO.ANY_SN) == "tmp.tert.category"] <- paste0(PRS.to.categorize[i], ".tertile.category")
 }
 
@@ -190,11 +196,17 @@ TERT = unname(quantile(PHENO.ANY_SN[PRS.to.categorize[i]][PHENO.ANY_SN[PRS.to.ca
 if(sum(duplicated(TERT)) > 0) next
 print(TERT)
 print (i)
-PHENO.ANY_SN$tmp.tert.category[PHENO.ANY_SN[PRS.to.categorize[i]] ==0| is.na(PHENO.ANY_SN[,PRS.to.categorize[i]])] <- "None"
-PHENO.ANY_SN$tmp.tert.category[!grepl("None", PHENO.ANY_SN$tmp.tert.category)] <- as.character(cut(PHENO.ANY_SN[,PRS.to.categorize[i]][!grepl("None", PHENO.ANY_SN$tmp.tert.category)], breaks = c(0, TERT),
+# PHENO.ANY_SN$tmp.tert.category[PHENO.ANY_SN[PRS.to.categorize[i]] ==0| is.na(PHENO.ANY_SN[,PRS.to.categorize[i]])] <- "None"
+# PHENO.ANY_SN$tmp.tert.category[is.na(PHENO.ANY_SN[,PRS.to.categorize[i]])] <- "None"
+# PHENO.ANY_SN$tmp.tert.category[!grepl("None", PHENO.ANY_SN$tmp.tert.category)] <- as.character(cut(PHENO.ANY_SN[,PRS.to.categorize[i]][!grepl("None", PHENO.ANY_SN$tmp.tert.category)], breaks = c(0, TERT),
+#                                                                                                    labels = c("1st", "2nd", "3rd"),
+#                                                                                                    include.lowest = TRUE))
+
+PHENO.ANY_SN$tmp.tert.category <- as.character(cut(PHENO.ANY_SN[,PRS.to.categorize[i]], breaks = c(0, TERT),
                                                                                                    labels = c("1st", "2nd", "3rd"),
                                                                                                    include.lowest = TRUE))
-PHENO.ANY_SN$tmp.tert.category <- factor(PHENO.ANY_SN$tmp.tert.category, levels = c("None", "1st", "2nd", "3rd"))
+
+PHENO.ANY_SN$tmp.tert.category <- factor(PHENO.ANY_SN$tmp.tert.category, levels = c("1st", "2nd", "3rd"))
 colnames(PHENO.ANY_SN)[colnames(PHENO.ANY_SN) == "tmp.tert.category"] <- paste0(PRS.to.categorize[i], ".decile.category")
 }
 
