@@ -1,7 +1,7 @@
 #########################
 ## Load Phenotype data ##
 #########################
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores.RDATA")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores_categories.RDATA")
 #########################
 ## Subsequent Neoplasm ##
 #########################
@@ -69,67 +69,67 @@ dim(ANY_SNs)
 
 PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
 
-#############################
-## Add Lifestyle variables ##
-#############################
-## For each samples, get habits immediately after 18 years of age in agesurvey
-
-# adlthabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.sas7bdat")
-adlthabits <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.txt", header = T, sep ="\t")
-head(adlthabits)
-# remove duplicated rows
-adlthabits <- distinct(adlthabits)
-## Get DOB
-adlthabits$DOB <- PHENO.ANY_SN$dob [match(adlthabits$SJLIFEID, PHENO.ANY_SN$sjlid)]
-adlthabits <- adlthabits[!is.na(adlthabits$DOB),]
-# change the format of dates YYYY-MM-DD
-adlthabits$datecomp <- paste(sapply(strsplit(adlthabits$datecomp, "\\/"), `[`, 3), sapply(strsplit(adlthabits$datecomp, "\\/"), `[`, 1), sapply(strsplit(adlthabits$datecomp, "\\/"), `[`, 2), sep = "-")
-adlthabits$agesurvey <- time_length(interval(as.Date(adlthabits$DOB), as.Date(adlthabits$datecomp)), "years")
-# adlthabits$agesurvey <- floor(adlthabits$agesurvey_diff_of_dob_datecomp)
-
-samples.sjlife <- unique(adlthabits$SJLIFEID)
-
-lifestyle <- {}
-for (i in 1:length(samples.sjlife)){
-  print(paste0("Doing ", i))
-  dat <- adlthabits[adlthabits$SJLIFEID == samples.sjlife[i],]
-  if (max(dat$agesurvey) >= 18){
-    print("YES")
-    dat2 <- dat[dat$agesurvey >= 18,]
-    lifestyle.tmp <- dat2[which(dat2$agesurvey == min(dat2$agesurvey)),] # Keep the earliest age after 18 years
-  }
-  lifestyle <- rbind.data.frame(lifestyle, lifestyle.tmp)
-}
-
-sum(duplicated(lifestyle$SJLIFEID))
-lifestyle$SJLIFEID[duplicated(lifestyle$SJLIFEID)]
-## Remove duplicate row
-lifestyle <- lifestyle[!duplicated(lifestyle$SJLIFEID),]
-
-## Add all samples
-# lifestyle <- cbind.data.frame(wgspop[,1:2], lifestyle[match(wgspop$MRN, lifestyle$mrn), ])
-# lifestyle <- lifestyle[-c(3,4)]
-# tt <- lifestyle
-## Recode categorical variables
-lifestyle$relation[lifestyle$relation == 1] <- "Self"
-lifestyle$relation[lifestyle$relation == 2] <- "Parent"
-lifestyle$relation[lifestyle$relation == 3] <- "Other"
-
-## Recode smoker
-lifestyle$smoker[lifestyle$smoker == 1] <- "Past"
-lifestyle$smoker[lifestyle$smoker == 2] <- "Current"
-lifestyle$smoker[lifestyle$smoker == 3] <- "Never"
-lifestyle$smoker_current_yn <- factor(ifelse(lifestyle$smoker != "Current", "N", "Y"))
-lifestyle$smoker_ever_yn <- factor(ifelse(grepl("Never", lifestyle$smoker), "N", "Y"))
-
-## Recode 1/2 or 0/1 to Y/N
-lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink|ltpaw|wtlt|vpa10|yoga", 
-                colnames(lifestyle))][lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink|ltpaw|wtlt|vpa10|yoga", 
-                                                      colnames(lifestyle))] == 1 ] <- "Y"
-
-lifestyle[grepl("nopa|ltpa|ltpaw|wtlt|vpa10|yoga", colnames(lifestyle))][lifestyle[grepl("nopa|ltpa|ltpaw|wtlt|vpa10|yoga", colnames(lifestyle))] == 2 ] <- "N"
-
-lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))][lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))] == 0 ] <- "N"
+# #############################
+# ## Add Lifestyle variables ##
+# #############################
+# ## For each samples, get habits immediately after 18 years of age in agesurvey
+# 
+# # adlthabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.sas7bdat")
+# adlthabits <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.txt", header = T, sep ="\t")
+# head(adlthabits)
+# # remove duplicated rows
+# adlthabits <- distinct(adlthabits)
+# ## Get DOB
+# adlthabits$DOB <- PHENO.ANY_SN$dob [match(adlthabits$SJLIFEID, PHENO.ANY_SN$sjlid)]
+# adlthabits <- adlthabits[!is.na(adlthabits$DOB),]
+# # change the format of dates YYYY-MM-DD
+# adlthabits$datecomp <- paste(sapply(strsplit(adlthabits$datecomp, "\\/"), `[`, 3), sapply(strsplit(adlthabits$datecomp, "\\/"), `[`, 1), sapply(strsplit(adlthabits$datecomp, "\\/"), `[`, 2), sep = "-")
+# adlthabits$agesurvey <- time_length(interval(as.Date(adlthabits$DOB), as.Date(adlthabits$datecomp)), "years")
+# # adlthabits$agesurvey <- floor(adlthabits$agesurvey_diff_of_dob_datecomp)
+# 
+# samples.sjlife <- unique(adlthabits$SJLIFEID)
+# 
+# lifestyle <- {}
+# for (i in 1:length(samples.sjlife)){
+#   print(paste0("Doing ", i))
+#   dat <- adlthabits[adlthabits$SJLIFEID == samples.sjlife[i],]
+#   if (max(dat$agesurvey) >= 18){
+#     print("YES")
+#     dat2 <- dat[dat$agesurvey >= 18,]
+#     lifestyle.tmp <- dat2[which(dat2$agesurvey == min(dat2$agesurvey)),] # Keep the earliest age after 18 years
+#   }
+#   lifestyle <- rbind.data.frame(lifestyle, lifestyle.tmp)
+# }
+# 
+# sum(duplicated(lifestyle$SJLIFEID))
+# lifestyle$SJLIFEID[duplicated(lifestyle$SJLIFEID)]
+# ## Remove duplicate row
+# lifestyle <- lifestyle[!duplicated(lifestyle$SJLIFEID),]
+# 
+# ## Add all samples
+# # lifestyle <- cbind.data.frame(wgspop[,1:2], lifestyle[match(wgspop$MRN, lifestyle$mrn), ])
+# # lifestyle <- lifestyle[-c(3,4)]
+# # tt <- lifestyle
+# ## Recode categorical variables
+# lifestyle$relation[lifestyle$relation == 1] <- "Self"
+# lifestyle$relation[lifestyle$relation == 2] <- "Parent"
+# lifestyle$relation[lifestyle$relation == 3] <- "Other"
+# 
+# ## Recode smoker
+# lifestyle$smoker[lifestyle$smoker == 1] <- "Past"
+# lifestyle$smoker[lifestyle$smoker == 2] <- "Current"
+# lifestyle$smoker[lifestyle$smoker == 3] <- "Never"
+# lifestyle$smoker_current_yn <- factor(ifelse(lifestyle$smoker != "Current", "N", "Y"))
+# lifestyle$smoker_ever_yn <- factor(ifelse(grepl("Never", lifestyle$smoker), "N", "Y"))
+# 
+# ## Recode 1/2 or 0/1 to Y/N
+# lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink|ltpaw|wtlt|vpa10|yoga", 
+#                 colnames(lifestyle))][lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink|ltpaw|wtlt|vpa10|yoga", 
+#                                                       colnames(lifestyle))] == 1 ] <- "Y"
+# 
+# lifestyle[grepl("nopa|ltpa|ltpaw|wtlt|vpa10|yoga", colnames(lifestyle))][lifestyle[grepl("nopa|ltpa|ltpaw|wtlt|vpa10|yoga", colnames(lifestyle))] == 2 ] <- "N"
+# 
+# lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))][lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))] == 0 ] <- "N"
 
 #######################
 ## Adolescent habits ##
@@ -138,26 +138,26 @@ lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyl
 # adolhabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adolhabits.sas7bdat")
 # head(adolhabits)
 
-###############
-## Adult BMI ##
-###############
-
-adultbmi <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.sas7bdat")
-head(adultbmi)
-
-lifestyle$agesurvey_floor <- floor(lifestyle$agesurvey)
-
-## Add BMI and Nutrition to Lifestyle. Here, I am extracting the the BMI and Nutrition for the same age for each sample
-lifestyle$BMI_KEY <- paste(lifestyle$SJLIFEID, lifestyle$agesurvey_floor, sep = ":")
-
-length(unique(adultbmi$sjlid))
-# 3640
-adultbmi$BMI_KEY <- paste(adultbmi$sjlid, adultbmi$AGE, sep = ":")
-sum(lifestyle$BMI_KEY %in% adultbmi$BMI_KEY)
-# 2964
-## samples that did not match by corresponding age
-cc <- lifestyle[!lifestyle$BMI_KEY %in% adultbmi$BMI_KEY,]
-lifestyle <- cbind.data.frame(lifestyle, adultbmi[match(lifestyle$BMI_KEY, adultbmi$BMI_KEY), c("BMI", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")])
+# ###############
+# ## Adult BMI ##
+# ###############
+# 
+# adultbmi <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.sas7bdat")
+# head(adultbmi)
+# 
+# lifestyle$agesurvey_floor <- floor(lifestyle$agesurvey)
+# 
+# ## Add BMI and Nutrition to Lifestyle. Here, I am extracting the the BMI and Nutrition for the same age for each sample
+# lifestyle$BMI_KEY <- paste(lifestyle$SJLIFEID, lifestyle$agesurvey_floor, sep = ":")
+# 
+# length(unique(adultbmi$sjlid))
+# # 3640
+# adultbmi$BMI_KEY <- paste(adultbmi$sjlid, adultbmi$AGE, sep = ":")
+# sum(lifestyle$BMI_KEY %in% adultbmi$BMI_KEY)
+# # 2964
+# ## samples that did not match by corresponding age
+# cc <- lifestyle[!lifestyle$BMI_KEY %in% adultbmi$BMI_KEY,]
+# lifestyle <- cbind.data.frame(lifestyle, adultbmi[match(lifestyle$BMI_KEY, adultbmi$BMI_KEY), c("BMI", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")])
 
 
 #########################
@@ -178,9 +178,9 @@ PHENO.ANY_SN.AFR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'AFR', -grep("sjl
 mod1 <- glm(ANY_SN ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
 
-## SJLIFE (EUR)
-mod1.EUR <- glm(ANY_SN ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
-summary(mod1.EUR)
+# ## SJLIFE (EUR)
+# mod1.EUR <- glm(ANY_SN ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+# summary(mod1.EUR)
 
 
 ######################################
@@ -190,8 +190,7 @@ summary(mod1.EUR)
 ## Predicted prevalence of ANY_SN
 dat_all = PHENO.ANY_SN
 # Fit the model - this needs to be the final model with all the variables of interest
-fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_carriers.HR.pathways + Qin_carriers.FA.pathways + Qin_carriers.MMR.pathways + 
-                Qin_carriers.BER.pathways + Qin_carriers.NER.pathways + Qin_carriers.NHEJ.pathways + AGE_AT_LAST_CONTACT.cs1 +
+fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_carriers + H.C.Clin.LoF.WO.Zhao.Qin.variants_carriers + H.C.Clin.LoF.WO.Zhao.Qin.variants_carriers + AGE_AT_LAST_CONTACT.cs1 +
                 AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
                 maxchestrtdose.category + epitxn_dose_5.category + Pleiotropy_Bi_directional_Increasing_Sig_PRS + 

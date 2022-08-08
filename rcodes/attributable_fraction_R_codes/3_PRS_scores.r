@@ -161,3 +161,41 @@ saved.PHENO.ANY_SN <- PHENO.ANY_SN
 
 # lapply(list(wgspop, wgsdiag, subneo, radiation, drug, demog, adultbmi, adolhabits, adlthabits), dim)
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores.RDATA")
+
+## Change PRS to categories
+PRS.to.categorize <- colnames(PHENO.ANY_SN)[grepl("_PRS$", colnames(PHENO.ANY_SN))]
+
+# ## Breaks are not unique for "Meningiom_Claus_PRS"
+# PRS.to.categorize <- PRS.to.categorize[!grepl("Meningiom_Claus_PRS", PRS.to.categorize)]
+
+## Tertile categories
+for(i in 1:length(PRS.to.categorize)){
+TERT = unname(quantile(PHENO.ANY_SN[PRS.to.categorize[i]][PHENO.ANY_SN[PRS.to.categorize[i]] !=0], c(1/3, 2/3, 1), na.rm = T))
+if(sum(duplicated(TERT)) > 0) next
+print(TERT)
+print (i)
+PHENO.ANY_SN$tmp.tert.category[PHENO.ANY_SN[PRS.to.categorize[i]] ==0| is.na(PHENO.ANY_SN[,PRS.to.categorize[i]])] <- "None"
+PHENO.ANY_SN$tmp.tert.category[!grepl("None", PHENO.ANY_SN$tmp.tert.category)] <- as.character(cut(PHENO.ANY_SN[,PRS.to.categorize[i]][!grepl("None", PHENO.ANY_SN$tmp.tert.category)], breaks = c(0, TERT),
+                                           labels = c("1st", "2nd", "3rd"),
+                                           include.lowest = TRUE))
+PHENO.ANY_SN$tmp.tert.category <- factor(PHENO.ANY_SN$tmp.tert.category, levels = c("None", "1st", "2nd", "3rd"))
+colnames(PHENO.ANY_SN)[colnames(PHENO.ANY_SN) == "tmp.tert.category"] <- paste0(PRS.to.categorize[i], ".tertile.category")
+}
+
+
+## Decile categories
+## Breaks are not unique for Meningioma_Dobbins_PRS
+for(i in 1:length(PRS.to.categorize)){
+TERT = unname(quantile(PHENO.ANY_SN[PRS.to.categorize[i]][PHENO.ANY_SN[PRS.to.categorize[i]] !=0], c(1/10, 1/9, 1), na.rm = T))
+if(sum(duplicated(TERT)) > 0) next
+print(TERT)
+print (i)
+PHENO.ANY_SN$tmp.tert.category[PHENO.ANY_SN[PRS.to.categorize[i]] ==0| is.na(PHENO.ANY_SN[,PRS.to.categorize[i]])] <- "None"
+PHENO.ANY_SN$tmp.tert.category[!grepl("None", PHENO.ANY_SN$tmp.tert.category)] <- as.character(cut(PHENO.ANY_SN[,PRS.to.categorize[i]][!grepl("None", PHENO.ANY_SN$tmp.tert.category)], breaks = c(0, TERT),
+                                                                                                   labels = c("1st", "2nd", "3rd"),
+                                                                                                   include.lowest = TRUE))
+PHENO.ANY_SN$tmp.tert.category <- factor(PHENO.ANY_SN$tmp.tert.category, levels = c("None", "1st", "2nd", "3rd"))
+colnames(PHENO.ANY_SN)[colnames(PHENO.ANY_SN) == "tmp.tert.category"] <- paste0(PRS.to.categorize[i], ".decile.category")
+}
+
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores_categories.RDATA")
