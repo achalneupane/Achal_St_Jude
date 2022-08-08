@@ -19,9 +19,6 @@ library(lubridate)
 # benchmarkme::get_ram()
 
 
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores.RDATA")
-
-
 subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
 head(subneo)
 table(subneo$diaggrp)
@@ -187,14 +184,21 @@ summary(mod1)
 ## Attributable fraction of Any SNs ##
 ######################################
 
+# Pleiotropy_PRSWEB_PRS.decile.category # error
+# Pleiotropy_Bi_directional_Decreasing_PRS.decile.category
+# Pleiotropy_Bi_directional_Increasing_PRS.decile.category
+# H.C.Clin.LoF.MetaSVM.Non.Ref.Counts
+# H.C.Clin.LoF.Non.Ref.Counts
+# H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts
+
 ## Predicted prevalence of ANY_SN
 dat_all = PHENO.ANY_SN
 # Fit the model - this needs to be the final model with all the variables of interest
-fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_carriers + H.C.Clin.LoF.WO.Zhao.Qin.variants_carriers + H.C.Clin.LoF.WO.Zhao.Qin.variants_carriers + AGE_AT_LAST_CONTACT.cs1 +
-                AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_carriers + H.C.Clin.LoF.MetaSVM.Non.Ref.Counts + H.C.Clin.LoF.Non.Ref.Counts + 
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                Pleiotropy_Bi_directional_Increasing_PRS.decile.category +
                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
-                maxchestrtdose.category + epitxn_dose_5.category + Pleiotropy_Bi_directional_Increasing_Sig_PRS + 
-                Pleiotropy_Bi_directional_Decreasing_Sig_PRS, family = binomial,
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 
 # Get predicted values
