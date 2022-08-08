@@ -5,6 +5,7 @@
 ## Chunk 1.
 gwas.dat <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Summary_results_AN.txt", sep = "\t", header = T)
 dim(gwas.dat)
+gwas.dat.original <- gwas.dat 
 gwas.dat$SNP <- paste(gwas.dat$SNP, gwas.dat$A2, gwas.dat$A1, sep = ":")
 
 
@@ -72,7 +73,7 @@ gwas.dat$maf <- freq.dat$MAF[match(gwas.dat$V2, freq.dat$SNP)]
 
 
 gwas.dat <- cbind.data.frame(rsid=gwas.dat$V2, SNP=gwas.dat$SNP, chromosome=gwas.dat$CHR, position=gwas.dat$BP, 
-                             allele1 = gwas.dat$A1, allele2 = gwas.dat$A2, maf = gwas.dat$maf, OR_95percent_CI_SJLIFE = gwas.dat$OR_95percent_CI_SJLIFE)
+                             allele1 = gwas.dat$A1, allele2 = gwas.dat$A2, maf = gwas.dat$maf, OR_95percent_CI_SJLIFE = gwas.dat$OR_95percent_CI_SJLIFE, P=gwas.dat$P_SJLIFE)
 
 gwas.dat$OR <- as.numeric(sapply(strsplit(gwas.dat$OR_95percent_CI_SJLIFE, " "), `[`, 1))
 
@@ -107,7 +108,7 @@ gwas.dat$maf[gwas.dat$maf > 0.5] <- 1-gwas.dat$maf[gwas.dat$maf > 0.5] # Finally
 
 ## Now Keep only the the required columns
 gwas.dat <- cbind.data.frame(rsid=gwas.dat$rsid, chromosome=gwas.dat$chromosome, position=gwas.dat$position, 
-                             allele1 = gwas.dat$allele1, allele2 = gwas.dat$allele2, maf = gwas.dat$maf, beta = gwas.dat$beta, se = gwas.dat$beta.SE)
+                             allele1 = gwas.dat$allele1, allele2 = gwas.dat$allele2, maf = gwas.dat$maf, beta = gwas.dat$beta, se = gwas.dat$beta.SE, P=gwas.dat$P)
 
 
 # Now sort this summary stat in the same order as Plink
@@ -189,6 +190,23 @@ dim(samplesnp_BAG3_gt_MAF_1_perc.snp)
 max(samplesnp_BAG3_gt_MAF_1_perc.snp$prob)
 # 0.038; 10:119670121 is top 74th
 
+
+prob.stats.titn.bag3.maf.gt.1.perc <- rbind.data.frame(samplesnp_TITN_gt_MAF_1_perc.snp, samplesnp_BAG3_gt_MAF_1_perc.snp)
+dim(prob.stats.titn.bag3.maf.gt.1.perc)
+
+prob.stats.titn.bag3.maf.gt.1.perc$SNP <- paste(prob.stats.titn.bag3.maf.gt.1.perc$chromosome, prob.stats.titn.bag3.maf.gt.1.perc$position, sep = ":")
+
+sum(gwas.dat.original$SNP %in% prob.stats.titn.bag3.maf.gt.1.perc$SNP)
+# 2541
+
+gwas.dat.original$FINEMAP_Prob <- prob.stats.titn.bag3.maf.gt.1.perc$prob[match(gwas.dat.original$SNP, prob.stats.titn.bag3.maf.gt.1.perc$SNP)]
+gwas.dat$SNP <- paste(gwas.dat$chromosome, gwas.dat$position, sep = ":")
+gwas.dat.original$MAF <- gwas.dat$maf[match(gwas.dat.original$SNP, gwas.dat$SNP)]
+
+write.table(gwas.dat.original, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_prob.stats.titn.bag3.maf.gt.1.perc.txt", quote = F, row.names = F, col.names = T, sep = "\t")
+
+
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP.RDATA")
 
 # # Without assumption for causal SNPs
 # samplesnp_TITN_gt_MAF_1_perc.snp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/without_assumption_4_causal_SNP/samplesnp_TITN_gt_MAF_1_perc.snp", header = T)

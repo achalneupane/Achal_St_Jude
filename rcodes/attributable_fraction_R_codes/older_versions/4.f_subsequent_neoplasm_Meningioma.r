@@ -171,8 +171,19 @@ CI <-  paste0("(", paste0(round(exp(estimates$Estimate - (1.96*estimates$S.error
 estimates$OR <- paste(estimates$OR, CI, sep = " ")
 estimates
 
-## SJLIFE (EUR)
-mod1.EUR <- glm(MENINGIOMA ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
-summary(mod1.EUR)
-
+####################
+## 3. FA Pathways ##
+####################
+mod1 <- glm(MENINGIOMA ~ Qin_carriers.FA.pathways + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+summary(mod1)
+estimates <- as.data.frame(summary(mod1)$coefficients)[c(1,2)]
+estimates$Estimate <- as.numeric(estimates$Estimate)
+estimates$OR <- round(exp(estimates$Estimate),2)
+## CI
+# exp(5.319e-01-(1.96*1.009e-01))
+# exp(5.319e-01+(1.96*1.009e-01))
+estimates$S.error <- as.numeric(as.character(estimates$`Std. Error`))
+CI <-  paste0("(", paste0(round(exp(estimates$Estimate - (1.96*estimates$S.error)),1), " to ", round(exp(estimates$Estimate + (1.96*estimates$S.error)),1)),")")
+estimates$OR <- paste(estimates$OR, CI, sep = " ")
+estimates
 
