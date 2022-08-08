@@ -181,16 +181,19 @@ write.table(BAG3.COJO, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/
 samplesnp_TITN_gt_MAF_1_perc.snp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/assuming_1_causal_SNP/samplesnp_TITN_gt_MAF_1_perc.snp", header = T)
 dim(samplesnp_TITN_gt_MAF_1_perc.snp)
 # 947
-
+max(samplesnp_TITN_gt_MAF_1_perc.snp$prob)
+# 0.014; 2:178562809 is top 27th
 
 samplesnp_BAG3_gt_MAF_1_perc.snp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/assuming_1_causal_SNP/samplesnp_BAG3_gt_MAF_1_perc.snp", header = T)
 dim(samplesnp_BAG3_gt_MAF_1_perc.snp)
+max(samplesnp_BAG3_gt_MAF_1_perc.snp$prob)
+# 0.038; 10:119670121 is top 74th
 
 
-# Without assumption for causal SNPs
-samplesnp_TITN_gt_MAF_1_perc.snp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/without_assumption_4_causal_SNP/samplesnp_TITN_gt_MAF_1_perc.snp", header = T)
-dim(samplesnp_TITN_gt_MAF_1_perc.snp)
-
-
-samplesnp_BAG3_gt_MAF_1_perc.snp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/without_assumption_4_causal_SNP/samplesnp_BAG3_gt_MAF_1_perc.snp", header = T)
-dim(samplesnp_BAG3_gt_MAF_1_perc.snp)
+# # Without assumption for causal SNPs
+# samplesnp_TITN_gt_MAF_1_perc.snp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/without_assumption_4_causal_SNP/samplesnp_TITN_gt_MAF_1_perc.snp", header = T)
+# dim(samplesnp_TITN_gt_MAF_1_perc.snp)
+# 
+# 
+# samplesnp_BAG3_gt_MAF_1_perc.snp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/without_assumption_4_causal_SNP/samplesnp_BAG3_gt_MAF_1_perc.snp", header = T)
+# dim(samplesnp_BAG3_gt_MAF_1_perc.snp)
