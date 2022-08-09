@@ -1,7 +1,7 @@
 #########################
 ## Load Phenotype data ##
 #########################
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores.RDATA")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores_categories.RDATA")
 #########################
 ## Subsequent Neoplasm ##
 #########################
@@ -17,9 +17,6 @@ library(stringr)
 # library(tidyverse)
 library(lubridate)
 # benchmarkme::get_ram()
-
-
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores.RDATA")
 
 
 subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
@@ -102,4 +99,176 @@ summary(mod1)
 mod1.EUR <- glm(SMN ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 summary(mod1.EUR)
 
+############################
+## Attributable Fractions ##
+############################
+dat_all = PHENO.ANY_SN
+
+# fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+#                 H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts +
+#                 All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts +
+#                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+#                 Pleiotropy_Bi_directional_Increasing_PRS.tertile.category +
+#                 Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category +
+#                 Pleiotropy_Meta_analysis_PRS.tertile.category +
+#                 Pleiotropy_PRSWEB_PRS.tertile.category +
+#                 Pleiotropy_One_directional_PRS.tertile.category +
+#                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+#                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+#               data = dat_all)
+
+
+# fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+#                 H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts +
+#                 All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts +
+#                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+#                 Pleiotropy_Bi_directional_Increasing_PRS.tertile.category +
+#                 Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category +
+#                 Pleiotropy_Meta_analysis_PRS.tertile.category +
+#                 Pleiotropy_One_directional_PRS.tertile.category +
+#                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+#                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+#               data = dat_all)
+# 
+# 
+# fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+#                 H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts +
+#                 All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts +
+#                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+#                 Pleiotropy_Bi_directional_Increasing_PRS.tertile.category +
+#                 Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category +
+#                 Pleiotropy_One_directional_PRS.tertile.category +
+#                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+#                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+#               data = dat_all)
+
+
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers + 
+                H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts + 
+                All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts +
+                Pleiotropy_PRSWEB_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+
+
+
+
+
+summary(fit_all)
+
+# Get predicted values
+dat_all$pred_all = predict(fit_all, newdat = dat_all, type = "response")
+
+## Move relevant treatment exposures for everyone to no exposure
+dat_tx = dat_all
+dat_tx$maxsegrtdose.category = dat_tx$maxabdrtdose.category = dat_tx$maxchestrtdose.category = dat_tx$epitxn_dose_5.category = "None"
+dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
+
+## Attributable fraction calculation
+# First get the "predicted" number of SNs
+# Based on the model including all variables
+N_all = sum(dat_all$pred_all, na.rm = TRUE)
+N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
+af_by_tx = (N_all - N_no_tx) / N_all
+print(af_by_tx)
+# 0.4947382
+
+## maxsegrtdose.category
+dat_tx = dat_all
+dat_tx$maxsegrtdose.category = "None"
+dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
+
+N_all = sum(dat_all$pred_all, na.rm = TRUE)
+N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
+af_by_tx = (N_all - N_no_tx) / N_all
+print(af_by_tx)
+# 0.2138112
+
+## maxabdrtdose.category
+dat_tx = dat_all
+dat_tx$maxabdrtdose.category = "None"
+dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
+
+N_all = sum(dat_all$pred_all, na.rm = TRUE)
+N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
+af_by_tx = (N_all - N_no_tx) / N_all
+print(af_by_tx)
+# 0.09324085
+
+
+## maxchestrtdose.category
+dat_tx = dat_all
+dat_tx$maxchestrtdose.category = "None"
+dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
+
+N_all = sum(dat_all$pred_all, na.rm = TRUE)
+N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
+af_by_tx = (N_all - N_no_tx) / N_all
+print(af_by_tx)
+# 0.1635751
+
+## epitxn_dose_5.category
+dat_tx = dat_all
+dat_tx$epitxn_dose_5.category = "None"
+dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
+
+N_all = sum(dat_all$pred_all, na.rm = TRUE)
+N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
+af_by_tx = (N_all - N_no_tx) / N_all
+print(af_by_tx)
+# 0.07783655
+
+## P/LP Zhaoming
+dat_plp = dat_all
+dat_plp$Zhaoming_carriers = "N"
+
+dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
+N_no_plp = sum(dat_all$pred_no_plp, na.rm = TRUE)
+af_by_plp_Zhaoming = (N_all - N_no_plp) / N_all
+print(af_by_plp_Zhaoming)
+# 0.02267418
+
+## P/LP Qin
+dat_plp = dat_all
+dat_plp$Qin_carriers = "N"
+
+dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
+N_no_plp = sum(dat_all$pred_no_plp, na.rm = TRUE)
+af_by_plp_Qin = (N_all - N_no_plp) / N_all
+print(af_by_plp_Qin)
+# 0.01281991
+
+## H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts
+dat_plp = dat_all
+dat_plp$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts  = 0
+
+dat_all$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts = predict(fit_all, newdata = dat_plp, type = "response")
+N_no_pred_H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts = sum(dat_all$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts, na.rm = TRUE)
+af_by_N_no_pred_H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts = (N_all - N_no_pred_H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts) / N_all
+print(af_by_N_no_pred_H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts)
+# -3.298338
+
+## All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts
+dat_plp = dat_all
+dat_plp$All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts  = 0
+
+dat_all$All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts = predict(fit_all, newdata = dat_plp, type = "response")
+N_no_pred_All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts = sum(dat_all$All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts, na.rm = TRUE)
+af_by_N_no_pred_All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts = (N_all - N_no_pred_All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts) / N_all
+print(af_by_N_no_pred_All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts)
+# -1.44166
+
+#########
+## PRS ##
+#########
+dat_prs = dat_all
+dat_prs$Pleiotropy_PRSWEB_PRS.tertile.category = "1st"
+
+dat_all$pred_no_Pleiotropy_PRSWEB_PRS.tertile.category = predict(fit_all, newdata = dat_prs, type = "response")
+N_no_Pleiotropy_PRSWEB_PRS.tertile.category = sum(dat_all$pred_no_Pleiotropy_PRSWEB_PRS.tertile.category, na.rm = TRUE)
+af_by_N_no_Pleiotropy_PRSWEB_PRS.tertile.category = (N_all - N_no_Pleiotropy_PRSWEB_PRS.tertile.category) / N_all
+print(af_by_N_no_Pleiotropy_PRSWEB_PRS.tertile.category)
+# -1.168303
 

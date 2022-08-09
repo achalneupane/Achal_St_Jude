@@ -235,17 +235,73 @@ dat_all = PHENO.ANY_SN
 #               data = dat_all)
 
 
-fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_carriers + H.C.Clin.LoF.MetaSVM.Non.Ref.Counts + H.C.Clin.LoF.Non.Ref.Counts + 
+# fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_carriers + 
+#                 H.C.Clin.LoF.MetaSVM.Non.Ref.Counts + 
+#                 H.C.Clin.LoF.Non.Ref.Counts + 
+#                 H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts + 
+#                 All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts +
+#                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+#                 Pleiotropy_Bi_directional_Increasing_PRS.tertile.category +
+#                 Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category +
+#                 Pleiotropy_Meta_analysis_PRS.tertile.category +
+#                 Pleiotropy_PRSWEB_PRS.tertile.category +
+#                 Pleiotropy_One_directional_PRS.tertile.category +
+#                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+#                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+#               data = dat_all)
+
+
+# fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_carriers + 
+#                 H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts + 
+#                 All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts +
+#                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+#                 Pleiotropy_Bi_directional_Increasing_PRS.tertile.category +
+#                 Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category +
+#                 Pleiotropy_Meta_analysis_PRS.tertile.category +
+#                 Pleiotropy_PRSWEB_PRS.tertile.category +
+#                 Pleiotropy_One_directional_PRS.tertile.category +
+#                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+#                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+#               data = dat_all)
+
+
+
+# fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_carriers + 
+#                 H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts + 
+#                 All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts +
+#                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+#                 Pleiotropy_Bi_directional_Increasing_PRS.tertile.category +
+#                 Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category +
+#                 Pleiotropy_Meta_analysis_PRS.tertile.category +
+#                 Pleiotropy_One_directional_PRS.tertile.category +
+#                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+#                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+#               data = dat_all)
+
+
+# fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_carriers + 
+#                 H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts + 
+#                 All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts +
+#                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+#                 Pleiotropy_Bi_directional_Increasing_PRS.tertile.category +
+#                 Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category +
+#                 Pleiotropy_One_directional_PRS.tertile.category +
+#                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+#                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+#               data = dat_all)
+
+
+fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_carriers + 
                 H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts + 
-                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-                Pleiotropy_Bi_directional_Increasing_PRS.tertile.category +
-                Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category +
-                Pleiotropy_Meta_analysis_PRS.tertile.category +
+                All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts +
                 Pleiotropy_PRSWEB_PRS.tertile.category +
-                Pleiotropy_One_directional_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
+
+
+summary(fit_all)
 
 # Get predicted values
 dat_all$pred_all = predict(fit_all, newdat = dat_all, type = "response")
@@ -272,7 +328,7 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 print(af_by_tx)
-# 0.2017523
+# 0.2024548
 
 ## maxabdrtdose.category
 dat_tx = dat_all
@@ -286,8 +342,6 @@ print(af_by_tx)
 # 0.07492755
 
 
-dat_tx$maxchestrtdose.category = dat_tx$epitxn_dose_5.category
-
 ## maxchestrtdose.category
 dat_tx = dat_all
 dat_tx$maxchestrtdose.category = "None"
@@ -297,7 +351,7 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 print(af_by_tx)
-# 0.1633049
+# 0.1635751
 
 ## epitxn_dose_5.category
 dat_tx = dat_all
@@ -308,7 +362,7 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 print(af_by_tx)
-# 0.04914264
+# 0.04908683
 
 ## P/LP Zhaoming
 dat_plp = dat_all
@@ -318,7 +372,7 @@ dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
 N_no_plp = sum(dat_all$pred_no_plp, na.rm = TRUE)
 af_by_plp_Zhaoming = (N_all - N_no_plp) / N_all
 print(af_by_plp_Zhaoming)
-
+# 0.01999075
 
 ## P/LP Qin
 dat_plp = dat_all
@@ -328,54 +382,36 @@ dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
 N_no_plp = sum(dat_all$pred_no_plp, na.rm = TRUE)
 af_by_plp_Qin = (N_all - N_no_plp) / N_all
 print(af_by_plp_Qin)
+# -0.0006263049
 
-
-# # H.C.Clin.LoF.Non.Ref.Counts
+## H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts
 dat_plp = dat_all
-dat_plp$H.C.Clin.LoF.Non.Ref.Counts = 0
+dat_plp$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts  = 0
 
-dat_all$pred_no_H.C.Clin.LoF.Non.Ref.Counts = predict(fit_all, newdata = dat_plp, type = "response")
-N_no_pred_no_H.C.Clin.LoF.Non.Ref.Counts = sum(dat_all$pred_no_H.C.Clin.LoF.Non.Ref.Counts, na.rm = TRUE)
-af_by_H.C.Clin.LoF.Non.Ref.Counts = (N_all - N_no_pred_no_H.C.Clin.LoF.Non.Ref.Counts) / N_all
-print(af_by_H.C.Clin.LoF.Non.Ref.Counts)
-# -2.153046
+dat_all$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts = predict(fit_all, newdata = dat_plp, type = "response")
+N_no_pred_H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts = sum(dat_all$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts, na.rm = TRUE)
+af_by_N_no_pred_H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts = (N_all - N_no_pred_H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts) / N_all
+print(af_by_N_no_pred_H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts)
+# -2.216773
 
-
-# # H.C.Clin.LoF.Non.Ref.Counts
+## All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts
 dat_plp = dat_all
-dat_plp$H.C.Clin.LoF.Non.Ref.Counts = 0
+dat_plp$All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts  = 0
 
-dat_all$pred_no_H.C.Clin.LoF.Non.Ref.Counts = predict(fit_all, newdata = dat_plp, type = "response")
-N_no_pred_no_H.C.Clin.LoF.Non.Ref.Counts = sum(dat_all$pred_no_H.C.Clin.LoF.Non.Ref.Counts, na.rm = TRUE)
-af_by_H.C.Clin.LoF.Non.Ref.Counts = (N_all - N_no_pred_no_H.C.Clin.LoF.Non.Ref.Counts) / N_all
-print(af_by_H.C.Clin.LoF.Non.Ref.Counts)
-# -2.153046
+dat_all$All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts = predict(fit_all, newdata = dat_plp, type = "response")
+N_no_pred_All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts = sum(dat_all$All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts, na.rm = TRUE)
+af_by_N_no_pred_All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts = (N_all - N_no_pred_All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts) / N_all
+print(af_by_N_no_pred_All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts)
+# -2.424273
 
-
-dat_plp = dat_all
-dat_plp$H.C.Clin.LoF.MetaSVM.Non.Ref.Counts = dat_plp$H.C.Clin.LoF.Non.Ref.Counts = dat_plp$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts = 0
-
-dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
-N_no_plp = sum(dat_all$pred_no_plp, na.rm = TRUE)
-af_by_plp_all.HC.counts = (N_all - N_no_plp) / N_all
-print(af_by_plp_all.HC.counts)
-# -2.849201
 #########
 ## PRS ##
 #########
 dat_prs = dat_all
-dat_prs$Pleiotropy_Bi_directional_Increasing_PRS.decile.category = dat_prs$Pleiotropy_Bi_directional_Decreasing_PRS.decile.category = dat_prs$Pleiotropy_Meta_analysis_PRS.decile.category = dat_prs$Pleiotropy_PRSWEB_PRS.decile.category = dat_prs$Pleiotropy_One_directional_PRS.decile.category = "None"
+dat_prs$Pleiotropy_PRSWEB_PRS.tertile.category = "1st"
 
-dat_all$pred_no_Pleiotropy_PRS = predict(fit_all, newdata = dat_prs, type = "response")
-N_no_Pleiotropy_PRS = sum(dat_all$pred_no_Pleiotropy_PRS, na.rm = TRUE)
-af_by_Pleiotropy_PRS.decile = (N_all - N_no_Pleiotropy_PRS) / N_all
-print(af_by_Pleiotropy_PRS)
+dat_all$pred_no_Pleiotropy_PRSWEB_PRS.tertile.category = predict(fit_all, newdata = dat_prs, type = "response")
+N_no_Pleiotropy_PRSWEB_PRS.tertile.category = sum(dat_all$pred_no_Pleiotropy_PRSWEB_PRS.tertile.category, na.rm = TRUE)
+af_by_N_no_Pleiotropy_PRSWEB_PRS.tertile.category = (N_all - N_no_Pleiotropy_PRSWEB_PRS.tertile.category) / N_all
+print(af_by_N_no_Pleiotropy_PRSWEB_PRS.tertile.category)
 
-
-dat_prs = dat_all
-dat_prs$Pleiotropy_Bi_directional_Increasing_PRS.tertile.category = dat_prs$Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category = dat_prs$Pleiotropy_Meta_analysis_PRS.tertile.category = dat_prs$Pleiotropy_PRSWEB_PRS.tertile.category = dat_prs$Pleiotropy_One_directional_PRS.tertile.category = "None"
-
-dat_all$pred_no_Pleiotropy_PRS = predict(fit_all, newdata = dat_prs, type = "response")
-N_no_Pleiotropy_PRS = sum(dat_all$pred_no_Pleiotropy_PRS, na.rm = TRUE)
-af_by_Pleiotropy_PRS.tertile = (N_all - N_no_Pleiotropy_PRS) / N_all
-print(af_by_Pleiotropy_PRS.tertile)
