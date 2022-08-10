@@ -142,9 +142,6 @@ dat_all = PHENO.ANY_SN
 #                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
 #               data = dat_all)
 
-###############################
-## Fitting One PRS at a time ##
-###############################
 dat_all = PHENO.ANY_SN
 # Pleiotropy_Bi_directional_Increasing_PRS.tertile.category +
 #   Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category +
@@ -163,6 +160,8 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 summary(fit_all)
+df.1 <- cbind.data.frame(OR=exp(fit_all$coefficients[4:7]),P=(summary(fit_all))$coefficients[4:7,4])
+
 
 # Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category  
 dat_all = PHENO.ANY_SN
@@ -175,6 +174,7 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 summary(fit_all)
+df.2 <- cbind.data.frame(OR=exp(fit_all$coefficients[4:7]),P=(summary(fit_all))$coefficients[4:7,4])
 
 # Pleiotropy_Meta_analysis_PRS.tertile.category  
 dat_all = PHENO.ANY_SN
@@ -187,6 +187,7 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 summary(fit_all)
+df.3 <- cbind.data.frame(OR=exp(fit_all$coefficients[4:7]),P=(summary(fit_all))$coefficients[4:7,4])
 
 # Pleiotropy_PRSWEB_PRS.tertile.category  
 dat_all = PHENO.ANY_SN
@@ -199,7 +200,7 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 summary(fit_all)
-
+df.4 <- cbind.data.frame(OR=exp(fit_all$coefficients[4:7]),P=(summary(fit_all))$coefficients[4:7,4])
 
 # Pleiotropy_One_directional_PRS.tertile.category 
 dat_all = PHENO.ANY_SN
@@ -212,6 +213,7 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 summary(fit_all)
+df.5 <- cbind.data.frame(OR=exp(fit_all$coefficients[4:7]),P=(summary(fit_all))$coefficients[4:7,4])
 
 
 # Pleiotropy_Replication_prior_studies_PRS.tertile.category
@@ -225,7 +227,7 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 summary(fit_all)
-
+df.6 <- cbind.data.frame(OR=exp(fit_all$coefficients[4:7]),P=(summary(fit_all))$coefficients[4:7,4])
 
 
 # Pleiotropy_Bi_directional_Increasing_Sig_PRS.tertile.category
@@ -239,6 +241,7 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 summary(fit_all)
+df.7 <- cbind.data.frame(OR=exp(fit_all$coefficients[4:7]),P=(summary(fit_all))$coefficients[4:7,4])
 
 # Pleiotropy_Bi_directional_Decreasing_Sig_PRS.tertile.category
 dat_all = PHENO.ANY_SN
@@ -251,7 +254,7 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 summary(fit_all)
-
+df.8 <- cbind.data.frame(OR=exp(fit_all$coefficients[4:7]),P=(summary(fit_all))$coefficients[4:7,4])
 
 # Pleiotropy_One_directional_Significant_PRS.tertile.category
 dat_all = PHENO.ANY_SN
@@ -264,7 +267,7 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 summary(fit_all)
-
+df.9 <- cbind.data.frame(OR=exp(fit_all$coefficients[4:7]),P=(summary(fit_all))$coefficients[4:7,4])
 
 ## Repeat without H.C and P/LP in the Genome
 
@@ -284,7 +287,7 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 summary(fit_all)
-
+df.1.WO <- cbind.data.frame(OR=exp(fit_all$coefficients[4:5]),P=(summary(fit_all))$coefficients[4:5,4])
 # Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category  
 dat_all = PHENO.ANY_SN
 fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
@@ -294,6 +297,7 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 summary(fit_all)
+df.2.WO <- cbind.data.frame(OR=exp(fit_all$coefficients[4:5]),P=(summary(fit_all))$coefficients[4:5,4])
 
 # Pleiotropy_Meta_analysis_PRS.tertile.category  
 dat_all = PHENO.ANY_SN
@@ -304,6 +308,7 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 summary(fit_all)
+df.3.WO <- cbind.data.frame(OR=exp(fit_all$coefficients[4:5]),P=(summary(fit_all))$coefficients[4:5,4])
 
 # Pleiotropy_PRSWEB_PRS.tertile.category  
 dat_all = PHENO.ANY_SN
@@ -314,7 +319,7 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 summary(fit_all)
-
+df.4.WO <- cbind.data.frame(OR=exp(fit_all$coefficients[4:5]),P=(summary(fit_all))$coefficients[4:5,4])
 
 # Pleiotropy_One_directional_PRS.tertile.category 
 dat_all = PHENO.ANY_SN
@@ -325,7 +330,7 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 summary(fit_all)
-
+df.5.WO <- cbind.data.frame(OR=exp(fit_all$coefficients[4:5]),P=(summary(fit_all))$coefficients[4:5,4])
 
 # Pleiotropy_Replication_prior_studies_PRS.tertile.category
 dat_all = PHENO.ANY_SN
@@ -336,7 +341,7 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 summary(fit_all)
-
+df.6.WO <- cbind.data.frame(OR=exp(fit_all$coefficients[4:5]),P=(summary(fit_all))$coefficients[4:5,4])
 
 
 # Pleiotropy_Bi_directional_Increasing_Sig_PRS.tertile.category
@@ -348,6 +353,7 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 summary(fit_all)
+df.7.WO <- cbind.data.frame(OR=exp(fit_all$coefficients[4:5]),P=(summary(fit_all))$coefficients[4:5,4])
 
 # Pleiotropy_Bi_directional_Decreasing_Sig_PRS.tertile.category
 dat_all = PHENO.ANY_SN
@@ -358,7 +364,7 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 summary(fit_all)
-
+df.8.WO <- cbind.data.frame(OR=exp(fit_all$coefficients[4:5]),P=(summary(fit_all))$coefficients[4:5,4])
 
 # Pleiotropy_One_directional_Significant_PRS.tertile.category
 dat_all = PHENO.ANY_SN
@@ -369,6 +375,288 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
                 maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 summary(fit_all)
+df.9.WO <- cbind.data.frame(OR=exp(fit_all$coefficients[4:5]),P=(summary(fit_all))$coefficients[4:5,4])
+
+paste0("df", 1:9,".WO")
+df.ALL <- rbind.data.frame(df.1,df.2,df.3,df.4,df.5,df.6,df.7,df.8,df.9)
+df.ALL.0 <- df.ALL[!grepl("H.C.Clin|All.P.LP",rownames(df.ALL)),]
+df.ALL.0
+colnames(df.ALL.0) <- c("OR_Pleotropy","P_Pleotropy" )
+
+df.ALL.1 <- df.ALL[grepl("H.C.Clin",rownames(df.ALL)),]
+cut <- rep(1:(nrow(df.ALL.1)/1), each = 1)
+df.ALL.1 <- df.ALL.1[sapply(split(1:nrow(df.ALL.1), cut), c, NA), ]
+colnames(df.ALL.1) <- c("OR_H.C_P_LP","P_H.C_P_LP" )
+
+df.ALL.2 <- df.ALL[grepl("All.P.LP",rownames(df.ALL)),]
+cut <- rep(1:(nrow(df.ALL.2)/1), each = 1)
+df.ALL.2 <- df.ALL.2[sapply(split(1:nrow(df.ALL.2), cut), c, NA), ]
+colnames(df.ALL.2) <- c("OR_ALL_P_LP","P_ALL_P_LP" )
+
+df.ALL.WO <- rbind.data.frame(df.1.WO,df.2.WO,df.3.WO,df.4.WO,df.5.WO,df.6.WO,df.7.WO,df.8.WO,df.9.WO)
+colnames(df.ALL.WO) <- c("OR_Pleotropy_WO_P_LP", "P_Pleotropy_WO_P_LP")
+
+df.final.prs.check <- cbind.data.frame(df.ALL.0, df.ALL.1, df.ALL.2, df.ALL.WO)
+
+#######################################
+## Changing the P/LP without MetaSVM ##
+#######################################
+dat_all = PHENO.ANY_SN
+# Pleiotropy_Bi_directional_Increasing_PRS.tertile.category +
+#   Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category +
+#   Pleiotropy_Meta_analysis_PRS.tertile.category +
+#   Pleiotropy_PRSWEB_PRS.tertile.category +
+#   Pleiotropy_One_directional_PRS.tertile.category +
+
+# Pleiotropy_Bi_directional_Increasing_PRS.tertile.category  
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+                H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts +
+                All.P.LP.clinvars.LoF.WO.Prior.vars.Non.Ref.Counts +
+                Pleiotropy_Bi_directional_Increasing_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+summary(fit_all)
+df.1 <- cbind.data.frame(OR=exp(fit_all$coefficients[4:7]),P=(summary(fit_all))$coefficients[4:7,4])
+
+
+# Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category  
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+                H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts +
+                All.P.LP.clinvars.LoF.WO.Prior.vars.Non.Ref.Counts +
+                Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+summary(fit_all)
+df.2 <- cbind.data.frame(OR=exp(fit_all$coefficients[4:7]),P=(summary(fit_all))$coefficients[4:7,4])
+
+# Pleiotropy_Meta_analysis_PRS.tertile.category  
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+                H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts +
+                All.P.LP.clinvars.LoF.WO.Prior.vars.Non.Ref.Counts +
+                Pleiotropy_Meta_analysis_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+summary(fit_all)
+df.3 <- cbind.data.frame(OR=exp(fit_all$coefficients[4:7]),P=(summary(fit_all))$coefficients[4:7,4])
+
+# Pleiotropy_PRSWEB_PRS.tertile.category  
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+                H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts +
+                All.P.LP.clinvars.LoF.WO.Prior.vars.Non.Ref.Counts +
+                Pleiotropy_PRSWEB_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+summary(fit_all)
+df.4 <- cbind.data.frame(OR=exp(fit_all$coefficients[4:7]),P=(summary(fit_all))$coefficients[4:7,4])
+
+# Pleiotropy_One_directional_PRS.tertile.category 
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+                H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts +
+                All.P.LP.clinvars.LoF.WO.Prior.vars.Non.Ref.Counts +
+                Pleiotropy_One_directional_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+summary(fit_all)
+df.5 <- cbind.data.frame(OR=exp(fit_all$coefficients[4:7]),P=(summary(fit_all))$coefficients[4:7,4])
+
+
+# Pleiotropy_Replication_prior_studies_PRS.tertile.category
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+                H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts +
+                All.P.LP.clinvars.LoF.WO.Prior.vars.Non.Ref.Counts +
+                Pleiotropy_Replication_prior_studies_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+summary(fit_all)
+df.6 <- cbind.data.frame(OR=exp(fit_all$coefficients[4:7]),P=(summary(fit_all))$coefficients[4:7,4])
+
+
+# Pleiotropy_Bi_directional_Increasing_Sig_PRS.tertile.category
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+                H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts +
+                All.P.LP.clinvars.LoF.WO.Prior.vars.Non.Ref.Counts +
+                Pleiotropy_Bi_directional_Increasing_Sig_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+summary(fit_all)
+df.7 <- cbind.data.frame(OR=exp(fit_all$coefficients[4:7]),P=(summary(fit_all))$coefficients[4:7,4])
+
+# Pleiotropy_Bi_directional_Decreasing_Sig_PRS.tertile.category
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+                H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts +
+                All.P.LP.clinvars.LoF.WO.Prior.vars.Non.Ref.Counts +
+                Pleiotropy_Bi_directional_Decreasing_Sig_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+summary(fit_all)
+df.8 <- cbind.data.frame(OR=exp(fit_all$coefficients[4:7]),P=(summary(fit_all))$coefficients[4:7,4])
+
+# Pleiotropy_One_directional_Significant_PRS.tertile.category
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+                H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts +
+                All.P.LP.clinvars.LoF.WO.Prior.vars.Non.Ref.Counts +
+                Pleiotropy_One_directional_Significant_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+summary(fit_all)
+df.9 <- cbind.data.frame(OR=exp(fit_all$coefficients[4:7]),P=(summary(fit_all))$coefficients[4:7,4])
+
+## Repeat without H.C and P/LP in the Genome
+
+dat_all = PHENO.ANY_SN
+# Pleiotropy_Bi_directional_Increasing_PRS.tertile.category +
+#   Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category +
+#   Pleiotropy_Meta_analysis_PRS.tertile.category +
+#   Pleiotropy_PRSWEB_PRS.tertile.category +
+#   Pleiotropy_One_directional_PRS.tertile.category +
+
+# Pleiotropy_Bi_directional_Increasing_PRS.tertile.category  
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+                Pleiotropy_Bi_directional_Increasing_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+summary(fit_all)
+df.1.WO <- cbind.data.frame(OR=exp(fit_all$coefficients[4:5]),P=(summary(fit_all))$coefficients[4:5,4])
+# Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category  
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+                Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+summary(fit_all)
+df.2.WO <- cbind.data.frame(OR=exp(fit_all$coefficients[4:5]),P=(summary(fit_all))$coefficients[4:5,4])
+
+# Pleiotropy_Meta_analysis_PRS.tertile.category  
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+                Pleiotropy_Meta_analysis_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+summary(fit_all)
+df.3.WO <- cbind.data.frame(OR=exp(fit_all$coefficients[4:5]),P=(summary(fit_all))$coefficients[4:5,4])
+
+# Pleiotropy_PRSWEB_PRS.tertile.category  
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+                Pleiotropy_PRSWEB_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+summary(fit_all)
+df.4.WO <- cbind.data.frame(OR=exp(fit_all$coefficients[4:5]),P=(summary(fit_all))$coefficients[4:5,4])
+
+# Pleiotropy_One_directional_PRS.tertile.category 
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+                Pleiotropy_One_directional_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+summary(fit_all)
+df.5.WO <- cbind.data.frame(OR=exp(fit_all$coefficients[4:5]),P=(summary(fit_all))$coefficients[4:5,4])
+
+# Pleiotropy_Replication_prior_studies_PRS.tertile.category
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+                Pleiotropy_Replication_prior_studies_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+summary(fit_all)
+df.6.WO <- cbind.data.frame(OR=exp(fit_all$coefficients[4:5]),P=(summary(fit_all))$coefficients[4:5,4])
+
+
+# Pleiotropy_Bi_directional_Increasing_Sig_PRS.tertile.category
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+                Pleiotropy_Bi_directional_Increasing_Sig_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+summary(fit_all)
+df.7.WO <- cbind.data.frame(OR=exp(fit_all$coefficients[4:5]),P=(summary(fit_all))$coefficients[4:5,4])
+
+# Pleiotropy_Bi_directional_Decreasing_Sig_PRS.tertile.category
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+                Pleiotropy_Bi_directional_Decreasing_Sig_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+summary(fit_all)
+df.8.WO <- cbind.data.frame(OR=exp(fit_all$coefficients[4:5]),P=(summary(fit_all))$coefficients[4:5,4])
+
+# Pleiotropy_One_directional_Significant_PRS.tertile.category
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_carriers +
+                Pleiotropy_One_directional_Significant_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+              data = dat_all)
+summary(fit_all)
+df.9.WO <- cbind.data.frame(OR=exp(fit_all$coefficients[4:5]),P=(summary(fit_all))$coefficients[4:5,4])
+
+paste0("df", 1:9,".WO")
+df.ALL <- rbind.data.frame(df.1,df.2,df.3,df.4,df.5,df.6,df.7,df.8,df.9)
+df.ALL.0 <- df.ALL[!grepl("H.C.Clin|All.P.LP",rownames(df.ALL)),]
+df.ALL.0
+colnames(df.ALL.0) <- c("OR_Pleotropy","P_Pleotropy" )
+
+df.ALL.1 <- df.ALL[grepl("H.C.Clin",rownames(df.ALL)),]
+cut <- rep(1:(nrow(df.ALL.1)/1), each = 1)
+df.ALL.1 <- df.ALL.1[sapply(split(1:nrow(df.ALL.1), cut), c, NA), ]
+colnames(df.ALL.1) <- c("OR_H.C_P_LP","P_H.C_P_LP" )
+
+df.ALL.2 <- df.ALL[grepl("All.P.LP",rownames(df.ALL)),]
+cut <- rep(1:(nrow(df.ALL.2)/1), each = 1)
+df.ALL.2 <- df.ALL.2[sapply(split(1:nrow(df.ALL.2), cut), c, NA), ]
+colnames(df.ALL.2) <- c("OR_ALL_P_LP","P_ALL_P_LP" )
+
+df.ALL.WO <- rbind.data.frame(df.1.WO,df.2.WO,df.3.WO,df.4.WO,df.5.WO,df.6.WO,df.7.WO,df.8.WO,df.9.WO)
+colnames(df.ALL.WO) <- c("OR_Pleotropy_WO_P_LP", "P_Pleotropy_WO_P_LP")
+
+df.final.prs.check <- cbind.data.frame(df.ALL.0, df.ALL.1, df.ALL.2, df.ALL.WO)
+
 
 #############################################################################
 

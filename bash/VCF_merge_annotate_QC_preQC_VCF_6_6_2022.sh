@@ -313,7 +313,9 @@ plink --make-bed --merge-list merge_list.txt  --out sjlife_all_PRS
 
 
 ## run this one more time for the variants that I missed in the first run
-ln -s ../extract_batch2_SNVs_PRS.bed .
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data
+# ln -s ../extract_batch2_SNVs_PRS.bed .
+ln -s ../extract_batch4_thyroid_NMSC.bed .
 for it in 1 2 3 4 5 6 7 8 9 10 11 12 14 16 18 19 22; do
 echo "Doing chr${it}"; \
 export CHR="$it"; \
@@ -321,13 +323,15 @@ export THREADS=4; \
 	bsub \
 	-P "chr${CHR}_extract" \
 	-J "chr${CHR}_extract" \
-	-e "${PWD}/logs/chr${CHR}_extractV3_err.%J" \
-	-o "${PWD}/logs/chr${CHR}_extractV3.%J" \
+	-e "${PWD}/logs/chr${CHR}_extractV4_err.%J" \
+	-o "${PWD}/logs/chr${CHR}_extractV4.%J" \
 	-n ${THREADS} \
 	-R "rusage[mem=20000]" \
-	"./extract_variants_from_VCF_for_PRS_v3.sh"; \
+	"./extract_variants_from_VCF_for_PRS_v4.sh"; \
 done
 
+
+## Note: I missed lots of variants for ./extract_variants_from_VCF_for_PRS_v4.sh; so had to run "# Directly from the list of variants" as below
 
 ## also run for missing meningioma variants
 for it in 10 11; do
@@ -342,6 +346,11 @@ export THREADS=4; \
 	-n ${THREADS} \
 	-R "rusage[mem=20000]" \
 	"./meningioma_extract_variants_from_VCF_for_PRS.sh"; \
+done
+
+
+for line in "$(cat extract_batch4_thyroid_NMSC.bed)"; do
+echo "$line"
 done
 
 
@@ -367,12 +376,13 @@ plink --bfile sjlife_all_PRS_all --bmerge sjlife_all_PRS3 --out sjlife_all_PRS_a
 
 
 # In my PRS calculation, some variants were not matched, so trying one more time to find them here
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data/missed_vars_in_PRS_calculation
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data/
 ln -s ../extract_batch3_after_PRS_calculation1.bed .
 module load bcftools/1.9
 module load plink/1.90b
 
 
+# Directly from the list of variants
 for it in $(cat extract_batch3_after_PRS_calculation1.bed); do
 VAR="$(echo ${it}| tr -d " \t\n\r" )"
 echo "Doing ${VAR}"
@@ -388,6 +398,34 @@ plink --make-bed --merge-list merge_list4.txt  --out sjlife_all_PRS4
 # merge sjlife_all_PRS_all_final and sjlife_all_PRS4
 ln -s ./missed_vars_in_PRS_calculation/sjlife_all_PRS4.* .
 plink --bfile sjlife_all_PRS_all_final --bmerge sjlife_all_PRS4 --out sjlife_all_PRS_all_final_v2
+
+
+
+# Directly from the list of variants
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data/
+awk '{print $1":"$2"-"$3}' /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/extract_batch4_thyroid_NMSC.bed > extract_batch6_after_PRS_calculation1.bed
+for it in $(cat extract_batch6_after_PRS_calculation1.bed); do
+VAR="$(echo ${it}| tr -d " \t\n\r" )"
+echo "Doing ${VAR}"
+CHR="$(echo $VAR |awk -F':' '{print $1}')"
+bcftools view MERGED.SJLIFE.1.2.GATKv3.4.VQSR.${CHR}.preQC_biallelic_renamed_ID_edited.vcf.gz ${VAR} > ./missed_vars_in_PRS_calculation/${VAR}_v6.vcf.gz
+plink --vcf ./missed_vars_in_PRS_calculation/${VAR}_v6.vcf.gz --double-id --vcf-half-call m --keep-allele-order --threads 2 --make-bed --out ./missed_vars_in_PRS_calculation/${VAR}_v6
+done
+
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data/missed_vars_in_PRS_calculation
+ls *_v6bim| sort -V| awk -F '\\.bim' '{print $1}' > merge_list5.txt
+
+plink --make-bed --merge-list merge_list5.txt  --out sjlife_all_PRS5
+
+# merge sjlife_all_PRS_all_final and sjlife_all_PRS4
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/plink_data
+ln -s ./missed_vars_in_PRS_calculation/sjlife_all_PRS5.* .
+# plink --bfile sjlife_all_PRS_all_final --bmerge sjlife_all_PRS4 --out sjlife_all_PRS_all_final_v2
+plink --bfile sjlife_all_PRS_all_final_v2 --bmerge sjlife_all_PRS5 --out sjlife_all_PRS_all_final_v3
+
+
+
+
 
 # # Variants with PRS scores from all cancer types
 # [aneupane@noderome186 plink_data]$ wc -l PRS_all_cancers_vars.txt
