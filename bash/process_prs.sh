@@ -86,7 +86,7 @@ plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweigh
 # Pleiotropy_Replication_prior_studies	308 308 # OK
 # Sarcoma_Machiela	6 6 # OK
 # Wang_African_Breast	98 98
-
+# sjlife_thyroid.profile 12 12
 
 
 

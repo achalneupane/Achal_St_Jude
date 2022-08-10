@@ -265,8 +265,13 @@ awk '{print "chr"$1"\t"$2"\t"$2+1"\t"$9}' ER_NEG_PRSWEB_PHECODE174.1_GWAS-Catalo
 ########################
 /home/aneupane/liftover/liftOver Wang_African_GRCh37.bed /home/aneupane/liftover/hg19ToHg38.over.chain Wang_African_GrCh38.bed Wang_African_Hg19_unmapped.bed
 
+##########
+## NMSC ##
+##########
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/NMSC
+/home/aneupane/liftover/liftOver NMSC_hg19.bed /home/aneupane/liftover/hg19ToHg38.over.chain NMSC_hg19_GrCh38.bed NMSC_hg19_unmapped.bed
 
-
+######################################################
 awk 'FNR==NR{a[$4] = (a[$4]==""?"":a[$4] " ") $2 OFS $3 OFS $4; next}
     {print $4, ($4 in a ? a[$4] : 0)}' Michigan_ER_NEG_GrCh38.bed ER_NEG_PRSWEB_PHECODE174.1_GWAS-Catalog-r2019-05-03-X174.1_PT_UKB_20200608_WEIGHTS_edited_1.txt
 

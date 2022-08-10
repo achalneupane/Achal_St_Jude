@@ -146,6 +146,9 @@ PHENO.ANY_SN$MichiganWeb_ER_OVERALL_Breast_PRS <-  MichiganWeb_ER_OVERALL_Breast
 Wang_African_Breast <- read.table("Wang_African_Breast_prs.profile", header = T)
 PHENO.ANY_SN$Wang_African_Breast_PRS <-  Wang_African_Breast$SCORE [match(PHENO.ANY_SN$sjlid, Wang_African_Breast$IID)]
 
+THYROID <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/thyroid/sjlife_thyroid.profile", header = T)
+PHENO.ANY_SN$Thyroid_PRS <-  THYROID$SCORE [match(PHENO.ANY_SN$sjlid, THYROID$IID)]
+
 colnames(PHENO.ANY_SN)
 
 saved.PHENO.ANY_SN <- PHENO.ANY_SN
