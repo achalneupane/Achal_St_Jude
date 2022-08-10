@@ -352,8 +352,15 @@ all.cancers2 [grepl("Meningioma_Claus", all.cancers2$TYPE),][i,] <-
 # write.table(all.cancers1[1:8], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", row.names = F, col.names = T, quote = F, sep = "\t")
 write.table(all.cancers2[1:8], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", row.names = F, col.names = T, quote = F, sep = "\t")
 
+# Also add NMSC to this list
+NMSC <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/NMSC/NMSC_GrCh38_edited.txt", header = T)
+NMSC[NMSC$Effect_size < 0, c("REF", "Effect_allele")] <- NMSC[NMSC$Effect_size < 0, c("Effect_allele", "REF")]
+NMSC$Effect_size <- abs(NMSC$Effect_size)
 
-
+# rbind NMSC to all.cancers2
+all.cancers3 <- all.cancers2[1:8]
+all.cancers3 <- rbind.data.frame(all.cancers3, NMSC)
+write.table(all.cancers3, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", row.names = F, col.names = T, quote = F, sep = "\t")
 ###################################################################
 ## create bed files for the new variants missed in first attempt ##
 ###################################################################
