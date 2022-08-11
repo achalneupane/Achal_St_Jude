@@ -1006,3 +1006,14 @@ echo -e "${TYPE} vars from VCF after dp10, gq20 NOpass filter\t $(zgrep -Ew $var
 # zhaoming vars from VCF after dp10, gq15 pass filter      0
 # zhaoming vars from VCF after dp10, gq20 pass filter      0
 # zhaoming vars from VCF after dp10, gq20 NOpass filter    71
+
+
+
+## Extract lines from Annotated VCF for TITN and BAG3
+head -1 ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr2.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > TITN_BAG3_region_all/chr2_header
+awk '$2 ~ /^178/' ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr2.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > TITN_BAG3_region_all/chr2_178_list.txt
+cat chr2_header chr2_178_list.txt > chr2_178_list_ALL.txt
+
+head -1 ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr10.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > TITN_BAG3_region_all/chr10_header
+awk '$2 ~ /^119/' ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr10.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > TITN_BAG3_region_all/chr10_119_list.txt
+cat chr10_header chr10_119_list.txt > chr10_119_list_ALL.txt

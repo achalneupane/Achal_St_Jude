@@ -284,6 +284,8 @@ TITN_BAG3.df <- cbind.data.frame(TITN_BAG3.df, TITN_BAG3.df3[match(TITN_BAG3.df$
 
 write.table(TITN_BAG3.df, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/Yadav_TITN_BAG3_list.txt", quote = F, col.names = T, sep = "\t", row.names = F)
 
+# save.image("SNPEFF_clinvar_metaSVM_LoF_from_R_filtering_process_PreQC_VCF.RData")
+load("SNPEFF_clinvar_metaSVM_LoF_from_R_filtering_process_PreQC_VCF.RData")
 
 ###################################
 ## With Clinvar, MetaSVM and LoF ##
@@ -349,7 +351,107 @@ BAG3_VCF.extracted <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genom
 BAG3_VCF.extracted$V1[!BAG3_VCF.extracted$V1 %in% unique(BAG3.df$KEY)]
 
 
+############################
+## Clinvar, LoF and Revel ##
+############################
+
+TITN_annovar <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/annovar/TITN_BAG3_region_all/chr2_178_list_ALL.txt", sep = "\t", header = T)
+dim(TITN_annovar)
+colnames(TITN_annovar)
+TITN_annovar <- TITN_annovar[TITN_annovar$Start >= 178525989 & TITN_annovar$Start <= 178807423,]
+sum(TITN_annovar$gnomAD_genome_ALL < 0.01)
+# 6398
+TITN_annovar$gnomAD_genome_ALL <-  as.numeric(TITN_annovar$gnomAD_genome_ALL)
+TITN_annovar$gnomAD_genome_NFE <-  as.numeric(TITN_annovar$gnomAD_genome_NFE)
+
+sum(TITN_annovar$gnomAD_genome_ALL < 0.01|TITN_annovar$gnomAD_genome_NFE < 0.01, na.rm = T)
+# 5263
+
+TITN_annovar <- TITN_annovar %>%
+  filter(!(is.na(gnomAD_genome_ALL) & is.na(gnomAD_genome_NFE)))
+
+TITN_annovar.lt.1.perc.maf.gnom.AD <- TITN_annovar[TITN_annovar$gnomAD_genome_ALL < 0.01|TITN_annovar$gnomAD_genome_NFE < 0.01,]
+
+TITN_annovar.lt.1.perc.maf.gnom.AD$KEY <- paste0(TITN_annovar.lt.1.perc.maf.gnom.AD$Chr,":", TITN_annovar.lt.1.perc.maf.gnom.AD$Start,":", TITN_annovar.lt.1.perc.maf.gnom.AD$Ref,":", TITN_annovar.lt.1.perc.maf.gnom.AD$Alt)
+
+TITN.1.per.maf.gnomad.ALL.and.NFE <- BAG3_TITN[BAG3_TITN$KEY %in% TITN_annovar.lt.1.perc.maf.gnom.AD$KEY,]
+TITN.1.per.maf.gnomad.ALL.and.NFE$gnomAD_genome_ALL <- TITN_annovar.lt.1.perc.maf.gnom.AD$gnomAD_genome_ALL[match(TITN.1.per.maf.gnomad.ALL.and.NFE$KEY, TITN_annovar.lt.1.perc.maf.gnom.AD$KEY)]
+TITN.1.per.maf.gnomad.ALL.and.NFE$gnomAD_genome.NFE <- TITN_annovar.lt.1.perc.maf.gnom.AD$gnomAD_genome_NFE[match(TITN.1.per.maf.gnomad.ALL.and.NFE$KEY, TITN_annovar.lt.1.perc.maf.gnom.AD$KEY)]
+TITN.1.per.maf.gnomad.ALL.and.NFE$REVEL <- as.numeric(TITN_annovar.lt.1.perc.maf.gnom.AD$REVEL[match(TITN.1.per.maf.gnomad.ALL.and.NFE$KEY, TITN_annovar.lt.1.perc.maf.gnom.AD$KEY)])
+TITN.1.per.maf.gnomad.ALL.and.NFE$REVEL[TITN.1.per.maf.gnomad.ALL.and.NFE$REVEL <= 0.5] <- NA
+
+CLINVAR.Keys <- TITN.1.per.maf.gnomad.ALL.and.NFE$KEY[grepl("Clinvar", TITN.1.per.maf.gnomad.ALL.and.NFE$PRED_TYPE)]
+TITN.1.per.maf.gnomad.ALL.and.NFE$CLINVAR <- ifelse(TITN.1.per.maf.gnomad.ALL.and.NFE$KEY %in% CLINVAR.Keys,"Y", "N")
+
+LoF.Keys <- TITN.1.per.maf.gnomad.ALL.and.NFE$KEY[grepl("LoF", TITN.1.per.maf.gnomad.ALL.and.NFE$PRED_TYPE)]
+TITN.1.per.maf.gnomad.ALL.and.NFE$LoF <- ifelse(TITN.1.per.maf.gnomad.ALL.and.NFE$KEY %in% LoF.Keys,"Y", "N")
+
+MetaSVM.Keys <- TITN.1.per.maf.gnomad.ALL.and.NFE$KEY[grepl("MetaSVM", TITN.1.per.maf.gnomad.ALL.and.NFE$PRED_TYPE)]
+TITN.1.per.maf.gnomad.ALL.and.NFE$MetaSVM <- ifelse(TITN.1.per.maf.gnomad.ALL.and.NFE$KEY %in% MetaSVM.Keys,"Y", "N")
+
+TITN.1.per.maf.gnomad.ALL.and.NFE <- as.data.frame(TITN.1.per.maf.gnomad.ALL.and.NFE)
+TITN.1.per.maf.gnomad.ALL.and.NFE <- TITN.1.per.maf.gnomad.ALL.and.NFE[!grepl("PRED_TYPE", colnames(TITN.1.per.maf.gnomad.ALL.and.NFE))]
+
+# Remove duplicate rows
+TITN.1.per.maf.gnomad.ALL.and.NFE <- TITN.1.per.maf.gnomad.ALL.and.NFE %>% 
+  distinct(.keep_all = TRUE)
+
+# TITN.1.per.maf.gnomad.ALL.and.NFE$KEY[duplicated(TITN.1.per.maf.gnomad.ALL.and.NFE$KEY)]
+
+write.table(TITN.1.per.maf.gnomad.ALL.and.NFE, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/TITN.1.per.maf.gnomad.ALL.and.NFE.txt", quote = F, col.names = T, sep = "\t", row.names = F)
 
 
-# save.image("SNPEFF_clinvar_metaSVM_LoF_from_R_filtering_process_PreQC_VCF.RData")
-load("SNPEFF_clinvar_metaSVM_LoF_from_R_filtering_process_PreQC_VCF.RData")
+
+BAG3_annovar <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/annovar/TITN_BAG3_region_all/chr10_119_list_ALL.txt", sep = "\t", header = T)
+dim(BAG3_annovar)
+colnames(BAG3_annovar)
+BAG3_annovar <- BAG3_annovar[BAG3_annovar$Start >= 119651380 & BAG3_annovar$Start <= 119677819,]
+sum(BAG3_annovar$gnomAD_genome_ALL < 0.01)
+# 1063
+BAG3_annovar$gnomAD_genome_ALL <-  as.numeric(BAG3_annovar$gnomAD_genome_ALL)
+BAG3_annovar$gnomAD_genome_NFE <-  as.numeric(BAG3_annovar$gnomAD_genome_NFE)
+
+sum(BAG3_annovar$gnomAD_genome_ALL < 0.01|BAG3_annovar$gnomAD_genome_NFE < 0.01, na.rm = T)
+# 840
+
+BAG3_annovar <- BAG3_annovar %>%
+  filter(!(is.na(gnomAD_genome_ALL) & is.na(gnomAD_genome_NFE)))
+
+BAG3_annovar.lt.1.perc.maf.gnom.AD <- BAG3_annovar[BAG3_annovar$gnomAD_genome_ALL < 0.01|BAG3_annovar$gnomAD_genome_NFE < 0.01,]
+
+BAG3_annovar.lt.1.perc.maf.gnom.AD$KEY <- paste0(BAG3_annovar.lt.1.perc.maf.gnom.AD$Chr,":", BAG3_annovar.lt.1.perc.maf.gnom.AD$Start,":", BAG3_annovar.lt.1.perc.maf.gnom.AD$Ref,":", BAG3_annovar.lt.1.perc.maf.gnom.AD$Alt)
+
+BAG3.1.per.maf.gnomad.ALL.and.NFE <- BAG3_TITN[BAG3_TITN$KEY %in% BAG3_annovar.lt.1.perc.maf.gnom.AD$KEY,]
+BAG3.1.per.maf.gnomad.ALL.and.NFE$gnomAD_genome_ALL <- BAG3_annovar.lt.1.perc.maf.gnom.AD$gnomAD_genome_ALL[match(BAG3.1.per.maf.gnomad.ALL.and.NFE$KEY, BAG3_annovar.lt.1.perc.maf.gnom.AD$KEY)]
+BAG3.1.per.maf.gnomad.ALL.and.NFE$gnomAD_genome.NFE <- BAG3_annovar.lt.1.perc.maf.gnom.AD$gnomAD_genome_NFE[match(BAG3.1.per.maf.gnomad.ALL.and.NFE$KEY, BAG3_annovar.lt.1.perc.maf.gnom.AD$KEY)]
+BAG3.1.per.maf.gnomad.ALL.and.NFE$REVEL <- as.numeric(BAG3_annovar.lt.1.perc.maf.gnom.AD$REVEL[match(BAG3.1.per.maf.gnomad.ALL.and.NFE$KEY, BAG3_annovar.lt.1.perc.maf.gnom.AD$KEY)])
+BAG3.1.per.maf.gnomad.ALL.and.NFE$REVEL[BAG3.1.per.maf.gnomad.ALL.and.NFE$REVEL <= 0.5] <- NA
+
+
+CLINVAR.Keys <- BAG3.1.per.maf.gnomad.ALL.and.NFE$KEY[grepl("Clinvar", BAG3.1.per.maf.gnomad.ALL.and.NFE$PRED_TYPE)]
+BAG3.1.per.maf.gnomad.ALL.and.NFE$CLINVAR <- ifelse(BAG3.1.per.maf.gnomad.ALL.and.NFE$KEY %in% CLINVAR.Keys,"Y", "N")
+
+LoF.Keys <- BAG3.1.per.maf.gnomad.ALL.and.NFE$KEY[grepl("LoF", BAG3.1.per.maf.gnomad.ALL.and.NFE$PRED_TYPE)]
+BAG3.1.per.maf.gnomad.ALL.and.NFE$LoF <- ifelse(BAG3.1.per.maf.gnomad.ALL.and.NFE$KEY %in% LoF.Keys,"Y", "N")
+
+MetaSVM.Keys <- BAG3.1.per.maf.gnomad.ALL.and.NFE$KEY[grepl("MetaSVM", BAG3.1.per.maf.gnomad.ALL.and.NFE$PRED_TYPE)]
+BAG3.1.per.maf.gnomad.ALL.and.NFE$MetaSVM <- ifelse(BAG3.1.per.maf.gnomad.ALL.and.NFE$KEY %in% MetaSVM.Keys,"Y", "N")
+
+
+BAG3.1.per.maf.gnomad.ALL.and.NFE <- as.data.frame(BAG3.1.per.maf.gnomad.ALL.and.NFE)
+BAG3.1.per.maf.gnomad.ALL.and.NFE <- BAG3.1.per.maf.gnomad.ALL.and.NFE[!grepl("PRED_TYPE", colnames(BAG3.1.per.maf.gnomad.ALL.and.NFE))]
+
+
+# Remove duplicate rows
+BAG3.1.per.maf.gnomad.ALL.and.NFE <- BAG3.1.per.maf.gnomad.ALL.and.NFE %>% 
+  distinct(.keep_all = TRUE)
+
+write.table(BAG3.1.per.maf.gnomad.ALL.and.NFE, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/BAG3.1.per.maf.gnomad.ALL.and.NFE.txt", quote = F, col.names = T, sep = "\t", row.names = F)
+
+
+
+
+
+
+
+
