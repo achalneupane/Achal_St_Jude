@@ -247,8 +247,17 @@ mv *.cred1 *.bf1 *.config *.snp *.log_sss /research_jude/rgs01_jude/groups/sapko
 ## Email: 08/11/2022  "can you please also run GCTA analysis but conditioning on the SNPs in bold for both TTN and BAG3 separately?"
 gcta64  --bfile test  --chr 1 --maf 0.01 --cojo-file test.ma --cojo-cond cond.bag3.snplist --out test_chr1
 
- 
+# <cond.TTN.snplist>
+# chr2:178562809:T:C
 
-module load gcta
+# <cond.BAG3.snplist>
+# chr10:119670121:T:C
+
 gcta64  --bfile samplesnp_TITN_gt_MAF_1_perc_vars.dat  --chr 2 --maf 0.01 --cojo-file samplesnp_TITN_gt_MAF_1_perc_vars.ma --cojo-slct --cojo-p 0.00017925 --cojo-wind 100000 --out TITN_cojo
 gcta64  --bfile samplesnp_BAG3_gt_MAF_1_perc_vars.dat  --chr 10 --maf 0.01 --cojo-file samplesnp_BAG3_gt_MAF_1_perc_vats.ma --cojo-slct --cojo-p 0.000103976 --cojo-wind 100000 --out BAG3_cojo
+
+
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64
+module load gcta
+gcta64  --bfile samplesnp_TITN_gt_MAF_1_perc_vars.dat --chr 2 --maf 0.01 --cojo-file samplesnp_TITN_gt_MAF_1_perc_vars.ma --cojo-p 0.00017925 --cojo-cond cond.TTN.snplist --out cond.TTN.snplist.out
+gcta64  --bfile samplesnp_BAG3_gt_MAF_1_perc_vars.dat --chr 10 --maf 0.01 --cojo-file samplesnp_BAG3_gt_MAF_1_perc_vats.ma --cojo-p 0.000103976 --cojo-cond cond.BAG3.snplist --out cond.BAG3.snplist.out
