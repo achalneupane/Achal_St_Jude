@@ -261,3 +261,29 @@ cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_
 module load gcta
 gcta64  --bfile samplesnp_TITN_gt_MAF_1_perc_vars.dat --chr 2 --maf 0.01 --cojo-file samplesnp_TITN_gt_MAF_1_perc_vars.ma --cojo-p 0.00017925 --cojo-cond cond.TTN.snplist --out cond.TTN.snplist.out
 gcta64  --bfile samplesnp_BAG3_gt_MAF_1_perc_vars.dat --chr 10 --maf 0.01 --cojo-file samplesnp_BAG3_gt_MAF_1_perc_vats.ma --cojo-p 0.000103976 --cojo-cond cond.BAG3.snplist --out cond.BAG3.snplist.out
+
+
+########################################################
+## Extract lines from Annotated VCF for TITN and BAG3 ##
+########################################################
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/annovar/
+head -1 ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr2.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > TITN_BAG3_region_all/chr2_header
+awk '$2 ~ /^178/' ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr2.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > TITN_BAG3_region_all/chr2_178_list.txt
+cat chr2_header chr2_178_list.txt > chr2_178_list_ALL.txt
+
+head -1 ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr10.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > TITN_BAG3_region_all/chr10_header
+awk '$2 ~ /^119/' ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr10.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > TITN_BAG3_region_all/chr10_119_list.txt
+cat chr10_header chr10_119_list.txt > chr10_119_list_ALL.txt
+
+
+# The extract VCF using extract.sh with bcftools
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3
+
+for files in *.vcf; do
+plink --vcf ${files} --double-id --vcf-half-call m --keep-allele-order --keep /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/samples_for_maf.txt --threads 2 --make-bed --max-maf 0.01 --out plink_out/${files}.sjlife.max.maf.0.01.dat
+done
+
+
+cat *.bim| sort -V| uniq > all_var.sjlife.0.01.maf.txt
+
+# check for common variants in CCSS_exp with 

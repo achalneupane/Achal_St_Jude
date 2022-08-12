@@ -284,8 +284,6 @@ TITN_BAG3.df <- cbind.data.frame(TITN_BAG3.df, TITN_BAG3.df3[match(TITN_BAG3.df$
 
 write.table(TITN_BAG3.df, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/Yadav_TITN_BAG3_list.txt", quote = F, col.names = T, sep = "\t", row.names = F)
 
-# save.image("SNPEFF_clinvar_metaSVM_LoF_from_R_filtering_process_PreQC_VCF.RData")
-load("SNPEFF_clinvar_metaSVM_LoF_from_R_filtering_process_PreQC_VCF.RData")
 
 ###################################
 ## With Clinvar, MetaSVM and LoF ##
@@ -350,6 +348,9 @@ TITN_VCF.extracted$V1[duplicated(TITN_VCF.extracted$V1)]
 BAG3_VCF.extracted <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/BAG3_VCF_clinvar_metaSVM_LoF_vars.txt", header = F)
 BAG3_VCF.extracted$V1[!BAG3_VCF.extracted$V1 %in% unique(BAG3.df$KEY)]
 
+# save.image("SNPEFF_clinvar_metaSVM_LoF_from_R_filtering_process_PreQC_VCF.RData")
+load("SNPEFF_clinvar_metaSVM_LoF_from_R_filtering_process_PreQC_VCF.RData")
+
 
 ############################
 ## Clinvar, LoF and Revel ##
@@ -364,15 +365,18 @@ sum(TITN_annovar$gnomAD_genome_ALL < 0.01)
 TITN_annovar$gnomAD_genome_ALL <-  as.numeric(TITN_annovar$gnomAD_genome_ALL)
 TITN_annovar$gnomAD_genome_NFE <-  as.numeric(TITN_annovar$gnomAD_genome_NFE)
 
-sum(TITN_annovar$gnomAD_genome_ALL < 0.01|TITN_annovar$gnomAD_genome_NFE < 0.01, na.rm = T)
-# 5263
+saved.TITN_annovar <- TITN_annovar
+
+sum(TITN_annovar$gnomAD_genome_ALL < 0.01 & TITN_annovar$gnomAD_genome_NFE < 0.01, na.rm = T)
+# 5010
 
 TITN_annovar <- TITN_annovar %>%
   filter(!(is.na(gnomAD_genome_ALL) & is.na(gnomAD_genome_NFE)))
 
-TITN_annovar.lt.1.perc.maf.gnom.AD <- TITN_annovar[TITN_annovar$gnomAD_genome_ALL < 0.01|TITN_annovar$gnomAD_genome_NFE < 0.01,]
+TITN_annovar.lt.1.perc.maf.gnom.AD <- TITN_annovar[TITN_annovar$gnomAD_genome_ALL < 0.01 & TITN_annovar$gnomAD_genome_NFE < 0.01,]
 
-TITN_annovar.lt.1.perc.maf.gnom.AD$KEY <- paste0(TITN_annovar.lt.1.perc.maf.gnom.AD$Chr,":", TITN_annovar.lt.1.perc.maf.gnom.AD$Start,":", TITN_annovar.lt.1.perc.maf.gnom.AD$Ref,":", TITN_annovar.lt.1.perc.maf.gnom.AD$Alt)
+TITN_annovar.lt.1.perc.maf.gnom.AD$KEY <- paste0(TITN_annovar.lt.1.perc.maf.gnom.AD$Otherinfo4,":", TITN_annovar.lt.1.perc.maf.gnom.AD$Otherinfo5,":",
+                                                 TITN_annovar.lt.1.perc.maf.gnom.AD$Otherinfo7,":", TITN_annovar.lt.1.perc.maf.gnom.AD$Otherinfo8)
 
 TITN.1.per.maf.gnomad.ALL.and.NFE <- BAG3_TITN[BAG3_TITN$KEY %in% TITN_annovar.lt.1.perc.maf.gnom.AD$KEY,]
 TITN.1.per.maf.gnomad.ALL.and.NFE$gnomAD_genome_ALL <- TITN_annovar.lt.1.perc.maf.gnom.AD$gnomAD_genome_ALL[match(TITN.1.per.maf.gnomad.ALL.and.NFE$KEY, TITN_annovar.lt.1.perc.maf.gnom.AD$KEY)]
@@ -411,15 +415,17 @@ sum(BAG3_annovar$gnomAD_genome_ALL < 0.01)
 BAG3_annovar$gnomAD_genome_ALL <-  as.numeric(BAG3_annovar$gnomAD_genome_ALL)
 BAG3_annovar$gnomAD_genome_NFE <-  as.numeric(BAG3_annovar$gnomAD_genome_NFE)
 
-sum(BAG3_annovar$gnomAD_genome_ALL < 0.01|BAG3_annovar$gnomAD_genome_NFE < 0.01, na.rm = T)
-# 840
+saved.BAG3_annovar <- BAG3_annovar
+sum(BAG3_annovar$gnomAD_genome_ALL < 0.01 & BAG3_annovar$gnomAD_genome_NFE < 0.01, na.rm = T)
+# 817
 
 BAG3_annovar <- BAG3_annovar %>%
   filter(!(is.na(gnomAD_genome_ALL) & is.na(gnomAD_genome_NFE)))
 
-BAG3_annovar.lt.1.perc.maf.gnom.AD <- BAG3_annovar[BAG3_annovar$gnomAD_genome_ALL < 0.01|BAG3_annovar$gnomAD_genome_NFE < 0.01,]
+BAG3_annovar.lt.1.perc.maf.gnom.AD <- BAG3_annovar[BAG3_annovar$gnomAD_genome_ALL < 0.01 & BAG3_annovar$gnomAD_genome_NFE < 0.01,]
 
-BAG3_annovar.lt.1.perc.maf.gnom.AD$KEY <- paste0(BAG3_annovar.lt.1.perc.maf.gnom.AD$Chr,":", BAG3_annovar.lt.1.perc.maf.gnom.AD$Start,":", BAG3_annovar.lt.1.perc.maf.gnom.AD$Ref,":", BAG3_annovar.lt.1.perc.maf.gnom.AD$Alt)
+BAG3_annovar.lt.1.perc.maf.gnom.AD$KEY <- paste0(BAG3_annovar.lt.1.perc.maf.gnom.AD$Otherinfo4,":", BAG3_annovar.lt.1.perc.maf.gnom.AD$Otherinfo5,":",
+                                                 BAG3_annovar.lt.1.perc.maf.gnom.AD$Otherinfo7,":", BAG3_annovar.lt.1.perc.maf.gnom.AD$Otherinfo8)
 
 BAG3.1.per.maf.gnomad.ALL.and.NFE <- BAG3_TITN[BAG3_TITN$KEY %in% BAG3_annovar.lt.1.perc.maf.gnom.AD$KEY,]
 BAG3.1.per.maf.gnomad.ALL.and.NFE$gnomAD_genome_ALL <- BAG3_annovar.lt.1.perc.maf.gnom.AD$gnomAD_genome_ALL[match(BAG3.1.per.maf.gnomad.ALL.and.NFE$KEY, BAG3_annovar.lt.1.perc.maf.gnom.AD$KEY)]
@@ -449,9 +455,47 @@ BAG3.1.per.maf.gnomad.ALL.and.NFE <- BAG3.1.per.maf.gnomad.ALL.and.NFE %>%
 write.table(BAG3.1.per.maf.gnomad.ALL.and.NFE, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/BAG3.1.per.maf.gnomad.ALL.and.NFE.txt", quote = F, col.names = T, sep = "\t", row.names = F)
 
 
+################################################
+## Extract common variants in SJLIFE and CCSS ##
+################################################
+TITN_BAG3_annovar <- rbind.data.frame(saved.TITN_annovar, saved.BAG3_annovar)
+TITN_BAG3_annovar$KEY <- paste0(TITN_BAG3_annovar$Otherinfo4,":", TITN_BAG3_annovar$Otherinfo5,":", 
+       TITN_BAG3_annovar$Otherinfo7,":", TITN_BAG3_annovar$Otherinfo8)
+sum(BAG3_TITN$KEY %in% TITN_BAG3_annovar$KEY)
+
+REVEL.gt.0.5.annovar <- TITN_BAG3_annovar[TITN_BAG3_annovar$REVEL > 0.5,]
+
+# REVEL.gt.0.5 <- REVEL.gt.0.5.annovar$KEY
+
+REVEL.gt.0.5.bed <- cbind.data.frame(REVEL.gt.0.5.annovar$Otherinfo4, REVEL.gt.0.5.annovar$Otherinfo5-1, REVEL.gt.0.5.annovar$Otherinfo5)
 
 
 
+# write.table(REVEL.gt.0.5, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/REVEL.gt.0.5.txt", quote = F, col.names = F, sep = "\t", row.names = F)
+
+write.table(REVEL.gt.0.5.bed[grepl("chr2", REVEL.gt.0.5.bed$`REVEL.gt.0.5.annovar$Otherinfo4`),], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/TTN_REVEL.gt.0.5.bed", quote = F, col.names = F, sep = "\t", row.names = F)
+write.table(REVEL.gt.0.5.bed[grepl("chr10", REVEL.gt.0.5.bed$`REVEL.gt.0.5.annovar$Otherinfo4`),], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/BAG3_REVEL.gt.0.5.bed", quote = F, col.names = F, sep = "\t", row.names = F)
 
 
+ttn_check <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/check_ttn.txt")
 
+## Check common vars between SJLIFE and CCSS_EXP
+sjlife.maf.0.01 <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/plink_out/all_var.sjlife.0.01.maf.txt")
+
+ccss_exp.maf.0.01 <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/ccss_exp.bim")
+sum(sjlife.maf.0.01$V4 %in% ccss_exp.maf.0.01$V4 )
+sum(sjlife.maf.0.01$V2 %in% ccss_exp.maf.0.01$V2 )
+
+set.0 <- ccss_exp.maf.0.01$V4[ccss_exp.maf.0.01$V4 %in% sjlife.maf.0.01$V4]
+sum(duplicated(set.0))
+set.0[duplicated(set.0)]
+set.1 <- sjlife.maf.0.01$V2[sjlife.maf.0.01$V4 %in% ccss_exp.maf.0.01$V4] # match by position and extract variant ID
+set.2 <- sjlife.maf.0.01$V2[sjlife.maf.0.01$V2 %in% ccss_exp.maf.0.01$V2] # match by variant ID and extract matching variant ID
+
+set.1[!set.1 %in% set.2] # print no direct match
+# "chr2:178750594:G:A"          "chr2:178752047:A:G"          "chr2:178776816:C:A"          "chr2:178781235:C:T"          "chr10:119656670:GATGAAGGT:G"
+# "chr2:178752047:A:G", "chr2:178781235:C:G", chr10:119656670:G:A, "chr10:119656670:GATGAAGGT:G # no match
+direct.match <- set.1[set.1 %in% set.2]
+
+replace.ccss_exp_id <- cbind.data.frame(c("chr2:178750594:G:T","chr2:178776816:C:T"), c("chr2:178750594:G:A", "chr2:178776816:C:A"))
+write.table(replace.ccss_exp_id, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/replace.ccss_exp_id.txt", quote = F, col.names = F, sep = "\t", row.names = F)
