@@ -1022,3 +1022,10 @@ cat chr10_header chr10_119_list.txt > chr10_119_list_ALL.txt
 
 
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3
+
+# extract CCSS_exp variants with maf < 0.01 and 'gnomad_NF & gnomad_ALL' maf < 0.01
+head -1 TITN.1.per.maf.gnomad.ALL.and.NFE.txt | sed 's/\t/\n/g' | nl
+awk 'NR>1 {print $24}' TITN.1.per.maf.gnomad.ALL.and.NFE.txt > TITN.1.per.maf.gnomad.ALL.and.NFE_vars.list
+awk 'NR>1 {print $24}' BAG3.1.per.maf.gnomad.ALL.and.NFE.txt > BAG3.1.per.maf.gnomad.ALL.and.NFE_vars.list
+
+

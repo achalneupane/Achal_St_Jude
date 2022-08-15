@@ -280,10 +280,69 @@ cat chr10_header chr10_119_list.txt > chr10_119_list_ALL.txt
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3
 
 for files in *.vcf; do
-plink --vcf ${files} --double-id --vcf-half-call m --keep-allele-order --keep /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/samples_for_maf.txt --threads 2 --make-bed --max-maf 0.01 --out plink_out/${files}.sjlife.max.maf.0.01.dat
+plink --vcf ${files} --double-id --vcf-half-call m --keep-allele-order --threads 2 --make-bed --out plink_out/${files}.sjlife.max.maf.0.01.dat
 done
 
 
 cat *.bim| sort -V| uniq > all_var.sjlife.0.01.maf.txt
 
 # check for common variants in CCSS_exp with 
+
+
+# Extract overlapping P/LP
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/ALL_P_LP_combinations
+
+plink --bfile  ../ccss_exp --bim ../ccss_exp_edited.bim --extract ../TITN.1.per.maf.gnomad.ALL.and.NFE_vars.list --max-maf 0.01 --make-bed --out TITN_ccss_exp.0.01maf
+plink --bfile  ../ccss_exp --bim ../ccss_exp_edited.bim --extract ../BAG3.1.per.maf.gnomad.ALL.and.NFE_vars.list --max-maf 0.01 --make-bed --out BAG3_ccss_exp.0.01maf
+
+
+plink --bfile  ../sjlife --extract ../TITN.1.per.maf.gnomad.ALL.and.NFE_vars.list --max-maf 0.01 --make-bed --out TITN_sjlife.0.01maf
+plink --bfile  ../sjlife --extract ../BAG3.1.per.maf.gnomad.ALL.and.NFE_vars.list --max-maf 0.01 --make-bed --out BAG3_sjlife.0.01maf
+
+# After extracting the common variants with maf < 0.01 in sjlife and ccss that are also rare in gnomad_ALL and gnomad_NFE, I am now extracting the overlapping variants (overlapping_vars_in_sjlife_ccss_exp_maf_0.01)
+
+plink --bfile  TITN_ccss_exp.0.01maf --extract TITN_overlapping_vars_in_sjlife_ccss_exp_maf_0.01 --make-bed --out TITN_ccss_exp.0.01maf_overlapping
+plink --bfile  BAG3_ccss_exp.0.01maf --extract BAG3_overlapping_vars_in_sjlife_ccss_exp_maf_0.01 --make-bed --out BAG3_ccss_exp.0.01maf_overlapping
+
+
+plink --bfile  TITN_sjlife.0.01maf --extract TITN_overlapping_vars_in_sjlife_ccss_exp_maf_0.01 --make-bed --out TITN_sjlife.0.01maf_overlapping
+plink --bfile  BAG3_sjlife.0.01maf --extract BAG3_overlapping_vars_in_sjlife_ccss_exp_maf_0.01 --make-bed --out BAG3_sjlife.0.01maf_overlapping
+
+################################
+## Now extract variants for:  ##
+## 1. Clinvar and LoF         ##
+## 2. Clinvar, LoF and REVEL  ##
+################################
+
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/TITN.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.REVEL.txt .
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/BAG3.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.REVEL.txt .
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/TITN.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.txt .
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/BAG3.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.txt .
+
+# CCSS_exp
+plink --bfile TITN_ccss_exp.0.01maf_overlapping --extract TITN.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.txt --make-bed --out TITN_ccss_exp.0.01maf_overlapping.clinvar.lof
+plink --bfile TITN_ccss_exp.0.01maf_overlapping --extract TITN.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.REVEL.txt --make-bed --out TITN_ccss_exp.0.01maf_overlapping.clinvar.lof.REVEL
+plink --bfile BAG3_ccss_exp.0.01maf_overlapping --extract BAG3.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.txt --make-bed --out BAG3_ccss_exp.0.01maf_overlapping.clinvar.lof
+plink --bfile BAG3_ccss_exp.0.01maf_overlapping --extract BAG3.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.REVEL.txt --make-bed --out BAG3_ccss_exp.0.01maf_overlapping.clinvar.lof.REVEL
+
+# Sjlife
+plink --bfile TITN_sjlife.0.01maf_overlapping --extract TITN.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.txt --make-bed --out TITN_sjlife.0.01maf_overlapping.clinvar.lof
+plink --bfile TITN_sjlife.0.01maf_overlapping --extract TITN.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.REVEL.txt --make-bed --out TITN_sjlife.0.01maf_overlapping.clinvar.lof.REVEL
+plink --bfile BAG3_sjlife.0.01maf_overlapping --extract BAG3.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.txt --make-bed --out BAG3_sjlife.0.01maf_overlapping.clinvar.lof
+plink --bfile BAG3_sjlife.0.01maf_overlapping --extract BAG3.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.REVEL.txt --make-bed --out BAG3_sjlife.0.01maf_overlapping.clinvar.lof.REVEL
+
+##############
+## Recode A ##
+##############
+# CCSS_exp
+
+plink --bfile TITN_ccss_exp.0.01maf_overlapping --extract TITN.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.txt --recode A --out TITN_ccss_exp.0.01maf_overlapping.clinvar.lof_recodeA
+plink --bfile TITN_ccss_exp.0.01maf_overlapping --extract TITN.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.REVEL.txt --recode A  --out TITN_ccss_exp.0.01maf_overlapping.clinvar.lof.REVEL_recodeA
+plink --bfile BAG3_ccss_exp.0.01maf_overlapping --extract BAG3.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.txt --recode A  --out BAG3_ccss_exp.0.01maf_overlapping.clinvar.lof_recodeA
+plink --bfile BAG3_ccss_exp.0.01maf_overlapping --extract BAG3.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.REVEL.txt --recode A  --out BAG3_ccss_exp.0.01maf_overlapping.clinvar.lof.REVEL_recodeA
+
+# Sjlife
+plink --bfile TITN_sjlife.0.01maf_overlapping --extract TITN.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.txt --recode A --out TITN_sjlife.0.01maf_overlapping.clinvar.lof_recodeA
+plink --bfile TITN_sjlife.0.01maf_overlapping --extract TITN.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.REVEL.txt --recode A --out TITN_sjlife.0.01maf_overlapping.clinvar.lof.REVEL_recodeA
+plink --bfile BAG3_sjlife.0.01maf_overlapping --extract BAG3.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.txt --recode A --out BAG3_sjlife.0.01maf_overlapping.clinvar.lof_recodeA
+plink --bfile BAG3_sjlife.0.01maf_overlapping --extract BAG3.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.REVEL.txt --recode A --out BAG3_sjlife.0.01maf_overlapping.clinvar.lof.REVEL_recodeA
