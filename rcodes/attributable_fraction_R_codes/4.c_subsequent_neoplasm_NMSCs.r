@@ -99,3 +99,13 @@ summary(mod1)
 mod1.EUR <- glm(NMSC ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + gender + maxsegrtdose.category + maxabdrtdose.category + maxpelvisrtdose.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 summary(mod1.EUR)
 
+
+##########################
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = NMSC ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
+                BASALcell_PRS.tertile.category + SQUAMOUScell_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                gender + maxsegrtdose.category + maxabdrtdose.category + maxpelvisrtdose.category, family = binomial,
+              data = dat_all)
+
+summary(fit_all)

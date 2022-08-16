@@ -105,8 +105,6 @@ summary(mod1.EUR)
 # PRS 2015
 dat_all = PHENO.ANY_SN
 fit_all = glm(formula = BREASTcancer ~ Zhaoming_carriers + Qin_carriers + 
-                H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts + 
-                All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts +
                 Mavaddat_2015_ER_POS_Breast_PRS.tertile.category +
                 Mavaddat_2015_ER_OVERALL_Breast_PRS.tertile.category +
                 Mavaddat_2015_ER_NEG_Breast_PRS.tertile.category +
@@ -120,8 +118,6 @@ summary(fit_all)
 # PRS 2019
 dat_all = PHENO.ANY_SN
 fit_all = glm(formula = BREASTcancer ~ Zhaoming_carriers + Qin_carriers + 
-                H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts + 
-                All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts +
                 Mavaddat_2019_ER_POS_Breast_PRS.tertile.category +
                 Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category +
                 Mavaddat_2019_ER_NEG_Breast_PRS.tertile.category +
@@ -135,8 +131,6 @@ summary(fit_all)
 # PRSWEB
 dat_all = PHENO.ANY_SN
 fit_all = glm(formula = BREASTcancer ~ Zhaoming_carriers + Qin_carriers + 
-                H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts + 
-                All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts +
                 MichiganWeb_ER_NEG_Breast_PRS.tertile.category +
                 MichiganWeb_ER_OVERALL_Breast_PRS.tertile.category +
                 MichiganWeb_ER_POS_Breast_PRS.tertile.category +
@@ -146,6 +140,19 @@ fit_all = glm(formula = BREASTcancer ~ Zhaoming_carriers + Qin_carriers +
               data = dat_all)
 
 summary(fit_all)
+
+
+# Khera et al
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = BREASTcancer ~ Zhaoming_carriers + Qin_carriers + 
+                Khera_2018_Breast_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2+ 
+                AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS +
+                maxchestrtdose.category + anthra_jco_dose_5.category, family = binomial,
+              data = dat_all)
+
+summary(fit_all)
+
 
 # Get predicted values
 dat_all$pred_all = predict(fit_all, newdat = dat_all, type = "response")
