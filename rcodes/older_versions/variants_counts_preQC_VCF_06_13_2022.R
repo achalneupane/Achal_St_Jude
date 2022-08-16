@@ -349,7 +349,7 @@ BAG3_VCF.extracted <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genom
 BAG3_VCF.extracted$V1[!BAG3_VCF.extracted$V1 %in% unique(BAG3.df$KEY)]
 
 # save.image("SNPEFF_clinvar_metaSVM_LoF_from_R_filtering_process_PreQC_VCF.RData")
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/SNPEFF_clinvar_metaSVM_LoF_from_R_filtering_process_PreQC_VCF.RDat")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/SNPEFF_clinvar_metaSVM_LoF_from_R_filtering_process_PreQC_VCF.RData")
 
 
 ############################
@@ -524,7 +524,7 @@ ccss_bim$V2[na.omit(match(replace.ccss_exp_id$old, ccss_bim$V2))] <- replace.ccs
 write.table(ccss_bim, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/ccss_exp_edited.bim", quote = F, col.names = F, sep = "\t", row.names = F)
 
 
-# Overlapping TITN P/LP
+# Overlapping TITN P/LP and maf below 1% in gnomad_ALL and gnomad_NFE
 ccss <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/ALL_P_LP_combinations/TITN_ccss_exp.0.01maf.bim")
 sjlife <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/ALL_P_LP_combinations/TITN_sjlife.0.01maf.bim")
 
