@@ -1,4 +1,4 @@
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/analysis_model_fitting/phenotype_carrier_status.RDATA")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/analysis_model_fitting/phenotype_carrier_status_v2.RDATA")
 
 colnames(pheno.ccss_exp_eur)
 pheno.ccss_exp_eur$CMP2plus <- factor(ifelse(pheno.ccss_exp_eur$CMP2plus == 1, 0,1))
@@ -35,28 +35,28 @@ BAG3.C.LoF.test.adj <- glm(formula = CMP2plus ~  BAG3.Clinv.LoF.carrierSTATUS + 
                              PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial,
                            data = pheno.ccss_exp_eur)
 
-## 2. With Clinvar, Lof, REVEL in CCSS_exp
-## -------------------------------
-# a. TITN + BAG3 
-TITN.BAG3.C.LoF.REVEL <- table(pheno.ccss_exp_eur$CMP2plus, pheno.ccss_exp_eur$TITN_BAG3.clin.LoF.REVEL.carrierSTATUS)
-TITN.BAG3.C.LoF.REVEL.test <- fisher.test(TITN.BAG3.C.LoF.REVEL)
-TITN.BAG3.C.LoF.REVEL.test.adj <- glm(formula = CMP2plus ~  TITN_BAG3.clin.LoF.REVEL.carrierSTATUS + a_dx + a_end + SEX + anth_DED + HeartAvg + PC1 + PC2 + PC3 +
-                             PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial,
-                           data = pheno.ccss_exp_eur)
+# ## 2. With Clinvar, Lof, REVEL in CCSS_exp
+# ## -------------------------------
+# # a. TITN + BAG3 
+# TITN.BAG3.C.LoF.REVEL <- table(pheno.ccss_exp_eur$CMP2plus, pheno.ccss_exp_eur$TITN_BAG3.clin.LoF.REVEL.carrierSTATUS)
+# TITN.BAG3.C.LoF.REVEL.test <- fisher.test(TITN.BAG3.C.LoF.REVEL)
+# TITN.BAG3.C.LoF.REVEL.test.adj <- glm(formula = CMP2plus ~  TITN_BAG3.clin.LoF.REVEL.carrierSTATUS + a_dx + a_end + SEX + anth_DED + HeartAvg + PC1 + PC2 + PC3 +
+#                              PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial,
+#                            data = pheno.ccss_exp_eur)
+# 
+# # b. TITN only
+# TITN.C.LoF.REVEL <- table(pheno.ccss_exp_eur$CMP2plus, pheno.ccss_exp_eur$TITN.Clinv.LoF.REVEL.carrierSTATUS)
+# TITN.C.LoF.REVEL.test <- fisher.test(TITN.C.LoF.REVEL) 
+# TITN.C.LoF.REVEL.test.adj <- glm(formula = CMP2plus ~  TITN.Clinv.LoF.REVEL.carrierSTATUS + a_dx + a_end + SEX + anth_DED + HeartAvg + PC1 + PC2 + PC3 +
+#                                         PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial,
+#                                       data = pheno.ccss_exp_eur)
 
-# b. TITN only
-TITN.C.LoF.REVEL <- table(pheno.ccss_exp_eur$CMP2plus, pheno.ccss_exp_eur$TITN.Clinv.LoF.REVEL.carrierSTATUS)
-TITN.C.LoF.REVEL.test <- fisher.test(TITN.C.LoF.REVEL) 
-TITN.C.LoF.REVEL.test.adj <- glm(formula = CMP2plus ~  TITN.Clinv.LoF.REVEL.carrierSTATUS + a_dx + a_end + SEX + anth_DED + HeartAvg + PC1 + PC2 + PC3 +
-                                        PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial,
-                                      data = pheno.ccss_exp_eur)
-
-# c. BAG3 only
-BAG3.C.LoF.REVEL <- table(pheno.ccss_exp_eur$CMP2plus, pheno.ccss_exp_eur$BAG3.Clinv.LoF.REVEL.carrierSTATUS)
-BAG3.C.LoF.REVEL.test <- fisher.test(BAG3.C.LoF.REVEL) # Got warning for chi-square
-BAG3.C.LoF.REVEL.test.adj <- glm(formula = CMP2plus ~  BAG3.Clinv.LoF.REVEL.carrierSTATUS + a_dx + a_end + SEX + anth_DED + HeartAvg + PC1 + PC2 + PC3 +
-                                   PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial,
-                                 data = pheno.ccss_exp_eur)
+# # c. BAG3 only
+# BAG3.C.LoF.REVEL <- table(pheno.ccss_exp_eur$CMP2plus, pheno.ccss_exp_eur$BAG3.Clinv.LoF.REVEL.carrierSTATUS)
+# BAG3.C.LoF.REVEL.test <- fisher.test(BAG3.C.LoF.REVEL) # Got warning for chi-square
+# BAG3.C.LoF.REVEL.test.adj <- glm(formula = CMP2plus ~  BAG3.Clinv.LoF.REVEL.carrierSTATUS + a_dx + a_end + SEX + anth_DED + HeartAvg + PC1 + PC2 + PC3 +
+#                                    PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial,
+#                                  data = pheno.ccss_exp_eur)
 
 ## 3. With Clinvar and Lof only in SJLIFE
 ## -------------------------------
@@ -81,28 +81,28 @@ BAG3.C.LoF.test.sjlife.adj <- glm(formula = CMP ~  BAG3.Clinv.LoF.carrierSTATUS 
                                     PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial,
                                   data = pheno.sjlife_ttn_bag3)
 
-## 4. With Clinvar, Lof, REVEL in SJLIFE
-## -------------------------------
-# a. TITN + BAG3 
-TITN.BAG3.C.LoF.REVEL.sjlife <- table(pheno.sjlife_ttn_bag3$CMP, pheno.sjlife_ttn_bag3$TITN_BAG3.clin.LoF.REVEL.carrierSTATUS)
-TITN.BAG3.C.LoF.REVEL.test.sjlife <- fisher.test(TITN.BAG3.C.LoF.REVEL.sjlife)
-TITN.BAG3.C.LoF.REVEL.test.sjlife.adj <- glm(formula = CMP ~  TITN_BAG3.clin.LoF.REVEL.carrierSTATUS + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
-                                    PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial,
-                                  data = pheno.sjlife_ttn_bag3)
-
-# b. TITN only
-TITN.C.LoF.REVEL.sjlife <- table(pheno.sjlife_ttn_bag3$CMP, pheno.sjlife_ttn_bag3$TITN.Clinv.LoF.REVEL.carrierSTATUS)
-TITN.C.LoF.REVEL.test.sjlife <- fisher.test(TITN.C.LoF.REVEL.sjlife) 
-TITN.C.LoF.REVEL.test.sjlife.adj <- glm(formula = CMP ~  TITN.Clinv.LoF.REVEL.carrierSTATUS + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
-                                          PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial,
-                                        data = pheno.sjlife_ttn_bag3)
-
-# c. BAG3 only
-BAG3.C.LoF.REVEL.sjlife <- table(pheno.sjlife_ttn_bag3$CMP, pheno.sjlife_ttn_bag3$BAG3.Clinv.LoF.REVEL.carrierSTATUS)
-BAG3.C.LoF.REVEL.test.sjlife <- fisher.test(BAG3.C.LoF.REVEL.sjlife) # Got warning for chi-square
-BAG3.C.LoF.REVEL.test.sjlife.adj <- glm(formula = CMP ~  BAG3.Clinv.LoF.REVEL.carrierSTATUS + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
-                                          PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial,
-                                        data = pheno.sjlife_ttn_bag3)
+# ## 4. With Clinvar, Lof, REVEL in SJLIFE
+# ## -------------------------------
+# # a. TITN + BAG3 
+# TITN.BAG3.C.LoF.REVEL.sjlife <- table(pheno.sjlife_ttn_bag3$CMP, pheno.sjlife_ttn_bag3$TITN_BAG3.clin.LoF.REVEL.carrierSTATUS)
+# TITN.BAG3.C.LoF.REVEL.test.sjlife <- fisher.test(TITN.BAG3.C.LoF.REVEL.sjlife)
+# TITN.BAG3.C.LoF.REVEL.test.sjlife.adj <- glm(formula = CMP ~  TITN_BAG3.clin.LoF.REVEL.carrierSTATUS + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
+#                                     PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial,
+#                                   data = pheno.sjlife_ttn_bag3)
+# 
+# # b. TITN only
+# TITN.C.LoF.REVEL.sjlife <- table(pheno.sjlife_ttn_bag3$CMP, pheno.sjlife_ttn_bag3$TITN.Clinv.LoF.REVEL.carrierSTATUS)
+# TITN.C.LoF.REVEL.test.sjlife <- fisher.test(TITN.C.LoF.REVEL.sjlife) 
+# TITN.C.LoF.REVEL.test.sjlife.adj <- glm(formula = CMP ~  TITN.Clinv.LoF.REVEL.carrierSTATUS + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
+#                                           PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial,
+#                                         data = pheno.sjlife_ttn_bag3)
+# 
+# # c. BAG3 only
+# BAG3.C.LoF.REVEL.sjlife <- table(pheno.sjlife_ttn_bag3$CMP, pheno.sjlife_ttn_bag3$BAG3.Clinv.LoF.REVEL.carrierSTATUS)
+# BAG3.C.LoF.REVEL.test.sjlife <- fisher.test(BAG3.C.LoF.REVEL.sjlife) # Got warning for chi-square
+# BAG3.C.LoF.REVEL.test.sjlife.adj <- glm(formula = CMP ~  BAG3.Clinv.LoF.REVEL.carrierSTATUS + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
+#                                           PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial,
+#                                         data = pheno.sjlife_ttn_bag3)
 
 #############
 ## Results ##
