@@ -19,9 +19,6 @@ library(lubridate)
 # benchmarkme::get_ram()
 
 
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores.RDATA")
-
-
 subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
 head(subneo)
 table(subneo$diaggrp)
