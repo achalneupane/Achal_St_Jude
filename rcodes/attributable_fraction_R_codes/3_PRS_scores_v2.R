@@ -11,18 +11,9 @@ PHENO.ANY_SN <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/commo
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/prs_out")
 # setwd("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/prs_out")
 
-## Meningioma_Claus_prs.profile
-meningioma_Claus <- read.table("Meningioma_Claus_prs.profile", header = T)
-PHENO.ANY_SN$Meningiom_Claus_PRS <-  meningioma_Claus$SCORE [match(PHENO.ANY_SN$sjlid, meningioma_Claus$IID)]
-
-## Meningioma_Dobbins_prs.profile
-Meningioma_Dobbins <- read.table("Meningioma_Dobbins_prs.profile", header = T)
-PHENO.ANY_SN$Meningioma_Dobbins_PRS <-  Meningioma_Dobbins$SCORE [match(PHENO.ANY_SN$sjlid, Meningioma_Dobbins$IID)]
-
-
 ## Meningioma_prs.profile
 Meningioma <- read.table("Meningioma_prs.profile", header = T)
-PHENO.ANY_SN$Meningioma_PRS <-  Meningioma_Dobbins$SCORE [match(PHENO.ANY_SN$sjlid, Meningioma$IID)]
+PHENO.ANY_SN$Meningioma_PRS <-  Meningioma$SCORE [match(PHENO.ANY_SN$sjlid, Meningioma$IID)]
 
 
 ## Pleiotropy_Bi_directional_Increasing_prs.profile
@@ -181,8 +172,6 @@ PHENO.ANY_SN <- PHENO.ANY_SN[!grepl("SJL5450006", PHENO.ANY_SN$sjlid),]
 ## Change PRS to categories
 PRS.to.categorize <- colnames(PHENO.ANY_SN)[grepl("_PRS$", colnames(PHENO.ANY_SN))]
 
-# ## Breaks are not unique for "Meningiom_Claus_PRS"
-# PRS.to.categorize <- PRS.to.categorize[!grepl("Meningiom_Claus_PRS", PRS.to.categorize)]
 
 ## Tertile categories
 for(i in 1:length(PRS.to.categorize)){
