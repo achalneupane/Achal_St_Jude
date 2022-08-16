@@ -164,28 +164,28 @@ SJLIFE.Clin.LoF.df <- cbind.data.frame(setNames(rbind.data.frame(c("TTN_BAG3", T
 
 write.table(SJLIFE.Clin.LoF.df, "SJLIFE.Clin.LoF.df.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 
-## With Clinvar, LoF, and REVEL
-CI1 <- paste0(" (",round(exp(c(coef(summary(TITN.BAG3.C.LoF.REVEL.test.adj))[2,1]))-1.96*as.data.frame(summary(TITN.BAG3.C.LoF.REVEL.test.adj)$coefficients)[c(1,2)][2,2],2), " to ", round(exp(c(coef(summary(TITN.BAG3.C.LoF.REVEL.test.adj))[2,1]))+1.96*as.data.frame(summary(TITN.BAG3.C.LoF.REVEL.test.adj)$coefficients)[c(1,2)][2,2], 2),")")
-CI2 <- paste0(" (",round(exp(c(coef(summary(TITN.C.LoF.REVEL.test.adj))[2,1]))-1.96*as.data.frame(summary(TITN.C.LoF.REVEL.test.adj)$coefficients)[c(1,2)][2,2],2), " to ", round(exp(c(coef(summary(TITN.C.LoF.REVEL.test.adj))[2,1]))+1.96*as.data.frame(summary(TITN.C.LoF.REVEL.test.adj)$coefficients)[c(1,2)][2,2], 2),")")
-CI3 <- paste0(" (",round(exp(c(coef(summary(BAG3.C.LoF.REVEL.test.adj))[2,1]))-1.96*as.data.frame(summary(BAG3.C.LoF.REVEL.test.adj)$coefficients)[c(1,2)][2,2],2), " to ", round(exp(c(coef(summary(BAG3.C.LoF.REVEL.test.adj))[2,1]))+1.96*as.data.frame(summary(BAG3.C.LoF.REVEL.test.adj)$coefficients)[c(1,2)][2,2], 2),")")
-
-CCSS.Clin.LoF.REVEL.df <- cbind.data.frame(setNames(rbind.data.frame(c("TTN_BAG3", TITN.BAG3.C.LoF.REVEL[1,2]/sum(TITN.BAG3.C.LoF.REVEL[1,]), TITN.BAG3.C.LoF.REVEL[2,2]/sum(TITN.BAG3.C.LoF.REVEL[2,]), paste0(round(exp(c(coef(summary(TITN.BAG3.C.LoF.REVEL.test.adj))[2,1])),2), CI1), coef(summary(TITN.BAG3.C.LoF.REVEL.test.adj))[2,4]),
-                                                               c("TTN", TITN.C.LoF.REVEL[1,2]/sum(TITN.C.LoF.REVEL[1,]), TITN.C.LoF.REVEL[2,2]/sum(TITN.C.LoF.REVEL[2,]), paste0(round(exp(c(coef(summary(TITN.C.LoF.REVEL.test.adj))[2,1])),2), CI2), coef(summary(TITN.C.LoF.REVEL.test.adj))[2,4]),
-                                                               c("BAG3", 0, 0, paste0(round(exp(c(coef(summary(BAG3.C.LoF.REVEL.test.adj))[2,1])),2), CI3), coef(summary(BAG3.C.LoF.REVEL.test.adj))[2,4])
-), c("Gene", "prevalence.in.CCSS.exp.CO", "prevalence.in.CCSS.exp.CA","OR.CCSS (CI)", "adj.P.CCSS")))
-
-write.table(CCSS.Clin.LoF.REVEL.df, "CCSS.Clin.LoF.REVEL.df.txt", sep = "\t", col.names = T, row.names = F, quote = F)
-
-CI1 <- paste0(" (",round(exp(c(coef(summary(TITN.BAG3.C.LoF.REVEL.test.sjlife.adj))[2,1]))-1.96*as.data.frame(summary(TITN.BAG3.C.LoF.REVEL.test.sjlife.adj)$coefficients)[c(1,2)][2,2],2), " to ", round(exp(c(coef(summary(TITN.BAG3.C.LoF.REVEL.test.sjlife.adj))[2,1]))+1.96*as.data.frame(summary(TITN.BAG3.C.LoF.REVEL.test.sjlife.adj)$coefficients)[c(1,2)][2,2], 2),")")
-CI2 <- paste0(" (",round(exp(c(coef(summary(TITN.C.LoF.REVEL.test.sjlife.adj))[2,1]))-1.96*as.data.frame(summary(TITN.C.LoF.REVEL.test.sjlife.adj)$coefficients)[c(1,2)][2,2],2), " to ", round(exp(c(coef(summary(TITN.C.LoF.REVEL.test.sjlife.adj))[2,1]))+1.96*as.data.frame(summary(TITN.C.LoF.REVEL.test.sjlife.adj)$coefficients)[c(1,2)][2,2], 2),")")
-CI3 <- paste0(" (",round(exp(c(coef(summary(BAG3.C.LoF.REVEL.test.sjlife.adj))[2,1]))-1.96*as.data.frame(summary(BAG3.C.LoF.REVEL.test.sjlife.adj)$coefficients)[c(1,2)][2,2],2), " to ", round(exp(c(coef(summary(BAG3.C.LoF.REVEL.test.sjlife.adj))[2,1]))+1.96*as.data.frame(summary(BAG3.C.LoF.REVEL.test.sjlife.adj)$coefficients)[c(1,2)][2,2], 2),")")
-
-SJLIFE.Clin.LoF.REVEL.df <- cbind.data.frame(setNames(rbind.data.frame(c("TTN_BAG3", TITN.BAG3.C.LoF.REVEL.sjlife[1,2]/sum(TITN.BAG3.C.LoF.REVEL.sjlife[1,]), TITN.BAG3.C.LoF.REVEL.sjlife[2,2]/sum(TITN.BAG3.C.LoF.REVEL.sjlife[2,]), paste0(round(exp(c(coef(summary(TITN.BAG3.C.LoF.REVEL.test.sjlife.adj))[2,1])),2), CI1), coef(summary(TITN.BAG3.C.LoF.REVEL.test.sjlife.adj))[2,4]),
-                                                               c("TTN", TITN.C.LoF.REVEL.sjlife[1,2]/sum(TITN.C.LoF.REVEL.sjlife[1,]), TITN.C.LoF.REVEL.sjlife[2,2]/sum(TITN.C.LoF.REVEL.sjlife[2,]), paste0(round(exp(c(coef(summary(TITN.C.LoF.REVEL.test.sjlife.adj))[2,1])),2), CI2), coef(summary(TITN.C.LoF.REVEL.test.sjlife.adj))[2,4]),
-                                                               c("BAG3", BAG3.C.LoF.REVEL.sjlife[1,2]/sum(BAG3.C.LoF.REVEL.sjlife[1,]), BAG3.C.LoF.REVEL.sjlife[2,2]/sum(BAG3.C.LoF.REVEL.sjlife[2,]), paste0(round(exp(c(coef(summary(BAG3.C.LoF.REVEL.test.sjlife.adj))[2,1])),2), CI3), coef(summary(BAG3.C.LoF.REVEL.test.sjlife.adj))[2,4])
-), c("Gene", "prevalence.in.SJLIFE.exp.CO", "prevalence.in.SJLIFE.exp.CA","OR.SJLIFE (CI)", "adj.P.SJLIFE")))
-
-write.table(SJLIFE.Clin.LoF.REVEL.df, "SJLIFE.Clin.LoF.REVEL.df.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+# ## With Clinvar, LoF, and REVEL
+# CI1 <- paste0(" (",round(exp(c(coef(summary(TITN.BAG3.C.LoF.REVEL.test.adj))[2,1]))-1.96*as.data.frame(summary(TITN.BAG3.C.LoF.REVEL.test.adj)$coefficients)[c(1,2)][2,2],2), " to ", round(exp(c(coef(summary(TITN.BAG3.C.LoF.REVEL.test.adj))[2,1]))+1.96*as.data.frame(summary(TITN.BAG3.C.LoF.REVEL.test.adj)$coefficients)[c(1,2)][2,2], 2),")")
+# CI2 <- paste0(" (",round(exp(c(coef(summary(TITN.C.LoF.REVEL.test.adj))[2,1]))-1.96*as.data.frame(summary(TITN.C.LoF.REVEL.test.adj)$coefficients)[c(1,2)][2,2],2), " to ", round(exp(c(coef(summary(TITN.C.LoF.REVEL.test.adj))[2,1]))+1.96*as.data.frame(summary(TITN.C.LoF.REVEL.test.adj)$coefficients)[c(1,2)][2,2], 2),")")
+# CI3 <- paste0(" (",round(exp(c(coef(summary(BAG3.C.LoF.REVEL.test.adj))[2,1]))-1.96*as.data.frame(summary(BAG3.C.LoF.REVEL.test.adj)$coefficients)[c(1,2)][2,2],2), " to ", round(exp(c(coef(summary(BAG3.C.LoF.REVEL.test.adj))[2,1]))+1.96*as.data.frame(summary(BAG3.C.LoF.REVEL.test.adj)$coefficients)[c(1,2)][2,2], 2),")")
+# 
+# CCSS.Clin.LoF.REVEL.df <- cbind.data.frame(setNames(rbind.data.frame(c("TTN_BAG3", TITN.BAG3.C.LoF.REVEL[1,2]/sum(TITN.BAG3.C.LoF.REVEL[1,]), TITN.BAG3.C.LoF.REVEL[2,2]/sum(TITN.BAG3.C.LoF.REVEL[2,]), paste0(round(exp(c(coef(summary(TITN.BAG3.C.LoF.REVEL.test.adj))[2,1])),2), CI1), coef(summary(TITN.BAG3.C.LoF.REVEL.test.adj))[2,4]),
+#                                                                c("TTN", TITN.C.LoF.REVEL[1,2]/sum(TITN.C.LoF.REVEL[1,]), TITN.C.LoF.REVEL[2,2]/sum(TITN.C.LoF.REVEL[2,]), paste0(round(exp(c(coef(summary(TITN.C.LoF.REVEL.test.adj))[2,1])),2), CI2), coef(summary(TITN.C.LoF.REVEL.test.adj))[2,4]),
+#                                                                c("BAG3", 0, 0, paste0(round(exp(c(coef(summary(BAG3.C.LoF.REVEL.test.adj))[2,1])),2), CI3), coef(summary(BAG3.C.LoF.REVEL.test.adj))[2,4])
+# ), c("Gene", "prevalence.in.CCSS.exp.CO", "prevalence.in.CCSS.exp.CA","OR.CCSS (CI)", "adj.P.CCSS")))
+# 
+# write.table(CCSS.Clin.LoF.REVEL.df, "CCSS.Clin.LoF.REVEL.df.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+# 
+# CI1 <- paste0(" (",round(exp(c(coef(summary(TITN.BAG3.C.LoF.REVEL.test.sjlife.adj))[2,1]))-1.96*as.data.frame(summary(TITN.BAG3.C.LoF.REVEL.test.sjlife.adj)$coefficients)[c(1,2)][2,2],2), " to ", round(exp(c(coef(summary(TITN.BAG3.C.LoF.REVEL.test.sjlife.adj))[2,1]))+1.96*as.data.frame(summary(TITN.BAG3.C.LoF.REVEL.test.sjlife.adj)$coefficients)[c(1,2)][2,2], 2),")")
+# CI2 <- paste0(" (",round(exp(c(coef(summary(TITN.C.LoF.REVEL.test.sjlife.adj))[2,1]))-1.96*as.data.frame(summary(TITN.C.LoF.REVEL.test.sjlife.adj)$coefficients)[c(1,2)][2,2],2), " to ", round(exp(c(coef(summary(TITN.C.LoF.REVEL.test.sjlife.adj))[2,1]))+1.96*as.data.frame(summary(TITN.C.LoF.REVEL.test.sjlife.adj)$coefficients)[c(1,2)][2,2], 2),")")
+# CI3 <- paste0(" (",round(exp(c(coef(summary(BAG3.C.LoF.REVEL.test.sjlife.adj))[2,1]))-1.96*as.data.frame(summary(BAG3.C.LoF.REVEL.test.sjlife.adj)$coefficients)[c(1,2)][2,2],2), " to ", round(exp(c(coef(summary(BAG3.C.LoF.REVEL.test.sjlife.adj))[2,1]))+1.96*as.data.frame(summary(BAG3.C.LoF.REVEL.test.sjlife.adj)$coefficients)[c(1,2)][2,2], 2),")")
+# 
+# SJLIFE.Clin.LoF.REVEL.df <- cbind.data.frame(setNames(rbind.data.frame(c("TTN_BAG3", TITN.BAG3.C.LoF.REVEL.sjlife[1,2]/sum(TITN.BAG3.C.LoF.REVEL.sjlife[1,]), TITN.BAG3.C.LoF.REVEL.sjlife[2,2]/sum(TITN.BAG3.C.LoF.REVEL.sjlife[2,]), paste0(round(exp(c(coef(summary(TITN.BAG3.C.LoF.REVEL.test.sjlife.adj))[2,1])),2), CI1), coef(summary(TITN.BAG3.C.LoF.REVEL.test.sjlife.adj))[2,4]),
+#                                                                c("TTN", TITN.C.LoF.REVEL.sjlife[1,2]/sum(TITN.C.LoF.REVEL.sjlife[1,]), TITN.C.LoF.REVEL.sjlife[2,2]/sum(TITN.C.LoF.REVEL.sjlife[2,]), paste0(round(exp(c(coef(summary(TITN.C.LoF.REVEL.test.sjlife.adj))[2,1])),2), CI2), coef(summary(TITN.C.LoF.REVEL.test.sjlife.adj))[2,4]),
+#                                                                c("BAG3", BAG3.C.LoF.REVEL.sjlife[1,2]/sum(BAG3.C.LoF.REVEL.sjlife[1,]), BAG3.C.LoF.REVEL.sjlife[2,2]/sum(BAG3.C.LoF.REVEL.sjlife[2,]), paste0(round(exp(c(coef(summary(BAG3.C.LoF.REVEL.test.sjlife.adj))[2,1])),2), CI3), coef(summary(BAG3.C.LoF.REVEL.test.sjlife.adj))[2,4])
+# ), c("Gene", "prevalence.in.SJLIFE.exp.CO", "prevalence.in.SJLIFE.exp.CA","OR.SJLIFE (CI)", "adj.P.SJLIFE")))
+# 
+# write.table(SJLIFE.Clin.LoF.REVEL.df, "SJLIFE.Clin.LoF.REVEL.df.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 
 
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/analysis_model_fitting/2.Model_fitting_v2.RDATA")
