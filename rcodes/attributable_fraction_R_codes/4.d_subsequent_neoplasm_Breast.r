@@ -1,7 +1,7 @@
 #########################
 ## Load Phenotype data ##
 #########################
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores_categories.RDATA")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores_categories_v2.RDATA")
 #########################
 ## Subsequent Neoplasm ##
 #########################
