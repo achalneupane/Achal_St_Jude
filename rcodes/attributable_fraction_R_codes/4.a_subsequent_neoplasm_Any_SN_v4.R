@@ -252,8 +252,10 @@ adultbmi$VEGSRV_YN <- factor(ifelse(adultbmi$VEGSRV >= 3, 1, 0)) # Veggie
 adultbmi$FRUITSRV_YN <- factor(ifelse(adultbmi$FRUITSRV >= 3, 1, 0)) # fruits
 adultbmi$WGRAINS_YN <- factor(ifelse(adultbmi$WGRAINS >= 3, 1, 0)) # whole grains
 adultbmi$DAIRYSRV_YN <- factor(ifelse(adultbmi$DAIRYSRV >= 2.5, 1, 0)) # Dairy
-adultbmi$GRAINSRV_YN <- factor(ifelse(adultbmi$GRAINSRV <= 1.5, 1, 0)) # Dairy 
-
+adultbmi$GRAINSRV_YN <- factor(ifelse(adultbmi$GRAINSRV <= 1.5, 1, 0)) # Dairy
+# No Fish
+adultbmi$R_MEAT_S_YN <- factor(ifelse(adultbmi$R_MEAT_S <= 1.5, 1, 0)) # Dairy
+adultbmi$R_MEAT_S_YN <- factor(ifelse(adultbmi$R_MEAT_S <= 1.5, 1, 0)) # Dairy
 
 ########################################
 ## Merge BMI, Lifestyle and Phenotype ##
