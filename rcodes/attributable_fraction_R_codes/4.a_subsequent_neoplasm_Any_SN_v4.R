@@ -105,28 +105,25 @@ for (i in 1:length(samples.sjlife)){
 
 
 
-lifestyle$STATUS <- ifelse(lifestyle$SJLIFEID %in% ANY_SNs$sjlid, "case", "control")
-table(lifestyle$STATUS)
-# case control 
-# 592    2978 
-
-## Lifestyle.control (Keep the latest variables)
-lifestyle.control <- lifestyle[lifestyle$STATUS == "control",]
-
-
-## Lifestyle.case (non-missing variables before SN diag date)
-lifestyle.case <- lifestyle[lifestyle$STATUS == "case",]
+# lifestyle$STATUS <- ifelse(lifestyle$SJLIFEID %in% ANY_SNs$sjlid, "case", "control")
+# table(lifestyle$STATUS)
+# # case control 
+# # 592    2978 
+# 
+# ## Lifestyle.control (Keep the latest variables)
+# lifestyle.control <- lifestyle[lifestyle$STATUS == "control",]
+# 
+# 
+# ## Lifestyle.case (non-missing variables before SN diag date)
+# lifestyle.case <- lifestyle[lifestyle$STATUS == "case",]
 
 
 sum(duplicated(lifestyle$SJLIFEID))
+# 2
 lifestyle$SJLIFEID[duplicated(lifestyle$SJLIFEID)]
+# "SJL1080201" "SJL5359215"
 ## Remove duplicate row
 lifestyle <- lifestyle[!duplicated(lifestyle$SJLIFEID),]
-
-
-
-# merge cases and controls
-
 
 ## Add all samples
 # lifestyle <- cbind.data.frame(wgspop[,1:2], lifestyle[match(wgspop$MRN, lifestyle$mrn), ])
@@ -155,9 +152,6 @@ lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyl
 
 
 
-
-
-
 #######################
 ## Adolescent habits ##
 #######################
@@ -169,8 +163,8 @@ head(adolhabits)
 # ## Adult BMI ##
 # ###############
 # Keep the earliest age after 18 years, same as in lifestyle
-adultbmi <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.sas7bdat")
-adultbmi <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.txt")
+# adultbmi <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.sas7bdat")
+adultbmi <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.txt", sep = "\t", header = T)
 head(adultbmi)
 
 lifestyle$agesurvey_floor <- floor(lifestyle$agesurvey)

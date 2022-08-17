@@ -24,10 +24,14 @@ splice.region <- splice_region.remove[grepl("splice_region_variant", splice_regi
 
 splice.region.keep <- splice.region[grepl("frameshift|stop|donor|acceptor", splice.region$ANN....EFFECT),]
 splice.region.keep <- rbind.data.frame(NO.splice.region, splice.region.keep)
+# remove any missense that is not coming from clinvar
+splice.region.keep <- splice.region.keep[!(splice.region.keep$CLINVAR == "N" & splice.region.keep$ANN....EFFECT == "missense_variant"),]
+
 table(splice.region.keep$Annovar_ExonicFunc.refGene)
 # .  frameshift deletion frameshift insertion    nonsynonymous SNV             stopgain       synonymous SNV 
-# 9                    2                    1                    2                    8                    2 
+# 9                    2                    1                    1                    8                    2 
 
+cbind.data.frame(splice.region.keep$ANN....EFFECT, splice.region.keep$Annovar_ExonicFunc.refGene, splice.region.keep$CLINVAR)
 
 ################
 ## CCSS::TITN ##

@@ -101,7 +101,7 @@ dat_all = PHENO.ANY_SN
 fit_all = glm(formula = SARCOMA ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
                 Sarcoma_Machiela_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-                AGE_AT_DIAGNOSIS + gender + aa_class_dose_5.category, family = binomial,
+                gender + aa_class_dose_5.category, family = binomial,
               data = dat_all)
 
 
@@ -128,7 +128,7 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx,3)
-# 0.422
+# 0.411
 
 ##########
 ## P/LP ##
@@ -141,7 +141,7 @@ dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
 N_no_plp = sum(dat_all$pred_no_plp, na.rm = TRUE)
 af_by_plp_Zhaoming = (N_all - N_no_plp) / N_all
 round(af_by_plp_Zhaoming,3)
-# 0.278
+# 0.279
 
 #########
 ## PRS ##
@@ -153,4 +153,4 @@ dat_all$pred_no_Sarcoma_Machiela_PRS.tertile.category = predict(fit_all, newdata
 no_pred_Sarcoma_Machiela_PRS.tertile.category = sum(dat_all$pred_no_Sarcoma_Machiela_PRS.tertile.category, na.rm = TRUE)
 af_by_Sarcoma_Machiela_PRS.tertile.category = (N_all - no_pred_Sarcoma_Machiela_PRS.tertile.category) / N_all
 round(af_by_Sarcoma_Machiela_PRS.tertile.category, 3)
-# 0.22
+# 0.217
