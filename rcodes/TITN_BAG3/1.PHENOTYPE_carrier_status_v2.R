@@ -31,7 +31,7 @@ table(splice.region.keep$Annovar_ExonicFunc.refGene)
 # .  frameshift deletion frameshift insertion    nonsynonymous SNV             stopgain       synonymous SNV 
 # 9                    2                    1                    1                    8                    2 
 
-cbind.data.frame(splice.region.keep$ANN....EFFECT, splice.region.keep$Annovar_ExonicFunc.refGene, splice.region.keep$CLINVAR)
+cbind.data.frame(splice.region.keep$KEY, splice.region.keep$ANN....EFFECT, splice.region.keep$Annovar_ExonicFunc.refGene, splice.region.keep$CLINVAR)
 
 ################
 ## CCSS::TITN ##
@@ -145,3 +145,4 @@ pheno.sjlife_ttn_bag3$TITN_BAG3.clin.LoF.carrierSTATUS <- factor(ifelse(pheno.sj
 # table(TITN_sjlife.Clinv.LoF$IID == BAG3_sjlife.Clinv.LoF$IID)
 
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/analysis_model_fitting/phenotype_carrier_status_v2.RDATA")
+
