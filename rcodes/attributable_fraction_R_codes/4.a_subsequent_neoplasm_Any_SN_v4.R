@@ -215,42 +215,6 @@ summary(mod1)
 ## Attributable fraction of Any SNs ##
 ######################################
 
-# Pleiotropy_Bi_directional_Increasing_PRS.decile.category +
-# Pleiotropy_Bi_directional_Decreasing_PRS.decile.category +
-# Pleiotropy_Meta_analysis_PRS.decile.category +
-# Pleiotropy_PRSWEB_PRS.decile.category +
-# Pleiotropy_One_directional_PRS.decile.category +
-
-# Pleiotropy_Bi_directional_Increasing_PRS.tertile.category +
-# Pleiotropy_Bi_directional_Decreasing_PRS.tertile.category +
-# Pleiotropy_Meta_analysis_PRS.tertile.category +
-# Pleiotropy_PRSWEB_PRS.tertile.category +
-# Pleiotropy_One_directional_PRS.tertile.category +
-
-
-
-# H.C.Clin.LoF.MetaSVM.Non.Ref.Counts
-# H.C.Clin.LoF.Non.Ref.Counts
-# H.C.Clin.LoF.WO.Zhao.Qin_variants.Non.Ref.Counts
-
-
-
-# We also considered bidirectional pleiotropic associations, wherein the same
-# allele for a given variant was associated with an increased risk for some
-# cancers but a decreased risk for others.
-
-# For any pair of cancers associated with the same variant, the type of
-# association falls in one of three categories: (1) SNPs identified in the
-# one-directional analysis, where all associations are in the same direction;
-# (2) SNPs identified in the bidirectional analysis, where both cancers in the
-# pair are associated in the same direction (both risk increasing or both risk
-# decreasing), even though at least one other cancer is associated in the
-# opposite direction; and (3) SNPs identified in the bidirectional analysis,
-# where the pair of cancers are associated in opposite directions (one risk
-# increasing and one risk decreasing).
-
-
-
 dat_all = PHENO.ANY_SN
 fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
                 Pleiotropy_PRSWEB_PRS.tertile.category +
@@ -262,106 +226,41 @@ fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_c
 
 summary(fit_all)
 
-# Get predicted values
+
+##########################
+## Get predicted values ##
+##########################
 dat_all$pred_all = predict(fit_all, newdat = dat_all, type = "response")
+
+###############
+## Treatment ##
+###############
 
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx = dat_all
-dat_tx$maxsegrtdose.category = dat_tx$maxabdrtdose.category = dat_tx$maxchestrtdose.category = dat_tx$epitxn_dose_5.category = "None"
+
+dat_tx$maxsegrtdose.category = dat_tx$maxabdrtdose.category =  dat_tx$maxchestrtdose.category = dat_tx$epitxn_dose_5.category = "None"
 dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
 
-## Attributable fraction calculation
-# First get the "predicted" number of SNs
-# Based on the model including all variables
+## Attributable fraction calculation. First get the "predicted" number of SNs based on the model including all variables
 N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
-print(af_by_tx)
+round(af_by_tx,3)
+# 0.455
 
-## maxsegrtdose.category
-dat_tx = dat_all
-dat_tx$maxsegrtdose.category = "None"
-dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
-
-N_all = sum(dat_all$pred_all, na.rm = TRUE)
-N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
-af_by_tx = (N_all - N_no_tx) / N_all
-print(af_by_tx)
-# 0.2024548
-
-## maxabdrtdose.category
-dat_tx = dat_all
-dat_tx$maxabdrtdose.category = "None"
-dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
-
-N_all = sum(dat_all$pred_all, na.rm = TRUE)
-N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
-af_by_tx = (N_all - N_no_tx) / N_all
-print(af_by_tx)
-# 0.07492755
-
-
-## maxchestrtdose.category
-dat_tx = dat_all
-dat_tx$maxchestrtdose.category = "None"
-dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
-
-N_all = sum(dat_all$pred_all, na.rm = TRUE)
-N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
-af_by_tx = (N_all - N_no_tx) / N_all
-print(af_by_tx)
-# 0.1635751
-
-## epitxn_dose_5.category
-dat_tx = dat_all
-dat_tx$epitxn_dose_5.category = "None"
-dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
-
-N_all = sum(dat_all$pred_all, na.rm = TRUE)
-N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
-af_by_tx = (N_all - N_no_tx) / N_all
-print(af_by_tx)
-# 0.04908683
-
-## P/LP Zhaoming
+##########
+## P/LP ##
+##########
+## P/LP Zhaoming and Qin without Zhaoming
 dat_plp = dat_all
-dat_plp$Zhaoming_carriers = "N"
+dat_plp$Zhaoming_carriers = dat_plp$Qin_without_Zhaoming_vars_carriers = "N"
 
 dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
 N_no_plp = sum(dat_all$pred_no_plp, na.rm = TRUE)
 af_by_plp_Zhaoming = (N_all - N_no_plp) / N_all
-print(af_by_plp_Zhaoming)
-# 0.01999075
-
-## P/LP Qin
-dat_plp = dat_all
-dat_plp$Qin_carriers = "N"
-
-dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
-N_no_plp = sum(dat_all$pred_no_plp, na.rm = TRUE)
-af_by_plp_Qin = (N_all - N_no_plp) / N_all
-print(af_by_plp_Qin)
-# -0.0006263049
-
-## H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts
-dat_plp = dat_all
-dat_plp$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts  = 0
-
-dat_all$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts = predict(fit_all, newdata = dat_plp, type = "response")
-N_no_pred_H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts = sum(dat_all$H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts, na.rm = TRUE)
-af_by_N_no_pred_H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts = (N_all - N_no_pred_H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts) / N_all
-print(af_by_N_no_pred_H.C.Clin.LoF.MetaSVM.WO.Zhao.Qin_variants.Non.Ref.Counts)
-# -2.216773
-
-## All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts
-dat_plp = dat_all
-dat_plp$All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts  = 0
-
-dat_all$All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts = predict(fit_all, newdata = dat_plp, type = "response")
-N_no_pred_All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts = sum(dat_all$All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts, na.rm = TRUE)
-af_by_N_no_pred_All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts = (N_all - N_no_pred_All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts) / N_all
-print(af_by_N_no_pred_All.P.LP.clinvars.LoF.MetaSVM.WO.Prior.vars.Non.Ref.Counts)
-# -2.424273
+round(af_by_plp_Zhaoming,3)
+# 0.022
 
 #########
 ## PRS ##
@@ -370,7 +269,7 @@ dat_prs = dat_all
 dat_prs$Pleiotropy_PRSWEB_PRS.tertile.category = "1st"
 
 dat_all$pred_no_Pleiotropy_PRSWEB_PRS.tertile.category = predict(fit_all, newdata = dat_prs, type = "response")
-N_no_Pleiotropy_PRSWEB_PRS.tertile.category = sum(dat_all$pred_no_Pleiotropy_PRSWEB_PRS.tertile.category, na.rm = TRUE)
-af_by_N_no_Pleiotropy_PRSWEB_PRS.tertile.category = (N_all - N_no_Pleiotropy_PRSWEB_PRS.tertile.category) / N_all
-print(af_by_N_no_Pleiotropy_PRSWEB_PRS.tertile.category)
-
+N_no_pred_no_Pleiotropy_PRSWEB_PRS.tertile.category = sum(dat_all$pred_no_Pleiotropy_PRSWEB_PRS.tertile.category, na.rm = TRUE)
+af_by_N_no_pred_no_Pleiotropy_PRSWEB_PRS.tertile.category = (N_all - N_no_pred_no_Pleiotropy_PRSWEB_PRS.tertile.category) / N_all
+round(af_by_N_no_pred_no_Pleiotropy_PRSWEB_PRS.tertile.category, 3)
+# 0.085
