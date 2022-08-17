@@ -31,7 +31,7 @@ table(splice.region.keep$Annovar_ExonicFunc.refGene)
 # .  frameshift deletion frameshift insertion    nonsynonymous SNV             stopgain       synonymous SNV 
 # 9                    2                    1                    1                    8                    2 
 
-cc <- cbind.data.frame(SNPId=splice.region.keep$KEY, SnpEff_annotation = splice.region.keep$ANN....EFFECT, Annovar_annotation = splice.region.keep$Annovar_ExonicFunc.refGene, Clinvar_YN = splice.region.keep$CLINVAR)
+cc <- cbind.data.frame(CHROM = splice.region.keep$CHROM, POS = splice.region.keep$POS, REF = splice.region.keep$REF, ALT = splice.region.keep$ALT, SNP = splice.region.keep$KEY, SnpEff_annotation = splice.region.keep$ANN....EFFECT, Annovar_annotation = splice.region.keep$Annovar_ExonicFunc.refGene, Clinvar_YN = splice.region.keep$CLINVAR, gnomad_gnome_ALL_maf=splice.region.keep$gnomAD_genome_ALL, gnomad_gnome_NFE_maf = splice.region.keep$gnomAD_genome.NFE)
 write.table(cc, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/ALL_P_LP_combinations/overlapping_sjlife_ccss_exp_maf_0.01.Clinvar.LoF.SNP_list.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 
 ################

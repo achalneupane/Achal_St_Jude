@@ -138,17 +138,17 @@ lifestyle$relation[lifestyle$relation == 3] <- "Other"
 lifestyle$smoker[lifestyle$smoker == 1] <- "Past"
 lifestyle$smoker[lifestyle$smoker == 2] <- "Current"
 lifestyle$smoker[lifestyle$smoker == 3] <- "Never"
-lifestyle$smoker_current_yn <- factor(ifelse(lifestyle$smoker != "Current", "N", "Y"))
-lifestyle$smoker_ever_yn <- factor(ifelse(grepl("Never", lifestyle$smoker), "N", "Y"))
+lifestyle$smoker_current_yn <- factor(ifelse(lifestyle$smoker != "Current", 0, 1))
+lifestyle$smoker_ever_yn <- factor(ifelse(grepl("Never", lifestyle$smoker), 0, 1))
 
-## Recode 1/2 or 0/1 to Y/N
+## Recode 1/2 or 0/1 to 0(N) and 1 (Y)
 lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink|ltpaw|wtlt|vpa10|yoga",
                 colnames(lifestyle))][lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink|ltpaw|wtlt|vpa10|yoga",
-                                                      colnames(lifestyle))] == 1 ] <- "Y"
+                                                      colnames(lifestyle))] == 1 ] <- 1
 
-lifestyle[grepl("nopa|ltpa|ltpaw|wtlt|vpa10|yoga", colnames(lifestyle))][lifestyle[grepl("nopa|ltpa|ltpaw|wtlt|vpa10|yoga", colnames(lifestyle))] == 2 ] <- "N"
+lifestyle[grepl("nopa|ltpa|ltpaw|wtlt|vpa10|yoga", colnames(lifestyle))][lifestyle[grepl("nopa|ltpa|ltpaw|wtlt|vpa10|yoga", colnames(lifestyle))] == 2 ] <- 0
 
-lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))][lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))] == 0 ] <- "N"
+lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))][lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))] == 0 ] <- 0
 
 
 
@@ -166,10 +166,101 @@ head(adolhabits)
 # adultbmi <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.sas7bdat")
 adultbmi <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.txt", sep = "\t", header = T)
 head(adultbmi)
+adultbmi$AGE <- as.numeric(adultbmi$AGE) ## This age seems to be wrong; for example, SJL1287901 age
 
-lifestyle$agesurvey_floor <- floor(lifestyle$agesurvey)
+# Remove those that is missing DateVisitStart
+sum(adultbmi$DateVisitStart == "")
+# 149
+adultbmi <- adultbmi[adultbmi$DateVisitStart != "",]
 
-## Add BMI and Nutrition to Lifestyle. Here, I am extracting the the BMI and Nutrition for the same age for each sample
+## Keep only those BMI data only for the samples in phenotype 
+adultbmi <- adultbmi[adultbmi$sjlid %in% PHENO.ANY_SN$sjlid,]; dim(adultbmi)
+
+## Add DOB
+adultbmi$DOB <- PHENO.ANY_SN$dob[match(adultbmi$sjlid, PHENO.ANY_SN$sjlid)]
+
+adultbmi$DateVisitStart_edited <-  paste(sapply(strsplit(adultbmi$DateVisitStart, "\\/"), `[`, 3), sapply(strsplit(adultbmi$DateVisitStart, "\\/"), `[`, 1), sapply(strsplit(adultbmi$DateVisitStart, "\\/"), `[`, 2), sep ="-")
+
+# adultbmi$AGE_at_Visit <- floor(time_length(interval(as.Date(adultbmi$DOB), as.Date(adultbmi$DateVisitStart_edited)), "years"))
+# table(adultbmi$AGE_at_Visit == adultbmi$AGE) # 125 $AGE seem to be wrong, so calculating the Age as AGE_at_Visit below
+# WRONG.AGE <- adultbmi[which(adultbmi$AGE_at_Visit != adultbmi$AGE),]
+
+adultbmi$AGE_at_Visit <- time_length(interval(as.Date(adultbmi$DOB), as.Date(adultbmi$DateVisitStart_edited)), "years")
+
+## Keep the earliest age after 18
+samples.sjlife <- unique(adultbmi$sjlid)
+length(samples.sjlife)
+# 3640
+
+
+BMI <- {}
+for (i in 1:length(samples.sjlife)){
+  print(paste0("Doing ", i))
+  dat <- adultbmi[adultbmi$sjlid == samples.sjlife[i],]
+  if (max(dat$AGE_at_Visit, na.rm = T) >= 18){
+    print("YES")
+    dat2 <- dat[dat$AGE_at_Visit >= 18,]
+    BMI.tmp <- dat2[which(dat2$AGE_at_Visit == min(dat2$AGE_at_Visit, na.rm = T)),] # Keep the earliest age after 18 years
+  }
+  BMI <- rbind.data.frame(BMI, BMI.tmp)
+}
+
+save.BIM <- BMI
+
+BMI <- distinct(BMI)
+sum(duplicated(BMI$sjlid))
+# 0
+BMI$sjlid[duplicated(BMI$sjlid)]
+
+
+#######################
+## Physical Activity ##
+#######################
+
+# 1. Create Physical activity based variables every week
+# Criteria: 
+#   - Physical activity at least 20 mins, three times a week (lifestyle$pa20 > 3). All seem to be doing at least once.
+#   - Light physical activity every week (ltpaw == "Y") 
+# as.data.frame(ftable(ltpa=lifestyle$ltpa, wtlt=lifestyle$wtlt, vpa10=lifestyle$vpa10, pa20=lifestyle$pa20, yoga=lifestyle$yoga))  
+physical.activity <- as.data.frame(ftable(ltpa=lifestyle$ltpa, wtlt=lifestyle$wtlt, vpa10=lifestyle$vpa10, pa20=lifestyle$pa20, yoga=lifestyle$yoga))
+
+# If ltpa, wtlt, vpa10 and yoga, ny three or more have 1, then Yes for PhysicalActivity_YN
+lifestyle$PhysicalActivity_YN <- factor(ifelse (rowSums(lifestyle[c("ltpa", "wtlt", "vpa10", "yoga")])>=3, "Y", "N"))
+
+#############
+## Obesity ##
+#############
+
+BMI$Obesity_YN <- factor(ifelse(BMI$BMI < 30, "N", "Y"))
+
+#############
+## Alcohol ##
+#############
+# If binge, heavy or risky drink any is 1, then Yes for RiskyHeavyDrink_YN
+lifestyle$RiskyHeavyDrink_YN <- factor(ifelse (rowSums(lifestyle[c("bingedrink", "heavydrink", "riskydrink")])>=1, "Y", "N"))
+
+
+##########
+## Diet ##
+##########
+colnames(adultbmi)
+# VEGSRV"               
+# [19] "FRUITSRV"              "GRAINSRV"              "MEATSRV"               "WGRAINS"               "DAIRYSRV"              "FATSRV"               
+# [25] "DT_SODI"               "DT_TFAT"               "DT_CARB"               "DT_PROT"               "M_EGG"                 "AV_TOT_S"             
+# [31] "AF_TOT_S"              "R_MEAT_S"              "A_NUT_S"               "A_BEAN_S"
+adultbmi$VEGSRV_YN <- factor(ifelse(adultbmi$VEGSRV >= 3, 1, 0)) # Veggie 
+adultbmi$FRUITSRV_YN <- factor(ifelse(adultbmi$FRUITSRV >= 3, 1, 0)) # fruits
+adultbmi$WGRAINS_YN <- factor(ifelse(adultbmi$WGRAINS >= 3, 1, 0)) # whole grains
+adultbmi$DAIRYSRV_YN <- factor(ifelse(adultbmi$DAIRYSRV >= 2.5, 1, 0)) # Dairy
+adultbmi$GRAINSRV_YN <- factor(ifelse(adultbmi$GRAINSRV <= 1.5, 1, 0)) # Dairy 
+
+
+########################################
+## Merge BMI, Lifestyle and Phenotype ##
+########################################
+
+
+## Add BMI and Nutrition to Lifestyle. Here, I am extracting the the BMI and Nutrition for the samples
 lifestyle$BMI_KEY <- paste(lifestyle$SJLIFEID, lifestyle$agesurvey_floor, sep = ":")
 
 length(unique(adultbmi$sjlid))
