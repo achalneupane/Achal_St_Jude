@@ -53,10 +53,10 @@ lifestyle$relation[lifestyle$relation == 3] <- "Other"
 lifestyle$smoker[lifestyle$smoker == 1] <- "Past"
 lifestyle$smoker[lifestyle$smoker == 2] <- "Current"
 lifestyle$smoker[lifestyle$smoker == 3] <- "Never"
-lifestyle$smoker_current_yn <- factor(ifelse(lifestyle$smoker != "Current", 0, 1))
-lifestyle$smoker_ever_yn <- factor(ifelse(grepl("Never", lifestyle$smoker), 0, 1))
+lifestyle$smoker_former_or_never_yn <- as.numeric(ifelse(lifestyle$smoker != "Current", 1, 0))
+lifestyle$smoker_never_yn <- as.numeric(ifelse(lifestyle$smoker == "Never", 1, 0))
 
-## Recode 1/2 or 0/1 to 0(N) and 1 (Y)
+## Recode 1/2 or 0/1 to 0 (N) and 1 (Y)
 lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink|ltpaw|wtlt|vpa10|yoga",
                 colnames(lifestyle))][lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink|ltpaw|wtlt|vpa10|yoga",
                                                       colnames(lifestyle))] == 1 ] <- 1
@@ -91,6 +91,8 @@ adultbmi$DateVisitStart <-  paste(sapply(strsplit(adultbmi$DateVisitStart, "\\/"
 
 ## There are some missing variables in the data that Siddhant provided, so extracting those from the original SAS data
 original.adultbmi <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/ffq_grams.sas7bdat")
+colnames(original.adultbmi)
+
 dim(original.adultbmi)
 # utils::View(original.adultbmi)
 # original.adultbmi seems to have leading zeros in date, so removing those zeors
@@ -124,14 +126,23 @@ table(original.adultbmi$KEY == adultbmi$KEY)
 ## Now adding a few more variables that Siddhant missed ##
 ##########################################################
 adultbmi$NUTSFREQ <- as.numeric(original.adultbmi$NUTSFREQ) # 5 indicates 1.0 serving/frequency per Week
-adultbmi$ANYFISHFREQ <- original.adultbmi$ANYFISHFREQ # 3 indicates 2 serving days last week
-adultbmi$SOFTDRINKSFREQ <-  as.numeric(original.adultbmi$SOFTDRINKSFREQ) # Sugary beverage; 5 indicates 1.0 per Week; 1 Neve
+## Fish is missing; see below for details
+# adultbmi$ANYFISHFREQ <- original.adultbmi$ANYFISHFREQ # 3 indicates 2 serving days last week
+adultbmi$SOFTDRINKSFREQ <-  as.numeric(original.adultbmi$SOFTDRINKSFREQ) # Sugary beverage; 5 indicates 1.0 per Week; 1 Never
+# adultbmi$BOLOGNAFREQ <- as.numeric(original.adultbmi$BOLOGNAFREQ) # Type LunchMeat: low-fat/turkey, reg.
+adultbmi$MIXEDBEEFPORKFREQ <- as.numeric(original.adultbmi$MIXEDBEEFPORKFREQ)
+
+adultbmi$NOTFRIEDFISHFREQ <- as.numeric(original.adultbmi$NOTFRIEDFISHFREQ)
+
+# Processed meat: hot dogs, ham, bacon, sausage
+adultbmi$HOTDOGFREQ <- as.numeric(original.adultbmi$HOTDOGFREQ)
+adultbmi$BACONFREQ <- as.numeric(original.adultbmi$BACONFREQ)
+adultbmi$SAUSAGEFREQ <- as.numeric(original.adultbmi$SAUSAGEFREQ)
+adultbmi$G_NWHL <- as.numeric(original.adultbmi$G_NWHL)
+
 
 adultbmi$AGE <- as.numeric(adultbmi$AGE) ## This age seems to be wrong; for example, SJL1287901 age
 
-
-## Keep only those BMI data only for the samples in phenotype 
-adultbmi <- adultbmi[adultbmi$sjlid %in% PHENO.ANY_SN$sjlid,]; dim(adultbmi)
 
 ## Add DOB
 adultbmi$DOB <- PHENO.ANY_SN$dob[match(adultbmi$sjlid, PHENO.ANY_SN$sjlid)]
@@ -147,7 +158,7 @@ adultbmi$AGE_at_Visit <- time_length(interval(as.Date(adultbmi$DOB), as.Date(adu
 ## Keep the earliest age after 18
 samples.sjlife <- unique(adultbmi$sjlid)
 length(samples.sjlife)
-# 3640
+# 3630
 
 
 BMI <- {}
@@ -175,57 +186,102 @@ BMI$sjlid[duplicated(BMI$sjlid)]
 #######################
 
 # Use variable 'nopa': I rarely or never do any physical activities 
-lifestyle$PhysicalActivity_YN <- factor(ifelse(lifestyle$nopa, "Y", "N"))
+lifestyle$PhysicalActivity_yn <- as.numeric(ifelse(lifestyle$nopa == 0, 1, 0))
 
 #############
 ## Obesity ##
 #############
 
-BMI$Obesity_YN <- factor(ifelse(BMI$BMI < 30, "N", "Y"))
+BMI$Obesity_yn <- as.numeric(ifelse(BMI$BMI < 30, 1, 0))
 
 #############
 ## Alcohol ##
 #############
-# If heavy or risky drink any is 1, then Yes for RiskyHeavyDrink_YN
-lifestyle$RiskyHeavyDrink_YN <- factor(ifelse (rowSums(lifestyle[c("heavydrink", "riskydrink")])>=1, "Y", "N"))
+# If heavy or risky drink any is 1, then Yes for RiskyHeavyDrink_yn
+lifestyle$NOT_RiskyHeavyDrink_yn <- as.numeric(ifelse (rowSums(lifestyle[c("heavydrink", "riskydrink")])==0, 1, 0))
 
 
 ##########
-## Diet ##
+## Diet ## 
 ##########
+
+## Fish is missing
 colnames(adultbmi)
-# VEGSRV"               
-# [19] "FRUITSRV"              "GRAINSRV"              "MEATSRV"               "WGRAINS"               "DAIRYSRV"              "FATSRV"               
-# [25] "DT_SODI"               "DT_TFAT"               "DT_CARB"               "DT_PROT"               "M_EGG"                 "AV_TOT_S"             
-# [31] "AF_TOT_S"              "R_MEAT_S"              "A_NUT_S"               "A_BEAN_S"     "NUTSFREQ_YN"
-adultbmi$FRUITSRV_YN <- factor(ifelse(adultbmi$FRUITSRV >= 3, 1, 0)) # fruits
-adultbmi$NUTSFREQ_YN <- factor(ifelse(adultbmi$NUTSFREQ >= 1, 1, 0))
-adultbmi$VEGSRV_YN <- factor(ifelse(adultbmi$VEGSRV >= 3, 1, 0)) # Veggie 
-adultbmi$WGRAINS_YN <- factor(ifelse(adultbmi$WGRAINS >= 3, 1, 0)) # whole grains
-adultbmi$ANYFISHFREQ <- factor(ifelse(adultbmi$ANYFISHFREQ >= 3, 1, 0)) # Any fish; 3 indicates 2 days last week; 1 Not eaten in the last week
-adultbmi$DAIRYSRV_YN <- factor(ifelse(adultbmi$DAIRYSRV >= 2.5, 1, 0)) # Dairy
-adultbmi$GRAINSRV_YN <- factor(ifelse(adultbmi$GRAINSRV <= 1.5, 1, 0)) # GRAINSRV
-# No processed meats
-adultbmi$R_MEAT_S_YN <- factor(ifelse(adultbmi$R_MEAT_S <= 1.5, 1, 0)) # Red meat
-adultbmi$DT_TFAT_cohort_median_YN <- factor(ifelse(adultbmi$DT_TFAT <= median(adultbmi$DT_TFAT, na.rm = T), 1, 0)) # Fat serving less than or equal to cohort median
-adultbmi$SOFTDRINKSFREQ_YN <- factor(ifelse(adultbmi$SOFTDRINKSFREQ <= 1.5, 1, 0)) # Sugary beverage; 5 indicates 1.0 per Week; 1 Never
-adultbmi$DT_SODI_YN <- factor(ifelse(adultbmi$DT_SODI <= 2000, 1, 0))
+# > colnames(adultbmi)
+# [1] "mrn"                 "sjlid"               "DateVisitStart"      "visittype"           "AGE"                 "SEX"                 "BMI"                
+# [8] "HEI2005_TOTAL_SCORE" "HEI2010_TOTAL_SCORE" "HEI2015_TOTAL_SCORE" "AHEI_VEGS"           "AHEI_FRUITS"         "AHEI_SUGBEVS"        "AHEI_NUTLEGS"       
+# [15] "AHEI_RMEATS"         "AHEI_TRFATPCT"       "AHEI2010"            "VEGSRV"              "FRUITSRV"            "GRAINSRV"            "MEATSRV"            
+# [22] "WGRAINS"             "DAIRYSRV"            "FATSRV"              "DT_SODI"             "DT_TFAT"             "DT_CARB"             "DT_PROT"            
+# [29] "M_EGG"               "AV_TOT_S"            "AF_TOT_S"            "R_MEAT_S"            "A_NUT_S"             "A_BEAN_S"            "KEY"                
+# [36] "NUTSFREQ"            "SOFTDRINKSFREQ"      "DOB"                 "AGE_at_Visit"   
 
-########################################
-## Merge BMI, Lifestyle and Phenotype ##
-########################################
+#----------------------------1. Fruits
+BMI$FRUITSRV_yn <- as.numeric(ifelse(BMI$FRUITSRV >= 3, 1, 0)) # fruits; daily servings
+
+#----------------------------2. Nuts
+BMI$NUTSFREQ_yn <- as.numeric(ifelse(BMI$NUTSFREQ >= 5, 1, 0)) # NUTSFREQ 1 or more serving per week; indicated by 5 or more
+
+#----------------------------3. Veggies
+BMI$VEGSRV_yn <- as.numeric(ifelse(BMI$VEGSRV >= 3, 1, 0)) # Veggie; daily servings
+
+#----------------------------4. Whole grains
+BMI$WGRAINS_yn <- as.numeric(ifelse(BMI$WGRAINS >= 3, 1, 0)) # whole grains; daily servings
+
+#----------------------------5. Fish 
+## There is this variable for Fish in dictionary file for child only, but
+#ffq_child.sas7bdat data doesn't have it (Z:\SJShare\SJCOMMON\ECC\SJLife\SJLIFE
+#Data Freeze\2 Final Data SJLIFE\20200430\Clinical Data) BMI$ANYFISHFREQ <-
+#as.numeric(ifelse(BMI$ANYFISHFREQ >= 3, 1, 0)) # Any fish; 3 indicates 2 days last week; 1 Not eaten in the last week
+
+BMI$NOTFRIEDFISHFREQ_yn <- as.numeric(ifelse(BMI$NOTFRIEDFISHFREQ >= 6, 1, 0)) # Other fish; 6 indicates 2 times per week; 1 Never
+
+#----------------------------6. Dairy
+BMI$DAIRYSRV_yn <- as.numeric(ifelse(BMI$DAIRYSRV >= 2.5, 1, 0)) # Dairy; daily servings
+
+# #----------------------------7. Grains (using this as refined grains)
+# BMI$G_NWHL_yn <- as.numeric(ifelse(BMI$G_NWHL <= 1.5, 1, 0)) # Not sure about this; frequency is not clear
+# BMI$GRAINSRV <- as.numeric(ifelse(BMI$GRAINSRV <= 1.5, 1, 0)) # GRAINSRV; daily servings
+
+# #----------------------------8. Processed meats
+# doi: 10.1080/01635580701684872
+# Processed meat includes bacon, ham (raw, smoked or cooked), heated sausages
+# like hot-dogs (frankfurters), raw sausages (like salami), bologna, blood
+# sausage (UK: black pudding), liver pâté (or liverwurst) and other pâtés and
+# spread meat, luncheon meat and other cold cuts, canned meat, and corned beef
+
+# No processed meats; also frequency is not available for week
+# BMI$R_MEAT_S_yn <- as.numeric(ifelse(BMI$R_MEAT_S <= 1.5, 1, 0)) # Red meat servings daily
+# BMI$BOLOGNAFREQ_yn <- as.numeric(ifelse(BMI$BOLOGNAFREQ <= 5)) # Lunch Meats, 5 indicates 1 serving per week; 1 Never
+
+# Processed meat" hotdogs, bacon, sausage
+
+# # Processed meat: hot dogs, ham, bacon, sausage;  5 indicates 1 serving per week; 1 Never
+# BMI$HOTDOGFREQ_yn <- as.numeric(ifelse(BMI$HOTDOGFREQ <= 5, 1, 0))
+# BMI$BACONFREQ_yn <- as.numeric(ifelse(BMI$BACONFREQ <= 5, 1, 0)) # 5 indicates 1 serving per week; 1 Never
+# BMI$SAUSAGEFREQ_yn <- as.numeric(ifelse(BMI$SAUSAGEFREQ <= 5, 1, 0)) # 5 indicates 1 serving per week; 1 Never
+# BMI$processed_meats_yn <- as.numeric(ifelse(rowSums(cbind(BMI$HOTDOGFREQ, BMI$BACONFREQ, BMI$SAUSAGEFREQ)) <= 15, 1, 0)) # 5 indicates 1 serving per week; 1 Never
+
+#----------------------------9. Unprocessed red meats
+BMI$MIXEDBEEFPORKFREQ_yn <- as.numeric(ifelse(BMI$MIXEDBEEFPORKFREQ <= 5, 1, 0)) # 5 indicates 1 serving per week; 1 Never
 
 
-## Add BMI and Nutrition to Lifestyle. Here, I am extracting the the BMI and Nutrition for the samples
-lifestyle$BMI_KEY <- paste(lifestyle$SJLIFEID, lifestyle$agesurvey_floor, sep = ":")
+#----------------------------10. Trans fat
+BMI$DT_TFAT_cohort_median_yn <- as.numeric(ifelse(BMI$DT_TFAT <= median(BMI$DT_TFAT, na.rm = T), 1, 0)) # Fat serving less than or equal to cohort median
+#----------------------------11. Sugary beverage
+BMI$SOFTDRINKSFREQ_yn <- as.numeric(ifelse(BMI$SOFTDRINKSFREQ <= 5, 1, 0)) # Sugary beverage; 5 indicates 1.0 per Week; 1 Never
+#----------------------------12. Sodium
+BMI$DT_SODI_yn <- as.numeric(ifelse(BMI$DT_SODI <= 2000, 1, 0))
 
-length(unique(adultbmi$sjlid))
-# 3640
-adultbmi$BMI_KEY <- paste(adultbmi$sjlid, adultbmi$AGE, sep = ":")
-sum(lifestyle$BMI_KEY %in% adultbmi$BMI_KEY)
-# 2964
-## samples that did not match by corresponding age
-cc <- lifestyle[!lifestyle$BMI_KEY %in% adultbmi$BMI_KEY,]
-lifestyle <- cbind.data.frame(lifestyle, adultbmi[match(lifestyle$BMI_KEY, adultbmi$BMI_KEY), c("BMI", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")])
+BMI$HEALTHY_Diet_yn <- ifelse(rowSums(BMI[,c("FRUITSRV_yn", "NUTSFREQ_yn", "VEGSRV_yn", "WGRAINS_yn", "NOTFRIEDFISHFREQ_yn", "DAIRYSRV_yn", "MIXEDBEEFPORKFREQ_yn", "DT_TFAT_cohort_median_yn", "SOFTDRINKSFREQ_yn", "DT_SODI_yn")]) >= 5, 1,0)
+
+ 
+
+######################################
+## Merge BMI and Lifestyle datasets ##
+######################################
+
+ALL.LIFESTYLE <- merge(lifestyle, BMI, by.x = "SJLIFEID", by.y = "sjlid", all = T)
+
+ALL.LIFESTYLE$favorable_lifestyle_yn <- ALL.LIFESTYLE$smoker_ever_yn
 
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v2.RDATA")
