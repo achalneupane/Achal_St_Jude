@@ -50,36 +50,30 @@ length(unique(subneo.after5$sjlid))
 subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
 sum(!duplicated(subneo.within5$sjlid))
 # 22
-#############
-## Any SNs ##
-#############
-# Get SNs for the first time and Age at First SN.
-# For this, I will first sort the table by date
-library(data.table)
-ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+###############
+## Meningioma
+###############
+MENINGIOMA <- subneo[grepl("meningioma", subneo$diag, ignore.case = T),]
+MENINGIOMA <- setDT(MENINGIOMA)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+nrow(MENINGIOMA)
+# 149
+# Removing samples with SNs within 5 years of childhood cancer
+MENINGIOMA <- MENINGIOMA[!MENINGIOMA$sjlid %in% subneo.within5$sjlid,]
+nrow(MENINGIOMA)
+# 149
+PHENO.ANY_SN$MENINGIOMA <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% MENINGIOMA$sjlid, 0, 1))
+table(MENINGIOMA$diaggrp)
 
-
-# Removing samples with with SN within the 5 years of childhood cancer
-ANY_SNs <- ANY_SNs[!ANY_SNs$sjlid %in% subneo.within5$sjlid,]
-dim(ANY_SNs)
-# 605
-
-PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
 
 #############################
 ## Add Lifestyle variables ##
 #############################
-# lifestyle$STATUS <- ifelse(lifestyle$SJLIFEID %in% ANY_SNs$sjlid, "case", "control")
-# table(lifestyle$STATUS)
-# # case control 
-# # 592    2978 
-# 
-# ## Lifestyle.control (Keep the latest variables)
-# lifestyle.control <- lifestyle[lifestyle$STATUS == "control",]
-# 
-# 
-# ## Lifestyle.case (non-missing variables before SN diag date)
-# lifestyle.case <- lifestyle[lifestyle$STATUS == "case",]
+
+
+
+
+
+
 
 
 #########################
@@ -97,24 +91,19 @@ PHENO.ANY_SN.AFR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'AFR', -grep("sjl
 ## 1. Qin baseline model ##
 ###########################
 ## SJLIFE (ALL) 
-mod1 <- glm(ANY_SN ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+mod1 <- glm(MENINGIOMA ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
 
-# ## SJLIFE (EUR)
-# mod1.EUR <- glm(ANY_SN ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
-# summary(mod1.EUR)
+## SJLIFE (EUR)
+mod1.EUR <- glm(MENINGIOMA ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+summary(mod1.EUR)
 
-
-######################################
-## Attributable fraction of Any SNs ##
-######################################
-
+##########################
 dat_all = PHENO.ANY_SN
-fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
-                Pleiotropy_PRSWEB_PRS.tertile.category +
+fit_all = glm(formula = MENINGIOMA ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
+                Meningioma_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
-                maxchestrtdose.category + epitxn_dose_5.category, family = binomial,
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + epitxn_dose_5.category, family = binomial,
               data = dat_all)
 
 
@@ -133,7 +122,7 @@ dat_all$pred_all = predict(fit_all, newdat = dat_all, type = "response")
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx = dat_all
 
-dat_tx$maxsegrtdose.category = dat_tx$maxabdrtdose.category =  dat_tx$maxchestrtdose.category = dat_tx$epitxn_dose_5.category = "None"
+dat_tx$maxsegrtdose.category = dat_tx$epitxn_dose_5.category = "None"
 dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
 
 ## Attributable fraction calculation. First get the "predicted" number of SNs based on the model including all variables
@@ -141,7 +130,7 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx,3)
-# 0.455
+# 0.947
 
 ##########
 ## P/LP ##
@@ -154,16 +143,17 @@ dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
 N_no_plp = sum(dat_all$pred_no_plp, na.rm = TRUE)
 af_by_plp_Zhaoming = (N_all - N_no_plp) / N_all
 round(af_by_plp_Zhaoming,3)
-# 0.022
+# -0.012
 
 #########
 ## PRS ##
 #########
 dat_prs = dat_all
-dat_prs$Pleiotropy_PRSWEB_PRS.tertile.category = "1st"
+dat_prs$Meningioma_PRS.tertile.category = "1st"
 
-dat_all$pred_no_Pleiotropy_PRSWEB_PRS.tertile.category = predict(fit_all, newdata = dat_prs, type = "response")
-N_no_pred_no_Pleiotropy_PRSWEB_PRS.tertile.category = sum(dat_all$pred_no_Pleiotropy_PRSWEB_PRS.tertile.category, na.rm = TRUE)
-af_by_N_no_pred_no_Pleiotropy_PRSWEB_PRS.tertile.category = (N_all - N_no_pred_no_Pleiotropy_PRSWEB_PRS.tertile.category) / N_all
-round(af_by_N_no_pred_no_Pleiotropy_PRSWEB_PRS.tertile.category, 3)
-# 0.085
+dat_all$pred_no_Meningioma_PRS.tertile.category = predict(fit_all, newdata = dat_prs, type = "response")
+no_pred_Meningioma_PRS.tertile.category = sum(dat_all$pred_no_Meningioma_PRS.tertile.category, na.rm = TRUE)
+af_by_N_no_pred_no_Meningioma_PRS.tertile.category = (N_all - no_pred_Meningioma_PRS.tertile.category) / N_all
+round(af_by_N_no_pred_no_Meningioma_PRS.tertile.category, 3)
+# -0.033
+

@@ -1,3 +1,7 @@
+#########################
+## Load Phenotype data ##
+#########################
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores_categories_v2.RDATA")
 #############################
 ## Add Lifestyle variables ##
 #############################
@@ -18,6 +22,11 @@ adlthabits$agesurvey <- time_length(interval(as.Date(adlthabits$DOB), as.Date(ad
 # adlthabits$agesurvey <- floor(adlthabits$agesurvey_diff_of_dob_datecomp)
 
 samples.sjlife <- unique(adlthabits$SJLIFEID)
+# Only interested in those present in the phenotype data
+sum(samples.sjlife%in% PHENO.ANY_SN$sjlid)
+# 3571
+samples.sjlife <- samples.sjlife[(samples.sjlife%in% PHENO.ANY_SN$sjlid)]
+
 length(samples.sjlife)
 # 3571
 
@@ -157,8 +166,14 @@ adultbmi$AGE_at_Visit <- time_length(interval(as.Date(adultbmi$DOB), as.Date(adu
 
 ## Keep the earliest age after 18
 samples.sjlife <- unique(adultbmi$sjlid)
+
+# Only interested in those present in the phenotype data
+sum(samples.sjlife%in% PHENO.ANY_SN$sjlid)
+# 3574
+samples.sjlife <- samples.sjlife[(samples.sjlife%in% PHENO.ANY_SN$sjlid)]
+
 length(samples.sjlife)
-# 3630
+# 3574
 
 
 BMI <- {}
@@ -179,14 +194,14 @@ BMI <- distinct(BMI)
 sum(duplicated(BMI$sjlid))
 # 0
 BMI$sjlid[duplicated(BMI$sjlid)]
-
-
+nrow(BMI)
+# 3543
 #######################
 ## Physical Activity ##
 #######################
 
-# Use variable 'nopa': I rarely or never do any physical activities 
-lifestyle$PhysicalActivity_yn <- as.numeric(ifelse(lifestyle$nopa == 0, 1, 0))
+# Use variable 'wtlt': I do activities to increase muscle strength, such as lifting weights or aerobics, once a week or more 
+lifestyle$PhysicalActivity_yn <- as.numeric(ifelse(lifestyle$wtlt == 1, 1, 0))
 
 #############
 ## Obesity ##
@@ -275,13 +290,20 @@ BMI$DT_SODI_yn <- as.numeric(ifelse(BMI$DT_SODI <= 2000, 1, 0))
 BMI$HEALTHY_Diet_yn <- ifelse(rowSums(BMI[,c("FRUITSRV_yn", "NUTSFREQ_yn", "VEGSRV_yn", "WGRAINS_yn", "NOTFRIEDFISHFREQ_yn", "DAIRYSRV_yn", "MIXEDBEEFPORKFREQ_yn", "DT_TFAT_cohort_median_yn", "SOFTDRINKSFREQ_yn", "DT_SODI_yn")]) >= 5, 1,0)
 
  
-
 ######################################
 ## Merge BMI and Lifestyle datasets ##
 ######################################
 
 ALL.LIFESTYLE <- merge(lifestyle, BMI, by.x = "SJLIFEID", by.y = "sjlid", all = T)
 
-ALL.LIFESTYLE$favorable_lifestyle_yn <- ALL.LIFESTYLE$smoker_ever_yn
+# 1. 
+# cbind.data.frame(ALL.LIFESTYLE$smoker_ever_yn, ALL.LIFESTYLE$PhysicalActivity_yn, ALL.LIFESTYLE$obesity_yn, ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn, ALL.LIFESTYLE$HEALTHY_Diet_yn)
+# 2. 
+ALL.LIFESTYLE$favorable_lifestyle.category [rowSums(cbind.data.frame(ALL.LIFESTYLE$smoker_former_or_never_yn, ALL.LIFESTYLE$PhysicalActivity_yn, ALL.LIFESTYLE$Obesity_yn, ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn, ALL.LIFESTYLE$HEALTHY_Diet_yn)) >= 3] <- "favorable"
+ALL.LIFESTYLE$favorable_lifestyle.category [rowSums(cbind.data.frame(ALL.LIFESTYLE$smoker_former_or_never_yn, ALL.LIFESTYLE$PhysicalActivity_yn, ALL.LIFESTYLE$Obesity_yn, ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn, ALL.LIFESTYLE$HEALTHY_Diet_yn)) == 2] <- "intermediate"
+ALL.LIFESTYLE$favorable_lifestyle.category [rowSums(cbind.data.frame(ALL.LIFESTYLE$smoker_former_or_never_yn, ALL.LIFESTYLE$PhysicalActivity_yn, ALL.LIFESTYLE$Obesity_yn, ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn, ALL.LIFESTYLE$HEALTHY_Diet_yn)) <= 1] <- "unfavorable"
 
+ALL.LIFESTYLE$favorable_lifestyle.category <- factor(ALL.LIFESTYLE$favorable_lifestyle.category, levels = c("favorable", "intermediate", "unfavorable"))
+
+                                          
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v2.RDATA")
