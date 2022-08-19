@@ -1,7 +1,7 @@
 #########################
 ## Load Phenotype data ##
 #########################
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores_categories_v2.RDATA")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v2.RDATA")
 #########################
 ## Subsequent Neoplasm ##
 #########################
@@ -68,6 +68,23 @@ table(MENINGIOMA$diaggrp)
 #############################
 ## Add Lifestyle variables ##
 #############################
+# Define CA/CO status in lifestyle
+ALL.LIFESTYLE$CACO <- factor(ifelse(!ALL.LIFESTYLE$SJLIFEID %in% MENINGIOMA$sjlid, 0, 1))
+
+
+## Get date (gradedt) and age at diagnosis of SN
+ALL.LIFESTYLE$ANY.SN_gradedate <- MENINGIOMA$gradedt[match(ALL.LIFESTYLE$SJLIFEID, MENINGIOMA$sjlid)]
+ALL.LIFESTYLE$AGE.ANY_SN <- MENINGIOMA$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, MENINGIOMA$sjlid)]
+
+## In CASES, if age survey is greater than age at diagnosis; NULLIFY the favorable_lifestyle.category. That information is not useful
+ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_Obese_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")] <- NA
+# ALL.LIFESTYLE[c("smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_Obese_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")]
+
+
+CASES.ALL.LIFESTYLE <- ALL.LIFESTYLE[ALL.LIFESTYLE$CACO == 1,c("smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_Obese_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")]
+
+CASES.ALL.LIFESTYLE$Missing.VAlues <- rowSums(is.na(CASES.ALL.LIFESTYLE))
+table(CASES.ALL.LIFESTYLE$Missing.VAlues)
 
 
 
