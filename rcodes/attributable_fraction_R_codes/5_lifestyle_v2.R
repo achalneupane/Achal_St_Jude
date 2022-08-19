@@ -65,6 +65,7 @@ lifestyle$smoker[lifestyle$smoker == 3] <- "Never"
 lifestyle$smoker_former_or_never_yn <- as.numeric(ifelse(lifestyle$smoker != "Current", 1, 0))
 lifestyle$smoker_never_yn <- as.numeric(ifelse(lifestyle$smoker == "Never", 1, 0))
 
+
 ## Recode 1/2 or 0/1 to 0 (N) and 1 (Y)
 lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink|ltpaw|wtlt|vpa10|yoga",
                 colnames(lifestyle))][lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink|ltpaw|wtlt|vpa10|yoga",
@@ -207,7 +208,7 @@ lifestyle$PhysicalActivity_yn <- as.numeric(ifelse(lifestyle$wtlt == 1, 1, 0))
 ## Obesity ##
 #############
 
-BMI$Obesity_yn <- as.numeric(ifelse(BMI$BMI < 30, 1, 0))
+BMI$Not_Obese_yn <- as.numeric(ifelse(BMI$BMI < 30, 1, 0))
 
 #############
 ## Alcohol ##
@@ -296,14 +297,9 @@ BMI$HEALTHY_Diet_yn <- ifelse(rowSums(BMI[,c("FRUITSRV_yn", "NUTSFREQ_yn", "VEGS
 
 ALL.LIFESTYLE <- merge(lifestyle, BMI, by.x = "SJLIFEID", by.y = "sjlid", all = T)
 
-# 1. 
-# cbind.data.frame(ALL.LIFESTYLE$smoker_ever_yn, ALL.LIFESTYLE$PhysicalActivity_yn, ALL.LIFESTYLE$obesity_yn, ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn, ALL.LIFESTYLE$HEALTHY_Diet_yn)
-# 2. 
-ALL.LIFESTYLE$favorable_lifestyle.category [rowSums(cbind.data.frame(ALL.LIFESTYLE$smoker_former_or_never_yn, ALL.LIFESTYLE$PhysicalActivity_yn, ALL.LIFESTYLE$Obesity_yn, ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn, ALL.LIFESTYLE$HEALTHY_Diet_yn)) >= 3] <- "favorable"
-ALL.LIFESTYLE$favorable_lifestyle.category [rowSums(cbind.data.frame(ALL.LIFESTYLE$smoker_former_or_never_yn, ALL.LIFESTYLE$PhysicalActivity_yn, ALL.LIFESTYLE$Obesity_yn, ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn, ALL.LIFESTYLE$HEALTHY_Diet_yn)) == 2] <- "intermediate"
-ALL.LIFESTYLE$favorable_lifestyle.category [rowSums(cbind.data.frame(ALL.LIFESTYLE$smoker_former_or_never_yn, ALL.LIFESTYLE$PhysicalActivity_yn, ALL.LIFESTYLE$Obesity_yn, ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn, ALL.LIFESTYLE$HEALTHY_Diet_yn)) <= 1] <- "unfavorable"
+## Only Keep the ones that are needed
+ALL.LIFESTYLE <- ALL.LIFESTYLE[c("agesurvey", "SJLIFEID", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE", "smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_Obese_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")]
 
-ALL.LIFESTYLE$favorable_lifestyle.category <- factor(ALL.LIFESTYLE$favorable_lifestyle.category, levels = c("favorable", "intermediate", "unfavorable"))
 
                                           
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v2.RDATA")
