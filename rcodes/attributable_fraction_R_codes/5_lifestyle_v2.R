@@ -1,3 +1,15 @@
+
+library(haven)
+library(benchmarkme)
+library(dplyr)
+library(plyr)
+library(data.table)
+library (birk)
+library(gtools)
+library(stringr)
+# library(tidyverse)
+library(lubridate)
+
 #########################
 ## Load Phenotype data ##
 #########################
@@ -86,6 +98,24 @@ head(adolhabits)
 ###############
 ## Adult BMI ##
 ###############
+# This BMI has more samples, so using this for BMI only
+library(sas7bdat)
+bmi = read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/function_combo_basic.sas7bdat')
+iid = read.table('Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/4401_attributable_fraction_ids.txt', header = FALSE)
+bmi_iid = subset(bmi, sjlid %in% iid$V1, select = c('sjlid', 'assmntdate', 'BMIadj'))
+demo = read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/demographics.sas7bdat')
+dob = demo[c('sjlid', 'dob')]
+bmi_iid_dob = merge(bmi_iid, dob, by='sjlid')
+bmi_iid_dob$assmntdate = bmi_iid_dob$assmntdate
+bmi_iid_dob$agebmi = as.numeric(difftime(as.Date(bmi_iid_dob$assmntdate), as.Date(bmi_iid_dob$dob))/365.25)
+bmi_iid_dob_18 = subset(bmi_iid_dob, agebmi>=18)
+bmi_iid_dob_18_sorted = bmi_iid_dob_18[order(bmi_iid_dob_18$sjlid, bmi_iid_dob_18$agebmi, decreasing = FALSE),]
+bmi_iid_dob_18_uniq = bmi_iid_dob_18_sorted[!duplicated(bmi_iid_dob_18_sorted$sjlid),]
+
+##############################
+## More lifestyle variables ##
+##############################
+
 # Keep the earliest age after 18 years, same as in lifestyle
 # adultbmi <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.sas7bdat")
 adultbmi <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.txt", sep = "\t", header = T)
@@ -208,8 +238,10 @@ lifestyle$PhysicalActivity_yn <- as.numeric(ifelse(lifestyle$wtlt == 1, 1, 0))
 ## Obesity ##
 #############
 
-BMI$Not_Obese_yn <- as.numeric(ifelse(BMI$BMI < 30, 1, 0))
+# BMI$Not_obese_yn <- as.numeric(ifelse(BMI$BMI < 30, 1, 0))
 
+# BMI file Yadav used has more samples
+bmi_iid_dob_18_uniq$Not_obese_yn <- as.numeric(ifelse(bmi_iid_dob_18_uniq$BMIadj < 30, 1, 0))
 #############
 ## Alcohol ##
 #############
@@ -298,8 +330,10 @@ BMI$HEALTHY_Diet_yn <- ifelse(rowSums(BMI[,c("FRUITSRV_yn", "NUTSFREQ_yn", "VEGS
 ALL.LIFESTYLE <- merge(lifestyle, BMI, by.x = "SJLIFEID", by.y = "sjlid", all = T)
 
 ## Only Keep the ones that are needed
-ALL.LIFESTYLE <- ALL.LIFESTYLE[c("agesurvey", "SJLIFEID", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE", "smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_Obese_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")]
+ALL.LIFESTYLE <- ALL.LIFESTYLE[c("agesurvey", "SJLIFEID", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE", "smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")]
+
+## Merge BMI from Yadav
+ALL.LIFESTYLE <- merge(ALL.LIFESTYLE, bmi_iid_dob_18_uniq, by.x = "SJLIFEID", by.y = "sjlid", all = T)
 
 
-                                          
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v2.RDATA")
