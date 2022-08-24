@@ -71,54 +71,26 @@ PHENO.ANY_SN$BREASTcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% BREASTcancer
 # Define CA/CO status in lifestyle
 ALL.LIFESTYLE$CACO <- factor(ifelse(!ALL.LIFESTYLE$SJLIFEID %in% BREASTcancer$sjlid, 0, 1))
 
+
 ## Get date (gradedt) and age at diagnosis of SN
 ALL.LIFESTYLE$ANY.SN_gradedate <- BREASTcancer$gradedt[match(ALL.LIFESTYLE$SJLIFEID, BREASTcancer$sjlid)]
 ALL.LIFESTYLE$AGE.ANY_SN <- BREASTcancer$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, BREASTcancer$sjlid)]
 
 ## In CASES, if age survey is greater than age at diagnosis; NULLIFY the favorable_lifestyle.category. That information is not useful
-ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$agesurvey > ALL.LIFESTYLE$AGE.ANY_SN),
-              c("smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")] <- NA
-
-ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$agebmi > ALL.LIFESTYLE$AGE.ANY_SN), c("Not_obese_yn")] <- NA
+ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_Obese_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")] <- NA
+# ALL.LIFESTYLE[c("smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_Obese_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")]
 
 
+CASES.ALL.LIFESTYLE <- ALL.LIFESTYLE[ALL.LIFESTYLE$CACO == 1,c("smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_Obese_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")]
 
-## Addd lifestyle to Pheno
-# PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE", "smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")])
-PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")])
+CASES.ALL.LIFESTYLE$Missing.VAlues <- rowSums(is.na(CASES.ALL.LIFESTYLE))
+table(CASES.ALL.LIFESTYLE$Missing.VAlues)
 
-# Count missing
-PHENO.ANY_SN$missing.lifestyles <- rowSums(is.na(PHENO.ANY_SN[c("smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")]))
-table(PHENO.ANY_SN$missing.lifestyles)
-# 0    1    2    3    4    5 
-# 2896  594   51   56   76  728
-
-## Relevel 5 lifestyle variables
-# PHENO.ANY_SN$smoker_never_yn[is.na(PHENO.ANY_SN$smoker_never_yn)] <- "Unknown"; PHENO.ANY_SN$smoker_never_yn <- factor(PHENO.ANY_SN$smoker_never_yn, level = c(0, "Unknown", 1)) 
-PHENO.ANY_SN$smoker_former_or_never_yn[is.na(PHENO.ANY_SN$smoker_former_or_never_yn)] <- "Unknown"
-PHENO.ANY_SN$smoker_former_or_never_yn <- factor(PHENO.ANY_SN$smoker_former_or_never_yn, level = c(1, 0, "Unknown")) 
-
-PHENO.ANY_SN$PhysicalActivity_yn[is.na(PHENO.ANY_SN$PhysicalActivity_yn)] <- "Unknown"
-PHENO.ANY_SN$PhysicalActivity_yn <- factor(PHENO.ANY_SN$PhysicalActivity_yn, level = c(1, 0, "Unknown")) 
-
-PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn[is.na(PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn)] <- "Unknown"
-PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn <- factor(PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn, level = c(1, 0, "Unknown")) 
-
-PHENO.ANY_SN$HEALTHY_Diet_yn[is.na(PHENO.ANY_SN$HEALTHY_Diet_yn)] <- "Unknown"
-PHENO.ANY_SN$HEALTHY_Diet_yn <- factor(PHENO.ANY_SN$HEALTHY_Diet_yn, level = c(1, 0, "Unknown")) 
-
-PHENO.ANY_SN$Not_obese_yn[is.na(PHENO.ANY_SN$Not_obese_yn)] <- "Unknown";
-PHENO.ANY_SN$Not_obese_yn <- factor(PHENO.ANY_SN$Not_obese_yn, level = c(1, 0, "Unknown")) 
 
 
 #########################
 ## Extract Ethnicities ##
 #########################
-## Add admixture ethnicity 
-ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/final.5.Q_header2_SJLIFE_only", header = T)
-PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AMR", "SAS", "AFR")])
-
-
 PHENO.ANY_SN.EUR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'EUR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN))]
 PHENO.ANY_SN.AFR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'AFR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN))]
 
@@ -150,10 +122,7 @@ fit_all = glm(formula = BREASTcancer ~ Zhaoming_carriers + Qin_without_Zhaoming_
                 Mavaddat_2015_ER_NEG_Breast_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2+ 
                 AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS +
-                maxchestrtdose.category + anthra_jco_dose_5.category + 
-                smoker_former_or_never_yn + PhysicalActivity_yn + NOT_RiskyHeavyDrink_yn + HEALTHY_Diet_yn + Not_obese_yn +
-                EAS + AMR + SAS + AFR,
-              family = binomial,
+                maxchestrtdose.category + anthra_jco_dose_5.category, family = binomial,
                 data = dat_all)
 
 summary(fit_all)
@@ -178,36 +147,35 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx,3)
-# 0.361
-# 0.356 (Without diet)
-##################
-## P/LP and PRS ##
-##################
-## P/LP Zhaoming, Qin without Zhaoming and PRS
-dat_plp.prs = dat_all
-dat_plp.prs$Zhaoming_carriers = dat_plp.prs$Qin_without_Zhaoming_vars_carriers = "N"
-dat_plp.prs$Mavaddat_2015_ER_POS_Breast_PRS.tertile.category = dat_plp.prs$Mavaddat_2015_ER_NEG_Breast_PRS.tertile.category = dat_plp.prs$Mavaddat_2015_ER_OVERALL_Breast_PRS.tertile.category = "1st"
+# 0.542
 
-dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "response")
-N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
-af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
-round(af_by_plp.prs,3)
-# 0.335
-# 0.345 (Without diet)
-###############
-## Lifestyle ##
-###############
-dat_lifestyle = dat_all
-dat_lifestyle$smoker_former_or_never_yn = dat_lifestyle$PhysicalActivity_yn = dat_lifestyle$NOT_RiskyHeavyDrink_yn = dat_lifestyle$HEALTHY_Diet_yn = dat_lifestyle$Not_obese_yn = "1"
+##########
+## P/LP ##
+##########
+## P/LP Zhaoming and Qin without Zhaoming
+dat_plp = dat_all
+dat_plp$Zhaoming_carriers = dat_plp$Qin_without_Zhaoming_vars_carriers = "N"
 
-dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
-N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
-af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
-round(af_by_N_no_favorable_lifestyle.category,3)
-# 0.342
-# -0.238 (Without diet)
+dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
+N_no_plp = sum(dat_all$pred_no_plp, na.rm = TRUE)
+af_by_plp_Zhaoming = (N_all - N_no_plp) / N_all
+round(af_by_plp_Zhaoming,3)
+# 0.07
+
+#########
+## PRS ##
+#########
+dat_prs = dat_all
+dat_prs$Mavaddat_2015_ER_POS_Breast_PRS.tertile.category = dat_prs$Mavaddat_2015_ER_NEG_Breast_PRS.tertile.category = dat_prs$Mavaddat_2015_ER_OVERALL_Breast_PRS.tertile.category = "1st"
+
+dat_all$pred_no_Mavaddat_2015.tertile.category = predict(fit_all, newdata = dat_prs, type = "response")
+N_no_pred_no_Mavaddat_2015.tertile.category = sum(dat_all$pred_no_Mavaddat_2015.tertile.category, na.rm = TRUE)
+af_by_N_no_pred_no_Mavaddat_2015.tertile.category = (N_all - N_no_pred_no_Mavaddat_2015.tertile.category) / N_all
+round(af_by_N_no_pred_no_Mavaddat_2015.tertile.category, 3)
+# 0.388
 
 ## --------------------------------------2. PRS 2019
+
 dat_all = PHENO.ANY_SN
 fit_all = glm(formula = BREASTcancer ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
                 Mavaddat_2019_ER_POS_Breast_PRS.tertile.category +
@@ -215,10 +183,7 @@ fit_all = glm(formula = BREASTcancer ~ Zhaoming_carriers + Qin_without_Zhaoming_
                 Mavaddat_2019_ER_NEG_Breast_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2+ 
                 AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS +
-                maxchestrtdose.category + anthra_jco_dose_5.category +
-                smoker_former_or_never_yn + PhysicalActivity_yn + NOT_RiskyHeavyDrink_yn + HEALTHY_Diet_yn + Not_obese_yn +
-                EAS + AMR + SAS + AFR,
-              family = binomial,
+                maxchestrtdose.category + anthra_jco_dose_5.category, family = binomial,
               data = dat_all)
 
 summary(fit_all)
@@ -231,6 +196,7 @@ dat_all$pred_all = predict(fit_all, newdat = dat_all, type = "response")
 ###############
 ## Treatment ##
 ###############
+
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx = dat_all
 dat_tx$maxchestrtdose.category = dat_tx$anthra_jco_dose_5.category = "None"
@@ -241,34 +207,33 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx, 3)
-# 0.374
-# 0.369
-##################
-## P/LP and PRS ##
-##################
-## P/LP Zhaoming, Qin without Zhaoming and PRS
-dat_plp.prs = dat_all
-dat_plp.prs$Zhaoming_carriers = dat_plp.prs$Qin_without_Zhaoming_vars_carriers = "N"
-dat_plp.prs$Mavaddat_2019_ER_POS_Breast_PRS.tertile.category = dat_plp.prs$Mavaddat_2019_ER_NEG_Breast_PRS.tertile.category = dat_plp.prs$Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category = "1st"
+# 0.546
 
-dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "response")
-N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
-af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
-round(af_by_plp.prs,3)
-# 0.49
-# 0.496 (Without diet)
-###############
-## Lifestyle ##
-###############
-dat_lifestyle = dat_all
-dat_lifestyle$smoker_former_or_never_yn = dat_lifestyle$PhysicalActivity_yn = dat_lifestyle$NOT_RiskyHeavyDrink_yn = dat_lifestyle$HEALTHY_Diet_yn = dat_lifestyle$Not_obese_yn = "1"
+##########
+## P/LP ##
+##########
+## P/LP Zhaoming and Qin without Zhaoming
+dat_plp = dat_all
+dat_plp$Zhaoming_carriers = dat_plp$Qin_without_Zhaoming_vars_carriers = "N"
 
-dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
-N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
-af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
-round(af_by_N_no_favorable_lifestyle.category,3)
-# 0.3
-# -0.266 (Without diet)
+dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
+N_no_plp = sum(dat_all$pred_no_plp, na.rm = TRUE)
+af_by_plp_Zhaoming = (N_all - N_no_plp) / N_all
+round(af_by_plp_Zhaoming, 3)
+# 0.065
+
+#########
+## PRS ##
+#########
+dat_prs = dat_all
+dat_prs$Mavaddat_2019_ER_POS_Breast_PRS.tertile.category = dat_prs$Mavaddat_2019_ER_NEG_Breast_PRS.tertile.category = dat_prs$Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category = "1st"
+
+dat_all$pred_no_Mavaddat_2015.tertile.category = predict(fit_all, newdata = dat_prs, type = "response")
+N_no_pred_no_Mavaddat_2015.tertile.category = sum(dat_all$pred_no_Mavaddat_2015.tertile.category, na.rm = TRUE)
+af_by_N_no_pred_no_Mavaddat_2015.tertile.category = (N_all - N_no_pred_no_Mavaddat_2015.tertile.category) / N_all
+round(af_by_N_no_pred_no_Mavaddat_2015.tertile.category, 3)
+# 0.557
+
 
 
 ## --------------------------------------3. PRSWEB
@@ -279,10 +244,7 @@ fit_all = glm(formula = BREASTcancer ~ Zhaoming_carriers + Qin_without_Zhaoming_
                 MichiganWeb_ER_POS_Breast_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2+ 
                 AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS +
-                maxchestrtdose.category + anthra_jco_dose_5.category +
-                smoker_former_or_never_yn + PhysicalActivity_yn + NOT_RiskyHeavyDrink_yn + HEALTHY_Diet_yn + Not_obese_yn +
-                EAS + AMR + SAS + AFR,
-              family = binomial,
+                maxchestrtdose.category + anthra_jco_dose_5.category, family = binomial,
               data = dat_all)
 
 summary(fit_all)
@@ -307,35 +269,33 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx, 3)
-# 0.359
-# 0.354 (Without diet)
+# 0.545
 
-##################
-## P/LP and PRS ##
-##################
-## P/LP Zhaoming, Qin without Zhaoming and PRS
-dat_plp.prs = dat_all
-dat_plp.prs$Zhaoming_carriers = dat_plp.prs$Qin_without_Zhaoming_vars_carriers = "N"
-dat_plp.prs$MichiganWeb_ER_NEG_Breast_PRS.tertile.category = dat_plp.prs$MichiganWeb_ER_POS_Breast_PRS.tertile.category = dat_plp.prs$MichiganWeb_ER_OVERALL_Breast_PRS.tertile.category = "1st"
+##########
+## P/LP ##
+##########
+## P/LP Zhaoming and Qin without Zhaoming
+dat_plp = dat_all
+dat_plp$Zhaoming_carriers = dat_plp$Qin_without_Zhaoming_vars_carriers = "N"
 
-dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "response")
-N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
-af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
-round(af_by_plp.prs,3)
-# 0.397
-# 0.398 (Without diet)
-###############
-## Lifestyle ##
-###############
-dat_lifestyle = dat_all
-dat_lifestyle$smoker_former_or_never_yn = dat_lifestyle$PhysicalActivity_yn = dat_lifestyle$NOT_RiskyHeavyDrink_yn = dat_lifestyle$HEALTHY_Diet_yn = dat_lifestyle$Not_obese_yn = "1"
+dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
+N_no_plp = sum(dat_all$pred_no_plp, na.rm = TRUE)
+af_by_plp_Zhaoming = (N_all - N_no_plp) / N_all
+round(af_by_plp_Zhaoming, 3)
+# 0.067
 
-dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
-N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
-af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
-round(af_by_N_no_favorable_lifestyle.category,3)
-# 0.293
-# -0.261
+#########
+## PRS ##
+#########
+dat_prs = dat_all
+dat_prs$MichiganWeb_ER_NEG_Breast_PRS.tertile.category = dat_prs$MichiganWeb_ER_POS_Breast_PRS.tertile.category = dat_prs$MichiganWeb_ER_OVERALL_Breast_PRS.tertile.category = "1st"
+
+dat_all$pred_no_Mavaddat_2015.tertile.category = predict(fit_all, newdata = dat_prs, type = "response")
+N_no_pred_no_Mavaddat_2015.tertile.category = sum(dat_all$pred_no_Mavaddat_2015.tertile.category, na.rm = TRUE)
+af_by_N_no_pred_no_Mavaddat_2015.tertile.category = (N_all - N_no_pred_no_Mavaddat_2015.tertile.category) / N_all
+round(af_by_N_no_pred_no_Mavaddat_2015.tertile.category, 3)
+# 0.406
+
 
 ## --------------------------------------4. Khera
 dat_all = PHENO.ANY_SN
@@ -343,10 +303,7 @@ fit_all = glm(formula = BREASTcancer ~ Zhaoming_carriers + Qin_without_Zhaoming_
                 Khera_2018_Breast_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2+ 
                 AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS +
-                maxchestrtdose.category + anthra_jco_dose_5.category +
-                smoker_former_or_never_yn + PhysicalActivity_yn + NOT_RiskyHeavyDrink_yn + HEALTHY_Diet_yn + Not_obese_yn +
-                EAS + AMR + SAS + AFR,
-              family = binomial,
+                maxchestrtdose.category + anthra_jco_dose_5.category, family = binomial,
               data = dat_all)
 
 summary(fit_all)
@@ -371,34 +328,31 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx, 3)
-# 0.354
-# 0.348 (Without diet)
+# 0.539
 
-##################
-## P/LP and PRS ##
-##################
-## P/LP Zhaoming, Qin without Zhaoming and PRS
-dat_plp.prs = dat_all
-dat_plp.prs$Zhaoming_carriers = dat_plp.prs$Qin_without_Zhaoming_vars_carriers = "N"
-dat_plp.prs$Khera_2018_Breast_PRS.tertile.category = "1st"
+##########
+## P/LP ##
+##########
+## P/LP Zhaoming and Qin without Zhaoming
+dat_plp = dat_all
+dat_plp$Zhaoming_carriers = dat_plp$Qin_without_Zhaoming_vars_carriers = "N"
 
-dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "response")
-N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
-af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
-round(af_by_plp.prs,3)
-# 0.229
-# 0.241 (Without diet)
+dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
+N_no_plp = sum(dat_all$pred_no_plp, na.rm = TRUE)
+af_by_plp_Zhaoming = (N_all - N_no_plp) / N_all
+round(af_by_plp_Zhaoming, 3)
+# 0.067
 
-###############
-## Lifestyle ##
-###############
-dat_lifestyle = dat_all
-dat_lifestyle$smoker_former_or_never_yn = dat_lifestyle$PhysicalActivity_yn = dat_lifestyle$NOT_RiskyHeavyDrink_yn = dat_lifestyle$HEALTHY_Diet_yn = dat_lifestyle$Not_obese_yn = "1"
+#########
+## PRS ##
+#########
+dat_prs = dat_all
+dat_prs$Khera_2018_Breast_PRS.tertile.category = "1st"
 
-dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
-N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
-af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
-round(af_by_N_no_favorable_lifestyle.category,3)
-# 0.355
-# -0.214 (Without diet)
+dat_all$pred_no_Mavaddat_2015.tertile.category = predict(fit_all, newdata = dat_prs, type = "response")
+N_no_pred_no_Mavaddat_2015.tertile.category = sum(dat_all$pred_no_Mavaddat_2015.tertile.category, na.rm = TRUE)
+af_by_N_no_pred_no_Mavaddat_2015.tertile.category = (N_all - N_no_pred_no_Mavaddat_2015.tertile.category) / N_all
+round(af_by_N_no_pred_no_Mavaddat_2015.tertile.category, 3)
+# 0.275
+
 

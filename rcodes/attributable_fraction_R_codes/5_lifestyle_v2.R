@@ -336,4 +336,4 @@ ALL.LIFESTYLE <- ALL.LIFESTYLE[c("agesurvey", "SJLIFEID", "HEI2005_TOTAL_SCORE",
 ALL.LIFESTYLE <- merge(ALL.LIFESTYLE, bmi_iid_dob_18_uniq, by.x = "SJLIFEID", by.y = "sjlid", all = T)
 
 
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v2.RDATA")
+# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v2.RDATA")
