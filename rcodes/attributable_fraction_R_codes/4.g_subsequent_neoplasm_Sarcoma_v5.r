@@ -68,32 +68,54 @@ PHENO.ANY_SN$SARCOMA <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% SARCOMA$sjlid, 0,
 # Define CA/CO status in lifestyle
 ALL.LIFESTYLE$CACO <- factor(ifelse(!ALL.LIFESTYLE$SJLIFEID %in% SARCOMA$sjlid, 0, 1))
 
-
 ## Get date (gradedt) and age at diagnosis of SN
 ALL.LIFESTYLE$ANY.SN_gradedate <- SARCOMA$gradedt[match(ALL.LIFESTYLE$SJLIFEID, SARCOMA$sjlid)]
 ALL.LIFESTYLE$AGE.ANY_SN <- SARCOMA$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, SARCOMA$sjlid)]
 
 ## In CASES, if age survey is greater than age at diagnosis; NULLIFY the favorable_lifestyle.category. That information is not useful
-ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_Obese_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")] <- NA
-# ALL.LIFESTYLE[c("smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_Obese_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")]
+ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$agesurvey > ALL.LIFESTYLE$AGE.ANY_SN),
+              c("smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")] <- NA
 
-
-CASES.ALL.LIFESTYLE <- ALL.LIFESTYLE[ALL.LIFESTYLE$CACO == 1,c("smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_Obese_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")]
-
-CASES.ALL.LIFESTYLE$Missing.VAlues <- rowSums(is.na(CASES.ALL.LIFESTYLE))
-table(CASES.ALL.LIFESTYLE$Missing.VAlues)
+ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$agebmi > ALL.LIFESTYLE$AGE.ANY_SN), c("Not_obese_yn")] <- NA
 
 
 
+## Addd lifestyle to Pheno
+# PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE", "smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")])
+PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")])
 
+# Count missing
+PHENO.ANY_SN$missing.lifestyles <- rowSums(is.na(PHENO.ANY_SN[c("smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")]))
+table(PHENO.ANY_SN$missing.lifestyles)
+# 0    1    2    3    4    5 
+# 2905  594   50   56   75  721 
 
+## Relevel 5 lifestyle variables
+# PHENO.ANY_SN$smoker_never_yn[is.na(PHENO.ANY_SN$smoker_never_yn)] <- "Unknown"; PHENO.ANY_SN$smoker_never_yn <- factor(PHENO.ANY_SN$smoker_never_yn, level = c(0, "Unknown", 1)) 
+PHENO.ANY_SN$smoker_former_or_never_yn[is.na(PHENO.ANY_SN$smoker_former_or_never_yn)] <- "Unknown"
+PHENO.ANY_SN$smoker_former_or_never_yn <- factor(PHENO.ANY_SN$smoker_former_or_never_yn, level = c(1, 0, "Unknown")) 
 
+PHENO.ANY_SN$PhysicalActivity_yn[is.na(PHENO.ANY_SN$PhysicalActivity_yn)] <- "Unknown"
+PHENO.ANY_SN$PhysicalActivity_yn <- factor(PHENO.ANY_SN$PhysicalActivity_yn, level = c(1, 0, "Unknown")) 
 
+PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn[is.na(PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn)] <- "Unknown"
+PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn <- factor(PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn, level = c(1, 0, "Unknown")) 
+
+PHENO.ANY_SN$HEALTHY_Diet_yn[is.na(PHENO.ANY_SN$HEALTHY_Diet_yn)] <- "Unknown"
+PHENO.ANY_SN$HEALTHY_Diet_yn <- factor(PHENO.ANY_SN$HEALTHY_Diet_yn, level = c(1, 0, "Unknown")) 
+
+PHENO.ANY_SN$Not_obese_yn[is.na(PHENO.ANY_SN$Not_obese_yn)] <- "Unknown";
+PHENO.ANY_SN$Not_obese_yn <- factor(PHENO.ANY_SN$Not_obese_yn, level = c(1, 0, "Unknown")) 
 
 
 #########################
 ## Extract Ethnicities ##
 #########################
+## Add admixture ethnicity 
+ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/final.5.Q_header2_SJLIFE_only", header = T)
+PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AMR", "SAS", "AFR")])
+
+
 PHENO.ANY_SN.EUR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'EUR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN))]
 PHENO.ANY_SN.AFR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'AFR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN))]
 
@@ -119,7 +141,10 @@ dat_all = PHENO.ANY_SN
 fit_all = glm(formula = SARCOMA ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
                 Sarcoma_Machiela_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-                gender + aa_class_dose_5.category, family = binomial,
+                gender + aa_class_dose_5.category +
+                smoker_former_or_never_yn + PhysicalActivity_yn + NOT_RiskyHeavyDrink_yn + HEALTHY_Diet_yn + Not_obese_yn +
+                EAS + AMR + SAS + AFR,
+              family = binomial,
               data = dat_all)
 
 
@@ -146,29 +171,32 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx,3)
-# 0.411
+# 0.298
+# 0.299 (Without diet)
 
-##########
-## P/LP ##
-##########
-## P/LP Zhaoming and Qin without Zhaoming
-dat_plp = dat_all
-dat_plp$Zhaoming_carriers = dat_plp$Qin_without_Zhaoming_vars_carriers = "N"
+##################
+## P/LP and PRS ##
+##################
+## P/LP Zhaoming, Qin without Zhaoming and PRS
+dat_plp.prs = dat_all
+dat_plp.prs$Zhaoming_carriers = dat_plp.prs$Qin_without_Zhaoming_vars_carriers = "N";
+dat_plp.prs$Sarcoma_Machiela_PRS.tertile.category = "1st"
 
-dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
-N_no_plp = sum(dat_all$pred_no_plp, na.rm = TRUE)
-af_by_plp_Zhaoming = (N_all - N_no_plp) / N_all
-round(af_by_plp_Zhaoming,3)
-# 0.279
+dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "response")
+N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
+af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
+round(af_by_plp.prs,3)
+# 0.461
+# 0.456 (Without diet)
+###############
+## Lifestyle ##
+###############
+dat_lifestyle = dat_all
+dat_lifestyle$smoker_former_or_never_yn = dat_lifestyle$PhysicalActivity_yn = dat_lifestyle$NOT_RiskyHeavyDrink_yn = dat_lifestyle$HEALTHY_Diet_yn = dat_lifestyle$Not_obese_yn = "1"
 
-#########
-## PRS ##
-#########
-dat_prs = dat_all
-dat_prs$Sarcoma_Machiela_PRS.tertile.category = "1st"
-
-dat_all$pred_no_Sarcoma_Machiela_PRS.tertile.category = predict(fit_all, newdata = dat_prs, type = "response")
-no_pred_Sarcoma_Machiela_PRS.tertile.category = sum(dat_all$pred_no_Sarcoma_Machiela_PRS.tertile.category, na.rm = TRUE)
-af_by_Sarcoma_Machiela_PRS.tertile.category = (N_all - no_pred_Sarcoma_Machiela_PRS.tertile.category) / N_all
-round(af_by_Sarcoma_Machiela_PRS.tertile.category, 3)
-# 0.217
+dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
+N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
+af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
+round(af_by_N_no_favorable_lifestyle.category,3)
+# 0.312
+# 0.341 (Without diet)
