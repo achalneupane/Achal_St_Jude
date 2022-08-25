@@ -923,7 +923,7 @@ mod.sjlife1.EUR <- glm(ANY_SN ~ Qin_carriers.HR.pathways + AGE_AT_LAST_CONTACT +
 summary(mod.sjlife1.EUR)
 
 ########################################
-## cross tab of categorical variables (Zhaoming)
+## Contingency table/cross tab of categorical variables (Zhaoming)
 library(expss)
 
 CROSS_CASES.df <- PHENO.ANY_SN[c("ANY_SN", "Zhaoming_carriers" , "AGE_AT_LAST_CONTACT", "AGE_AT_DIAGNOSIS", "gender", "brainrt_yn", "chestrt_yn", "abdomenrt_yn", "Epidophyllotoxin")]
