@@ -79,7 +79,7 @@ ALL.LIFESTYLE$AGE.ANY_SN <- ANY_SNs$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, ANY
 
 ## In CASES, if age survey is greater than age at diagnosis; NULLIFY the favorable_lifestyle.category. That information is not useful
 ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$agesurvey > ALL.LIFESTYLE$AGE.ANY_SN),
-              c("smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")] <- NA
+              c("smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")] <- NA
 
 ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$agebmi > ALL.LIFESTYLE$AGE.ANY_SN), c("Not_obese_yn")] <- NA
 
@@ -101,8 +101,8 @@ ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$agebmi > ALL.LIFESTY
 
 
 ## Addd lifestyle to Pheno
-# PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE", "smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")])
-PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")])
+PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE", "smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")])
+# PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")])
 
 # Count missing
 PHENO.ANY_SN$missing.lifestyles <- rowSums(is.na(PHENO.ANY_SN[c("smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")]))
@@ -131,6 +131,30 @@ PHENO.ANY_SN$Not_obese_yn[is.na(PHENO.ANY_SN$Not_obese_yn)] <- "Unknown";
 PHENO.ANY_SN$Not_obese_yn <- factor(PHENO.ANY_SN$Not_obese_yn, level = c(1, 0, "Unknown")) 
 
 
+#########################
+## Create HEI tertiles ##
+#########################
+HEI.to.categorize <- c("HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")
+
+## Tertile categories
+for(i in 1:length(HEI.to.categorize)){
+  TERT = unname(quantile(PHENO.ANY_SN[HEI.to.categorize[i]][PHENO.ANY_SN[HEI.to.categorize[i]] !=0], c(1/3, 2/3, 1), na.rm = T))
+  if(sum(duplicated(TERT)) > 0) next
+  print (HEI.to.categorize[i])
+  print(TERT)
+  
+  PHENO.ANY_SN$HEI.tmp.tert.category <- as.character(cut(PHENO.ANY_SN[,HEI.to.categorize[i]], breaks = c(0, TERT),
+                                                     labels = c("1st", "2nd", "3rd"),
+                                                     include.lowest = TRUE))
+  
+  PHENO.ANY_SN$HEI.tmp.tert.category[is.na(PHENO.ANY_SN$HEI.tmp.tert.category)] <- "Unknown"
+  PHENO.ANY_SN$HEI.tmp.tert.category <- factor(PHENO.ANY_SN$HEI.tmp.tert.category, levels = c("3rd", "2nd", "1st", "Unknown"))
+  colnames(PHENO.ANY_SN)[colnames(PHENO.ANY_SN) == "HEI.tmp.tert.category"] <- paste0(HEI.to.categorize[i], ".tertile.category")
+}
+
+table(PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category)
+# 3rd     2nd     1st Unknown 
+# 1090    1090    1091    1130
 #########################
 ## Extract Ethnicities ##
 #########################
@@ -197,6 +221,22 @@ fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_c
 summary(fit_all)
 
 
+## With HEI Score
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
+                Pleiotropy_PRSWEB_PRS.tertile.category + 
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category + 
+                smoker_former_or_never_yn + PhysicalActivity_yn + NOT_RiskyHeavyDrink_yn + HEI2015_TOTAL_SCORE.tertile.category + Not_obese_yn +
+                EAS + AMR + SAS + AFR,
+              family = binomial,
+              data = dat_all)
+
+
+summary(fit_all)
+
+
 ##########################
 ## Get predicted values ##
 ##########################
@@ -219,12 +259,14 @@ af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx,3)
 # 0.284
 # 0.283 (Without diet)
+# 0.283 [With HEI 2015 (instead of Diet) and other 4 lifestyle factors]
 ##################
 ## P/LP and PRS ##
 ##################
 ## P/LP Zhaoming, Qin without Zhaoming and PRS
 dat_plp.prs = dat_all
-dat_plp.prs$Zhaoming_carriers = dat_plp.prs$Qin_without_Zhaoming_vars_carriers = "N"; dat_plp.prs$Pleiotropy_PRSWEB_PRS.tertile.category = "1st"
+dat_plp.prs$Zhaoming_carriers = dat_plp.prs$Qin_without_Zhaoming_vars_carriers = "N";
+dat_plp.prs$Pleiotropy_PRSWEB_PRS.tertile.category = "1st"
 
 dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "response")
 N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
@@ -232,11 +274,16 @@ af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
 round(af_by_plp.prs,3)
 # 0.081
 # 0.081 (Without diet)
+# 0.082 [With HEI 2015 (instead of Diet) and other 4 lifestyle factors]
 ###############
 ## Lifestyle ##
 ###############
 dat_lifestyle = dat_all
 dat_lifestyle$smoker_former_or_never_yn = dat_lifestyle$PhysicalActivity_yn = dat_lifestyle$NOT_RiskyHeavyDrink_yn = dat_lifestyle$HEALTHY_Diet_yn = dat_lifestyle$Not_obese_yn = "1"
+
+## HEI
+# dat_lifestyle$smoker_former_or_never_yn = dat_lifestyle$PhysicalActivity_yn = dat_lifestyle$NOT_RiskyHeavyDrink_yn = dat_lifestyle$Not_obese_yn = "1"
+# dat_lifestyle$HEI2015_TOTAL_SCORE.tertile.category = "3rd"
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
@@ -244,8 +291,7 @@ af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.cate
 round(af_by_N_no_favorable_lifestyle.category,3)
 # 0.301
 # 0.305 (Without diet)
-
-
+# 0.32 [With HEI 2015 (instead of Diet) and other 4 lifestyle factors]
 ################################################################ GENDER SPECIFIC #########################################################################
 dat_all = PHENO.ANY_SN
 fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 

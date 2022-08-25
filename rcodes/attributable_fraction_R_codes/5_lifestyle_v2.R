@@ -332,7 +332,10 @@ ALL.LIFESTYLE <- merge(lifestyle, BMI, by.x = "SJLIFEID", by.y = "sjlid", all = 
 ## Only Keep the ones that are needed
 ALL.LIFESTYLE <- ALL.LIFESTYLE[c("agesurvey", "SJLIFEID", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE", "smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")]
 
-## Merge BMI from Yadav
+
+##########################
+## Merge BMI from Yadav ##
+##########################
 ALL.LIFESTYLE <- merge(ALL.LIFESTYLE, bmi_iid_dob_18_uniq, by.x = "SJLIFEID", by.y = "sjlid", all = T)
 
 
