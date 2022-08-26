@@ -197,7 +197,7 @@ summary(fit_all)
 
 # # With HEI score
 # dat_all = PHENO.ANY_SN
-# fit_all = glm(formula = SARCOMA ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
+# fit_all = glm(formula = SARCOMA ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers +
 #                 Sarcoma_Machiela_PRS.tertile.category +
 #                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
 #                 gender + aa_class_dose_5.category +
@@ -222,7 +222,8 @@ dat_all$pred_all = predict(fit_all, newdat = dat_all, type = "response")
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx = dat_all
 
-dat_tx$aa_class_dose_5.category = "None"
+dat_tx$aa_class_dose_5.category [!grepl("Unknown", dat_tx$aa_class_dose_5.category)] = "None"
+
 dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
 
 ## Attributable fraction calculation. First get the "predicted" number of SNs based on the model including all variables
@@ -230,9 +231,9 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx,3)
-# 0.298
-# 0.299 (Without diet)
-# 0.304 [With HEI 2015 (instead of Diet) and other 4 lifestyle factors]
+# 0.267
+# 0.269 (Without diet)
+# 0.273 [With HEI 2015 (instead of Diet) and other 4 lifestyle factors]
 ##################
 ## P/LP and PRS ##
 ##################
@@ -252,16 +253,24 @@ round(af_by_plp.prs,3)
 ## Lifestyle ##
 ###############
 dat_lifestyle = dat_all
-dat_lifestyle$smoker_former_or_never_yn = dat_lifestyle$PhysicalActivity_yn = dat_lifestyle$NOT_RiskyHeavyDrink_yn = dat_lifestyle$HEALTHY_Diet_yn = dat_lifestyle$Not_obese_yn = "1"
+
+dat_lifestyle$smoker_former_or_never_yn [!grepl("Unknown", dat_lifestyle$smoker_former_or_never_yn)] =
+dat_lifestyle$PhysicalActivity_yn [!grepl("Unknown", dat_lifestyle$PhysicalActivity_yn)] =
+dat_lifestyle$NOT_RiskyHeavyDrink_yn [!grepl("Unknown", dat_lifestyle$NOT_RiskyHeavyDrink_yn)] =
+dat_lifestyle$HEALTHY_Diet_yn [!grepl("Unknown", dat_lifestyle$HEALTHY_Diet_yn)] =
+dat_lifestyle$Not_obese_yn [!grepl("Unknown", dat_lifestyle$Not_obese_yn)] = "1"
 
 # ## HEI
-# dat_lifestyle$smoker_former_or_never_yn = dat_lifestyle$PhysicalActivity_yn = dat_lifestyle$NOT_RiskyHeavyDrink_yn = dat_lifestyle$Not_obese_yn = "1"
-# dat_lifestyle$HEI2015_TOTAL_SCORE.tertile.category = "3rd"
+# dat_lifestyle$smoker_former_or_never_yn [!grepl("Unknown", dat_lifestyle$smoker_former_or_never_yn)] =
+# dat_lifestyle$PhysicalActivity_yn [!grepl("Unknown", dat_lifestyle$PhysicalActivity_yn)] =
+# dat_lifestyle$NOT_RiskyHeavyDrink_yn [!grepl("Unknown", dat_lifestyle$NOT_RiskyHeavyDrink_yn)] =
+# dat_lifestyle$Not_obese_yn [!grepl("Unknown", dat_lifestyle$Not_obese_yn)] = "1"
+# dat_lifestyle$HEI2015_TOTAL_SCORE.tertile.category [!grepl("Unknown", dat_lifestyle$HEI2015_TOTAL_SCORE.tertile.category)] = "3rd"
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# 0.312
-# 0.341 (Without diet)
-# 0.657 [With HEI 2015 (instead of Diet) and other 4 lifestyle factors]
+# -0.19
+# -0.175 (Without diet)
+# 0.153 [With HEI 2015 (instead of Diet) and other 4 lifestyle factors]
