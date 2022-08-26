@@ -83,11 +83,71 @@ ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$agesurvey > ALL.LIFE
 
 ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$agebmi > ALL.LIFESTYLE$AGE.ANY_SN), c("Not_obese_yn")] <- NA
 
+##################################
+## Imputation of missing values ##
+##################################
+# wanted items
+wanted.cols <- c("smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_obese_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")
+ALL.LIFESTYLE.IMPUTE <- ALL.LIFESTYLE[c("SJLIFEID", wanted.cols)]
+## Number of items available to get scores
+ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score <- rowSums(!is.na(ALL.LIFESTYLE.IMPUTE[wanted.cols]))
+
+# If all 5 items are available; they were simply summed up to get the score 
+ALL.LIFESTYLE.IMPUTE$SCORE [ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score == 5] <-  rowSums(ALL.LIFESTYLE.IMPUTE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score == 5, wanted.cols])
+
+## For missing items, per Qi: "For people with missing items, mean of non-missing items were taken and then multiplied by the # of items to get the score"
+ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items <- rowMeans(ALL.LIFESTYLE[wanted.cols], na.rm = T)
+ALL.LIFESTYLE.IMPUTE$imputedSCORE <- ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items * ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score
+
+# replace the score values with imputed score for missing ones; this was applied to rows where items available (non-missing ones) are >= 3 & < 5 
+ALL.LIFESTYLE.IMPUTE$SCORE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score >= 3 & ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score < 5] <- ALL.LIFESTYLE.IMPUTE$imputedSCORE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score >= 3 & ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score < 5]
+
+# Define favorable, intermediate and unfavorable----
+ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS[ALL.LIFESTYLE.IMPUTE$SCORE>= 3] <- "favorable" # favorable [at least 3 of the five health lifestyle factors]
+ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS[ALL.LIFESTYLE.IMPUTE$SCORE == 2] <- "intermediate" # intermediate [two healthy lifestyle factors] 
+ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS[ALL.LIFESTYLE.IMPUTE$SCORE <= 1] <- "unfavorable" # unfavorable [no or only one healthy lifestyle factor] 
+
+## Add to PHENO
+PHENO.ANY_SN$LIFESTYLE_STATUS <- ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE.IMPUTE$SJLIFEID)]
+
+# relevel factors
+PHENO.ANY_SN$LIFESTYLE_STATUS[is.na(PHENO.ANY_SN$LIFESTYLE_STATUS)] <- "Unknown"
+PHENO.ANY_SN$LIFESTYLE_STATUS <- factor(PHENO.ANY_SN$LIFESTYLE_STATUS, level = c("favorable", "intermediate", "unfavorable", "Unknown"))
 
 
-#############################
-## Addd lifestyle to Pheno ##
-#############################
+## Repeat for composite without diet
+# wanted items
+wanted.cols <- c("smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_obese_yn", "NOT_RiskyHeavyDrink_yn")
+ALL.LIFESTYLE.IMPUTE <- ALL.LIFESTYLE[c("SJLIFEID", wanted.cols)]
+## Number of items available to get scores
+ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score <- rowSums(!is.na(ALL.LIFESTYLE.IMPUTE[wanted.cols]))
+
+# If all 4 (after removing HEALTHY_Diet_yn) items are available; they were simply summed up to get the score 
+ALL.LIFESTYLE.IMPUTE$SCORE [ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score == 4] <-  rowSums(ALL.LIFESTYLE.IMPUTE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score == 4, wanted.cols])
+
+## For missing items, per Qi: "For people with missing items, mean of non-missing items were taken and then multiplied by the # of items to get the score"
+ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items <- rowMeans(ALL.LIFESTYLE[wanted.cols], na.rm = T)
+ALL.LIFESTYLE.IMPUTE$imputedSCORE <- ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items * ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score
+
+# replace the score values with imputed score for missing ones; this was applied to rows where items available (non-missing ones) are >= 3 & < 5 
+ALL.LIFESTYLE.IMPUTE$SCORE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score >= 2 & ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score < 4] <- ALL.LIFESTYLE.IMPUTE$imputedSCORE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score >= 2 & ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score < 4]
+
+# Define favorable, intermediate and unfavorable----
+ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS_WO_DIET[ALL.LIFESTYLE.IMPUTE$SCORE>= 3] <- "favorable" # favorable [at least 3 of the five health lifestyle factors]
+ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS_WO_DIET[ALL.LIFESTYLE.IMPUTE$SCORE == 2] <- "intermediate" # intermediate [two healthy lifestyle factors] 
+ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS_WO_DIET[ALL.LIFESTYLE.IMPUTE$SCORE <= 1] <- "unfavorable" # unfavorable [no or only one healthy lifestyle factor] 
+
+## Add to PHENO
+PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET <- ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS_WO_DIET[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE.IMPUTE$SJLIFEID)]
+
+# relevel factors
+PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET[is.na(PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET)] <- "Unknown"
+PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET <- factor(PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET, level = c("favorable", "intermediate", "unfavorable", "Unknown"))
+
+
+############################
+## Add lifestyle to Pheno ##
+############################
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE", "smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")])
 # PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")])
 
@@ -199,29 +259,16 @@ fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_c
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
                 maxchestrtdose.category + epitxn_dose_5.category + 
-                smoker_former_or_never_yn + PhysicalActivity_yn + NOT_RiskyHeavyDrink_yn + HEALTHY_Diet_yn + Not_obese_yn +
+                LIFESTYLE_STATUS_WO_DIET +
                 EAS + AMR + SAS + AFR,
               family = binomial,
               data = dat_all)
 
 
+# LIFESTYLE_STATUS
+# LIFESTYLE_STATUS_WO_DIET
+
 summary(fit_all)
-
-
-# ## With HEI Score
-# dat_all = PHENO.ANY_SN
-# fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
-#                 Pleiotropy_PRSWEB_PRS.tertile.category + 
-#                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-#                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
-#                 maxchestrtdose.category + epitxn_dose_5.category + 
-#                 smoker_former_or_never_yn + PhysicalActivity_yn + NOT_RiskyHeavyDrink_yn + HEI2015_TOTAL_SCORE.tertile.category + Not_obese_yn +
-#                 EAS + AMR + SAS + AFR,
-#               family = binomial,
-#               data = dat_all)
-# 
-# 
-# summary(fit_all)
 
 
 ##########################
@@ -248,9 +295,8 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx,3)
-# 0.28
-# 0.28 Without diet
-# 0.28 [With HEI 2015 (instead of Diet) and other 4 lifestyle factors]
+# 0.304
+# 0.303 Without diet
 ##################
 ## P/LP and PRS ##
 ##################
@@ -263,33 +309,20 @@ dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "respon
 N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
 af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
 round(af_by_plp.prs,3)
-# 0.081
-# 0.081 Without diet
-# 0.082 [With HEI 2015 (instead of Diet) and other 4 lifestyle factors]
+# 0.094
+# 0.089 Without diet
 ###############
 ## Lifestyle ##
 ###############
 dat_lifestyle = dat_all
 
-dat_lifestyle$smoker_former_or_never_yn [!grepl("Unknown", dat_lifestyle$smoker_former_or_never_yn)] =
-dat_lifestyle$PhysicalActivity_yn [!grepl("Unknown", dat_lifestyle$PhysicalActivity_yn)] =
-dat_lifestyle$NOT_RiskyHeavyDrink_yn [!grepl("Unknown", dat_lifestyle$NOT_RiskyHeavyDrink_yn)] =
-dat_lifestyle$HEALTHY_Diet_yn [!grepl("Unknown", dat_lifestyle$HEALTHY_Diet_yn)] =
-dat_lifestyle$Not_obese_yn [!grepl("Unknown", dat_lifestyle$Not_obese_yn)] = "1"
-
-# ## HEI
-# dat_lifestyle$smoker_former_or_never_yn [!grepl("Unknown", dat_lifestyle$smoker_former_or_never_yn)] =
-# dat_lifestyle$PhysicalActivity_yn [!grepl("Unknown", dat_lifestyle$PhysicalActivity_yn)] =
-# dat_lifestyle$NOT_RiskyHeavyDrink_yn [!grepl("Unknown", dat_lifestyle$NOT_RiskyHeavyDrink_yn)] =
-# dat_lifestyle$Not_obese_yn [!grepl("Unknown", dat_lifestyle$Not_obese_yn)] = "1"
-# dat_lifestyle$HEI2015_TOTAL_SCORE.tertile.category [!grepl("Unknown", dat_lifestyle$HEI2015_TOTAL_SCORE.tertile.category)] = "3rd"
+dat_lifestyle$LIFESTYLE_STATUS [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS)] = "favorable"
+# dat_lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable" # Without diet
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# -0.066
-# -0.075 Without diet
-# -0.06 [With HEI 2015 (instead of Diet) and other 4 lifestyle factors]
-
+# -0.02
+# -0.01 Without diet
 ################################################################ GENDER SPECIFIC #########################################################################
