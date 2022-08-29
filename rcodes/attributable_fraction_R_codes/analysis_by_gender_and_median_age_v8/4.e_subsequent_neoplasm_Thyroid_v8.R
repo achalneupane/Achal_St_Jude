@@ -252,7 +252,7 @@ fit_all = glm(formula = THYROIDcancer ~ Zhaoming_carriers + Qin_without_Zhaoming
                 Thyroid_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + maxneckrtdose.category + epitxn_dose_5.category + 
-                LIFESTYLE_STATUS +
+                LIFESTYLE_STATUS_WO_DIET +
                 EAS + AMR + SAS + AFR,
               family = binomial,
               data = dat_all)
@@ -346,8 +346,8 @@ round(af_by_plp.prs.gteq.35,3)
 ###############
 dat_lifestyle = dat_all
 
-dat_lifestyle$LIFESTYLE_STATUS [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS)] = "favorable"
-# dat_lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable" # Without diet
+# dat_lifestyle$LIFESTYLE_STATUS [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS)] = "favorable"
+dat_lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable" # Without diet
 
 
 ## Male
