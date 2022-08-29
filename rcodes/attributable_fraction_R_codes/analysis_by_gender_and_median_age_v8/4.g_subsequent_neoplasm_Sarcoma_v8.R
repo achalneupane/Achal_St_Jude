@@ -251,7 +251,7 @@ fit_all = glm(formula = SARCOMA ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_
                 Sarcoma_Machiela_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 gender + aa_class_dose_5.category +
-                LIFESTYLE_STATUS_WO_DIET +
+                LIFESTYLE_STATUS +
                 EAS + AMR + SAS + AFR,
               family = binomial,
               data = dat_all)
@@ -280,12 +280,33 @@ dat_tx$aa_class_dose_5.category [!grepl("Unknown", dat_tx$aa_class_dose_5.catego
 dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
 
 ## Attributable fraction calculation. First get the "predicted" number of SNs based on the model including all variables
-N_all = sum(dat_all$pred_all, na.rm = TRUE)
-N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
-af_by_tx = (N_all - N_no_tx) / N_all
-round(af_by_tx,3)
-# 0.257
-# 0.256 (Without diet)
+N_all.male = sum(dat_all$pred_all[dat_all$gender == "Male"], na.rm = TRUE) # subset by gender
+N_all.female = sum(dat_all$pred_all[dat_all$gender == "Female"], na.rm = TRUE) # subset by gender
+## subset by age at diagnosis group
+# median(dat_all$AGE_AT_LAST_CONTACT.cs1)
+N_all.lt.35 = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 < 35], na.rm = TRUE) # subset by age
+N_all.gteq.35 = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.rm = TRUE) # subset by age
+
+
+## Male
+N_no_tx = sum(dat_all$pred_no_tx[dat_all$gender == "Male"], na.rm = TRUE)
+af_by_tx.male = (N_all.male - N_no_tx) / N_all.male
+round(af_by_tx.male,3)
+
+## Female
+N_no_tx = sum(dat_all$pred_no_tx[dat_all$gender == "Female"], na.rm = TRUE)
+af_by_tx.female = (N_all.female - N_no_tx) / N_all.female
+round(af_by_tx.female,3)
+
+## < 35
+N_no_tx = sum(dat_all$pred_no_tx[dat_all$AGE_AT_LAST_CONTACT.cs1 < 35], na.rm = TRUE)
+af_by_tx.lt.35 = (N_all.lt.35 - N_no_tx) / N_all.lt.35
+round(af_by_tx.lt.35,3)
+
+## >= 35
+N_no_tx = sum(dat_all$pred_no_tx[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.rm = TRUE)
+af_by_tx.gteq.35 = (N_all.gteq.35 - N_no_tx) / N_all.gteq.35
+round(af_by_tx.gteq.35,3)
 ##################
 ## P/LP and PRS ##
 ##################
@@ -294,23 +315,69 @@ dat_plp.prs = dat_all
 dat_plp.prs$Zhaoming_carriers = dat_plp.prs$Qin_without_Zhaoming_vars_carriers = "N";
 dat_plp.prs$Sarcoma_Machiela_PRS.tertile.category = "1st"
 
+## Male
 dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "response")
-N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
-af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
-round(af_by_plp.prs,3)
-# 0.432
-# 0.422 (Without diet)
+N_no_plp.prs = sum(dat_all$pred_no_plp.prs[dat_all$gender == "Male"], na.rm = TRUE)
+af_by_plp.prs.male = (N_all.male - N_no_plp.prs) / N_all.male
+round(af_by_plp.prs.male,3)
+
+## Female
+dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "response")
+N_no_plp.prs = sum(dat_all$pred_no_plp.prs[dat_all$gender == "Female"], na.rm = TRUE)
+af_by_plp.prs.female = (N_all.female - N_no_plp.prs) / N_all.female
+round(af_by_plp.prs.female,3)
+
+## < 35
+dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "response")
+N_no_plp.prs = sum(dat_all$pred_no_plp.prs[dat_all$AGE_AT_LAST_CONTACT.cs1 < 35], na.rm = TRUE)
+af_by_plp.prs.lt.35 = (N_all.lt.35 - N_no_plp.prs) / N_all.lt.35
+round(af_by_plp.prs.lt.35,3)
+
+
+## >= 35
+dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "response")
+N_no_plp.prs = sum(dat_all$pred_no_plp.prs[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.rm = TRUE)
+af_by_plp.prs.gteq.35 = (N_all.gteq.35 - N_no_plp.prs) / N_all.gteq.35
+round(af_by_plp.prs.gteq.35,3)
 ###############
 ## Lifestyle ##
 ###############
 dat_lifestyle = dat_all
 
-# dat_lifestyle$LIFESTYLE_STATUS [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS)] = "favorable"
-dat_lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable" # Without diet
+dat_lifestyle$LIFESTYLE_STATUS [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS)] = "favorable"
+# dat_lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable" # Without diet
 
+## Male
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
-N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
-af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
-round(af_by_N_no_favorable_lifestyle.category,3)
-# -0.07
-# -0.051 (Without diet)
+N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category[dat_all$gender == "Male"], na.rm = TRUE)
+af_by_N_no_favorable_lifestyle.category.male = (N_all.male - N_no_favorable_lifestyle.category) / N_all.male
+round(af_by_N_no_favorable_lifestyle.category.male,3)
+
+## Female
+dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
+N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category[dat_all$gender == "Female"], na.rm = TRUE)
+af_by_N_no_favorable_lifestyle.category.female = (N_all.female - N_no_favorable_lifestyle.category) / N_all.female
+round(af_by_N_no_favorable_lifestyle.category.female,3)
+
+## < 35
+dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
+N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category[dat_all$AGE_AT_LAST_CONTACT.cs1 < 35], na.rm = TRUE)
+af_by_N_no_favorable_lifestyle.category.lt.35 = (N_all.lt.35 - N_no_favorable_lifestyle.category) / N_all.lt.35
+round(af_by_N_no_favorable_lifestyle.category.lt.35,3)
+
+## >= 35
+dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
+N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.rm = TRUE)
+af_by_N_no_favorable_lifestyle.category.gteq.35 = (N_all.gteq.35 - N_no_favorable_lifestyle.category) / N_all.gteq.35
+round(af_by_N_no_favorable_lifestyle.category.gteq.35,3)
+
+
+
+setNames(cbind.data.frame(af_by_tx.female, af_by_plp.prs.female, af_by_N_no_favorable_lifestyle.category.female, # female
+                          af_by_tx.male, af_by_plp.prs.male, af_by_N_no_favorable_lifestyle.category.male, # male
+                          af_by_tx.lt.35, af_by_plp.prs.lt.35, af_by_N_no_favorable_lifestyle.category.lt.35, # less than 35
+                          af_by_tx.gteq.35, af_by_plp.prs.gteq.35,af_by_N_no_favorable_lifestyle.category.gteq.35 # 35 or above
+), c("Treatment_female", "Genetics_female", "Lifestyle_female",
+     "Treatment_male", "Genetics_male", "Lifestyle_male",
+     "Treatment_<35", "Genetics_<35", "Lifestyle_<35",
+     "Treatment_>=35", "Genetics_>=35", "Lifestyle_>=35"))
