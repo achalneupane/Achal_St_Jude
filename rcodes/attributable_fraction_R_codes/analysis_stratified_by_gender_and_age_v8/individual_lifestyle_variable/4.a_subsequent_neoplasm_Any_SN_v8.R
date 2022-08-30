@@ -265,8 +265,7 @@ fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_c
               data = dat_all)
 
 
-# LIFESTYLE_STATUS
-# LIFESTYLE_STATUS_WO_DIET
+# HEI2015_TOTAL_SCORE.tertile.category
 
 summary(fit_all)
 
