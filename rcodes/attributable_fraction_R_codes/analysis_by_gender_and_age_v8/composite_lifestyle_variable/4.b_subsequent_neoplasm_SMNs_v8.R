@@ -258,7 +258,7 @@ fit_all = glm(formula = SMN ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carr
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
                 maxchestrtdose.category + epitxn_dose_5.category +
-                LIFESTYLE_STATUS_WO_DIET +
+                LIFESTYLE_STATUS +
                 EAS + AMR + SAS + AFR,
               family = binomial,
               data = dat_all)
@@ -294,8 +294,11 @@ N_all.male = sum(dat_all$pred_all[dat_all$gender == "Male"], na.rm = TRUE) # sub
 N_all.female = sum(dat_all$pred_all[dat_all$gender == "Female"], na.rm = TRUE) # subset by gender
 ## subset by age at diagnosis group
 # median(dat_all$AGE_AT_LAST_CONTACT.cs1)
-N_all.lt.35 = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 < 35], na.rm = TRUE) # subset by age
-N_all.gteq.35 = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.rm = TRUE) # subset by age
+N_all.lt.35 = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 < 35], na.rm = TRUE) # subset by age 35
+N_all.gteq.35 = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.rm = TRUE) # subset by age 35
+
+N_all.lt.45 = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 < 45], na.rm = TRUE) # subset by age 45
+N_all.gteq.45 = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 45], na.rm = TRUE) # subset by age 45
 
 
 ## Male
@@ -318,6 +321,15 @@ N_no_tx = sum(dat_all$pred_no_tx[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.rm =
 af_by_tx.gteq.35 = (N_all.gteq.35 - N_no_tx) / N_all.gteq.35
 round(af_by_tx.gteq.35,3)
 
+## < 45
+N_no_tx = sum(dat_all$pred_no_tx[dat_all$AGE_AT_LAST_CONTACT.cs1 < 45], na.rm = TRUE)
+af_by_tx.lt.45 = (N_all.lt.45 - N_no_tx) / N_all.lt.45
+round(af_by_tx.lt.45,3)
+
+## >= 45
+N_no_tx = sum(dat_all$pred_no_tx[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 45], na.rm = TRUE)
+af_by_tx.gteq.45 = (N_all.gteq.45 - N_no_tx) / N_all.gteq.45
+round(af_by_tx.gteq.45,3)
 ##################
 ## P/LP and PRS ##
 ##################
@@ -350,13 +362,27 @@ dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "respon
 N_no_plp.prs = sum(dat_all$pred_no_plp.prs[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.rm = TRUE)
 af_by_plp.prs.gteq.35 = (N_all.gteq.35 - N_no_plp.prs) / N_all.gteq.35
 round(af_by_plp.prs.gteq.35,3)
+
+## < 45
+dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "response")
+N_no_plp.prs = sum(dat_all$pred_no_plp.prs[dat_all$AGE_AT_LAST_CONTACT.cs1 < 45], na.rm = TRUE)
+af_by_plp.prs.lt.45 = (N_all.lt.45 - N_no_plp.prs) / N_all.lt.45
+round(af_by_plp.prs.lt.45,3)
+
+
+## >= 45
+dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "response")
+N_no_plp.prs = sum(dat_all$pred_no_plp.prs[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 45], na.rm = TRUE)
+af_by_plp.prs.gteq.45 = (N_all.gteq.45 - N_no_plp.prs) / N_all.gteq.45
+round(af_by_plp.prs.gteq.45,3)
+
 ###############
 ## Lifestyle ##
 ###############
 dat_lifestyle = dat_all
 
-# dat_lifestyle$LIFESTYLE_STATUS [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS)] = "favorable"
-dat_lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable" # Without diet
+dat_lifestyle$LIFESTYLE_STATUS [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS)] = "favorable"
+# dat_lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable" # Without diet
 
 ## Male
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
@@ -384,12 +410,29 @@ round(af_by_N_no_favorable_lifestyle.category.gteq.35,3)
 
 
 
+## < 45
+dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
+N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category[dat_all$AGE_AT_LAST_CONTACT.cs1 < 45], na.rm = TRUE)
+af_by_N_no_favorable_lifestyle.category.lt.45 = (N_all.lt.45 - N_no_favorable_lifestyle.category) / N_all.lt.45
+round(af_by_N_no_favorable_lifestyle.category.lt.45,3)
+
+## >= 45
+dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
+N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 45], na.rm = TRUE)
+af_by_N_no_favorable_lifestyle.category.gteq.45 = (N_all.gteq.45 - N_no_favorable_lifestyle.category) / N_all.gteq.45
+round(af_by_N_no_favorable_lifestyle.category.gteq.45,3)
+
+
 setNames(cbind.data.frame(af_by_tx.female, af_by_plp.prs.female, af_by_N_no_favorable_lifestyle.category.female, # female
-                                    af_by_tx.male, af_by_plp.prs.male, af_by_N_no_favorable_lifestyle.category.male, # male
-                                    af_by_tx.lt.35, af_by_plp.prs.lt.35, af_by_N_no_favorable_lifestyle.category.lt.35, # less than 35
-                                    af_by_tx.gteq.35, af_by_plp.prs.gteq.35,af_by_N_no_favorable_lifestyle.category.gteq.35 # 35 or above
+                          af_by_tx.male, af_by_plp.prs.male, af_by_N_no_favorable_lifestyle.category.male, # male
+                          af_by_tx.lt.35, af_by_plp.prs.lt.35, af_by_N_no_favorable_lifestyle.category.lt.35, # less than 35
+                          af_by_tx.gteq.35, af_by_plp.prs.gteq.35,af_by_N_no_favorable_lifestyle.category.gteq.35, # 35 or above
+                          af_by_tx.lt.45, af_by_plp.prs.lt.45, af_by_N_no_favorable_lifestyle.category.lt.45, # less than 45
+                          af_by_tx.gteq.45, af_by_plp.prs.gteq.45,af_by_N_no_favorable_lifestyle.category.gteq.45 # 45 or above
 ), c("Treatment_female", "Genetics_female", "Lifestyle_female",
      "Treatment_male", "Genetics_male", "Lifestyle_male",
      "Treatment_<35", "Genetics_<35", "Lifestyle_<35",
-     "Treatment_>=35", "Genetics_>=35", "Lifestyle_>=35"))
+     "Treatment_>=35", "Genetics_>=35", "Lifestyle_>=35",
+     "Treatment_<45", "Genetics_<45", "Lifestyle_<45",
+     "Treatment_>=45", "Genetics_>=45", "Lifestyle_>=45"))
 
