@@ -1,6 +1,12 @@
 #!/usr/bin/bash
 
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/gwas/finemap
+
+################
+## Analysis 2 ##
+################
+# Yadav:  I think there are some SNPs which are probably <1% in controls but higher in cases and this the overall freq is higher than 1%. Can you remove variants from the summary statistics file that have <1% in controls only and then condition for chr16:25611595:C:T only?
+
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/gwas/finemap2
 ln -s ../../../../Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr16.PASS.decomposed.vcf.gz .
 PHENO=../pheno/sjlife_eur_dox_only_pcs.pheno
 
@@ -11,14 +17,27 @@ awk '{print $1"\t"$2}' $PHENO > samples.list
 module load plink/1.90b
 plink --chr 16 --from-bp 25361595 --make-bed --out sjlife_CMP --to-bp 25861595 --vcf MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr16.PASS.decomposed.vcf.gz
 
+
 awk '{print $2}' ../CMP_chr1_22.assoc.logistic.clean.Psorted_chr16_25611595_250kb > samplesnp.list
 # keep samples and variants
+ln -s ../finemap/sjlife_CMP.* .
 plink --bfile sjlife_CMP --extract samplesnp.list --keep samples.list --keep-allele-order --make-bed --out samplesnp.dat
 
 
-plink --bfile sjlife_CMP --freq --keep-allele-order --out sjlife.freq.out
-awk '{ for(i=1;i<=NF;i++){if(i==NF){printf("%s\n",$NF);}else {printf("%s\t",$i)}}}' sjlife.freq.out.frq > sjlife.freq.out.frq_edited1
+# plink --bfile sjlife_CMP --freq --keep-allele-order --out sjlife.freq.out
+# awk '{ for(i=1;i<=NF;i++){if(i==NF){printf("%s\n",$NF);}else {printf("%s\t",$i)}}}' sjlife.freq.out.frq > sjlife.freq.out.frq_edited1
 
+plink --bfile samplesnp.dat --freq --keep-allele-order --out samplesnp.dat.freq.out
+awk '{ for(i=1;i<=NF;i++){if(i==NF){printf("%s\n",$NF);}else {printf("%s\t",$i)}}}' samplesnp.dat.freq.out.frq > samplesnp.dat.freq.out.frq_edited1
+
+
+# Yadav:  I think there are some SNPs which are probably <1% in controls but higher in cases and this the overall freq is higher than 1%. Can you remove variants from the summary statistics file that have <1% in controls only and then condition for chr16:25611595:C:T only?
+plink --bfile  samplesnp.dat --keep controls.list --keep-allele-order --make-bed --out samplesnp.dat.controls
+plink --bfile samplesnp.dat.controls --freq --keep-allele-order --out samplesnp.dat.controls.freq.out
+awk '{ for(i=1;i<=NF;i++){if(i==NF){printf("%s\n",$NF);}else {printf("%s\t",$i)}}}' samplesnp.dat.controls.freq.out.frq > samplesnp.dat.controls.freq.out.frq_edited1
+
+
+plink --bfile sjlife_CMP --extract final.snp.list --keep samples.list --keep-allele-order --make-bed --out samplesnp.dat.final
 
 ## Create LD matrix
 plink --r2 --bfile samplesnp.dat --matrix --out samplesnp_ld_matrix
@@ -36,7 +55,7 @@ plink --r2 --bfile samplesnp.dat --matrix --out samplesnp_ld_matrix
 ######################
 ## Run GEC analysis ##
 ######################
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/gwas/finemap
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/gwas/finemap2
 module load java
 java -jar -Xmx1g /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/gec/gec.jar --var-gec --effect-number --plink-binary samplesnp.dat --genome --out samplesnp_chr16_vars.dat_GEC_test1
 # java -jar -Xmx1g gec.jar --var-gec --effect-number --plink-binary samplesnp.dat --maf 0.01 --genome --out samplesnp_chr16_vars.dat_GEC_test1

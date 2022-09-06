@@ -79,61 +79,20 @@ sum(gwas.dat$maf < 0.05)
 write.table(gwas.dat, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/finemap/samplesnp.z", quote = F, row.names = F, col.names = T, sep = " ")
 
 
-
-
-
-
-
+## FINEMAP results are in excel spreadsheet: Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/finemap/samplesnp_finemap_results.xlsx
 
 
 
 
 ## Input summary stat file for COJO analysis 
-TITN.COJO <- cbind.data.frame(SNP=gwas.dat.maf.gt.1perc.TITN$rsid, A1=gwas.dat.maf.gt.1perc.TITN$allele1, A2=gwas.dat.maf.gt.1perc.TITN$allele2, 
-                              freq=gwas.dat.maf.gt.1perc.TITN$maf, b=gwas.dat.maf.gt.1perc.TITN$beta, se=gwas.dat.maf.gt.1perc.TITN$se, p=gwas.dat.maf.gt.1perc.TITN$P)
-TITN.COJO$N <- 1645
+COJO <- cbind.data.frame(SNP=gwas.dat$rsid, A1=gwas.dat$allele1, A2=gwas.dat$allele2, 
+                            freq=gwas.dat$maf, b=gwas.dat$beta, se=gwas.dat$se)
 
-BAG3.COJO <- cbind.data.frame(SNP=gwas.dat.maf.gt.1perc.BAG3$rsid, A1=gwas.dat.maf.gt.1perc.BAG3$allele1, A2=gwas.dat.maf.gt.1perc.BAG3$allele2, 
-                              freq=gwas.dat.maf.gt.1perc.BAG3$maf, b=gwas.dat.maf.gt.1perc.BAG3$beta, se=gwas.dat.maf.gt.1perc.BAG3$se, p=gwas.dat.maf.gt.1perc.BAG3$P)
-BAG3.COJO$N <- 1645
+COJO$P <- gwas.dat.original$P[match(COJO$SNP, gwas.dat.original$SNP)]
+
+COJO$N <- 859
+
 
 ## COJO files
-write.table(TITN.COJO, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/cojo_test/samplesnp_TITN_gt_MAF_1_perc_vars.ma", quote = F, row.names = F, col.names = F, sep = " ")
-write.table(BAG3.COJO, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/cojo_test/samplesnp_BAG3_gt_MAF_1_perc_vats.ma", quote = F, row.names = F, col.names = F, sep = " ")
-
-
-
-#########################
-## Reading the results ##
-#########################
-# Assuming 1 causal
-samplesnp_TITN_gt_MAF_1_perc.snp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/assuming_1_causal_SNP/samplesnp_TITN_gt_MAF_1_perc.snp", header = T)
-dim(samplesnp_TITN_gt_MAF_1_perc.snp)
-# 947
-max(samplesnp_TITN_gt_MAF_1_perc.snp$prob)
-# 0.014; 2:178562809 is top 27th
-
-samplesnp_BAG3_gt_MAF_1_perc.snp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/assuming_1_causal_SNP/samplesnp_BAG3_gt_MAF_1_perc.snp", header = T)
-dim(samplesnp_BAG3_gt_MAF_1_perc.snp)
-max(samplesnp_BAG3_gt_MAF_1_perc.snp$prob)
-# 0.038; 10:119670121 is top 74th
-
-
-prob.stats.titn.bag3.maf.gt.1.perc <- rbind.data.frame(samplesnp_TITN_gt_MAF_1_perc.snp, samplesnp_BAG3_gt_MAF_1_perc.snp)
-dim(prob.stats.titn.bag3.maf.gt.1.perc)
-
-prob.stats.titn.bag3.maf.gt.1.perc$SNP <- paste(prob.stats.titn.bag3.maf.gt.1.perc$chromosome, prob.stats.titn.bag3.maf.gt.1.perc$position, sep = ":")
-
-sum(gwas.dat.original$SNP %in% prob.stats.titn.bag3.maf.gt.1.perc$SNP)
-# 2541
-
-gwas.dat.original$FINEMAP_Prob <- prob.stats.titn.bag3.maf.gt.1.perc$prob[match(gwas.dat.original$SNP, prob.stats.titn.bag3.maf.gt.1.perc$SNP)]
-gwas.dat$SNP <- paste(gwas.dat$chromosome, gwas.dat$position, sep = ":")
-gwas.dat.original$MAF <- gwas.dat$maf[match(gwas.dat.original$SNP, gwas.dat$SNP)]
-
-write.table(gwas.dat.original, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_prob.stats.titn.bag3.maf.gt.1.perc.txt", quote = F, row.names = F, col.names = T, sep = "\t")
-
-
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP.RDATA")
-
+write.table(COJO, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/finemap/samplesnp_vars.ma", quote = F, row.names = F, col.names = F, sep = " ")
 
