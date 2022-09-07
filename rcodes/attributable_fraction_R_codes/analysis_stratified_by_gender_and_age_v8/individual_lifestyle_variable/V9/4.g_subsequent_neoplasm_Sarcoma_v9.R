@@ -647,7 +647,6 @@ SARCOMA.af <- setNames(cbind.data.frame(af_by_tx.chemo, af_by_tx.radiation, af_b
 all <- rbind.data.frame(SN.af, SMN.af, NMSC.af,BREAST.af, THYROID.af, MENINGIOMA.af, SARCOMA.af)
 rownames(all) <- c("ANY_SN", "SMN", "NMSC", "Breast", "Thyroid", "Meningioma", "Sarcoma")
 
-sapply(all, round = 3)
 
 all <- all %>% 
-  mutate_if(is.numeric, round, digits = 2)
+  mutate_if(is.numeric, round, digits = 3)
