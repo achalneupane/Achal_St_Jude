@@ -109,7 +109,7 @@ table(gwas.dat$rsid == samplesnp.dat.bim$V2)
 write.table(gwas.dat, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/finemap2/samplesnp.z", quote = F, row.names = F, col.names = T, sep = " ")
 
 
-## FINEMAP results are in excel spreadsheet: Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/finemap/samplesnp_finemap_results.xlsx
+## FINEMAP results are in excel spreadsheet: Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/finemap2/samplesnp_finemap_results.xlsx
 
 
 
