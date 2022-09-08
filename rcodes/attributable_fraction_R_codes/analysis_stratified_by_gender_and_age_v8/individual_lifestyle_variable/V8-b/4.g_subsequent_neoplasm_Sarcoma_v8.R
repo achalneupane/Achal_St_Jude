@@ -650,3 +650,5 @@ rownames(all) <- c("ANY_SN", "SMN", "NMSC", "Breast", "Thyroid", "Meningioma", "
 
 all <- all %>% 
   mutate_if(is.numeric, round, digits = 3)
+
+write.table(all, "test.csv", row.names = T, quote = F)

@@ -50,30 +50,28 @@ length(unique(subneo.after5$sjlid))
 subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
 sum(!duplicated(subneo.within5$sjlid))
 # 22
-###############
-## Meningioma
-###############
-MENINGIOMA <- subneo[grepl("meningioma", subneo$diag, ignore.case = T),]
-MENINGIOMA <- setDT(MENINGIOMA)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
-nrow(MENINGIOMA)
-# 149
+##################
+## Thyroid cancer
+##################
+THYROIDcancer <- subneo[grepl("thyroid", subneo$diag, ignore.case = T),]
+THYROIDcancer <- setDT(THYROIDcancer)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+nrow(THYROIDcancer)
 # Removing samples with SNs within 5 years of childhood cancer
-MENINGIOMA <- MENINGIOMA[!MENINGIOMA$sjlid %in% subneo.within5$sjlid,]
-nrow(MENINGIOMA)
-# 149
-PHENO.ANY_SN$MENINGIOMA <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% MENINGIOMA$sjlid, 0, 1))
-table(MENINGIOMA$diaggrp)
-
+THYROIDcancer <- THYROIDcancer[!THYROIDcancer$sjlid %in% subneo.within5$sjlid,]
+nrow(THYROIDcancer)
+# 86
+PHENO.ANY_SN$THYROIDcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% THYROIDcancer$sjlid, 0, 1))
+table(THYROIDcancer$diaggrp)
 
 #############################
 ## Add Lifestyle variables ##
 #############################
 # Define CA/CO status in lifestyle
-ALL.LIFESTYLE$CACO <- factor(ifelse(!ALL.LIFESTYLE$SJLIFEID %in% MENINGIOMA$sjlid, 0, 1))
+ALL.LIFESTYLE$CACO <- factor(ifelse(!ALL.LIFESTYLE$SJLIFEID %in% THYROIDcancer$sjlid, 0, 1))
 
 ## Get date (gradedt) and age at diagnosis of SN
-ALL.LIFESTYLE$ANY.SN_gradedate <- MENINGIOMA$gradedt[match(ALL.LIFESTYLE$SJLIFEID, MENINGIOMA$sjlid)]
-ALL.LIFESTYLE$AGE.ANY_SN <- MENINGIOMA$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, MENINGIOMA$sjlid)]
+ALL.LIFESTYLE$ANY.SN_gradedate <- THYROIDcancer$gradedt[match(ALL.LIFESTYLE$SJLIFEID, THYROIDcancer$sjlid)]
+ALL.LIFESTYLE$AGE.ANY_SN <- THYROIDcancer$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, THYROIDcancer$sjlid)]
 
 ## In CASES, if age survey is greater than age at diagnosis; NULLIFY the favorable_lifestyle.category. That information is not useful
 ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$agesurvey > ALL.LIFESTYLE$AGE.ANY_SN),
@@ -84,71 +82,7 @@ ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$agebmi > ALL.LIFESTY
 
 
 
-##################################
-## Imputation of missing values ##
-##################################
-# wanted items
-wanted.cols <- c("smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_obese_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")
-ALL.LIFESTYLE.IMPUTE <- ALL.LIFESTYLE[c("SJLIFEID", wanted.cols)]
-## Number of items available to get scores
-ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score <- rowSums(!is.na(ALL.LIFESTYLE.IMPUTE[wanted.cols]))
-
-# If all 5 items are available; they were simply summed up to get the score 
-ALL.LIFESTYLE.IMPUTE$SCORE [ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score == 5] <-  rowSums(ALL.LIFESTYLE.IMPUTE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score == 5, wanted.cols])
-
-## For missing items, per Qi: "For people with missing items, mean of non-missing items were taken and then multiplied by the # of items to get the score"
-ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items <- rowMeans(ALL.LIFESTYLE[wanted.cols], na.rm = T)
-ALL.LIFESTYLE.IMPUTE$imputedSCORE <- ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items * ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score
-
-# replace the score values with imputed score for missing ones; this was applied to rows where items available (non-missing ones) are >= 3 & < 5 
-ALL.LIFESTYLE.IMPUTE$SCORE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score >= 3 & ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score < 5] <- ALL.LIFESTYLE.IMPUTE$imputedSCORE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score >= 3 & ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score < 5]
-
-# Define favorable, intermediate and unfavorable----
-ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS[ALL.LIFESTYLE.IMPUTE$SCORE>= 3] <- "favorable" # favorable [at least 3 of the five health lifestyle factors]
-ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS[ALL.LIFESTYLE.IMPUTE$SCORE == 2] <- "intermediate" # intermediate [two healthy lifestyle factors] 
-ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS[ALL.LIFESTYLE.IMPUTE$SCORE <= 1] <- "unfavorable" # unfavorable [no or only one healthy lifestyle factor] 
-
-## Add to PHENO
-PHENO.ANY_SN$LIFESTYLE_STATUS <- ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE.IMPUTE$SJLIFEID)]
-
-# relevel factors
-PHENO.ANY_SN$LIFESTYLE_STATUS[is.na(PHENO.ANY_SN$LIFESTYLE_STATUS)] <- "Unknown"
-PHENO.ANY_SN$LIFESTYLE_STATUS <- factor(PHENO.ANY_SN$LIFESTYLE_STATUS, level = c("favorable", "intermediate", "unfavorable", "Unknown"))
-
-
-## Repeat for composite without diet
-# wanted items
-wanted.cols <- c("smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_obese_yn", "NOT_RiskyHeavyDrink_yn")
-ALL.LIFESTYLE.IMPUTE <- ALL.LIFESTYLE[c("SJLIFEID", wanted.cols)]
-## Number of items available to get scores
-ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score <- rowSums(!is.na(ALL.LIFESTYLE.IMPUTE[wanted.cols]))
-
-# If all 4 (after removing HEALTHY_Diet_yn) items are available; they were simply summed up to get the score 
-ALL.LIFESTYLE.IMPUTE$SCORE [ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score == 4] <-  rowSums(ALL.LIFESTYLE.IMPUTE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score == 4, wanted.cols])
-
-## For missing items, per Qi: "For people with missing items, mean of non-missing items were taken and then multiplied by the # of items to get the score"
-ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items <- rowMeans(ALL.LIFESTYLE[wanted.cols], na.rm = T)
-ALL.LIFESTYLE.IMPUTE$imputedSCORE <- ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items * ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score
-
-# replace the score values with imputed score for missing ones; this was applied to rows where items available (non-missing ones) are >= 3 & < 5 
-ALL.LIFESTYLE.IMPUTE$SCORE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score >= 2 & ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score < 4] <- ALL.LIFESTYLE.IMPUTE$imputedSCORE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score >= 2 & ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score < 4]
-
-# Define favorable, intermediate and unfavorable----
-ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS_WO_DIET[ALL.LIFESTYLE.IMPUTE$SCORE>= 3] <- "favorable" # favorable [at least 3 of the five health lifestyle factors]
-ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS_WO_DIET[ALL.LIFESTYLE.IMPUTE$SCORE == 2] <- "intermediate" # intermediate [two healthy lifestyle factors] 
-ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS_WO_DIET[ALL.LIFESTYLE.IMPUTE$SCORE <= 1] <- "unfavorable" # unfavorable [no or only one healthy lifestyle factor] 
-
-## Add to PHENO
-PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET <- ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS_WO_DIET[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE.IMPUTE$SJLIFEID)]
-
-# relevel factors
-PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET[is.na(PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET)] <- "Unknown"
-PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET <- factor(PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET, level = c("favorable", "intermediate", "unfavorable", "Unknown"))
-
-
-############################
-## Add lifestyle to Pheno ##
-############################
+## Addd lifestyle to Pheno
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE", "smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")])
 # PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")])
 
@@ -156,7 +90,7 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$
 PHENO.ANY_SN$missing.lifestyles <- rowSums(is.na(PHENO.ANY_SN[c("smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")]))
 table(PHENO.ANY_SN$missing.lifestyles)
 # 0    1    2    3    4    5 
-# 2861  593   50   56   75  766 
+# 2880  590   50   56   76  749 
 
 ## Relevel 6 lifestyle variables
 PHENO.ANY_SN$smoker_never_yn[is.na(PHENO.ANY_SN$smoker_never_yn)] <- "Unknown"
@@ -200,7 +134,8 @@ for(i in 1:length(HEI.to.categorize)){
 
 table(PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category)
 # 3rd     2nd     1st Unknown 
-# 1160    1159    1161     921
+# 1165    1165    1167     904 
+
 #########################
 ## Extract Ethnicities ##
 #########################
@@ -220,16 +155,15 @@ library(expss)
 # Getting counts for non-missing data only; 26 samples do not have admixture ancestry
 CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$AMR),]
 
-CROSS_CASES.df <- CROSS_CASES.df[c("MENINGIOMA", "smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn",
+CROSS_CASES.df <- CROSS_CASES.df[c("THYROIDcancer", "smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn",
                                    "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")]
 
-CROSS_CASES.df <- apply_labels(CROSS_CASES.df, MENINGIOMA = "MENINGIOMA", smoker_never_yn = "smoker_never_yn", 
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df, THYROIDcancer = "THYROIDcancer", smoker_never_yn = "smoker_never_yn", 
                                smoker_former_or_never_yn = "smoker_former_or_never_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
                                NOT_RiskyHeavyDrink_yn = "NOT_RiskyHeavyDrink_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")
 
 as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(MENINGIOMA, list(smoker_never_yn , smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
-
+                  cross_cases(THYROIDcancer, list(smoker_never_yn , smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
 
 
@@ -241,29 +175,42 @@ as.data.frame(t(CROSS_CASES.df %>%
 ## 1. Qin baseline model ##
 ###########################
 ## SJLIFE (ALL) 
-mod1 <- glm(MENINGIOMA ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+mod1 <- glm(THYROIDcancer ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxneckrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
 
 ## SJLIFE (EUR)
-mod1.EUR <- glm(MENINGIOMA ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+mod1.EUR <- glm(THYROIDcancer ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxneckrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 summary(mod1.EUR)
 
 ##########################
 dat_all = PHENO.ANY_SN
-fit_all = glm(formula = MENINGIOMA ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
-                Meningioma_PRS.tertile.category +
+fit_all = glm(formula = THYROIDcancer ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
+                Thyroid_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + epitxn_dose_5.category + 
-                LIFESTYLE_STATUS_WO_DIET +
+                AGE_AT_DIAGNOSIS + gender + maxneckrtdose.category + epitxn_dose_5.category + 
+                smoker_former_or_never_yn + PhysicalActivity_yn + NOT_RiskyHeavyDrink_yn + HEALTHY_Diet_yn + Not_obese_yn +
                 EAS + AMR + SAS + AFR,
               family = binomial,
               data = dat_all)
 
-# LIFESTYLE_STATUS
-# LIFESTYLE_STATUS_WO_DIET
+
 
 summary(fit_all)
 
+# ## With HEI score
+# dat_all = PHENO.ANY_SN
+# fit_all = glm(formula = THYROIDcancer ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
+#                 Thyroid_PRS.tertile.category +
+#                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+#                 AGE_AT_DIAGNOSIS + gender + maxneckrtdose.category + epitxn_dose_5.category + 
+#                 smoker_former_or_never_yn + PhysicalActivity_yn + NOT_RiskyHeavyDrink_yn + HEI2015_TOTAL_SCORE.tertile.category + Not_obese_yn +
+#                 EAS + AMR + SAS + AFR,
+#               family = binomial,
+#               data = dat_all)
+# 
+# 
+# 
+# summary(fit_all)
 
 ##########################
 ## Get predicted values ##
@@ -277,7 +224,8 @@ dat_all$pred_all = predict(fit_all, newdat = dat_all, type = "response")
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx = dat_all
 
-dat_tx$maxsegrtdose.category [!grepl("Unknown", dat_tx$maxsegrtdose.category)] =
+
+dat_tx$maxneckrtdose.category [!grepl("Unknown", dat_tx$maxneckrtdose.category)] =
 dat_tx$epitxn_dose_5.category [!grepl("Unknown", dat_tx$epitxn_dose_5.category)] = "None"
 
 dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
@@ -287,33 +235,47 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx,3)
-# 0.87
-# 0.861 (Without diet)
+# 0.549
+# 0.55 (Without diet)
+# 0.555 [With HEI 2015 (instead of Diet) and other 4 lifestyle factors]
 ##################
 ## P/LP and PRS ##
 ##################
 ## P/LP Zhaoming, Qin without Zhaoming and PRS
 dat_plp.prs = dat_all
 dat_plp.prs$Zhaoming_carriers = dat_plp.prs$Qin_without_Zhaoming_vars_carriers = "N"
-dat_plp.prs$Meningioma_PRS.tertile.category = "1st"
+dat_plp.prs$Thyroid_PRS.tertile.category = "1st"
 
 dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "response")
 N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
 af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
 round(af_by_plp.prs,3)
-# -0.003
-# -0.004 (Without diet)
+# 0.416
+# 0.417 (Without diet)
+# 0.416 [With HEI 2015 (instead of Diet) and other 4 lifestyle factors]
 ###############
 ## Lifestyle ##
 ###############
 dat_lifestyle = dat_all
 
-# dat_lifestyle$LIFESTYLE_STATUS [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS)] = "favorable"
-dat_lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable" # Without diet
+dat_lifestyle$smoker_former_or_never_yn [!grepl("Unknown", dat_lifestyle$smoker_former_or_never_yn)] =
+dat_lifestyle$PhysicalActivity_yn [!grepl("Unknown", dat_lifestyle$PhysicalActivity_yn)] =
+dat_lifestyle$NOT_RiskyHeavyDrink_yn [!grepl("Unknown", dat_lifestyle$NOT_RiskyHeavyDrink_yn)] =
+dat_lifestyle$HEALTHY_Diet_yn [!grepl("Unknown", dat_lifestyle$HEALTHY_Diet_yn)] =
+dat_lifestyle$Not_obese_yn [!grepl("Unknown", dat_lifestyle$Not_obese_yn)] = "1"
+
+# ## HEI
+# dat_lifestyle$smoker_former_or_never_yn [!grepl("Unknown", dat_lifestyle$smoker_former_or_never_yn)] =
+# dat_lifestyle$PhysicalActivity_yn [!grepl("Unknown", dat_lifestyle$PhysicalActivity_yn)] =
+# dat_lifestyle$NOT_RiskyHeavyDrink_yn [!grepl("Unknown", dat_lifestyle$NOT_RiskyHeavyDrink_yn)] =
+# dat_lifestyle$Not_obese_yn [!grepl("Unknown", dat_lifestyle$Not_obese_yn)] = "1"
+# dat_lifestyle$HEI2015_TOTAL_SCORE.tertile.category [!grepl("Unknown", dat_lifestyle$HEI2015_TOTAL_SCORE.tertile.category)] = "3rd"
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# -0.03
-# -0.033 (Without diet)
+# 0.094
+# -0.031 (Without diet)
+# -0.138 [With HEI 2015 (instead of Diet) and other 4 lifestyle factors]
+
