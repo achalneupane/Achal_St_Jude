@@ -294,7 +294,6 @@ round(af_by_N_no_favorable_lifestyle.category,3)
 dat_tx.plp.prs.lifestyle = dat_all
 
 ## Nullify Treatment
-
 dat_tx.plp.prs.lifestyle$maxsegrtdose.category [!grepl("Unknown", dat_tx.plp.prs.lifestyle$maxsegrtdose.category)] =
   dat_tx.plp.prs.lifestyle$maxabdrtdose.category [!grepl("Unknown", dat_tx.plp.prs.lifestyle$maxabdrtdose.category)] =
   dat_tx.plp.prs.lifestyle$maxchestrtdose.category [!grepl("Unknown", dat_tx.plp.prs.lifestyle$maxchestrtdose.category)] =

@@ -300,7 +300,7 @@ dat_tx.plp.prs.lifestyle$maxchestrtdose.category [!grepl("Unknown", dat_tx.plp.p
 
 ## Nullify Genetics
 dat_tx.plp.prs.lifestyle$Zhaoming_carriers = dat_tx.plp.prs.lifestyle$Qin_without_Zhaoming_vars_carriers = "N";
-dat_tx.plp.prs.lifestyle$SQUAMOUScell_PRS.tertile.category = dat_tx.plp.prs.lifestyle$BASALcell_PRS.tertile.category = "1st"
+dat_tx.plp.prs.lifestyle$Mavaddat_2019_ER_POS_Breast_PRS.tertile.category = dat_tx.plp.prs.lifestyle$Mavaddat_2019_ER_NEG_Breast_PRS.tertile.category = dat_tx.plp.prs.lifestyle$Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category = "1st"
 
 ## Nullify Lifestyle
 dat_tx.plp.prs.lifestyle$smoker_former_or_never_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$smoker_former_or_never_yn)] =
@@ -323,5 +323,5 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx
 N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
-# 0.218 With diet
-# 0.282 Without diet
+# 0.672 With diet
+# 0.556 Without diet
