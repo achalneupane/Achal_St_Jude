@@ -183,5 +183,5 @@ write.table(as.data.frame(AFR$SNPID), "Z:/ResearchHome/Groups/sapkogrp/projects/
 
 
 
-# Fisher test
-
+# Fisher test of AFR_diabetes_chrALL.dat-chr11.raw for chr11:71918924:G:A and chr11:71918995:TTTAGCAAGTTCTCTACAGGA:T
+df.raw <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/diabetes/gene-based-analysis/AFR/chr11/AFR_diabetes_chrALL.dat-chr11.raw", header = T)
