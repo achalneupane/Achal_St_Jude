@@ -182,3 +182,6 @@ write.table(as.data.frame(EUR$SNPID), "Z:/ResearchHome/Groups/sapkogrp/projects/
 write.table(as.data.frame(AFR$SNPID), "Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/diabetes/extract_variants_gnomAD_ALL_AFR_lt_0.01_MAC_gt_3_at_least_2_vars_per_gene.list", sep = "\t", row.names = F, quote = F, col.names = F)
 
 
+
+# Fisher test
+
