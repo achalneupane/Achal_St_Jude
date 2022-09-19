@@ -16,6 +16,16 @@ ex_thyroid_df_tmp = thyroid_df.iloc[:, 1:3].reset_index(drop=True)
 # ex_thyroid_df_tmp = ex_thyroid_df_tmp.set_axis(new_cols, axis=1, inplace=False)
 ex_thyroid_df_tmp.columns = new_cols
 
-df_c = pd.concat([ex_thyroid_df, ex_thyroid_df_tmp, axis=1)
+df_thyroid = pd.concat([ex_thyroid_df, ex_thyroid_df_tmp], axis=1)
+
+# df_thyroid.columns.to_list()loc['Effect_allele']
+
+df_thyroid.loc[df_thyroid['Effect_allele'] != df_thyroid['true_effect_allele'], "Effect_allele" ] = df_thyroid.loc[df_thyroid['Effect_allele'] != df_thyroid['true_effect_allele'], "true_effect_allele" ]
+
+
+df[df$Effect_allele != df$V2, c("REF", "Effect_allele")] <- df[df$Effect_allele != df$V2, c("Effect_allele", "REF")]
+
+
+pd.concat([all_cancers, df_thyroid], axis = 1)
 
 
