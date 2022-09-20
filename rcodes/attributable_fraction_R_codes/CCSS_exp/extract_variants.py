@@ -1,6 +1,9 @@
 import numpy as np
 import pandas as pd
 import re
+import os
+import natsort
+from natsort import natsort_keygen
 
 all_cancers = pd.read_csv("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", sep='\t', header = 0) # specify the first row as the header
 # Extract only those that are needed
@@ -54,12 +57,32 @@ df_thyroid['Cancer'] = "THYROID"
 df_thyroid['Significant_YN'] = "Y"
 
 # remove chr from df_thyroid
-df_thyroid['CHROM'] = df_thyroid['CHROM'].str.replace(r'\D+', '', regex=True).astype('int')
-# df_thyroid['CHROM'].replace("chr", "", regex=True)
+# df_thyroid['CHROM'] = df_thyroid['CHROM'].str.replace(r'\D+', '', regex=True).astype('int')
+## df_thyroid['CHROM'].replace("chr", "", regex=True)
+
 
 # Row bind two dataframes
 df_thyroid.shape
 all_cancers.shape
 all_cancers = pd.concat([all_cancers, df_thyroid])
 
+all_cancers.Cancer.value_counts()
+all_cancers.TYPE.value_counts()
 
+all_cancers
+
+# check if a value contains 'chr' and prepend it if not
+all_cancers['CHROM'] = [x if isinstance(x, str) and 'chr' in x else f"chr{x}" for x in all_cancers['CHROM'].tolist()]
+# all_cancers['CHROM'] = np.where(~all_cancers['CHROM'].str.startswith("chr", na=False), "chr", all_cancers['CHROM'])
+
+# sort df
+all_cancers = all_cancers.sort_values(
+    by=["CHROM", "POS_GRCh38"],
+    key=natsort_keygen()
+    )
+
+# You can specify a python write mode in the pandas to_csv function. For append it is 'a'. default is w (write)
+all_cancers.to_csv(r'Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/ccss_exp_wgs/attr_fraction/prs/all_cancer.txt', header=True, index=None, sep='\t', mode='w')
+
+cc = all_cancers['CHROM'] + ":" + all_cancers.POS_GRCh38.map(str)
+cc.to_csv(r'Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/ccss_exp_wgs/attr_fraction/prs/all_cancer_extract_var.txt', header=False, index=None, sep='\t', mode='w')
