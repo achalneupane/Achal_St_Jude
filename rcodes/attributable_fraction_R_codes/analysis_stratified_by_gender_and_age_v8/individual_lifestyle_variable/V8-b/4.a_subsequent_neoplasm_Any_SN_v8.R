@@ -472,6 +472,7 @@ dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx.radiation = (N_all - N_no_tx) / N_all
 round(af_by_tx.radiation,3)
+# 0.25
 
 ## Male
 N_no_tx = sum(dat_all$pred_no_tx[dat_all$gender == "Male"], na.rm = TRUE)
@@ -519,7 +520,7 @@ dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = T)
 af_by_tx.chemo = (N_all - N_no_tx) / N_all
 round(af_by_tx.chemo,3)
-
+# 0.041
 
 ## Male
 N_no_tx = sum(dat_all$pred_no_tx[dat_all$gender == "Male"], na.rm = TRUE)
@@ -565,6 +566,7 @@ dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
 N_no_plp = sum(dat_all$pred_no_plp, na.rm = T)
 af_by_plp = (N_all - N_no_plp) / N_all
 round(af_by_plp,3)
+# 0.023
 
 ## Male
 N_no_plp = sum(dat_all$pred_no_plp[dat_all$gender == "Male"], na.rm = TRUE)
@@ -614,6 +616,7 @@ dat_all$pred_no_prs = predict(fit_all, newdata = dat_prs, type = "response")
 N_no_prs = sum(dat_all$pred_no_plp, na.rm = T)
 af_by_prs = (N_all - N_no_prs) / N_all
 round(af_by_prs,3)
+# 0.023
 
 ## Male
 N_no_prs = sum(dat_all$pred_no_prs[dat_all$gender == "Male"], na.rm = TRUE)
