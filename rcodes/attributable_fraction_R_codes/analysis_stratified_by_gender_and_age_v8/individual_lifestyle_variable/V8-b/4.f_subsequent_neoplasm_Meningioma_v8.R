@@ -545,6 +545,7 @@ dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
 N_no_plp = sum(dat_all$pred_no_plp, na.rm = T)
 af_by_plp = (N_all - N_no_plp) / N_all
 round(af_by_plp,3)
+# -0.003
 
 ## Male
 N_no_plp = sum(dat_all$pred_no_plp[dat_all$gender == "Male"], na.rm = TRUE)
@@ -591,9 +592,10 @@ dat_prs$Meningioma_PRS.tertile.category = "1st"
 dat_all$pred_no_prs = predict(fit_all, newdata = dat_prs, type = "response")
 
 # Overall.plp 
-N_no_prs = sum(dat_all$pred_no_plp, na.rm = T)
+N_no_prs = sum(dat_all$pred_no_prs, na.rm = T)
 af_by_prs = (N_all - N_no_prs) / N_all
 round(af_by_prs,3)
+# -0.06
 
 ## Male
 N_no_prs = sum(dat_all$pred_no_prs[dat_all$gender == "Male"], na.rm = TRUE)

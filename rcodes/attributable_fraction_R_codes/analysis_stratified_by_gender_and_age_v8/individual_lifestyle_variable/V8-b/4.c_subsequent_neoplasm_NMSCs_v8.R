@@ -599,9 +599,10 @@ dat_prs$SQUAMOUScell_PRS.tertile.category = dat_plp$BASALcell_PRS.tertile.catego
 dat_all$pred_no_prs = predict(fit_all, newdata = dat_prs, type = "response")
 
 # Overall.plp 
-N_no_prs = sum(dat_all$pred_no_plp, na.rm = T)
+N_no_prs = sum(dat_all$pred_no_prs, na.rm = T)
 af_by_prs = (N_all - N_no_prs) / N_all
 round(af_by_prs,3)
+# -0.002
 
 ## Male
 N_no_prs = sum(dat_all$pred_no_prs[dat_all$gender == "Male"], na.rm = TRUE)

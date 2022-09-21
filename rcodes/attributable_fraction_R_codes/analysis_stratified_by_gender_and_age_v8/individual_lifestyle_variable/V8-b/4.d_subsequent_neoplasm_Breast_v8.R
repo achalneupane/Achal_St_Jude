@@ -556,6 +556,7 @@ dat_all$pred_no_plp = predict(fit_all, newdata = dat_plp, type = "response")
 N_no_plp = sum(dat_all$pred_no_plp, na.rm = T)
 af_by_plp = (N_all - N_no_plp) / N_all
 round(af_by_plp,3)
+# 0.008
 
 ## Male
 N_no_plp = sum(dat_all$pred_no_plp[dat_all$gender == "Male"], na.rm = TRUE)
@@ -602,10 +603,10 @@ dat_prs$Mavaddat_2019_ER_POS_Breast_PRS.tertile.category = dat_prs$Mavaddat_2019
 dat_all$pred_no_prs = predict(fit_all, newdata = dat_prs, type = "response")
 
 # Overall.plp 
-N_no_prs = sum(dat_all$pred_no_plp, na.rm = T)
+N_no_prs = sum(dat_all$pred_no_prs, na.rm = T)
 af_by_prs = (N_all - N_no_prs) / N_all
 round(af_by_prs,3)
-
+# 0.482
 ## Male
 N_no_prs = sum(dat_all$pred_no_prs[dat_all$gender == "Male"], na.rm = TRUE)
 af_by_prs.male = (N_all.male - N_no_prs) / N_all.male
