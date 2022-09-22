@@ -22,6 +22,9 @@ covarsfile <- "Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/diabete
 cat(paste0("\nUploading covariates file ",covarsfile,"\n"))
 covars <-read.table(covarsfile, head=T, check.names=F)
 
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v2.RDATA")
+
+covars$IID %in% PHENO.ANY_SN$sjlid
 
 
 chrALL <- {}
