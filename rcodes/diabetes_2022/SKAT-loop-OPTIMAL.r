@@ -14,6 +14,16 @@ library(data.table)
 workdir <- "Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/diabetes/gene-based-analysis/EUR/"
 # workdir<-args[1]
 
+
+covarsfile <- "Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/diabetes/SJLIFE_T2D_GWAS_EUR.pheno"
+# covarsfile<-args[5]
+# t2d,agedx,gender,age_last_visit,BMIadj,aa_class_dose_5,maxabdrtdose,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10
+## LOAD COVARS file
+cat(paste0("\nUploading covariates file ",covarsfile,"\n"))
+covars <-read.table(covarsfile, head=T, check.names=F)
+
+
+
 chrALL <- {}
 chrom <- 1:22
 for (j in 1:length(chrom)){
@@ -26,10 +36,6 @@ raw <- "EUR_diabetes_chrALL.dat-chr"
 
 set<-"geneset-EUR"
 # set<-args[4]
-
-covarsfile <- "Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/diabetes/SJLIFE_T2D_GWAS_EUR.pheno"
-# covarsfile<-args[5]
-# t2d,agedx,gender,age_last_visit,BMIadj,aa_class_dose_5,maxabdrtdose,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10
 
 # set up directories:
 chrdir<-paste0(workdir,"/chr", chr)
@@ -46,10 +52,6 @@ cat(dim(raw))
 HEADER = sub(pattern="_[T,A,G,C,*]+",replacement="",colnames(raw))
 HEADER = gsub(pattern=";rs\\d+",replacement="",HEADER)
 colnames(raw) = HEADER
-
-## LOAD COVARS file
-cat(paste0("\nUploading covariates file ",covarsfile,"\n"))
-covars <-read.table(covarsfile, head=T, check.names=F)
 
 #MERGE1=merge(covars,raw, by="IID" ) #use this way and follwoing STEPS IF adding further covariants
 com.data=merge(covars,raw, by="IID" )
