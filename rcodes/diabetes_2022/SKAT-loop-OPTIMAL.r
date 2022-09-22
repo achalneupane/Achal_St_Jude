@@ -48,7 +48,14 @@ covars$aa_class_dose_any <- PHENO.ANY_SN$aa_class_dose_any[match(covars$IID, PHE
 # --------------------------------------------------------------------------------------------
 # 3. Could you please repeat step 5 but with cases defined using CTCAE-graded DM  >=3?; Re: 6
 # --------------------------------------------------------------------------------------------
+load("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/diabetes/CTCAE Abnormal Glucose Metabolism Rows With Transient Hyperglycemia-Mapping Rows Removed For Yadav's Population (n=4747, rows=9349).Rda")
+dim(diabetes29.ctcae)
+# Extract samples with the most recent grade date
+diabetes29.ctcae <- diabetes29.ctcae[tapply(1:nrow(diabetes29.ctcae),diabetes29.ctcae$sjlid,function(ii) ii[which.max(diabetes29.ctcae$grade.date[ii])]),]
+sum(covars$IID %in% covars$IID)
+# 3113
 
+covars$ctcae_grade <- diabetes29.ctcae$grade[match(covars$IID, diabetes29.ctcae$sjlid)]
 # ------------------------------------------------------------------------------
 # 4. Could you please use the treatment/case definition parameters set for 5 and
 # 6 above but test for interaction (logit[y] ~ covariates + RV_burden +
