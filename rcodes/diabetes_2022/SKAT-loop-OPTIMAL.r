@@ -24,7 +24,37 @@ covars <-read.table(covarsfile, head=T, check.names=F)
 
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v2.RDATA")
 
-covars$IID %in% PHENO.ANY_SN$sjlid
+sum(covars$IID %in% PHENO.ANY_SN$sjlid)
+
+# ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 1. Could you please re-evaluate the top findings from this RV analysis with genes with SKAT-O P<1e-3 in treatment-stratified samples, per the following:; Re: 5
+# ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 1.a. Cutoff: for exposed, define as >200 cGy
+# 1.b. Cutoff: same as above, but for RT cutoffs at >=500 cGy vs <500, >=1000 cGy vs <1000, >=1500 cGy vs
+
+# abdominalRT dose
+covars$maxabdrtdose <- PHENO.ANY_SN$maxabdrtdose[match(covars$IID, PHENO.ANY_SN$sjlid)]
+# PelvisRT dose
+covars$maxpelvisrtdose <- PHENO.ANY_SN$maxpelvisrtdose[match(covars$IID, PHENO.ANY_SN$sjlid)]
+
+# -------------------
+# 2 alkylating agents
+# -------------------
+# AA within 5 years of primary cancer
+covars$aa_class_dose_5 <- PHENO.ANY_SN$aa_class_dose_5[match(covars$IID, PHENO.ANY_SN$sjlid)]
+# AA Any
+covars$aa_class_dose_any <- PHENO.ANY_SN$aa_class_dose_any[match(covars$IID, PHENO.ANY_SN$sjlid)]
+
+# --------------------------------------------------------------------------------------------
+# 3. Could you please repeat step 5 but with cases defined using CTCAE-graded DM  >=3?; Re: 6
+# --------------------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# 4. Could you please use the treatment/case definition parameters set for 5 and
+# 6 above but test for interaction (logit[y] ~ covariates + RV_burden +
+# RV_burden * treatment), changing the definitions of "covariates" based on how
+# you defined the treatment set in 5
+# ------------------------------------------------------------------------------
 
 
 chrALL <- {}
