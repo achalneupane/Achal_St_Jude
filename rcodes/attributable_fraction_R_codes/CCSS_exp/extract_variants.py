@@ -73,7 +73,8 @@ all_cancers
 
 # check if a value contains 'chr' and prepend it if not
 all_cancers['CHROM'] = [x if isinstance(x, str) and 'chr' in x else f"chr{x}" for x in all_cancers['CHROM'].tolist()]
-# all_cancers['CHROM'] = np.where(~all_cancers['CHROM'].str.startswith("chr", na=False), "chr", all_cancers['CHROM'])
+# all_cancers['CHROM'] = all_cancers['CHROM'].mask(~all_cancers['CHROM'].str.startswith('chr', na=False), 'chr'+all_cancers['CHROM'].astype(str))
+# all_cancers['CHROM'] = all_cancers['CHROM'].astype(str).replace(r'^(\d+)', r'chr\1', regex=True)
 
 # # sort df
 # all_cancers = all_cancers.sort_values(
