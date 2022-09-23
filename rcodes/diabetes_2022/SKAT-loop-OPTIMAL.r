@@ -85,9 +85,9 @@ covars$ctcae_grade <- diabetes29.ctcae$grade[match(covars$IID, diabetes29.ctcae$
 # you defined the treatment set in 5
 # ------------------------------------------------------------------------------
 
-#############################################################
-## 1. Running SKAT, BURDEN and SKAT-O as covars as in GWAS ##
-#############################################################
+################################################################
+## 1. Running SKAT, BURDEN and SKAT-O using covars as in GWAS ##
+################################################################
 
 chrALL <- {}
 chrom <- 1:22
@@ -167,10 +167,6 @@ for (i in 1:length(datafiles)) {
   snpID<-paste(SETlist, collapse = ";")
   SETgeno<-as.matrix(com.data[,SETlist])
   
-  # Calculate RV_Burden
-  com.data$RV_Burden <- rowSums(SETgeno)
-  # print(max(com.data$RV_Burden, na.rm = T))
-  
   ### Define y
   y=as.matrix(com.data$t2d)
   table(y)
@@ -207,3 +203,20 @@ chrALL <- rbind.data.frame(chrALL, chr.tmp)
 }
 
 write.table(chrALL, paste(workdir, set, "_chrALL","_SKAT.pval",sep=""), sep="\t", col.names=T, row.names=F, quote=F)
+
+
+chrALL[c("SKAT", "SKATO", "BURDEN")] <- sapply(chrALL[c("SKAT", "SKATO", "BURDEN")], as.numeric)
+
+
+sum(chrALL$SKATO < 1e-3)
+# 5
+
+###################################################
+## Re-evaluate the top finding as asked in no. 5 ##
+###################################################
+chrALL[chrALL$SKATO < 1e-3,]
+
+
+# Calculate RV_Burden
+com.data$RV_Burden <- rowSums(SETgeno)
+# print(max(com.data$RV_Burden, na.rm = T))
