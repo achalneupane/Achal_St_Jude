@@ -125,7 +125,8 @@ study=Mavaddat_2019_ER_NEG_Breast
 ## remove chr4:57426897|chr6:114515866 from MichiganWeb_ER_POS_Breast
 awk -v study=$study '$6==study' all_cancer.txt > prs_out/all_cancer.txt_${study}
 # Remove variants from Mavaddat 2019 that are duplicated and are rare in gnomAD
-# awk -v study=$study '$6==study' all_cancer.txt | egrep -v 'chr1:51001424:C:CT|chr1:172359627:TA:T|chr2:39472369:CT:C|chr3:49672479:CT:C' > prs_out/all_cancer.txt_${study} # MichiganWeb_ER_OVERALL_Breast
+# awk -v study=$study '$6==study' all_cancer.txt | egrep -v 'chr1:51001424:C:CT|chr1:172359627:TA:T|chr2:39472369:CT:C|chr3:49672479:CT:C
+#' > prs_out/all_cancer.txt_${study} # MichiganWeb_ER_OVERALL_Breast
 # Check for duplicate variants based on chr:pos
 awk 'a[$1":"$2]++' prs_out/all_cancer.txt_$study | wc -l
 # Look for directly matching variants in the WGS data

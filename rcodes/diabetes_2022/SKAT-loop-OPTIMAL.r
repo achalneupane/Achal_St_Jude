@@ -37,16 +37,32 @@ sum(covars$IID %in% PHENO.ANY_SN$sjlid)
 
 # abdominalRT dose
 covars$maxabdrtdose <- PHENO.ANY_SN$maxabdrtdose[match(covars$IID, PHENO.ANY_SN$sjlid)]
+# abdominalRT_YN 
+covars$maxabdrtdose.exposed_more_than_200cGy_YN <- ifelse(covars$maxabdrtdose > 200, "Y", "N")
+covars$maxabdrtdose.exposed_500cGy_or_higher_YN <- ifelse(covars$maxabdrtdose >= 500, "Y", "N")
+covars$maxabdrtdose.exposed_1000cGy_or_higher_YN <- ifelse(covars$maxabdrtdose >= 1000, "Y", "N")
+covars$maxabdrtdose.exposed_1500cGy_or_higher_YN <- ifelse(covars$maxabdrtdose >= 1500, "Y", "N")
+covars$maxabdrtdose.exposed_2000cGy_or_higher_YN <- ifelse(covars$maxabdrtdose >= 2000, "Y", "N")
+
 # PelvisRT dose
 covars$maxpelvisrtdose <- PHENO.ANY_SN$maxpelvisrtdose[match(covars$IID, PHENO.ANY_SN$sjlid)]
-
+# PelvisRT_YN
+covars$maxpelvisrtdose.exposed_more_than_200cGy_YN <- ifelse(covars$maxpelvisrtdose > 200, "Y", "N")
+covars$maxpelvisrtdose.exposed_500cGy_or_higher_YN <- ifelse(covars$maxpelvisrtdose >= 500, "Y", "N")
+covars$maxpelvisrtdose.exposed_1000cGy_or_higher_YN <- ifelse(covars$maxpelvisrtdose >= 1000, "Y", "N")
+covars$maxpelvisrtdose.exposed_1500cGy_or_higher_YN <- ifelse(covars$maxpelvisrtdose >= 1500, "Y", "N")
+covars$maxpelvisrtdose.exposed_2000cGy_or_higher_YN <- ifelse(covars$maxpelvisrtdose >= 2000, "Y", "N")
 # -------------------
 # 2 alkylating agents
 # -------------------
 # AA within 5 years of primary cancer
 covars$aa_class_dose_5 <- PHENO.ANY_SN$aa_class_dose_5[match(covars$IID, PHENO.ANY_SN$sjlid)]
+covars$aa_class_dose_5_YN <- ifelse(covars$aa_class_dose_5 > 0, "Y", "N" )
+covars$aa_class_dose_5_4000_or_higher_YN <- ifelse(covars$aa_class_dose_5 >= 4000, "Y", "N" )
 # AA Any
 covars$aa_class_dose_any <- PHENO.ANY_SN$aa_class_dose_any[match(covars$IID, PHENO.ANY_SN$sjlid)]
+covars$aa_class_dose_any_YN <- ifelse(covars$aa_class_dose_any > 0, "Y", "N" )
+covars$aa_class_dose_any_4000_or_higher_YN <- ifelse(covars$aa_class_dose_any >= 4000, "Y", "N" )
 
 # --------------------------------------------------------------------------------------------
 # 3. Could you please repeat step 5 but with cases defined using CTCAE-graded DM  >=3?; Re: 6
@@ -69,6 +85,9 @@ covars$ctcae_grade <- diabetes29.ctcae$grade[match(covars$IID, diabetes29.ctcae$
 # you defined the treatment set in 5
 # ------------------------------------------------------------------------------
 
+#############################################################
+## 1. Running SKAT, BURDEN and SKAT-O as covars as in GWAS ##
+#############################################################
 
 chrALL <- {}
 chrom <- 1:22
@@ -147,6 +166,10 @@ for (i in 1:length(datafiles)) {
   # snpID<-SET[1,1]
   snpID<-paste(SETlist, collapse = ";")
   SETgeno<-as.matrix(com.data[,SETlist])
+  
+  # Calculate RV_Burden
+  com.data$RV_Burden <- rowSums(SETgeno)
+  # print(max(com.data$RV_Burden, na.rm = T))
   
   ### Define y
   y=as.matrix(com.data$t2d)
