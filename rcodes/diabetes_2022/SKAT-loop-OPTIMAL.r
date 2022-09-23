@@ -22,10 +22,13 @@ covarsfile <- "Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/diabete
 cat(paste0("\nUploading covariates file ",covarsfile,"\n"))
 covars <-read.table(covarsfile, head=T, check.names=F)
 
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v2.RDATA")
+# attach('Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v2.RDATA')
+# PHENO.ANY_SN <- PHENO.ANY_SN
+# detach('file:Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v2.RDATA')
+
 
 sum(covars$IID %in% PHENO.ANY_SN$sjlid)
-
+# 3113
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 # 1. Could you please re-evaluate the top findings from this RV analysis with genes with SKAT-O P<1e-3 in treatment-stratified samples, per the following:; Re: 5
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -48,9 +51,12 @@ covars$aa_class_dose_any <- PHENO.ANY_SN$aa_class_dose_any[match(covars$IID, PHE
 # --------------------------------------------------------------------------------------------
 # 3. Could you please repeat step 5 but with cases defined using CTCAE-graded DM  >=3?; Re: 6
 # --------------------------------------------------------------------------------------------
-load("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/diabetes/CTCAE Abnormal Glucose Metabolism Rows With Transient Hyperglycemia-Mapping Rows Removed For Yadav's Population (n=4747, rows=9349).Rda")
-dim(diabetes29.ctcae)
-# Extract samples with the most recent grade date
+# attach("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/diabetes/CTCAE Abnormal Glucose Metabolism Rows With Transient Hyperglycemia-Mapping Rows Removed For Yadav's Population (n=4747, rows=9349).Rda")
+# diabetes29.ctcae <- diabetes29.ctcae
+# detach("file:Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/diabetes/CTCAE Abnormal Glucose Metabolism Rows With Transient Hyperglycemia-Mapping Rows Removed For Yadav's Population (n=4747, rows=9349).Rda")
+# dim(diabetes29.ctcae)
+
+## Extract samples with the most recent grade dates
 diabetes29.ctcae <- diabetes29.ctcae[tapply(1:nrow(diabetes29.ctcae),diabetes29.ctcae$sjlid,function(ii) ii[which.max(diabetes29.ctcae$grade.date[ii])]),]
 sum(covars$IID %in% covars$IID)
 # 3113

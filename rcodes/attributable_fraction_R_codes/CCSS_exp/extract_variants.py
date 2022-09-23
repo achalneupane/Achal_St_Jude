@@ -71,16 +71,23 @@ all_cancers.TYPE.value_counts()
 
 all_cancers
 
-# check if a value contains 'chr' and prepend it if not
-all_cancers['CHROM'] = [x if isinstance(x, str) and 'chr' in x else f"chr{x}" for x in all_cancers['CHROM'].tolist()]
-# all_cancers['CHROM'] = all_cancers['CHROM'].mask(~all_cancers['CHROM'].str.startswith('chr', na=False), 'chr'+all_cancers['CHROM'].astype(str))
-# all_cancers['CHROM'] = all_cancers['CHROM'].astype(str).replace(r'^(\d+)', r'chr\1', regex=True)
+# remove chr from CHROM column
+all_cancers['CHROM'] = all_cancers['CHROM'].astype(str).str.replace(r'chr', '')
 
-# # sort df
-# all_cancers = all_cancers.sort_values(
-#     by=["CHROM", "POS_GRCh38"],
-#     key=natsort_keygen()
-#     )
+# df = all_cancers.iloc[,[1,2,3,1186,1187]]
+# print(df.to_dict())
+
+
+# # check if a value contains 'chr' and prepend it if not
+# all_cancers['CHROM'] = [x if isinstance(x, str) and 'chr' in x else f"chr{x}" for x in all_cancers['CHROM'].tolist()]
+# # all_cancers['CHROM'] = all_cancers['CHROM'].mask(~all_cancers['CHROM'].str.startswith('chr', na=False), 'chr'+all_cancers['CHROM'].astype(str))
+# # all_cancers['CHROM'] = all_cancers['CHROM'].astype(str).replace(r'^(\d+)', r'chr\1', regex=True)
+# 
+# # # sort df
+# # all_cancers = all_cancers.sort_values(
+# #     by=["CHROM", "POS_GRCh38"],
+# #     key=natsort_keygen()
+# #     )
 
 # You can specify a python write mode in the pandas to_csv function. For append it is 'a'. default is w (write)
 all_cancers.to_csv(r'Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/ccss_exp_wgs/attr_fraction/prs/all_cancer.txt', header=True, index=None, sep='\t', mode='w')
