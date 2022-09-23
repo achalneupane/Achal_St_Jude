@@ -8,6 +8,7 @@
 library(SKAT)
 library(tools)
 library(data.table)
+library(rrapply)
 # Define arguments
 # args <- commandArgs(TRUE)
 
@@ -91,7 +92,7 @@ covars$ctcae_grad_3_or_higher_YN <- ifelse(covars$ctcae_grade >= 3, "Y", "N")
 ## 1. Running SKAT, BURDEN and SKAT-O using covars as in GWAS ##
 ################################################################
 
-chrALL <- {}
+com.data <- covars
 chrom <- 1:22
 for (j in 1:length(chrom)){
 print(paste0("Doing chr", j))
@@ -119,11 +120,14 @@ cat(dim(raw))
 HEADER = sub(pattern="_[T,A,G,C,*]+",replacement="",colnames(raw))
 HEADER = gsub(pattern=";rs\\d+",replacement="",HEADER)
 colnames(raw) = HEADER
+raw <- raw[grep("chr|IID", colnames(raw))]
+target_vec <- covars$IID
+raw <- raw[match(target_vec, raw$IID),]
+if(sum(com.data$IID != raw$IID) == 0){
+com.data <- cbind.data.frame(com.data,raw[-1])
+}
+}
 
-#MERGE1=merge(covars,raw, by="IID" ) #use this way and follwoing STEPS IF adding further covariants
-com.data=merge(covars,raw, by="IID" )
-cat("\n\ndimensions of com.data matrix are:\n")
-dim(com.data)
 
 # #ARRANGE PHENO and GENDER so values are within  [0,1]
 # #GENDER
@@ -135,6 +139,27 @@ dim(com.data)
 com.data$t2d[com.data$t2d==-9]=NA
 com.data$t2d[com.data$t2d==1]=0
 com.data$t2d[com.data$t2d==2]=1
+
+
+## Create gene list
+geneLIST <- list()
+geneLISTALL <- list()
+extension<-".gene"
+##  Create variant set by gene
+datafiles<- Sys.glob(paste("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/diabetes/gene-based-analysis/EUR//chr*/geneset-EUR","/*",extension,sep=""))
+for (i in 1:length(datafiles)) {
+  print(i)
+  #print(datafiles[i])
+  genename=basename(file_path_sans_ext(datafiles[i]))
+  print(genename)
+  
+  ### GET GENO DATA
+  SET<-read.table(datafiles[i],head=F, as.is=T, check.names=F,sep="\n")
+  # geneLIST[i] <- SETlist 
+  geneLIST[i] <- SET
+  names(geneLIST)[i] <- genename
+}
+
 
 #####################
 ## START LOOP PART ##
@@ -156,15 +181,15 @@ BURDEN<-"BURDEN"
 ### START loop over list of genes
 cat(paste0("\nStart loop over list of genes in chr ",chr,"in geneset driectory",dir,"\n"))
 datafiles<-Sys.glob(paste(dir,"/*",extension,sep=""))
-for (i in 1:length(datafiles)) {
+for (i in 1:length(geneLIST)) {
   print(i)
   #print(datafiles[i])
-  genename=basename(file_path_sans_ext(datafiles[i]))
+  genename=names(geneLIST[i])
   print(genename)
   
   ### GET GENO DATA
   SET<-read.table(datafiles[i],head=F, as.is=T, check.names=F,sep="\n")
-  SETlist<-c(SET$V1)
+  SETlist <- unname(rrapply(geneLIST[i],  how = 'unlist'))
   # snpID<-SET[1,1]
   snpID<-paste(SETlist, collapse = ";")
   SETgeno<-as.matrix(com.data[,SETlist])
@@ -213,3 +238,26 @@ chrALL[c("SKAT", "SKATO", "BURDEN")] <- sapply(chrALL[c("SKAT", "SKATO", "BURDEN
 sum(chrALL$SKATO < 1e-3)
 # 5
 
+###################################################
+## Re-evaluate the top finding as asked in no. 5 ##
+###################################################
+# Could you please re-evaluate the top findings from this RV analysis with genes with SKAT-O P<1e-3 in treatment-stratified samples, per the following:
+# abdominal RT exposed (for exposed, define as >200 cGy)
+# pelvic RT exposed
+# abdominal OR pelvic RT exposed
+# same as above, but for RT cutoffs at >=500 cGy vs <500, >=1000 cGy vs <1000, >=1500 cGy vs <1500, >=2000 cGy vs <2000
+# alkylating agents exposed (none vs any)
+# alkylating agents, using dose cutoffs at >=4000 mg/m2 vs <4000 mg/m2
+
+
+
+chrALL[chrALL$SKATO < 1e-3,]
+
+
+
+
+
+
+# Calculate RV_Burden
+com.data$RV_Burden <- rowSums(SETgeno)
+# print(max(com.data$RV_Burden, na.rm = T))
