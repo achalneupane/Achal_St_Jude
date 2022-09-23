@@ -73,6 +73,7 @@ all_cancers
 
 # remove chr from CHROM column
 all_cancers['CHROM'] = all_cancers['CHROM'].astype(str).str.replace(r'chr', '')
+# all_cancers["CHROM"] = all_cancers["CHROM"].apply(lambda x: re.sub('\D', '', str(x)))
 
 # df = all_cancers.iloc[,[1,2,3,1186,1187]]
 # print(df.to_dict())
