@@ -203,6 +203,14 @@ plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweigh
 #####################
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38
 
+ln -s ../chr*.dose.vcf.gz .
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/all_cancer.txt .
+
+# awk 'BEGIN { FS="\t"; OFS="\t" } { $1="chr"$1; $2=$2-1 "\t" $2 } 1' all_cancer.txt| sed '1d' > all_cancer1.bed
+# awk 'BEGIN { FS="\t"; OFS="\t" } { $1="chr"$1 } 1' all_cancer.txt| sed '1d' > all_cancer1.bed
+
+# Instead of lifting over the VCF, I will just lift over the PRS SNPs.
+/home/aneupane/liftover/liftOver  all_cancer1.bed /home/aneupane/liftover/hg19ToHg38.over.chain all_cancer_GrCh38.bed all_cancer_unmapped.bed
 
 bcftools annotate --set-id '%CHROM\:%POS\:%REF\:%FIRST_ALT' chr21.dose.vcf.gz -Oz -o chr21.dose_ID_edited_tmp2.vcf.gz
 
