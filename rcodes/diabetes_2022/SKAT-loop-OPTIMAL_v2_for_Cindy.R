@@ -246,7 +246,7 @@ chrALL <- rbind.data.frame(chrALL, chrALL.tmp)
 
 #--------------------------------------------------------------------------------------
 # 6 - Could you please repeat step 5 but with cases defined using CTCAE-graded DM  >=3?
----------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 chrALL.2 <- NULL            
 for (j in 1:length(treatments)){
   
@@ -314,10 +314,10 @@ for (j in 1:length(treatments)){
 
 
 #-------------------------------------------------------------------------------
-## 7. Could you please use the treatment/case definition parameters set for 5
-## above but test for interaction (logit[y] ~ covariates + RV_burden +
-## RV_burden * treatment), changing the definitions of "covariates" based on how
-## you defined the treatment set in 5?
+# 7. Could you please use the treatment/case definition parameters set for 5
+# above but test for interaction (logit[y] ~ covariates + RV_burden +
+# RV_burden * treatment), changing the definitions of "covariates" based on how
+# you defined the treatment set in 5?
 #-------------------------------------------------------------------------------
 
 
@@ -504,3 +504,4 @@ chrALL.AFR[,c("SKAT", "SKATO", "BURDEN")] <- sapply(chrALL.AFR[,c("SKAT", "SKATO
 
 # write.table(chrALL.AFR, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/gene-based-analysis/geneset-AFR_chrALL_SKAT.pval", sep="\t", col.names=T, row.names=F, quote=F)
 
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/gene-based-analysis/additional_analysis_for_cindy.RData")
