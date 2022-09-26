@@ -234,7 +234,7 @@ chrALL[,c("SKAT", "SKATO", "BURDEN")] <- sapply(chrALL[,c("SKAT", "SKATO", "BURD
 sum(chrALL$SKATO < 1e-3)
 # 5
 
-write.table(chrALL, paste("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/gene-based-analysis/", set, "_chrALL","_SKAT.pval",sep=""), sep="\t", col.names=T, row.names=F, quote=F)
+write.table(chrALL, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/gene-based-analysis/geneset-EUR_chrALL_SKAT.pval", sep="\t", col.names=T, row.names=F, quote=F)
 
 
 ##################################################

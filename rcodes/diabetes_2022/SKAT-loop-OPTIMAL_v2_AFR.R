@@ -84,7 +84,7 @@ dim(diabetes29.ctcae)
 ## Extract samples with the most recent grade dates
 diabetes29.ctcae <- diabetes29.ctcae[tapply(1:nrow(diabetes29.ctcae),diabetes29.ctcae$sjlid,function(ii) ii[which.max(diabetes29.ctcae$grade.date[ii])]),]
 sum(covars$IID %in% covars$IID)
-# 3113
+# 575
 
 covars$ctcae_grade <- diabetes29.ctcae$grade[match(covars$IID, diabetes29.ctcae$sjlid)]
 covars$ctcae_grade[covars$ctcae_grade == -9 ] <- NA
@@ -101,7 +101,7 @@ covars$ctcae_grad_3_or_higher_YN <- ifelse(covars$ctcae_grade >= 3, "Y", "N")
 ################################################################
 
 com.data <- covars
-chrom <- 1:22
+chrom <- c(1:17, 19:22)
 for (j in 1:length(chrom)){
 print(paste0("Doing chr", j))
 chr<-chrom[j]
@@ -231,10 +231,10 @@ colnames(chrALL) <- chrALL[1,]
 chrALL <- chrALL[-1,]
 chrALL[,c("SKAT", "SKATO", "BURDEN")] <- sapply(chrALL[,c("SKAT", "SKATO", "BURDEN")], as.numeric)
 
-sum(chrALL$SKATO < 1e-3)
-# 5
+# sum(chrALL$SKATO < 1e-3)
+# 
 
-write.table(chrALL, paste("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/gene-based-analysis/", set, "_chrALL","_SKAT.pval",sep=""), sep="\t", col.names=T, row.names=F, quote=F)
+write.table(chrALL, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/gene-based-analysis/geneset-AFR_chrALL_SKAT.pval", sep="\t", col.names=T, row.names=F, quote=F)
 
 
 ##################################################
