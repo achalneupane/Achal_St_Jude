@@ -169,7 +169,7 @@ for (i in 1:length(datafiles)) {
 }
 
 
-# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//diabetes/gene-based-analysis/rare_variant_analysis.Rdata")
+# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//diabetes/gene-based-analysis/rare_variant_analysis_EUR.Rdata")
 
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//diabetes/gene-based-analysis/rare_variant_analysis_EUR.Rdata")
 
