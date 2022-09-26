@@ -121,17 +121,13 @@ study=$1
 ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/harmonize_alleles.R .
 study=Mavaddat_2019_ER_NEG_Breast
 # Subset PRS data for each study
-## remove chr1:145902073|chr4:57426897|chr6:114515866 from MichiganWeb_ER_OVERALL_Breast
-## remove chr4:57426897|chr6:114515866 from MichiganWeb_ER_POS_Breast
 awk -v study=$study '$6==study' all_cancer.txt > prs_out/all_cancer.txt_${study}
-# Remove variants from Mavaddat 2019 that are duplicated and are rare in gnomAD
-# awk -v study=$study '$6==study' all_cancer.txt | egrep -v 'chr1:51001424:C:CT|chr1:172359627:TA:T|chr2:39472369:CT:C|chr3:49672479:CT:C
-#' > prs_out/all_cancer.txt_${study} # MichiganWeb_ER_OVERALL_Breast
+
 # Check for duplicate variants based on chr:pos
 awk 'a[$1":"$2]++' prs_out/all_cancer.txt_$study | wc -l
-# Look for directly matching variants in the WGS data
+# Look for directly matching variants in the WGS data; Remove variants from Mavaddat 2019 that are duplicated and are rare in gnomAD
 awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/all_cancer.txt_$study plink_data/merged.dat.bim \
-| awk '($4==$6 || $4==$7) && ($5==$6 || $5==$7)' > prs_out/all_cancer.txt_${study}_direct_match
+| awk '($4==$6 || $4==$7) && ($5==$6 || $5==$7)'| egrep -v 'chr1:51001424:C:CT|chr1:172359627:TA:T|chr2:39472369:CT:C|chr3:49672479:CT:C|chr5:44508162:GT:G|chr5:56366713:CT:C|chr6:20537614:C:CA|chr6:81553832:A:AAT|chr7:140243902:C:CT|chr8:17930101:C:CT|chr10:22188847:A:ACC|chr10:93532430:C:CAA|chr17:45134972:CT:C|chr22:40508703:C:CT' > prs_out/all_cancer.txt_${study}_direct_match
 # No direct match
 awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/all_cancer.txt_$study plink_data/merged.dat.bim \
 | awk '!(($4==$6 || $4==$7) && ($5==$6 || $5==$7))' | grep -v DEL > prs_out/all_cancer.txt_${study}_no_direct_match
@@ -140,6 +136,8 @@ awk 'NR==FNR{a[$1":"$3];next}!($1":"$3 in a){print}' prs_out/all_cancer.txt_${st
 > prs_out/all_cancer.txt_${study}_no_direct_match_final
 
 wc -l prs_out/all_cancer.txt_${study}_no_direct_match_final
+
+
 
 
 # check how many in PRS and direct match
@@ -178,28 +176,28 @@ awk '{print $1":"$2, $4, $5}' prs_out/all_cancer.txt_$study > prs_out/${study}.p
 plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweight --out prs_out/${study}_prs
 
 
-## For errors with Mavaddat variants, first check the frequency
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/plink_data
-plink --bfile merged.dat --freq --out merged.data.freq
-awk '{print $1":"$3}' prs_out/all_cancer.txt_${study}_direct_match| uniq -c|sed 's/^[ \t]*//;s/[ \t]*$//'| grep ^2
-2 1:51001424
-2 1:172359627
-2 2:39472369
-2 3:49672479
-2 5:44508162
-2 5:56366713
-2 6:20537614
-2 6:81553832
-2 7:140243902
-2 8:17930101
-2 10:22188847
-2 10:93532430
-2 17:45134972
-2 22:40508703
+# ## For errors with Mavaddat variants, first check the frequency
+# cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/plink_data
+# plink --bfile merged.dat --freq --out merged.data.freq
+# awk '{print $1":"$3}' prs_out/all_cancer.txt_${study}_direct_match| uniq -c|sed 's/^[ \t]*//;s/[ \t]*$//'| grep ^2
+# 2 1:51001424
+# 2 1:172359627
+# 2 2:39472369
+# 2 3:49672479
+# 2 5:44508162
+# 2 5:56366713
+# 2 6:20537614
+# 2 6:81553832
+# 2 7:140243902
+# 2 8:17930101
+# 2 10:22188847
+# 2 10:93532430
+# 2 17:45134972
+# 2 22:40508703
 
-# Now check them individually and remove those that are not true
-grep 3:49672479 merged.data.freq.frq
-grep 3:49672479 ../prs_out/all_cancer.txt_${study}_direct_match
+# # Now check them individually and remove those that are not true
+# grep 22:40508703 merged.data.freq.frq
+# grep 22:40508703 ../prs_out/all_cancer.txt_${study}_direct_match
 #####################
 ## CCSS _ Original ##
 #####################
