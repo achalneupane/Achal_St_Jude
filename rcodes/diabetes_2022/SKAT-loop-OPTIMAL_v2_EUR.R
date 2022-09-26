@@ -39,39 +39,39 @@ sum(covars$IID %in% PHENO.ANY_SN$sjlid)
 # abdominalRT dose
 covars$maxabdrtdose <- PHENO.ANY_SN$maxabdrtdose[match(covars$IID, PHENO.ANY_SN$sjlid)]
 # abdominalRT_YN 
-covars$maxabdrtdose.exposed_more_than_200cGy_YN <- ifelse(covars$maxabdrtdose > 200, "Y", "N")
-covars$maxabdrtdose.exposed_500cGy_or_higher_YN <- ifelse(covars$maxabdrtdose >= 500, "Y", "N")
-covars$maxabdrtdose.exposed_1000cGy_or_higher_YN <- ifelse(covars$maxabdrtdose >= 1000, "Y", "N")
-covars$maxabdrtdose.exposed_1500cGy_or_higher_YN <- ifelse(covars$maxabdrtdose >= 1500, "Y", "N")
-covars$maxabdrtdose.exposed_2000cGy_or_higher_YN <- ifelse(covars$maxabdrtdose >= 2000, "Y", "N")
+covars$maxabdrtdose.exposed_more_than_200cGy_YN <- ifelse(covars$maxabdrtdose > 200, 1, 0)
+covars$maxabdrtdose.exposed_500cGy_or_higher_YN <- ifelse(covars$maxabdrtdose >= 500, 1, 0)
+covars$maxabdrtdose.exposed_1000cGy_or_higher_YN <- ifelse(covars$maxabdrtdose >= 1000, 1, 0)
+covars$maxabdrtdose.exposed_1500cGy_or_higher_YN <- ifelse(covars$maxabdrtdose >= 1500, 1, 0)
+covars$maxabdrtdose.exposed_2000cGy_or_higher_YN <- ifelse(covars$maxabdrtdose >= 2000, 1, 0)
 
 # PelvisRT dose
 covars$maxpelvisrtdose <- PHENO.ANY_SN$maxpelvisrtdose[match(covars$IID, PHENO.ANY_SN$sjlid)]
 # PelvisRT_YN
-covars$maxpelvisrtdose.exposed_more_than_200cGy_YN <- ifelse(covars$maxpelvisrtdose > 200, "Y", "N")
-covars$maxpelvisrtdose.exposed_500cGy_or_higher_YN <- ifelse(covars$maxpelvisrtdose >= 500, "Y", "N")
-covars$maxpelvisrtdose.exposed_1000cGy_or_higher_YN <- ifelse(covars$maxpelvisrtdose >= 1000, "Y", "N")
-covars$maxpelvisrtdose.exposed_1500cGy_or_higher_YN <- ifelse(covars$maxpelvisrtdose >= 1500, "Y", "N")
-covars$maxpelvisrtdose.exposed_2000cGy_or_higher_YN <- ifelse(covars$maxpelvisrtdose >= 2000, "Y", "N")
+covars$maxpelvisrtdose.exposed_more_than_200cGy_YN <- ifelse(covars$maxpelvisrtdose > 200, 1, 0)
+covars$maxpelvisrtdose.exposed_500cGy_or_higher_YN <- ifelse(covars$maxpelvisrtdose >= 500, 1, 0)
+covars$maxpelvisrtdose.exposed_1000cGy_or_higher_YN <- ifelse(covars$maxpelvisrtdose >= 1000, 1, 0)
+covars$maxpelvisrtdose.exposed_1500cGy_or_higher_YN <- ifelse(covars$maxpelvisrtdose >= 1500, 1, 0)
+covars$maxpelvisrtdose.exposed_2000cGy_or_higher_YN <- ifelse(covars$maxpelvisrtdose >= 2000, 1, 0)
 
 # Abdominal or Pelvic RT exposed
-covars$abd_OR_pelvis_exposed_more_than_200cGY_YN <- ifelse(covars$maxabdrtdose.exposed_more_than_200cGy_YN == "Y" |covars$maxpelvisrtdose.exposed_more_than_200cGy_YN == "Y", "Y","N")
-covars$abd_OR_pelvis.exposed_500cGy_or_higher_YN <- ifelse(covars$maxabdrtdose.exposed_500cGy_or_higher_YN == "Y" |covars$maxpelvisrtdose.exposed_500cGy_or_higher_YN == "Y", "Y","N")
-covars$abd_OR_pelvis.exposed_1000cGy_or_higher_YN <- ifelse(covars$maxabdrtdose.exposed_1000cGy_or_higher_YN == "Y" |covars$maxpelvisrtdose.exposed_1000cGy_or_higher_YN == "Y", "Y","N")
-covars$abd_OR_pelvis.exposed_1500cGy_or_higher_YN <- ifelse(covars$maxabdrtdose.exposed_1500cGy_or_higher_YN == "Y" |covars$maxpelvisrtdose.exposed_1500cGy_or_higher_YN == "Y", "Y","N")
-covars$abd_OR_pelvis.exposed_2000cGy_or_higher_YN <- ifelse(covars$maxabdrtdose.exposed_2000cGy_or_higher_YN == "Y" |covars$maxpelvisrtdose.exposed_2000cGy_or_higher_YN == "Y", "Y","N")
+covars$abd_OR_pelvis_exposed_more_than_200cGY_YN <- ifelse(covars$maxabdrtdose.exposed_more_than_200cGy_YN == 1 |covars$maxpelvisrtdose.exposed_more_than_200cGy_YN == 1, 1, 0)
+covars$abd_OR_pelvis.exposed_500cGy_or_higher_YN <- ifelse(covars$maxabdrtdose.exposed_500cGy_or_higher_YN == 1 |covars$maxpelvisrtdose.exposed_500cGy_or_higher_YN == 1, 1, 0)
+covars$abd_OR_pelvis.exposed_1000cGy_or_higher_YN <- ifelse(covars$maxabdrtdose.exposed_1000cGy_or_higher_YN == 1 |covars$maxpelvisrtdose.exposed_1000cGy_or_higher_YN == 1, 1, 0)
+covars$abd_OR_pelvis.exposed_1500cGy_or_higher_YN <- ifelse(covars$maxabdrtdose.exposed_1500cGy_or_higher_YN == 1 |covars$maxpelvisrtdose.exposed_1500cGy_or_higher_YN == 1, 1, 0)
+covars$abd_OR_pelvis.exposed_2000cGy_or_higher_YN <- ifelse(covars$maxabdrtdose.exposed_2000cGy_or_higher_YN == 1 |covars$maxpelvisrtdose.exposed_2000cGy_or_higher_YN == 1, 1, 0)
 
 # -------------------
 # 2 alkylating agents
 # -------------------
 # AA within 5 years of primary cancer
 covars$aa_class_dose_5 <- PHENO.ANY_SN$aa_class_dose_5[match(covars$IID, PHENO.ANY_SN$sjlid)]
-covars$aa_class_dose_5_YN <- ifelse(covars$aa_class_dose_5 > 0, "Y", "N" )
-covars$aa_class_dose_5_4000_or_higher_YN <- ifelse(covars$aa_class_dose_5 >= 4000, "Y", "N" )
+covars$aa_class_dose_5_YN <- ifelse(covars$aa_class_dose_5 > 0, 1, 0 )
+covars$aa_class_dose_5_4000_or_higher_YN <- ifelse(covars$aa_class_dose_5 >= 4000, 1, 0 )
 # AA Any
 covars$aa_class_dose_any <- PHENO.ANY_SN$aa_class_dose_any[match(covars$IID, PHENO.ANY_SN$sjlid)]
-covars$aa_class_dose_any_YN <- ifelse(covars$aa_class_dose_any > 0, "Y", "N" )
-covars$aa_class_dose_any_4000_or_higher_YN <- ifelse(covars$aa_class_dose_any >= 4000, "Y", "N" )
+covars$aa_class_dose_any_YN <- ifelse(covars$aa_class_dose_any > 0, 1, 0 )
+covars$aa_class_dose_any_4000_or_higher_YN <- ifelse(covars$aa_class_dose_any >= 4000, 1, 0 )
 
 # --------------------------------------------------------------------------------------------
 # 3. Could you please repeat step 5 but with cases defined using CTCAE-graded DM  >=3?; Re: 6
@@ -88,7 +88,7 @@ sum(covars$IID %in% covars$IID)
 
 covars$ctcae_grade <- diabetes29.ctcae$grade[match(covars$IID, diabetes29.ctcae$sjlid)]
 covars$ctcae_grade[covars$ctcae_grade == -9 ] <- NA
-covars$ctcae_grad_3_or_higher_YN <- ifelse(covars$ctcae_grade >= 3, "Y", "N")
+covars$ctcae_grad_3_or_higher_YN <- ifelse(covars$ctcae_grade >= 3, 1, 0)
 # ------------------------------------------------------------------------------
 # 4. Could you please use the treatment/case definition parameters set for 5 and
 # 6 above but test for interaction (logit[y] ~ covariates + RV_burden +
@@ -168,6 +168,7 @@ for (i in 1:length(datafiles)) {
   names(geneLIST)[i] <- genename
 }
 
+rm(covars)
 
 # save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//diabetes/gene-based-analysis/rare_variant_analysis_EUR.Rdata")
 
