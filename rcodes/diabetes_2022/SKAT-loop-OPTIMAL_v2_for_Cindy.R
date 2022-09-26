@@ -2,11 +2,11 @@
 ## Create variables for Cindy ##
 ################################
 # # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-# # 1. Could you please re-evaluate the top findings from this RV analysis with genes with SKAT-O P<1e-3 in treatment-stratified samples, per the following:; Re: 5
+# # 5. Could you please re-evaluate the top findings from this RV analysis with genes with SKAT-O P<1e-3 in treatment-stratified samples, per the following:; Re: 5
 # # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-# # 1.a. Cutoff: for exposed, define as >200 cGy
-# # 1.b. Cutoff: same as above, but for RT cutoffs at >=500 cGy vs <500, >=1000 cGy vs <1000, >=1500 cGy vs
-# # 1.c Cutoff : same as above, but abdominal OR pelvic RT exposed
+# # 5.a. Cutoff: for exposed, define as >200 cGy
+# # 5.b. Cutoff: same as above, but for RT cutoffs at >=500 cGy vs <500, >=1000 cGy vs <1000, >=1500 cGy vs
+# # 5.c Cutoff : same as above, but abdominal OR pelvic RT exposed
 # # abdominalRT dose
 # # abdominalRT_YN 
 # covars$maxabdrtdose.exposed_more_than_200cGy_YN <- ifelse(covars$maxabdrtdose > 200, "Y", "N")
@@ -31,9 +31,9 @@
 # covars$abd_OR_pelvis.exposed_1500cGy_or_higher_YN <- ifelse(covars$maxabdrtdose.exposed_1500cGy_or_higher_YN == "Y" |covars$maxpelvisrtdose.exposed_1500cGy_or_higher_YN == "Y", "Y","N")
 # covars$abd_OR_pelvis.exposed_2000cGy_or_higher_YN <- ifelse(covars$maxabdrtdose.exposed_2000cGy_or_higher_YN == "Y" |covars$maxpelvisrtdose.exposed_2000cGy_or_higher_YN == "Y", "Y","N")
 # 
-# # -------------------
-# # 2 alkylating agents
-# # -------------------
+# # ----------------------
+# # 5.d. alkylating agents
+# # ----------------------
 # # AA within 5 years of primary cancer
 # covars$aa_class_dose_5 <- PHENO.ANY_SN$aa_class_dose_5[match(covars$IID, PHENO.ANY_SN$sjlid)]
 # covars$aa_class_dose_5_YN <- ifelse(covars$aa_class_dose_5 > 0, "Y", "N" )
@@ -43,9 +43,9 @@
 # covars$aa_class_dose_any_YN <- ifelse(covars$aa_class_dose_any > 0, "Y", "N" )
 # covars$aa_class_dose_any_4000_or_higher_YN <- ifelse(covars$aa_class_dose_any >= 4000, "Y", "N" )
 # 
-# # --------------------------------------------------------------------------------------------
-# # 3. Could you please repeat step 5 but with cases defined using CTCAE-graded DM  >=3?; Re: 6
-# # --------------------------------------------------------------------------------------------
+# # ------------------------------------------------------------------------------------
+# # 6. Could you please repeat step 5 but with cases defined using CTCAE-graded DM  >=3?
+# # ------------------------------------------------------------------------------------
 # attach("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/diabetes/CTCAE Abnormal Glucose Metabolism Rows With Transient Hyperglycemia-Mapping Rows Removed For Yadav's Population (n=4747, rows=9349).Rda")
 # diabetes29.ctcae <- diabetes29.ctcae
 # detach("file:Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/diabetes/CTCAE Abnormal Glucose Metabolism Rows With Transient Hyperglycemia-Mapping Rows Removed For Yadav's Population (n=4747, rows=9349).Rda")
@@ -60,10 +60,11 @@
 # covars$ctcae_grade[covars$ctcae_grade == -9 ] <- NA
 # covars$ctcae_grad_3_or_higher_YN <- ifelse(covars$ctcae_grade >= 3, "Y", "N")
 # # ------------------------------------------------------------------------------
-# # 4. Could you please use the treatment/case definition parameters set for 5 and
+# # 7. Could you please use the treatment/case definition parameters set for 5 and
 # # 6 above but test for interaction (logit[y] ~ covariates + RV_burden +
 # # RV_burden * treatment), changing the definitions of "covariates" based on how
 # # you defined the treatment set in 5
+# # com.data$RV_Burden <- rowSums(SETgeno) # created for each gene below
 # # ------------------------------------------------------------------------------
 
 ##############
