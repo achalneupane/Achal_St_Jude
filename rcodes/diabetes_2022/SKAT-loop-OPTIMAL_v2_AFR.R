@@ -201,6 +201,9 @@ for (i in 1:length(geneLIST)) {
   y=as.matrix(com.data$t2d)
   table(y)
   
+  # Create RV_Burden variable
+  com.data$RV_Burden <- rowSums(SETgeno)
+  
   # MODEL adjusted by GWAS covars
   covariates = c("agedx","gender","age_last_visit","BMIadj","aa_class_dose_5","maxabdrtdose","PC1","PC2","PC3","PC4","PC5","PC6","PC7","PC8","PC9","PC10")
   index= which(colnames(com.data)%in%covariates)
