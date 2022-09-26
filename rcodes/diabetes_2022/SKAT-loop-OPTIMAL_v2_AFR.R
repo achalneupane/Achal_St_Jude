@@ -201,7 +201,7 @@ for (i in 1:length(geneLIST)) {
   y=as.matrix(com.data$t2d)
   table(y)
   
-  # MODEL adjusted by SEX and fisrt three PCs
+  # MODEL adjusted by GWAS covars
   covariates = c("agedx","gender","age_last_visit","BMIadj","aa_class_dose_5","maxabdrtdose","PC1","PC2","PC3","PC4","PC5","PC6","PC7","PC8","PC9","PC10")
   index= which(colnames(com.data)%in%covariates)
   Xm2=as.matrix(com.data[,index])
@@ -278,8 +278,12 @@ for (i in 1:length(geneLIST.wanted)) {
   y=as.matrix(com.data$t2d)
   table(y)
   
-  # MODEL adjusted by SEX and fisrt three PCs
+  # Create RV_Burden variable
+  com.data$RV_Burden <- rowSums(SETgeno)
+  
+  # MODEL adjusted
   covariates = c("agedx","gender","age_last_visit","BMIadj","aa_class_dose_5","maxabdrtdose","PC1","PC2","PC3","PC4","PC5","PC6","PC7","PC8","PC9","PC10")
+
   index= which(colnames(com.data)%in%covariates)
   Xm2=as.matrix(com.data[,index])
   obj<-SKAT_Null_Model(y ~ Xm2,out_type="D")
