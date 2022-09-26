@@ -253,8 +253,8 @@ write.table(chrALL, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/di
 
 genelist<-"GENE"
 SNPID<-"SNPID"
-N0<-"N0"
-N1<-"N1"
+N0<-"N0" # Number of input SNPs
+N1<-"N1" # Number of tested SNPs
 SKAT<-"SKAT"
 SKATO<-"SKATO"
 BURDEN<-"BURDEN"
