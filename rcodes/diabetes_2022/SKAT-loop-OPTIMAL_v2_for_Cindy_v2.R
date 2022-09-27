@@ -161,7 +161,7 @@ sum(chrALL.EUR$SKATO < 1e-3)
 wanted.genes <- chrALL.EUR$GENE[chrALL.EUR$SKATO < 1e-3]
 geneLIST.wanted <- geneLIST[names(geneLIST) %in% wanted.genes]
 
-
+# Loop over different treatment cutoffs requested by Cindy for request #5 and #6
 treatments <- c("maxabdrtdose.exposed_more_than_200cGy_YN", # abdominal RT
             "maxabdrtdose.exposed_500cGy_or_higher_YN",
             "maxabdrtdose.exposed_1000cGy_or_higher_YN",
@@ -169,15 +169,15 @@ treatments <- c("maxabdrtdose.exposed_more_than_200cGy_YN", # abdominal RT
             "maxabdrtdose.exposed_2000cGy_or_higher_YN",
             "aa_class_dose_5_YN", # aa_class_dose_5 (none vs any)
             "aa_class_dose_5_4000_or_higher_YN") # aa_class_dose_5 (>=4000 mg/m2 vs <4000 mg/m2)
-   
+ 
+
+### Exposed to treatments
 chrALL.exposed <- NULL   # stratified by treatment (exposed)         
 for (j in 1:length(treatments)){
 
 # subset data
-com.data.sub <- com.data[com.data[treatments[j]] == "1"  ,] # exposed
-    
-
-
+com.data.sub <- com.data[com.data[treatments[j]] == "1"  ,] # exposed to treatment
+  
 genelist<-"GENE"
 SNPID<-"SNPID"
 N0<-"N0"
@@ -202,7 +202,7 @@ for (i in 1:length(geneLIST.wanted)) {
 
   
   # Model adjust
-  covariates <- c("agedx","gender","age_last_visit","BMIadj", "maxabdrtdose","PC1","PC2","PC3","PC4","PC5","PC6","PC7","PC8","PC9","PC10")
+  covariates = c("agedx","gender","age_last_visit","BMIadj","aa_class_dose_5","maxabdrtdose","PC1","PC2","PC3","PC4","PC5","PC6","PC7","PC8","PC9","PC10")
   
 
   index= which(colnames(com.data.sub)%in%covariates)
@@ -238,15 +238,14 @@ chrALL.tmp$TREATMENT <- treatments[j]
 chrALL.exposed <- rbind.data.frame(chrALL.exposed, chrALL.tmp)
 }
 
-#--------------------------------------------------------------------------------------
-# 6 - Could you please repeat step 5 but with cases defined using CTCAE-graded DM  >=3?
-# ---------------------------------------------------------------------------------------
-chrALL.2 <- NULL            
+write.table(chrALL.exposed, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/gene-based-analysis/geneset-EUR_5.genes.exposed.to.treatments.t2d.as.caco.pval", sep="\t", col.names=T, row.names=F, quote=F)
+
+### Not exposed to treatments
+chrALL.not.exposed <- NULL   # stratified by treatment (not exposed)         
 for (j in 1:length(treatments)){
   
-  # Model adjust
-  covariates <- c("agedx","gender","age_last_visit","BMIadj","maxabdrtdose","PC1","PC2","PC3","PC4","PC5","PC6","PC7","PC8","PC9","PC10")
-  
+  # subset data
+  com.data.sub <- com.data[com.data[treatments[j]] == "0"  ,] # Not exposed to treatment
   
   genelist<-"GENE"
   SNPID<-"SNPID"
@@ -264,19 +263,19 @@ for (j in 1:length(treatments)){
     ### GET GENO DATA
     SETlist <- unname(rrapply(geneLIST.wanted[i],  how = 'unlist'))
     snpID<-paste(SETlist, collapse = ";")
-    SETgeno<-as.matrix(com.data[,SETlist])
+    SETgeno<-as.matrix(com.data.sub[,SETlist])
     
     ### Define y
-    # # 6 - Could you please repeat step 5 but with cases defined using CTCAE-graded DM  >=3?
-    y=as.matrix(com.data$ctcae_grad_3_or_higher_YN)
+    y=as.matrix(com.data.sub$t2d)
     table(y)
     
+    
     # Model adjust
-    covariates <- c("agedx","gender","age_last_visit","BMIadj", treatments[j],"PC1","PC2","PC3","PC4","PC5","PC6","PC7","PC8","PC9","PC10")
+    covariates = c("agedx","gender","age_last_visit","BMIadj","aa_class_dose_5","maxabdrtdose","PC1","PC2","PC3","PC4","PC5","PC6","PC7","PC8","PC9","PC10")
     
     
-    index= which(colnames(com.data)%in%covariates)
-    Xm2=as.matrix(com.data[,index])
+    index= which(colnames(com.data.sub)%in%covariates)
+    Xm2=as.matrix(com.data.sub[,index])
     
     
     obj<-SKAT_Null_Model(y ~ Xm2,out_type="D")
@@ -305,10 +304,154 @@ for (j in 1:length(treatments)){
   chrALL.tmp <- chrALL.tmp[-1,]
   chrALL.tmp[,c("SKAT", "SKATO", "BURDEN")] <- sapply(chrALL.tmp[,c("SKAT", "SKATO", "BURDEN")], as.numeric)
   chrALL.tmp$TREATMENT <- treatments[j]
-  chrALL.2 <- rbind.data.frame(chrALL.2, chrALL.tmp)
+  chrALL.not.exposed <- rbind.data.frame(chrALL.not.exposed, chrALL.tmp)
 }
 
+write.table(chrALL.not.exposed, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/gene-based-analysis/geneset-EUR_5.genes.not.exposed.to.treatments.t2d.as.caco.pval", sep="\t", col.names=T, row.names=F, quote=F)
 
+#--------------------------------------------------------------------------------------
+# 6 - Could you please repeat step 5 but with cases defined using CTCAE-graded DM  >=3?
+# -------------------------------------------------------------------------------------
+### Exposed to treatments
+chrALL.2.exposed <- NULL            
+for (j in 1:length(treatments)){
+  
+  # subset data
+  com.data.sub <- com.data[com.data[treatments[j]] == "0"  ,] # Not exposed to treatment
+  
+  
+  genelist<-"GENE"
+  SNPID<-"SNPID"
+  N0<-"N0"
+  N1<-"N1"
+  SKAT<-"SKAT"
+  SKATO<-"SKATO"
+  BURDEN<-"BURDEN"
+  ### START loop over list of genes
+  for (i in 1:length(geneLIST.wanted)) {
+    print(i)
+    genename=names(geneLIST.wanted[i])
+    print(genename)
+    
+    ### GET GENO DATA
+    SETlist <- unname(rrapply(geneLIST.wanted[i],  how = 'unlist'))
+    snpID<-paste(SETlist, collapse = ";")
+    SETgeno<-as.matrix(com.data.sub[,SETlist])
+    
+    ### Define y
+    # # 6 - Could you please repeat step 5 but with cases defined using CTCAE-graded DM  >=3?
+    y=as.matrix(com.data.sub$ctcae_grad_3_or_higher_YN)
+    table(y)
+    
+    # Model adjust
+    covariates = c("agedx","gender","age_last_visit","BMIadj","aa_class_dose_5","maxabdrtdose","PC1","PC2","PC3","PC4","PC5","PC6","PC7","PC8","PC9","PC10")
+    
+    
+    index= which(colnames(com.data.sub)%in%covariates)
+    Xm2=as.matrix(com.data.sub[,index])
+    
+    
+    obj<-SKAT_Null_Model(y ~ Xm2,out_type="D")
+    n0<-SKAT(SETgeno, obj, kernel = "linear.weighted")$param$n.marker	# n input SNPs
+    n1<-SKAT(SETgeno, obj, kernel = "linear.weighted")$param$n.marker.test # n ouptut SNPs
+    skat<-SKAT(SETgeno, obj, kernel = "linear.weighted")$p.value
+    skato<-SKAT(SETgeno, obj, kernel = "linear.weighted", method="optimal.adj")$p.value
+    ## Burden can be stated in two different ways
+    # burden<-SKAT(SETgeno, obj, kernel = "linear.weighted", method="Burden")$p.value
+    burden<-SKAT(SETgeno, obj, kernel = "linear.weighted", method="davies", r.corr =1)$p.value
+    
+    ## add values to lists
+    genelist<-rbind(genelist,genename)
+    SNPID<-rbind(SNPID,snpID)
+    N0<-rbind(N0,n0)
+    N1<-rbind(N1,n1)
+    
+    SKAT<-rbind(SKAT,skat)
+    SKATO<-rbind(SKATO,skato)
+    BURDEN <- rbind(BURDEN, burden)
+  }
+  
+  
+  chrALL.tmp <- cbind.data.frame(genelist,SNPID,N0,N1,SKAT,SKATO,BURDEN)
+  colnames(chrALL.tmp) <- chrALL.tmp[1,]
+  chrALL.tmp <- chrALL.tmp[-1,]
+  chrALL.tmp[,c("SKAT", "SKATO", "BURDEN")] <- sapply(chrALL.tmp[,c("SKAT", "SKATO", "BURDEN")], as.numeric)
+  chrALL.tmp$TREATMENT <- treatments[j]
+  chrALL.2.exposed <- rbind.data.frame(chrALL.2.exposed, chrALL.tmp)
+}
+
+write.table(chrALL.2.exposed, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/gene-based-analysis/geneset-EUR_5.genes.exposed.to.treatments.CTCAE.gt.3.as.caco.pval", sep="\t", col.names=T, row.names=F, quote=F)
+
+
+### Not exposed to treatments
+chrALL.2.not.exposed <- NULL            
+for (j in 1:length(treatments)){
+  
+  # subset data
+  com.data.sub <- com.data[com.data[treatments[j]] == "1"  ,] # exposed to treatment
+  
+  
+  genelist<-"GENE"
+  SNPID<-"SNPID"
+  N0<-"N0"
+  N1<-"N1"
+  SKAT<-"SKAT"
+  SKATO<-"SKATO"
+  BURDEN<-"BURDEN"
+  ### START loop over list of genes
+  for (i in 1:length(geneLIST.wanted)) {
+    print(i)
+    genename=names(geneLIST.wanted[i])
+    print(genename)
+    
+    ### GET GENO DATA
+    SETlist <- unname(rrapply(geneLIST.wanted[i],  how = 'unlist'))
+    snpID<-paste(SETlist, collapse = ";")
+    SETgeno<-as.matrix(com.data.sub[,SETlist])
+    
+    ### Define y
+    # # 6 - Could you please repeat step 5 but with cases defined using CTCAE-graded DM  >=3?
+    y=as.matrix(com.data.sub$ctcae_grad_3_or_higher_YN)
+    table(y)
+    
+    # Model adjust
+    covariates = c("agedx","gender","age_last_visit","BMIadj","aa_class_dose_5","maxabdrtdose","PC1","PC2","PC3","PC4","PC5","PC6","PC7","PC8","PC9","PC10")
+    
+    
+    index= which(colnames(com.data.sub)%in%covariates)
+    Xm2=as.matrix(com.data.sub[,index])
+    
+    
+    obj<-SKAT_Null_Model(y ~ Xm2,out_type="D")
+    n0<-SKAT(SETgeno, obj, kernel = "linear.weighted")$param$n.marker	# n input SNPs
+    n1<-SKAT(SETgeno, obj, kernel = "linear.weighted")$param$n.marker.test # n ouptut SNPs
+    skat<-SKAT(SETgeno, obj, kernel = "linear.weighted")$p.value
+    skato<-SKAT(SETgeno, obj, kernel = "linear.weighted", method="optimal.adj")$p.value
+    ## Burden can be stated in two different ways
+    # burden<-SKAT(SETgeno, obj, kernel = "linear.weighted", method="Burden")$p.value
+    burden<-SKAT(SETgeno, obj, kernel = "linear.weighted", method="davies", r.corr =1)$p.value
+    
+    ## add values to lists
+    genelist<-rbind(genelist,genename)
+    SNPID<-rbind(SNPID,snpID)
+    N0<-rbind(N0,n0)
+    N1<-rbind(N1,n1)
+    
+    SKAT<-rbind(SKAT,skat)
+    SKATO<-rbind(SKATO,skato)
+    BURDEN <- rbind(BURDEN, burden)
+  }
+  
+  
+  chrALL.tmp <- cbind.data.frame(genelist,SNPID,N0,N1,SKAT,SKATO,BURDEN)
+  colnames(chrALL.tmp) <- chrALL.tmp[1,]
+  chrALL.tmp <- chrALL.tmp[-1,]
+  chrALL.tmp[,c("SKAT", "SKATO", "BURDEN")] <- sapply(chrALL.tmp[,c("SKAT", "SKATO", "BURDEN")], as.numeric)
+  chrALL.tmp$TREATMENT <- treatments[j]
+  chrALL.2.not.exposed <- rbind.data.frame(chrALL.2.not.exposed, chrALL.tmp)
+}
+
+write.table(chrALL.2.not.exposed, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/gene-based-analysis/geneset-EUR_5.genes.not.exposed.to.treatments.CTCAE.gt.3.as.caco.pval", sep="\t", col.names=T, row.names=F, quote=F)
 
 #-------------------------------------------------------------------------------
 # 7. Could you please use the treatment/case definition parameters set for 5
@@ -316,8 +459,6 @@ for (j in 1:length(treatments)){
 # RV_burden * treatment), changing the definitions of "covariates" based on how
 # you defined the treatment set in 5?
 #-------------------------------------------------------------------------------
-
-
 RV_BURDEN_INTERACTION <- "RV_BURDEN_INTERACTION"
 ### START loop over list of genes
 
@@ -364,6 +505,7 @@ for (i in 1:length(geneLIST.wanted)) {
 }
 }
 
+write.table(RV_BURDEN_INTERACTION, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/gene-based-analysis/geneset-EUR_5.genes.RV_BURDEN_INTERACTION.t2d.as.caco.pval", sep="\t", col.names=T, row.names=F, quote=F)
 
 #-------------------------------------------------------------------------------
 ## 7. Could you please use the treatment/case definition parameters set for 
@@ -415,12 +557,12 @@ for (h in 1:length (formula)){
   }
 }
 
-
+write.table(RV_BURDEN_INTERACTION.2, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/gene-based-analysis/geneset-EUR_5.genes.RV_BURDEN_INTERACTION.CTCAE.gt.3.as.caco.pval", sep="\t", col.names=T, row.names=F, quote=F)
 
 #############
 ## AFRICAN ##
 #############
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//diabetes/gene-based-analysis/rare_variant_analysis_AFR.Rdata")
+# load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//diabetes/gene-based-analysis/rare_variant_analysis_AFR.Rdata")
 
 ## Run rare variant analysis; loop through genes
 genelist<-"GENE"
