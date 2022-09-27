@@ -74,7 +74,8 @@
 ##############
 ## EUROPEAN ##
 ##############
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//diabetes/gene-based-analysis/rare_variant_analysis_EUR.Rdata")
+# load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//diabetes/gene-based-analysis/rare_variant_analysis_EUR.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/gene-based-analysis/additional_analysis_for_cindy.RData")
 #-----------------------------------------------------------------------
 ## Run rare variant analysis using covars as in GWAS; loop through genes
 #-----------------------------------------------------------------------
@@ -504,4 +505,4 @@ chrALL.AFR[,c("SKAT", "SKATO", "BURDEN")] <- sapply(chrALL.AFR[,c("SKAT", "SKATO
 
 # write.table(chrALL.AFR, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/gene-based-analysis/geneset-AFR_chrALL_SKAT.pval", sep="\t", col.names=T, row.names=F, quote=F)
 
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/gene-based-analysis/additional_analysis_for_cindy.RData")
+# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/gene-based-analysis/additional_analysis_for_cindy.RData")
