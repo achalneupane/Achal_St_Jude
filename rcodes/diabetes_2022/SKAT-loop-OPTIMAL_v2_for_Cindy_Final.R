@@ -20,21 +20,7 @@
 # com.data$maxabdrtdose.exposed_1000cGy_or_higher_YN <- ifelse(com.data$maxabdrtdose >= 1000, 1, 0)
 # com.data$maxabdrtdose.exposed_1500cGy_or_higher_YN <- ifelse(com.data$maxabdrtdose >= 1500, 1, 0)
 # com.data$maxabdrtdose.exposed_2000cGy_or_higher_YN <- ifelse(com.data$maxabdrtdose >= 2000, 1, 0)
-# 
-# # PelvisRT_YN
-# com.data$maxpelvisrtdose.exposed_more_than_200cGy_YN <- ifelse(com.data$maxpelvisrtdose > 200, 1, 0)
-# com.data$maxpelvisrtdose.exposed_500cGy_or_higher_YN <- ifelse(com.data$maxpelvisrtdose >= 500, 1, 0)
-# com.data$maxpelvisrtdose.exposed_1000cGy_or_higher_YN <- ifelse(com.data$maxpelvisrtdose >= 1000, 1, 0)
-# com.data$maxpelvisrtdose.exposed_1500cGy_or_higher_YN <- ifelse(com.data$maxpelvisrtdose >= 1500, 1, 0)
-# com.data$maxpelvisrtdose.exposed_2000cGy_or_higher_YN <- ifelse(com.data$maxpelvisrtdose >= 2000, 1, 0)
-# 
-# # Abdominal or Pelvic RT exposed
-# com.data$abd_OR_pelvis_exposed_more_than_200cGY_YN <- ifelse(com.data$maxabdrtdose.exposed_more_than_200cGy_YN == 1 |com.data$maxpelvisrtdose.exposed_more_than_200cGy_YN == 1, 1,0)
-# com.data$abd_OR_pelvis.exposed_500cGy_or_higher_YN <- ifelse(com.data$maxabdrtdose.exposed_500cGy_or_higher_YN == 1 |com.data$maxpelvisrtdose.exposed_500cGy_or_higher_YN == 1, 1,0)
-# com.data$abd_OR_pelvis.exposed_1000cGy_or_higher_YN <- ifelse(com.data$maxabdrtdose.exposed_1000cGy_or_higher_YN == 1 |com.data$maxpelvisrtdose.exposed_1000cGy_or_higher_YN == 1, 1,0)
-# com.data$abd_OR_pelvis.exposed_1500cGy_or_higher_YN <- ifelse(com.data$maxabdrtdose.exposed_1500cGy_or_higher_YN == 1 |com.data$maxpelvisrtdose.exposed_1500cGy_or_higher_YN == 1, 1,0)
-# com.data$abd_OR_pelvis.exposed_2000cGy_or_higher_YN <- ifelse(com.data$maxabdrtdose.exposed_2000cGy_or_higher_YN == 1 |com.data$maxpelvisrtdose.exposed_2000cGy_or_higher_YN == 1, 1,0)
-# 
+
 # # ----------------------
 # # 5.d. alkylating agents
 # # ----------------------
