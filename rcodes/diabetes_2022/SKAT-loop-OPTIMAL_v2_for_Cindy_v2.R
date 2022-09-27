@@ -460,8 +460,8 @@ write.table(chrALL.2.not.exposed, "Z:/ResearchHome/Groups/sapkogrp/projects/Geno
 # you defined the treatment set in 5?
 #-------------------------------------------------------------------------------
 RV_BURDEN_INTERACTION <- "RV_BURDEN_INTERACTION"
-### START loop over list of genes
 
+### START loop over formula
 formula = c("t2d ~ agedx + gender + age_last_visit + BMIadj + maxabdrtdose.exposed_more_than_200cGy_YN + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10 + RV_Burden + RV_Burden*maxabdrtdose.exposed_more_than_200cGy_YN", # abdominal RT
             "t2d ~ agedx + gender + age_last_visit + BMIadj + maxabdrtdose.exposed_500cGy_or_higher_YN + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10 + RV_Burden + RV_Burden*maxabdrtdose.exposed_500cGy_or_higher_YN",
             "t2d ~ agedx + gender + age_last_visit + BMIadj + maxabdrtdose.exposed_1000cGy_or_higher_YN + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10 + RV_Burden + RV_Burden*maxabdrtdose.exposed_1000cGy_or_higher_YN",
@@ -476,7 +476,7 @@ formula = c("t2d ~ agedx + gender + age_last_visit + BMIadj + maxabdrtdose.expos
 RV_BURDEN_INTERACTION <- NULL
 
 for (h in 1:length (formula)){
-
+### START loop over list of genes
 for (i in 1:length(geneLIST.wanted)) {
   print(i)
   genename=names(geneLIST.wanted[i])
@@ -514,8 +514,7 @@ write.table(RV_BURDEN_INTERACTION, "Z:/ResearchHome/Groups/sapkogrp/projects/Gen
 ## you defined the treatment set in 5?
 #-------------------------------------------------------------------------------
 
-### Case/Control based on CTCAE-graded DM  >=3
-
+### Case/Control based on CTCAE-graded DM  >=3; START loop over formula
 formula = c("ctcae_grad_3_or_higher_YN ~ agedx + gender + age_last_visit + BMIadj + maxabdrtdose.exposed_more_than_200cGy_YN + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10 + RV_Burden + RV_Burden*maxabdrtdose.exposed_more_than_200cGy_YN", # abdominal RT
             "ctcae_grad_3_or_higher_YN ~ agedx + gender + age_last_visit + BMIadj + maxabdrtdose.exposed_500cGy_or_higher_YN + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10 + RV_Burden + RV_Burden*maxabdrtdose.exposed_500cGy_or_higher_YN",
             "ctcae_grad_3_or_higher_YN ~ agedx + gender + age_last_visit + BMIadj + maxabdrtdose.exposed_1000cGy_or_higher_YN + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10 + RV_Burden + RV_Burden*maxabdrtdose.exposed_1000cGy_or_higher_YN",
@@ -528,7 +527,7 @@ formula = c("ctcae_grad_3_or_higher_YN ~ agedx + gender + age_last_visit + BMIad
 RV_BURDEN_INTERACTION.2 <- NULL
 
 for (h in 1:length (formula)){
-  
+### START loop over list of genes
   for (i in 1:length(geneLIST.wanted)) {
     print(i)
     genename=names(geneLIST.wanted[i])
