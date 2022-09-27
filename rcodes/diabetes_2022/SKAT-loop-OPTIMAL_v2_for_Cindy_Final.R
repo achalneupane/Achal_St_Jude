@@ -163,7 +163,8 @@ for (j in 1:length(treatments)){
 
 # subset data
 com.data.sub <- com.data[com.data[treatments[j]] == "1"  ,] # exposed to treatment
-  
+
+
 genelist<-"GENE"
 SNPID<-"SNPID"
 N0<-"N0"
@@ -171,6 +172,8 @@ N1<-"N1"
 SKAT<-"SKAT"
 SKATO<-"SKATO"
 BURDEN<-"BURDEN"
+CASES<-"CASES"
+CONTROLS<-"CONTROLS"
 ### START loop over list of genes
 for (i in 1:length(geneLIST.wanted)) {
   print(i)
@@ -182,10 +185,13 @@ for (i in 1:length(geneLIST.wanted)) {
   snpID<-paste(SETlist, collapse = ";")
   SETgeno<-as.matrix(com.data.sub[,SETlist])
   
+  # Count CA/CO
+  cases=sum(com.data.sub$t2d == 1, na.rm = T)
+  controls=sum(com.data.sub$t2d == 0, na.rm = T)
+  
   ### Define y
   y=as.matrix(com.data.sub$t2d)
   table(y)
-
   
   # Model adjust
   covariates = c("agedx","gender","age_last_visit","BMIadj","aa_class_dose_5","maxabdrtdose","PC1","PC2","PC3","PC4","PC5","PC6","PC7","PC8","PC9","PC10")
@@ -213,10 +219,12 @@ for (i in 1:length(geneLIST.wanted)) {
   SKAT<-rbind(SKAT,skat)
   SKATO<-rbind(SKATO,skato)
   BURDEN <- rbind(BURDEN, burden)
+  CASES <- rbind(CASES, cases)
+  CONTROLS <- rbind(CONTROLS, controls)
 }
 
 
-chrALL.tmp <- cbind.data.frame(genelist,SNPID,N0,N1,SKAT,SKATO,BURDEN)
+chrALL.tmp <- cbind.data.frame(genelist,SNPID,N0,N1,SKAT,SKATO,BURDEN,CASES,CONTROLS)
 colnames(chrALL.tmp) <- chrALL.tmp[1,]
 chrALL.tmp <- chrALL.tmp[-1,]
 chrALL.tmp[,c("SKAT", "SKATO", "BURDEN")] <- sapply(chrALL.tmp[,c("SKAT", "SKATO", "BURDEN")], as.numeric)
@@ -240,6 +248,8 @@ for (j in 1:length(treatments)){
   SKAT<-"SKAT"
   SKATO<-"SKATO"
   BURDEN<-"BURDEN"
+  CASES<-"CASES"
+  CONTROLS<-"CONTROLS"
   ### START loop over list of genes
   for (i in 1:length(geneLIST.wanted)) {
     print(i)
@@ -250,6 +260,10 @@ for (j in 1:length(treatments)){
     SETlist <- unname(rrapply(geneLIST.wanted[i],  how = 'unlist'))
     snpID<-paste(SETlist, collapse = ";")
     SETgeno<-as.matrix(com.data.sub[,SETlist])
+    
+    # Count CA/CO
+    cases=sum(com.data.sub$t2d == 1, na.rm = T)
+    controls=sum(com.data.sub$t2d == 0, na.rm = T)
     
     ### Define y
     y=as.matrix(com.data.sub$t2d)
@@ -285,7 +299,7 @@ for (j in 1:length(treatments)){
   }
   
   
-  chrALL.tmp <- cbind.data.frame(genelist,SNPID,N0,N1,SKAT,SKATO,BURDEN)
+  chrALL.tmp <- cbind.data.frame(genelist,SNPID,N0,N1,SKAT,SKATO,BURDEN,CASES,CONTROLS)
   colnames(chrALL.tmp) <- chrALL.tmp[1,]
   chrALL.tmp <- chrALL.tmp[-1,]
   chrALL.tmp[,c("SKAT", "SKATO", "BURDEN")] <- sapply(chrALL.tmp[,c("SKAT", "SKATO", "BURDEN")], as.numeric)
@@ -313,6 +327,8 @@ for (j in 1:length(treatments)){
   SKAT<-"SKAT"
   SKATO<-"SKATO"
   BURDEN<-"BURDEN"
+  CASES<-"CASES"
+  CONTROLS<-"CONTROLS"
   ### START loop over list of genes
   for (i in 1:length(geneLIST.wanted)) {
     print(i)
@@ -323,6 +339,10 @@ for (j in 1:length(treatments)){
     SETlist <- unname(rrapply(geneLIST.wanted[i],  how = 'unlist'))
     snpID<-paste(SETlist, collapse = ";")
     SETgeno<-as.matrix(com.data.sub[,SETlist])
+    
+    # Count CA/CO
+    cases=sum(com.data.sub$t2d == 1, na.rm = T)
+    controls=sum(com.data.sub$t2d == 0, na.rm = T)
     
     ### Define y
     # # 6 - Could you please repeat step 5 but with cases defined using CTCAE-graded DM  >=3?
@@ -358,7 +378,7 @@ for (j in 1:length(treatments)){
   }
   
   
-  chrALL.tmp <- cbind.data.frame(genelist,SNPID,N0,N1,SKAT,SKATO,BURDEN)
+  chrALL.tmp <- cbind.data.frame(genelist,SNPID,N0,N1,SKAT,SKATO,BURDEN,CASES,CONTROLS)
   colnames(chrALL.tmp) <- chrALL.tmp[1,]
   chrALL.tmp <- chrALL.tmp[-1,]
   chrALL.tmp[,c("SKAT", "SKATO", "BURDEN")] <- sapply(chrALL.tmp[,c("SKAT", "SKATO", "BURDEN")], as.numeric)
@@ -384,6 +404,8 @@ for (j in 1:length(treatments)){
   SKAT<-"SKAT"
   SKATO<-"SKATO"
   BURDEN<-"BURDEN"
+  CASES<-"CASES"
+  CONTROLS<-"CONTROLS"
   ### START loop over list of genes
   for (i in 1:length(geneLIST.wanted)) {
     print(i)
@@ -394,6 +416,10 @@ for (j in 1:length(treatments)){
     SETlist <- unname(rrapply(geneLIST.wanted[i],  how = 'unlist'))
     snpID<-paste(SETlist, collapse = ";")
     SETgeno<-as.matrix(com.data.sub[,SETlist])
+    
+    # Count CA/CO
+    cases=sum(com.data.sub$t2d == 1, na.rm = T)
+    controls=sum(com.data.sub$t2d == 0, na.rm = T)
     
     ### Define y
     # # 6 - Could you please repeat step 5 but with cases defined using CTCAE-graded DM  >=3?
@@ -429,7 +455,7 @@ for (j in 1:length(treatments)){
   }
   
   
-  chrALL.tmp <- cbind.data.frame(genelist,SNPID,N0,N1,SKAT,SKATO,BURDEN)
+  chrALL.tmp <- cbind.data.frame(genelist,SNPID,N0,N1,SKAT,SKATO,BURDEN,CASES,CONTROLS)
   colnames(chrALL.tmp) <- chrALL.tmp[1,]
   chrALL.tmp <- chrALL.tmp[-1,]
   chrALL.tmp[,c("SKAT", "SKATO", "BURDEN")] <- sapply(chrALL.tmp[,c("SKAT", "SKATO", "BURDEN")], as.numeric)
@@ -481,13 +507,11 @@ for (i in 1:length(geneLIST.wanted)) {
   fit.df <- setNames(as.data.frame(coef(summary(glm.fit))[,4]), "P")
   fit.df$VAR <- rownames(fit.df)
   
-  fit.df <- fit.df[grepl("RV", fit.df$VAR),]
+  fit.df <- fit.df[grepl(":RV", fit.df$VAR),]
   
-  for (j in 1:nrow(fit.df)){
-  RV_BURDEN_INTERACTION.tmp <- cbind.data.frame(genename, fit.df[j,2],fit.df[j,1], formula[h])
+  RV_BURDEN_INTERACTION.tmp <- cbind.data.frame(genename, fit.df[1,2],fit.df[1,1], formula[h])
   colnames(RV_BURDEN_INTERACTION.tmp) <- c("GENE", "VAR", "P", "formula")
   RV_BURDEN_INTERACTION <- rbind.data.frame(RV_BURDEN_INTERACTION, RV_BURDEN_INTERACTION.tmp)  
-  }
   
 }
 }
@@ -533,13 +557,11 @@ for (h in 1:length (formula)){
     fit.df <- setNames(as.data.frame(coef(summary(glm.fit))[,4]), "P")
     fit.df$VAR <- rownames(fit.df)
     
-    fit.df <- fit.df[grepl("RV", fit.df$VAR),]
+    fit.df <- fit.df[grepl(":RV", fit.df$VAR),]
     
-    for (j in 1:nrow(fit.df)){
-      RV_BURDEN_INTERACTION.tmp <- cbind.data.frame(genename, fit.df[j,2],fit.df[j,1], formula[h])
+      RV_BURDEN_INTERACTION.tmp <- cbind.data.frame(genename, fit.df[1,2],fit.df[1,1], formula[h])
       colnames(RV_BURDEN_INTERACTION.tmp) <- c("GENE", "VAR", "P", "formula")
       RV_BURDEN_INTERACTION.2 <- rbind.data.frame(RV_BURDEN_INTERACTION.2, RV_BURDEN_INTERACTION.tmp)  
-    }
     
   }
 }
