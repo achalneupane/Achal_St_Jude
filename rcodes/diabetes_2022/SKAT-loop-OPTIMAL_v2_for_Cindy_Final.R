@@ -296,6 +296,8 @@ for (j in 1:length(treatments)){
     SKAT<-rbind(SKAT,skat)
     SKATO<-rbind(SKATO,skato)
     BURDEN <- rbind(BURDEN, burden)
+    CASES <- rbind(CASES, cases)
+    CONTROLS <- rbind(CONTROLS, controls)
   }
   
   
@@ -375,6 +377,8 @@ for (j in 1:length(treatments)){
     SKAT<-rbind(SKAT,skat)
     SKATO<-rbind(SKATO,skato)
     BURDEN <- rbind(BURDEN, burden)
+    CASES <- rbind(CASES, cases)
+    CONTROLS <- rbind(CONTROLS, controls)
   }
   
   
@@ -452,6 +456,8 @@ for (j in 1:length(treatments)){
     SKAT<-rbind(SKAT,skat)
     SKATO<-rbind(SKATO,skato)
     BURDEN <- rbind(BURDEN, burden)
+    CASES <- rbind(CASES, cases)
+    CONTROLS <- rbind(CONTROLS, controls)
   }
   
   
