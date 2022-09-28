@@ -61,6 +61,7 @@
 ## EUROPEAN ##
 ##############
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//diabetes/gene-based-analysis/rare_variant_analysis_EUR.Rdata")
+
 #-----------------------------------------------------------------------
 ## Run rare variant analysis using covars as in GWAS; loop through genes
 #-----------------------------------------------------------------------
@@ -577,7 +578,8 @@ write.table(RV_BURDEN_INTERACTION.2, "Z:/ResearchHome/Groups/sapkogrp/projects/G
 #############
 ## AFRICAN ##
 #############
-# load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//diabetes/gene-based-analysis/rare_variant_analysis_AFR.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//diabetes/gene-based-analysis/rare_variant_analysis_AFR.Rdata")
+
 
 ## Run rare variant analysis; loop through genes
 genelist<-"GENE"
