@@ -75,6 +75,11 @@ cat <<\EoF > extract_vars_GRCH37.bed
 21 37518705 37518706 rs1056892 G A,
 EoF
 
+
+samples	rs17863783	rs4149178	rs7853758	rs2229774	rs4982753	rs2232228	rs1786814	rs1056892
+samples	2:234602277:G:T	6:43272188:A:G	9:86900926:G:A	12:53605545:G:A	14:23814569:C:T	16:69143577:A:G	18:35077028:G:A	21:37518706:G:A
+
+
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/yutaka_request_09_27_2022
 ln -s ../CCSS_exp_biallelic*vcf.gz* .
 
