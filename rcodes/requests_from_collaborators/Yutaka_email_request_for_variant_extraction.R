@@ -15,13 +15,26 @@ colnames(raw) = HEADER
 raw <- raw[!grepl("chr9.84286010.A.G|FID|PAT|MAT|SEX|PHENOTYPE", colnames(raw))]
 colnames(raw) # check this with the .bim REF and NON-REFERENCE alleles
 
+
+rownames(raw) <- raw$IID
+raw <- raw[!grepl("IID", colnames(raw))]
+
 df.list <- list()
-for (i in 1:ncol(df)){
-  i=1
-df.list <- cbind.data.frame(sapply(strsplit(df$chr12.53211761.G.A, "="), `[`, 1), sapply(strsplit(df$chr12.53211761.G.A, "="), `[`, 2))
+for (i in 1:ncol(raw)){
+  # i=1
+df.list.tmp <- raw[i]
 
-colnames(df.list) <- c(colnames(df)[i], "genotype")
-REF = unlist(strsplit(colnames(df)[i], "\\."))[3]
-ALT = unlist(strsplit(colnames(df)[i], "\\."))[4]
+REF = unlist(strsplit(colnames(df.list.tmp), "\\."))[3]
+ALT = unlist(strsplit(colnames(df.list.tmp), "\\."))[4]
 
+df.list.tmp$genotype <- as.character(df.list.tmp[,1])
+df.list.tmp$genotype <- gsub("0", paste0(REF,REF), df.list.tmp$genotype)
+df.list.tmp$genotype <- gsub("1", paste0(REF,ALT), df.list.tmp$genotype)
+df.list.tmp$genotype <- gsub("2", paste0(ALT,ALT), df.list.tmp$genotype)
+df.list.tmp$samples <- row.names(df.list.tmp)
+colnames(df.list.tmp)
+df.list.tmp <- df.list.tmp[, c("samples", "genotype")]
+df.list[[i]] <- df.list.tmp
 }
+
+cc <- bind_rows(df.list, .id = "samples")
