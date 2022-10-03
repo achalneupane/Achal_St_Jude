@@ -203,26 +203,30 @@ plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweigh
 #####################
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38
 
-ln -s ../chr*.dose.vcf.gz .
+ln -s ../chr*.dose.vcf.gz* .
 ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/all_cancer.txt .
 
 # awk 'BEGIN { FS="\t"; OFS="\t" } { $1="chr"$1; $2=$2-1 "\t" $2 } 1' all_cancer.txt| sed '1d' > all_cancer1.bed
 # awk 'BEGIN { FS="\t"; OFS="\t" } { $1="chr"$1 } 1' all_cancer.txt| sed '1d' > all_cancer1.bed
+# awk 'BEGIN { FS="\t"; OFS="\t" } { $1="chr"$1; $2=$2-1 "\t" $2 } 1' all_cancer.txt| cut -d$'\t' -f1-3,1-3| sed '1d' > all_cancer1.bed
+
+awk '{print "chr"$1"\t"$2-1"\t"$2"\t""chr"$1":"$2-1"-"$2 }' all_cancer.txt| sed '1d' > all_cancer1.bed
+
 
 # Instead of lifting over the VCF, I will just lift over the PRS SNPs.
-/home/aneupane/liftover/liftOver  all_cancer1.bed /home/aneupane/liftover/hg19ToHg38.over.chain all_cancer_GrCh38.bed all_cancer_unmapped.bed
+/home/aneupane/liftover/liftOver  all_cancer1.bed /home/aneupane/liftover/hg38ToHg19.over.chain all_cancer_GrCh37.bed all_cancer_unmapped.bed
 
-bcftools annotate --set-id '%CHROM\:%POS\:%REF\:%FIRST_ALT' chr21.dose.vcf.gz -Oz -o chr21.dose_ID_edited_tmp2.vcf.gz
-
-
-module load java/17.0.1
-module load picard/2.9.4
-
-java -jar /hpcf/apps/picard/install/2.9.4/picard.jar LiftoverVcf \
-     I=/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/chr1.dose.vcf.gz \
-     O=/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/ccss_org_lifted_over_GRCh38_chr1.vcf \
-     CHAIN=/home/aneupane/liftover/hg19ToHg38.over.chain \
-     REJECT=/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/rejected_variants_chr1.vcf \
-     R=/research_jude/rgs01_jude/reference/public/genomes/Homo_sapiens/GRCh38/GRCh38_no_alt/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa
+mkdir plink_data
 
 
+IFS=$'\n' # set IFS
+for line in $(cat all_cancer_GrCh37.bed| sed '1d'); do
+VAR="$(echo ${line}| awk '{print $1":"$2"-"$3}'|sed 's/chr//g')"
+CHR="$(echo $VAR |awk -F':' '{print $1}')"
+echo "Doing ${VAR}"
+bcftools view /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/chr${CHR}.dose.vcf.gz ${VAR} > /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/plink_data/PRS_${VAR}.vcf.gz
+# bcftools query -f '%CHROM:%POS:%REF:%ALT[\n%SAMPLE=%GT]\n' /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/yutaka_request_09_27_2022/plink_data/yutaka_${VAR}.vcf.gz >> /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/yutaka_request_09_27_2022/plink_data/yutaka_${VAR}.geno.txt
+# annotate VCF
+bcftools annotate --set-id '%CHROM\:%POS\:%REF\:%FIRST_ALT' /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/plink_data/PRS_${VAR}.vcf.gz -Oz -o /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/plink_data/PRS_${VAR}_edited.vcf.gz
+plink --vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/plink_data/PRS_${VAR}_edited.vcf.gz --double-id --vcf-half-call m --keep-allele-order --make-bed --out /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/plink_data/PRS_${VAR}_edited 2>&1 | tee -a extract_plink_all.log
+done
