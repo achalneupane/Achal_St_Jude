@@ -50,9 +50,12 @@ length(unique(subneo.after5$sjlid))
 subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
 sum(!duplicated(subneo.within5$sjlid))
 # 22
-##################
-## Thyroid cancer
-##################
+#################### 
+## Thyroid cancer ##
+####################
+table(subneo$diag)
+
+
 THYROIDcancer <- subneo[grepl("thyroid", subneo$diag, ignore.case = T),]
 THYROIDcancer <- setDT(THYROIDcancer)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 nrow(THYROIDcancer)
