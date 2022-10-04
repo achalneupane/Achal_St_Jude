@@ -12,7 +12,3 @@ Re-download:
 V300063238_L2_B5GHUMrcaRAAADAAA-548_1.fq.gz
 
 
-for file1 in $(ls ./*/*_1.fq.gz| sort -V); do
-file2="$(echo $file1 | sed 's/_1.fq.gz/_2.fq.gz/g')"
-echo ${file2}
-done
