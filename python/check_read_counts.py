@@ -31,4 +31,5 @@ with open('read_counts.txt') as file:
     # list(set([*i for i in a]))
   unique_samples = list(map(list, set(map(tuple, a))))
   print(unique_samples)   
+  len(unique_samples)
 
