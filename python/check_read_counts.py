@@ -3,6 +3,7 @@ import re
 
 os.chdir("Z:/ResearchHome/Groups/sapkogrp/projects/CAB/common/WGS_Northwestern/")
 
+# Run count_fastq_lines.sh first, then this code to get any FATSQ with discordant read counts
 
 def stringToList(string):
     listRes = list(string.split(" "))
@@ -24,7 +25,6 @@ with open('read_counts.txt') as file:
     B=re.findall(r'\d+', str(numbers))[1]
     if A != B:
       print(file + ' of ' + sample + ' = ' + 'Not OK')
-      print(a)
     # else:
     #   print(file + ' of ' + sample + ' = ' + 'OK')
     # all.samples = set(list(k[0] for k in a))
