@@ -9,11 +9,13 @@ with open('read_counts.txt') as file:
     # print(line.rstrip())
     line=line.rstrip()
     sample=line.split('/',2)[1]
+    string=line.split('/',2)[2]
+    file=string[:string.index(" has")]
     numbers=re.findall(r'has \d+ lines', line)
     A=re.findall(r'\d+', str(numbers))[0]
     B=re.findall(r'\d+', str(numbers))[1]
     if A != B:
-      print(sample + ' = ' + 'Not OK')
+      print(file + ' of ' + sample + ' = ' + 'Not OK')
     # else:
-    #   print(sample + ' = ' + 'OK')
+    #   print(file + ' of ' + sample + ' = ' + 'OK')
 
