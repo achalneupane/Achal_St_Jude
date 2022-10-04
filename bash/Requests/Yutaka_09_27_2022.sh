@@ -58,6 +58,13 @@ plink --bfile yutaka_chr2:233693630-233693631 --merge-list merge_list.list --kee
 
 plink --bfile merged.dat.yutaka --recodeA --out merged.dat.yutaka_recodeA 
 
+## Update 2: flipping two variants (rs17863783; chr2:233693630-233693631 and rs4982753; chr14:23345359-23345360) allele
+plink --bfile merged.dat.yutaka --flip flipsnp --make-bed  --out merged.dat.yutaka.flipped
+plink --bfile merged.dat.yutaka.flipped --recodeA --out merged.dat.yutaka.flipped_recodeA 
+
+
+zcat CCSS.GATKv3.4.VQSR_chr19.PASS.decomposed.ccssid.vcf.gz |head -5000|  grep "#CHROM" | tr "\t" "\n " | tail -n +10 | uniq > QCed_samples
+
 ##################
 ## ccss_org_hrc ##
 ##################
@@ -110,3 +117,37 @@ ls *.bim| sort -V | sed 's/\.bim//g'|sed -n '1d;p' > merge_list.list
 plink --bfile yutaka_2:234602276-234602277_edited --merge-list merge_list.list --keep-allele-order --out merged.dat.yutaka
 
 plink --bfile merged.dat.yutaka --recodeA --out merged.dat.yutaka_recodeA 
+
+
+Hi Yutaka,
+
+I double checked these variants in UCSC browser and also in our data and what I reported earlier looks correct. 
+
+
+From UCSC table browser:
+
+Build GRCh38 
+#chrom	chromStart	chromEnd	name	ref	alts
+chr2	233693630	233693631	rs17863783	G	T,
+chr14	23345359	23345360	rs4982753	C	A,T,
+
+Build GRCh37
+#chrom	chromStart	chromEnd	name	ref	alts
+chr2	234602276	234602277	rs17863783	G	T,
+chr14	23814568	23814569	rs4982753	C	A,T,
+
+
+
+Reference and alternate alleles in ccss_exp_wgs
+#CHROM  POS     ID      REF     ALT 
+chr2    233693631       chr2:233693631:G:T      G       T 
+chr14   23345360        chr14:23345360:C:T      C       T
+
+Reference and alternate alleles in ccss_org_hrc
+#CHROM  POS     ID      REF     ALT 
+chr2       234602277       chr2:234602277:G:T G       T
+chr14      23814569        chr14:23814569:C:T C       T
+
+
+My guess is that the reference papers may have employed methodology based on complementary sequence. I see that Vischer et al used Illumina Veracode GoldenGate SNP genotyping assay which I am not familiar with, but I found this, particularly slide 6 (https://www.illumina.com/documents/seminars/presentations/2009_08_downing_jason.pdf) which may clarify the issue. We used GATK, which uses the StrandBiasBySample annotation and produces read counts per allele and per strand that are used by other annotation modules (FisherStrand and StrandOddsRatio) to estimate strand bias using statistical approaches.
+
