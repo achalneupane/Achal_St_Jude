@@ -29,6 +29,6 @@ with open('read_counts.txt') as file:
     #   print(file + ' of ' + sample + ' = ' + 'OK')
     # all.samples = set(list(k[0] for k in a))
     # list(set([*i for i in a]))
-  a = list(map(list, set(map(tuple, a))))
-  print(a)    
+  unique_samples = list(map(list, set(map(tuple, a))))
+  print(unique_samples)   
 
