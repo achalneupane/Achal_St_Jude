@@ -14,6 +14,6 @@ with open('read_counts.txt') as file:
     B=re.findall(r'\d+', str(numbers))[1]
     if A != B:
       print(sample + ' = ' + 'Not OK')
-
-
+    # else:
+    #   print(sample + ' = ' + 'OK')
 
