@@ -50,31 +50,32 @@ length(unique(subneo.after5$sjlid))
 subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
 sum(!duplicated(subneo.within5$sjlid))
 # 22
-#################### 
-## Thyroid cancer ##
-####################
+############################# 
+## Hematological disorders ##
+#############################
 table(subneo$diag)
 
 
-THYROIDcancer <- subneo[grepl("thyroid", subneo$diag, ignore.case = T),]
-THYROIDcancer <- setDT(THYROIDcancer)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
-nrow(THYROIDcancer)
+HEMATOcancer <- subneo[grepl("hema", subneo$diaggrp, ignore.case = T),]
+HEMATOcancer <- setDT(HEMATOcancer)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+nrow(HEMATOcancer)
+# 24
 # Removing samples with SNs within 5 years of childhood cancer
-THYROIDcancer <- THYROIDcancer[!THYROIDcancer$sjlid %in% subneo.within5$sjlid,]
-nrow(THYROIDcancer)
-# 86
-PHENO.ANY_SN$THYROIDcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% THYROIDcancer$sjlid, 0, 1))
-table(THYROIDcancer$diaggrp)
+HEMATOcancer <- HEMATOcancer[!HEMATOcancer$sjlid %in% subneo.within5$sjlid,]
+nrow(HEMATOcancer)
+# 19
+PHENO.ANY_SN$HEMATOcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% HEMATOcancer$sjlid, 0, 1))
+table(HEMATOcancer$diaggrp)
 
 #############################
 ## Add Lifestyle variables ##
 #############################
 # Define CA/CO status in lifestyle
-ALL.LIFESTYLE$CACO <- factor(ifelse(!ALL.LIFESTYLE$SJLIFEID %in% THYROIDcancer$sjlid, 0, 1))
+ALL.LIFESTYLE$CACO <- factor(ifelse(!ALL.LIFESTYLE$SJLIFEID %in% HEMATOcancer$sjlid, 0, 1))
 
 ## Get date (gradedt) and age at diagnosis of SN
-ALL.LIFESTYLE$ANY.SN_gradedate <- THYROIDcancer$gradedt[match(ALL.LIFESTYLE$SJLIFEID, THYROIDcancer$sjlid)]
-ALL.LIFESTYLE$AGE.ANY_SN <- THYROIDcancer$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, THYROIDcancer$sjlid)]
+ALL.LIFESTYLE$ANY.SN_gradedate <- HEMATOcancer$gradedt[match(ALL.LIFESTYLE$SJLIFEID, HEMATOcancer$sjlid)]
+ALL.LIFESTYLE$AGE.ANY_SN <- HEMATOcancer$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, HEMATOcancer$sjlid)]
 
 ## In CASES, if age survey is greater than age at diagnosis; NULLIFY the favorable_lifestyle.category. That information is not useful
 ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$agesurvey > ALL.LIFESTYLE$AGE.ANY_SN),
@@ -158,15 +159,15 @@ library(expss)
 # Getting counts for non-missing data only; 26 samples do not have admixture ancestry
 CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$AMR),]
 
-CROSS_CASES.df <- CROSS_CASES.df[c("THYROIDcancer", "smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn",
+CROSS_CASES.df <- CROSS_CASES.df[c("HEMATOcancer", "smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn",
                                    "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")]
 
-CROSS_CASES.df <- apply_labels(CROSS_CASES.df, THYROIDcancer = "THYROIDcancer", smoker_never_yn = "smoker_never_yn", 
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df, HEMATOcancer = "HEMATOcancer", smoker_never_yn = "smoker_never_yn", 
                                smoker_former_or_never_yn = "smoker_former_or_never_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
                                NOT_RiskyHeavyDrink_yn = "NOT_RiskyHeavyDrink_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")
 
 as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(THYROIDcancer, list(smoker_never_yn , smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
+                  cross_cases(HEMATOcancer, list(smoker_never_yn , smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
 
 
@@ -178,16 +179,16 @@ as.data.frame(t(CROSS_CASES.df %>%
 ## 1. Qin baseline model ##
 ###########################
 ## SJLIFE (ALL) 
-mod1 <- glm(THYROIDcancer ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxneckrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
+mod1 <- glm(HEMATOcancer ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxneckrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
 summary(mod1)
 
 ## SJLIFE (EUR)
-mod1.EUR <- glm(THYROIDcancer ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxneckrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
+mod1.EUR <- glm(HEMATOcancer ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxneckrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
 summary(mod1.EUR)
 
 ##########################
 dat_all = PHENO.ANY_SN
-fit_all = glm(formula = THYROIDcancer ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
+fit_all = glm(formula = HEMATOcancer ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
                 Thyroid_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + maxneckrtdose.category + epitxn_dose_5.category + 
@@ -202,7 +203,7 @@ summary(fit_all)
 
 # ## With HEI score
 # dat_all = PHENO.ANY_SN
-# fit_all = glm(formula = THYROIDcancer ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
+# fit_all = glm(formula = HEMATOcancer ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
 #                 Thyroid_PRS.tertile.category +
 #                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
 #                 AGE_AT_DIAGNOSIS + gender + maxneckrtdose.category + epitxn_dose_5.category + 
