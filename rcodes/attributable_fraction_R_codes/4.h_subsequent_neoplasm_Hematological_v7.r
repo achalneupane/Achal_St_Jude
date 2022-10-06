@@ -50,6 +50,14 @@ length(unique(subneo.after5$sjlid))
 subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
 sum(!duplicated(subneo.within5$sjlid))
 # 22
+
+###################
+## Other cancers ##
+###################
+## Teratoma 15
+
+
+
 ############################# 
 ## Hematological disorders ##
 #############################
