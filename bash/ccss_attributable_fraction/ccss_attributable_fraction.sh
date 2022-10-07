@@ -240,14 +240,20 @@ cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_h
 ls *.bim| sort -V | sed 's/\.bim//g'|sed -n '1d;p' > merge_list.list
 plink --bfile PRS_1:2056490-2056491_edited --merge-list merge_list.list --keep-allele-order --out merged.dat
 
-# Lift this over to GRCh38: merged.dat
-/home/aneupane/liftover/liftOver merged.dat.bim /home/aneupane/liftover/hg19ToHg38.over.chain merged.dat_grch38.bim merged.dat_unmapped.bed
+
+
+## Now convert bim file GRCh37 to GRCh38, workin with Python ccss_org_bed.py
+
 
 
 mkdir prs_out
 
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs
 ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/all_cancer.txt .
+
+
+
+
 
 
 study=$1
@@ -264,7 +270,9 @@ study=$1
 # THYROID_PGS
 
 # Mavaddat is generating errors
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs
 
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/all_cancer.txt .
 ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/harmonize_alleles.R .
 study=Mavaddat_2019_ER_NEG_Breast
 # Subset PRS data for each study
@@ -273,8 +281,11 @@ awk -v study=$study '$6==study' all_cancer.txt > prs_out/all_cancer.txt_${study}
 # Check for duplicate variants based on chr:pos
 awk 'a[$1":"$2]++' prs_out/all_cancer.txt_$study | wc -l
 # Look for directly matching variants in the WGS data; Remove variants from Mavaddat 2019 that are duplicated and are rare in gnomAD
+# awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/all_cancer.txt_$study plink_data/merged.dat.bim \
+# | awk '($4==$6 || $4==$7) && ($5==$6 || $5==$7)'| egrep -v 'chr1:51001424:C:CT|chr1:172359627:TA:T|chr2:39472369:CT:C|chr3:49672479:CT:C|chr5:44508162:GT:G|chr5:56366713:CT:C|chr6:20537614:C:CA|chr6:81553832:A:AAT|chr7:140243902:C:CT|chr8:17930101:C:CT|chr10:22188847:A:ACC|chr10:93532430:C:CAA|chr17:45134972:CT:C|chr22:40508703:C:CT' > prs_out/all_cancer.txt_${study}_direct_match
 awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/all_cancer.txt_$study plink_data/merged.dat.bim \
-| awk '($4==$6 || $4==$7) && ($5==$6 || $5==$7)'| egrep -v 'chr1:51001424:C:CT|chr1:172359627:TA:T|chr2:39472369:CT:C|chr3:49672479:CT:C|chr5:44508162:GT:G|chr5:56366713:CT:C|chr6:20537614:C:CA|chr6:81553832:A:AAT|chr7:140243902:C:CT|chr8:17930101:C:CT|chr10:22188847:A:ACC|chr10:93532430:C:CAA|chr17:45134972:CT:C|chr22:40508703:C:CT' > prs_out/all_cancer.txt_${study}_direct_match
+| awk '($4==$6 || $4==$7) && ($5==$6 || $5==$7)' > prs_out/all_cancer.txt_${study}_direct_match
+
 # No direct match
 awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/all_cancer.txt_$study plink_data/merged.dat.bim \
 | awk '!(($4==$6 || $4==$7) && ($5==$6 || $5==$7))' | grep -v DEL > prs_out/all_cancer.txt_${study}_no_direct_match
