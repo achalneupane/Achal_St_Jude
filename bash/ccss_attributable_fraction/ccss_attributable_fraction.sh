@@ -241,15 +241,33 @@ ls *.bim| sort -V | sed 's/\.bim//g'|sed -n '1d;p' > merge_list.list
 plink --bfile PRS_1:2056490-2056491_edited --merge-list merge_list.list --keep-allele-order --out merged.dat
 
 
+## Now convert bim file GRCh37 to GRCh38, using ccss_org_bed.R
 
-## Now convert bim file GRCh37 to GRCh38, workin with Python ccss_org_bed.py
 
-
+## Try to find the missing variants again 
+# for line in $(cat all_cancer_GrCh37.bed| sed '1d'); do
+# VAR="$(echo ${line}| awk '{print $1":"$2"-"$3}'|sed 's/chr//g')"
+# CHR="$(echo $VAR |awk -F':' '{print $1}')"
+# echo "Doing ${VAR}"
+# bcftools view /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/chr${CHR}.dose.vcf.gz ${VAR} > /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/plink_data/PRS_${VAR}.vcf.gz
+# # bcftools query -f '%CHROM:%POS:%REF:%ALT[\n%SAMPLE=%GT]\n' /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/yutaka_request_09_27_2022/plink_data/yutaka_${VAR}.vcf.gz >> /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/yutaka_request_09_27_2022/plink_data/yutaka_${VAR}.geno.txt
+# # annotate VCF
+# bcftools annotate --set-id '%CHROM\:%POS\:%REF\:%FIRST_ALT' /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/plink_data/PRS_${VAR}.vcf.gz -Oz -o /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/plink_data/PRS_${VAR}_edited.vcf.gz
+# plink --vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/plink_data/PRS_${VAR}_edited.vcf.gz --double-id --vcf-half-call m --keep-allele-order --make-bed --out /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/plink_data/PRS_${VAR}_edited 2>&1 | tee -a extract_plink_all.log
+# done
+for i in $(awk '{print $1}' /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/all_cancers_38.Not_matched.bed| sort -V| uniq); do
+CHR=$(echo ${i})
+bcftools view -Oz /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/chr${CHR}.dose.vcf.gz -R  \
+/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/all_cancers_38.Not_matched.bed \
+ > /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/plink_data/PRS_chr${CHR}_batch2.vcf.gz
+done
 
 mkdir prs_out
 
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs
 ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/all_cancer.txt .
+
+
 
 
 
