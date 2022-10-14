@@ -12,7 +12,7 @@ def stringToList(string):
 a = []
 used = set()
 # with open('read_counts.txt') as file:
-with open('read_counts_LVNC.txt') as file:
+with open('read_counts_HLHS.txt') as file:
   for line in file:
     # print(line.rstrip())
     line=line.rstrip()
