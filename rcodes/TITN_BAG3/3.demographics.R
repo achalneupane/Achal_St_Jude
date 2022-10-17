@@ -2,17 +2,145 @@ getwd()
 
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno")
 
+
+############
+## SJLIFE ##
+############
+
 sjlife <- read.table("sjlife_ttn_bag3.pheno", header = T)
 head(sjlife)
 
+## N
+n_sjlife = nrow(sjlife)
+
+## CMP status (sjlife$CMP_EF_HEIRARCHY >= 2 was used for CMP CA/CO variable)
+sjlife_CMP2plus_CA <- sum(sjlife$CMP == 2)
+sjlife_CMP2plus_CA <- paste0(sjlife_CMP2plus_CA, " (", round((sjlife_CMP2plus_CA/n_sjlife)*100,1), "%)")
+
+sjlife_CMP2plus_CO <- sum(sjlife$CMP == 1)
+sjlife_CMP2plus_CO <- paste0(sjlife_CMP2plus_CO, " (", round((sjlife_CMP2plus_CO/n_sjlife)*100,1), "%)")
 
 
+## Age at last contact: Median (IQR)
+sjlife_agelstcontact <- paste0(round(median(sjlife$agelstcontact), 1), " (", round(quantile(sjlife$agelstcontact, prob=c(.25,.5,.75), type=1)[1], 1), "-" , round(quantile(sjlife$agelstcontact, prob=c(.25,.5,.75), type=1)[3],1), ")")
 
+## Age at diagnosis
+sjlife_agedx_0_4 <- sum(sjlife$agedx >= 0 & sjlife$agedx < 5)
+sjlife_agedx_0_4 <- paste0(sjlife_agedx_0_4, " (", round((sjlife_agedx_0_4/n_sjlife)*100,1), "%)")
+
+sjlife_agedx_5_9 <- sum(sjlife$agedx >= 5 & sjlife$agedx < 10)
+sjlife_agedx_5_9 <- paste0(sjlife_agedx_5_9, " (", round((sjlife_agedx_5_9/n_sjlife)*100,1), "%)")
+
+sjlife_agedx_10_14 <- sum(sjlife$agedx >= 10 & sjlife$agedx < 15)
+sjlife_agedx_10_14 <- paste0(sjlife_agedx_10_14, " (", round((sjlife_agedx_10_14/n_sjlife)*100,1), "%)")
+
+sjlife_agedx_15_or_plus <- sum(sjlife$agedx >= 15)
+sjlife_agedx_15_or_plus <- paste0(sjlife_agedx_15_or_plus, " (", round((sjlife_agedx_15_or_plus/n_sjlife)*100,1), "%)")
+
+## Gender (0 = Male; 1 = Female)
+sjlife_male <- sum(sjlife$gender == 0)
+sjlife_male <- paste0(sjlife_male, " (", round((sjlife_male/n_sjlife)*100,1), "%)")
+
+sjlife_female <- sum(sjlife$gender == 1)
+sjlife_female <- paste0(sjlife_female, " (", round((sjlife_female/n_sjlife)*100,1), "%)")
+
+##############
+## CCSS_ORG ##
+##############
 ccss_org <- read.table("ccss_org_eur_cardiotoxic_exposed.pheno", header = T)
 head(ccss_org)
 
+# rename columns to make same as sjlife column names
+colnames(ccss_org) [match(c("a_dx", "a_end", "SEX", "anth_DED", "HeartAvg", "CMP2plus"), colnames(ccss_org))] <- c("agedx", "agelstcontact", "gender", "anthra_jco_dose_any", "hrtavg", "CMP")
+
+
+## N
+n_ccss_org = nrow(ccss_org)
+
+## CMP status (CMP2plus was used for CMP CA/CO variable)
+ccss_org_CMP2plus_CA <- sum(ccss_org$CMP == 2)
+ccss_org_CMP2plus_CA <- paste0(ccss_org_CMP2plus_CA, " (", round((ccss_org_CMP2plus_CA/n_ccss_org)*100,1), "%)")
+
+ccss_org_CMP2plus_CO <- sum(ccss_org$CMP == 1)
+ccss_org_CMP2plus_CO <- paste0(ccss_org_CMP2plus_CO, " (", round((ccss_org_CMP2plus_CO/n_ccss_org)*100,1), "%)")
+
+
+## Age at last contact: Median (IQR)
+ccss_org_agelstcontact <- paste0(round(median(ccss_org$agelstcontact), 1), " (", round(quantile(ccss_org$agelstcontact, prob=c(.25,.5,.75), type=1)[1], 1), "-" , round(quantile(ccss_org$agelstcontact, prob=c(.25,.5,.75), type=1)[3],1), ")")
+
+## Age at diagnosis
+ccss_org_agedx_0_4 <- sum(ccss_org$agedx >= 0 & ccss_org$agedx < 5)
+ccss_org_agedx_0_4 <- paste0(ccss_org_agedx_0_4, " (", round((ccss_org_agedx_0_4/n_ccss_org)*100,1), "%)")
+
+ccss_org_agedx_5_9 <- sum(ccss_org$agedx >= 5 & ccss_org$agedx < 10)
+ccss_org_agedx_5_9 <- paste0(ccss_org_agedx_5_9, " (", round((ccss_org_agedx_5_9/n_ccss_org)*100,1), "%)")
+
+ccss_org_agedx_10_14 <- sum(ccss_org$agedx >= 10 & ccss_org$agedx < 15)
+ccss_org_agedx_10_14 <- paste0(ccss_org_agedx_10_14, " (", round((ccss_org_agedx_10_14/n_ccss_org)*100,1), "%)")
+
+ccss_org_agedx_15_or_plus <- sum(ccss_org$agedx >= 15)
+ccss_org_agedx_15_or_plus <- paste0(ccss_org_agedx_15_or_plus, " (", round((ccss_org_agedx_15_or_plus/n_ccss_org)*100,1), "%)")
+
+## Gender (0 = Male; 1 = Female)
+ccss_org_male <- sum(ccss_org$gender == 0)
+ccss_org_male <- paste0(ccss_org_male, " (", round((ccss_org_male/n_ccss_org)*100,1), "%)")
+
+ccss_org_female <- sum(ccss_org$gender == 1)
+ccss_org_female <- paste0(ccss_org_female, " (", round((ccss_org_female/n_ccss_org)*100,1), "%)")
 
 
 
+##############
+## CCSS_EXP ##
+##############
 ccss_exp <- read.table("ccss_exp_eur_cardiotoxic_exposed.pheno", header = T)
 head(ccss_exp)
+
+# rename columns to make same as sjlife column names
+colnames(ccss_exp) [match(c("a_dx", "a_end", "SEX", "anth_DED", "HeartAvg", "CMP2plus"), colnames(ccss_exp))] <- c("agedx", "agelstcontact", "gender", "anthra_jco_dose_any", "hrtavg", "CMP")
+
+
+## N
+n_ccss_exp = nrow(ccss_exp)
+
+## CMP status (CMP2plus was used for CMP CA/CO variable)
+ccss_exp_CMP2plus_CA <- sum(ccss_exp$CMP == 2)
+ccss_exp_CMP2plus_CA <- paste0(ccss_exp_CMP2plus_CA, " (", round((ccss_exp_CMP2plus_CA/n_ccss_exp)*100,1), "%)")
+
+ccss_exp_CMP2plus_CO <- sum(ccss_exp$CMP == 1)
+ccss_exp_CMP2plus_CO <- paste0(ccss_exp_CMP2plus_CO, " (", round((ccss_exp_CMP2plus_CO/n_ccss_exp)*100,1), "%)")
+
+
+## Age at last contact: Median (IQR)
+ccss_exp_agelstcontact <- paste0(round(median(ccss_exp$agelstcontact), 1), " (", round(quantile(ccss_exp$agelstcontact, prob=c(.25,.5,.75), type=1)[1], 1), "-" , round(quantile(ccss_exp$agelstcontact, prob=c(.25,.5,.75), type=1)[3],1), ")")
+
+## Age at diagnosis
+ccss_exp_agedx_0_4 <- sum(ccss_exp$agedx >= 0 & ccss_exp$agedx < 5)
+ccss_exp_agedx_0_4 <- paste0(ccss_exp_agedx_0_4, " (", round((ccss_exp_agedx_0_4/n_ccss_exp)*100,1), "%)")
+
+ccss_exp_agedx_5_9 <- sum(ccss_exp$agedx >= 5 & ccss_exp$agedx < 10)
+ccss_exp_agedx_5_9 <- paste0(ccss_exp_agedx_5_9, " (", round((ccss_exp_agedx_5_9/n_ccss_exp)*100,1), "%)")
+
+ccss_exp_agedx_10_14 <- sum(ccss_exp$agedx >= 10 & ccss_exp$agedx < 15)
+ccss_exp_agedx_10_14 <- paste0(ccss_exp_agedx_10_14, " (", round((ccss_exp_agedx_10_14/n_ccss_exp)*100,1), "%)")
+
+ccss_exp_agedx_15_or_plus <- sum(ccss_exp$agedx >= 15)
+ccss_exp_agedx_15_or_plus <- paste0(ccss_exp_agedx_15_or_plus, " (", round((ccss_exp_agedx_15_or_plus/n_ccss_exp)*100,1), "%)")
+
+## Gender (0 = Male; 1 = Female)
+ccss_exp_male <- sum(ccss_exp$gender == 0)
+ccss_exp_male <- paste0(ccss_exp_male, " (", round((ccss_exp_male/n_ccss_exp)*100,1), "%)")
+
+ccss_exp_female <- sum(ccss_exp$gender == 1)
+ccss_exp_female <- paste0(ccss_exp_female, " (", round((ccss_exp_female/n_ccss_exp)*100,1), "%)")
+
+
+#################################
+## Finalized demographic table ##
+#################################
+
+SJLIFE_VARS <- c(CA=sjlife_CMP2plus_CA, CO=sjlife_CMP2plus_CO, AGE_AT_LAST_CONTACT = sjlife_agelstcontact, agedx_0_4 = sjlife_agedx_0_4, agedx_5_9 = sjlife_agedx_5_9, agedx_10_14 = sjlife_agedx_10_14, agedx_15orPLUS = sjlife_agedx_15_or_plus, MALE = sjlife_male, FEMALE = sjlife_female)
+CCSS_ORG_VARS <- c(CA=ccss_org_CMP2plus_CA, CO=ccss_org_CMP2plus_CO, AGE_AT_LAST_CONTACT = ccss_org_agelstcontact, agedx_0_4 = ccss_org_agedx_0_4, agedx_5_9 = ccss_org_agedx_5_9, agedx_10_14 = ccss_org_agedx_10_14, agedx_15orPLUS = ccss_org_agedx_15_or_plus, MALE = ccss_org_male, FEMALE = ccss_org_female)
+CCSS_EXP_VARS <- c(CA=ccss_exp_CMP2plus_CA, CO=ccss_exp_CMP2plus_CO, AGE_AT_LAST_CONTACT = ccss_exp_agelstcontact, agedx_0_4 = ccss_exp_agedx_0_4, agedx_5_9 = ccss_exp_agedx_5_9, agedx_10_14 = ccss_exp_agedx_10_14, agedx_15orPLUS = ccss_exp_agedx_15_or_plus, MALE = ccss_exp_male, FEMALE = ccss_exp_female)
+
+cbind.data.frame(SJLIFE_VARS, CCSS_ORG_VARS, CCSS_EXP_VARS)
