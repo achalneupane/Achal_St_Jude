@@ -145,11 +145,12 @@ ccss_exp_female <- paste0(ccss_exp_female, " (", round((ccss_exp_female/n_ccss_e
 #######################
 ## Calculate P-value ##
 #######################
-library(sjstats)
-library(coin)
-# P-Age at last contact 
-cc <- cbind.data.frame(age=c(sjlife$agelstcontact, ccss_org$agelstcontact, ccss_exp$agelstcontact), 
-mannwhitney()
+# library(sjstats)
+# library(coin)
+# # P-Age at last contact 
+# cc <- cbind.data.frame(age=c(sjlife$agelstcontact, ccss_org$agelstcontact, ccss_exp$agelstcontact),
+#                        cohort=c(rep("sjlife", nrow(sjlife)), rep("ccss_org", nrow(ccss_org)), rep("ccss_exp", nrow(ccss_exp))))
+# gg<-mannwhitney(cc, age, cohort)
 
 #################################
 ## Finalized demographic table ##
@@ -159,4 +160,6 @@ SJLIFE_VARS <- c(CA=sjlife_CMP2plus_CA, CO=sjlife_CMP2plus_CO, AGE_AT_LAST_CONTA
 CCSS_ORG_VARS <- c(CA=ccss_org_CMP2plus_CA, CO=ccss_org_CMP2plus_CO, AGE_AT_LAST_CONTACT = ccss_org_agelstcontact, agedx_0_4 = ccss_org_agedx_0_4, agedx_5_9 = ccss_org_agedx_5_9, agedx_10_14 = ccss_org_agedx_10_14, agedx_15orPLUS = ccss_org_agedx_15_or_plus, MALE = ccss_org_male, FEMALE = ccss_org_female)
 CCSS_EXP_VARS <- c(CA=ccss_exp_CMP2plus_CA, CO=ccss_exp_CMP2plus_CO, AGE_AT_LAST_CONTACT = ccss_exp_agelstcontact, agedx_0_4 = ccss_exp_agedx_0_4, agedx_5_9 = ccss_exp_agedx_5_9, agedx_10_14 = ccss_exp_agedx_10_14, agedx_15orPLUS = ccss_exp_agedx_15_or_plus, MALE = ccss_exp_male, FEMALE = ccss_exp_female)
 
-cbind.data.frame(SJLIFE_VARS, CCSS_ORG_VARS, CCSS_EXP_VARS)
+final.df <- cbind.data.frame(SJLIFE_VARS, CCSS_ORG_VARS, CCSS_EXP_VARS)
+
+write.table(final.df, "manuscript_table1.txt", col.names = T, sep = "\t", quote = F)
