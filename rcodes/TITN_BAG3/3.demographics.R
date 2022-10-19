@@ -3,12 +3,32 @@ getwd()
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno")
 
 
+# Read pheno files
+## SJLIFE
+sjlife <- read.table("sjlife_ttn_bag3.pheno", header = T)
+head(sjlife)
+
+
+## CCSS_org
+ccss_org <- read.table("ccss_org_eur_cardiotoxic_exposed.pheno", header = T)
+head(ccss_org)
+
+# rename columns to make same as sjlife column names
+colnames(ccss_org) [match(c("a_dx", "a_end", "SEX", "anth_DED", "HeartAvg", "CMP2plus"), colnames(ccss_org))] <- c("agedx", "agelstcontact", "gender", "anthra_jco_dose_any", "hrtavg", "CMP")
+
+## CCSS_exp
+ccss_exp <- read.table("ccss_exp_eur_cardiotoxic_exposed.pheno", header = T)
+head(ccss_exp)
+
+# rename columns to make same as sjlife column names
+colnames(ccss_exp) [match(c("a_dx", "a_end", "SEX", "anth_DED", "HeartAvg", "CMP2plus"), colnames(ccss_exp))] <- c("agedx", "agelstcontact", "gender", "anthra_jco_dose_any", "hrtavg", "CMP")
+
+
+
 ############
 ## SJLIFE ##
 ############
 
-sjlife <- read.table("sjlife_ttn_bag3.pheno", header = T)
-head(sjlife)
 
 ## N
 n_sjlife = nrow(sjlife)
@@ -47,12 +67,6 @@ sjlife_female <- paste0(sjlife_female, " (", round((sjlife_female/n_sjlife)*100,
 ##############
 ## CCSS_ORG ##
 ##############
-ccss_org <- read.table("ccss_org_eur_cardiotoxic_exposed.pheno", header = T)
-head(ccss_org)
-
-# rename columns to make same as sjlife column names
-colnames(ccss_org) [match(c("a_dx", "a_end", "SEX", "anth_DED", "HeartAvg", "CMP2plus"), colnames(ccss_org))] <- c("agedx", "agelstcontact", "gender", "anthra_jco_dose_any", "hrtavg", "CMP")
-
 
 ## N
 n_ccss_org = nrow(ccss_org)
@@ -93,12 +107,6 @@ ccss_org_female <- paste0(ccss_org_female, " (", round((ccss_org_female/n_ccss_o
 ##############
 ## CCSS_EXP ##
 ##############
-ccss_exp <- read.table("ccss_exp_eur_cardiotoxic_exposed.pheno", header = T)
-head(ccss_exp)
-
-# rename columns to make same as sjlife column names
-colnames(ccss_exp) [match(c("a_dx", "a_end", "SEX", "anth_DED", "HeartAvg", "CMP2plus"), colnames(ccss_exp))] <- c("agedx", "agelstcontact", "gender", "anthra_jco_dose_any", "hrtavg", "CMP")
-
 
 ## N
 n_ccss_exp = nrow(ccss_exp)
@@ -134,6 +142,14 @@ ccss_exp_male <- paste0(ccss_exp_male, " (", round((ccss_exp_male/n_ccss_exp)*10
 ccss_exp_female <- sum(ccss_exp$gender == 1)
 ccss_exp_female <- paste0(ccss_exp_female, " (", round((ccss_exp_female/n_ccss_exp)*100,1), "%)")
 
+#######################
+## Calculate P-value ##
+#######################
+library(sjstats)
+library(coin)
+# P-Age at last contact 
+cc <- cbind.data.frame(age=c(sjlife$agelstcontact, ccss_org$agelstcontact, ccss_exp$agelstcontact), 
+mannwhitney()
 
 #################################
 ## Finalized demographic table ##
