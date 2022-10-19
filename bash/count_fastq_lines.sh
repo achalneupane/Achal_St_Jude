@@ -46,6 +46,18 @@ ls ./*/*/*_1.fq.gz| sort -V
 
 
 
+ls ./*/*/*_1.fq.gz| sort -V | parallel -j30 'var=$(echo {}|sed s/_1.fq.gz/_2.fq.gz/g); echo {} has $(zcat -n {} | wc -l) lines and $var has $(zcat $var | wc -l)'  >> all_fastq_line_counts_v2.txt
+
 for file in $(ls *.fq.gz| sort -V); do
 md5sum $file
 done
+
+
+# gzip: V300009670_L4_B5GHUMsgfRAAALAAA-522_1.fq.gz: not in gzip format
+# gzip: V300009670_L4_B5GHUMsgfRAAALAAA-522_2.fq.gz: not in gzip format
+
+
+
+for dir in */ ; do     echo $dir | wc -l; done
+
+
