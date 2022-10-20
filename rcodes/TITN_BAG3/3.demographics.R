@@ -64,6 +64,10 @@ sjlife_male <- paste0(sjlife_male, " (", round((sjlife_male/n_sjlife)*100,1), "%
 sjlife_female <- sum(sjlife$gender == 1)
 sjlife_female <- paste0(sjlife_female, " (", round((sjlife_female/n_sjlife)*100,1), "%)")
 
+# ## Ejection fraction
+# sjlife_ejectionfraction <- paste0(round(median(sjlife$ejection_fraction_hrt), 3)*100, " (", round(quantile(sjlife$ejection_fraction_hrt, prob=c(.25,.5,.75), type=1)[1], 3)*100, "-" , round(quantile(sjlife$ejection_fraction_hrt, prob=c(.25,.5,.75), type=1)[3],3)*100, ")")
+
+
 ##############
 ## CCSS_ORG ##
 ##############
@@ -145,12 +149,31 @@ ccss_exp_female <- paste0(ccss_exp_female, " (", round((ccss_exp_female/n_ccss_e
 #######################
 ## Calculate P-value ##
 #######################
-# library(sjstats)
-# library(coin)
-# # P-Age at last contact 
-# cc <- cbind.data.frame(age=c(sjlife$agelstcontact, ccss_org$agelstcontact, ccss_exp$agelstcontact),
-#                        cohort=c(rep("sjlife", nrow(sjlife)), rep("ccss_org", nrow(ccss_org)), rep("ccss_exp", nrow(ccss_exp))))
-# gg<-mannwhitney(cc, age, cohort)
+library(sjstats)
+library(coin)
+# P-Age at last contact
+cc <- cbind.data.frame(age=c(sjlife$agelstcontact, ccss_org$agelstcontact, ccss_exp$agelstcontact),
+                       cohort=c(rep("sjlife", nrow(sjlife)), rep("ccss_org", nrow(ccss_org)), rep("ccss_exp", nrow(ccss_exp))))
+cc <-mannwhitney(cc, age, cohort)
+cc$df$groups <- paste0(cc$df$grp1.label , " Vs ", cc$df$grp2.label)
+
+# paste(cc$df$groups, cc$df$p, sep = "=")
+cc  = rbind.data.frame(cc$df$groups, cc$df$p)
+colnames(cc) <- cc[1,]
+agelstcontact_p <- cc[-1,]
+
+
+# P-Age at diagnosis
+cc <- cbind.data.frame(age=c(sjlife$agedx, ccss_org$agedx, ccss_exp$agedx),
+                       cohort=c(rep("sjlife", nrow(sjlife)), rep("ccss_org", nrow(ccss_org)), rep("ccss_exp", nrow(ccss_exp))))
+cc <-mannwhitney(cc, age, cohort)
+cc$df$groups <- paste0(cc$df$grp1.label , " Vs ", cc$df$grp2.label)
+
+# paste(cc$df$groups, cc$df$p, sep = "=")
+cc  = rbind.data.frame(cc$df$groups, cc$df$p)
+colnames(cc) <- cc[1,]
+agedx_p <- cc[-1,]
+
 
 #################################
 ## Finalized demographic table ##
