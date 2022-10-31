@@ -151,19 +151,28 @@ ccss_exp_female <- paste0(ccss_exp_female, " (", round((ccss_exp_female/n_ccss_e
 #######################
 library(sjstats)
 library(coin)
-# P-Age at last contact
+## P-Age at last contact 
+
+## Note : The Wilcoxon-Mann-Whitney test is for two groups. If you want to
+# compare locations of more than two groups with a similar test, then you would
+# usually go to the Kruskal-Wallis test. More: https://stats.stackexchange.com/questions/274146/clarification-on-mann-whitney-wilcoxon-test-on-two-to-three-groups
+
+# cc <- cbind.data.frame(age=c(sjlife$agelstcontact, ccss_org$agelstcontact, ccss_exp$agelstcontact),
+#                        cohort=c(rep("sjlife", nrow(sjlife)), rep("ccss_org", nrow(ccss_org)), rep("ccss_exp", nrow(ccss_exp))))
+# cc <-mannwhitney(cc, age, cohort)
+# cc$df$groups <- paste0(cc$df$grp1.label , " Vs ", cc$df$grp2.label)
+# 
+# # paste(cc$df$groups, cc$df$p, sep = "=")
+# cc  = rbind.data.frame(cc$df$groups, cc$df$p)
+# colnames(cc) <- cc[1,]
+# agelstcontact_p <- cc[-1,]
+
+
 cc <- cbind.data.frame(age=c(sjlife$agelstcontact, ccss_org$agelstcontact, ccss_exp$agelstcontact),
                        cohort=c(rep("sjlife", nrow(sjlife)), rep("ccss_org", nrow(ccss_org)), rep("ccss_exp", nrow(ccss_exp))))
-cc <-mannwhitney(cc, age, cohort)
-cc$df$groups <- paste0(cc$df$grp1.label , " Vs ", cc$df$grp2.label)
+cc <-kruskal.test(age ~ cohort, data = cc)
 
-# paste(cc$df$groups, cc$df$p, sep = "=")
-cc  = rbind.data.frame(cc$df$groups, cc$df$p)
-colnames(cc) <- cc[1,]
-agelstcontact_p <- cc[-1,]
-
-
-# P-Age at diagnosis
+## P-Age at diagnosis
 cc <- cbind.data.frame(age=c(sjlife$agedx, ccss_org$agedx, ccss_exp$agedx),
                        cohort=c(rep("sjlife", nrow(sjlife)), rep("ccss_org", nrow(ccss_org)), rep("ccss_exp", nrow(ccss_exp))))
 cc <-mannwhitney(cc, age, cohort)
@@ -174,7 +183,12 @@ cc  = rbind.data.frame(cc$df$groups, cc$df$p)
 colnames(cc) <- cc[1,]
 agedx_p <- cc[-1,]
 
+## P-Sex
+cc <- cbind.data.frame(sjlife=table(sjlife$gender), ccss_org=table(ccss_org$gender), ccss_exp=table(ccss_exp$gender))
+cc <- as.table(rbind(M=as.numeric(cc[1,-1]), F=as.numeric(cc[2,-1])))
+colnames(cc) <- c("SJLIFE", "CCSS_org_hrc", "CCSS_exp_wgs")
 
+sex_p <- chisq.test(cc)
 #################################
 ## Finalized demographic table ##
 #################################

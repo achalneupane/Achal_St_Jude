@@ -61,3 +61,10 @@ done
 for dir in */ ; do     echo $dir | wc -l; done
 
 
+V300009599_L3_B5GHUMsgfRAAAZAAA-503_1.fq.gz
+
+
+
+1607 chr10
+
+994 chr2
