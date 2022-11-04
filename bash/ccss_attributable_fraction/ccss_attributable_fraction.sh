@@ -262,6 +262,18 @@ bcftools view -Oz /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/co
  > /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/plink_data/PRS_chr${CHR}_batch2.vcf.gz
 done
 
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/plink_data
+
+module load plink/1.90b
+for file in $(ls PRS_chr*_batch2.vcf.gz); do
+plink --vcf $file --double-id --vcf-half-call m --keep-allele-order --make-bed --out ${file}_plink
+done
+
+# merge batch 2
+ls *batch2.vcf.gz_plink.bim| sort -V | sed 's/\.bim//g'|sed -n '1d;p' > merge_list_batch2.list
+plink --bfile PRS_chr1_batch2.vcf.gz_plink --merge-list merge_list_batch2.list --keep-allele-order --out merged_batch2  
+
+
 mkdir prs_out
 
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs
@@ -272,6 +284,9 @@ ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_ex
 
 
 
+for file in $(ls PRS_chr*_batch2.vcf.gz); do
+echo $file
+done
 
 
 study=$1
