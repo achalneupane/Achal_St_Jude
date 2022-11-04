@@ -49,3 +49,11 @@ BED.NOT.FOUND <- cbind.data.frame(all_cancers_38.Not_matched$CHROM, all_cancers_
 
 write.table(all_cancers_38.Not_matched, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/all_cancers_38.Not_matched.txt", sep = "\t", col.names = T, quote = F, row.names = F)
 write.table(BED.NOT.FOUND, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/all_cancers_38.Not_matched.bed", sep = "\t", col.names = T, quote = F, row.names = F)
+
+
+## replace GRCh38 with GRCh37 in all_cancer.txt
+all_cancers_38$POS_GRCh37 <- all_cancers$V3[match(all_cancers_38$KEY_GRCh38, all_cancers$KEY_GRCh38)]
+
+colnames(all_cancers_38)
+
+all_cancers_38[c("CHROM", "POS_GRCh37", "REF", "Effect_allele", "Effect_size", "TYPE", "Cancer", "Significant_YN")]

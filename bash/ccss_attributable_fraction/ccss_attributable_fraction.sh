@@ -119,7 +119,8 @@ study=$1
 # Mavaddat is generating errors
 
 ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/harmonize_alleles.R .
-study=Mavaddat_2019_ER_NEG_Breast
+study=Mavaddat_2019_ER_POS_Breast
+study=Mavaddat_2019_ER_OVERALL_Breast
 # Subset PRS data for each study
 awk -v study=$study '$6==study' all_cancer.txt > prs_out/all_cancer.txt_${study}
 
@@ -273,11 +274,30 @@ done
 ls *batch2.vcf.gz_plink.bim| sort -V | sed 's/\.bim//g'|sed -n '1d;p' > merge_list_batch2.list
 plink --bfile PRS_chr1_batch2.vcf.gz_plink --merge-list merge_list_batch2.list --keep-allele-order --out merged_batch2  
 
+## Using ccss_org_bed.R
+
+## Found
+ #             ALL_Vijayakrishnan     Basal_cell_carcinoma_PRSWeb     Mavaddat_2019_ER_NEG_Breast Mavaddat_2019_ER_OVERALL_Breast 
+ #                             15                              27                             241                             241 
+ #    Mavaddat_2019_ER_POS_Breast              Meningioma_Dobbins               Pleiotropy_PRSWEB                Sarcoma_Machiela 
+ #                            241                               2                             172                               5 
+ # Squamous_cell_carcinoma_PRSWeb                     THYROID_PGS 
+ #                              7                              12 
+
+
+## Not-found
+# Mavaddat_2019_ER_NEG_Breast Mavaddat_2019_ER_OVERALL_Breast     Mavaddat_2019_ER_POS_Breast                Meningioma_Claus 
+#                              72                              72                              72                               1 
+#               Pleiotropy_PRSWEB                Sarcoma_Machiela 
+#                               7                               1
+
 
 mkdir prs_out
 
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs
-ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/all_cancer.txt .
+
+
+# Using ccss_org_bed.R script, I am updating the GRCh38 to GRCh37 in this all_cancer.txt file
 
 
 
