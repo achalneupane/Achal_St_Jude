@@ -324,10 +324,11 @@ study=$1
 
 # Mavaddat is generating errors
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs
-
-ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/all_cancer.txt .
 ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/harmonize_alleles.R .
-study=Mavaddat_2019_ER_NEG_Breast
+
+
+
+study=Squamous_cell_carcinoma_PRSWeb
 # Subset PRS data for each study
 awk -v study=$study '$6==study' all_cancer.txt > prs_out/all_cancer.txt_${study}
 

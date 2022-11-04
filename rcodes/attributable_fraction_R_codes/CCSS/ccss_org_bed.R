@@ -56,4 +56,6 @@ all_cancers_38$POS_GRCh37 <- all_cancers$V3[match(all_cancers_38$KEY_GRCh38, all
 
 colnames(all_cancers_38)
 
-all_cancers_38[c("CHROM", "POS_GRCh37", "REF", "Effect_allele", "Effect_size", "TYPE", "Cancer", "Significant_YN")]
+all_cancers_37 <- all_cancers_38[c("CHROM", "POS_GRCh37", "REF", "Effect_allele", "Effect_size", "TYPE", "Cancer", "Significant_YN")]
+
+write.table(all_cancers_37, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/all_cancer.txt", sep = "\t", col.names = T, quote = F, row.names = F)
