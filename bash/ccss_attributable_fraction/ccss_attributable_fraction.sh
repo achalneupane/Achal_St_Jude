@@ -328,9 +328,12 @@ ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fr
 
 
 
-study=Squamous_cell_carcinoma_PRSWeb
+study=THYROID_PGS
+
 # Subset PRS data for each study
 awk -v study=$study '$6==study' all_cancer.txt > prs_out/all_cancer.txt_${study}
+# ## Meningioma
+# grep $study all_cancer.txt > prs_out/all_cancer.txt_${study}
 
 # Check for duplicate variants based on chr:pos
 awk 'a[$1":"$2]++' prs_out/all_cancer.txt_$study | wc -l
