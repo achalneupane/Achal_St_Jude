@@ -1,6 +1,6 @@
-####################
-## CCSS_Expansion ##
-####################
+##############
+## CCSS_exp ##
+##############
 ## extract variants from VCF and see which ones are present
 module load bcftools/1.9
 module load plink/1.90b
@@ -198,9 +198,9 @@ plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweigh
 # # Now check them individually and remove those that are not true
 # grep 22:40508703 merged.data.freq.frq
 # grep 22:40508703 ../prs_out/all_cancer.txt_${study}_direct_match
-#####################
-## CCSS _ Original ##
-#####################
+##############
+## CCSS_org ##
+##############
 module load bcftools/1.9
 module load plink/1.90b
 
