@@ -73,11 +73,12 @@ sum(is.na(lifestyle$vpa10))
 # get additional adult health habits
 adult_habbits <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Survey Data/adult_healthhabits.sas7bdat')
 
-# Get vpadays, vpamin, mpadays, mpamin
+# Get vpadays, vpamin, mpadays, mpamin and mpa10
 lifestyle$vpadays <- adult_habbits$vpadays[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
 lifestyle$vpamin <- adult_habbits$vpamin[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
 lifestyle$mpadays <- adult_habbits$mpadays[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
 lifestyle$mpamin <- adult_habbits$mpamin[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
+lifestyle$mpa10 <- adult_habbits$mpa10[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
 
 ## First, work on vpa10
 # if vpa10=1 and vpadays=. then do vpadays=1; end;
@@ -105,6 +106,8 @@ lifestyle$wvpa[index] <- lifestyle$pa20[index] *20
 lifestyle$wvpa[which(is.na(lifestyle$wvpa) & (is.na(lifestyle$vpa10) | lifestyle$vpa10 ==2) & lifestyle$nopa ==2 & (is.na(lifestyle$pa20) | lifestyle$pa20 ==0))] <- 0
 
 ## Now work on mpa
+# if mpa10=. and (mpadays ne . or mpamin ne .) then do mpa10=1; end;
+lifestyle$mpa10[which(is.na(lifestyle$mpa10) & (!is.na(lifestyle$mpadays) | !is.na(lifestyle$mpamin)))]
 
 ##################################
 ## Recode categorical variables ##
