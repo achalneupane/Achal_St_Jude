@@ -134,6 +134,40 @@ lifestyle$mvpawk[which(lifestyle$mvpawk > 2520)] <- 2520
 lifestyle$CDC_PA <- ifelse(lifestyle$mvpawk < 150 | is.na(lifestyle$mvpawk), 0,1)
 
 
+## 2.-------------- Smoker status
+# Get evsm, smnow, smnvr, cigmo, cigd, smyr
+lifestyle$evsm <- adult_habbits$evsm[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
+lifestyle$smnow <- adult_habbits$smnow[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
+lifestyle$cigmo <- adult_habbits$cigmo[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
+lifestyle$cigd <- adult_habbits$cigd[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
+lifestyle$smyr <- adult_habbits$smyr[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
+
+
+# if evsm=2 then do ; smnow=2 ; cigmo=2 ; cigd=0 ; smyr=0 ; end ;
+lifestyle$smnow[which(lifestyle$evsm == 2)] <- 2
+lifestyle$cigmo[which(lifestyle$evsm == 2)] <- 2
+lifestyle$cigd[which(lifestyle$evsm == 2)] <- 0
+lifestyle$smyr[which(lifestyle$evsm == 2)] <- 0
+
+# if smnvr=1 then do ; evsm=2 ; smnow=2 ; cigmo=2 ; cigd=0 ; smyr=0 ; end ;
+lifestyle$evsm[which(lifestyle$smnvr == 1)] <- 2
+lifestyle$smnow[which(lifestyle$smnvr == 1)] <- 2
+lifestyle$cigmo[which(lifestyle$smnvr == 1)] <- 2
+lifestyle$cigd[which(lifestyle$smnvr == 1)] <- 0
+lifestyle$smyr[which(lifestyle$smnvr == 1)] <- 0
+
+
+
+lifestyle$smkStat <- NA
+lifestyle$smkStat[which(lifestyle$evsm == 1 & lifestyle$smnow == 2)] <- 1 # Former
+lifestyle$smkStat[which(lifestyle$evsm == 1 & lifestyle$smnow == 1)] <- 2 # Current
+lifestyle$smkStat[which(lifestyle$evsm == 2)] <- 3 # Never
+
+table(lifestyle$smoker)
+table(lifestyle$smkStat)
+
+table(lifestyle$smoker == lifestyle$smkStat)
+
 ##################################
 ## Recode categorical variables ##
 ##################################
