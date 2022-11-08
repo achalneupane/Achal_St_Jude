@@ -69,6 +69,7 @@ lifestyle <- lifestyle[!duplicated(lifestyle$SJLIFEID),]
 
 ## 1.-------------- Physical activity
 sum(is.na(lifestyle$vpa10))
+# 42
 # get additional adult health habits
 adult_habbits <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Survey Data/adult_healthhabits.sas7bdat')
 
@@ -83,7 +84,15 @@ lifestyle$vpadays[which(lifestyle$vpa10 == 1 & is.na(lifestyle$vpadays))] <- 1
 
 # if vpa10=1 and vpamin=. then do vpamin=10; end;
 lifestyle$vpamin[which(lifestyle$vpa10 == 1 & is.na(lifestyle$vpamin))] <- 10
-cc <- lifestyle[which(lifestyle$vpa10 == 1 & is.na(lifestyle$vpamin)),]
+# cc <- lifestyle[which(lifestyle$vpa10 == 1 & is.na(lifestyle$vpamin)),]
+max(lifestyle$vpamin, na.rm = T)
+# 720
+# if vpamin>360 then do vpamin=360; end; /*Cap six hours per day*/; So, cap this to six hours only
+lifestyle$vpamin[which(lifestyle$vpamin > 360)] <- 360
+
+lifestyle$wvpa <- NA
+lifestyle$wvpa[which(lifestyle$vpa10 == 1)] <- lifestyle$vpadays[which(lifestyle$vpa10 == 1)] * lifestyle$vpamin[which(lifestyle$vpa10 == 1)]
+lifestyle$wvpa[which(lifestyle$vpa10 == 2)] <- 0
 
 ##################################
 ## Recode categorical variables ##
@@ -328,6 +337,6 @@ ALL.LIFESTYLE <- ALL.LIFESTYLE[c("agesurvey", "SJLIFEID", "HEI2005_TOTAL_SCORE",
 ALL.LIFESTYLE <- merge(ALL.LIFESTYLE, bmi_iid_dob_18_uniq, by.x = "SJLIFEID", by.y = "sjlid", all = T)
 
 
-# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v2.RDATA")
+# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v10.RDATA")
 
 # load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v2.RDATA")
