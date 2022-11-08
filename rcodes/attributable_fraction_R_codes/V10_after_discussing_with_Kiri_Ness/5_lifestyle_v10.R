@@ -98,11 +98,13 @@ lifestyle$wvpa[which(lifestyle$vpa10 == 2)] <- 0
 
 # if wvpa=. then do;---
 # if vpa10 in (.,2) and nopa=1 and pa20 in (.,0) then do wvpa=0; end;
-lifestyle$wvpa[which(is.na(lifestyle$wvpa) & (is.na(lifestyle$vpa10) | lifestyle$vpa10 ==2) & lifestyle$nopa ==1 & (is.na(lifestyle$pa20) | lifestyle$pa20 ==0))] <- 0
 # if vpa10 in (.,2) and pa20 not in (.,0) then do wvpa=pa20*20; end;
+# if vpa10 in (.,2) and nopa=2 and pa20 in (.,0) then do wvpa=0; end;
+lifestyle$wvpa[which(is.na(lifestyle$wvpa) & (is.na(lifestyle$vpa10) | lifestyle$vpa10 ==2) & lifestyle$nopa ==1 & (is.na(lifestyle$pa20) | lifestyle$pa20 ==0))] <- 0
+
 index <- which(is.na(lifestyle$wvpa) & (is.na(lifestyle$vpa10) | lifestyle$vpa10 ==2) & (!is.na(lifestyle$pa20) | lifestyle$pa20 !=0))
 lifestyle$wvpa[index] <- lifestyle$pa20[index] *20
-# if vpa10 in (.,2) and nopa=2 and pa20 in (.,0) then do wvpa=0; end;
+
 lifestyle$wvpa[which(is.na(lifestyle$wvpa) & (is.na(lifestyle$vpa10) | lifestyle$vpa10 ==2) & lifestyle$nopa ==2 & (is.na(lifestyle$pa20) | lifestyle$pa20 ==0))] <- 0
 
 ## Now work on mpa
@@ -114,7 +116,23 @@ lifestyle$mpadays[which((lifestyle$mpa10==1) & (is.na(lifestyle$mpadays)))] <- 1
 lifestyle$mpamin[which((lifestyle$mpa10==1) & (is.na(lifestyle$mpamin)))] <- 1
 # if mpamin>360 then do mpamin=360; end; /*Cap six hours per day*/
 lifestyle$mpamin[which(lifestyle$mpamin > 360)] <- 360
+
 # if mpa10=1 then do wmpa=mpadays*mpamin; end;
+lifestyle$wmpa <- NA
+lifestyle$wmpa[which(lifestyle$mpa10 == 1)] <- lifestyle$mpadays[which(lifestyle$mpa10 == 1)] * lifestyle$mpamin[which(lifestyle$mpa10 == 1)] 
+# if mpa10=2 then do wmpa=0; end;
+lifestyle$wmpa[which(lifestyle$mpa10 == 2)] <- 0
+# if wmpa=. then do;---
+# if mpa10 in (.,2) and nopa=1 then do wmpa=0; end;
+# if wvpa ne . then do wmpa=0; end;
+lifestyle$wmpa[which(is.na(lifestyle$wmpa) & ((is.na(lifestyle$mpa10)|lifestyle$mpa10 == 2) & lifestyle$nopa == 1))] <- 0
+lifestyle$wmpa[which(is.na(lifestyle$wmpa) & !is.na(lifestyle$wvpa)) ] <- 0
+
+# mvpawk=(wmpa)+(wvpa*2); if mvpawk>2520 then mvpawk=2520; /*cap six hours per day*/
+lifestyle$mvpawk <- lifestyle$wmpa + (lifestyle$wvpa *2)
+lifestyle$mvpawk[which(lifestyle$mvpawk > 2520)] <- 2520
+lifestyle$CDC_PA <- ifelse(lifestyle$mvpawk < 150 | is.na(lifestyle$mvpawk), 0,1)
+
 
 ##################################
 ## Recode categorical variables ##
