@@ -79,6 +79,7 @@ lifestyle$vpamin <- adult_habbits$vpamin[match(lifestyle$SJLIFEID, adult_habbits
 lifestyle$mpadays <- adult_habbits$mpadays[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
 lifestyle$mpamin <- adult_habbits$mpamin[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
 
+## First, work on vpa10
 # if vpa10=1 and vpadays=. then do vpadays=1; end;
 lifestyle$vpadays[which(lifestyle$vpa10 == 1 & is.na(lifestyle$vpadays))] <- 1
 
@@ -93,6 +94,17 @@ lifestyle$vpamin[which(lifestyle$vpamin > 360)] <- 360
 lifestyle$wvpa <- NA
 lifestyle$wvpa[which(lifestyle$vpa10 == 1)] <- lifestyle$vpadays[which(lifestyle$vpa10 == 1)] * lifestyle$vpamin[which(lifestyle$vpa10 == 1)]
 lifestyle$wvpa[which(lifestyle$vpa10 == 2)] <- 0
+
+# if wvpa=. then do;---
+# if vpa10 in (.,2) and nopa=1 and pa20 in (.,0) then do wvpa=0; end;
+lifestyle$wvpa[which(is.na(lifestyle$wvpa) & (is.na(lifestyle$vpa10) | lifestyle$vpa10 ==2) & lifestyle$nopa ==1 & (is.na(lifestyle$pa20) | lifestyle$pa20 ==0))] <- 0
+# if vpa10 in (.,2) and pa20 not in (.,0) then do wvpa=pa20*20; end;
+index <- which(is.na(lifestyle$wvpa) & (is.na(lifestyle$vpa10) | lifestyle$vpa10 ==2) & (!is.na(lifestyle$pa20) | lifestyle$pa20 !=0))
+lifestyle$wvpa[index] <- lifestyle$pa20[index] *20
+# if vpa10 in (.,2) and nopa=2 and pa20 in (.,0) then do wvpa=0; end;
+lifestyle$wvpa[which(is.na(lifestyle$wvpa) & (is.na(lifestyle$vpa10) | lifestyle$vpa10 ==2) & lifestyle$nopa ==2 & (is.na(lifestyle$pa20) | lifestyle$pa20 ==0))] <- 0
+
+## Now work on mpa
 
 ##################################
 ## Recode categorical variables ##
