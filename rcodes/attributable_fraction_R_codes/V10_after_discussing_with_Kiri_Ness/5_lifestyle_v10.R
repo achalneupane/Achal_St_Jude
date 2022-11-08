@@ -107,7 +107,14 @@ lifestyle$wvpa[which(is.na(lifestyle$wvpa) & (is.na(lifestyle$vpa10) | lifestyle
 
 ## Now work on mpa
 # if mpa10=. and (mpadays ne . or mpamin ne .) then do mpa10=1; end;
-lifestyle$mpa10[which(is.na(lifestyle$mpa10) & (!is.na(lifestyle$mpadays) | !is.na(lifestyle$mpamin)))]
+lifestyle$mpa10[which(is.na(lifestyle$mpa10) & (!is.na(lifestyle$mpadays) | !is.na(lifestyle$mpamin)))] <- 1
+# if mpa10=1 and mpadays=. then do mpadays=1; end;
+lifestyle$mpadays[which((lifestyle$mpa10==1) & (is.na(lifestyle$mpadays)))] <- 1
+# if mpa10=1 and mpamin=. then do mpamin=10; end;
+lifestyle$mpamin[which((lifestyle$mpa10==1) & (is.na(lifestyle$mpamin)))] <- 1
+# if mpamin>360 then do mpamin=360; end; /*Cap six hours per day*/
+lifestyle$mpamin[which(lifestyle$mpamin > 360)] <- 360
+# if mpa10=1 then do wmpa=mpadays*mpamin; end;
 
 ##################################
 ## Recode categorical variables ##
