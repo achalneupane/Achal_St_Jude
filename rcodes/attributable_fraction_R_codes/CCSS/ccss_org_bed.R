@@ -59,3 +59,14 @@ colnames(all_cancers_38)
 all_cancers_37 <- all_cancers_38[c("CHROM", "POS_GRCh37", "REF", "Effect_allele", "Effect_size", "TYPE", "Cancer", "Significant_YN")]
 
 write.table(all_cancers_37, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/all_cancer.txt", sep = "\t", col.names = T, quote = F, row.names = F)
+
+##########################################################################################
+## Part 2: re-calculating PRS in SJLIFE with the variants present in CCSS_original data ##
+##########################################################################################
+## Extract matching variants from SJLIFE
+SJLIFE_vars <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data.txt", header = T)
+SJLIFE_vars$KEY_GRCh38 <- paste0("chr", SJLIFE_vars$CHROM,":", SJLIFE_vars$POS_GRCh38)
+all_cancers_38.matched$KEY_GRCh38 
+
+SJLIFE_vars.in.CCSS_org <- SJLIFE_vars[SJLIFE_vars$KEY_GRCh38 %in% all_cancers_38.matched$KEY_GRCh38 ,]
+paste0(SJLIFE_vars.in.CCSS_org$TYPE

@@ -382,3 +382,58 @@ plink --bfile 1000genomes_merged --keep /research_jude/rgs01_jude/groups/sapkogr
 awk '{print "chr"$1"\tchr"$1":"$4":"$5":"$6"\t"$3"\t"$4"\t"$6"\t"$5}' test_freq_Eur.bim> test_freq_Eur.bim2
 
 plink --bfile test_freq_Eur --freq --out test_freq_Eur_freq
+
+
+
+
+
+## Since CCSS_original was missing 72 variants in the GWAS data, I am re-calculating PRS for breast cancer with just 241 variants 
+## Use R code: ccss_org_bed.R (Part 2) to extract variants
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs
+awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt > prs_out/ALL_Cancers_PRS_data.txt_${study}
+# awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt | egrep -v '145902073|57426897|114515866|129989587' > prs_out/ALL_Cancers_PRS_data.txt_${study} # MichiganWeb_ER_OVERALL_Breast
+# awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt | egrep -v '57426897|114515866' > prs_out/ALL_Cancers_PRS_data.txt_${study} # MichiganWeb_ER_POS_Breast
+# awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt | grep -v 30641447 > prs_out/ALL_Cancers_PRS_data.txt_${study}
+# Check for duplicate variants based on chr:pos
+awk 'a[$1":"$2]++' prs_out/ALL_Cancers_PRS_data.txt_$study | wc -l
+# Look for directly matching variants in the WGS data
+awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/ALL_Cancers_PRS_data.txt_$study plink_data/sjlife_all_PRS_all_final_v3.bim \
+| awk '($4==$6 || $4==$7) && ($5==$6 || $5==$7)' > prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match
+# No direct match
+awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/ALL_Cancers_PRS_data.txt_$study plink_data/sjlife_all_PRS_all_final_v3.bim \
+| awk '!(($4==$6 || $4==$7) && ($5==$6 || $5==$7))' | grep -v DEL > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match
+# Exclude those that are already a direct match
+awk 'NR==FNR{a[$1":"$3];next}!($1":"$3 in a){print}' prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match \
+> prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final
+
+wc -l prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final
+
+# grep -vw chr1:113903258:G:T prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final
+# Check for duplicate variants
+# awk 'a[$1":"$3]++' prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_duplicates
+# Drop one from the duplicate; check for the allele frequency first, and get rid of the rare variant keeping the common one
+# egrep -vw 'chr9:108126198:G:A|chr3:30641447:G:C' prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_uniq
+# grep -vw chr9:108126198:G:A prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_uniq
+# mv prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_uniq prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match
+# Harmonize no direct match alleles
+module load R
+Rscript harmonize_alleles.R prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final
+
+# Update the alleles
+awk '($NF==1){ print $3, $6, $7, $8, $9}' prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final_alleles_harmonized > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt
+# awk '($NF==1){ print $3, $6, $7, $8, $9}' prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final_alleles_harmonized | grep -vw chr9:108126198:G:A > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt
+# grep -v chr1:145902073:G:GA prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt > prs_out/t1
+# mv prs_out/t1 prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt
+# Extract study-specific variants
+awk '{print $2}' prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match > prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match_to_extract.txt
+module load plink/1.90b
+plink --bfile plink_data/sjlife_all_PRS_all_final_v3 --extract prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match_to_extract.txt --make-bed --out prs_out/${study}_direct_match
+plink --bfile plink_data/sjlife_all_PRS_all_final_v3 --extract prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --update-alleles prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --make-bed --out prs_out/${study}_harmonized
+plink --bfile prs_out/${study}_direct_match --bmerge prs_out/${study}_harmonized --make-bed --out prs_out/$study
+# Update variant names
+awk '{print $2, $1":"$4}' prs_out/${study}.bim > prs_out/${study}_update_variantnames
+plink --bfile prs_out/$study --update-name prs_out/${study}_update_variantnames --make-bed --out prs_out/${study}_varname_updated
+# Create a score file
+awk '{print $1":"$2, $4, $5}' prs_out/ALL_Cancers_PRS_data.txt_$study > prs_out/${study}.prsweight
+# Calculate PRS
+plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweight --out prs_out/${study}_prs
