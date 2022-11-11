@@ -69,4 +69,7 @@ SJLIFE_vars$KEY_GRCh38 <- paste0("chr", SJLIFE_vars$CHROM,":", SJLIFE_vars$POS_G
 all_cancers_38.matched$KEY_GRCh38 
 
 SJLIFE_vars.in.CCSS_org <- SJLIFE_vars[SJLIFE_vars$KEY_GRCh38 %in% all_cancers_38.matched$KEY_GRCh38 ,]
-paste0(SJLIFE_vars.in.CCSS_org$TYPE
+## Add study identifier, so it's easy to identify the PRS files later on
+SJLIFE_vars.in.CCSS_org$TYPE <- paste0(SJLIFE_vars.in.CCSS_org$TYPE, "_from_variants_also_in_CCSS_org")
+
+write.table(SJLIFE_vars.in.CCSS_org[1:8], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data_in_CCSS_org.txt", sep = "\t", col.names = T, quote = F, row.names = F)

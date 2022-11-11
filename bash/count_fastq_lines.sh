@@ -1,3 +1,5 @@
+hpcf_interactive -n 30 -R "rusage[mem=4000]" -q standard
+
 for file1 in $(ls ./*/*_1.fq.gz| sort -V); do
 file2="$(echo $file1 | sed 's/_1.fq.gz/_2.fq.gz/g')"
 file1_lines="$(zcat ${file1}| wc -l)"

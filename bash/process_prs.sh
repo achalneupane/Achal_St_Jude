@@ -390,7 +390,12 @@ plink --bfile test_freq_Eur --freq --out test_freq_Eur_freq
 ## Since CCSS_original was missing 72 variants in the GWAS data, I am re-calculating PRS for breast cancer with just 241 variants 
 ## Use R code: ccss_org_bed.R (Part 2) to extract variants
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs
-awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt > prs_out/ALL_Cancers_PRS_data.txt_${study}
+
+study="Meningioma_from_variants_also_in_CCSS_org"
+awk -v study=$study '$6==study' ALL_Cancers_PRS_data_in_CCSS_org.txt > prs_out/ALL_Cancers_PRS_data.txt_${study}
+# ## Meningioma
+## grep "Meningioma" ALL_Cancers_PRS_data_in_CCSS_org.txt > prs_out/ALL_Cancers_PRS_data.txt_${study}
+
 # awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt | egrep -v '145902073|57426897|114515866|129989587' > prs_out/ALL_Cancers_PRS_data.txt_${study} # MichiganWeb_ER_OVERALL_Breast
 # awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt | egrep -v '57426897|114515866' > prs_out/ALL_Cancers_PRS_data.txt_${study} # MichiganWeb_ER_POS_Breast
 # awk -v study=$study '$6==study' ALL_Cancers_PRS_data.txt | grep -v 30641447 > prs_out/ALL_Cancers_PRS_data.txt_${study}
@@ -407,6 +412,10 @@ awk 'NR==FNR{a[$1":"$3];next}!($1":"$3 in a){print}' prs_out/ALL_Cancers_PRS_dat
 > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final
 
 wc -l prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final
+
+# check how many in PRS and direct match
+wc -l prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match
+grep $study ALL_Cancers_PRS_data_in_CCSS_org.txt| wc -l
 
 # grep -vw chr1:113903258:G:T prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_final
 # Check for duplicate variants
