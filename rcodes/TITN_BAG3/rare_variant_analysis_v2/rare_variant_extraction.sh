@@ -37,47 +37,49 @@ awk '/^chr2/ && $2 >= 178525989 && $2 <= 178807423' >> ${GENE}
 ##############################################
 ## Extract these nine genes from plink data ##
 ##############################################
+module load plink/1.90b
 ## BAG3
-plink
---bfile
---chr 2
---from-bp 119651380
---make-bed
---max-maf 0.01
---out sjlife_bag3_maf_lt_0.01
---to-bp 119651380
---vcf ../../../Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr2.PASS.decomposed.vcf.gz
+CHR=10
+GENE=BAG3
+START=119651380
+END=119677819
+plink \
+--chr ${CHR} \
+--from-bp ${START} \
+--make-bed \
+--max-maf 0.01 \
+--out sjlife_${GENE}_maf_lt_0.01 \
+--to-bp ${END} \
+--vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf.gz
 
+plink \
+--chr ${CHR} \
+--from-bp ${START} \
+--make-bed \
+--max-maf 0.01 \
+--out ccss_exp_bag3_maf_lt_0.01 \
+--to-bp ${END} \
+--vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSS.GATKv3.4.VQSR_chr${CHR}.PASS.decomposed.ccssid.vcf.gz
 
-plink
---bfile
---chr 2
---from-bp 178525989
---make-bed
---max-maf 0.01
---out ccss_exp_ttn_maf_lt_0.01
---to-bp 178807423
---vcf ../../../Genomics/common/ccss_exp_wgs/CCSS.GATKv3.4.VQSR_chr2.PASS.decomposed.ccssid.vcf.gz
+## DSP
+CHR=6
+GENE=DSP
+START=7541671
+END=7586714
+plink \
+--chr ${CHR} \
+--from-bp ${START} \
+--make-bed \
+--max-maf 0.01 \
+--out sjlife_${GENE}_maf_lt_0.01 \
+--to-bp ${END} \
+--vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf.gz
 
-
-## TTN
-plink
---bfile
---chr 2
---from-bp 178525989
---make-bed
---max-maf 0.01
---out sjlife_ttn_maf_lt_0.01
---to-bp 178807423
---vcf ../../../Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr2.PASS.decomposed.vcf.gz
-
-
-plink
---bfile
---chr 2
---from-bp 178525989
---make-bed
---max-maf 0.01
---out ccss_exp_ttn_maf_lt_0.01
---to-bp 178807423
---vcf ../../../Genomics/common/ccss_exp_wgs/CCSS.GATKv3.4.VQSR_chr2.PASS.decomposed.ccssid.vcf.gz
+plink \
+--chr ${CHR} \
+--from-bp ${START} \
+--make-bed \
+--max-maf 0.01 \
+--out ccss_exp_bag3_maf_lt_0.01 \
+--to-bp ${END} \
+--vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSS.GATKv3.4.VQSR_chr${CHR}.PASS.decomposed.ccssid.vcf.gz
