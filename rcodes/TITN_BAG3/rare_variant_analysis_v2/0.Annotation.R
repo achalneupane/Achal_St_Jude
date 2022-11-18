@@ -14,7 +14,107 @@ dim(NINE_GENES.annovar)
 
 
 
+## Part 2
 
+## Read bim files from ccss and sjlife maf less than 0.01 and get common variants bettween the cohorts to keep.
+ccss_vars_bim <- read.table("all_ccss_exp_vars_lt_maf_0.01.txt")
+sjlife_vars_bim <- read.table("all_sjlife_vars_lt_maf_0.01.txt")
+
+colnames(ccss_vars_bim) <- c("CHROM", "SNP", "centi", "POS", "REF", "ALT")
+colnames(sjlife_vars_bim) <- c("CHROM", "SNP", "centi", "POS", "REF", "ALT")
+
+
+## Flip alleles
+sjlife_vars_bim$REF_flipped <- chartr("acgtACGT", "tgcaTGCA", sjlife_vars_bim$REF)
+sjlife_vars_bim$ALT_flipped <- chartr("acgtACGT", "tgcaTGCA", sjlife_vars_bim$ALT)
+
+# Create positional keys
+ccss_vars_bim$KEY <- paste(ccss_vars_bim$CHROM, ccss_vars_bim$POS, sep = ":")
+sjlife_vars_bim$KEY <- paste(sjlife_vars_bim$CHROM, sjlife_vars_bim$POS, sep = ":")
+
+## Keep gnomad rare variants
+NINE_GENES.annovar$KEY <- gsub("chr", "", paste(NINE_GENES.annovar$Chr, NINE_GENES.annovar$Start, sep = ":"))
+sjlife_vars_bim <- sjlife_vars_bim[sjlife_vars_bim$KEY %in% NINE_GENES.annovar$KEY,]
+
+dim(sjlife_vars_bim)
+
+for (i in 1:nrow(sjlife_vars_bim)){
+  print(paste0("Doing iteration: ", i))
+  if (sum(grepl(paste0("chr",sjlife_vars_bim$KEY[i],":"), ccss_vars_bim$SNP)) > 0){ # Only if position matches; do
+    match.index <- grep(paste0("chr",sjlife_vars_bim$KEY[i],":"), ccss_vars_bim$SNP)
+    for(j in 1:length(match.index)){
+    if(sjlife_vars_bim$REF[i] == ccss_vars_bim$REF[match.index[j]] & sjlife_vars_bim$ALT[i] == ccss_vars_bim$ALT[match.index[j]]){
+      sjlife_vars_bim$MATCH[i] <- "DIRECT_MATCH"
+      sjlife_vars_bim$CCSS_equivalent[i] <- ccss_vars_bim$SNP[match.index[j]]
+    } else if
+      ((sjlife_vars_bim$REF_flipped[i] == ccss_vars_bim$REF[match.index[j]] & sjlife_vars_bim$ALT_flipped[i] == ccss_vars_bim$ALT[match.index[j]])|
+      (sjlife_vars_bim$REF_flipped[i] == ccss_vars_bim$REF[match.index[j]] & sjlife_vars_bim$ALT[i] == ccss_vars_bim$ALT[match.index[j]])|
+      (sjlife_vars_bim$REF[i] == ccss_vars_bim$REF[j] & sjlife_vars_bim$ALT_flipped[i] == ccss_vars_bim$ALT[match.index[j]])){
+      sjlife_vars_bim$MATCH[i] <- "INDIRECT_MATCH"
+      sjlife_vars_bim$CCSS_equivalent[i] <- ccss_vars_bim$SNP[match.index[j]]
+    }else{
+      sjlife_vars_bim$MATCH[i] <- NA
+      sjlife_vars_bim$CCSS_equivalent[i] <- NA
+    }
+      
+    }
+  } else {
+    sjlife_vars_bim$MATCH[i] <- NA
+    sjlife_vars_bim$CCSS_equivalent[i] <- NA
+  }
+    
+}
+
+
+
+
+head(sjlife_vars_bim)
+
+
+
+
+for (i in 1: nrow(sjlife_vars_bim)){
+  sjlife_vars_bim
+}
+
+
+
+
+
+
+
+
+
+## Now keep common ones only based on chr:POS
+sjlife_vars_bim <- sjlife_vars_bim[sjlife_vars_bim$KEY %in% ccss_vars_bim$KEY,]
+dim(sjlife_vars_bim)
+# 2783
+sum(sjlife_vars_bim$KEY1 %in% ccss_vars_bim$KEY1)
+# 2674
+sum(sjlife_vars_bim$KEY2 %in% ccss_vars_bim$KEY1)
+# 27
+
+# sjlife_vars_bim$MATCH1 <- ifelse(sjlife_vars_bim$KEY1 %in% ccss_vars_bim$KEY1, 1, 0)
+# sjlife_vars_bim$MATCH2 <- ifelse(sjlife_vars_bim$KEY2 %in% ccss_vars_bim$KEY1, 1, 0)
+
+
+
+
+
+
+
+
+
+
+sjlife_vars_bim$KEY1_flipped <- paste(sjlife_vars_bim$KEY, sjlife_vars_bim$REF_flipped, sjlife_vars_bim$ALT_flipped , sep = ":")
+sjlife_vars_bim$KEY2_flipped <- paste(sjlife_vars_bim$KEY, sjlife_vars_bim$ALT_flipped, sjlife_vars_bim$REF_flipped , sep = ":")
+
+sum(sjlife_vars_bim$KEY1_flipped %in% ccss_vars_bim$KEY1)
+# 0
+sum(sjlife_vars_bim$KEY2_flipped %in% ccss_vars_bim$KEY1)
+# 327
+
+sjlife_vars_bim$MATCH3 <- ifelse(sjlife_vars_bim$KEY2_flipped %in% ccss_vars_bim$KEY1, 1,NA)
 
 ############################
 ## Clinvar, LoF and Revel ##

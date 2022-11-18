@@ -57,7 +57,7 @@ plink \
 --from-bp ${START} \
 --make-bed \
 --max-maf 0.01 \
---out ccss_exp_bag3_maf_lt_0.01 \
+--out ccss_exp_${GENE}_maf_lt_0.01 \
 --to-bp ${END} \
 --vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSS.GATKv3.4.VQSR_chr${CHR}.PASS.decomposed.ccssid.vcf.gz
 
@@ -80,6 +80,200 @@ plink \
 --from-bp ${START} \
 --make-bed \
 --max-maf 0.01 \
---out ccss_exp_bag3_maf_lt_0.01 \
+--out ccss_exp_${GENE}_maf_lt_0.01 \
 --to-bp ${END} \
 --vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSS.GATKv3.4.VQSR_chr${CHR}.PASS.decomposed.ccssid.vcf.gz
+
+
+## LMNA
+CHR=1
+GENE=LMNA
+START=156082573
+END=156140081
+plink \
+--chr ${CHR} \
+--from-bp ${START} \
+--make-bed \
+--max-maf 0.01 \
+--out sjlife_${GENE}_maf_lt_0.01 \
+--to-bp ${END} \
+--vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf.gz
+
+plink \
+--chr ${CHR} \
+--from-bp ${START} \
+--make-bed \
+--max-maf 0.01 \
+--out ccss_exp_${GENE}_maf_lt_0.01 \
+--to-bp ${END} \
+--vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSS.GATKv3.4.VQSR_chr${CHR}.PASS.decomposed.ccssid.vcf.gz
+
+
+## MYH7
+CHR=14
+GENE=MYH7
+START=23412740
+END=23435660
+plink \
+--chr ${CHR} \
+--from-bp ${START} \
+--make-bed \
+--max-maf 0.01 \
+--out sjlife_${GENE}_maf_lt_0.01 \
+--to-bp ${END} \
+--vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf.gz
+
+plink \
+--chr ${CHR} \
+--from-bp ${START} \
+--make-bed \
+--max-maf 0.01 \
+--out ccss_exp_${GENE}_maf_lt_0.01 \
+--to-bp ${END} \
+--vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSS.GATKv3.4.VQSR_chr${CHR}.PASS.decomposed.ccssid.vcf.gz
+
+
+## SCN5A
+CHR=3
+GENE=SCN5A
+START=38548062
+END=38649687
+plink \
+--chr ${CHR} \
+--from-bp ${START} \
+--make-bed \
+--max-maf 0.01 \
+--out sjlife_${GENE}_maf_lt_0.01 \
+--to-bp ${END} \
+--vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf.gz
+
+plink \
+--chr ${CHR} \
+--from-bp ${START} \
+--make-bed \
+--max-maf 0.01 \
+--out ccss_exp_${GENE}_maf_lt_0.01 \
+--to-bp ${END} \
+--vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSS.GATKv3.4.VQSR_chr${CHR}.PASS.decomposed.ccssid.vcf.gz
+
+
+## TCAP
+CHR=17
+GENE=TCAP
+START=39665349
+END=39666554
+plink \
+--chr ${CHR} \
+--from-bp ${START} \
+--make-bed \
+--max-maf 0.01 \
+--out sjlife_${GENE}_maf_lt_0.01 \
+--to-bp ${END} \
+--vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf.gz
+
+plink \
+--chr ${CHR} \
+--from-bp ${START} \
+--make-bed \
+--max-maf 0.01 \
+--out ccss_exp_${GENE}_maf_lt_0.01 \
+--to-bp ${END} \
+--vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSS.GATKv3.4.VQSR_chr${CHR}.PASS.decomposed.ccssid.vcf.gz
+
+
+## TNNC1
+CHR=3
+GENE=TNNC1
+START=52451100
+END=52454041
+plink \
+--chr ${CHR} \
+--from-bp ${START} \
+--make-bed \
+--max-maf 0.01 \
+--out sjlife_${GENE}_maf_lt_0.01 \
+--to-bp ${END} \
+--vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf.gz
+
+plink \
+--chr ${CHR} \
+--from-bp ${START} \
+--make-bed \
+--max-maf 0.01 \
+--out ccss_exp_${GENE}_maf_lt_0.01 \
+--to-bp ${END} \
+--vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSS.GATKv3.4.VQSR_chr${CHR}.PASS.decomposed.ccssid.vcf.gz
+
+
+## TNNT2
+CHR=1
+GENE=TNNT2
+START=201359014
+END=201377680
+plink \
+--chr ${CHR} \
+--from-bp ${START} \
+--make-bed \
+--max-maf 0.01 \
+--out sjlife_${GENE}_maf_lt_0.01 \
+--to-bp ${END} \
+--vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf.gz
+
+plink \
+--chr ${CHR} \
+--from-bp ${START} \
+--make-bed \
+--max-maf 0.01 \
+--out ccss_exp_${GENE}_maf_lt_0.01 \
+--to-bp ${END} \
+--vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSS.GATKv3.4.VQSR_chr${CHR}.PASS.decomposed.ccssid.vcf.gz
+
+
+## TTN
+CHR=2
+GENE=TTN
+START=178525989
+END=178807423
+plink \
+--chr ${CHR} \
+--from-bp ${START} \
+--make-bed \
+--max-maf 0.01 \
+--out sjlife_${GENE}_maf_lt_0.01 \
+--to-bp ${END} \
+--vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf.gz
+
+plink \
+--chr ${CHR} \
+--from-bp ${START} \
+--make-bed \
+--max-maf 0.01 \
+--out ccss_exp_${GENE}_maf_lt_0.01 \
+--to-bp ${END} \
+--vcf /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSS.GATKv3.4.VQSR_chr${CHR}.PASS.decomposed.ccssid.vcf.gz
+
+
+
+cut -d' ' -f1-2 /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ttn_bag3.pheno > sjlife_samples
+cut -d' ' -f1-2 /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/ccss_exp_eur_cardiotoxic_exposed.pheno > ccss_exp_samples
+
+
+plink1.9 --bfile ${BFILE} --keep amyloid_imaging_sample_list.txt --make-bed --keep-allele-order --out ${BFILE}_Amyloid_Imaging
+
+
+# subset to SJLIFE EUR cohort
+for file in ls sjlife*.bim; do
+BFILE="$(echo ${file%.*})"
+plink --bfile ${BFILE} --keep sjlife_samples --make-bed --keep-allele-order --max-maf 0.01 --out ${BFILE}_final
+done
+
+# subset to CCSS EUR cohort
+for file in ls ccss_exp*.bim; do
+BFILE="$(echo ${file%.*})"
+plink --bfile ${BFILE} --keep ccss_exp_samples --make-bed --keep-allele-order --max-maf 0.01 --out ${BFILE}_final
+done
+
+cat ccss_exp*0.01_final.bim > all_ccss_exp_vars_lt_maf_0.01.txt
+cat sjlife*0.01_final.bim > all_sjlife_vars_lt_maf_0.01.txt
+
+## Now read these two files in Rscipt Z:\ResearchHome\ClusterHome\aneupane\St_Jude\Achal_St_Jude\rcodes\TITN_BAG3\rare_variant_analysis_v2; part 2
