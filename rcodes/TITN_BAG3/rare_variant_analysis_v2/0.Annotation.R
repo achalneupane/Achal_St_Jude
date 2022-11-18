@@ -34,6 +34,9 @@ NINE_GENES.annovar$KEY <- gsub("chr", "", paste(NINE_GENES.annovar$Otherinfo4, N
 # create SNPID for annovar
 NINE_GENES.annovar$SNP <- paste0(NINE_GENES.annovar$Otherinfo4,":", NINE_GENES.annovar$Otherinfo5,":",
                                  NINE_GENES.annovar$Otherinfo7,":", NINE_GENES.annovar$Otherinfo8)
+NINE_GENES.annovar$REF <- NINE_GENES.annovar$Otherinfo7
+NINE_GENES.annovar$ALT <- NINE_GENES.annovar$Otherinfo8
+
 
 sjlife_vars_bim <- sjlife_vars_bim[sjlife_vars_bim$KEY %in% NINE_GENES.annovar$KEY,]
 
@@ -69,7 +72,8 @@ for (i in 1:nrow(sjlife_vars_bim)){
 
 
 ## Now get the match index from gnomAD variants with less than 0.01 maf
-NINE_GENES.annovar_vars <- NINE_GENES.annovar$Otherinfo10
+NINE_GENES.annovar_vars <- NINE_GENES.annovar
+
 for (i in 1:nrow(sjlife_vars_bim)){
   print(paste0("Doing iteration: ", i))
   if (sum(grepl(paste0("chr",sjlife_vars_bim$KEY[i],":"), NINE_GENES.annovar_vars$SNP)) > 0){ # Only if position matches; do
