@@ -72,31 +72,29 @@ for (i in 1:nrow(sjlife_vars_bim)){
 
 
 ## Now get the match index from gnomAD variants with less than 0.01 maf
-NINE_GENES.annovar_vars <- NINE_GENES.annovar
-
 for (i in 1:nrow(sjlife_vars_bim)){
   print(paste0("Doing iteration: ", i))
-  if (sum(grepl(paste0("chr",sjlife_vars_bim$KEY[i],":"), NINE_GENES.annovar_vars$SNP)) > 0){ # Only if position matches; do
-    match.index <- grep(paste0("chr",sjlife_vars_bim$KEY[i],":"), NINE_GENES.annovar_vars$SNP)
+  if (sum(grepl(paste0("chr",sjlife_vars_bim$KEY[i],":"), NINE_GENES.annovar$SNP)) > 0){ # Only if position matches; do
+    match.index <- grep(paste0("chr",sjlife_vars_bim$KEY[i],":"), NINE_GENES.annovar$SNP)
     for(j in 1:length(match.index)){
-      if(sjlife_vars_bim$REF[i] == NINE_GENES.annovar_vars$REF[match.index[j]] & sjlife_vars_bim$ALT[i] == NINE_GENES.annovar_vars$ALT[match.index[j]]){
+      if(sjlife_vars_bim$REF[i] == NINE_GENES.annovar$REF[match.index[j]] & sjlife_vars_bim$ALT[i] == NINE_GENES.annovar$ALT[match.index[j]]){
         sjlife_vars_bim$MATCH_gnomad[i] <- "DIRECT_MATCH"
-        sjlife_vars_bim$gnomad_equivalent[i] <- NINE_GENES.annovar_vars$SNP[match.index[j]]
+        sjlife_vars_bim$gnomAD_equivalent[i] <- NINE_GENES.annovar$SNP[match.index[j]]
       } else if
-      ((sjlife_vars_bim$REF_flipped[i] == NINE_GENES.annovar_vars$REF[match.index[j]] & sjlife_vars_bim$ALT_flipped[i] == NINE_GENES.annovar_vars$ALT[match.index[j]])|
-       (sjlife_vars_bim$REF_flipped[i] == NINE_GENES.annovar_vars$REF[match.index[j]] & sjlife_vars_bim$ALT[i] == NINE_GENES.annovar_vars$ALT[match.index[j]])|
-       (sjlife_vars_bim$REF[i] == NINE_GENES.annovar_vars$REF[j] & sjlife_vars_bim$ALT_flipped[i] == NINE_GENES.annovar_vars$ALT[match.index[j]])){
+      ((sjlife_vars_bim$REF_flipped[i] == NINE_GENES.annovar$REF[match.index[j]] & sjlife_vars_bim$ALT_flipped[i] == NINE_GENES.annovar$ALT[match.index[j]])|
+       (sjlife_vars_bim$REF_flipped[i] == NINE_GENES.annovar$REF[match.index[j]] & sjlife_vars_bim$ALT[i] == NINE_GENES.annovar$ALT[match.index[j]])|
+       (sjlife_vars_bim$REF[i] == NINE_GENES.annovar$REF[j] & sjlife_vars_bim$ALT_flipped[i] == NINE_GENES.annovar$ALT[match.index[j]])){
         sjlife_vars_bim$MATCH_gnomad[i] <- "INDIRECT_MATCH"
-        sjlife_vars_bim$gnomad_equivalent[i] <- NINE_GENES.annovar_vars$SNP[match.index[j]]
+        sjlife_vars_bim$gnomAD_equivalent[i] <- NINE_GENES.annovar$SNP[match.index[j]]
       }else{
         sjlife_vars_bim$MATCH_gnomad[i] <- NA
-        sjlife_vars_bim$gnomad_equivalent[i] <- NA
+        sjlife_vars_bim$gnomAD_equivalent[i] <- NA
       }
       
     }
   } else {
     sjlife_vars_bim$MATCH_gnomad[i] <- NA
-    sjlife_vars_bim$gnomad_equivalent[i] <- NA
+    sjlife_vars_bim$gnomAD_equivalent[i] <- NA
   }
   
 }
