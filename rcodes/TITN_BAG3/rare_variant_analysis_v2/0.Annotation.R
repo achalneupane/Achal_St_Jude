@@ -11,9 +11,6 @@ NINE_GENES.annovar$gnomAD_genome_NFE <- as.numeric(NINE_GENES.annovar$gnomAD_gen
 NINE_GENES.annovar <- NINE_GENES.annovar[which(NINE_GENES.annovar$gnomAD_genome_ALL < 0.01 & NINE_GENES.annovar$gnomAD_genome_NFE < 0.01),]
 dim(NINE_GENES.annovar)
 
-
-
-
 ## Part 2
 
 ## Read bim files from ccss and sjlife maf less than 0.01 and get common variants bettween the cohorts to keep.
@@ -33,10 +30,15 @@ ccss_vars_bim$KEY <- paste(ccss_vars_bim$CHROM, ccss_vars_bim$POS, sep = ":")
 sjlife_vars_bim$KEY <- paste(sjlife_vars_bim$CHROM, sjlife_vars_bim$POS, sep = ":")
 
 ## Keep gnomad rare variants
-NINE_GENES.annovar$KEY <- gsub("chr", "", paste(NINE_GENES.annovar$Chr, NINE_GENES.annovar$Start, sep = ":"))
+NINE_GENES.annovar$KEY <- gsub("chr", "", paste(NINE_GENES.annovar$Otherinfo4, NINE_GENES.annovar$Otherinfo5, sep = ":"))
+# create SNPID for annovar
+NINE_GENES.annovar$SNP <- paste0(NINE_GENES.annovar$Otherinfo4,":", NINE_GENES.annovar$Otherinfo5,":",
+                                 NINE_GENES.annovar$Otherinfo7,":", NINE_GENES.annovar$Otherinfo8)
+
 sjlife_vars_bim <- sjlife_vars_bim[sjlife_vars_bim$KEY %in% NINE_GENES.annovar$KEY,]
 
 dim(sjlife_vars_bim)
+# 5263
 
 for (i in 1:nrow(sjlife_vars_bim)){
   print(paste0("Doing iteration: ", i))
@@ -44,77 +46,57 @@ for (i in 1:nrow(sjlife_vars_bim)){
     match.index <- grep(paste0("chr",sjlife_vars_bim$KEY[i],":"), ccss_vars_bim$SNP)
     for(j in 1:length(match.index)){
     if(sjlife_vars_bim$REF[i] == ccss_vars_bim$REF[match.index[j]] & sjlife_vars_bim$ALT[i] == ccss_vars_bim$ALT[match.index[j]]){
-      sjlife_vars_bim$MATCH[i] <- "DIRECT_MATCH"
+      sjlife_vars_bim$MATCH_CCSS[i] <- "DIRECT_MATCH"
       sjlife_vars_bim$CCSS_equivalent[i] <- ccss_vars_bim$SNP[match.index[j]]
     } else if
       ((sjlife_vars_bim$REF_flipped[i] == ccss_vars_bim$REF[match.index[j]] & sjlife_vars_bim$ALT_flipped[i] == ccss_vars_bim$ALT[match.index[j]])|
       (sjlife_vars_bim$REF_flipped[i] == ccss_vars_bim$REF[match.index[j]] & sjlife_vars_bim$ALT[i] == ccss_vars_bim$ALT[match.index[j]])|
       (sjlife_vars_bim$REF[i] == ccss_vars_bim$REF[j] & sjlife_vars_bim$ALT_flipped[i] == ccss_vars_bim$ALT[match.index[j]])){
-      sjlife_vars_bim$MATCH[i] <- "INDIRECT_MATCH"
+      sjlife_vars_bim$MATCH_CCSS[i] <- "INDIRECT_MATCH"
       sjlife_vars_bim$CCSS_equivalent[i] <- ccss_vars_bim$SNP[match.index[j]]
     }else{
-      sjlife_vars_bim$MATCH[i] <- NA
+      sjlife_vars_bim$MATCH_CCSS[i] <- NA
       sjlife_vars_bim$CCSS_equivalent[i] <- NA
     }
       
     }
   } else {
-    sjlife_vars_bim$MATCH[i] <- NA
+    sjlife_vars_bim$MATCH_CCSS[i] <- NA
     sjlife_vars_bim$CCSS_equivalent[i] <- NA
   }
     
 }
 
 
-
-
-head(sjlife_vars_bim)
-
-
-
-
-for (i in 1: nrow(sjlife_vars_bim)){
-  sjlife_vars_bim
+## Now get the match index from gnomAD variants with less than 0.01 maf
+NINE_GENES.annovar_vars <- NINE_GENES.annovar$Otherinfo10
+for (i in 1:nrow(sjlife_vars_bim)){
+  print(paste0("Doing iteration: ", i))
+  if (sum(grepl(paste0("chr",sjlife_vars_bim$KEY[i],":"), NINE_GENES.annovar_vars$SNP)) > 0){ # Only if position matches; do
+    match.index <- grep(paste0("chr",sjlife_vars_bim$KEY[i],":"), NINE_GENES.annovar_vars$SNP)
+    for(j in 1:length(match.index)){
+      if(sjlife_vars_bim$REF[i] == NINE_GENES.annovar_vars$REF[match.index[j]] & sjlife_vars_bim$ALT[i] == NINE_GENES.annovar_vars$ALT[match.index[j]]){
+        sjlife_vars_bim$MATCH_gnomad[i] <- "DIRECT_MATCH"
+        sjlife_vars_bim$gnomad_equivalent[i] <- NINE_GENES.annovar_vars$SNP[match.index[j]]
+      } else if
+      ((sjlife_vars_bim$REF_flipped[i] == NINE_GENES.annovar_vars$REF[match.index[j]] & sjlife_vars_bim$ALT_flipped[i] == NINE_GENES.annovar_vars$ALT[match.index[j]])|
+       (sjlife_vars_bim$REF_flipped[i] == NINE_GENES.annovar_vars$REF[match.index[j]] & sjlife_vars_bim$ALT[i] == NINE_GENES.annovar_vars$ALT[match.index[j]])|
+       (sjlife_vars_bim$REF[i] == NINE_GENES.annovar_vars$REF[j] & sjlife_vars_bim$ALT_flipped[i] == NINE_GENES.annovar_vars$ALT[match.index[j]])){
+        sjlife_vars_bim$MATCH_gnomad[i] <- "INDIRECT_MATCH"
+        sjlife_vars_bim$gnomad_equivalent[i] <- NINE_GENES.annovar_vars$SNP[match.index[j]]
+      }else{
+        sjlife_vars_bim$MATCH_gnomad[i] <- NA
+        sjlife_vars_bim$gnomad_equivalent[i] <- NA
+      }
+      
+    }
+  } else {
+    sjlife_vars_bim$MATCH_gnomad[i] <- NA
+    sjlife_vars_bim$gnomad_equivalent[i] <- NA
+  }
+  
 }
 
-
-
-
-
-
-
-
-
-## Now keep common ones only based on chr:POS
-sjlife_vars_bim <- sjlife_vars_bim[sjlife_vars_bim$KEY %in% ccss_vars_bim$KEY,]
-dim(sjlife_vars_bim)
-# 2783
-sum(sjlife_vars_bim$KEY1 %in% ccss_vars_bim$KEY1)
-# 2674
-sum(sjlife_vars_bim$KEY2 %in% ccss_vars_bim$KEY1)
-# 27
-
-# sjlife_vars_bim$MATCH1 <- ifelse(sjlife_vars_bim$KEY1 %in% ccss_vars_bim$KEY1, 1, 0)
-# sjlife_vars_bim$MATCH2 <- ifelse(sjlife_vars_bim$KEY2 %in% ccss_vars_bim$KEY1, 1, 0)
-
-
-
-
-
-
-
-
-
-
-sjlife_vars_bim$KEY1_flipped <- paste(sjlife_vars_bim$KEY, sjlife_vars_bim$REF_flipped, sjlife_vars_bim$ALT_flipped , sep = ":")
-sjlife_vars_bim$KEY2_flipped <- paste(sjlife_vars_bim$KEY, sjlife_vars_bim$ALT_flipped, sjlife_vars_bim$REF_flipped , sep = ":")
-
-sum(sjlife_vars_bim$KEY1_flipped %in% ccss_vars_bim$KEY1)
-# 0
-sum(sjlife_vars_bim$KEY2_flipped %in% ccss_vars_bim$KEY1)
-# 327
-
-sjlife_vars_bim$MATCH3 <- ifelse(sjlife_vars_bim$KEY2_flipped %in% ccss_vars_bim$KEY1, 1,NA)
 
 ############################
 ## Clinvar, LoF and Revel ##
