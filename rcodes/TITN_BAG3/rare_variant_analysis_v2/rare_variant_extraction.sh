@@ -2,7 +2,7 @@ cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjl
 head -1 ../ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr2.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > header
 
 ## Extract variants regrions from nine genes: BAG3, DSP, LMNA, MYH7, SCN5A, TCAP, TNNC1, TNNT2, and TTN 
-GENE=NINE_GENES
+GENE=NINE_GENES_ANNOVAR
 cat header > ${GENE}
 # cat ../ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr10.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt| awk '/^chr10/ && ($2 >= 119651380 && $2 <= 119677819) && ($38+0 < 0.01 && $38 !=".") && ($44+0 < 0.01 && $44 !=".")' >> ${GENE}
 # BAG3; 10q26.11
@@ -262,13 +262,13 @@ plink1.9 --bfile ${BFILE} --keep amyloid_imaging_sample_list.txt --make-bed --ke
 
 
 # subset to SJLIFE EUR cohort
-for file in ls sjlife*.bim; do
+for file in ls sjlife*0.01.bim; do
 BFILE="$(echo ${file%.*})"
 plink --bfile ${BFILE} --keep sjlife_samples --make-bed --keep-allele-order --max-maf 0.01 --out ${BFILE}_final
 done
 
 # subset to CCSS EUR cohort
-for file in ls ccss_exp*.bim; do
+for file in ls ccss_exp*0.01.bim; do
 BFILE="$(echo ${file%.*})"
 plink --bfile ${BFILE} --keep ccss_exp_samples --make-bed --keep-allele-order --max-maf 0.01 --out ${BFILE}_final
 done
