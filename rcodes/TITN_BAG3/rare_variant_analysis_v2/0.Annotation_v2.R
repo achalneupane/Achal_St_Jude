@@ -51,7 +51,6 @@ NINE_GENES.annovar$ALT <- NINE_GENES.annovar$Otherinfo8
 sjlife_vars_bim <- sjlife_vars_bim[sjlife_vars_bim$KEY %in% NINE_GENES.annovar$KEY,]
 
 dim(sjlife_vars_bim)
-# 5263
 
 # cc <- NINE_GENES.annovar[NINE_GENES.annovar$Start >= 178525989 & NINE_GENES.annovar$Start <= 178807423,]
 # sum(cc$gnomAD_genome_ALL < 0.01 & cc$gnomAD_genome_NFE < 0.01, na.rm = T)
