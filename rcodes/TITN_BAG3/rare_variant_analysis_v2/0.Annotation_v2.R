@@ -1,7 +1,7 @@
 # save.image("SNPEFF_clinvar_metaSVM_LoF_from_R_filtering_process_PreQC_VCF.RData")
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/SNPEFF_clinvar_metaSVM_LoF_from_R_filtering_process_PreQC_VCF.RData")
 
-setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/annovar/pablo_garcia_et_al_nine_genes")
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/ALL_P_LP_combinations/rare_variant_analysis_v2/pablo_garcia_et_al_nine_genes")
 ## Extract variants regrions from nine genes: BAG3, DSP, LMNA, MYH7, SCN5A, TCAP, TNNC1, TNNT2, and TTN 
 # BAG3
 NINE_GENES.annovar <- read.table("NINE_GENES_ANNOVAR", sep = "\t", header = T)
@@ -207,10 +207,15 @@ sjlife_vars_bim$GENE[sjlife_vars_bim$CHROM == 1 &  (sjlife_vars_bim$POS >= 20135
 # TTN
 sjlife_vars_bim$GENE[sjlife_vars_bim$CHROM == 2 &  (sjlife_vars_bim$POS >= 178525989 & sjlife_vars_bim$POS <= 178807423)] <- "TTN"
 
-save.image("common_p_LP_rare_variants_gnomad_all_gnomad_NFE_lt_0.01.RData")
+# save.image("common_p_LP_rare_variants_gnomad_all_gnomad_NFE_lt_0.01.RData")
 
 
 
+write.table(sjlife_vars_bim$SNP, "sjlife_SNPS_maf_lt_0.01_gnomad_also_common_in_ccss.txt", quote = FALSE, col.names = FALSE, row.names = F)
+write.table(sjlife_vars_bim$CCSS_equivalent, "ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife.txt", quote = FALSE, col.names = FALSE, row.names = F)
+
+
+## Now run shell script rare_variant_extraction.sh to extract ccss and sjlife overlapping variants
 
 
 
