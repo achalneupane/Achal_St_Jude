@@ -276,4 +276,10 @@ done
 cat ccss_exp*0.01_final.bim > all_ccss_exp_vars_lt_maf_0.01.txt
 cat sjlife*0.01_final.bim > all_sjlife_vars_lt_maf_0.01.txt
 
-## Now read these two files in Rscipt Z:\ResearchHome\ClusterHome\aneupane\St_Jude\Achal_St_Jude\rcodes\TITN_BAG3\rare_variant_analysis_v2; part 2
+## Get allele count for each P/LP variants in nine gene in CCSS and SJLIFE using Rscipt Z:\ResearchHome\ClusterHome\aneupane\St_Jude\Achal_St_Jude\rcodes\TITN_BAG3\rare_variant_analysis_v2\0.Annotation_v2_allele_count.R
+## Now read these two files in Rscipt Z:\ResearchHome\ClusterHome\aneupane\St_Jude\Achal_St_Jude\rcodes\TITN_BAG3\rare_variant_analysis_v2\0.Annotation_v2; part 2
+
+
+
+
+

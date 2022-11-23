@@ -23,7 +23,7 @@ options fmtsearch=(datafmt icd);
 
 %let mydata=%str(C:\Users\hwang3\OneDrive - St. Jude Children%'s Research Hospital\Project);
 libname qi "&mydata.\0. Files\CCSS" access=readonly;
-libname whq "&mydata.\13. Physical Activity & Smoking for Yadav";
+libname whq "&mydata.\13. Requet from Achal and Yadav";
 
 %macro add_dummy_table();
 	ods excel options(sheet_interval="table");
@@ -358,7 +358,7 @@ proc sort data=whq.smoke; by ccssid; run;
 proc freq data=whq.smoke; tables smkcatb smkcatf2 smkcatf07 smkcatf5 smk_mostrecent; run;
 
 data smoke; set whq.smoke(keep=ccssid evsmoke d_smoke smk: ); run;
-ods excel file="&mydata.\13. Physical Activity & Smoking for Yadav\ExportedCCSS_smoke.xlsx";
+ods excel file="&mydata.\13. Requet from Achal and Yadav\ExportedCCSS_smoke.xlsx";
 		ods excel options(sheet_name="Exported" sheet_interval='none');
 		proc print data=smoke noobs; run;
 
@@ -680,7 +680,7 @@ select count(distinct ccssid) from physical_activity where t_mostrecent>=150;
 quit;
 
 data physical_activity(drop=met_:); set whq.physical_activity; run;
-ods excel file="&mydata.\13. Physical Activity & Smoking for Yadav\ExportedCCSS_physical_activity.xlsx";
+ods excel file="&mydata.\13. Requet from Achal and Yadav\ExportedCCSS_physical_activity.xlsx";
 		ods excel options(sheet_name="Exported" sheet_interval='none');
 		proc print data=physical_activity noobs; run;
 
