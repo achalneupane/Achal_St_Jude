@@ -293,6 +293,6 @@ ls sjlife*0.01_final.bim| grep bim| sed 's/.bim//' | sed -n '1d;p' > sjlife_want
 plink --bfile sjlife_BAG3_maf_lt_0.01_final --merge-list sjlife_wanted_plink --out sjlife_all_genes_maf_lt_0.01_final
 plink --bfile sjlife_all_genes_maf_lt_0.01_final --extract sjlife_SNPS_maf_lt_0.01_gnomad_also_common_in_ccss.txt --recodeA --out sjlife_SNPS_maf_lt_0.01_gnomad_also_common_in_ccss_recodeA
 
-ccss_exp_BAG3_maf_lt_0.01_final
+ls ccss*0.01_final.bim| grep bim| sed 's/.bim//' | sed -n '1d;p' > ccss_wanted_plink
 plink --bfile ccss_exp_BAG3_maf_lt_0.01_final --merge-list ccss_wanted_plink --out ccss_all_genes_maf_lt_0.01_final
-plink --bfile sjlife_all_genes_maf_lt_0.01_final --extract ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife.txt --recodeA --out ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife_recodeA
+plink --bfile ccss_all_genes_maf_lt_0.01_final --extract ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife.txt --recodeA --out ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife_recodeA
