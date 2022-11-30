@@ -8,6 +8,9 @@ setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/p
 sjlife <- read.table("sjlife_ttn_bag3.pheno", header = T)
 head(sjlife)
 
+## add cancer types
+
+
 
 ## CCSS_org
 ccss_org <- read.table("ccss_org_eur_cardiotoxic_exposed.pheno", header = T)
