@@ -1,9 +1,9 @@
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/CCSS_Data_from_Huiqi/RE__CCSS_phenotype_data2")
 
 
-CCSS_data <- read.delim("ExportedCCSS_data.txt", header = T, sep = "\t")
+CCSS_data <- read.delim("ExportedCCSS_data.txt", header = T, sep = "\t", stringsAsFactors = F)
 
-BMI.PA.SMK.DRK <- read.delim("ExportedCCSS_BMI_PA_Smk_drink.txt", header = T, sep = "\t")
+BMI.PA.SMK.DRK <- read.delim("ExportedCCSS_BMI_PA_Smk_drink.txt", header = T, sep = "\t", stringsAsFactors = F)
 
 BMI.PA.SMK.DRK <- BMI.PA.SMK.DRK[c("ccssid", "a_base", "a_fu1", "a_fu2", "a_fu3", "a_fu2007", "a_fu5", "a_fu6",
                           "cbmi_0",  "cbmi_2", "cbmi_2007", "cbmi_5",
@@ -44,6 +44,7 @@ BMI.PA.SMK.DRK$fu6.bmi <- NA
 BMI.PA.SMK.DRK$fu6.smk <- NA
 BMI.PA.SMK.DRK$fu6.riskydrk <- NA
 
+BMI.PA.SMK.DRK[BMI.PA.SMK.DRK == "."] <- NA
 
 ## Reshape BMI.PA.SMK.DRK to long format
 
@@ -63,7 +64,7 @@ cc <- reshape(BMI.PA.SMK.DRK, direction='long',
         idvar='ccssid')
 
 
-cc[cc == "."] <- NA
+
 
 cc$age <- as.numeric(cc$age)
 
@@ -105,7 +106,16 @@ sum(CCSS_data$ccssid %in% ccss_exp.samples$V2)
 sum(ccss_exp.samples$V2 %in% CCSS_data$ccssid)
 # 2936
 
+## Add lifestyle variables
 CCSS_exp <- CCSS_data[CCSS_data$ccssid %in% ccss_exp.samples$V2,]
+
+CCSS_exp$Not_obese_yn <- factor(ifelse(as.numeric(bmi_iid_dob_18_uniq$bmi[match(CCSS_exp$ccssid, bmi_iid_dob_18_uniq$ccssid)]) < 30, 1, 0))
+
+CCSS_exp$PhysicalActivity_yn <- factor(MET_iid_dob_18_uniq$MET[match(CCSS_exp$ccssid, MET_iid_dob_18_uniq$ccssid)])
+
+CCSS_exp$smoker_former_or_never_yn <- factor(smk_iid_dob_18_uniq$smk[match(CCSS_exp$ccssid, smk_iid_dob_18_uniq$ccssid)])
+
+
 
 
 
