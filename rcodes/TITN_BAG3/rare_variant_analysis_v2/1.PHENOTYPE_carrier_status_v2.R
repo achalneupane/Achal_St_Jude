@@ -2,37 +2,66 @@
 pheno.ccss_exp_eur <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/ccss_exp_eur_cardiotoxic_exposed.pheno", header = T)
 # pheno.ccss_org_eur <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/ccss_org_eur_cardiotoxic_exposed.pheno", header = T)
 pheno.sjlife_ttn_bag3 <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ttn_bag3.pheno", header = T)
-
+pheno.sjlife_ttn_bag3$CMP <- factor(pheno.sjlife_ttn_bag3$CMP)
 #########################
 ## read carrier status ##
 #########################
-setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/ALL_P_LP_combinations")
-
-## On 08/15/2022, we decided to remove splice_region_variants. 
-BAG3.splice_region.remove <-  read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/BAG3.1.per.maf.gnomad.ALL.and.NFE.txt", header = T, sep = "\t")
-## Remove Meta SVM and REVEL
-BAG3.splice_region.remove <- BAG3.splice_region.remove[BAG3.splice_region.remove$CLINVAR == "Y" | BAG3.splice_region.remove$LoF == "Y",]
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/ALL_P_LP_combinations/rare_variant_analysis_v2/pablo_garcia_et_al_nine_genes")
 
 
-TITN.splice_region.remove <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3/TITN.1.per.maf.gnomad.ALL.and.NFE.txt", header = T, sep = "\t")
-TITN.splice_region.remove <- TITN.splice_region.remove[TITN.splice_region.remove$CLINVAR == "Y" | TITN.splice_region.remove$LoF == "Y",]
+load("common_p_LP_rare_variants_gnomad_all_gnomad_NFE_lt_0.01.RData")
 
-splice_region.remove <- rbind.data.frame(BAG3.splice_region.remove, TITN.splice_region.remove)
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/ALL_P_LP_combinations/rare_variant_analysis_v2/pablo_garcia_et_al_nine_genes")
+sjlife.raw <- read.table("sjlife_SNPS_maf_lt_0.01_gnomad_also_common_in_ccss_recodeA.raw", header = T)
 
-NO.splice.region <- splice_region.remove[!grepl("splice_region_variant", splice_region.remove$ANN....EFFECT),]
-splice.region <- splice_region.remove[grepl("splice_region_variant", splice_region.remove$ANN....EFFECT),]
+genes <- unique(sjlife_vars_bim$GENE)
 
-splice.region.keep <- splice.region[grepl("frameshift|stop|donor|acceptor", splice.region$ANN....EFFECT),]
-splice.region.keep <- rbind.data.frame(NO.splice.region, splice.region.keep)
-# remove any missense that is not coming from clinvar
-splice.region.keep <- splice.region.keep[!(splice.region.keep$CLINVAR == "N" & splice.region.keep$ANN....EFFECT == "missense_variant"),]
+## SJLIFE analysis
 
-table(splice.region.keep$Annovar_ExonicFunc.refGene)
-# .  frameshift deletion frameshift insertion    nonsynonymous SNV             stopgain       synonymous SNV 
-# 9                    2                    1                    1                    8                    2 
+for (i in 1:length(genes)){
+  genes[i]
+  rm(total.carriers, total.cases, carriers.cases, total.controls, carriers.controls, OR.CI, pvalue, OR.CI.adj, pvalue.adj)
+  genes.carriers <-  sjlife.raw[c(2,grep(paste0(gsub(":" , "\\.",paste0("chr", sjlife_vars_bim$KEY[grepl(genes[i], sjlife_vars_bim$GENE)], ".")), collapse = "|"), colnames(sjlife.raw)))]
+  genes.carriers$carrier <- factor(ifelse(rowSums(genes.carriers[-1]) != 0, "1", "0"))
+  # table(genes.carriers$carrier)
+  pheno.sjlife_ttn_bag3$carriers <- genes.carriers$carrier[match(pheno.sjlife_ttn_bag3$IID, genes.carriers$IID)]
+  rm(gene.test)
+  gene.test <- fisher.test(table(pheno.sjlife_ttn_bag3$CMP, pheno.sjlife_ttn_bag3$carriers)) # Got error; no carriers
+  # gene.test <- chisq.test(table(pheno.sjlife_ttn_bag3$CMP, pheno.sjlife_ttn_bag3$carriers)) # Got error; no carriers
+  
+  pvalue <- gene.test$p.value
+  OR.CI <- paste0(round(gene.test$estimate, 2), " (", paste0(round(gene.test$conf.int, 2), collapse = "-"), ")")
+  
+  rm(gene.test.adj)
+  gene.test.adj <- glm(formula = CMP ~  pheno.sjlife_ttn_bag3$carriers + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
+                         PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial,
+                       data = pheno.sjlife_ttn_bag3)
+  
+  
+  CI1 <- paste0(" (",round(exp(c(coef(summary(gene.test.adj))[2,1]))-1.96*as.data.frame(summary(gene.test.adj)$coefficients)[c(1,2)][2,2],2), " to ", round(exp(c(coef(summary(gene.test.adj))[2,1]))+1.96*as.data.frame(summary(gene.test.adj)$coefficients)[c(1,2)][2,2], 2),")")
+  
+  total.carriers <- sum(pheno.sjlife_ttn_bag3$carriers == 1, na.rm = T)
+  total.cases <- sum(pheno.sjlife_ttn_bag3$CMP == 2, na.rm = T)
+  carriers.cases <- sum(pheno.sjlife_ttn_bag3$CMP == 2 & pheno.sjlife_ttn_bag3$carriers == 1, na.rm = T)
+  total.controls <- sum(pheno.sjlife_ttn_bag3$CMP == 1, na.rm = T)
+  carriers.controls <- sum(pheno.sjlife_ttn_bag3$CMP == 1 & pheno.sjlife_ttn_bag3$carriers == 1, na.rm = T)
+  OR.CI.adj <- paste0(round(exp(c(coef(summary(gene.test.adj))[2,1])),2), CI1)
+  pvalue.adj <- coef(summary(gene.test.adj))[2,4]
+  # cbind.data.frame(genes[i],total.carriers, total.cases, carriers.cases, total.controls, carriers.controls, OR.CI, pvalue, OR.CI.adj, pvalue.adj)
+  
+  genes[i]
+  total.carriers
+  total.cases
+  carriers.cases
+  total.controls
+  carriers.controls 
+  OR.CI
+  pvalue
+  OR.CI.adj
+  pvalue.adj
+  
+}
 
-cc <- cbind.data.frame(CHROM = splice.region.keep$CHROM, POS = splice.region.keep$POS, REF = splice.region.keep$REF, ALT = splice.region.keep$ALT, SNP = splice.region.keep$KEY, SnpEff_annotation = splice.region.keep$ANN....EFFECT, Annovar_annotation = splice.region.keep$Annovar_ExonicFunc.refGene, Clinvar_YN = splice.region.keep$CLINVAR, gnomad_gnome_ALL_maf=splice.region.keep$gnomAD_genome_ALL, gnomad_gnome_NFE_maf = splice.region.keep$gnomAD_genome.NFE)
-write.table(cc, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/ALL_P_LP_combinations/overlapping_sjlife_ccss_exp_maf_0.01.Clinvar.LoF.SNP_list.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 
 ################
 ## CCSS::TITN ##
