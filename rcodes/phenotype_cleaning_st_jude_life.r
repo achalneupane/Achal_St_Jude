@@ -23,6 +23,8 @@ data <- read_sas("ctcaegrades.sas7bdat")
 data.df <- as.data.frame(data)
 # View(data.df)
 
+data.df.cmp <- data.df[grepl( "Cardiomyopathy", data.df$condition),]
+
 ## Recode any values other than 0-5 as NAs
 data.df$grade[!grepl("0|1|2|3|4|5", data.df$grade)] <- NA
 
