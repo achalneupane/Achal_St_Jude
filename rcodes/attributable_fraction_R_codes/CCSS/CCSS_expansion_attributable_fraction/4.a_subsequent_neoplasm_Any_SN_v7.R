@@ -1,10 +1,3 @@
-#########################
-## Load Phenotype data ##
-#########################
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v2.RDATA")
-#########################
-## Subsequent Neoplasm ##
-#########################
 
 library(haven)
 library(benchmarkme)
@@ -17,6 +10,12 @@ library(stringr)
 # library(tidyverse)
 library(lubridate)
 # benchmarkme::get_ram()
+
+
+#########################
+## Subsequent neoplasm ##
+#########################
+PHENO.ANY_SN <- read.delim("ExportedCCSS_data.txt", header = T, sep = "\t")
 
 
 
