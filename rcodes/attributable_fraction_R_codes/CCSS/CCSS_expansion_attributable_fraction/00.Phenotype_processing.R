@@ -50,18 +50,21 @@ BMI.PA.SMK.DRK[BMI.PA.SMK.DRK == "."] <- NA
 
 # dw <- BMI.PA.SMK.DRK[1:2,]
 
-cc <- reshape(BMI.PA.SMK.DRK, direction='long', 
-        varying=c('base.age', 'base.bmi', "base.MET", 'base.CDC', "base.smk", "base.riskydrk",
-                  'fu1.age', 'fu1.bmi', "fu1.MET", 'fu1.CDC', "fu1.smk", "fu1.riskydrk",
-                  'fu2.age', 'fu2.bmi', "fu2.MET", 'fu2.CDC', "fu2.smk", "fu2.riskydrk",
-                  'fu3.age', 'fu3.bmi', "fu3.MET", 'fu3.CDC', "fu3.smk", "fu3.riskydrk",
-                  'fu7.age', 'fu7.bmi', "fu7.MET", 'fu7.CDC', "fu7.smk", "fu7.riskydrk",
-                  'fu5.age', 'fu5.bmi', "fu5.MET", 'fu5.CDC', "fu5.smk", "fu5.riskydrk",
-                  'fu6.age', 'fu6.bmi', "fu6.MET", 'fu6.CDC', "fu6.smk", "fu6.riskydrk"),
-        timevar='var',
-        times=c('base', 'fu1', 'fu2', 'fu3', 'fu7', 'fu5', 'fu6'),
-        v.names=c('age', 'bmi', 'MET', 'CDC', 'smk', 'riskydrk'),
-        idvar='ccssid')
+## OR
+# suppressPackageStartupMessages({
+#   library(tidyr)
+# })
+#  dw |>
+#   pivot_longer(
+#     cols = -ccssid,
+#     names_to = c("var", ".value"),
+#     names_pattern = "(.*)\\.(.*)"
+#   )
+
+## make prefixes to suffixes
+names(BMI.PA.SMK.DRK) <- strsplit(names(BMI.PA.SMK.DRK), '\\.') |> lapply(rev) |> sapply(paste, collapse='.')
+
+cc <- reshape(BMI.PA.SMK.DRK, direction='l', idvar='ccssid', varying=sort(names(dw)[-1]))
 
 
 
@@ -93,10 +96,6 @@ drk_iid_dob_18_sorted = drk_iid_dob_18[order(drk_iid_dob_18$ccssid, drk_iid_dob_
 drk_iid_dob_18_uniq = drk_iid_dob_18_sorted[!duplicated(drk_iid_dob_18_sorted$ccssid),]
 
 
-###################
-## CCSS_original ##
-###################
-
 ##############
 ## CCSS_exp ##
 ##############
@@ -106,23 +105,126 @@ sum(CCSS_data$ccssid %in% ccss_exp.samples$V2)
 sum(ccss_exp.samples$V2 %in% CCSS_data$ccssid)
 # 2936
 
-## Add lifestyle variables
+#############################
+## Add lifestyle variables ##
+#############################
 CCSS_exp <- CCSS_data[CCSS_data$ccssid %in% ccss_exp.samples$V2,]
 
+# Obesity
+CCSS_exp$BMI <- as.numeric(bmi_iid_dob_18_uniq$bmi[match(CCSS_exp$ccssid, bmi_iid_dob_18_uniq$ccssid)])
 CCSS_exp$Not_obese_yn <- factor(ifelse(as.numeric(bmi_iid_dob_18_uniq$bmi[match(CCSS_exp$ccssid, bmi_iid_dob_18_uniq$ccssid)]) < 30, 1, 0))
+CCSS_exp$Not_obese_yn <- factor(CCSS_exp$Not_obese_yn, level = c(1, 0, "Unknown")) 
+CCSS_exp$Not_obese_yn[is.na(CCSS_exp$Not_obese_yn)] <- "Unknown";
 
-CCSS_exp$PhysicalActivity_yn <- factor(MET_iid_dob_18_uniq$MET[match(CCSS_exp$ccssid, MET_iid_dob_18_uniq$ccssid)])
+# Physical activity
+CCSS_exp$CDC <- MET_iid_dob_18_uniq$CDC[match(CCSS_exp$ccssid, MET_iid_dob_18_uniq$ccssid)]
+CCSS_exp$PhysicalActivity_yn <- factor(MET_iid_dob_18_uniq$CDC[match(CCSS_exp$ccssid, MET_iid_dob_18_uniq$ccssid)])
+CCSS_exp$PhysicalActivity_yn <- ifelse (CCSS_exp$PhysicalActivity_yn == "Yes", 1, 0)
+CCSS_exp$PhysicalActivity_yn[is.na(CCSS_exp$PhysicalActivity_yn)] <- "Unknown"
+CCSS_exp$PhysicalActivity_yn <- factor(CCSS_exp$PhysicalActivity_yn, level = c(1, 0, "Unknown")) 
 
+# Smoker
+CCSS_exp$SMK <- smk_iid_dob_18_uniq$smk[match(CCSS_exp$ccssid, smk_iid_dob_18_uniq$ccssid)]
 CCSS_exp$smoker_former_or_never_yn <- factor(smk_iid_dob_18_uniq$smk[match(CCSS_exp$ccssid, smk_iid_dob_18_uniq$ccssid)])
+CCSS_exp$smoker_former_or_never_yn <- factor(ifelse(CCSS_exp$smoker_former_or_never_yn != 3, 1, 0))
+CCSS_exp$smoker_former_or_never_yn <- factor(CCSS_exp$smoker_former_or_never_yn, level = c(1, 0, "Unknown")) 
+CCSS_exp$smoker_former_or_never_yn[is.na(CCSS_exp$smoker_former_or_never_yn)] <- "Unknown"
+
+# drinker
+CCSS_exp$DRK <- drk_iid_dob_18_uniq$riskydrk[match(CCSS_exp$ccssid, smk_iid_dob_18_uniq$ccssid)]
+CCSS_exp$NOT_RiskyHeavyDrink_yn <- factor(ifelse(factor(drk_iid_dob_18_uniq$riskydrk[match(CCSS_exp$ccssid, smk_iid_dob_18_uniq$ccssid)]) == "No", 1, 0))
+CCSS_exp$NOT_RiskyHeavyDrink_yn <- factor(CCSS_exp$NOT_RiskyHeavyDrink_yn, level = c(1, 0, "Unknown")) 
+CCSS_exp$NOT_RiskyHeavyDrink_yn[is.na(CCSS_exp$NOT_RiskyHeavyDrink_yn)] <- "Unknown"
+
+
+## USe this variable CCSS_exp_ANY_SN for ANY_SN
+CCSS_exp_ANY_SN <- CCSS_exp
 
 
 
-
-
-###########################################################
-## Phenotype radiation and chemotherapy: create tertiles ##
-###########################################################
+####################################################
+## Phenotype: radiation and chemotherapy tertiles ##
+####################################################
 ## Create tertiles for ccss org and ccss exp separately
-treatments <- CCSS_data[!duplicated(CCSS_data$ccssid),]
+CCSS_exp <- CCSS_exp[!duplicated(CCSS_exp$ccssid),]
+
+## Anthracyclines (Y/N and Tertiles)
+CCSS_exp$anth_DED5 <- as.numeric(CCSS_exp$anth_DED5)
+CCSS_exp$anthra_jco_dose_5_yn <- factor(ifelse(CCSS_exp$anth_DED5 == 0, "N", "Y"))
+
+TERT = unname(quantile(CCSS_exp$anth_DED5[CCSS_exp$anth_DED5 !=0], c(1/3, 2/3, 1), na.rm = T))
+CCSS_exp$anthra_jco_dose_5.category <- cut(CCSS_exp$anth_DED5, breaks = c(0, 0.001, TERT),
+                                               labels = c("None", "1st", "2nd", "3rd"),
+                                               include.lowest = TRUE)
+levels(CCSS_exp$anthra_jco_dose_5.category) <- c(levels(CCSS_exp$anthra_jco_dose_5.category), "Unknown")
+CCSS_exp$anthra_jco_dose_5.category [is.na(CCSS_exp$anthra_jco_dose_5.category)] <- "Unknown"
 
 
+## Alkylating agents (Y/N and Tertiles)
+CCSS_exp$alk_CED5 <- as.numeric(CCSS_exp$alk_CED5)
+CCSS_exp$aa_class_dose_5_yn <- factor(ifelse(CCSS_exp$alk_CED5 == 0, "N", "Y"))
+
+TERT = unname(quantile(CCSS_exp$alk_CED5[CCSS_exp$alk_CED5 !=0], c(1/3, 2/3, 1), na.rm = T))
+CCSS_exp$aa_class_dose_5.category <- cut(CCSS_exp$alk_CED5, breaks = c(0, 0.001, TERT),
+                                           labels = c("None", "1st", "2nd", "3rd"),
+                                           include.lowest = TRUE)
+levels(CCSS_exp$aa_class_dose_5.category) <- c(levels(CCSS_exp$aa_class_dose_5.category), "Unknown")
+CCSS_exp$aa_class_dose_5.category [is.na(CCSS_exp$aa_class_dose_5.category)] <- "Unknown"
+
+## Epipodophyllotoxin agents (Y/N and Tertiles)
+CCSS_exp$epipdose5 <- as.numeric(CCSS_exp$epipdose5)
+CCSS_exp$epitxn_dose_5_yn <- factor(ifelse(CCSS_exp$epipdose5 == 0, "N", "Y"))
+
+TERT = unname(quantile(CCSS_exp$epipdose5[CCSS_exp$epipdose5 !=0], c(1/3, 2/3, 1), na.rm = T))
+CCSS_exp$epitxn_dose_5.category <- cut(CCSS_exp$epipdose5, breaks = c(0, 0.001, TERT),
+                                         labels = c("None", "1st", "2nd", "3rd"),
+                                         include.lowest = TRUE)
+levels(CCSS_exp$epitxn_dose_5.category) <- c(levels(CCSS_exp$epitxn_dose_5.category), "Unknown")
+CCSS_exp$epitxn_dose_5.category [is.na(CCSS_exp$epitxn_dose_5.category)] <- "Unknown"
+
+## Cis-platinum (Y/N and Tertiles)
+CCSS_exp$pt_cisED5 <- as.numeric(CCSS_exp$pt_cisED5)
+CCSS_exp$cisplateq_dose_5_yn <- factor(ifelse(CCSS_exp$epipdose5 == 0, "N", "Y"))
+
+TERT = unname(quantile(CCSS_exp$epipdose5[CCSS_exp$epipdose5 !=0], c(1/3, 2/3, 1), na.rm = T))
+CCSS_exp$cisplateq_dose_5.category <- cut(CCSS_exp$epipdose5, breaks = c(0, 0.001, TERT),
+                                         labels = c("None", "1st", "2nd", "3rd"),
+                                         include.lowest = TRUE)
+levels(CCSS_exp$cisplateq_dose_5.category) <- c(levels(CCSS_exp$cisplateq_dose_5.category), "Unknown")
+CCSS_exp$cisplateq_dose_5.category [is.na(CCSS_exp$cisplateq_dose_5.category)] <- "Unknown"
+
+
+
+PHENO.ANY_SN <- CCSS_exp[c('ccssid', 'SEX', 'a_dx', 'diagnose', 'a_end', 'd_candx', 'groupdx3', 
+  'a_candx', 'chestrtgrp', 'neckrtgrp', 'pelvisrtgrp', 'abdomenrtgrp', 'brainrtgrp',
+  'smk_mostrecent', 'Not_obese_yn', 'PhysicalActivity_yn', 'smoker_former_or_never_yn',
+  'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category',
+  'Not_obese_yn', 'PhysicalActivity_yn', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn')]
+
+
+
+
+
+################
+## PRS scores ##
+################
+
+## Tertile categories
+for(i in 1:length(PRS.to.categorize)){
+  TERT = unname(quantile(PHENO.ANY_SN[PRS.to.categorize[i]][PHENO.ANY_SN[PRS.to.categorize[i]] !=0], c(1/3, 2/3, 1), na.rm = T))
+  if(sum(duplicated(TERT)) > 0) next
+  print(TERT)
+  print (i)
+  # PHENO.ANY_SN$tmp.tert.category[PHENO.ANY_SN[PRS.to.categorize[i]] ==0| is.na(PHENO.ANY_SN[,PRS.to.categorize[i]])] <- "None"
+  # PHENO.ANY_SN$tmp.tert.category[is.na(PHENO.ANY_SN[,PRS.to.categorize[i]])] <- "None"
+  # PHENO.ANY_SN$tmp.tert.category[!grepl("None", PHENO.ANY_SN$tmp.tert.category)] <- as.character(cut(PHENO.ANY_SN[,PRS.to.categorize[i]][!grepl("None", PHENO.ANY_SN$tmp.tert.category)], breaks = c(0, TERT),
+  #                                            labels = c("1st", "2nd", "3rd"),
+  #                                            include.lowest = TRUE))
+  
+  PHENO.ANY_SN$tmp.tert.category <- as.character(cut(PHENO.ANY_SN[,PRS.to.categorize[i]], breaks = c(0, TERT),
+                                                     labels = c("1st", "2nd", "3rd"),
+                                                     include.lowest = TRUE))
+  
+  PHENO.ANY_SN$tmp.tert.category <- factor(PHENO.ANY_SN$tmp.tert.category, levels = c("1st", "2nd", "3rd"))
+  colnames(PHENO.ANY_SN)[colnames(PHENO.ANY_SN) == "tmp.tert.category"] <- paste0(PRS.to.categorize[i], ".tertile.category")
+}
