@@ -328,7 +328,7 @@ ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fr
 
 
 
-study=THYROID_PGS
+study=Mavaddat_2019_ER_POS_Breast
 
 # Subset PRS data for each study
 awk -v study=$study '$6==study' all_cancer.txt > prs_out/all_cancer.txt_${study}

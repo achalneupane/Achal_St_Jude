@@ -3,7 +3,10 @@ setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PH
 
 CCSS_data <- read.delim("ExportedCCSS_data.txt", header = T, sep = "\t", stringsAsFactors = F)
 
+CCSS_data$ccssid <- paste(CCSS_data$ccssid, CCSS_data$ccssid, sep = "_") # making IDs consistent with the genotype ID (plink data)
+
 BMI.PA.SMK.DRK <- read.delim("ExportedCCSS_BMI_PA_Smk_drink.txt", header = T, sep = "\t", stringsAsFactors = F)
+BMI.PA.SMK.DRK$ccssid <- paste(BMI.PA.SMK.DRK$ccssid, BMI.PA.SMK.DRK$ccssid, sep = "_") # making IDs consistent with the genotype ID (plink data)
 
 BMI.PA.SMK.DRK <- BMI.PA.SMK.DRK[c("ccssid", "a_base", "a_fu1", "a_fu2", "a_fu3", "a_fu2007", "a_fu5", "a_fu6",
                           "cbmi_0",  "cbmi_2", "cbmi_2007", "cbmi_5",
@@ -96,88 +99,90 @@ drk_iid_dob_18_uniq = drk_iid_dob_18_sorted[!duplicated(drk_iid_dob_18_sorted$cc
 
 
 ##############
-## CCSS_exp ##
+## CCSS_org ##
 ##############
-ccss_exp.samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/plink_data/merged.dat.fam")
-sum(CCSS_data$ccssid %in% ccss_exp.samples$V2)
-# 3078
-sum(ccss_exp.samples$V2 %in% CCSS_data$ccssid)
-# 2936
+ccss_org.samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/plink_data/merged_batch2.fam")
+
+
+sum(CCSS_data$ccssid %in% ccss_org.samples$V2)
+# 7645
+sum(ccss_org.samples$V2 %in% CCSS_data$ccssid)
+# 5739 ## All match
 
 #############################
 ## Add lifestyle variables ##
 #############################
-CCSS_exp <- CCSS_data[CCSS_data$ccssid %in% ccss_exp.samples$V2,]
+ccss_org <- CCSS_data[CCSS_data$ccssid %in% ccss_org.samples$V2,]
 
 # Obesity
-CCSS_exp$BMI <- as.numeric(bmi_iid_dob_18_uniq$bmi[match(CCSS_exp$ccssid, bmi_iid_dob_18_uniq$ccssid)])
-CCSS_exp$Not_obese_yn <- factor(ifelse(as.numeric(bmi_iid_dob_18_uniq$bmi[match(CCSS_exp$ccssid, bmi_iid_dob_18_uniq$ccssid)]) < 30, 1, 0))
-CCSS_exp$Not_obese_yn <- factor(CCSS_exp$Not_obese_yn, level = c(1, 0, "Unknown")) 
-CCSS_exp$Not_obese_yn[is.na(CCSS_exp$Not_obese_yn)] <- "Unknown";
+ccss_org$BMI <- as.numeric(bmi_iid_dob_18_uniq$bmi[match(ccss_org$ccssid, bmi_iid_dob_18_uniq$ccssid)])
+ccss_org$Not_obese_yn <- factor(ifelse(as.numeric(bmi_iid_dob_18_uniq$bmi[match(ccss_org$ccssid, bmi_iid_dob_18_uniq$ccssid)]) < 30, 1, 0))
+ccss_org$Not_obese_yn <- factor(ccss_org$Not_obese_yn, level = c(1, 0, "Unknown")) 
+ccss_org$Not_obese_yn[is.na(ccss_org$Not_obese_yn)] <- "Unknown";
 
 # Physical activity
-CCSS_exp$CDC <- MET_iid_dob_18_uniq$CDC[match(CCSS_exp$ccssid, MET_iid_dob_18_uniq$ccssid)]
-CCSS_exp$PhysicalActivity_yn <- factor(MET_iid_dob_18_uniq$CDC[match(CCSS_exp$ccssid, MET_iid_dob_18_uniq$ccssid)])
-CCSS_exp$PhysicalActivity_yn <- ifelse (CCSS_exp$PhysicalActivity_yn == "Yes", 1, 0)
-CCSS_exp$PhysicalActivity_yn[is.na(CCSS_exp$PhysicalActivity_yn)] <- "Unknown"
-CCSS_exp$PhysicalActivity_yn <- factor(CCSS_exp$PhysicalActivity_yn, level = c(1, 0, "Unknown")) 
+ccss_org$CDC <- MET_iid_dob_18_uniq$CDC[match(ccss_org$ccssid, MET_iid_dob_18_uniq$ccssid)]
+ccss_org$PhysicalActivity_yn <- factor(MET_iid_dob_18_uniq$CDC[match(ccss_org$ccssid, MET_iid_dob_18_uniq$ccssid)])
+ccss_org$PhysicalActivity_yn <- ifelse (ccss_org$PhysicalActivity_yn == "Yes", 1, 0)
+ccss_org$PhysicalActivity_yn[is.na(ccss_org$PhysicalActivity_yn)] <- "Unknown"
+ccss_org$PhysicalActivity_yn <- factor(ccss_org$PhysicalActivity_yn, level = c(1, 0, "Unknown")) 
 
 # Smoker
-CCSS_exp$SMK <- smk_iid_dob_18_uniq$smk[match(CCSS_exp$ccssid, smk_iid_dob_18_uniq$ccssid)]
-CCSS_exp$smoker_former_or_never_yn <- factor(smk_iid_dob_18_uniq$smk[match(CCSS_exp$ccssid, smk_iid_dob_18_uniq$ccssid)])
-CCSS_exp$smoker_former_or_never_yn <- factor(ifelse(CCSS_exp$smoker_former_or_never_yn != 3, 1, 0))
-CCSS_exp$smoker_former_or_never_yn <- factor(CCSS_exp$smoker_former_or_never_yn, level = c(1, 0, "Unknown")) 
-CCSS_exp$smoker_former_or_never_yn[is.na(CCSS_exp$smoker_former_or_never_yn)] <- "Unknown"
+ccss_org$SMK <- smk_iid_dob_18_uniq$smk[match(ccss_org$ccssid, smk_iid_dob_18_uniq$ccssid)]
+ccss_org$smoker_former_or_never_yn <- factor(smk_iid_dob_18_uniq$smk[match(ccss_org$ccssid, smk_iid_dob_18_uniq$ccssid)])
+ccss_org$smoker_former_or_never_yn <- factor(ifelse(ccss_org$smoker_former_or_never_yn != 3, 1, 0))
+ccss_org$smoker_former_or_never_yn <- factor(ccss_org$smoker_former_or_never_yn, level = c(1, 0, "Unknown")) 
+ccss_org$smoker_former_or_never_yn[is.na(ccss_org$smoker_former_or_never_yn)] <- "Unknown"
 
 # drinker
-CCSS_exp$DRK <- drk_iid_dob_18_uniq$riskydrk[match(CCSS_exp$ccssid, smk_iid_dob_18_uniq$ccssid)]
-CCSS_exp$NOT_RiskyHeavyDrink_yn <- factor(ifelse(factor(drk_iid_dob_18_uniq$riskydrk[match(CCSS_exp$ccssid, smk_iid_dob_18_uniq$ccssid)]) == "No", 1, 0))
-CCSS_exp$NOT_RiskyHeavyDrink_yn <- factor(CCSS_exp$NOT_RiskyHeavyDrink_yn, level = c(1, 0, "Unknown")) 
-CCSS_exp$NOT_RiskyHeavyDrink_yn[is.na(CCSS_exp$NOT_RiskyHeavyDrink_yn)] <- "Unknown"
+ccss_org$DRK <- drk_iid_dob_18_uniq$riskydrk[match(ccss_org$ccssid, smk_iid_dob_18_uniq$ccssid)]
+ccss_org$NOT_RiskyHeavyDrink_yn <- factor(ifelse(factor(drk_iid_dob_18_uniq$riskydrk[match(ccss_org$ccssid, smk_iid_dob_18_uniq$ccssid)]) == "No", 1, 0))
+ccss_org$NOT_RiskyHeavyDrink_yn <- factor(ccss_org$NOT_RiskyHeavyDrink_yn, level = c(1, 0, "Unknown")) 
+ccss_org$NOT_RiskyHeavyDrink_yn[is.na(ccss_org$NOT_RiskyHeavyDrink_yn)] <- "Unknown"
 
 #############################
 ## Harmonize age variables ##
 #############################
-## Use this variable CCSS_exp_ANY_SN for ANY_SN
-CCSS_exp$AGE.ANY_SN <- as.numeric(CCSS_exp$a_candx)
-CCSS_exp$agedx <- as.numeric(CCSS_exp$a_dx)
-CCSS_exp$agelstcontact <- as.numeric(CCSS_exp$a_end)
+## Use this variable ccss_org_ANY_SN for ANY_SN
+ccss_org$AGE.ANY_SN <- as.numeric(ccss_org$a_candx)
+ccss_org$agedx <- as.numeric(ccss_org$a_dx)
+ccss_org$agelstcontact <- as.numeric(ccss_org$a_end)
 
 
 ## Age at diagnosis
 # PHENO.ANY_SN$agedx <- floor(PHENO.ANY_SN$agedx)
-CCSS_exp$AGE_AT_DIAGNOSIS[CCSS_exp$agedx >= 0 & CCSS_exp$agedx < 5 ] <- "0-4"
-CCSS_exp$AGE_AT_DIAGNOSIS[CCSS_exp$agedx >= 5 & CCSS_exp$agedx < 10 ] <- "5-9"
-CCSS_exp$AGE_AT_DIAGNOSIS[CCSS_exp$agedx >= 10 & CCSS_exp$agedx < 15 ] <- "10-14"
-CCSS_exp$AGE_AT_DIAGNOSIS[CCSS_exp$agedx >= 15 ] <- ">=15"
-CCSS_exp$AGE_AT_DIAGNOSIS <- factor(CCSS_exp$AGE_AT_DIAGNOSIS, levels = c("0-4", "5-9", "10-14", ">=15")) # first level will be treated as reference
+ccss_org$AGE_AT_DIAGNOSIS[ccss_org$agedx >= 0 & ccss_org$agedx < 5 ] <- "0-4"
+ccss_org$AGE_AT_DIAGNOSIS[ccss_org$agedx >= 5 & ccss_org$agedx < 10 ] <- "5-9"
+ccss_org$AGE_AT_DIAGNOSIS[ccss_org$agedx >= 10 & ccss_org$agedx < 15 ] <- "10-14"
+ccss_org$AGE_AT_DIAGNOSIS[ccss_org$agedx >= 15 ] <- ">=15"
+ccss_org$AGE_AT_DIAGNOSIS <- factor(ccss_org$AGE_AT_DIAGNOSIS, levels = c("0-4", "5-9", "10-14", ">=15")) # first level will be treated as reference
 
 
 ## Age at last contact
-CCSS_exp$AGE_AT_LAST_CONTACT[CCSS_exp$agelstcontact >= 0 & CCSS_exp$agelstcontact < 25 ] <- "0-24"
-CCSS_exp$AGE_AT_LAST_CONTACT[CCSS_exp$agelstcontact >= 25 & CCSS_exp$agelstcontact < 35 ] <- "25-34"
-CCSS_exp$AGE_AT_LAST_CONTACT[CCSS_exp$agelstcontact >= 35 & CCSS_exp$agelstcontact < 45 ] <- "35-44"
-CCSS_exp$AGE_AT_LAST_CONTACT[CCSS_exp$agelstcontact >= 45 ] <- ">=45"
-CCSS_exp$AGE_AT_LAST_CONTACT <- factor(CCSS_exp$AGE_AT_LAST_CONTACT, levels = c("0-24", "25-34", "35-44", ">=45")) # first level will be treated as reference
+ccss_org$AGE_AT_LAST_CONTACT[ccss_org$agelstcontact >= 0 & ccss_org$agelstcontact < 25 ] <- "0-24"
+ccss_org$AGE_AT_LAST_CONTACT[ccss_org$agelstcontact >= 25 & ccss_org$agelstcontact < 35 ] <- "25-34"
+ccss_org$AGE_AT_LAST_CONTACT[ccss_org$agelstcontact >= 35 & ccss_org$agelstcontact < 45 ] <- "35-44"
+ccss_org$AGE_AT_LAST_CONTACT[ccss_org$agelstcontact >= 45 ] <- ">=45"
+ccss_org$AGE_AT_LAST_CONTACT <- factor(ccss_org$AGE_AT_LAST_CONTACT, levels = c("0-24", "25-34", "35-44", ">=45")) # first level will be treated as reference
 
-CCSS_exp$gradedt <- as.numeric(CCSS_exp$a_candx)
+ccss_org$gradedt <- as.numeric(ccss_org$a_candx)
 
-subneo <- CCSS_exp
+subneo <- ccss_org
 
-## Subset Pheno data only for CCSS_exp
-CCSS_exp <- CCSS_exp[!duplicated(CCSS_exp$ccssid),]
+## Subset Pheno data only for ccss_org
+ccss_org <- ccss_org[!duplicated(ccss_org$ccssid),]
 
 ## Age at last contact (cubic spline)
 source("https://raw.githubusercontent.com/achalneupane/Achal_St_Jude/main/rcodes/cubic_spline.r")
 
 breaks = seq(5, 95, 22.5)
 
-cp = quantile(CCSS_exp$agelstcontact, breaks/100, na.rm = T)
+cp = quantile(ccss_org$agelstcontact, breaks/100, na.rm = T)
 
-cs = cubic_spline(CCSS_exp$agelstcontact, knots = cp)
+cs = cubic_spline(ccss_org$agelstcontact, knots = cp)
 
 colnames(cs) <- c("AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4")
-CCSS_exp <- cbind.data.frame(CCSS_exp, cs)
+ccss_org <- cbind.data.frame(ccss_org, cs)
 # Merge cs to your original data.frame and adjust in the logistic regression
 
 
@@ -189,53 +194,53 @@ CCSS_exp <- cbind.data.frame(CCSS_exp, cs)
 ## Create tertiles for ccss org and ccss exp separately
 
 ## Anthracyclines (Y/N and Tertiles)
-CCSS_exp$anth_DED5 <- as.numeric(CCSS_exp$anth_DED5)
-CCSS_exp$anthra_jco_dose_5_yn <- factor(ifelse(CCSS_exp$anth_DED5 == 0, "N", "Y"))
+ccss_org$anth_DED5 <- as.numeric(ccss_org$anth_DED5)
+ccss_org$anthra_jco_dose_5_yn <- factor(ifelse(ccss_org$anth_DED5 == 0, "N", "Y"))
 
-TERT = unname(quantile(CCSS_exp$anth_DED5[CCSS_exp$anth_DED5 !=0], c(1/3, 2/3, 1), na.rm = T))
-CCSS_exp$anthra_jco_dose_5.category <- cut(CCSS_exp$anth_DED5, breaks = c(0, 0.001, TERT),
+TERT = unname(quantile(ccss_org$anth_DED5[ccss_org$anth_DED5 !=0], c(1/3, 2/3, 1), na.rm = T))
+ccss_org$anthra_jco_dose_5.category <- cut(ccss_org$anth_DED5, breaks = c(0, 0.001, TERT),
                                                labels = c("None", "1st", "2nd", "3rd"),
                                                include.lowest = TRUE)
-levels(CCSS_exp$anthra_jco_dose_5.category) <- c(levels(CCSS_exp$anthra_jco_dose_5.category), "Unknown")
-CCSS_exp$anthra_jco_dose_5.category [is.na(CCSS_exp$anthra_jco_dose_5.category)] <- "Unknown"
+levels(ccss_org$anthra_jco_dose_5.category) <- c(levels(ccss_org$anthra_jco_dose_5.category), "Unknown")
+ccss_org$anthra_jco_dose_5.category [is.na(ccss_org$anthra_jco_dose_5.category)] <- "Unknown"
 
 
 ## Alkylating agents (Y/N and Tertiles)
-CCSS_exp$alk_CED5 <- as.numeric(CCSS_exp$alk_CED5)
-CCSS_exp$aa_class_dose_5_yn <- factor(ifelse(CCSS_exp$alk_CED5 == 0, "N", "Y"))
+ccss_org$alk_CED5 <- as.numeric(ccss_org$alk_CED5)
+ccss_org$aa_class_dose_5_yn <- factor(ifelse(ccss_org$alk_CED5 == 0, "N", "Y"))
 
-TERT = unname(quantile(CCSS_exp$alk_CED5[CCSS_exp$alk_CED5 !=0], c(1/3, 2/3, 1), na.rm = T))
-CCSS_exp$aa_class_dose_5.category <- cut(CCSS_exp$alk_CED5, breaks = c(0, 0.001, TERT),
+TERT = unname(quantile(ccss_org$alk_CED5[ccss_org$alk_CED5 !=0], c(1/3, 2/3, 1), na.rm = T))
+ccss_org$aa_class_dose_5.category <- cut(ccss_org$alk_CED5, breaks = c(0, 0.001, TERT),
                                            labels = c("None", "1st", "2nd", "3rd"),
                                            include.lowest = TRUE)
-levels(CCSS_exp$aa_class_dose_5.category) <- c(levels(CCSS_exp$aa_class_dose_5.category), "Unknown")
-CCSS_exp$aa_class_dose_5.category [is.na(CCSS_exp$aa_class_dose_5.category)] <- "Unknown"
+levels(ccss_org$aa_class_dose_5.category) <- c(levels(ccss_org$aa_class_dose_5.category), "Unknown")
+ccss_org$aa_class_dose_5.category [is.na(ccss_org$aa_class_dose_5.category)] <- "Unknown"
 
 ## Epipodophyllotoxin agents (Y/N and Tertiles)
-CCSS_exp$epipdose5 <- as.numeric(CCSS_exp$epipdose5)
-CCSS_exp$epitxn_dose_5_yn <- factor(ifelse(CCSS_exp$epipdose5 == 0, "N", "Y"))
+ccss_org$epipdose5 <- as.numeric(ccss_org$epipdose5)
+ccss_org$epitxn_dose_5_yn <- factor(ifelse(ccss_org$epipdose5 == 0, "N", "Y"))
 
-TERT = unname(quantile(CCSS_exp$epipdose5[CCSS_exp$epipdose5 !=0], c(1/3, 2/3, 1), na.rm = T))
-CCSS_exp$epitxn_dose_5.category <- cut(CCSS_exp$epipdose5, breaks = c(0, 0.001, TERT),
+TERT = unname(quantile(ccss_org$epipdose5[ccss_org$epipdose5 !=0], c(1/3, 2/3, 1), na.rm = T))
+ccss_org$epitxn_dose_5.category <- cut(ccss_org$epipdose5, breaks = c(0, 0.001, TERT),
                                          labels = c("None", "1st", "2nd", "3rd"),
                                          include.lowest = TRUE)
-levels(CCSS_exp$epitxn_dose_5.category) <- c(levels(CCSS_exp$epitxn_dose_5.category), "Unknown")
-CCSS_exp$epitxn_dose_5.category [is.na(CCSS_exp$epitxn_dose_5.category)] <- "Unknown"
+levels(ccss_org$epitxn_dose_5.category) <- c(levels(ccss_org$epitxn_dose_5.category), "Unknown")
+ccss_org$epitxn_dose_5.category [is.na(ccss_org$epitxn_dose_5.category)] <- "Unknown"
 
 ## Cis-platinum (Y/N and Tertiles)
-CCSS_exp$pt_cisED5 <- as.numeric(CCSS_exp$pt_cisED5)
-CCSS_exp$cisplateq_dose_5_yn <- factor(ifelse(CCSS_exp$pt_cisED5 == 0, "N", "Y"))
+ccss_org$pt_cisED5 <- as.numeric(ccss_org$pt_cisED5)
+ccss_org$cisplateq_dose_5_yn <- factor(ifelse(ccss_org$pt_cisED5 == 0, "N", "Y"))
 
-TERT = unname(quantile(CCSS_exp$pt_cisED5[CCSS_exp$pt_cisED5 !=0], c(1/3, 2/3, 1), na.rm = T))
-CCSS_exp$cisplateq_dose_5.category <- cut(CCSS_exp$pt_cisED5, breaks = c(0, 0.001, TERT),
+TERT = unname(quantile(ccss_org$pt_cisED5[ccss_org$pt_cisED5 !=0], c(1/3, 2/3, 1), na.rm = T))
+ccss_org$cisplateq_dose_5.category <- cut(ccss_org$pt_cisED5, breaks = c(0, 0.001, TERT),
                                          labels = c("None", "1st", "2nd", "3rd"),
                                          include.lowest = TRUE)
-levels(CCSS_exp$cisplateq_dose_5.category) <- c(levels(CCSS_exp$cisplateq_dose_5.category), "Unknown")
-CCSS_exp$cisplateq_dose_5.category [is.na(CCSS_exp$cisplateq_dose_5.category)] <- "Unknown"
+levels(ccss_org$cisplateq_dose_5.category) <- c(levels(ccss_org$cisplateq_dose_5.category), "Unknown")
+ccss_org$cisplateq_dose_5.category [is.na(ccss_org$cisplateq_dose_5.category)] <- "Unknown"
 
 
 
-PHENO.ANY_SN <- CCSS_exp[c('ccssid', 'SEX', 'agedx', 'diagnose', 'agelstcontact', 
+PHENO.ANY_SN <- ccss_org[c('ccssid', 'SEX', 'agedx', 'diagnose', 'agelstcontact', 
   "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", 'd_candx', 'groupdx3', 
   'a_candx', 'chestrtgrp', 'neckrtgrp', 'pelvisrtgrp', 'abdomenrtgrp', 'brainrtgrp',
   'smk_mostrecent', 'Not_obese_yn', 'PhysicalActivity_yn', 'smoker_former_or_never_yn',
@@ -252,49 +257,49 @@ PHENO.ANY_SN <- CCSS_exp[c('ccssid', 'SEX', 'agedx', 'diagnose', 'agelstcontact'
 ################
 
 ## Meningioma_prs.profile----------------
-Meningioma <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Meningioma_prs.profile", header = T)
+Meningioma <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/prs_out/Meningioma_prs.profile", header = T)
 PHENO.ANY_SN$Meningioma_PRS <-  Meningioma$SCORE [match(PHENO.ANY_SN$ccssid, Meningioma$IID)]
 
 ## Pleiotropy_PRSWEB_prs.profile---------
-Pleiotropy_PRSWEB <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Pleiotropy_PRSWEB_prs.profile", header = T)
+Pleiotropy_PRSWEB <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/prs_out/Pleiotropy_PRSWEB_prs.profile", header = T)
 PHENO.ANY_SN$Pleiotropy_PRSWEB_PRS <-  Pleiotropy_PRSWEB$SCORE [match(PHENO.ANY_SN$ccssid, Pleiotropy_PRSWEB$IID)]
 
 
 ## Sarcoma_Machiela_prs.profile----------
-Sarcoma_Machiela <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Sarcoma_Machiela_prs.profile", header = T)
+Sarcoma_Machiela <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/prs_out/Sarcoma_Machiela_prs.profile", header = T)
 PHENO.ANY_SN$Sarcoma_Machiela_PRS <-  Sarcoma_Machiela$SCORE [match(PHENO.ANY_SN$ccssid, Sarcoma_Machiela$IID)]
 
 
 ## ALL_Vijayakrishnan_prs.profile--------
-ALL_Vijayakrishnan <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/ALL_Vijayakrishnan_prs.profile", header = T)
+ALL_Vijayakrishnan <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/prs_out/ALL_Vijayakrishnan_prs.profile", header = T)
 PHENO.ANY_SN$ALL_Vijayakrishnan_PRS <-  ALL_Vijayakrishnan$SCORE [match(PHENO.ANY_SN$ccssid, ALL_Vijayakrishnan$IID)]
 
 
 ## Breast cancer-------------------------
 ## Mavaddat_2019_ER_NEG_Breast_prs.profile
-Mavaddat_2019_ER_NEG_Breast <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Mavaddat_2019_ER_NEG_Breast_prs.profile", header = T)
+Mavaddat_2019_ER_NEG_Breast <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/prs_out/Mavaddat_2019_ER_NEG_Breast_prs.profile", header = T)
 PHENO.ANY_SN$Mavaddat_2019_ER_NEG_Breast_PRS <-  Mavaddat_2019_ER_NEG_Breast$SCORE [match(PHENO.ANY_SN$ccssid, Mavaddat_2019_ER_NEG_Breast$IID)]
 
 
 ## Mavaddat_2019_ER_POS_Breast_prs.profile
-Mavaddat_2019_ER_POS_Breast <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Mavaddat_2019_ER_POS_Breast_prs.profile", header = T)
+Mavaddat_2019_ER_POS_Breast <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/prs_out/Mavaddat_2019_ER_POS_Breast_prs.profile", header = T)
 PHENO.ANY_SN$Mavaddat_2019_ER_POS_Breast_PRS <-  Mavaddat_2019_ER_POS_Breast$SCORE [match(PHENO.ANY_SN$ccssid, Mavaddat_2019_ER_POS_Breast$IID)]
 
 
 ## Mavaddat_2019_ER_OVERALL_Breast_prs.profile
-Mavaddat_2019_ER_OVERALL_Breast <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Mavaddat_2019_ER_OVERALL_Breast_prs.profile", header = T)
+Mavaddat_2019_ER_OVERALL_Breast <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/prs_out/Mavaddat_2019_ER_OVERALL_Breast_prs.profile", header = T)
 PHENO.ANY_SN$Mavaddat_2019_ER_OVERALL_Breast_PRS <-  Mavaddat_2019_ER_OVERALL_Breast$SCORE [match(PHENO.ANY_SN$ccssid, Mavaddat_2019_ER_OVERALL_Breast$IID)]
 
 
 ## Thyroid cancer------------------------
-THYROID <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/THYROID_PGS_prs.profile", header = T)
+THYROID <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/prs_out/THYROID_PGS_prs.profile", header = T)
 PHENO.ANY_SN$Thyroid_PRS <-  THYROID$SCORE [match(PHENO.ANY_SN$ccssid, THYROID$IID)]
 
 ## NMSCs---------------------------------
-BASALcell <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Basal_cell_carcinoma_PRSWeb_prs.profile", header = T)
+BASALcell <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/prs_out/Basal_cell_carcinoma_PRSWeb_prs.profile", header = T)
 PHENO.ANY_SN$BASALcell_PRS <-  BASALcell$SCORE [match(PHENO.ANY_SN$ccssid, BASALcell$IID)]
 
-SQUAMOUScell <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Squamous_cell_carcinoma_PRSWeb_prs.profile", header = T)
+SQUAMOUScell <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/prs_out/Squamous_cell_carcinoma_PRSWeb_prs.profile", header = T)
 PHENO.ANY_SN$SQUAMOUScell_PRS <-  SQUAMOUScell$SCORE [match(PHENO.ANY_SN$ccssid, SQUAMOUScell$IID)]
 
 
@@ -317,4 +322,4 @@ for(i in 1:length(PRS.to.categorize)){
 }
 
 
-# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_exp_Genetic_data_P_LP.Rdata")
+# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_org_Genetic_data_P_LP.Rdata")
