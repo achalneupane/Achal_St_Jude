@@ -1,4 +1,4 @@
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_exp_Genetic_data_P_LP.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_org_Genetic_data_P_LP.Rdata")
 
 library(haven)
 library(benchmarkme)
@@ -22,11 +22,11 @@ subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subne
 # How many SNs after 5 years
 subneo.after5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5,]
 length(unique(subneo.after5$ccssid))
-# 269
+# 1551
 
 subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
 sum(!duplicated(subneo.within5$ccssid))
-# 8
+# 25
 
 
 
@@ -38,12 +38,12 @@ sum(!duplicated(subneo.within5$ccssid))
 NMSCs <- subneo[grepl("skin", subneo$groupdx3, ignore.case = T),]
 NMSCs <- setDT(NMSCs)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
 nrow(NMSCs)
-# 11
+# 75
 
 # Removing samples with SNs within 5 years of childhood cancer
 NMSCs <- NMSCs[!NMSCs$ccssid %in% subneo.within5$ccssid,]
 nrow(NMSCs)
-# 11
+# 75
 PHENO.ANY_SN$NMSC <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% NMSCs$ccssid, 0, 1))
 
 

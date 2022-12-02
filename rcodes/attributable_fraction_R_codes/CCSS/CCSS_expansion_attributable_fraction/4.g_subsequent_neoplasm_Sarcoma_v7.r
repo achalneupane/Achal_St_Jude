@@ -1,7 +1,4 @@
-#########################
-## Load Phenotype data ##
-#########################
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v2.RDATA")
+
 #########################
 ## Subsequent Neoplasm ##
 #########################
