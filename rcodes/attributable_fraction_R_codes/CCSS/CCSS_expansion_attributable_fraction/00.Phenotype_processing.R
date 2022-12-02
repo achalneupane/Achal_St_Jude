@@ -137,7 +137,7 @@ CCSS_exp$NOT_RiskyHeavyDrink_yn <- factor(CCSS_exp$NOT_RiskyHeavyDrink_yn, level
 CCSS_exp$NOT_RiskyHeavyDrink_yn[is.na(CCSS_exp$NOT_RiskyHeavyDrink_yn)] <- "Unknown"
 
 
-## USe this variable CCSS_exp_ANY_SN for ANY_SN
+## Use this variable CCSS_exp_ANY_SN for ANY_SN
 CCSS_exp_ANY_SN <- CCSS_exp
 
 
@@ -184,10 +184,10 @@ CCSS_exp$epitxn_dose_5.category [is.na(CCSS_exp$epitxn_dose_5.category)] <- "Unk
 
 ## Cis-platinum (Y/N and Tertiles)
 CCSS_exp$pt_cisED5 <- as.numeric(CCSS_exp$pt_cisED5)
-CCSS_exp$cisplateq_dose_5_yn <- factor(ifelse(CCSS_exp$epipdose5 == 0, "N", "Y"))
+CCSS_exp$cisplateq_dose_5_yn <- factor(ifelse(CCSS_exp$pt_cisED5 == 0, "N", "Y"))
 
-TERT = unname(quantile(CCSS_exp$epipdose5[CCSS_exp$epipdose5 !=0], c(1/3, 2/3, 1), na.rm = T))
-CCSS_exp$cisplateq_dose_5.category <- cut(CCSS_exp$epipdose5, breaks = c(0, 0.001, TERT),
+TERT = unname(quantile(CCSS_exp$pt_cisED5[CCSS_exp$pt_cisED5 !=0], c(1/3, 2/3, 1), na.rm = T))
+CCSS_exp$cisplateq_dose_5.category <- cut(CCSS_exp$pt_cisED5, breaks = c(0, 0.001, TERT),
                                          labels = c("None", "1st", "2nd", "3rd"),
                                          include.lowest = TRUE)
 levels(CCSS_exp$cisplateq_dose_5.category) <- c(levels(CCSS_exp$cisplateq_dose_5.category), "Unknown")
@@ -199,7 +199,8 @@ PHENO.ANY_SN <- CCSS_exp[c('ccssid', 'SEX', 'a_dx', 'diagnose', 'a_end', 'd_cand
   'a_candx', 'chestrtgrp', 'neckrtgrp', 'pelvisrtgrp', 'abdomenrtgrp', 'brainrtgrp',
   'smk_mostrecent', 'Not_obese_yn', 'PhysicalActivity_yn', 'smoker_former_or_never_yn',
   'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category',
-  'Not_obese_yn', 'PhysicalActivity_yn', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn')]
+  'Not_obese_yn', 'PhysicalActivity_yn', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn', 
+  'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category')]
 
 
 
@@ -209,18 +210,63 @@ PHENO.ANY_SN <- CCSS_exp[c('ccssid', 'SEX', 'a_dx', 'diagnose', 'a_end', 'd_cand
 ## PRS scores ##
 ################
 
+## Meningioma_prs.profile----------------
+Meningioma <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Meningioma_prs.profile", header = T)
+PHENO.ANY_SN$Meningioma_PRS <-  Meningioma$SCORE [match(PHENO.ANY_SN$ccssid, Meningioma$IID)]
+
+## Pleiotropy_PRSWEB_prs.profile---------
+Pleiotropy_PRSWEB <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Pleiotropy_PRSWEB_prs.profile", header = T)
+PHENO.ANY_SN$Pleiotropy_PRSWEB_PRS <-  Pleiotropy_PRSWEB$SCORE [match(PHENO.ANY_SN$ccssid, Pleiotropy_PRSWEB$IID)]
+
+
+## Sarcoma_Machiela_prs.profile----------
+Sarcoma_Machiela <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Sarcoma_Machiela_prs.profile", header = T)
+PHENO.ANY_SN$Sarcoma_Machiela_PRS <-  Sarcoma_Machiela$SCORE [match(PHENO.ANY_SN$ccssid, Sarcoma_Machiela$IID)]
+
+
+## ALL_Vijayakrishnan_prs.profile--------
+ALL_Vijayakrishnan <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/ALL_Vijayakrishnan_prs.profile", header = T)
+PHENO.ANY_SN$ALL_Vijayakrishnan_PRS <-  ALL_Vijayakrishnan$SCORE [match(PHENO.ANY_SN$ccssid, ALL_Vijayakrishnan$IID)]
+
+
+## Breast cancer-------------------------
+## Mavaddat_2019_ER_NEG_Breast_prs.profile
+Mavaddat_2019_ER_NEG_Breast <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Mavaddat_2019_ER_NEG_Breast_prs.profile", header = T)
+PHENO.ANY_SN$Mavaddat_2019_ER_NEG_Breast_PRS <-  Mavaddat_2019_ER_NEG_Breast$SCORE [match(PHENO.ANY_SN$ccssid, Mavaddat_2019_ER_NEG_Breast$IID)]
+
+
+## Mavaddat_2019_ER_POS_Breast_prs.profile
+Mavaddat_2019_ER_POS_Breast <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Mavaddat_2019_ER_POS_Breast_prs.profile", header = T)
+PHENO.ANY_SN$Mavaddat_2019_ER_POS_Breast_PRS <-  Mavaddat_2019_ER_POS_Breast$SCORE [match(PHENO.ANY_SN$ccssid, Mavaddat_2019_ER_POS_Breast$IID)]
+
+
+## Mavaddat_2019_ER_OVERALL_Breast_prs.profile
+Mavaddat_2019_ER_OVERALL_Breast <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Mavaddat_2019_ER_OVERALL_Breast_prs.profile", header = T)
+PHENO.ANY_SN$Mavaddat_2019_ER_OVERALL_Breast_PRS <-  Mavaddat_2019_ER_OVERALL_Breast$SCORE [match(PHENO.ANY_SN$ccssid, Mavaddat_2019_ER_OVERALL_Breast$IID)]
+
+
+## Thyroid cancer------------------------
+THYROID <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/THYROID_PGS_prs.profile", header = T)
+PHENO.ANY_SN$Thyroid_PRS <-  THYROID$SCORE [match(PHENO.ANY_SN$ccssid, THYROID$IID)]
+
+## NMSCs---------------------------------
+BASALcell <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Basal_cell_carcinoma_PRSWeb_prs.profile", header = T)
+PHENO.ANY_SN$BASALcell_PRS <-  BASALcell$SCORE [match(PHENO.ANY_SN$ccssid, BASALcell$IID)]
+
+SQUAMOUScell <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Squamous_cell_carcinoma_PRSWeb_prs.profile", header = T)
+PHENO.ANY_SN$SQUAMOUScell_PRS <-  SQUAMOUScell$SCORE [match(PHENO.ANY_SN$ccssid, SQUAMOUScell$IID)]
+
+
+## Change PRS to categories
+PRS.to.categorize <- colnames(PHENO.ANY_SN)[grepl("_PRS$", colnames(PHENO.ANY_SN))]
+
+
 ## Tertile categories
 for(i in 1:length(PRS.to.categorize)){
   TERT = unname(quantile(PHENO.ANY_SN[PRS.to.categorize[i]][PHENO.ANY_SN[PRS.to.categorize[i]] !=0], c(1/3, 2/3, 1), na.rm = T))
   if(sum(duplicated(TERT)) > 0) next
   print(TERT)
   print (i)
-  # PHENO.ANY_SN$tmp.tert.category[PHENO.ANY_SN[PRS.to.categorize[i]] ==0| is.na(PHENO.ANY_SN[,PRS.to.categorize[i]])] <- "None"
-  # PHENO.ANY_SN$tmp.tert.category[is.na(PHENO.ANY_SN[,PRS.to.categorize[i]])] <- "None"
-  # PHENO.ANY_SN$tmp.tert.category[!grepl("None", PHENO.ANY_SN$tmp.tert.category)] <- as.character(cut(PHENO.ANY_SN[,PRS.to.categorize[i]][!grepl("None", PHENO.ANY_SN$tmp.tert.category)], breaks = c(0, TERT),
-  #                                            labels = c("1st", "2nd", "3rd"),
-  #                                            include.lowest = TRUE))
-  
   PHENO.ANY_SN$tmp.tert.category <- as.character(cut(PHENO.ANY_SN[,PRS.to.categorize[i]], breaks = c(0, TERT),
                                                      labels = c("1st", "2nd", "3rd"),
                                                      include.lowest = TRUE))
