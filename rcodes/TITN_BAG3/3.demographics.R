@@ -2,26 +2,27 @@ getwd()
 
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno")
 
+## Load ccss and sjlife data
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_exp_Genetic_data_P_LP.Rdata")
+CCSS_exp.ANY_PHENO <- PHENO.ANY_SN
 
-# Read pheno files
-## SJLIFE
-sjlife <- read.table("sjlife_ttn_bag3.pheno", header = T)
-head(sjlife)
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_org_Genetic_data_P_LP.Rdata")
+CCSS_org.ANY_PHENO <- PHENO.ANY_SN
+CCSS_org.ANY_PHENO$ccssid <- sapply(strsplit(CCSS_org.ANY_PHENO$ccssid, "_"), `[`, 1, simplify=T)
 
-## add cancer types
+PHENO.ANY_SN <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/2_genetic_data_P_LP.rds")
+SJLIFE.ANY_PHENO <- PHENO.ANY_SN
+
+rm(list=setdiff(ls(), c("SJLIFE.ANY_PHENO", "CCSS_exp.ANY_PHENO", "CCSS_org.ANY_PHENO")))
 
 
 
-## CCSS_org
-ccss_org <- read.table("ccss_org_eur_cardiotoxic_exposed.pheno", header = T)
-head(ccss_org)
+
 
 # rename columns to make same as sjlife column names
 colnames(ccss_org) [match(c("a_dx", "a_end", "SEX", "anth_DED", "HeartAvg", "CMP2plus"), colnames(ccss_org))] <- c("agedx", "agelstcontact", "gender", "anthra_jco_dose_any", "hrtavg", "CMP")
 
-## CCSS_exp
-ccss_exp <- read.table("ccss_exp_eur_cardiotoxic_exposed.pheno", header = T)
-head(ccss_exp)
+
 
 # rename columns to make same as sjlife column names
 colnames(ccss_exp) [match(c("a_dx", "a_end", "SEX", "anth_DED", "HeartAvg", "CMP2plus"), colnames(ccss_exp))] <- c("agedx", "agelstcontact", "gender", "anthra_jco_dose_any", "hrtavg", "CMP")
@@ -31,6 +32,17 @@ colnames(ccss_exp) [match(c("a_dx", "a_end", "SEX", "anth_DED", "HeartAvg", "CMP
 ############
 ## SJLIFE ##
 ############
+## Read pheno file
+sjlife <- read.table("sjlife_ttn_bag3.pheno", header = T)
+head(sjlife)
+dim(sjlife)
+# 1645
+sum(sjlife$IID %in% SJLIFE.ANY_PHENO$sjlid)
+# 1645
+
+## add cancer types
+sjlife$diagrp <- SJLIFE.ANY_PHENO$diaggrp[match(sjlife$IID, SJLIFE.ANY_PHENO$sjlid)]
+
 
 
 ## N
@@ -75,6 +87,28 @@ sjlife_female <- paste0(sjlife_female, " (", round((sjlife_female/n_sjlife)*100,
 ## CCSS_ORG ##
 ##############
 
+ccss_org <- read.table("ccss_org_eur_cardiotoxic_exposed.pheno", header = T)
+head(ccss_org)
+dim(ccss_org)
+# 3147
+sum(ccss_org$IID %in% CCSS_org.ANY_PHENO$ccssid)
+# 3147
+
+ccss_org$diagrp <- CCSS_org.ANY_PHENO$diagnose[match(ccss_org$IID, CCSS_org.ANY_PHENO$ccssid)]
+
+## Add age at CHF
+ccss_age_CHF <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/pheno/ccss_eur_all.txt", header = T)
+ccss_org$IID[!ccss_org$IID %in% ccss_age_CHF$ccssid]
+# [1] 15125841 15126401 15166684 15179378 # not present 
+sum(ccss_org$IID %in% ccss_age_CHF$ccssid)
+# 3143
+ccss_org$agevent <- ccss_age_CHF$a_maxCHF15 [match(ccss_org$IID, ccss_age_CHF$ccssid)]
+ccss_org$agedx <- ccss_org$a_dx
+ccss_org$elapsedAGE <- ccss_org$agevent - ccss_org$agedx
+
+# All elapsed negative age are converted to zero. ageevent probably used floor value so there are some negatives
+ccss_org$elapsedAGE[ccss_org$elapsedAGE < 0] <- 0
+
 ## N
 n_ccss_org = nrow(ccss_org)
 
@@ -114,6 +148,17 @@ ccss_org_female <- paste0(ccss_org_female, " (", round((ccss_org_female/n_ccss_o
 ##############
 ## CCSS_EXP ##
 ##############
+
+## CCSS_exp
+ccss_exp <- read.table("ccss_exp_eur_cardiotoxic_exposed.pheno", header = T)
+head(ccss_exp)
+dim(ccss_exp)
+# 1484
+
+sum(ccss_exp$IID %in% CCSS_exp.ANY_PHENO$ccssid)
+# 1484
+
+ccss_exp$diagrp <- CCSS_exp.ANY_PHENO$diagnose[match(ccss_exp$IID, CCSS_exp.ANY_PHENO$ccssid)]
 
 ## N
 n_ccss_exp = nrow(ccss_exp)
