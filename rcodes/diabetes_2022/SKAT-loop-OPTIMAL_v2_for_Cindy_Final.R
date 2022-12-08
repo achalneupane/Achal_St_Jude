@@ -640,3 +640,14 @@ chrALL.AFR[,c("SKAT", "SKATO", "BURDEN")] <- sapply(chrALL.AFR[,c("SKAT", "SKATO
 
 # write.table(chrALL.AFR, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/gene-based-analysis/geneset-AFR_chrALL_SKAT.pval", sep="\t", col.names=T, row.names=F, quote=F)
 
+
+## gnomAD allele frequency for variants from Cindy (Email: 12/3/2022 2:58 pm)
+gnomad.af <- read.table("/ResearchHome/Groups/sapkogrp/projects//Genomics/common/diabetes/gnomAD_lookup_list_Cindy_12_06_2022_out.txt", header = T, sep = "\t", stringsAsFactors = F)
+
+gnomad.af$KEY <- paste(gnomad.af$Otherinfo4, gnomad.af$Otherinfo5, gnomad.af$Otherinfo7, gnomad.af$Otherinfo8, sep = ":")
+
+gnomad.af$CHROM <- gnomad.af$Otherinfo4
+gnomad.af$BP <- gnomad.af$Otherinfo5
+gnomad.af$EA <- gnomad.af$Otherinfo8
+gnomad.af$NEA <- gnomad.af$Otherinfo7
+cbind.data.frame(gnomad.af[c('CHROM', 'BP', 'EA', 'NEA', 'gnomAD_genome_NFE', 'gnomAD_genome_AFR', 'gnomAD_genome_ALL')])

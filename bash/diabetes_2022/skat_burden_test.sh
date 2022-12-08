@@ -198,3 +198,18 @@ cd chr${chr}; mkdir geneset-${set}; perl ../../get_gene.perl chr${chr}-${BASE}-$
 
 # Now Run SKAT-loop-OPTIMAL.r
 
+
+
+
+## gnomAD allele frequency for variants from Cindy (Email: 12/3/2022 2:58 pm)
+DIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/annovar/"
+head -1 ${DIR}/ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.${CHR}.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > gnomAD_lookup_list_Cindy_12_06_2022_out.txt
+IFS=$'\n' # set IFS
+for line in $(cat gnomAD_lookup_list_Cindy_12_06_2022.txt); do
+CHR="$(echo ${line}| cut -d$'\t' -f1)"
+BP="$(echo ${line}| cut -d$'\t' -f2)"
+echo $CHR
+grep -w $BP ${DIR}/ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.${CHR}.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt >> gnomAD_lookup_list_Cindy_12_06_2022_out.txt
+done
+
+
