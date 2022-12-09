@@ -1,7 +1,7 @@
 ## Phenotype data for CCSS (to replicate GWAS findings in SJLIFE)
 rm(list=ls())
 # setwd('/Volumes/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/pheno/')
-setwd("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/cardiomyopathy_gwas/yadav_pheno/")
+setwd("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/TITN_BAG3/cardiomyopathy_gwas/yadav_pheno/")
 ## Phenotype data by Huiqi and Qi
 load('ccss_export_05062022.RData')
 pheno = export
