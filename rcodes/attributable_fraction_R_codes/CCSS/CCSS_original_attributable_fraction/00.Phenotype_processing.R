@@ -243,8 +243,7 @@ ccss_org$cisplateq_dose_5.category [is.na(ccss_org$cisplateq_dose_5.category)] <
 PHENO.ANY_SN <- ccss_org[c('ccssid', 'SEX', 'agedx', 'diagnose', 'agelstcontact', 
   "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", 'd_candx', 'groupdx3', 
   'a_candx', 'chestrtgrp', 'neckrtgrp', 'pelvisrtgrp', 'abdomenrtgrp', 'brainrtgrp',
-  'smk_mostrecent', 'Not_obese_yn',
-  'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category',
+  'Not_obese_yn', 'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category',
   'PhysicalActivity_yn', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn')]
 
 

@@ -42,27 +42,6 @@ samples.sjlife <- samples.sjlife[(samples.sjlife%in% PHENO.ANY_SN$sjlid)]
 length(samples.sjlife)
 # 3571
 
-
-lifestyle <- {}
-for (i in 1:length(samples.sjlife)){
-  print(paste0("Doing ", i))
-  dat <- adlthabits[adlthabits$SJLIFEID == samples.sjlife[i],]
-  if (max(dat$agesurvey) >= 18){
-    print("YES")
-    dat2 <- dat[dat$agesurvey >= 18,]
-    lifestyle.tmp <- dat2[which(dat2$agesurvey == min(dat2$agesurvey)),] # Keep the earliest age after 18 years
-  }
-  lifestyle <- rbind.data.frame(lifestyle, lifestyle.tmp)
-}
-
-
-sum(duplicated(lifestyle$SJLIFEID))
-# 2
-lifestyle$SJLIFEID[duplicated(lifestyle$SJLIFEID)]
-# "SJL1080201" "SJL5359215"
-## Remove duplicate row
-lifestyle <- lifestyle[!duplicated(lifestyle$SJLIFEID),]
-
 ##########################################################################################################
 ## Recode Physical activity and Smoker based on what Kiri Ness' suggested (Using SAS code leanmass.sas) ##
 ##########################################################################################################
@@ -131,7 +110,8 @@ lifestyle$wmpa[which(is.na(lifestyle$wmpa) & !is.na(lifestyle$wvpa)) ] <- 0
 # mvpawk=(wmpa)+(wvpa*2); if mvpawk>2520 then mvpawk=2520; /*cap six hours per day*/
 lifestyle$mvpawk <- lifestyle$wmpa + (lifestyle$wvpa *2)
 lifestyle$mvpawk[which(lifestyle$mvpawk > 2520)] <- 2520
-lifestyle$CDC_PA <- ifelse(lifestyle$mvpawk < 150 | is.na(lifestyle$mvpawk), 0,1)
+lifestyle$CDC_PA <- ifelse(lifestyle$mvpawk < 150 | is.na(lifestyle$mvpawk), 0,1) ###### Check this line
+
 
 
 ## 2.-------------- Smoker status
@@ -257,16 +237,6 @@ original.adultdiet <- original.adultdiet[original.adultdiet$KEY %in% adultdiet$K
 # keep this in the same order as adultdiet
 original.adultdiet <- original.adultdiet[match(adultdiet$KEY, original.adultdiet$KEY),]
 
-# ## check few variables for sanity check between the two datasets
-# table(original.adultdiet$VEGSRV == adultdiet$VEGSRV)
-# table(original.adultdiet$WGRAINS == adultdiet$WGRAINS) 
-# table(original.adultdiet$M_EGG == adultdiet$M_EGG)
-# 
-# original.adultdiet$sjlid[which(original.adultdiet$M_EGG != adultdiet$M_EGG)]
-# 
-# ## Variables for SJL5248101 seem to be inconsistent between the Siddhant's adultdiet data and SJLIFE data
-# adultdiet$M_EGG[grepl("SJL5248101", adultdiet$sjlid)]
-# original.adultdiet$M_EGG[grepl("SJL5248101", original.adultdiet$sjlid)]
 
 table(original.adultdiet$KEY == adultdiet$KEY)
 ##########################################################
@@ -308,26 +278,26 @@ length(samples.sjlife)
 # 3574
 
 
-DIET <- {}
-for (i in 1:length(samples.sjlife)){
-  print(paste0("Doing ", i))
-  dat <- adultdiet[adultdiet$sjlid == samples.sjlife[i],]
-  if (max(dat$AGE_at_Visit, na.rm = T) >= 18){
-    print("YES")
-    dat2 <- dat[dat$AGE_at_Visit >= 18,]
-    DIET.tmp <- dat2[which(dat2$AGE_at_Visit == min(dat2$AGE_at_Visit, na.rm = T)),] # Keep the earliest age after 18 years
-  }
-  DIET <- rbind.data.frame(DIET, DIET.tmp)
-}
-
-save.DIET <- DIET
-
-DIET <- distinct(DIET)
-sum(duplicated(DIET$sjlid))
-# 0
-DIET$sjlid[duplicated(DIET$sjlid)]
-nrow(DIET)
-# 3543
+# DIET <- {}
+# for (i in 1:length(samples.sjlife)){
+#   print(paste0("Doing ", i))
+#   dat <- adultdiet[adultdiet$sjlid == samples.sjlife[i],]
+#   if (max(dat$AGE_at_Visit, na.rm = T) >= 18){
+#     print("YES")
+#     dat2 <- dat[dat$AGE_at_Visit >= 18,]
+#     DIET.tmp <- dat2[which(dat2$AGE_at_Visit == min(dat2$AGE_at_Visit, na.rm = T)),] # Keep the earliest age after 18 years
+#   }
+#   DIET <- rbind.data.frame(DIET, DIET.tmp)
+# }
+# 
+# save.DIET <- DIET
+# 
+# DIET <- distinct(DIET)
+# sum(duplicated(DIET$sjlid))
+# # 0
+# DIET$sjlid[duplicated(DIET$sjlid)]
+# nrow(DIET)
+# # 3543
 #######################
 ## Physical Activity ##
 #######################
@@ -363,6 +333,9 @@ colnames(adultdiet)
 # [22] "WGRAINS"             "DAIRYSRV"            "FATSRV"              "DT_SODI"             "DT_TFAT"             "DT_CARB"             "DT_PROT"            
 # [29] "M_EGG"               "AV_TOT_S"            "AF_TOT_S"            "R_MEAT_S"            "A_NUT_S"             "A_BEAN_S"            "KEY"                
 # [36] "NUTSFREQ"            "SOFTDRINKSFREQ"      "DOB"                 "AGE_at_Visit"   
+
+
+DIET <- adultdiet
 
 #----------------------------1. Fruits
 DIET$FRUITSRV_yn <- as.numeric(ifelse(DIET$FRUITSRV >= 3, 1, 0)) # fruits; daily servings
