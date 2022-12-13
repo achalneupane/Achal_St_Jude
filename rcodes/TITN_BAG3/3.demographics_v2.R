@@ -1,10 +1,11 @@
 ####################################
 ## Function to create demographic ##
 ####################################
+## NOTE: CCSS CHF data is based on self-report so ejection fraction is not available.
 
 get_demographic <- function(df, n){
 ## Ejection fraction
-ejection_fraction_hrt <- paste0(round(median(df$ejection_fraction_hrt, na.rm = T), 1), " (", round(quantile(df$ejection_fraction_hrt, prob=c(.25,.5,.75), type=1, na.rm = T)[1], 1), "-" , round(quantile(df$ejection_fraction_hrt, prob=c(.25,.5,.75), type=1, na.rm = T)[3],1), ")")
+ejection_fraction_hrt <- paste0(round((median(df$ejection_fraction_hrt, na.rm = T)*100), 1), " (", round((quantile(df$ejection_fraction_hrt, prob=c(.25,.5,.75), type=1, na.rm = T)*100)[1], 1), "-" , round((quantile(df$ejection_fraction_hrt, prob=c(.25,.5,.75), type=1, na.rm = T)*100)[3],1), ")")
 
 ## Elapsed time
 df$elapsedAGE <- df$agevent - df$agedx
@@ -78,7 +79,7 @@ CCSS_org.ANY_PHENO$ccssid <- sapply(strsplit(CCSS_org.ANY_PHENO$ccssid, "_"), `[
 PHENO.ANY_SN <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/2_genetic_data_P_LP.rds")
 SJLIFE.ANY_PHENO <- PHENO.ANY_SN
 
-rm(list=setdiff(ls(), c("SJLIFE.ANY_PHENO", "CCSS_exp.ANY_PHENO", "CCSS_org.ANY_PHENO")))
+rm(list=setdiff(ls(), c("SJLIFE.ANY_PHENO", "CCSS_exp.ANY_PHENO", "CCSS_org.ANY_PHENO", "get_demographic")))
 
 
 
@@ -96,8 +97,11 @@ sum(sjlife$IID %in% SJLIFE.ANY_PHENO$sjlid)
 ## add cancer types
 sjlife$diagrp <- SJLIFE.ANY_PHENO$diaggrp[match(sjlife$IID, SJLIFE.ANY_PHENO$sjlid)]
 
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/1870_SJLIFE_samples_with_time2echo.RData")
 
-sjlife$agevent <- NA ## Not available
+sjlife$time2echo <- d.eur$time2echo[match(sjlife$IID, d.eur$IID)]
+sjlife$agevent <- d.eur$agegraded[match(sjlife$IID, d.eur$IID)]
+sjlife$agevent[sjlife$CMP == 1] <- NA # nullify controls age at event
 
 # ccss_org_CMP2plus_CA <- sum(ccss_org$CMP == 2)
 df <- sjlife[sjlife$CMP == 2,] # With CMP (Cases)
@@ -115,6 +119,7 @@ sjlife_without_CMP <- get_demographic(df, n)
 ##############
 ## CCSS_ORG ##
 ##############
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/pheno/ccss_export_05062022.RData")
 
 ccss_org <- read.table("ccss_org_eur_cardiotoxic_exposed.pheno", header = T)
 head(ccss_org)
