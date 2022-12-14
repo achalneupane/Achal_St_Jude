@@ -107,77 +107,81 @@ sum(ccss_exp.samples$V2 %in% CCSS_data$ccssid)
 #############################
 ## Add lifestyle variables ##
 #############################
-CCSS_exp <- CCSS_data[CCSS_data$ccssid %in% ccss_exp.samples$V2,]
+ccss_exp <- CCSS_data[CCSS_data$ccssid %in% ccss_exp.samples$V2,]
 
 # Obesity
-CCSS_exp$BMI <- as.numeric(bmi_iid_dob_18_uniq$bmi[match(CCSS_exp$ccssid, bmi_iid_dob_18_uniq$ccssid)])
-CCSS_exp$Not_obese_yn <- factor(ifelse(as.numeric(bmi_iid_dob_18_uniq$bmi[match(CCSS_exp$ccssid, bmi_iid_dob_18_uniq$ccssid)]) < 30, 1, 0))
-CCSS_exp$Not_obese_yn <- factor(CCSS_exp$Not_obese_yn, level = c(1, 0, "Unknown")) 
-CCSS_exp$Not_obese_yn[is.na(CCSS_exp$Not_obese_yn)] <- "Unknown";
+ccss_exp$BMI <- as.numeric(bmi_iid_dob_18_uniq$bmi[match(ccss_exp$ccssid, bmi_iid_dob_18_uniq$ccssid)])
+ccss_exp$Not_obese_yn_agesurvey <- as.numeric(bmi_iid_dob_18_uniq$age[match(ccss_exp$ccssid, bmi_iid_dob_18_uniq$ccssid)])
+ccss_exp$Not_obese_yn <- factor(ifelse(as.numeric(bmi_iid_dob_18_uniq$bmi[match(ccss_exp$ccssid, bmi_iid_dob_18_uniq$ccssid)]) < 30, 1, 0))
+ccss_exp$Not_obese_yn <- factor(ccss_exp$Not_obese_yn, level = c(1, 0, "Unknown")) 
+ccss_exp$Not_obese_yn[is.na(ccss_exp$Not_obese_yn)] <- "Unknown";
 
 # Physical activity
-CCSS_exp$CDC <- MET_iid_dob_18_uniq$CDC[match(CCSS_exp$ccssid, MET_iid_dob_18_uniq$ccssid)]
-CCSS_exp$PhysicalActivity_yn <- factor(MET_iid_dob_18_uniq$CDC[match(CCSS_exp$ccssid, MET_iid_dob_18_uniq$ccssid)])
-CCSS_exp$PhysicalActivity_yn <- ifelse (CCSS_exp$PhysicalActivity_yn == "Yes", 1, 0)
-CCSS_exp$PhysicalActivity_yn[is.na(CCSS_exp$PhysicalActivity_yn)] <- "Unknown"
-CCSS_exp$PhysicalActivity_yn <- factor(CCSS_exp$PhysicalActivity_yn, level = c(1, 0, "Unknown")) 
+ccss_exp$CDC <- MET_iid_dob_18_uniq$CDC[match(ccss_exp$ccssid, MET_iid_dob_18_uniq$ccssid)]
+ccss_exp$PhysicalActivity_yn_agesurvey <- as.numeric(MET_iid_dob_18_uniq$age[match(ccss_exp$ccssid, MET_iid_dob_18_uniq$ccssid)])
+ccss_exp$PhysicalActivity_yn <- factor(MET_iid_dob_18_uniq$CDC[match(ccss_exp$ccssid, MET_iid_dob_18_uniq$ccssid)])
+ccss_exp$PhysicalActivity_yn <- ifelse (ccss_exp$PhysicalActivity_yn == "Yes", 1, 0)
+ccss_exp$PhysicalActivity_yn[is.na(ccss_exp$PhysicalActivity_yn)] <- "Unknown"
+ccss_exp$PhysicalActivity_yn <- factor(ccss_exp$PhysicalActivity_yn, level = c(1, 0, "Unknown")) 
 
 # Smoker
-CCSS_exp$SMK <- smk_iid_dob_18_uniq$smk[match(CCSS_exp$ccssid, smk_iid_dob_18_uniq$ccssid)]
-CCSS_exp$smoker_former_or_never_yn <- factor(smk_iid_dob_18_uniq$smk[match(CCSS_exp$ccssid, smk_iid_dob_18_uniq$ccssid)])
-CCSS_exp$smoker_former_or_never_yn <- factor(ifelse(CCSS_exp$smoker_former_or_never_yn != 3, 1, 0))
-CCSS_exp$smoker_former_or_never_yn <- factor(CCSS_exp$smoker_former_or_never_yn, level = c(1, 0, "Unknown")) 
-CCSS_exp$smoker_former_or_never_yn[is.na(CCSS_exp$smoker_former_or_never_yn)] <- "Unknown"
+ccss_exp$SMK <- smk_iid_dob_18_uniq$smk[match(ccss_exp$ccssid, smk_iid_dob_18_uniq$ccssid)]
+ccss_exp$smoker_former_or_never_yn_agesurvey <- as.numeric(smk_iid_dob_18_uniq$age[match(ccss_exp$ccssid, smk_iid_dob_18_uniq$ccssid)])
+ccss_exp$smoker_former_or_never_yn <- factor(smk_iid_dob_18_uniq$smk[match(ccss_exp$ccssid, smk_iid_dob_18_uniq$ccssid)])
+ccss_exp$smoker_former_or_never_yn <- factor(ifelse(ccss_exp$smoker_former_or_never_yn != 3, 1, 0))
+ccss_exp$smoker_former_or_never_yn <- factor(ccss_exp$smoker_former_or_never_yn, level = c(1, 0, "Unknown")) 
+ccss_exp$smoker_former_or_never_yn[is.na(ccss_exp$smoker_former_or_never_yn)] <- "Unknown"
 
 # drinker
-CCSS_exp$DRK <- drk_iid_dob_18_uniq$riskydrk[match(CCSS_exp$ccssid, smk_iid_dob_18_uniq$ccssid)]
-CCSS_exp$NOT_RiskyHeavyDrink_yn <- factor(ifelse(factor(drk_iid_dob_18_uniq$riskydrk[match(CCSS_exp$ccssid, smk_iid_dob_18_uniq$ccssid)]) == "No", 1, 0))
-CCSS_exp$NOT_RiskyHeavyDrink_yn <- factor(CCSS_exp$NOT_RiskyHeavyDrink_yn, level = c(1, 0, "Unknown")) 
-CCSS_exp$NOT_RiskyHeavyDrink_yn[is.na(CCSS_exp$NOT_RiskyHeavyDrink_yn)] <- "Unknown"
+ccss_exp$DRK <- drk_iid_dob_18_uniq$riskydrk[match(ccss_exp$ccssid, smk_iid_dob_18_uniq$ccssid)]
+ccss_exp$NOT_RiskyHeavyDrink_yn_agesurvey <- as.numeric(drk_iid_dob_18_uniq$age[match(ccss_exp$ccssid, smk_iid_dob_18_uniq$ccssid)])
+ccss_exp$NOT_RiskyHeavyDrink_yn <- factor(ifelse(factor(drk_iid_dob_18_uniq$riskydrk[match(ccss_exp$ccssid, smk_iid_dob_18_uniq$ccssid)]) == "No", 1, 0))
+ccss_exp$NOT_RiskyHeavyDrink_yn <- factor(ccss_exp$NOT_RiskyHeavyDrink_yn, level = c(1, 0, "Unknown")) 
+ccss_exp$NOT_RiskyHeavyDrink_yn[is.na(ccss_exp$NOT_RiskyHeavyDrink_yn)] <- "Unknown"
 
 #############################
 ## Harmonize age variables ##
 #############################
-## Use this variable CCSS_exp_ANY_SN for ANY_SN
-CCSS_exp$AGE.ANY_SN <- as.numeric(CCSS_exp$a_candx)
-CCSS_exp$agedx <- as.numeric(CCSS_exp$a_dx)
-CCSS_exp$agelstcontact <- as.numeric(CCSS_exp$a_end)
+## Use this variable ccss_exp_ANY_SN for ANY_SN
+ccss_exp$AGE.ANY_SN <- as.numeric(ccss_exp$a_candx)
+ccss_exp$agedx <- as.numeric(ccss_exp$a_dx)
+ccss_exp$agelstcontact <- as.numeric(ccss_exp$a_end)
 
 
 ## Age at diagnosis
 # PHENO.ANY_SN$agedx <- floor(PHENO.ANY_SN$agedx)
-CCSS_exp$AGE_AT_DIAGNOSIS[CCSS_exp$agedx >= 0 & CCSS_exp$agedx < 5 ] <- "0-4"
-CCSS_exp$AGE_AT_DIAGNOSIS[CCSS_exp$agedx >= 5 & CCSS_exp$agedx < 10 ] <- "5-9"
-CCSS_exp$AGE_AT_DIAGNOSIS[CCSS_exp$agedx >= 10 & CCSS_exp$agedx < 15 ] <- "10-14"
-CCSS_exp$AGE_AT_DIAGNOSIS[CCSS_exp$agedx >= 15 ] <- ">=15"
-CCSS_exp$AGE_AT_DIAGNOSIS <- factor(CCSS_exp$AGE_AT_DIAGNOSIS, levels = c("0-4", "5-9", "10-14", ">=15")) # first level will be treated as reference
+ccss_exp$AGE_AT_DIAGNOSIS[ccss_exp$agedx >= 0 & ccss_exp$agedx < 5 ] <- "0-4"
+ccss_exp$AGE_AT_DIAGNOSIS[ccss_exp$agedx >= 5 & ccss_exp$agedx < 10 ] <- "5-9"
+ccss_exp$AGE_AT_DIAGNOSIS[ccss_exp$agedx >= 10 & ccss_exp$agedx < 15 ] <- "10-14"
+ccss_exp$AGE_AT_DIAGNOSIS[ccss_exp$agedx >= 15 ] <- ">=15"
+ccss_exp$AGE_AT_DIAGNOSIS <- factor(ccss_exp$AGE_AT_DIAGNOSIS, levels = c("0-4", "5-9", "10-14", ">=15")) # first level will be treated as reference
 
 
 ## Age at last contact
-CCSS_exp$AGE_AT_LAST_CONTACT[CCSS_exp$agelstcontact >= 0 & CCSS_exp$agelstcontact < 25 ] <- "0-24"
-CCSS_exp$AGE_AT_LAST_CONTACT[CCSS_exp$agelstcontact >= 25 & CCSS_exp$agelstcontact < 35 ] <- "25-34"
-CCSS_exp$AGE_AT_LAST_CONTACT[CCSS_exp$agelstcontact >= 35 & CCSS_exp$agelstcontact < 45 ] <- "35-44"
-CCSS_exp$AGE_AT_LAST_CONTACT[CCSS_exp$agelstcontact >= 45 ] <- ">=45"
-CCSS_exp$AGE_AT_LAST_CONTACT <- factor(CCSS_exp$AGE_AT_LAST_CONTACT, levels = c("0-24", "25-34", "35-44", ">=45")) # first level will be treated as reference
+ccss_exp$AGE_AT_LAST_CONTACT[ccss_exp$agelstcontact >= 0 & ccss_exp$agelstcontact < 25 ] <- "0-24"
+ccss_exp$AGE_AT_LAST_CONTACT[ccss_exp$agelstcontact >= 25 & ccss_exp$agelstcontact < 35 ] <- "25-34"
+ccss_exp$AGE_AT_LAST_CONTACT[ccss_exp$agelstcontact >= 35 & ccss_exp$agelstcontact < 45 ] <- "35-44"
+ccss_exp$AGE_AT_LAST_CONTACT[ccss_exp$agelstcontact >= 45 ] <- ">=45"
+ccss_exp$AGE_AT_LAST_CONTACT <- factor(ccss_exp$AGE_AT_LAST_CONTACT, levels = c("0-24", "25-34", "35-44", ">=45")) # first level will be treated as reference
 
-CCSS_exp$gradedt <- as.numeric(CCSS_exp$a_candx)
+ccss_exp$gradedt <- as.numeric(ccss_exp$a_candx)
 
-subneo <- CCSS_exp
+subneo <- ccss_exp
 
-## Subset Pheno data only for CCSS_exp
-CCSS_exp <- CCSS_exp[!duplicated(CCSS_exp$ccssid),]
+## Subset Pheno data only for ccss_exp
+ccss_exp <- ccss_exp[!duplicated(ccss_exp$ccssid),]
 
 ## Age at last contact (cubic spline)
 source("https://raw.githubusercontent.com/achalneupane/Achal_St_Jude/main/rcodes/cubic_spline.r")
 
 breaks = seq(5, 95, 22.5)
 
-cp = quantile(CCSS_exp$agelstcontact, breaks/100, na.rm = T)
+cp = quantile(ccss_exp$agelstcontact, breaks/100, na.rm = T)
 
-cs = cubic_spline(CCSS_exp$agelstcontact, knots = cp)
+cs = cubic_spline(ccss_exp$agelstcontact, knots = cp)
 
 colnames(cs) <- c("AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4")
-CCSS_exp <- cbind.data.frame(CCSS_exp, cs)
+ccss_exp <- cbind.data.frame(ccss_exp, cs)
 # Merge cs to your original data.frame and adjust in the logistic regression
 
 
@@ -189,56 +193,57 @@ CCSS_exp <- cbind.data.frame(CCSS_exp, cs)
 ## Create tertiles for ccss org and ccss exp separately
 
 ## Anthracyclines (Y/N and Tertiles)
-CCSS_exp$anth_DED5 <- as.numeric(CCSS_exp$anth_DED5)
-CCSS_exp$anthra_jco_dose_5_yn <- factor(ifelse(CCSS_exp$anth_DED5 == 0, "N", "Y"))
+ccss_exp$anth_DED5 <- as.numeric(ccss_exp$anth_DED5)
+ccss_exp$anthra_jco_dose_5_yn <- factor(ifelse(ccss_exp$anth_DED5 == 0, "N", "Y"))
 
-TERT = unname(quantile(CCSS_exp$anth_DED5[CCSS_exp$anth_DED5 !=0], c(1/3, 2/3, 1), na.rm = T))
-CCSS_exp$anthra_jco_dose_5.category <- cut(CCSS_exp$anth_DED5, breaks = c(0, 0.001, TERT),
+TERT = unname(quantile(ccss_exp$anth_DED5[ccss_exp$anth_DED5 !=0], c(1/3, 2/3, 1), na.rm = T))
+ccss_exp$anthra_jco_dose_5.category <- cut(ccss_exp$anth_DED5, breaks = c(0, 0.001, TERT),
                                                labels = c("None", "1st", "2nd", "3rd"),
                                                include.lowest = TRUE)
-levels(CCSS_exp$anthra_jco_dose_5.category) <- c(levels(CCSS_exp$anthra_jco_dose_5.category), "Unknown")
-CCSS_exp$anthra_jco_dose_5.category [is.na(CCSS_exp$anthra_jco_dose_5.category)] <- "Unknown"
+levels(ccss_exp$anthra_jco_dose_5.category) <- c(levels(ccss_exp$anthra_jco_dose_5.category), "Unknown")
+ccss_exp$anthra_jco_dose_5.category [is.na(ccss_exp$anthra_jco_dose_5.category)] <- "Unknown"
 
 
 ## Alkylating agents (Y/N and Tertiles)
-CCSS_exp$alk_CED5 <- as.numeric(CCSS_exp$alk_CED5)
-CCSS_exp$aa_class_dose_5_yn <- factor(ifelse(CCSS_exp$alk_CED5 == 0, "N", "Y"))
+ccss_exp$alk_CED5 <- as.numeric(ccss_exp$alk_CED5)
+ccss_exp$aa_class_dose_5_yn <- factor(ifelse(ccss_exp$alk_CED5 == 0, "N", "Y"))
 
-TERT = unname(quantile(CCSS_exp$alk_CED5[CCSS_exp$alk_CED5 !=0], c(1/3, 2/3, 1), na.rm = T))
-CCSS_exp$aa_class_dose_5.category <- cut(CCSS_exp$alk_CED5, breaks = c(0, 0.001, TERT),
+TERT = unname(quantile(ccss_exp$alk_CED5[ccss_exp$alk_CED5 !=0], c(1/3, 2/3, 1), na.rm = T))
+ccss_exp$aa_class_dose_5.category <- cut(ccss_exp$alk_CED5, breaks = c(0, 0.001, TERT),
                                            labels = c("None", "1st", "2nd", "3rd"),
                                            include.lowest = TRUE)
-levels(CCSS_exp$aa_class_dose_5.category) <- c(levels(CCSS_exp$aa_class_dose_5.category), "Unknown")
-CCSS_exp$aa_class_dose_5.category [is.na(CCSS_exp$aa_class_dose_5.category)] <- "Unknown"
+levels(ccss_exp$aa_class_dose_5.category) <- c(levels(ccss_exp$aa_class_dose_5.category), "Unknown")
+ccss_exp$aa_class_dose_5.category [is.na(ccss_exp$aa_class_dose_5.category)] <- "Unknown"
 
 ## Epipodophyllotoxin agents (Y/N and Tertiles)
-CCSS_exp$epipdose5 <- as.numeric(CCSS_exp$epipdose5)
-CCSS_exp$epitxn_dose_5_yn <- factor(ifelse(CCSS_exp$epipdose5 == 0, "N", "Y"))
+ccss_exp$epipdose5 <- as.numeric(ccss_exp$epipdose5)
+ccss_exp$epitxn_dose_5_yn <- factor(ifelse(ccss_exp$epipdose5 == 0, "N", "Y"))
 
-TERT = unname(quantile(CCSS_exp$epipdose5[CCSS_exp$epipdose5 !=0], c(1/3, 2/3, 1), na.rm = T))
-CCSS_exp$epitxn_dose_5.category <- cut(CCSS_exp$epipdose5, breaks = c(0, 0.001, TERT),
+TERT = unname(quantile(ccss_exp$epipdose5[ccss_exp$epipdose5 !=0], c(1/3, 2/3, 1), na.rm = T))
+ccss_exp$epitxn_dose_5.category <- cut(ccss_exp$epipdose5, breaks = c(0, 0.001, TERT),
                                          labels = c("None", "1st", "2nd", "3rd"),
                                          include.lowest = TRUE)
-levels(CCSS_exp$epitxn_dose_5.category) <- c(levels(CCSS_exp$epitxn_dose_5.category), "Unknown")
-CCSS_exp$epitxn_dose_5.category [is.na(CCSS_exp$epitxn_dose_5.category)] <- "Unknown"
+levels(ccss_exp$epitxn_dose_5.category) <- c(levels(ccss_exp$epitxn_dose_5.category), "Unknown")
+ccss_exp$epitxn_dose_5.category [is.na(ccss_exp$epitxn_dose_5.category)] <- "Unknown"
 
 ## Cis-platinum (Y/N and Tertiles)
-CCSS_exp$pt_cisED5 <- as.numeric(CCSS_exp$pt_cisED5)
-CCSS_exp$cisplateq_dose_5_yn <- factor(ifelse(CCSS_exp$pt_cisED5 == 0, "N", "Y"))
+ccss_exp$pt_cisED5 <- as.numeric(ccss_exp$pt_cisED5)
+ccss_exp$cisplateq_dose_5_yn <- factor(ifelse(ccss_exp$pt_cisED5 == 0, "N", "Y"))
 
-TERT = unname(quantile(CCSS_exp$pt_cisED5[CCSS_exp$pt_cisED5 !=0], c(1/3, 2/3, 1), na.rm = T))
-CCSS_exp$cisplateq_dose_5.category <- cut(CCSS_exp$pt_cisED5, breaks = c(0, 0.001, TERT),
+TERT = unname(quantile(ccss_exp$pt_cisED5[ccss_exp$pt_cisED5 !=0], c(1/3, 2/3, 1), na.rm = T))
+ccss_exp$cisplateq_dose_5.category <- cut(ccss_exp$pt_cisED5, breaks = c(0, 0.001, TERT),
                                          labels = c("None", "1st", "2nd", "3rd"),
                                          include.lowest = TRUE)
-levels(CCSS_exp$cisplateq_dose_5.category) <- c(levels(CCSS_exp$cisplateq_dose_5.category), "Unknown")
-CCSS_exp$cisplateq_dose_5.category [is.na(CCSS_exp$cisplateq_dose_5.category)] <- "Unknown"
+levels(ccss_exp$cisplateq_dose_5.category) <- c(levels(ccss_exp$cisplateq_dose_5.category), "Unknown")
+ccss_exp$cisplateq_dose_5.category [is.na(ccss_exp$cisplateq_dose_5.category)] <- "Unknown"
 
 
 
-PHENO.ANY_SN <- CCSS_exp[c('ccssid', 'SEX', 'agedx', 'diagnose', 'agelstcontact', 
+PHENO.ANY_SN <- ccss_exp[c('ccssid', 'SEX', 'agedx', 'diagnose', 'agelstcontact', 
   "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", 'd_candx', 'groupdx3', 
   'a_candx', 'chestrtgrp', 'neckrtgrp', 'pelvisrtgrp', 'abdomenrtgrp', 'brainrtgrp',
-  'smk_mostrecent', 'Not_obese_yn', 'PhysicalActivity_yn', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn', 
+  'Not_obese_yn_agesurvey', 'Not_obese_yn', 'PhysicalActivity_yn_agesurvey', 'PhysicalActivity_yn', 
+  'smoker_former_or_never_yn_agesurvey', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn_agesurvey', 'NOT_RiskyHeavyDrink_yn', 
   'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category')]
 
 

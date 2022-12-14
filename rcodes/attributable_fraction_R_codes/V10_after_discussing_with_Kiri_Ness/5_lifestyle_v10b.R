@@ -14,50 +14,21 @@ library(lubridate)
 ## Load Phenotype data ##
 #########################
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores_categories_v2.RDATA")
-#############################
-## Add Lifestyle variables ##
-#############################
-## For each samples, get habits immediately after 18 years of age in agesurvey
-# adlthabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.sas7bdat")
-adlthabits <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.txt", header = T, sep ="\t")
-head(adlthabits)
-## Fix data format
-adlthabits$datecomp <- paste(sapply(strsplit(adlthabits$datecomp, "\\/"), `[`, 3), sapply(strsplit(adlthabits$datecomp, "\\/"), `[`, 1), sapply(strsplit(adlthabits$datecomp, "\\/"), `[`, 2), sep = "-")
-
-# remove duplicated rows
-adlthabits <- distinct(adlthabits)
-## Get DOB
-adlthabits$DOB <- PHENO.ANY_SN$dob [match(adlthabits$SJLIFEID, PHENO.ANY_SN$sjlid)]
-adlthabits <- adlthabits[!is.na(adlthabits$DOB),]
-# change the format of dates YYYY-MM-DD
-adlthabits$agesurvey <- time_length(interval(as.Date(adlthabits$DOB), as.Date(adlthabits$datecomp)), "years")
-# adlthabits$agesurvey <- floor(adlthabits$agesurvey_diff_of_dob_datecomp)
-
-samples.sjlife <- unique(adlthabits$SJLIFEID)
-# Only interested in those present in the phenotype data
-sum(samples.sjlife%in% PHENO.ANY_SN$sjlid)
-# 3571
-samples.sjlife <- samples.sjlife[(samples.sjlife%in% PHENO.ANY_SN$sjlid)]
-
-length(samples.sjlife)
-# 3571
 
 ##########################################################################################################
 ## Recode Physical activity and Smoker based on what Kiri Ness' suggested (Using SAS code leanmass.sas) ##
 ##########################################################################################################
-
-## 1.-------------- Physical activity
-sum(is.na(lifestyle$vpa10))
-# 42
 # get additional adult health habits
 adult_habbits <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Survey Data/adult_healthhabits.sas7bdat')
 
-# Get vpadays, vpamin, mpadays, mpamin and mpa10
-lifestyle$vpadays <- adult_habbits$vpadays[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
-lifestyle$vpamin <- adult_habbits$vpamin[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
-lifestyle$mpadays <- adult_habbits$mpadays[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
-lifestyle$mpamin <- adult_habbits$mpamin[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
-lifestyle$mpa10 <- adult_habbits$mpa10[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
+
+lifestyle <- adult_habbits
+
+lifestyle$sjlid <- lifestyle$SJLIFEID 
+lifestyle <- lifestyle[lifestyle$sjlid %in% PHENO.ANY_SN$sjlid,]
+
+
+## 1.-------------- Physical activity
 
 ## First, work on vpa10
 # if vpa10=1 and vpadays=. then do vpadays=1; end;
@@ -110,7 +81,16 @@ lifestyle$wmpa[which(is.na(lifestyle$wmpa) & !is.na(lifestyle$wvpa)) ] <- 0
 # mvpawk=(wmpa)+(wvpa*2); if mvpawk>2520 then mvpawk=2520; /*cap six hours per day*/
 lifestyle$mvpawk <- lifestyle$wmpa + (lifestyle$wvpa *2)
 lifestyle$mvpawk[which(lifestyle$mvpawk > 2520)] <- 2520
-lifestyle$CDC_PA <- ifelse(lifestyle$mvpawk < 150 | is.na(lifestyle$mvpawk), 0,1) ###### Check this line
+lifestyle$CDC_PA <- ifelse(lifestyle$mvpawk < 150, 0,1) # Check this line
+
+
+## Physical activity
+MET_iid_dob_18 = subset(lifestyle, agesurvey >= 18)
+MET_iid_dob_18 <- MET_iid_dob_18[!is.na(MET_iid_dob_18$CDC_PA), ]
+MET_iid_dob_18_sorted = MET_iid_dob_18[order(MET_iid_dob_18$sjlid, MET_iid_dob_18$agesurvey, decreasing = FALSE),]
+MET_iid_dob_18_uniq = MET_iid_dob_18_sorted[!duplicated(MET_iid_dob_18_sorted$sjlid),]
+
+MET_iid_dob_18_uniq$PhysicalActivity_yn <- as.numeric(ifelse(MET_iid_dob_18_uniq$CDC_PA == 1, 1, 0))
 
 
 
@@ -121,7 +101,7 @@ lifestyle$smnow <- adult_habbits$smnow[match(lifestyle$SJLIFEID, adult_habbits$S
 lifestyle$cigmo <- adult_habbits$cigmo[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
 lifestyle$cigd <- adult_habbits$cigd[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
 lifestyle$smyr <- adult_habbits$smyr[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
-lifestyle$smnvr <- adult_habbits$smnvr[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
+lifestyle$smnvr <- adult_habbits$smnvr[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)] # This variable is not available
 
 
 # if evsm=2 then do ; smnow=2 ; cigmo=2 ; cigd=0 ; smyr=0 ; end ;
@@ -137,6 +117,14 @@ lifestyle$cigmo[which(lifestyle$smnvr == 1)] <- 2
 lifestyle$cigd[which(lifestyle$smnvr == 1)] <- 0
 lifestyle$smyr[which(lifestyle$smnvr == 1)] <- 0
 
+# if evsm=. and smnow=1 then do ; evsm=1 ; end ;
+lifestyle$evsm[which(is.na(lifestyle$evsm) & lifestyle$smnow == 1)] <- 1
+
+# if evsm=1 and smnow=. and cigmo=1 then smnow=1
+lifestyle$smnow[which(lifestyle$evsm == 1 & is.na(lifestyle$smnow))] <- 1
+
+# if evsm=1 and smnow=. and cigmo=2 then smnow=2
+lifestyle$smnow[which(lifestyle$evsm == 1 & is.na(lifestyle$smnow) & lifestyle$cigmo == 2)] <- 2
 
 
 lifestyle$smkStat <- NA
@@ -144,47 +132,30 @@ lifestyle$smkStat[which(lifestyle$evsm == 1 & lifestyle$smnow == 2)] <- 1 # Form
 lifestyle$smkStat[which(lifestyle$evsm == 1 & lifestyle$smnow == 1)] <- 2 # Current
 lifestyle$smkStat[which(lifestyle$evsm == 2)] <- 3 # Never
 
-table(lifestyle$smoker)
 table(lifestyle$smkStat)
 
-table(lifestyle$smoker == lifestyle$smkStat)
+## smoker status
+smk_iid_dob_18 = subset(lifestyle, agesurvey >= 18)
+smk_iid_dob_18 <- smk_iid_dob_18[!is.na(smk_iid_dob_18$smkStat), ]
+smk_iid_dob_18_sorted = smk_iid_dob_18[order(smk_iid_dob_18$sjlid, smk_iid_dob_18$agesurvey, decreasing = FALSE),]
+smk_iid_dob_18_uniq = smk_iid_dob_18_sorted[!duplicated(smk_iid_dob_18_sorted$sjlid),]
 
-##################################
-## Recode categorical variables ##
-##################################
-lifestyle$relation[lifestyle$relation == 1] <- "Self"
-lifestyle$relation[lifestyle$relation == 2] <- "Parent"
-lifestyle$relation[lifestyle$relation == 3] <- "Other"
-
-## Recode smoker
-lifestyle$smoker[lifestyle$smoker == 1] <- "Past"
-lifestyle$smoker[lifestyle$smoker == 2] <- "Current"
-lifestyle$smoker[lifestyle$smoker == 3] <- "Never"
-lifestyle$smoker_former_or_never_yn <- as.numeric(ifelse(lifestyle$smoker != "Current", 1, 0))
-lifestyle$smoker_never_yn <- as.numeric(ifelse(lifestyle$smoker == "Never", 1, 0))
-
-
-## Recode 1/2 or 0/1 to 0 (N) and 1 (Y)
-lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink|ltpaw|wtlt|vpa10|yoga",
-                colnames(lifestyle))][lifestyle[grepl("nopa|ltpa|bingedrink|heavydrink|heavydrink|riskydrink|ltpaw|wtlt|vpa10|yoga",
-                                                      colnames(lifestyle))] == 1 ] <- 1
-
-lifestyle[grepl("nopa|ltpa|ltpaw|wtlt|vpa10|yoga", colnames(lifestyle))][lifestyle[grepl("nopa|ltpa|ltpaw|wtlt|vpa10|yoga", colnames(lifestyle))] == 2 ] <- 0
-
-lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))][lifestyle[grepl("bingedrink|heavydrink|heavydrink|riskydrink", colnames(lifestyle))] == 0 ] <- 0
+smk_iid_dob_18_uniq$smoker_former_or_never_yn <- as.numeric(ifelse(smk_iid_dob_18_uniq$smkStat != 2, 1, 0))
+smk_iid_dob_18_uniq$smoker_never_yn <- as.numeric(ifelse(smk_iid_dob_18_uniq$smkStat == 3, 1, 0))
 
 
 
-#######################
-## Adolescent habits ##
-#######################
-adolhabits <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adolhabits.sas7bdat")
-head(adolhabits)
+## 3.-----------Drinking
+drk_iid_dob_18 = subset(lifestyle, agesurvey >= 18)
+# If heavy or risky drink any is 1, then Yes for RiskyHeavyDrink_yn
+drk_iid_dob_18$NOT_RiskyHeavyDrink_yn <- as.numeric(ifelse (rowSums(drk_iid_dob_18[c("heavydrink", "riskydrink")])==0, 1, 0))
+drk_iid_dob_18 <- drk_iid_dob_18[!is.na(drk_iid_dob_18$NOT_RiskyHeavyDrink_yn), ]
+drk_iid_dob_18_sorted = drk_iid_dob_18[order(drk_iid_dob_18$sjlid, drk_iid_dob_18$agesurvey, decreasing = FALSE),]
+drk_iid_dob_18_uniq = drk_iid_dob_18_sorted[!duplicated(drk_iid_dob_18_sorted$sjlid),]
 
-###############
-## Adult BMI ##
-###############
-# This BMI has more samples, so using this for BMI only
+
+## 4.-----------Adult BMI
+# This BMI from Yadav has more samples, so using this for BMI only
 library(sas7bdat)
 bmi = read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/function_combo_basic.sas7bdat')
 iid = read.table('Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/4401_attributable_fraction_ids.txt', header = FALSE)
@@ -198,10 +169,68 @@ bmi_iid_dob_18 = subset(bmi_iid_dob, agebmi>=18)
 bmi_iid_dob_18_sorted = bmi_iid_dob_18[order(bmi_iid_dob_18$sjlid, bmi_iid_dob_18$agebmi, decreasing = FALSE),]
 bmi_iid_dob_18_uniq = bmi_iid_dob_18_sorted[!duplicated(bmi_iid_dob_18_sorted$sjlid),]
 
+bmi_iid_dob_18_uniq$Not_obese_yn <- as.numeric(ifelse(bmi_iid_dob_18_uniq$BMIadj < 30, 1, 0))
+
+## Part 2.------------Adult habits from Siddhant
+adlthabits <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adlthabits.txt", header = T, sep ="\t")
+head(adlthabits)
+adlthabits$sjlid <- adlthabits$SJLIFEID
+## Fix data format
+adlthabits$datecomp <- paste(sapply(strsplit(adlthabits$datecomp, "\\/"), `[`, 3), sapply(strsplit(adlthabits$datecomp, "\\/"), `[`, 1), sapply(strsplit(adlthabits$datecomp, "\\/"), `[`, 2), sep = "-")
+
+# remove duplicated rows
+adlthabits <- distinct(adlthabits)
+## Get DOB
+adlthabits$DOB <- PHENO.ANY_SN$dob [match(adlthabits$SJLIFEID, PHENO.ANY_SN$sjlid)]
+adlthabits <- adlthabits[!is.na(adlthabits$DOB),]
+# change the format of dates YYYY-MM-DD
+adlthabits$agesurvey <- time_length(interval(as.Date(adlthabits$DOB), as.Date(adlthabits$datecomp)), "years")
+
+adlthabits <- adlthabits[adlthabits$sjlid %in% PHENO.ANY_SN$sjlid,]
+
+
+## 2.-------------- Smoker status ## from Siddhant
+smk_iid_dob_18.2 = subset(adlthabits, agesurvey >= 18)
+smk_iid_dob_18.2 <- smk_iid_dob_18.2[!is.na(smk_iid_dob_18.2$smoker), ]
+smk_iid_dob_18_sorted.2 = smk_iid_dob_18.2[order(smk_iid_dob_18.2$sjlid, smk_iid_dob_18.2$agesurvey, decreasing = FALSE),]
+smk_iid_dob_18_uniq.2 = smk_iid_dob_18_sorted.2[!duplicated(smk_iid_dob_18_sorted.2$sjlid),]
+
+## Recode smoker
+# adlthabits$smoker[adlthabits$smoker == 1] <- "Past"
+# adlthabits$smoker[adlthabits$smoker == 2] <- "Current"
+# adlthabits$smoker[adlthabits$smoker == 3] <- "Never"
+smk_iid_dob_18_uniq.2$smoker_former_or_never_yn <- as.numeric(ifelse(smk_iid_dob_18_uniq.2$smoker != 2, 1, 0))
+smk_iid_dob_18_uniq.2$smoker_never_yn <- as.numeric(ifelse(smk_iid_dob_18_uniq.2$smoker == 3, 1, 0))
+
+table(smk_iid_dob_18_uniq.2$smoker)
+table(smk_iid_dob_18_uniq$smkStat)
+
+# PHENO.ANY_SN$smk_iid_dob_18_uniq.2 <- smk_iid_dob_18_uniq.2$smoker[match(PHENO.ANY_SN$sjlid, smk_iid_dob_18_uniq.2$sjlid)]
+# PHENO.ANY_SN$smk_iid_dob_18_uniq <- smk_iid_dob_18_uniq$smkStat[match(PHENO.ANY_SN$sjlid, smk_iid_dob_18_uniq$sjlid)]
+
+# smk_iid_dob_18_uniq is what I created and smk_iid_dob_18_uniq.2 is received from Siddhant; Use smk_iid_dob_18_uniq.2
+# table(PHENO.ANY_SN$smk_iid_dob_18_uniq.2 == PHENO.ANY_SN$smk_iid_dob_18_uniq) 
+
+
+## 3.-----------Drinking ## from Siddhant
+adlthabits[grepl("bingedrink|heavydrink|riskydrink", colnames(adlthabits))][adlthabits[grepl("bingedrink|heavydrink|riskydrink", colnames(adlthabits))] == 0 ] <- 0
+
+drk_iid_dob_18.2 = subset(adlthabits, agesurvey >= 18)
+# If heavy or risky drink any is 1, then Yes for RiskyHeavyDrink_yn
+drk_iid_dob_18.2$NOT_RiskyHeavyDrink_yn <- as.numeric(ifelse (rowSums(drk_iid_dob_18.2[c("heavydrink", "riskydrink")])==0, 1, 0))
+drk_iid_dob_18.2 <- drk_iid_dob_18.2[!is.na(drk_iid_dob_18.2$NOT_RiskyHeavyDrink_yn), ]
+drk_iid_dob_18_sorted.2 = drk_iid_dob_18[order(drk_iid_dob_18.2$sjlid, drk_iid_dob_18.2$agesurvey, decreasing = FALSE),]
+drk_iid_dob_18_uniq.2 = drk_iid_dob_18_sorted.2[!duplicated(drk_iid_dob_18_sorted.2$sjlid),]
+
+# PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn.2 <- drk_iid_dob_18_uniq.2$NOT_RiskyHeavyDrink_yn[match(PHENO.ANY_SN$sjlid, drk_iid_dob_18_uniq.2$sjlid)]
+# PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn <- drk_iid_dob_18_uniq$NOT_RiskyHeavyDrink_yn[match(PHENO.ANY_SN$sjlid, drk_iid_dob_18_uniq$sjlid)]
+# table(PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn.2 == PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn) 
+
 ##############################
 ## More lifestyle variables ##
 ##############################
 
+## 5.------------Diet
 # Keep the earliest age after 18 years, same as in lifestyle; Extracting diet here
 # adultdiet <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.sas7bdat")
 adultdiet <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/adultbmi.txt", sep = "\t", header = T)
@@ -278,50 +307,6 @@ length(samples.sjlife)
 # 3574
 
 
-# DIET <- {}
-# for (i in 1:length(samples.sjlife)){
-#   print(paste0("Doing ", i))
-#   dat <- adultdiet[adultdiet$sjlid == samples.sjlife[i],]
-#   if (max(dat$AGE_at_Visit, na.rm = T) >= 18){
-#     print("YES")
-#     dat2 <- dat[dat$AGE_at_Visit >= 18,]
-#     DIET.tmp <- dat2[which(dat2$AGE_at_Visit == min(dat2$AGE_at_Visit, na.rm = T)),] # Keep the earliest age after 18 years
-#   }
-#   DIET <- rbind.data.frame(DIET, DIET.tmp)
-# }
-# 
-# save.DIET <- DIET
-# 
-# DIET <- distinct(DIET)
-# sum(duplicated(DIET$sjlid))
-# # 0
-# DIET$sjlid[duplicated(DIET$sjlid)]
-# nrow(DIET)
-# # 3543
-#######################
-## Physical Activity ##
-#######################
-
-# Use variable 'wtlt': I do activities to increase muscle strength, such as lifting weights or aerobics, once a week or more 
-lifestyle$PhysicalActivity_yn <- as.numeric(ifelse(lifestyle$CDC_PA == 1, 1, 0))
-
-#############
-## Obesity ##
-#############
-
-# DIET$Not_obese_yn <- as.numeric(ifelse(DIET$DIET < 30, 1, 0))
-
-# BMI file Yadav used has more samples
-bmi_iid_dob_18_uniq$Not_obese_yn <- as.numeric(ifelse(bmi_iid_dob_18_uniq$BMIadj < 30, 1, 0))
-#############
-## Alcohol ##
-#############
-# If heavy or risky drink any is 1, then Yes for RiskyHeavyDrink_yn
-lifestyle$NOT_RiskyHeavyDrink_yn <- as.numeric(ifelse (rowSums(lifestyle[c("heavydrink", "riskydrink")])==0, 1, 0))
-
-
-
-
 ##########
 ## Diet ## 
 ##########
@@ -369,20 +354,78 @@ DIET$DT_SODI_yn <- as.numeric(ifelse(DIET$DT_SODI <= 2000, 1, 0))
 ## Define Healthy diet
 DIET$HEALTHY_Diet_yn <- ifelse(rowSums(DIET[,c("FRUITSRV_yn", "NUTSFREQ_yn", "VEGSRV_yn", "WGRAINS_yn", "NOTFRIEDFISHFREQ_yn", "DAIRYSRV_yn", "MIXEDBEEFPORKFREQ_yn", "DT_TFAT_cohort_median_yn", "SOFTDRINKSFREQ_yn", "DT_SODI_yn")]) >= 5, 1,0)
 
- 
-#######################################
-## Merge DIET and Lifestyle datasets ##
-#######################################
-ALL.LIFESTYLE <- merge(lifestyle, DIET, by.x = "SJLIFEID", by.y = "sjlid", all = T)
+DIET$agesurvey <- as.numeric(DIET$AGE)
 
-## Only Keep the ones that are needed
-ALL.LIFESTYLE <- ALL.LIFESTYLE[c("agesurvey", "SJLIFEID", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE", "smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")]
+## Extract the unique ones by keeping the earliest age after 18 years
+
+diet_iid_dob_18 = subset(DIET, agesurvey >= 18)
+# If heavy or risky drink any is 1, then Yes for RiskyHeavyDrink_yn
+diet_iid_dob_18 <- diet_iid_dob_18[!is.na(diet_iid_dob_18$HEALTHY_Diet_yn), ]
+diet_iid_dob_18_sorted = diet_iid_dob_18[order(diet_iid_dob_18$sjlid, diet_iid_dob_18$agesurvey, decreasing = FALSE),]
+diet_iid_dob_18_uniq = diet_iid_dob_18_sorted[!duplicated(diet_iid_dob_18_sorted$sjlid),]
 
 
-##########################
-## Merge BMI from Yadav ##
-##########################
-ALL.LIFESTYLE <- merge(ALL.LIFESTYLE, bmi_iid_dob_18_uniq, by.x = "SJLIFEID", by.y = "sjlid", all = T)
+
+HEI2015_iid_dob_18 = subset(DIET, agesurvey >= 18)
+# If heavy or risky drink any is 1, then Yes for RiskyHeavyDrink_yn
+HEI2015_iid_dob_18 <- HEI2015_iid_dob_18[!is.na(HEI2015_iid_dob_18$HEI2015_TOTAL_SCORE), ]
+HEI2015_iid_dob_18_sorted = HEI2015_iid_dob_18[order(HEI2015_iid_dob_18$sjlid, HEI2015_iid_dob_18$agesurvey, decreasing = FALSE),]
+HEI2015_iid_dob_18_uniq = HEI2015_iid_dob_18_sorted[!duplicated(HEI2015_iid_dob_18_sorted$sjlid),]
+
+
+
+
+sjlid <- PHENO.ANY_SN$sjlid
+
+
+
+# MET_iid_dob_18_uniq$PhysicalActivity_yn,
+# smk_iid_dob_18_uniq.2$smoker_former_or_never_yn
+# drk_iid_dob_18_uniq.2$NOT_RiskyHeavyDrink_yn
+# bmi_iid_dob_18_uniq$Not_obese_yn
+
+ALL.LIFESTYLE <- cbind.data.frame(SJLID = sjlid, PhysicalActivity_yn = MET_iid_dob_18_uniq$PhysicalActivity_yn[match(sjlid, MET_iid_dob_18_uniq$SJLIFEID)])
+ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey <- MET_iid_dob_18_uniq$agesurvey[match(ALL.LIFESTYLE$SJLID, MET_iid_dob_18_uniq$SJLIFEID)]
+ALL.LIFESTYLE$PhysicalActivity_yn[is.na(ALL.LIFESTYLE$PhysicalActivity_yn)] <- "Unknown"
+ALL.LIFESTYLE$PhysicalActivity_yn <- factor(ALL.LIFESTYLE$PhysicalActivity_yn, level = c(1, 0, "Unknown")) 
+table(ALL.LIFESTYLE$PhysicalActivity_yn)
+# 1       0 Unknown 
+# 1266    1267    1868
+
+ALL.LIFESTYLE$smoker_former_or_never_yn <- smk_iid_dob_18_uniq.2$smoker_former_or_never_yn[match(ALL.LIFESTYLE$SJLID, smk_iid_dob_18_uniq.2$SJLIFEID)]
+ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey <- smk_iid_dob_18_uniq.2$agesurvey[match(ALL.LIFESTYLE$SJLID, smk_iid_dob_18_uniq.2$SJLIFEID)]
+ALL.LIFESTYLE$smoker_former_or_never_yn[is.na(ALL.LIFESTYLE$smoker_former_or_never_yn)] <- "Unknown"
+ALL.LIFESTYLE$smoker_former_or_never_yn <- factor(ALL.LIFESTYLE$smoker_former_or_never_yn, level = c(1, 0, "Unknown")) 
+table(ALL.LIFESTYLE$smoker_former_or_never_yn)
+# 1       0 Unknown 
+# 2784     770     847 
+
+ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn <- drk_iid_dob_18_uniq.2$NOT_RiskyHeavyDrink_yn[match(ALL.LIFESTYLE$SJLID, drk_iid_dob_18_uniq.2$SJLIFEID)]
+ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey <- drk_iid_dob_18_uniq.2$agesurvey[match(ALL.LIFESTYLE$SJLID, drk_iid_dob_18_uniq.2$SJLIFEID)]
+ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn[is.na(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn)] <- "Unknown"
+ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn <- factor(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn, level = c(1, 0, "Unknown")) 
+table(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn)
+# 1       0 Unknown 
+# 1613     836    1952
+
+ALL.LIFESTYLE$Not_obese_yn <- bmi_iid_dob_18_uniq$Not_obese_yn[match(ALL.LIFESTYLE$SJLID, bmi_iid_dob_18_uniq$sjlid)]
+ALL.LIFESTYLE$Not_obese_yn_agesurvey <- bmi_iid_dob_18_uniq$agesurvey[match(ALL.LIFESTYLE$SJLID, bmi_iid_dob_18_uniq$sjlid)]
+ALL.LIFESTYLE$Not_obese_yn[is.na(ALL.LIFESTYLE$Not_obese_yn)] <- "Unknown"
+ALL.LIFESTYLE$Not_obese_yn <- factor(ALL.LIFESTYLE$Not_obese_yn, level = c(1, 0, "Unknown")) 
+table(ALL.LIFESTYLE$Not_obese_yn)
+# 1       0 Unknown 
+# 2398    1274     729
+
+ALL.LIFESTYLE$HEALTHY_Diet_yn <- diet_iid_dob_18_uniq$HEALTHY_Diet_yn[match(ALL.LIFESTYLE$SJLID, diet_iid_dob_18_uniq$sjlid)]
+ALL.LIFESTYLE$HEALTHY_Diet_yn_agesurvey <- diet_iid_dob_18_uniq$agesurvey[match(ALL.LIFESTYLE$SJLID, diet_iid_dob_18_uniq$sjlid)]
+ALL.LIFESTYLE$HEALTHY_Diet_yn[is.na(ALL.LIFESTYLE$HEALTHY_Diet_yn)] <- "Unknown"
+ALL.LIFESTYLE$HEALTHY_Diet_yn <- factor(ALL.LIFESTYLE$HEALTHY_Diet_yn, level = c(1, 0, "Unknown")) 
+table(ALL.LIFESTYLE$HEALTHY_Diet_yn)
+# 1       0 Unknown 
+# 307    2848    1246 
+
+ALL.LIFESTYLE$HEI2015_TOTAL_SCORE <- HEI2015_iid_dob_18_uniq$HEI2015_TOTAL_SCORE[match(ALL.LIFESTYLE$SJLID, HEI2015_iid_dob_18_uniq$sjlid)]
+ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey <- HEI2015_iid_dob_18_uniq$agesurvey[match(ALL.LIFESTYLE$SJLID, HEI2015_iid_dob_18_uniq$sjlid)]
 
 
 # save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v10.RDATA")

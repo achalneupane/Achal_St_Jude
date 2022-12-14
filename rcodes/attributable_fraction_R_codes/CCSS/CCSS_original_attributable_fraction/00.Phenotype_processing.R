@@ -116,12 +116,14 @@ ccss_org <- CCSS_data[CCSS_data$ccssid %in% ccss_org.samples$V2,]
 
 # Obesity
 ccss_org$BMI <- as.numeric(bmi_iid_dob_18_uniq$bmi[match(ccss_org$ccssid, bmi_iid_dob_18_uniq$ccssid)])
+ccss_org$Not_obese_yn_agesurvey <- as.numeric(bmi_iid_dob_18_uniq$age[match(ccss_org$ccssid, bmi_iid_dob_18_uniq$ccssid)])
 ccss_org$Not_obese_yn <- factor(ifelse(as.numeric(bmi_iid_dob_18_uniq$bmi[match(ccss_org$ccssid, bmi_iid_dob_18_uniq$ccssid)]) < 30, 1, 0))
 ccss_org$Not_obese_yn <- factor(ccss_org$Not_obese_yn, level = c(1, 0, "Unknown")) 
 ccss_org$Not_obese_yn[is.na(ccss_org$Not_obese_yn)] <- "Unknown";
 
 # Physical activity
 ccss_org$CDC <- MET_iid_dob_18_uniq$CDC[match(ccss_org$ccssid, MET_iid_dob_18_uniq$ccssid)]
+ccss_org$PhysicalActivity_yn_agesurvey <- as.numeric(MET_iid_dob_18_uniq$age[match(ccss_org$ccssid, MET_iid_dob_18_uniq$ccssid)])
 ccss_org$PhysicalActivity_yn <- factor(MET_iid_dob_18_uniq$CDC[match(ccss_org$ccssid, MET_iid_dob_18_uniq$ccssid)])
 ccss_org$PhysicalActivity_yn <- ifelse (ccss_org$PhysicalActivity_yn == "Yes", 1, 0)
 ccss_org$PhysicalActivity_yn[is.na(ccss_org$PhysicalActivity_yn)] <- "Unknown"
@@ -129,6 +131,7 @@ ccss_org$PhysicalActivity_yn <- factor(ccss_org$PhysicalActivity_yn, level = c(1
 
 # Smoker
 ccss_org$SMK <- smk_iid_dob_18_uniq$smk[match(ccss_org$ccssid, smk_iid_dob_18_uniq$ccssid)]
+ccss_org$smoker_former_or_never_yn_agesurvey <- as.numeric(smk_iid_dob_18_uniq$age[match(ccss_org$ccssid, smk_iid_dob_18_uniq$ccssid)])
 ccss_org$smoker_former_or_never_yn <- factor(smk_iid_dob_18_uniq$smk[match(ccss_org$ccssid, smk_iid_dob_18_uniq$ccssid)])
 ccss_org$smoker_former_or_never_yn <- factor(ifelse(ccss_org$smoker_former_or_never_yn != 3, 1, 0))
 ccss_org$smoker_former_or_never_yn <- factor(ccss_org$smoker_former_or_never_yn, level = c(1, 0, "Unknown")) 
@@ -136,6 +139,7 @@ ccss_org$smoker_former_or_never_yn[is.na(ccss_org$smoker_former_or_never_yn)] <-
 
 # drinker
 ccss_org$DRK <- drk_iid_dob_18_uniq$riskydrk[match(ccss_org$ccssid, smk_iid_dob_18_uniq$ccssid)]
+ccss_org$NOT_RiskyHeavyDrink_yn_agesurvey <- as.numeric(drk_iid_dob_18_uniq$age[match(ccss_org$ccssid, smk_iid_dob_18_uniq$ccssid)])
 ccss_org$NOT_RiskyHeavyDrink_yn <- factor(ifelse(factor(drk_iid_dob_18_uniq$riskydrk[match(ccss_org$ccssid, smk_iid_dob_18_uniq$ccssid)]) == "No", 1, 0))
 ccss_org$NOT_RiskyHeavyDrink_yn <- factor(ccss_org$NOT_RiskyHeavyDrink_yn, level = c(1, 0, "Unknown")) 
 ccss_org$NOT_RiskyHeavyDrink_yn[is.na(ccss_org$NOT_RiskyHeavyDrink_yn)] <- "Unknown"
@@ -241,12 +245,11 @@ ccss_org$cisplateq_dose_5.category [is.na(ccss_org$cisplateq_dose_5.category)] <
 
 
 PHENO.ANY_SN <- ccss_org[c('ccssid', 'SEX', 'agedx', 'diagnose', 'agelstcontact', 
-  "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", 'd_candx', 'groupdx3', 
-  'a_candx', 'chestrtgrp', 'neckrtgrp', 'pelvisrtgrp', 'abdomenrtgrp', 'brainrtgrp',
-  'Not_obese_yn', 'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category',
-  'PhysicalActivity_yn', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn')]
-
-
+                           "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", 'd_candx', 'groupdx3', 
+                           'a_candx', 'chestrtgrp', 'neckrtgrp', 'pelvisrtgrp', 'abdomenrtgrp', 'brainrtgrp',
+                           'Not_obese_yn_agesurvey', 'Not_obese_yn', 'PhysicalActivity_yn_agesurvey', 'PhysicalActivity_yn', 
+                           'smoker_former_or_never_yn_agesurvey', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn_agesurvey', 'NOT_RiskyHeavyDrink_yn', 
+                           'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category')]
 
 
 
