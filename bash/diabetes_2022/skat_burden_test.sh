@@ -213,3 +213,6 @@ grep -w $BP ${DIR}/ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.${CHR}.preQC_bialleli
 done
 
 
+
+
+## Stats for PASS variants only

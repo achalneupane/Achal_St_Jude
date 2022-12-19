@@ -7,6 +7,7 @@ mkdir -p prs_out
 study=$1
 study="Basal_cell_carcinoma_PRSWeb"
 study="Squamous_cell_carcinoma_PRSWeb"
+study="Mavaddat_2019_ER_NEG_Breast"
 # Subset PRS data for each study
 ## remove chr1:145902073|chr4:57426897|chr6:114515866 from MichiganWeb_ER_OVERALL_Breast
 ## remove chr4:57426897|chr6:114515866 from MichiganWeb_ER_POS_Breast
@@ -446,3 +447,17 @@ plink --bfile prs_out/$study --update-name prs_out/${study}_update_variantnames 
 awk '{print $1":"$2, $4, $5}' prs_out/ALL_Cancers_PRS_data.txt_$study > prs_out/${study}.prsweight
 # Calculate PRS
 plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweight --out prs_out/${study}_prs
+
+
+
+
+
+CHR  POS REF EA BETA
+1 33333 G A 0.03
+
+
+
+1       chr1:33333        0       33333 A       G
+
+
+
