@@ -2,24 +2,32 @@ df <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/CAB/common/WGS_Northw
 dim(df)
 
 table(df$STATUS)
+# PASS WARNING 
+# 91      19 
 
-coverage <- df[grepl("COVERAGE|SAMPLE", colnames(df), ignore.case = T)]
+coverage <- df[grepl("COVERAGE|SAMPLE|DUPLICATION_perc|MEAN_MAPPING_QUALITY|MAPPED_perc|READS_RAW", colnames(df), ignore.case = T)]
 colnames(coverage)
-coverage <- coverage[c("SAMPLE", "COVERAGE_MEAN", "COVERAGE_EXON_10X_perc", 
-           "COVERAGE_EXON_20X_perc", "COVERAGE_EXON_30X_perc", 
-           "COVERAGE_OVERALL_10X_perc", "COVERAGE_OVERALL_20X_perc", 
-           "COVERAGE_OVERALL_30X_perc")]
+# coverage <- coverage[c("SAMPLE", "COVERAGE_MEAN", "COVERAGE_EXON_10X_perc", 
+#            "COVERAGE_EXON_20X_perc", "COVERAGE_EXON_30X_perc", 
+#            "COVERAGE_OVERALL_10X_perc", "COVERAGE_OVERALL_20X_perc", 
+#            "COVERAGE_OVERALL_30X_perc")]
+coverage <- coverage[c("SAMPLE", "READS_RAW")]
+
 
 library(reshape2)
 library(ggplot2)
 d <- melt(coverage, id.vars="SAMPLE")
 
-ggplot(d, aes(SAMPLE,value, col=variable)) + 
-  stat_smooth(method="loess", span=0.1, se=TRUE, aes(fill=variable), alpha=0.3) +
-  theme_bw()
+ggplot(data=d,
+       aes(x=SAMPLE, y=value, group = 1, colour=variable)) +
+  geom_point() +
+  scale_colour_manual(values=c("orange")) +
+  geom_line(size = .5) +
+  # scale_y_continuous(breaks = seq(0, 100, len = 10)) +
+  scale_y_continuous(breaks = c( 20, 30, 50, 80, 90, 100), limits = c(1,100)) +
+  # facet_wrap(~variable, ncol=1)
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_text(size = 12)
+        ) 
 
-d$level <- factor(d$variable)
-d$SAMPLE <- factor(d$SAMPLE)
-ggplot(d, aes(x=SAMPLE,y=value, colour=variable)) +
-  geom_line(aes(linetype=level)) +
-  theme_bw()
+# panel.background = element_blank()

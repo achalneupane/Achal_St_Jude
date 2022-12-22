@@ -385,11 +385,11 @@ awk '{print "chr"$1"\tchr"$1":"$4":"$5":"$6"\t"$3"\t"$4"\t"$6"\t"$5}' test_freq_
 plink --bfile test_freq_Eur --freq --out test_freq_Eur_freq
 
 
-
-
-
-## Since CCSS_original was missing 72 variants in the GWAS data, I am re-calculating PRS for breast cancer with just 241 variants 
-## Use R code: ccss_org_bed.R (Part 2) to extract variants
+##################################################
+## Part 2: CCSS org overlapping PRS from SJLIFE ##
+##################################################
+## Since CCSS_original was missing 72 variants in the GWAS data, I am re-calculating PRS for breast cancer with just 241 variants; Meningioma with just 2 overlapping variants; Sarcoma with 5 overlapping variants; pleiotropy with 172 overlapping variants.
+## Use R Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/CCSS/ccss_org_bed.R (Part 2) to extract variants
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs
 
 study="Meningioma_from_variants_also_in_CCSS_org"
