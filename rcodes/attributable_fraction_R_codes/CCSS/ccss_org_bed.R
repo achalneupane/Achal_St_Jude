@@ -73,3 +73,18 @@ SJLIFE_vars.in.CCSS_org <- SJLIFE_vars[SJLIFE_vars$KEY_GRCh38 %in% all_cancers_3
 SJLIFE_vars.in.CCSS_org$TYPE <- paste0(SJLIFE_vars.in.CCSS_org$TYPE, "_from_variants_also_in_CCSS_org")
 
 write.table(SJLIFE_vars.in.CCSS_org[1:8], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/ALL_Cancers_PRS_data_in_CCSS_org.txt", sep = "\t", col.names = T, quote = F, row.names = F)
+
+
+##########################################################################################
+## Part 3: re-calculating PRS in SJLIFE with the variants present in CCSS_original data ##
+##########################################################################################
+## Extract matching variants from SJLIFE
+CCSS_exp_vars <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/all_cancer.txt", header = T)
+CCSS_exp_vars$KEY_GRCh38 <- paste0("chr", CCSS_exp_vars$CHROM,":", CCSS_exp_vars$POS_GRCh38)
+all_cancers_38.matched$KEY_GRCh38 
+
+CCSS_exp_vars.in.CCSS_org <- CCSS_exp_vars[CCSS_exp_vars$KEY_GRCh38 %in% all_cancers_38.matched$KEY_GRCh38 ,]
+## Add study identifier, so it's easy to identify the PRS files later on
+CCSS_exp_vars.in.CCSS_org$TYPE <- paste0(CCSS_exp_vars.in.CCSS_org$TYPE, "_from_variants_also_in_CCSS_org")
+
+write.table(CCSS_exp_vars.in.CCSS_org[1:8], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/ALL_Cancers_PRS_data_in_CCSS_org.txt", sep = "\t", col.names = T, quote = F, row.names = F)

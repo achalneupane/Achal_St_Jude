@@ -203,14 +203,14 @@ plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweigh
 
 
 ####################################################
-## Part 2: CCSS org overlapping PRS from CCSS exp ##
+## Part 2: CCSS org overlapping PRS in CCSS exp ##
 ####################################################
 
 ## Since CCSS_original was missing 72 variants in the GWAS data, I am re-calculating PRS for breast cancer with just 241 variants; Meningioma with just 2 overlapping variants; Sarcoma with 5 overlapping variants; pleiotropy with 172 overlapping variants.
 ## Use R code: Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/CCSS/ccss_org_bed.R (Part 2) to extract variants
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs
 
-study="Meningioma_from_variants_also_in_CCSS_org"
+study="Mavaddat_2019_ER_POS_Breast_from_variants_also_in_CCSS_org"
 awk -v study=$study '$6==study' ALL_Cancers_PRS_data_in_CCSS_org.txt > prs_out/ALL_Cancers_PRS_data.txt_${study}
 # ## Meningioma
 ## grep "Meningioma" ALL_Cancers_PRS_data_in_CCSS_org.txt > prs_out/ALL_Cancers_PRS_data.txt_${study}
@@ -221,10 +221,10 @@ awk -v study=$study '$6==study' ALL_Cancers_PRS_data_in_CCSS_org.txt > prs_out/A
 # Check for duplicate variants based on chr:pos
 awk 'a[$1":"$2]++' prs_out/ALL_Cancers_PRS_data.txt_$study | wc -l
 # Look for directly matching variants in the WGS data
-awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/ALL_Cancers_PRS_data.txt_$study plink_data/sjlife_all_PRS_all_final_v3.bim \
+awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/ALL_Cancers_PRS_data.txt_$study plink_data/merged.dat.bim \
 | awk '($4==$6 || $4==$7) && ($5==$6 || $5==$7)' > prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match
 # No direct match
-awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/ALL_Cancers_PRS_data.txt_$study plink_data/sjlife_all_PRS_all_final_v3.bim \
+awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/ALL_Cancers_PRS_data.txt_$study plink_data/merged.dat.bim \
 | awk '!(($4==$6 || $4==$7) && ($5==$6 || $5==$7))' | grep -v DEL > prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match
 # Exclude those that are already a direct match
 awk 'NR==FNR{a[$1":"$3];next}!($1":"$3 in a){print}' prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match \
@@ -254,9 +254,11 @@ awk '($NF==1){ print $3, $6, $7, $8, $9}' prs_out/ALL_Cancers_PRS_data.txt_${stu
 # mv prs_out/t1 prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt
 # Extract study-specific variants
 awk '{print $2}' prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match > prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match_to_extract.txt
+
 module load plink/1.90b
-plink --bfile plink_data/sjlife_all_PRS_all_final_v3 --extract prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match_to_extract.txt --make-bed --out prs_out/${study}_direct_match
-plink --bfile plink_data/sjlife_all_PRS_all_final_v3 --extract prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --update-alleles prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --make-bed --out prs_out/${study}_harmonized
+# If all are direct match, replace prs_out/${study}_direct_match with prs_out/$study and skip next two lines after this line
+plink --bfile plink_data/merged.dat --extract prs_out/ALL_Cancers_PRS_data.txt_${study}_direct_match_to_extract.txt --make-bed --out prs_out/${study}_direct_match 
+plink --bfile plink_data/merged.dat --extract prs_out/ALL_Cancers_PRS_data.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --update-alleles prs_out/all_cancer.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --make-bed --out prs_out/${study}_harmonized
 plink --bfile prs_out/${study}_direct_match --bmerge prs_out/${study}_harmonized --make-bed --out prs_out/$study
 # Update variant names
 awk '{print $2, $1":"$4}' prs_out/${study}.bim > prs_out/${study}_update_variantnames
