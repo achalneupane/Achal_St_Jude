@@ -210,7 +210,7 @@ plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweigh
 ## Use R code: Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/CCSS/ccss_org_bed.R (Part 2) to extract variants
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs
 
-study="Mavaddat_2019_ER_POS_Breast_from_variants_also_in_CCSS_org"
+study="Sarcoma_Machiela_from_variants_also_in_CCSS_org"
 awk -v study=$study '$6==study' ALL_Cancers_PRS_data_in_CCSS_org.txt > prs_out/ALL_Cancers_PRS_data.txt_${study}
 # ## Meningioma
 ## grep "Meningioma" ALL_Cancers_PRS_data_in_CCSS_org.txt > prs_out/ALL_Cancers_PRS_data.txt_${study}
