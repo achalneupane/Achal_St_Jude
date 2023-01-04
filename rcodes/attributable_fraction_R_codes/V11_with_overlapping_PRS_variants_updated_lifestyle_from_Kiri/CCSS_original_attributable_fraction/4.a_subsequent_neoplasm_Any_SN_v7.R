@@ -48,64 +48,14 @@ PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% ANY_SNs$ccssid, 0
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 #########################
 ## Extract Ethnicities ##
 #########################
 ## Add admixture ethnicity 
-ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/final.5.Q_header2_SJLIFE_only", header = T)
-PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AMR", "SAS", "AFR")])
+ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
+PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$ccssid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
 
 
-PHENO.ANY_SN.EUR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'EUR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN))]
-PHENO.ANY_SN.AFR <- PHENO.ANY_SN[PHENO.ANY_SN$PCA.ethnicity == 'AFR', -grep("sjlid|PCA.ethnicity|AGE.ANY_SN", colnames(PHENO.ANY_SN))]
-
-###########################################
-## Check data in each category/cross tab ##
-###########################################
-library(expss)
-
-# Getting counts for non-missing data only; 26 samples do not have admixture ancestry
-CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$AMR),]
-
-CROSS_CASES.df <- CROSS_CASES.df[c("ANY_SN", "smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn",
-                                   "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")]
-
-CROSS_CASES.df <- apply_labels(CROSS_CASES.df, ANY_SN = "ANY_SN", smoker_never_yn = "smoker_never_yn", 
-                               smoker_former_or_never_yn = "smoker_former_or_never_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
-                               NOT_RiskyHeavyDrink_yn = "NOT_RiskyHeavyDrink_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")
-
-as.data.frame(t(CROSS_CASES.df %>%
-  cross_cases(ANY_SN, list(smoker_never_yn , smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
-
-
-
-#################
-## MODEL TESTS ##
-#################
-
-###########################
-## 1. Qin baseline model ##
-###########################
-## SJLIFE (ALL) 
-mod1 <- glm(ANY_SN ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
-summary(mod1)
-
-# ## SJLIFE (EUR)
-# mod1.EUR <- glm(ANY_SN ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
-# summary(mod1.EUR)
 
 
 ######################################
@@ -113,13 +63,12 @@ summary(mod1)
 ######################################
 
 dat_all = PHENO.ANY_SN
-fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
-                Pleiotropy_PRSWEB_PRS.tertile.category + 
+fit_all = glm(formula = ANY_SN ~ Pleiotropy_PRSWEB_PRS.tertile.category + 
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
                 maxchestrtdose.category + epitxn_dose_5.category + 
                 smoker_former_or_never_yn + PhysicalActivity_yn + NOT_RiskyHeavyDrink_yn + HEALTHY_Diet_yn + Not_obese_yn +
-                EAS + AMR + SAS + AFR,
+                EAS + AFR,
               family = binomial,
               data = dat_all)
 

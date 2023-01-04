@@ -7,14 +7,15 @@ SJLIFE2 <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/
 head(SJLIFE2)
 colnames(SJLIFE2)[1] <- "INDIVIDUAL"
 
-CCSS_1 <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/CCSS_and_1kGP_final_EUR_AFR_EAS.3.Q_ccssexp_samples", header = T)
-head(CCSS_1)
-colnames(CCSS_1)[1] <- "INDIVIDUAL"
+CCSS_exp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/CCSS_and_1kGP_final_EUR_AFR_EAS.3.Q_ccssexp_samples", header = T)
+head(CCSS_exp)
+colnames(CCSS_exp)[1] <- "INDIVIDUAL"
 
-CCSS_2 <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/CCSS.SJLIFE.ancestry_CCSS.txt", header = T, sep = "\t")
-head(CCSS_2)
-CCSS_2 <- CCSS_2[c("SAMPLE", "CEU", "YRI", "ASA")]
-colnames(CCSS_2) <- c("INDIVIDUAL", "EUR", "AFR", "EAS")
+CCSS_org <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/CCSS.SJLIFE.ancestry_CCSS.txt", header = T, sep = "\t")
+head(CCSS_org)
+CCSS_org <- CCSS_org[c("SAMPLE", "CEU", "YRI", "ASA")]
+colnames(CCSS_org) <- c("INDIVIDUAL", "EUR", "AFR", "EAS")
+CCSS_org$INDIVIDUAL <- paste(CCSS_org$INDIVIDUAL, CCSS_org$INDIVIDUAL, sep = "_")
 
-ancestry <- rbind.data.frame(SJLIFE1, SJLIFE2, CCSS_1, CCSS_2)
+ancestry <- rbind.data.frame(SJLIFE1, SJLIFE2, CCSS_exp, CCSS_org)
 write.table(ancestry, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", col.names = T, sep = "\t")
