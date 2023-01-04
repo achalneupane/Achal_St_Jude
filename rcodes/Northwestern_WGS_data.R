@@ -21,10 +21,11 @@ d <- melt(coverage, id.vars="SAMPLE")
 ggplot(data=d,
        aes(x=SAMPLE, y=value, group = 1, colour=variable)) +
   geom_point() +
-  scale_colour_manual(values=c("orange")) +
+  scale_colour_manual(values=c("black")) +
   geom_line(size = .5) +
+  scale_y_log10() +
   # scale_y_continuous(breaks = seq(0, 100, len = 10)) +
-  scale_y_continuous(breaks = c( 20, 30, 50, 80, 90, 100), limits = c(1,100)) +
+  # scale_y_continuous(breaks = c( 20, 30, 50, 80, 90, 100), limits = c(1,100)) +
   # facet_wrap(~variable, ncol=1)
   theme(axis.text.x = element_blank(),
         axis.text.y = element_text(size = 12)
