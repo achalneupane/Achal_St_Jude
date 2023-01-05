@@ -243,7 +243,7 @@ levels(ccss_org$cisplateq_dose_5.category) <- c(levels(ccss_org$cisplateq_dose_5
 ccss_org$cisplateq_dose_5.category [is.na(ccss_org$cisplateq_dose_5.category)] <- "Unknown"
 
 # Making variable names consistent with the SJLIFE variables
-ccss_org$gender <- ccss_org$SEX
+ccss_org$gender <- factor(ccss_org$SEX, levels = c("Male", "Female"))
 ccss_org$maxchestrtdose.category <- factor(ccss_org$chestrtgrp, levels = c("None", "0-20", ">=20", "Unknown"))
 ccss_org$maxneckrtdose.category <- factor(ccss_org$neckrtgrp, levels = c("None", "0-11", "11-20", "20-30", ">=30", "Unknown"))
 ccss_org$maxabdrtdose.category <- factor(ccss_org$abdomenrtgrp, levels = c("None", "0-30", ">=30", "Unknown"))
@@ -341,4 +341,4 @@ sum(PHENO.ANY_SN$ccssid %in% overlaps$ccssid)
 # 732
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% overlaps$ccssid,]
 
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_org_Genetic_data_P_LP.Rdata")
+# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_org_Genetic_data_P_LP.Rdata")

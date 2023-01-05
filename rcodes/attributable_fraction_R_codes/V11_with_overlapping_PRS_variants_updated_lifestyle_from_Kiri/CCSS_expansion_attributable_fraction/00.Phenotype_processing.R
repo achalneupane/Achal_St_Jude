@@ -237,14 +237,17 @@ ccss_exp$cisplateq_dose_5.category <- cut(ccss_exp$pt_cisED5, breaks = c(0, 0.00
 levels(ccss_exp$cisplateq_dose_5.category) <- c(levels(ccss_exp$cisplateq_dose_5.category), "Unknown")
 ccss_exp$cisplateq_dose_5.category [is.na(ccss_exp$cisplateq_dose_5.category)] <- "Unknown"
 
-
 # Making variable names consistent with the SJLIFE variables
-ccss_exp$gender <- ccss_exp$SEX
-ccss_exp$maxchestrtdose.category <- ccss_exp$chestrtgrp
-ccss_exp$maxneckrtdose.category <- ccss_exp$neckrtgrp
-ccss_exp$maxabdrtdose.category <- ccss_exp$abdomenrtgrp
-ccss_exp$maxsegrtdose.category <- ccss_exp$brainrtgrp
-ccss_exp$maxpelvisrtdose.category <- ccss_exp$pelvisrtgrp
+ccss_exp$gender <- factor(ccss_exp$SEX, levels = c("Male", "Female"))
+ccss_exp$maxchestrtdose.category <- factor(ccss_exp$chestrtgrp, levels = c("None", "0-20", ">=20", "Unknown"))
+ccss_exp$maxneckrtdose.category <- factor(ccss_exp$neckrtgrp, levels = c("None", "0-11", "11-20", "20-30", ">=30", "Unknown"))
+ccss_exp$maxabdrtdose.category <- factor(ccss_exp$abdomenrtgrp, levels = c("None", "0-30", ">=30", "Unknown"))
+ccss_exp$maxsegrtdose.category <- factor(ccss_exp$brainrtgrp, levels = c("None", "0-18", "18-30", ">=30", "Unknown"))
+ccss_exp$maxpelvisrtdose.category <- factor(ccss_exp$pelvisrtgrp, levels = c("None", "0-20", ">=20", "Unknown"))
+
+# table(PHENO.ANY_SN$cisplateq_dose_5.category)
+# table(ccss_exp$cisplateq_dose_5.category)
+
 
 
 PHENO.ANY_SN <- ccss_exp[c('ccssid', 'gender', 'agedx', 'diagnose', 'agelstcontact', 'AGE_AT_DIAGNOSIS',
@@ -328,4 +331,4 @@ for(i in 1:length(PRS.to.categorize)){
 }
 
 
-# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_exp_Genetic_data_P_LP_v11.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_exp_Genetic_data_P_LP_v11.Rdata")
