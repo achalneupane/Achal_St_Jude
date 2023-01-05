@@ -244,11 +244,14 @@ ccss_org$cisplateq_dose_5.category [is.na(ccss_org$cisplateq_dose_5.category)] <
 
 # Making variable names consistent with the SJLIFE variables
 ccss_org$gender <- ccss_org$SEX
-ccss_org$maxchestrtdose.category <- ccss_org$chestrtgrp
-ccss_org$maxneckrtdose.category <- ccss_org$neckrtgrp
-ccss_org$maxabdrtdose.category <- ccss_org$abdomenrtgrp
-ccss_org$maxsegrtdose.category <- ccss_org$brainrtgrp
-ccss_org$maxpelvisrtdose.category <- ccss_org$pelvisrtgrp
+ccss_org$maxchestrtdose.category <- factor(ccss_org$chestrtgrp, levels = c("None", "0-20", ">=20", "Unknown"))
+ccss_org$maxneckrtdose.category <- factor(ccss_org$neckrtgrp, levels = c("None", "0-11", "11-20", "20-30", ">=30", "Unknown"))
+ccss_org$maxabdrtdose.category <- factor(ccss_org$abdomenrtgrp, levels = c("None", "0-30", ">=30", "Unknown"))
+ccss_org$maxsegrtdose.category <- factor(ccss_org$brainrtgrp, levels = c("None", "0-18", "18-30", ">=30", "Unknown"))
+ccss_org$maxpelvisrtdose.category <- factor(ccss_org$pelvisrtgrp, levels = c("None", "0-20", ">=20", "Unknown"))
+
+# table(PHENO.ANY_SN$cisplateq_dose_5.category)
+# table(ccss_org$cisplateq_dose_5.category)
 
 
 PHENO.ANY_SN <- ccss_org[c('ccssid', 'gender', 'agedx', 'diagnose', 'agelstcontact', 'AGE_AT_DIAGNOSIS', 
@@ -333,6 +336,9 @@ for(i in 1:length(PRS.to.categorize)){
 
 ## Exclude samples already included in SJLIFE (Note all 732 overlaps are in 4401 SJLIFE samples)
 overlaps <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/pheno/SJLIFE_WGS_samples_overlap_with_CCSS_org_SNP_samples.txt", header = T)
-PHENO.ANY_SN$ccssid %in% overlaps
+overlaps$ccssid <- paste(overlaps$ccssid, overlaps$ccssid, sep = "_")
+sum(PHENO.ANY_SN$ccssid %in% overlaps$ccssid)
+# 732
+PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% overlaps$ccssid,]
 
-# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_org_Genetic_data_P_LP.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_org_Genetic_data_P_LP.Rdata")
