@@ -330,4 +330,9 @@ for(i in 1:length(PRS.to.categorize)){
 }
 
 
+
+## Exclude samples already included in SJLIFE (Note all 732 overlaps are in 4401 SJLIFE samples)
+overlaps <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/pheno/SJLIFE_WGS_samples_overlap_with_CCSS_org_SNP_samples.txt", header = T)
+PHENO.ANY_SN$ccssid %in% overlaps
+
 # save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_org_Genetic_data_P_LP.Rdata")

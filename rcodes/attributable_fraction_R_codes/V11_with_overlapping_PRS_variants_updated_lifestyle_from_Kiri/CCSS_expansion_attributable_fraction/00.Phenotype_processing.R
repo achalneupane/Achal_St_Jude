@@ -238,10 +238,18 @@ levels(ccss_exp$cisplateq_dose_5.category) <- c(levels(ccss_exp$cisplateq_dose_5
 ccss_exp$cisplateq_dose_5.category [is.na(ccss_exp$cisplateq_dose_5.category)] <- "Unknown"
 
 
+# Making variable names consistent with the SJLIFE variables
+ccss_exp$gender <- ccss_exp$SEX
+ccss_exp$maxchestrtdose.category <- ccss_exp$chestrtgrp
+ccss_exp$maxneckrtdose.category <- ccss_exp$neckrtgrp
+ccss_exp$maxabdrtdose.category <- ccss_exp$abdomenrtgrp
+ccss_exp$maxsegrtdose.category <- ccss_exp$brainrtgrp
+ccss_exp$maxpelvisrtdose.category <- ccss_exp$pelvisrtgrp
 
-PHENO.ANY_SN <- ccss_exp[c('ccssid', 'SEX', 'agedx', 'diagnose', 'agelstcontact', 
+
+PHENO.ANY_SN <- ccss_exp[c('ccssid', 'gender', 'agedx', 'diagnose', 'agelstcontact', 'AGE_AT_DIAGNOSIS',
   "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", 'd_candx', 'groupdx3', 
-  'a_candx', 'chestrtgrp', 'neckrtgrp', 'pelvisrtgrp', 'abdomenrtgrp', 'brainrtgrp',
+  'a_candx', 'maxchestrtdose.category', 'maxneckrtdose.category', 'maxabdrtdose.category', 'maxsegrtdose.category', 'maxpelvisrtdose.category',
   'Not_obese_yn_agesurvey', 'Not_obese_yn', 'PhysicalActivity_yn_agesurvey', 'PhysicalActivity_yn', 
   'smoker_former_or_never_yn_agesurvey', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn_agesurvey', 'NOT_RiskyHeavyDrink_yn', 
   'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category')]
