@@ -12,6 +12,9 @@ plink --bfile LMNA_ALL --recodeA --keep-allele-order --out LMNA_ALL_recodeA
 plink --chr 1 --from-bp 156082573 --make-bed --out LMNA_ALL_VQSR_PASS --to-bp 156140081 --vcf-half-call m --keep sample_list.txt --keep-allele-order --vcf chr1.snp.indel.recalibrated_edited.PASS.vcf.gz
 
 
+plink --chr 1 --from-bp 156082573 --make-bed --out LMNA_ALL_FREQ --to-bp 156140081 --vcf-half-call m --keep-allele-order --vcf chr1.snp.indel.recalibrated_edited.vcf.gz
+plink --bfile LMNA_ALL_FREQ --freq --out LMNA_ALL_FREQ_result
+
 #####################
 ## Extract Emerin  ##
 #####################

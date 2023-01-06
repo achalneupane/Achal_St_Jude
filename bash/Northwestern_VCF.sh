@@ -84,10 +84,10 @@ export CHR="chr${i}"; \
 echo "Annotating $CHR"; \
 unset INPUT_VCF; \
 export THREADS=4; \
-export INPUT_VCF="${CHR}.snp.indel.recalibrated_edited.vcf.gz"; \
+export INPUT_VCF="${CHR}.snp.indel.recalibrated_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf"; \
 export JAVA="java"; \
 export JAVAOPTS="-Xms4g -Xmx30g"; \
-export WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/annovar"; \
+export WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/WGS_Northwestern_110_samples/VQSR_ApplyRecalibration_edited/annotation/annovar/"; \
 export REF="/research_jude/rgs01_jude/reference/public/genomes/Homo_sapiens/GRCh38/GRCh38_no_alt/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa"; \
 export CLINVAR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/clinvar/clinvar.vcf.gz"
 export GATK="/hpcf/apps/gatk/install/3.7/GenomeAnalysisTK.jar"; \
