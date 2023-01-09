@@ -61,43 +61,40 @@ LMNA_VQSR.pASS <- read.table("LMNA_ALL_VQSR_PASS.bim")
 sum(dd$SNP_ID %in%   LMNA_VQSR.pASS$V2)
 # 436
 
-## Add annotation
-LMNA.anno <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WGS_Northwestern_110_samples/VQSR_ApplyRecalibration_edited/HANA_Northwestern_request/LMNA_ANNOVAR.txt", sep = "\t", header = T)
-LMNA.anno$ID <- paste0(LMNA.anno$Otherinfo4,":", LMNA.anno$Otherinfo5,":",
-       LMNA.anno$Otherinfo7,":", LMNA.anno$Otherinfo8)
-
-
-sum(dd$SNP_ID %in% LMNA.anno$ID)
-# 452
-dd$SNP_ID[!dd$SNP_ID %in% LMNA.anno$ID]
-# [1] "chr1:156084328:CG:C" "chr1:156084335:T:*"  "chr1:156084338:T:*"  "chr1:156106643:A:*"  "chr1:156109819:C:*"  "chr1:156109820:A:*"  "chr1:156109837:C:*" 
-# [8] "chr1:156109839:C:*"
-
-# dd$MATCH <- dd$SNP_ID %in% LMNA.anno$ID
-# dd$MATCH[dd$MATCH == FALSE] <- NA
-
-LMNA.anno$MATCH <- LMNA.anno$ID %in% dd$SNP_ID
-LMNA.anno$MATCH[LMNA.anno$MATCH == FALSE] <- NA
-
-xx <- LMNA.anno[grepl("156084335", LMNA.anno$Start) & is.na(LMNA.anno$MATCH),]
-xx$ID
-
-
-LMNA.anno$ID [grepl("chr1:156084328:CG:C", LMNA.anno$ID)] <- "chr1:156084329:G:*"
-LMNA.anno$ID [grepl("chr1:156084328:CG:C", LMNA.anno$ID)] <- "chr1:156084329:G:*"
-
-
-
-LMNA.anno[match(dd$SNP_ID, LMNA.anno$ID),]
-LMNA.anno[match(dd$SNP_ID, LMNA.anno$ID),]
-
 ## Add Frequency
 FREQ <- read.table("LMNA_ALL_FREQ_result.frq", header = T)
 sum(FREQ$SNP %in% dd$SNP_ID)
 dd$NORTHWESTERN_WGS_MAF <- FREQ$MAF[match(dd$SNP_ID, FREQ$SNP)]
 
 dd$VQSR_PASS <- ifelse(dd$SNP_ID %in% LMNA_VQSR.pASS$V2, "YES", "NO")
-dd <- dd[c("CHROM",  "POS",    "REF",    "ALT",    "VQSR_PASS", "JW1-12", "JW10-1", "JW11-6", "JW12-17", "JW13-2", "JW2-2", "JW3-4", "JW4-5", "JW5-5", "JW6", "JW7-7", "JW8-6", "JW9-12")]
+dd <- dd[c("SNP_ID", "CHROM",  "POS",    "REF",    "ALT",    "VQSR_PASS", "JW1-12", "JW10-1", "JW11-6", "JW12-17", "JW13-2", "JW2-2", "JW3-4", "JW4-5", "JW5-5", "JW6", "JW7-7", "JW8-6", "JW9-12", "NORTHWESTERN_WGS_MAF")]
+
+
+## Add annotation
+LMNA.anno <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WGS_Northwestern_110_samples/VQSR_ApplyRecalibration_edited/HANA_Northwestern_request/LMNA_ANNOVAR.txt", sep = "\t", header = T)
+LMNA.anno <- cbind.data.frame(ID = paste0(LMNA.anno$Otherinfo4,":", LMNA.anno$Otherinfo5,":",
+       LMNA.anno$Otherinfo7,":", LMNA.anno$Otherinfo8), LMNA.anno)
+
+
+sum(dd$SNP_ID %in% LMNA.anno$ID)
+# 452
+dd$SNP_ID[!dd$SNP_ID %in% LMNA.anno$ID]
+# [1] "chr1:156084329:G:*" "chr1:156084335:T:*" "chr1:156084338:T:*"
+# "chr1:156106643:A:*" "chr1:156109819:C:*" "chr1:156109820:A:*"
+# "chr1:156109837:C:*" "chr1:156109839:C:*"
+
+# dd$SNP_UPDATED <- dd$SNP_ID
+# dd$SNP_UPDATED [grepl("chr1:156084329:G:*", dd$SNP_UPDATED)] <- "chr1:156084328:CG:C"
+# dd$SNP_UPDATED [grepl("chr1:156084335:T:*", dd$SNP_UPDATED)] <- "chr1:156084334:GT:G"
+# dd$SNP_UPDATED [grepl("chr1:156084338:T:*", dd$SNP_UPDATED)] <- "chr1:156084337:GT:G"
+# # dd$SNP_UPDATED [grepl("chr1:156106643:A:*", dd$SNP_UPDATED)] <- "chr1:156106643:A"
+# # dd$SNP_UPDATED [grepl("chr1:156109819:C:*", dd$SNP_UPDATED)] <- "chr1:156109819:C:"
+# # dd$SNP_UPDATED [grepl("chr1:156109820:A:*", dd$SNP_UPDATED)] <- "chr1:156109820:A"
+# # dd$SNP_UPDATED [grepl("chr1:156109837:C:*", dd$SNP_UPDATED)] <- "chr1:156109837:C:*"
+# # dd$SNP_UPDATED [grepl("chr1:156109839:C:*", dd$SNP_UPDATED)] <- "chr1:156109839:C"
+
+dd <- cbind.data.frame(dd, LMNA.anno[match(dd$SNP_ID, LMNA.anno$ID),])
+
 
 
 
@@ -158,9 +155,36 @@ EMD_VQSR.pASS <- read.table("EMD_ALL_VQSR_PASS.bim")
 sum(dd$SNP_ID %in%   EMD_VQSR.pASS$V2)
 # 14
 
+## Add Frequency
+FREQ <- read.table("EMD_ALL_FREQ_result.frq", header = T)
+sum(FREQ$SNP %in% dd$SNP_ID)
+dd$NORTHWESTERN_WGS_MAF <- FREQ$MAF[match(dd$SNP_ID, FREQ$SNP)]
+
 dd$VQSR_PASS <- ifelse(dd$SNP_ID %in% EMD_VQSR.pASS$V2, "YES", "NO")
-dd <- dd[c("CHROM",  "POS",    "REF",    "ALT",    "VQSR_PASS", "JW1-12", "JW10-1", "JW11-6", "JW12-17", "JW13-2", "JW2-2", "JW3-4", "JW4-5", "JW5-5", "JW6", "JW7-7", "JW8-6", "JW9-12")]
+dd <- dd[c("SNP_ID", "CHROM",  "POS",    "REF",    "ALT",    "VQSR_PASS", "JW1-12", "JW10-1", "JW11-6", "JW12-17", "JW13-2", "JW2-2", "JW3-4", "JW4-5", "JW5-5", "JW6", "JW7-7", "JW8-6", "JW9-12", "NORTHWESTERN_WGS_MAF")]
+
+
+## Add annotation
+EMD.anno <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WGS_Northwestern_110_samples/VQSR_ApplyRecalibration_edited/HANA_Northwestern_request/EMD_ANNOVAR.txt", sep = "\t", header = T)
+EMD.anno <- cbind.data.frame(ID = paste0(EMD.anno$Otherinfo4,":", EMD.anno$Otherinfo5,":",
+                                          EMD.anno$Otherinfo7,":", EMD.anno$Otherinfo8), EMD.anno)
+
+
+sum(dd$SNP_ID %in% EMD.anno$ID)
+# 14
+dd$SNP_ID[!dd$SNP_ID %in% EMD.anno$ID]
+
 dd$CHROM - NA
 dd$CHROM <- c("X")
+
+dd <- cbind.data.frame(dd,EMD.anno[match(dd$SNP_ID, EMD.anno$ID),])
+
+dd <- dd[c("SNP_ID","CHROM","POS","REF","ALT","VQSR_PASS","JW1-12","JW10-1",
+     "JW11-6","JW12-17","JW13-2","JW2-2","JW3-4","JW4-5","JW5-5","JW6",
+     "JW7-7","JW8-6","JW9-12","NORTHWESTERN_WGS_MAF","Func.refGene",
+     "Gene.refGene","ExonicFunc.refGene","AAChange.refGene","X1000g2015aug_all",
+     "gnomAD_genome_ALL","gnomAD_genome_AFR","gnomAD_genome_AMR","gnomAD_genome_ASJ",
+     "gnomAD_genome_EAS","gnomAD_genome_FIN","gnomAD_genome_NFE","gnomAD_genome_OTH",
+     "cosmic70","nci60","CLNSIG","REVEL")]
 
 write.table(dd, "Hana_EMD_genotype.txt", sep = "\t", col.names = T, quote = F, row.names = F)
