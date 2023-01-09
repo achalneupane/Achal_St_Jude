@@ -66,6 +66,23 @@ nrow(NMSCs)
 # 249
 PHENO.ANY_SN$NMSC <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% NMSCs$sjlid, 0, 1))
 
+#############################
+## Add Lifestyle variables ##
+#############################
+# Define CA/CO status in lifestyle
+ALL.LIFESTYLE$CACO <- factor(ifelse(!ALL.LIFESTYLE$SJLIFEID %in% NMSCs$sjlid, 0, 1))
+
+## Get date (gradedt) and age at diagnosis of SN
+ALL.LIFESTYLE$ANY.SN_gradedate <- NMSCs$gradedt[match(ALL.LIFESTYLE$SJLIFEID, NMSCs$sjlid)]
+ALL.LIFESTYLE$AGE.ANY_SN <- NMSCs$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, NMSCs$sjlid)]
+
+## In CASES, if age survey is greater than age at diagnosis; NULLIFY the favorable_lifestyle.category. That information is not useful
+ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$agesurvey > ALL.LIFESTYLE$AGE.ANY_SN),
+              c("smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")] <- NA
+
+
+ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$agebmi > ALL.LIFESTYLE$AGE.ANY_SN), c("Not_obese_yn")] <- NA
+
 ############################
 ## Add lifestyle to Pheno ##
 ############################
@@ -125,6 +142,26 @@ table(PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category)
 ## Add admixture ethnicity 
 ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
+
+###########################################
+## Check data in each category/cross tab ##
+###########################################
+library(expss)
+
+# Getting counts for non-missing data only; 26 samples do not have admixture ancestry
+CROSS_CASES.df <- PHENO.ANY_SN
+
+CROSS_CASES.df <- CROSS_CASES.df[c("NMSC", "smoker_former_or_never_yn", "PhysicalActivity_yn",
+                                   "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")]
+
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df, NMSC = "NMSC", 
+                               smoker_former_or_never_yn = "smoker_former_or_never_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
+                               NOT_RiskyHeavyDrink_yn = "NOT_RiskyHeavyDrink_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")
+
+as.data.frame(t(CROSS_CASES.df %>%
+                  cross_cases(NMSC, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
+
+
 
 
 ##########################

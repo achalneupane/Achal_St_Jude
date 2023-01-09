@@ -69,11 +69,11 @@ PHENO.ANY_SN$BREASTcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% BREASTcancer
 ## Add Lifestyle variables ##
 #############################
 # Define CA/CO status in lifestyle
-ALL.LIFESTYLE$CACO <- factor(ifelse(!ALL.LIFESTYLE$SJLIFEID %in% MENINGIOMA$sjlid, 0, 1))
+ALL.LIFESTYLE$CACO <- factor(ifelse(!ALL.LIFESTYLE$SJLIFEID %in% BREASTcancer$sjlid, 0, 1))
 
 ## Get date (gradedt) and age at diagnosis of SN
-ALL.LIFESTYLE$ANY.SN_gradedate <- MENINGIOMA$gradedt[match(ALL.LIFESTYLE$SJLIFEID, MENINGIOMA$sjlid)]
-ALL.LIFESTYLE$AGE.ANY_SN <- MENINGIOMA$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, MENINGIOMA$sjlid)]
+ALL.LIFESTYLE$ANY.SN_gradedate <- BREASTcancer$gradedt[match(ALL.LIFESTYLE$SJLIFEID, BREASTcancer$sjlid)]
+ALL.LIFESTYLE$AGE.ANY_SN <- BREASTcancer$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, BREASTcancer$sjlid)]
 
 ## In CASES, if age survey is greater than age at diagnosis; NULLIFY the favorable_lifestyle.category. That information is not useful
 ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$agesurvey > ALL.LIFESTYLE$AGE.ANY_SN),
@@ -154,21 +154,17 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.A
 library(expss)
 
 # Getting counts for non-missing data only; 26 samples do not have admixture ancestry
-CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$AMR),]
+CROSS_CASES.df <- PHENO.ANY_SN
 
-CROSS_CASES.df <- CROSS_CASES.df[c("ANY_SN", "smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn",
+CROSS_CASES.df <- CROSS_CASES.df[c("BREASTcancer", "smoker_former_or_never_yn", "PhysicalActivity_yn",
                                    "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")]
 
-CROSS_CASES.df <- apply_labels(CROSS_CASES.df, ANY_SN = "ANY_SN", smoker_never_yn = "smoker_never_yn", 
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df, BREASTcancer = "BREASTcancer", 
                                smoker_former_or_never_yn = "smoker_former_or_never_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
                                NOT_RiskyHeavyDrink_yn = "NOT_RiskyHeavyDrink_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")
 
 as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(ANY_SN, list(smoker_never_yn , smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
-
-
-
-
+                  cross_cases(BREASTcancer, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
 
 ############################
