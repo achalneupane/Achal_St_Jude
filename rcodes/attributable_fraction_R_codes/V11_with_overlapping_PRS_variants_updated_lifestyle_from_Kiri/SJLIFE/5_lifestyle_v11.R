@@ -409,7 +409,7 @@ table(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn)
 # 1613     836    1952
 
 ALL.LIFESTYLE$Not_obese_yn <- bmi_iid_dob_18_uniq$Not_obese_yn[match(ALL.LIFESTYLE$SJLIFEID, bmi_iid_dob_18_uniq$sjlid)]
-ALL.LIFESTYLE$Not_obese_yn_agesurvey <- bmi_iid_dob_18_uniq$agesurvey[match(ALL.LIFESTYLE$SJLIFEID, bmi_iid_dob_18_uniq$sjlid)]
+ALL.LIFESTYLE$Not_obese_yn_agesurvey <- bmi_iid_dob_18_uniq$agebmi[match(ALL.LIFESTYLE$SJLIFEID, bmi_iid_dob_18_uniq$sjlid)]
 ALL.LIFESTYLE$Not_obese_yn[is.na(ALL.LIFESTYLE$Not_obese_yn)] <- "Unknown"
 ALL.LIFESTYLE$Not_obese_yn <- factor(ALL.LIFESTYLE$Not_obese_yn, level = c(1, 0, "Unknown")) 
 table(ALL.LIFESTYLE$Not_obese_yn)
@@ -428,6 +428,6 @@ ALL.LIFESTYLE$HEI2015_TOTAL_SCORE <- HEI2015_iid_dob_18_uniq$HEI2015_TOTAL_SCORE
 ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey <- HEI2015_iid_dob_18_uniq$agesurvey[match(ALL.LIFESTYLE$SJLIFEID, HEI2015_iid_dob_18_uniq$sjlid)]
 
 
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
+# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
 
 # load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
