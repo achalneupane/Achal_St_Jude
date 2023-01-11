@@ -153,8 +153,8 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.A
 ###########################################
 library(expss)
 
-# Getting counts for non-missing data only; 26 samples do not have admixture ancestry
-CROSS_CASES.df <- PHENO.ANY_SN
+# Getting counts for non-missing data only; 6 samples do not have admixture ancestry
+CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
 
 CROSS_CASES.df <- CROSS_CASES.df[c("BREASTcancer", "smoker_former_or_never_yn", "PhysicalActivity_yn",
                                    "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")]
@@ -223,7 +223,7 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx, 3)
-# 0.515
+# 0.405
 ##################
 ## P/LP and PRS ##
 ##################
@@ -236,9 +236,7 @@ dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "respon
 N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
 af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
 round(af_by_plp.prs,3)
-# 0.49
-# 0.496 (Without diet)
-# 0.497 [With HEI 2015 (instead of Diet) and other 4 lifestyle factors]
+# 0.469
 ###############
 ## Lifestyle ##
 ###############
@@ -255,7 +253,7 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_li
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# -0.579
+# -0.599
 
 #################################################
 ## Treatment, Genetics and Lifestyle, combined ##
@@ -286,4 +284,4 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx
 N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
-#  0.708
+#  0.548

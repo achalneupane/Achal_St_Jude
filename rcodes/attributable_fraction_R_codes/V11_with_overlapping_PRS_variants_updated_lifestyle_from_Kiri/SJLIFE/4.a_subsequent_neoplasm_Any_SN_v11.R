@@ -151,8 +151,8 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.A
 ###########################################
 library(expss)
 
-# Getting counts for non-missing data only; 26 samples do not have admixture ancestry
-CROSS_CASES.df <- PHENO.ANY_SN
+# Getting counts for non-missing data only; 6 samples do not have admixture ancestry
+CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
 
 CROSS_CASES.df <- CROSS_CASES.df[c("ANY_SN", "smoker_former_or_never_yn", "PhysicalActivity_yn",
                                    "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")]

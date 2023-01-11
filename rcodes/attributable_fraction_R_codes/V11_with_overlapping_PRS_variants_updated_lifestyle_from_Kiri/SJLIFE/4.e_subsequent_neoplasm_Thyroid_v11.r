@@ -153,8 +153,8 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.A
 ###########################################
 library(expss)
 
-# Getting counts for non-missing data only; 26 samples do not have admixture ancestry
-CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$AMR),]
+# Getting counts for non-missing data only; 6 samples do not have admixture ancestry
+CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
 
 CROSS_CASES.df <- CROSS_CASES.df[c("THYROIDcancer", "smoker_never_yn", "smoker_former_or_never_yn", "PhysicalActivity_yn",
                                    "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")]
@@ -166,22 +166,6 @@ CROSS_CASES.df <- apply_labels(CROSS_CASES.df, THYROIDcancer = "THYROIDcancer", 
 as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(THYROIDcancer, list(smoker_never_yn , smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
-
-
-#################
-## MODEL TESTS ##
-#################
-
-###########################
-## 1. Qin baseline model ##
-###########################
-## SJLIFE (ALL) 
-mod1 <- glm(THYROIDcancer ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxneckrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN)
-summary(mod1)
-
-## SJLIFE (EUR)
-mod1.EUR <- glm(THYROIDcancer ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxneckrtdose.category + epitxn_dose_5.category, family = binomial(link = "logit"), data = PHENO.ANY_SN.EUR)
-summary(mod1.EUR)
 
 ##########################
 dat_all = PHENO.ANY_SN
@@ -263,7 +247,7 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_li
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# 0.026
+# -0.026
 #################################################
 ## Treatment, Genetics and Lifestyle, combined ##
 #################################################
