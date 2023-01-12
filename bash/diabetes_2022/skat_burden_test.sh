@@ -215,4 +215,70 @@ done
 
 
 
-## Stats for PASS variants only
+# Cindy's/ Yadav's email: 1/10/2023
+# Can you please do the following for the diabetes GWAS? I have copied GWAS results for EUR (chr1_22_PCA_eur.assoc.logistic.clean.Psorted.withBETA) and AFR (chr1_22_PCA_afr.assoc.logistic.clean.Psorted.withBETA) in /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/diabetes.
+
+## Run Mr-Mega
+/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/tools/mr_mega/MR-MEGA -h
+
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/diabetes/meta_analysis_with_mr_Mega/v2_with_preQC_VCF
+
+
+R --slave --vanilla --args input=chr1_22_PCA_afr.assoc.logistic.clean.Psorted.withBETA out=outputfilename < /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/tools/mr_mega/fixP.r
+
+
+PHENO: /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/diabetes
+/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/diabetes/SJLIFE_T2D_GWAS_EUR.pheno
+/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/diabetes/SJLIFE_T2D_GWAS_AFR.pheno
+
+
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf.gz.* .
+
+
+## Calculate MAF
+for CHR in {1..22}; do
+plink --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.preQC_biallelic_renamed_ID_edited.vcf.gz --keep AFR_samples_v1.list --freq --out tmp_AFR_filtered_variants_AFR_freq_chr${CHR}
+done
+
+
+
+for CHR in {1..22}; do
+plink --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.preQC_biallelic_renamed_ID_edited.vcf.gz --keep EUR_samples_v1.list --freq --out tmp_EUR_filtered_variants_EUR_freq_chr${CHR}
+done
+
+
+# Run Mr-Mega
+/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/tools/mr_mega/MR-MEGA
+
+
+# ## Request 2 
+# No problem, thanks for your help! To clarify:
+
+# (1) Get all variants with P<5e-6 in the AFR-only analysis
+# (2) Match up variants in (1) with variants also present in the EUR analysis (i.e., replication): put these in an excel file
+# (3) For all variants in (1), please send a rdata file with individual-level data for both AFR and EUR SJLIFE participants (I will find the email I got from Yadav and re-forward it to you so you can match up the variables included)
+
+# Please let me know if this makes sense.
+
+# Thanks,
+# Cindy
+
+
+# for CHR in {1..22}; do
+# awk 'NR==FNR{a[$0];next} {for (i in a) if ($0 ~ i) {print}}' TOP_AFR_vars_5e-06_in_EUR_analysis_VAR_POS.txt /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.preQC_biallelic_renamed_ID_edited.vcf.gz.bim >>  TOP_AFR_vars_5e-06_in_EUR_analysis_VAR_POS_BIM_extract.txt
+# done
+
+cat TOP_AFR_vars_5e-06_in_EUR_analysis_VAR_POS.txt| parallel -j25 'chr=$(grep {} TOP_AFR_vars_5e-06_in_EUR_analysis_VAR_POS.txt|sed "s/chr\([0-9]*\).*/\1/"); cat /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.preQC_biallelic_renamed_ID_edited.vcf.gz.bim | grep -w {}' >> bim_matched_TOP_AFR_vars_5e-06_in_EUR_analysis_VAR_POS.txt
+cut -d$'\t' -f2 bim_matched_TOP_AFR_vars_5e-06_in_EUR_analysis_VAR_POS.txt > extract_snp.list
+
+for chr in {1..22}; do
+plink --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.preQC_biallelic_renamed_ID_edited.vcf.gz --extract extract_snp.list --make-bed --out extract_snp_chr${chr}
+done
+
+
+plink --bfile extract_snp_chr1 --merge-list merge_list --keep-allele-order --out PLINK_TOP_AFR_vars_5e-06_in_EUR_analysis_VAR_POS
+
+## Check which variants match with R
+
+## Recode 
+plink --bfile PLINK_TOP_AFR_vars_5e-06_in_EUR_analysis_VAR_POS --keep-allele-order --recode A --out PLINK_TOP_AFR_vars_5e-06_in_EUR_analysis_VAR_POS_recodeA
