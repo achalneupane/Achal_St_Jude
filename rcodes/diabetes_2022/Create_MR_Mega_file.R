@@ -12,6 +12,8 @@ GWAS$KEY3 <- chartr("ACGT", "TGCA", GWAS$KEY1)
 GWAS$KEY4 <- chartr("ACGT", "TGCA", GWAS$KEY2)
 
 GWAS$MAF <- NA
+GWAS$A1_frq <- NA
+GWAS$A2_frq <- NA
 
 for (i in 1:22){
 FRQ <- fread(paste0("tmp_AFR_filtered_variants_AFR_freq_chr",i,".frq"), header = T)
@@ -59,6 +61,8 @@ GWAS$KEY3 <- chartr("ACGT", "TGCA", GWAS$KEY1)
 GWAS$KEY4 <- chartr("ACGT", "TGCA", GWAS$KEY2)
 
 GWAS$MAF <- NA
+GWAS$A1_frq <- NA
+GWAS$A2_frq <- NA
 
 for (i in 1:22){
   FRQ <- fread(paste0("tmp_EUR_filtered_variants_EUR_freq_chr",i,".frq"), header = T)
@@ -135,7 +139,7 @@ ALL <- merge(GWAS.AFR, GWAS.EUR, by = "SNP", all.x = T)
 dim(ALL)
 # 130 
 
-colnames(ALL) <- gsub(".x","_AUR", colnames(ALL))
+colnames(ALL) <- gsub(".x","_AFR", colnames(ALL))
 colnames(ALL) <- gsub(".y","_EUR", colnames(ALL))
 write.table(ALL, "TOP_AFR_vars_5e-06_in_EUR_analysis.txt", col.names = T, quote = F, row.names = F)
 
@@ -173,3 +177,7 @@ sum(dat_eur$IID %in% row.names(raw))
 # 3102
 dat_eur <- cbind.data.frame(dat_eur, raw[match(dat_eur$IID, row.names(raw)),])
 
+dat_afr_5e_06 <- dat_afr
+dat_eur_5e_06 <- dat_eur
+
+save.image("TOP_AFR_vars_5e-06_in_EUR_analysis.RDATA")
