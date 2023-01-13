@@ -33,15 +33,15 @@ GWAS$MAF[is.na(GWAS$MAF)] <- FRQ$MAF[match(GWAS$KEY2, FRQ$SNP)][is.na(GWAS$MAF)]
 GWAS$MAF[is.na(GWAS$MAF)] <- FRQ$MAF[match(GWAS$KEY3, FRQ$SNP)][is.na(GWAS$MAF)]
 GWAS$MAF[is.na(GWAS$MAF)] <- FRQ$MAF[match(GWAS$KEY4, FRQ$SNP)][is.na(GWAS$MAF)]
 
-GWAS$A1_frq[is.na(GWAS$MAF)] <- FRQ$A1[match(GWAS$KEY1, FRQ$SNP)][is.na(GWAS$A1_frq)]
-GWAS$A1_frq[is.na(GWAS$MAF)] <- FRQ$A1[match(GWAS$KEY2, FRQ$SNP)][is.na(GWAS$A1_frq)]
-GWAS$A1_frq[is.na(GWAS$MAF)] <- FRQ$A1[match(GWAS$KEY3, FRQ$SNP)][is.na(GWAS$A1_frq)]
+GWAS$A1_frq[is.na(GWAS$A1_frq)] <- FRQ$A1[match(GWAS$KEY1, FRQ$SNP)][is.na(GWAS$A1_frq)]
+GWAS$A1_frq[is.na(GWAS$A1_frq)] <- FRQ$A1[match(GWAS$KEY2, FRQ$SNP)][is.na(GWAS$A1_frq)]
+GWAS$A1_frq[is.na(GWAS$A1_frq)] <- FRQ$A1[match(GWAS$KEY3, FRQ$SNP)][is.na(GWAS$A1_frq)]
 GWAS$A1_frq[is.na(GWAS$MAF)] <- FRQ$A1[match(GWAS$KEY4, FRQ$SNP)][is.na(GWAS$A1_frq)]
 
-GWAS$A2_frq[is.na(GWAS$MAF)] <- FRQ$A2[match(GWAS$KEY1, FRQ$SNP)][is.na(GWAS$A2_frq)]
-GWAS$A2_frq[is.na(GWAS$MAF)] <- FRQ$A2[match(GWAS$KEY2, FRQ$SNP)][is.na(GWAS$A2_frq)]
-GWAS$A2_frq[is.na(GWAS$MAF)] <- FRQ$A2[match(GWAS$KEY3, FRQ$SNP)][is.na(GWAS$A2_frq)]
-GWAS$A2_frq[is.na(GWAS$MAF)] <- FRQ$A2[match(GWAS$KEY4, FRQ$SNP)][is.na(GWAS$A2_frq)]
+GWAS$A2_frq[is.na(GWAS$A2_frq)] <- FRQ$A2[match(GWAS$KEY1, FRQ$SNP)][is.na(GWAS$A2_frq)]
+GWAS$A2_frq[is.na(GWAS$A2_frq)] <- FRQ$A2[match(GWAS$KEY2, FRQ$SNP)][is.na(GWAS$A2_frq)]
+GWAS$A2_frq[is.na(GWAS$A2_frq)] <- FRQ$A2[match(GWAS$KEY3, FRQ$SNP)][is.na(GWAS$A2_frq)]
+GWAS$A2_frq[is.na(GWAS$A2_frq)] <- FRQ$A2[match(GWAS$KEY4, FRQ$SNP)][is.na(GWAS$A2_frq)]
 
 print(table(is.na(GWAS$MAF)))
 }
@@ -82,15 +82,15 @@ for (i in 1:22){
   GWAS$MAF[is.na(GWAS$MAF)] <- FRQ$MAF[match(GWAS$KEY3, FRQ$SNP)][is.na(GWAS$MAF)]
   GWAS$MAF[is.na(GWAS$MAF)] <- FRQ$MAF[match(GWAS$KEY4, FRQ$SNP)][is.na(GWAS$MAF)]
   
-  GWAS$A1_frq[is.na(GWAS$MAF)] <- FRQ$A1[match(GWAS$KEY1, FRQ$SNP)][is.na(GWAS$A1_frq)]
-  GWAS$A1_frq[is.na(GWAS$MAF)] <- FRQ$A1[match(GWAS$KEY2, FRQ$SNP)][is.na(GWAS$A1_frq)]
-  GWAS$A1_frq[is.na(GWAS$MAF)] <- FRQ$A1[match(GWAS$KEY3, FRQ$SNP)][is.na(GWAS$A1_frq)]
+  GWAS$A1_frq[is.na(GWAS$A1_frq)] <- FRQ$A1[match(GWAS$KEY1, FRQ$SNP)][is.na(GWAS$A1_frq)]
+  GWAS$A1_frq[is.na(GWAS$A1_frq)] <- FRQ$A1[match(GWAS$KEY2, FRQ$SNP)][is.na(GWAS$A1_frq)]
+  GWAS$A1_frq[is.na(GWAS$A1_frq)] <- FRQ$A1[match(GWAS$KEY3, FRQ$SNP)][is.na(GWAS$A1_frq)]
   GWAS$A1_frq[is.na(GWAS$MAF)] <- FRQ$A1[match(GWAS$KEY4, FRQ$SNP)][is.na(GWAS$A1_frq)]
   
-  GWAS$A2_frq[is.na(GWAS$MAF)] <- FRQ$A2[match(GWAS$KEY1, FRQ$SNP)][is.na(GWAS$A2_frq)]
-  GWAS$A2_frq[is.na(GWAS$MAF)] <- FRQ$A2[match(GWAS$KEY2, FRQ$SNP)][is.na(GWAS$A2_frq)]
-  GWAS$A2_frq[is.na(GWAS$MAF)] <- FRQ$A2[match(GWAS$KEY3, FRQ$SNP)][is.na(GWAS$A2_frq)]
-  GWAS$A2_frq[is.na(GWAS$MAF)] <- FRQ$A2[match(GWAS$KEY4, FRQ$SNP)][is.na(GWAS$A2_frq)]
+  GWAS$A2_frq[is.na(GWAS$A2_frq)] <- FRQ$A2[match(GWAS$KEY1, FRQ$SNP)][is.na(GWAS$A2_frq)]
+  GWAS$A2_frq[is.na(GWAS$A2_frq)] <- FRQ$A2[match(GWAS$KEY2, FRQ$SNP)][is.na(GWAS$A2_frq)]
+  GWAS$A2_frq[is.na(GWAS$A2_frq)] <- FRQ$A2[match(GWAS$KEY3, FRQ$SNP)][is.na(GWAS$A2_frq)]
+  GWAS$A2_frq[is.na(GWAS$A2_frq)] <- FRQ$A2[match(GWAS$KEY4, FRQ$SNP)][is.na(GWAS$A2_frq)]
   
   
   print(table(is.na(GWAS$MAF)))
