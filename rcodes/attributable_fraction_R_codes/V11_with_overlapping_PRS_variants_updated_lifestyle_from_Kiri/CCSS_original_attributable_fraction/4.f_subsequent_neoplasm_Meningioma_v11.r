@@ -43,6 +43,10 @@ MENINGIOMA <- MENINGIOMA[!MENINGIOMA$ccssid %in% subneo.within5$ccssid,]
 nrow(MENINGIOMA)
 # 265
 PHENO.ANY_SN$MENINGIOMA <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% MENINGIOMA$ccssid, 0, 1))
+table(PHENO.ANY_SN$MENINGIOMA)
+# 0    1 
+# 4790  217
+
 PHENO.ANY_SN$AGE.ANY_SN <- MENINGIOMA$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, MENINGIOMA$ccssid)]
 #############################
 ## Add Lifestyle variables ##

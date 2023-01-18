@@ -40,6 +40,10 @@ THYROIDcancer <- THYROIDcancer[!THYROIDcancer$ccssid %in% subneo.within5$ccssid,
 nrow(THYROIDcancer)
 # 152
 PHENO.ANY_SN$THYROIDcancer <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% THYROIDcancer$ccssid, 0, 1))
+table(PHENO.ANY_SN$THYROIDcancer)
+# 0    1 
+# 4882  125 
+
 PHENO.ANY_SN$AGE.ANY_SN <- THYROIDcancer$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, THYROIDcancer$ccssid)]
 #############################
 ## Add Lifestyle variables ##

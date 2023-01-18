@@ -42,6 +42,10 @@ BREASTcancer <- BREASTcancer[!BREASTcancer$ccssid %in% subneo.within5$ccssid,]
 nrow(BREASTcancer)
 # 280
 PHENO.ANY_SN$BREASTcancer <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% BREASTcancer$ccssid, 0, 1))
+table(PHENO.ANY_SN$BREASTcancer)
+# 0    1 
+# 4744  263 
+
 PHENO.ANY_SN$AGE.ANY_SN <- BREASTcancer$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, BREASTcancer$ccssid)]
 #############################
 ## Add Lifestyle variables ##
