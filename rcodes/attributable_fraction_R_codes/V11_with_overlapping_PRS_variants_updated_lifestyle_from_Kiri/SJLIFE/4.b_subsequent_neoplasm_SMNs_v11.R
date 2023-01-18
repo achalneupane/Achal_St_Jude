@@ -133,7 +133,7 @@ for(i in 1:length(HEI.to.categorize)){
 
 table(PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category)
 # 3rd     2nd     1st Unknown 
-# 1179    1179    1181     862
+# 1119    1119    1120    1043 
 
 #########################
 ## Extract Ethnicities ##
