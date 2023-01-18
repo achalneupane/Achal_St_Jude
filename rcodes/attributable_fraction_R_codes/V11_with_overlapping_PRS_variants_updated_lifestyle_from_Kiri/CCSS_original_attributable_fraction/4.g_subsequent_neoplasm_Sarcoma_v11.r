@@ -41,14 +41,12 @@ SARCOMA <- SARCOMA[!SARCOMA$ccssid %in% subneo.within5$ccssid,]
 nrow(SARCOMA)
 # 92
 PHENO.ANY_SN$SARCOMA <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% SARCOMA$ccssid, 0, 1))
-
+PHENO.ANY_SN$AGE.ANY_SN <- SARCOMA$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, SARCOMA$ccssid)]
 #############################
 ## Add Lifestyle variables ##
 #############################
 # Define CA/CO status in lifestyle
 PHENO.ANY_SN$CACO <- PHENO.ANY_SN$SARCOMA
-
-PHENO.ANY_SN$AGE.ANY_SN <- ANY_SNs$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, ANY_SNs$ccssid)]
 
 ## In CASES, if age survey is greater than age at diagnosis; NULLIFY the favorable_lifestyle.category. That information is not useful
 PHENO.ANY_SN[which(PHENO.ANY_SN$CACO == 1 & (PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)), "smoker_former_or_never_yn"] <- NA
