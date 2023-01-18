@@ -41,6 +41,10 @@ SARCOMA <- SARCOMA[!SARCOMA$ccssid %in% subneo.within5$ccssid,]
 nrow(SARCOMA)
 # 92
 PHENO.ANY_SN$SARCOMA <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% SARCOMA$ccssid, 0, 1))
+table(PHENO.ANY_SN$SARCOMA)
+# 0    1 
+# 4921   86 
+
 PHENO.ANY_SN$AGE.ANY_SN <- SARCOMA$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, SARCOMA$ccssid)]
 #############################
 ## Add Lifestyle variables ##
