@@ -1,70 +1,15 @@
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_exp_Genetic_data_P_LP_v11.Rdata")
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/")
+# 
+# CCSS.org.ANY_SN <- PHENO.ANY_SN # CCSS org
+# CCSS.exp.ANY_SN <- PHENO.ANY_SN ## CCSS exp
+# # # sum(colnames(CCSS.org.ANY_SN) == colnames(CCSS.exp.ANY_SN))
+# # 56
+# # Since columns are same, we can simply rbind the dataframes
+# PHENO.ANY_SN <- rbind.data.frame(CCSS.org.ANY_SN, CCSS.exp.ANY_SN)
+# rm(list=setdiff(ls(), c("PHENO.ANY_SN")))
+# save.image("00.PHENO.ANY_SN_CCSS_combined_v11.Rdata")
 
-library(haven)
-library(benchmarkme)
-library(dplyr)
-library(plyr)
-library(data.table)
-library (birk)
-library(gtools)
-library(stringr)
-# library(tidyverse)
-library(lubridate)
-# benchmarkme::get_ram()
-
-
-#########################
-## Subsequent neoplasm ##
-#########################
-subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subneo$agedx
-
-########################################
-# How many SNs after 5 years
-subneo.after5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5,]
-length(unique(subneo.after5$ccssid))
-# 269
-
-subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
-sum(!duplicated(subneo.within5$ccssid))
-# 8
-
-
-#############
-## Any SNs ##
-#############
-# Get SNs for the first time and Age at First SN.
-# For this, I will first sort the table by date
-library(data.table)
-ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
-
-
-# Removing samples with SN within the 5 years of childhood cancer
-ANY_SNs <- ANY_SNs[!ANY_SNs$ccssid %in% subneo.within5$ccssid,]
-dim(ANY_SNs)
-# 268
-
-PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% ANY_SNs$ccssid, 0, 1))
-PHENO.ANY_SN$AGE.ANY_SN <- ANY_SNs$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, ANY_SNs$ccssid)]
-
-#############################
-## Add Lifestyle variables ##
-#############################
-# Define CA/CO status in lifestyle
-PHENO.ANY_SN$CACO <- PHENO.ANY_SN$ANY_SN
-
-
-## In CASES, if age survey is greater than age at diagnosis; NULLIFY the favorable_lifestyle.category. That information is not useful
-PHENO.ANY_SN[which(PHENO.ANY_SN$CACO == 1 & (PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)), "smoker_former_or_never_yn"] <- NA
-PHENO.ANY_SN[which(PHENO.ANY_SN$CACO == 1 & (PHENO.ANY_SN$PhysicalActivity_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)), "PhysicalActivity_yn"] <- NA
-PHENO.ANY_SN[which(PHENO.ANY_SN$CACO == 1 & (PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)), "NOT_RiskyHeavyDrink_yn"] <- NA
-PHENO.ANY_SN[which(PHENO.ANY_SN$CACO == 1 & (PHENO.ANY_SN$Not_obese_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)), "Not_obese_yn"] <- NA
-
-#########################
-## Extract Ethnicities ##
-#########################
-## Add admixture ethnicity 
-ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
-PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$ccssid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.PHENO.ANY_SN_CCSS_combined_v11.Rdata")
 
 
 ######################################
@@ -109,7 +54,7 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx,3)
-# 0.508
+# 0.348
 ##################
 ## P/LP and PRS ##
 ##################
@@ -122,7 +67,7 @@ dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "respon
 N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
 af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
 round(af_by_plp.prs,3)
-# 0.023
+# 0.078
 ###############
 ## Lifestyle ##
 ###############
@@ -137,7 +82,8 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_li
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# -0.031
+# -0.399
+
 #################################################
 ## Treatment, Genetics and Lifestyle, combined ##
 #################################################
@@ -156,13 +102,14 @@ dat_tx.plp.prs.lifestyle$Pleiotropy_PRSWEB_PRS.tertile.category = "1st"
 
 ## Nullify Lifestyle
 dat_tx.plp.prs.lifestyle$smoker_former_or_never_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$smoker_former_or_never_yn)] =
-dat_tx.plp.prs.lifestyle$PhysicalActivity_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$PhysicalActivity_yn)] =
-dat_tx.plp.prs.lifestyle$NOT_RiskyHeavyDrink_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$NOT_RiskyHeavyDrink_yn)] =
-dat_tx.plp.prs.lifestyle$Not_obese_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$Not_obese_yn)] = "1"
+  dat_tx.plp.prs.lifestyle$PhysicalActivity_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$PhysicalActivity_yn)] =
+  dat_tx.plp.prs.lifestyle$NOT_RiskyHeavyDrink_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$NOT_RiskyHeavyDrink_yn)] =
+  dat_tx.plp.prs.lifestyle$Not_obese_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$Not_obese_yn)] = "1"
+
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx.plp.prs.lifestyle, type = "response")
 
 N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
-# 0.487
+# 0.183

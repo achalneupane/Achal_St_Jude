@@ -45,14 +45,12 @@ NMSCs <- NMSCs[!NMSCs$ccssid %in% subneo.within5$ccssid,]
 nrow(NMSCs)
 # 75
 PHENO.ANY_SN$NMSC <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% NMSCs$ccssid, 0, 1))
-
+PHENO.ANY_SN$AGE.ANY_SN <- NMSCs$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, NMSCs$ccssid)]
 #############################
 ## Add Lifestyle variables ##
 #############################
 # Define CA/CO status in lifestyle
 PHENO.ANY_SN$CACO <- PHENO.ANY_SN$NMSC
-
-PHENO.ANY_SN$AGE.ANY_SN <- ANY_SNs$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, ANY_SNs$ccssid)]
 
 ## In CASES, if age survey is greater than age at diagnosis; NULLIFY the favorable_lifestyle.category. That information is not useful
 PHENO.ANY_SN[which(PHENO.ANY_SN$CACO == 1 & (PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)), "smoker_former_or_never_yn"] <- NA

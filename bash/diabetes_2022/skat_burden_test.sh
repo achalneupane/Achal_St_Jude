@@ -250,6 +250,11 @@ done
 # Run Mr-Mega
 /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/tools/mr_mega/MR-MEGA
 
+## RUn on all variants in AFR and EUR
+/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/tools/mr_mega/MR-MEGA -i MR-MEGA.in --gc --pc -1 -o MEGA.FINAL.RESULTS.txt
+## Run on overlapping variants only
+/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/tools/mr_mega/MR-MEGA -i mrmega.input --gc --pc -1 -o MEGA.FINAL.RESULTS_overlapping_vars.txt
+
 
 # ## Request 2 
 # No problem, thanks for your help! To clarify:
@@ -268,6 +273,8 @@ done
 # awk 'NR==FNR{a[$0];next} {for (i in a) if ($0 ~ i) {print}}' TOP_AFR_vars_5e-06_in_EUR_analysis_VAR_POS.txt /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.preQC_biallelic_renamed_ID_edited.vcf.gz.bim >>  TOP_AFR_vars_5e-06_in_EUR_analysis_VAR_POS_BIM_extract.txt
 # done
 
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/diabetes/meta_analysis_with_mr_Mega/v2_with_preQC_VCF
+
 cat TOP_AFR_vars_5e-06_in_EUR_analysis_VAR_POS.txt| parallel -j25 'chr=$(grep {} TOP_AFR_vars_5e-06_in_EUR_analysis_VAR_POS.txt|sed "s/chr\([0-9]*\).*/\1/"); cat /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.preQC_biallelic_renamed_ID_edited.vcf.gz.bim | grep -w {}' >> bim_matched_TOP_AFR_vars_5e-06_in_EUR_analysis_VAR_POS.txt
 cut -d$'\t' -f2 bim_matched_TOP_AFR_vars_5e-06_in_EUR_analysis_VAR_POS.txt > extract_snp.list
 
@@ -282,3 +289,31 @@ plink --bfile extract_snp_chr1 --merge-list merge_list --keep-allele-order --out
 
 ## Recode 
 plink --bfile PLINK_TOP_AFR_vars_5e-06_in_EUR_analysis_VAR_POS --keep-allele-order --recode A --out PLINK_TOP_AFR_vars_5e-06_in_EUR_analysis_VAR_POS_recodeA
+
+
+
+## Try Metasoft
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/diabetes/METASOFT
+module load R
+module load java/1.8.0_66
+./plink2metasoft.py gwas2metasoft_file chr1_22_PCA_afr.assoc.logistic.clean.Psorted.withBETA chr1_22_PCA_eur.assoc.logistic.clean.Psorted.withBETA
+java -jar /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/tools/METASOFT/software-notes-master/docs/files/METASOFT/Metasoft.jar --help
+
+## Use R code: Chunk 4 to create input file
+## METASOFT analysis
+java -jar /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/tools/METASOFT/software-notes-master/docs/files/METASOFT/Metasoft.jar -input METASOFT_input_8899222_overlapping_variants.meta -output metasoft_res
+sed '1s/\#//g' metasoft_res > metasoft_res_edited
+
+
+## Extract 185 SNP not previously sent Rdata, but in meta-analysis with P<5e-06
+for chr in {1..22}; do
+plink --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.preQC_biallelic_renamed_ID_edited.vcf.gz --extract extract_SNPs.txt --make-bed --out extract_snp_chr${chr}
+done
+
+
+plink --bfile extract_snp_chr1 --merge-list merge_list --keep-allele-order --out PLINK_5e-06_meta-analysis_not_in_previous_RDATA
+
+## Check which variants match with R
+
+## Recode 
+plink --bfile PLINK_5e-06_meta-analysis_not_in_previous_RDATA --keep-allele-order --recode A --out PLINK_5e-06_meta-analysis_not_in_previous_RDATA_recodeA

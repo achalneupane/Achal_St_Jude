@@ -103,17 +103,71 @@ save.image("EUR.RData")
 
 ## Prepare MEGA files
 ## EUR
-setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/meta_analysis_with_mr_Mega")
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/meta_analysis_with_mr_Mega/v2_with_preQC_VCF")
 MEGA.1 <- fread("chr1_22_PCA_eur.assoc.logistic.clean.Psorted.withBETA.with.MAF", header = T)
-MEGA.FINAL1 <- cbind.data.frame(MARKERNAME= MEGA.1$SNP, EA= MEGA.1$A1, NEA= MEGA.1$A2,OR = MEGA.1$OR, OR_95L= MEGA.1$L95, OR_95U = MEGA.1$U95, EAF = MEGA.1$MAF, N= 3113, CHROMOSOME = MEGA.1$CHR, POSITION= MEGA.1$BP)
+sum(MEGA.1$A1 == MEGA.1$A1_frq & MEGA.1$A2 == MEGA.1$A2_frq, na.rm = T)
+# 10012741
+sum(MEGA.1$A1 != MEGA.1$A1_frq | MEGA.1$A2 != MEGA.1$A2_frq, na.rm = T)
+# 173540
+sum(MEGA.1$A1 == MEGA.1$A2_frq | MEGA.1$A2 == MEGA.1$A1_frq, na.rm = T)
+# 173540
+## change the maf of those where gwas A1 is not equal to A1 in freq file
+MEGA.1$MAF[which(MEGA.1$A1 == MEGA.1$A2_frq | MEGA.1$A2 == MEGA.1$A1_frq)] <- 1-MEGA.1$MAF[which(MEGA.1$A1 == MEGA.1$A2_frq | MEGA.1$A2 == MEGA.1$A1_frq)]
+
+# MEGA.1$KEY <- paste0(MEGA.1$CHR, ":", MEGA.1$BP, ":", MEGA.1$A2_frq, ":", MEGA.1$A1_frq)
+# MEGA.1.saved <- MEGA.1
+
+MEGA.FINAL1 <- cbind.data.frame(MARKERNAME= MEGA.1$SNP, EA= MEGA.1$A1, NEA= MEGA.1$A2,OR = MEGA.1$OR, OR_95L= MEGA.1$L95, OR_95U = MEGA.1$U95, EAF = MEGA.1$MAF, N= MEGA.1$NMISS, CHROMOSOME = MEGA.1$CHR, POSITION= MEGA.1$BP)
 head(MEGA.FINAL1)
+MEGA.FINAL1 <- MEGA.FINAL1[with(MEGA.FINAL1, order(MEGA.FINAL1$CHROMOSOME, MEGA.FINAL1$POSITION)), ]
 write.table(MEGA.FINAL1, "MEGA.FINAL.EUR.txt", col.names = T, quote = F, row.names = F)
 
 ## AFR
 MEGA.1 <- fread("chr1_22_PCA_afr.assoc.logistic.clean.Psorted.withBETA.with.MAF", header = T)
-MEGA.FINAL2 <- cbind.data.frame(MARKERNAME= MEGA.1$SNP, EA= MEGA.1$A1, NEA= MEGA.1$A2,OR = MEGA.1$OR, OR_95L= MEGA.1$L95, OR_95U = MEGA.1$U95, EAF = MEGA.1$MAF, N= 575, CHROMOSOME = MEGA.1$CHR, POSITION= MEGA.1$BP)
+sum(MEGA.1$A1 == MEGA.1$A1_frq & MEGA.1$A2 == MEGA.1$A2_frq, na.rm = T)
+# 9496105
+sum(MEGA.1$A1 != MEGA.1$A1_frq | MEGA.1$A2 != MEGA.1$A2_frq, na.rm = T)
+# 904628
+sum(MEGA.1$A1 == MEGA.1$A2_frq | MEGA.1$A2 == MEGA.1$A1_frq, na.rm = T)
+# 904628
+sum((MEGA.1$A1 == MEGA.1$A2_frq), na.rm = T)
+# 904628
+## change the maf of those where gwas A1 is not equal to A1 in freq file
+MEGA.1$MAF[which(MEGA.1$A1 == MEGA.1$A2_frq | MEGA.1$A2 == MEGA.1$A1_frq)] <- 1-MEGA.1$MAF[which(MEGA.1$A1 == MEGA.1$A2_frq | MEGA.1$A2 == MEGA.1$A1_frq)]
+
+# MEGA.1$KEY <- paste0(MEGA.1$CHR, ":", MEGA.1$BP, ":", MEGA.1$A2_frq, ":", MEGA.1$A1_frq)
+# MEGA.2.saved <- MEGA.1
+MEGA.FINAL2 <- cbind.data.frame(MARKERNAME= MEGA.1$SNP, EA= MEGA.1$A1, NEA= MEGA.1$A2,OR = MEGA.1$OR, OR_95L= MEGA.1$L95, OR_95U = MEGA.1$U95, EAF = MEGA.1$MAF, N= MEGA.1$NMISS, CHROMOSOME = MEGA.1$CHR, POSITION= MEGA.1$BP)
 head(MEGA.FINAL2)
+MEGA.FINAL2 <- MEGA.FINAL2[with(MEGA.FINAL2, order(MEGA.FINAL2$CHROMOSOME, MEGA.FINAL2$POSITION)), ]
 write.table(MEGA.FINAL2, "MEGA.FINAL.AFR.txt", col.names = T, quote = F, row.names = F)
+
+## KEEP only the common variants between AFR and EUR
+sum(MEGA.FINAL1$MARKERNAME %in% MEGA.FINAL2$MARKERNAME)
+# 8899222
+
+MEGA.FINAL2.common <- MEGA.FINAL2[match(MEGA.FINAL1$MARKERNAME, MEGA.FINAL2$MARKERNAME),]
+MEGA.FINAL2.common<- MEGA.FINAL2.common[!is.na(MEGA.FINAL2.common$MARKERNAME),]
+
+MEGA.FINAL1.common <- MEGA.FINAL1[match(MEGA.FINAL2$MARKERNAME, MEGA.FINAL1$MARKERNAME),]
+MEGA.FINAL1.common<- MEGA.FINAL1.common[!is.na(MEGA.FINAL1.common$MARKERNAME),]
+
+sum(MEGA.FINAL1.common$MARKERNAME %in% MEGA.FINAL2.common$MARKERNAME)
+# 8899222
+
+## Make same order based on SNP ID in both data
+MEGA.FINAL2.common <- MEGA.FINAL2.common[match(MEGA.FINAL1.common$MARKERNAME, MEGA.FINAL2.common$MARKERNAME),]
+
+sum(MEGA.FINAL1.common$MARKERNAME == MEGA.FINAL2.common$MARKERNAME)
+
+write.table(MEGA.FINAL1.common, "MEGA.FINAL.EUR.overlapping.txt", col.names = T, quote = F, row.names = F)
+write.table(MEGA.FINAL2.common, "MEGA.FINAL.AFR.overlapping.txt", col.names = T, quote = F, row.names = F)
+
+
+## Read mega results:
+## Overlapping variants
+MEGA.res <- fread("MEGA.FINAL.RESULTS_overlapping_vars.txt.result", header = T)
+cc <- MEGA.res[which(MEGA.res$`P-value_ancestry_het` < 5e-6),]
 
 
 # ## Request 2
@@ -135,7 +189,7 @@ GWAS.EUR <- GWAS.EUR[GWAS.EUR$CHR.BP %in% GWAS.AFR$CHR.BP,]
 
 GWAS.EUR$Exact.Match.in.AFR <- ifelse(GWAS.EUR$SNP %in% GWAS.AFR$SNP, "Yes", "No")
 
-ALL <- merge(GWAS.AFR, GWAS.EUR, by = "SNP", all.x = T)
+ALL <- cbind.data.frame(GWAS.AFR, GWAS.EUR[match(GWAS.AFR$SNP, GWAS.EUR$SNP),])
 dim(ALL)
 # 130 
 
@@ -179,5 +233,129 @@ dat_eur <- cbind.data.frame(dat_eur, raw[match(dat_eur$IID, row.names(raw)),])
 
 dat_afr_5e_06 <- dat_afr
 dat_eur_5e_06 <- dat_eur
+# remove all that are rare in EUR 
+rare.eur <- c("chr5:98340133:A:ACT", "chr5:98343634:T:C", "chr5:98343890:T:C", "chr5:98343892:C:G", "chr5:98350630:C:G", "chr5:175069792:T:C")
+dim(dat_eur_5e_06)
+sum(!colnames(dat_eur_5e_06) %in% rare.eur)
+# 147
+dat_eur_5e_06 <- dat_eur_5e_06[!colnames(dat_eur_5e_06) %in% rare.eur]
+
+# colnames(dat_afr_5e_06)[!colnames(dat_afr_5e_06) %in% colnames(dat_eur_5e_06)]
 
 save.image("TOP_AFR_vars_5e-06_in_EUR_analysis.RDATA")
+
+## Chunk 4
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/METASOFT")
+## Prepare Metasoft files
+eur.gwas <- fread("chr1_22_PCA_eur.assoc.logistic.clean.Psorted.withBETA", header = T)
+afr.gwas <- fread("chr1_22_PCA_afr.assoc.logistic.clean.Psorted.withBETA", header = T)
+
+sum(eur.gwas$SNP %in% afr.gwas$SNP)
+
+eur.gwas$afrBeta <- afr.gwas$BETA[match(eur.gwas$SNP, afr.gwas$SNP)]
+eur.gwas$afrSE <- afr.gwas$SE[match(eur.gwas$SNP, afr.gwas$SNP)]
+
+
+sum(!is.na(eur.gwas$afrBeta))
+# 8899222
+
+eur.gwas <- eur.gwas[!is.na(eur.gwas$afrBeta),]
+metasoft <- cbind.data.frame(eur.gwas$SNP, eur.gwas$BETA, eur.gwas$SE, eur.gwas$afrBeta, eur.gwas$afrSE)
+write.table(metasoft, "METASOFT_input_8899222_overlapping_variants.meta", col.names = F, quote = F, row.names = F)
+
+
+## Read the METASOFT results
+# metasoft.res <- fread("metasoft_res_edited", header = TRUE, sep = " ")
+# head(metasoft.res)
+
+metasoft.res <- fread("metasoft_res_edited", sep = "\t", header=F)
+header <- c("RSID", "STUDY", "PVALUE_FE", "BETA_FE", "STD_FE", "PVALUE_RE", "BETA_RE", "STD_RE", "PVALUE_RE2", "STAT1_RE2", "STAT2_RE2")
+# header <- c("RSID", "STUDY", "PVALUE_FE", "BETA_FE", "STD_FE", "PVALUE_RE", "BETA_RE", "STD_RE", "PVALUE_RE2", "STAT1_RE2", "STAT2_RE2", "PVALUE_BE", "I_SQUARE", "Q", "PVALUE_Q", "TAU_SQUARE", "PVALUES_OF_STUDIES", "MVALUES_OF_STUDIES")
+length(header)
+metasoft.res <- metasoft.res[,1:11]
+colnames(metasoft.res) <- header 
+head(metasoft.res)
+
+metasoft.res.FE <- metasoft.res[metasoft.res$PVALUE_FE < 5e-6,c("RSID", "PVALUE_FE", "BETA_FE", "STD_FE")]
+metasoft.res.RE <- metasoft.res[metasoft.res$PVALUE_RE < 5e-6,c("RSID", "PVALUE_RE", "BETA_RE", "STD_RE")]
+metasoft.res.RE2 <- metasoft.res[metasoft.res$PVALUE_RE2 < 5e-6, c("RSID", "PVALUE_RE2", "STAT1_RE2", "STAT2_RE2")]
+
+
+
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/Results_final_to_Cindy/TOP_AFR_vars_5e-06_in_EUR_analysis.RDATA")
+metal.FE <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/meta_analysis_with_mr_Mega/v2_with_preQC_VCF/T2D_Meta_analysis_SJLIFE_EUR_and_SJLIFE_AFR_fixed_1.tbl", header = T)
+metal.FE <- metal.FE[metal.FE$`P-value` < 5e-6,]
+
+
+library(purrr)
+library(dplyr)
+merged_df <- reduce(list(metasoft.res.FE, metasoft.res.RE, metasoft.res.RE2), full_join, by = "RSID")
+colnames(merged_df)[1] <- "MarkerName"
+
+merged_df <- reduce(list(merged_df, metal.FE), full_join, by = "MarkerName")
+
+merged_df <- cbind.data.frame(merged_df, eur.gwas[match(merged_df$MarkerName, eur.gwas$SNP),], afr.gwas[match(merged_df$MarkerName, afr.gwas$SNP),])
+
+write.table(merged_df, "METASOFT_FE_RE_RE2_and_metal-FE.meta-analysis.txt", col.names = T, quote = F, row.names = F)
+
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/Results_final_to_Cindy/SJLIFE_T2D_GWAS_data.RData")
+
+old.cols <- unique(c(colnames(dat_afr), colnames(dat_eur)))
+
+old.cols <- old.cols[grepl("^chr", old.cols)]
+
+old.cols <- sub("\\.\\.+..*$", "", old.cols)
+
+HEADER = sub(pattern="_[T,A,G,C,*]+",replacement="", old.cols)
+HEADER = gsub(pattern=";rs\\d+",replacement="",HEADER)
+HEADER = gsub("._...DEL", "",HEADER)
+HEADER = gsub("....DEL.", ".<*:DEL>",HEADER)
+HEADER = gsub("\\.", ":", HEADER)
+  
+
+sum(merged_df$MarkerName %in% unique(c(colnames(dat_afr_5e_06), colnames(dat_eur_5e_06), HEADER)))
+# 33
+
+extract <- merged_df$MarkerName[!merged_df$MarkerName %in% unique(c(colnames(dat_afr_5e_06), colnames(dat_eur_5e_06), HEADER))]
+
+write.table(extract, "extract_SNPs.txt", col.names = F, quote = F, row.names = F)
+
+
+
+## Get genotype of Meta-analysis variants that were not included in previous Rdata
+
+## Get genotype
+raw <- read.table("PLINK_5e-06_meta-analysis_not_in_previous_RDATA_recodeA.raw", header = T)
+rownames(raw) <- raw$IID
+raw <- raw[!grepl("FID|IID|PAT|MAT|SEX|PHENOTYPE", colnames(raw))]
+
+HEADER = sub(pattern="_[T,A,G,C,*]+",replacement="",colnames(raw))
+HEADER = gsub(pattern=";rs\\d+",replacement="",HEADER)
+HEADER = gsub("._...DEL", "",HEADER)
+HEADER = gsub("....DEL.", ".<*:DEL>",HEADER)
+colnames(raw) = gsub("\\.", ":", HEADER)
+
+sum(colnames(raw) %in% merged_df$MarkerName)
+# 185
+
+raw$IID <- rownames(raw)
+meta_analaysis_vars.AFR <- raw[raw$IID %in% dat_afr$IID,]
+meta_analaysis_vars.EUR <- raw[raw$IID %in% dat_eur$IID,]
+
+
+rm(list=setdiff(ls(), c("meta_analaysis_vars.AFR", "meta_analaysis_vars.EUR")))
+save.image("meta-analysis_vars_missed_in_EUR_AFR.RData")
+
+
+
+## Cindy also wanted variants first filtered by AFR-only results with P<5e-06 and extract the corresponding variants from EUR and Meta results?
+colnames(ALL)[1:14] <- paste0(colnames(ALL)[1:14], ".AFR")
+colnames(ALL)[15:30] <- paste0(colnames(ALL)[15:30], ".EUR")
+ALL <- ALL[1:29]
+colnames(ALL)[2] <- "MarkerName"
+colnames(metasoft.res)[1] <- "MarkerName"
+
+
+AFR.TOP <- reduce(list(ALL, metasoft.res, metal.FE), left_join, by = "MarkerName")
+
+write.table(AFR.TOP, "TOP.AFR.only.with.P.5e-06.and.results.from.meta.txt", col.names = T, quote = F, row.names = F)
