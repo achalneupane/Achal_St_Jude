@@ -44,6 +44,9 @@ dim(ANY_SNs)
 # 268
 
 PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% ANY_SNs$ccssid, 0, 1))
+table(PHENO.ANY_SN$ANY_SN)
+# 0    1 
+# 2668  268 
 PHENO.ANY_SN$AGE.ANY_SN <- ANY_SNs$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, ANY_SNs$ccssid)]
 
 #############################

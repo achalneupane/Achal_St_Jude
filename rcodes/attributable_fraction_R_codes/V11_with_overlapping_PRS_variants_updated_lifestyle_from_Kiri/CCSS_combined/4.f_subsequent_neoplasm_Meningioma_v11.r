@@ -98,7 +98,7 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx,3)
-# 0.845
+# 0.799
 ##################
 ## P/LP and PRS ##
 ##################
@@ -126,7 +126,7 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_li
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# 0.027
+# -0.157
 #################################################
 ## Treatment, Genetics and Lifestyle, combined ##
 #################################################
@@ -152,5 +152,5 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx
 N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
-# 0.832
+# 0.786
 

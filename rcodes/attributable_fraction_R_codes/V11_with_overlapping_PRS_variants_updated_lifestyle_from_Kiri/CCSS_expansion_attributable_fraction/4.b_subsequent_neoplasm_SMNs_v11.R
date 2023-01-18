@@ -43,6 +43,10 @@ SMNs <- SMNs[!SMNs$ccssid %in% subneo.within5$ccssid,]
 nrow(SMNs)
 # 262
 PHENO.ANY_SN$SMN <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% SMNs$ccssid, 0, 1))
+table(PHENO.ANY_SN$SMN)
+# 0    1 
+# 2674  262
+
 PHENO.ANY_SN$AGE.ANY_SN <- SMNs$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, SMNs$ccssid)]
 
 #############################
