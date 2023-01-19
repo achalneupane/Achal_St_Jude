@@ -1,12 +1,12 @@
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/")
-CCSS.org.ANY_SN <- PHENO.ANY_SN # CCSS org
-CCSS.exp.ANY_SN <- PHENO.ANY_SN ## CCSS exp
-sum(colnames(CCSS.org.ANY_SN) == colnames(CCSS.exp.ANY_SN))
-# 56
-# Since columns are same, we can simply rbind the dataframes
-PHENO.ANY_SN <- rbind.data.frame(CCSS.org.ANY_SN, CCSS.exp.ANY_SN)
-rm(list=setdiff(ls(), c("PHENO.ANY_SN")))
-save.image("00.PHENO.ANY_BREASTcancer_CCSS_combined_v11.Rdata")
+# CCSS.org.ANY_SN <- PHENO.ANY_SN # CCSS org
+# CCSS.exp.ANY_SN <- PHENO.ANY_SN ## CCSS exp
+# sum(colnames(CCSS.org.ANY_SN) == colnames(CCSS.exp.ANY_SN))
+# # 56
+# # Since columns are same, we can simply rbind the dataframes
+# PHENO.ANY_SN <- rbind.data.frame(CCSS.org.ANY_SN, CCSS.exp.ANY_SN)
+# rm(list=setdiff(ls(), c("PHENO.ANY_SN")))
+# save.image("00.PHENO.ANY_BREASTcancer_CCSS_combined_v11.Rdata")
 
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.PHENO.ANY_BREASTcancer_CCSS_combined_v11.Rdata")
 
