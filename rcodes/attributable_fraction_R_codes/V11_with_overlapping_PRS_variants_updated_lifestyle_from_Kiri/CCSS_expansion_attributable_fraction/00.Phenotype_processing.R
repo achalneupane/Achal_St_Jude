@@ -3,6 +3,7 @@ setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PH
 
 CCSS_data <- read.delim("ExportedCCSS_data.txt", header = T, sep = "\t", stringsAsFactors = F)
 
+
 BMI.PA.SMK.DRK <- read.delim("ExportedCCSS_BMI_PA_Smk_drink.txt", header = T, sep = "\t", stringsAsFactors = F)
 
 BMI.PA.SMK.DRK <- BMI.PA.SMK.DRK[c("ccssid", "a_base", "a_fu1", "a_fu2", "a_fu3", "a_fu2007", "a_fu5", "a_fu6",
@@ -109,6 +110,7 @@ sum(ccss_exp.samples$V2 %in% CCSS_data$ccssid)
 #############################
 ccss_exp <- CCSS_data[CCSS_data$ccssid %in% ccss_exp.samples$V2,]
 
+
 # Obesity
 ccss_exp$BMI <- as.numeric(bmi_iid_dob_18_uniq$bmi[match(ccss_exp$ccssid, bmi_iid_dob_18_uniq$ccssid)])
 ccss_exp$Not_obese_yn_agesurvey <- as.numeric(bmi_iid_dob_18_uniq$age[match(ccss_exp$ccssid, bmi_iid_dob_18_uniq$ccssid)])
@@ -166,10 +168,7 @@ ccss_exp$AGE_AT_LAST_CONTACT <- factor(ccss_exp$AGE_AT_LAST_CONTACT, levels = c(
 
 ccss_exp$gradedt <- as.numeric(ccss_exp$a_candx)
 
-subneo <- ccss_exp
 
-## Subset Pheno data only for ccss_exp
-ccss_exp <- ccss_exp[!duplicated(ccss_exp$ccssid),]
 
 ## Age at last contact (cubic spline)
 source("https://raw.githubusercontent.com/achalneupane/Achal_St_Jude/main/rcodes/cubic_spline.r")
@@ -250,13 +249,21 @@ ccss_exp$maxpelvisrtdose.category <- factor(ccss_exp$pelvisrtgrp, levels = c("No
 
 
 
-PHENO.ANY_SN <- ccss_exp[c('ccssid', 'gender', 'agedx', 'diagnose', 'agelstcontact', 'AGE_AT_DIAGNOSIS',
-  "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", 'd_candx', 'groupdx3', 
-  'a_candx', 'maxchestrtdose.category', 'maxneckrtdose.category', 'maxabdrtdose.category', 'maxsegrtdose.category', 'maxpelvisrtdose.category',
-  'Not_obese_yn_agesurvey', 'Not_obese_yn', 'PhysicalActivity_yn_agesurvey', 'PhysicalActivity_yn', 
-  'smoker_former_or_never_yn_agesurvey', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn_agesurvey', 'NOT_RiskyHeavyDrink_yn', 
-  'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category')]
 
+
+
+PHENO.ANY_SN <- ccss_exp[c('ccssid', 'gender', 'agedx', 'diagnose', 'agelstcontact', 'AGE_AT_DIAGNOSIS', 
+                           "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", 
+                           'maxchestrtdose.category', 'maxneckrtdose.category', 'maxabdrtdose.category', 'maxsegrtdose.category', 'maxpelvisrtdose.category',
+                           'Not_obese_yn_agesurvey', 'Not_obese_yn', 'PhysicalActivity_yn_agesurvey', 'PhysicalActivity_yn', 
+                           'smoker_former_or_never_yn_agesurvey', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn_agesurvey', 'NOT_RiskyHeavyDrink_yn', 
+                           'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category')]
+
+
+# Now KEEP the unique PHENO samples
+sum(duplicated(PHENO.ANY_SN$ccssid))
+# 142
+PHENO.ANY_SN <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$ccssid),]
 
 
 

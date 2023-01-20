@@ -171,10 +171,19 @@ ccss_org$AGE_AT_LAST_CONTACT <- factor(ccss_org$AGE_AT_LAST_CONTACT, levels = c(
 
 ccss_org$gradedt <- as.numeric(ccss_org$a_candx)
 
-subneo <- ccss_org
 
-## Subset Pheno data only for ccss_org
-ccss_org <- ccss_org[!duplicated(ccss_org$ccssid),]
+## Exclude samples already included in SJLIFE (Note all 732 overlaps are in 4401 SJLIFE samples)
+overlaps <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/pheno/SJLIFE_WGS_samples_overlap_with_CCSS_org_SNP_samples.txt", header = T)
+overlaps$ccssid <- paste(overlaps$ccssid, overlaps$ccssid, sep = "_")
+sum(ccss_org$ccssid %in% overlaps$ccssid)
+# 732
+ccss_org <- ccss_org[!ccss_org$ccssid %in% overlaps$ccssid,]
+
+
+
+
+# ## Subset Pheno data only for ccss_org
+# ccss_org <- ccss_org[!duplicated(ccss_org$ccssid),]
 
 ## Age at last contact (cubic spline)
 source("https://raw.githubusercontent.com/achalneupane/Achal_St_Jude/main/rcodes/cubic_spline.r")
@@ -250,17 +259,22 @@ ccss_org$maxabdrtdose.category <- factor(ccss_org$abdomenrtgrp, levels = c("None
 ccss_org$maxsegrtdose.category <- factor(ccss_org$brainrtgrp, levels = c("None", "0-18", "18-30", ">=30", "Unknown"))
 ccss_org$maxpelvisrtdose.category <- factor(ccss_org$pelvisrtgrp, levels = c("None", "0-20", ">=20", "Unknown"))
 
-# table(PHENO.ANY_SN$cisplateq_dose_5.category)
-# table(ccss_org$cisplateq_dose_5.category)
+
+subneo <- ccss_org
 
 
 PHENO.ANY_SN <- ccss_org[c('ccssid', 'gender', 'agedx', 'diagnose', 'agelstcontact', 'AGE_AT_DIAGNOSIS', 
-                           "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", 'd_candx', 'groupdx3', 
-                           'a_candx', 'maxchestrtdose.category', 'maxneckrtdose.category', 'maxabdrtdose.category', 'maxsegrtdose.category', 'maxpelvisrtdose.category',
-                           'Not_obese_yn_agesurvey', 'Not_obese_yn', 'PhysicalActivity_yn_agesurvey', 'PhysicalActivity_yn', 
-                           'smoker_former_or_never_yn_agesurvey', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn_agesurvey', 'NOT_RiskyHeavyDrink_yn', 
-                           'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category')]
+                               "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", 
+                               'maxchestrtdose.category', 'maxneckrtdose.category', 'maxabdrtdose.category', 'maxsegrtdose.category', 'maxpelvisrtdose.category',
+                               'Not_obese_yn_agesurvey', 'Not_obese_yn', 'PhysicalActivity_yn_agesurvey', 'PhysicalActivity_yn', 
+                               'smoker_former_or_never_yn_agesurvey', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn_agesurvey', 'NOT_RiskyHeavyDrink_yn', 
+                               'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category')]
 
+
+# Now KEEP the unique PHENO samples
+sum(duplicated(PHENO.ANY_SN$ccssid))
+# 1662
+PHENO.ANY_SN <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$ccssid),]
 
 
 ################
@@ -334,11 +348,10 @@ for(i in 1:length(PRS.to.categorize)){
 
 
 
-## Exclude samples already included in SJLIFE (Note all 732 overlaps are in 4401 SJLIFE samples)
-overlaps <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/pheno/SJLIFE_WGS_samples_overlap_with_CCSS_org_SNP_samples.txt", header = T)
-overlaps$ccssid <- paste(overlaps$ccssid, overlaps$ccssid, sep = "_")
-sum(PHENO.ANY_SN$ccssid %in% overlaps$ccssid)
-# 732
-PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% overlaps$ccssid,]
+
+
+
+
+
 
 # save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_org_Genetic_data_P_LP_v11.Rdata")

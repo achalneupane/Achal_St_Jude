@@ -22,11 +22,11 @@ subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subne
 # How many SNs after 5 years
 subneo.after5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5,]
 length(unique(subneo.after5$ccssid))
-# 1551
+# 1351
 
 subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
 sum(!duplicated(subneo.within5$ccssid))
-# 25
+# 19
 
 
 #############
@@ -35,17 +35,19 @@ sum(!duplicated(subneo.within5$ccssid))
 SARCOMA <- subneo[grepl("sarcoma", subneo$groupdx3, ignore.case = T),]
 SARCOMA <- setDT(SARCOMA)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
 nrow(SARCOMA)
-# 97
+# 89
 # Removing samples with SNs within 5 years of childhood cancer
 SARCOMA <- SARCOMA[!SARCOMA$ccssid %in% subneo.within5$ccssid,]
 nrow(SARCOMA)
-# 92
+# 86
 PHENO.ANY_SN$SARCOMA <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% SARCOMA$ccssid, 0, 1))
 table(PHENO.ANY_SN$SARCOMA)
 # 0    1 
 # 4921   86 
 
+
 PHENO.ANY_SN$AGE.ANY_SN <- SARCOMA$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, SARCOMA$ccssid)]
+PHENO.ANY_SN$ANY_SN_TYPE <- SARCOMA$groupdx3[match(PHENO.ANY_SN$ccssid, SARCOMA$ccssid)]
 #############################
 ## Add Lifestyle variables ##
 #############################
@@ -58,6 +60,7 @@ PHENO.ANY_SN[which(PHENO.ANY_SN$CACO == 1 & (PHENO.ANY_SN$PhysicalActivity_yn_ag
 PHENO.ANY_SN[which(PHENO.ANY_SN$CACO == 1 & (PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)), "NOT_RiskyHeavyDrink_yn"] <- NA
 PHENO.ANY_SN[which(PHENO.ANY_SN$CACO == 1 & (PHENO.ANY_SN$Not_obese_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)), "Not_obese_yn"] <- NA
 
+# SARCOMA.2 <- PHENO.ANY_SN[PHENO.ANY_SN$SARCOMA == 1,]
 #########################
 ## Extract Ethnicities ##
 #########################

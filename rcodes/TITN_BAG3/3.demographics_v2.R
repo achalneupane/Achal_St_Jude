@@ -2,6 +2,8 @@
 ## Function to create demographic ##
 ####################################
 ## NOTE: CCSS CHF data is based on self-report so ejection fraction is not available.
+# df <- df
+# n = nrow(df)
 
 get_demographic <- function(df, n){
 ## Ejection fraction
@@ -183,9 +185,13 @@ colnames(ccss_exp) [match(c("a_dx", "a_end", "SEX", "anth_DED", "HeartAvg", "CMP
 
 ccss_exp$agevent <- ccss_age_CHF$a_maxCHF15 [match(ccss_exp$IID, ccss_age_CHF$ccssid)]
 
+## Remove younger cases <5 years
+ccss_exp.ca.remove <- ccss_exp[(ccss_exp$agevent - ccss_exp$agedx < 5) & ccss_exp$CMP == 2,]
+
 
 # ccss_org_CMP2plus_CA <- sum(ccss_org$CMP == 2)
-df <- ccss_exp[ccss_exp$CMP == 2,] # With CMP (Cases)
+# df <- ccss_exp[ccss_exp$CMP == 2,] # With CMP (Cases)
+df <- ccss_exp[(ccss_exp$agevent - ccss_exp$agedx > 5) & ccss_exp$CMP == 2,]
 df <- ccss_exp[ccss_exp$CMP == 1,] # Without CMP (Controls)
 
 ## N
