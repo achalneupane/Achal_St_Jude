@@ -22,11 +22,11 @@ subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subne
 # How many SNs after 5 years
 subneo.after5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5,]
 length(unique(subneo.after5$ccssid))
-# 1551
+# 1351
 
 subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
 sum(!duplicated(subneo.within5$ccssid))
-# 25
+# 19
 
 
 
@@ -38,12 +38,12 @@ sum(!duplicated(subneo.within5$ccssid))
 NMSCs <- subneo[grepl("skin", subneo$groupdx3, ignore.case = T),]
 NMSCs <- setDT(NMSCs)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
 nrow(NMSCs)
-# 75
+# 70
 
 # Removing samples with SNs within 5 years of childhood cancer
 NMSCs <- NMSCs[!NMSCs$ccssid %in% subneo.within5$ccssid,]
 nrow(NMSCs)
-# 75
+# 70
 PHENO.ANY_SN$NMSC <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% NMSCs$ccssid, 0, 1))
 table(PHENO.ANY_SN$NMSC)
 # 0    1 
@@ -117,7 +117,7 @@ dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "respon
 N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
 af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
 round(af_by_plp.prs,3)
-# 0.291
+# 0.293
 ###############
 ## Lifestyle ##
 ###############
@@ -132,7 +132,7 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_li
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# -0.333
+# -0.332
 #################################################
 ## Treatment, Genetics and Lifestyle, combined ##
 #################################################

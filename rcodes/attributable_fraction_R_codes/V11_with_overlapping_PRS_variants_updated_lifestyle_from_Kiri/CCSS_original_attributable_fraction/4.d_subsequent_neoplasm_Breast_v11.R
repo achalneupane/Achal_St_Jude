@@ -22,11 +22,11 @@ subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subne
 # How many SNs after 5 years
 subneo.after5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5,]
 length(unique(subneo.after5$ccssid))
-# 1551
+# 1351
 
 subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
 sum(!duplicated(subneo.within5$ccssid))
-# 25
+# 19
 
 
 ###################
@@ -35,12 +35,12 @@ sum(!duplicated(subneo.within5$ccssid))
 BREASTcancer <- subneo[grepl("breast", subneo$groupdx3, ignore.case = T),]
 BREASTcancer <- setDT(BREASTcancer)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
 nrow(BREASTcancer)
-# 283
+# 264
 
 # Removing samples with SNs within 5 years of childhood cancer
 BREASTcancer <- BREASTcancer[!BREASTcancer$ccssid %in% subneo.within5$ccssid,]
 nrow(BREASTcancer)
-# 280
+# 263
 PHENO.ANY_SN$BREASTcancer <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% BREASTcancer$ccssid, 0, 1))
 table(PHENO.ANY_SN$BREASTcancer)
 # 0    1 
@@ -107,7 +107,7 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx, 3)
-# 0.53
+# 0.532
 ##################
 ## P/LP and PRS ##
 ##################
@@ -135,7 +135,7 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_li
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# -0.041
+# -0.042
 #################################################
 ## Treatment, Genetics and Lifestyle, combined ##
 #################################################
@@ -163,4 +163,4 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx
 N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
-# 0.748
+# 0.749
