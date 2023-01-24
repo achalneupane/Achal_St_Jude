@@ -375,3 +375,16 @@ plink --bfile TITN_sjlife.0.01maf_overlapping --extract TITN.1.per.maf.gnomad.AL
 plink --bfile TITN_sjlife.0.01maf_overlapping --extract TITN.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.REVEL.txt --recode A --out TITN_sjlife.0.01maf_overlapping.clinvar.lof.REVEL_recodeA
 plink --bfile BAG3_sjlife.0.01maf_overlapping --extract BAG3.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.txt --recode A --out BAG3_sjlife.0.01maf_overlapping.clinvar.lof_recodeA
 plink --bfile BAG3_sjlife.0.01maf_overlapping --extract BAG3.1.per.maf.gnomad.ALL.and.NFE.clinvar.lof.REVEL.txt --recode A --out BAG3_sjlife.0.01maf_overlapping.clinvar.lof.REVEL_recodeA
+
+
+
+############################################################################################################################
+## Repeat analysis for CCSS expansion (with CCM) excluding samples within 5 years of elapsed years from cancers diagnosis ##
+############################################################################################################################
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3
+
+# samples to remove Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/ccss_exp.young.CA.to.remove.txt
+
+# Run GWAS: run_gwas_ccss_with_elapsed_age_5yrs.sh
+# Run meta-analysis
+

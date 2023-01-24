@@ -188,6 +188,9 @@ ccss_exp$agevent <- ccss_age_CHF$a_maxCHF15 [match(ccss_exp$IID, ccss_age_CHF$cc
 ## Remove younger cases <5 years
 ccss_exp.ca.remove <- ccss_exp[(ccss_exp$agevent - ccss_exp$agedx < 5) & ccss_exp$CMP == 2,]
 
+write.table(ccss_exp.ca.remove[1:2], "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/ccss_exp.young.CA.to.remove.txt", row.names = F, col.names = T, quote = F)
+
+
 
 # ccss_org_CMP2plus_CA <- sum(ccss_org$CMP == 2)
 # df <- ccss_exp[ccss_exp$CMP == 2,] # With CMP (Cases)

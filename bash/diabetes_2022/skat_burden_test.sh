@@ -317,3 +317,26 @@ plink --bfile extract_snp_chr1 --merge-list merge_list --keep-allele-order --out
 
 ## Recode 
 plink --bfile PLINK_5e-06_meta-analysis_not_in_previous_RDATA --keep-allele-order --recode A --out PLINK_5e-06_meta-analysis_not_in_previous_RDATA_recodeA
+
+## Folloup_jan_24_2023
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/diabetes/followup_jan_24_2023
+
+for chr in 5 12; do
+plink --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.preQC_biallelic_renamed_ID_edited.vcf.gz --extract extract_SNP.list --make-bed --out extract_snp_chr${chr}
+done
+
+plink --bfile extract_snp_chr5 --bmerge extract_snp_chr12 --keep-allele-order --out followup_24_2023
+
+
+
+plink --bfile followup_24_2023 --keep AFR_samples.list --freq --out followup_24_2023_AFR_freq
+plink --bfile followup_24_2023 --keep EUR_samples.list --freq --out followup_24_2023_EUR_freq
+
+
+
+## Get individual genotype data
+plink --bfile followup_24_2023 --keep AFR_samples.list --keep-allele-order --make-bed --out folowup_24_2023_AFR
+plink --bfile followup_24_2023 --keep EUR_samples.list --keep-allele-order --make-bed --out folowup_24_2023_EUR
+
+plink --bfile folowup_24_2023_AFR --keep-allele-order --recode A --out folowup_24_2023_AFR_recodeA
+plink --bfile folowup_24_2023_EUR --keep-allele-order --recode A --out folowup_24_2023_EUR_recodeA
