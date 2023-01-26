@@ -12,7 +12,12 @@ library(stringr)
 library(lubridate)
 # benchmarkme::get_ram()
 
+## Read file from Qi
+data1 = read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_from_Qi_Liu/sns2022.sas7bdat")
+data1=as.data.frame(data1)
+data1$ccssid <- paste0(data1$ccssid,"_", data1$ccssid)
 
+sum(subneo$ccssid %in% data1$ccssid)
 #########################
 ## Subsequent neoplasm ##
 #########################
