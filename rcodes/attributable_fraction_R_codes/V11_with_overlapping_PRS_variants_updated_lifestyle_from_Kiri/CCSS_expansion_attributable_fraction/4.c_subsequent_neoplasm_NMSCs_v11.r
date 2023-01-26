@@ -12,10 +12,30 @@ library(stringr)
 library(lubridate)
 # benchmarkme::get_ram()
 
+## Read NMSC data from Qi
+data1 = read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_from_Qi_Liu/sns2022.sas7bdat")
+data1=as.data.frame(data1)
+# data1$ccssid <- paste0(data1$ccssid, "_", data1$ccssid)
+data1$KEY <- paste0(data1$ccssid,":",data1$d_candx)
+
 
 #########################
 ## Subsequent neoplasm ##
 #########################
+## ADD NMSC from Qi
+subneo$d_candx <- as.Date(subneo$d_candx, format = "%d%b%Y")
+subneo$KEY <- paste0(subneo$ccssid,":",subneo$d_candx)
+table(subneo$KEY %in% data1$KEY)
+# FALSE  TRUE 
+# 2661   417
+table(data1$KEY %in% subneo$KEY)
+# FALSE  TRUE 
+# 8529   534
+subneo$nmsc <- data1$nmsc[match(subneo$KEY, data1$KEY)]
+
+# cc <- cbind.data.frame(subneo$KEY, subneo$nmsc, subneo$AGE.ANY_SN, subneo$groupdx3)
+
+# Now get age of SN after first cancer
 subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subneo$agedx
 
 ########################################
@@ -29,28 +49,29 @@ sum(!duplicated(subneo.within5$ccssid))
 # 8
 
 
-
-
 ###########
 ## NMSCs ##
 ###########
 # This will include basal cell, squamous cell and melanoma
-NMSCs <- subneo[grepl("skin", subneo$groupdx3, ignore.case = T),]
+
+NMSCs <- subneo[which((subneo$nmsc ==1| (subneo$nmsc == 2 & subneo$groupdx3 == "Skin"))),]
+# cc <- cbind.data.frame(NMSC$KEY, NMSC$nmsc, NMSC$AGE.ANY_SN, NMSC$groupdx3)
+
+# NMSCs <- subneo[grepl("skin", subneo$groupdx3, ignore.case = T),]
 NMSCs <- setDT(NMSCs)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
 nrow(NMSCs)
-# 11
+# 97
 
 # Removing samples with SNs within 5 years of childhood cancer
 NMSCs <- NMSCs[!NMSCs$ccssid %in% subneo.within5$ccssid,]
 nrow(NMSCs)
-# 11
+# 97
 PHENO.ANY_SN$NMSC <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% NMSCs$ccssid, 0, 1))
 table(PHENO.ANY_SN$NMSC)
 # 0    1 
-# 2925   11 
+# 2839   97 
 
 PHENO.ANY_SN$AGE.ANY_SN <- NMSCs$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, NMSCs$ccssid)]
-
 #############################
 ## Add Lifestyle variables ##
 #############################
@@ -107,7 +128,7 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx,3)
-# 0.133
+# 0.233
 ##################
 ## P/LP and PRS ##
 ##################
@@ -120,7 +141,7 @@ dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "respon
 N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
 af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
 round(af_by_plp.prs,3)
-# 0.14
+# 0.21
 ###############
 ## Lifestyle ##
 ###############
@@ -135,7 +156,7 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_li
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# -0.764
+# -0.205
 #################################################
 ## Treatment, Genetics and Lifestyle, combined ##
 #################################################
@@ -164,5 +185,5 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx
 N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
-# -0.096
+# 0.288
 

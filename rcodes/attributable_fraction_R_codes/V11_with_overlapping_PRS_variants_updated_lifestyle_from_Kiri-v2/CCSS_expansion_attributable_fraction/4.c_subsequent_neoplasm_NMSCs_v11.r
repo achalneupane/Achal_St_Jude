@@ -12,10 +12,30 @@ library(stringr)
 library(lubridate)
 # benchmarkme::get_ram()
 
+## Read NMSC data from Qi
+data1 = read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_from_Qi_Liu/sns2022.sas7bdat")
+data1=as.data.frame(data1)
+# data1$ccssid <- paste0(data1$ccssid, "_", data1$ccssid)
+data1$KEY <- paste0(data1$ccssid,":",data1$d_candx)
+
 
 #########################
 ## Subsequent neoplasm ##
 #########################
+## ADD NMSC from Qi
+subneo$d_candx <- as.Date(subneo$d_candx, format = "%d%b%Y")
+subneo$KEY <- paste0(subneo$ccssid,":",subneo$d_candx)
+table(subneo$KEY %in% data1$KEY)
+# FALSE  TRUE 
+# 2661   417
+table(data1$KEY %in% subneo$KEY)
+# FALSE  TRUE 
+# 8529   534
+subneo$nmsc <- data1$nmsc[match(subneo$KEY, data1$KEY)]
+
+# cc <- cbind.data.frame(subneo$KEY, subneo$nmsc, subneo$AGE.ANY_SN, subneo$groupdx3)
+
+# Now get age of SN after first cancer
 subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subneo$agedx
 
 ########################################
@@ -29,28 +49,29 @@ sum(!duplicated(subneo.within5$ccssid))
 # 8
 
 
-
-
 ###########
 ## NMSCs ##
 ###########
 # This will include basal cell, squamous cell and melanoma
-NMSCs <- subneo[grepl("skin", subneo$groupdx3, ignore.case = T),]
+
+NMSCs <- subneo[which((subneo$nmsc ==1| (subneo$nmsc == 2 & subneo$groupdx3 == "Skin"))),]
+# cc <- cbind.data.frame(NMSC$KEY, NMSC$nmsc, NMSC$AGE.ANY_SN, NMSC$groupdx3)
+
+# NMSCs <- subneo[grepl("skin", subneo$groupdx3, ignore.case = T),]
 NMSCs <- setDT(NMSCs)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
 nrow(NMSCs)
-# 11
+# 97
 
 # Removing samples with SNs within 5 years of childhood cancer
 NMSCs <- NMSCs[!NMSCs$ccssid %in% subneo.within5$ccssid,]
 nrow(NMSCs)
-# 11
+# 97
 PHENO.ANY_SN$NMSC <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% NMSCs$ccssid, 0, 1))
 table(PHENO.ANY_SN$NMSC)
 # 0    1 
-# 2925   11 
+# 2839   97 
 
 PHENO.ANY_SN$AGE.ANY_SN <- NMSCs$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, NMSCs$ccssid)]
-
 #############################
 ## Add Lifestyle variables ##
 #############################
