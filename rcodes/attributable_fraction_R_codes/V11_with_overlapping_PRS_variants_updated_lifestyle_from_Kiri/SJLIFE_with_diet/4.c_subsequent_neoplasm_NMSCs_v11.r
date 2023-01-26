@@ -225,18 +225,18 @@ round(af_by_plp.prs,3)
 ###############
 dat_lifestyle = dat_all
 
-dat_lifestyle$smoker_former_or_never_yn =
-dat_lifestyle$PhysicalActivity_yn =
-dat_lifestyle$NOT_RiskyHeavyDrink_yn =
-dat_lifestyle$HEALTHY_Diet_yn =
-dat_lifestyle$Not_obese_yn = "1"
+dat_lifestyle$smoker_former_or_never_yn [!grepl("Unknown", dat_lifestyle$smoker_former_or_never_yn)] =
+dat_lifestyle$PhysicalActivity_yn [!grepl("Unknown", dat_lifestyle$PhysicalActivity_yn)] =
+dat_lifestyle$NOT_RiskyHeavyDrink_yn [!grepl("Unknown", dat_lifestyle$NOT_RiskyHeavyDrink_yn)] =
+dat_lifestyle$HEALTHY_Diet_yn [!grepl("Unknown", dat_lifestyle$HEALTHY_Diet_yn)] =
+dat_lifestyle$Not_obese_yn [!grepl("Unknown", dat_lifestyle$Not_obese_yn)] = "1"
 
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# 0.628
+# -0.247
 
 #################################################
 ## Treatment, Genetics and Lifestyle, combined ##
@@ -245,9 +245,9 @@ round(af_by_N_no_favorable_lifestyle.category,3)
 dat_tx.plp.prs.lifestyle = dat_all
 
 ## Nullify Treatment
-dat_tx.plp.prs.lifestyle$maxsegrtdose.category =
-  dat_tx.plp.prs.lifestyle$maxabdrtdose.category =
-  dat_tx.plp.prs.lifestyle$maxpelvisrtdose.category = "None"
+dat_tx.plp.prs.lifestyle$maxsegrtdose.category [!grepl("Unknown", dat_tx.plp.prs.lifestyle$maxsegrtdose.category)] =
+  dat_tx.plp.prs.lifestyle$maxabdrtdose.category [!grepl("Unknown", dat_tx.plp.prs.lifestyle$maxabdrtdose.category)] =
+  dat_tx.plp.prs.lifestyle$maxpelvisrtdose.category [!grepl("Unknown", dat_tx.plp.prs.lifestyle$maxpelvisrtdose.category)] = "None"
 
 
 ## Nullify Genetics
@@ -255,11 +255,11 @@ dat_tx.plp.prs.lifestyle$maxsegrtdose.category =
 dat_tx.plp.prs.lifestyle$SQUAMOUScell_PRS.tertile.category = dat_tx.plp.prs.lifestyle$BASALcell_PRS.tertile.category = "1st"
 
 ## Nullify Lifestyle
-dat_tx.plp.prs.lifestyle$smoker_former_or_never_yn =
-  dat_tx.plp.prs.lifestyle$PhysicalActivity_yn =
-  dat_tx.plp.prs.lifestyle$NOT_RiskyHeavyDrink_yn =
-  dat_tx.plp.prs.lifestyle$HEALTHY_Diet_yn =
-  dat_tx.plp.prs.lifestyle$Not_obese_yn = "1"
+dat_tx.plp.prs.lifestyle$smoker_former_or_never_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$smoker_former_or_never_yn)] =
+  dat_tx.plp.prs.lifestyle$PhysicalActivity_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$PhysicalActivity_yn)] =
+  dat_tx.plp.prs.lifestyle$NOT_RiskyHeavyDrink_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$NOT_RiskyHeavyDrink_yn)] =
+  dat_tx.plp.prs.lifestyle$HEALTHY_Diet_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$HEALTHY_Diet_yn)] =
+  dat_tx.plp.prs.lifestyle$Not_obese_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$Not_obese_yn)] = "1"
 
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx.plp.prs.lifestyle, type = "response")
@@ -267,4 +267,4 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx
 N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
-# 0.856
+# 0.184
