@@ -174,7 +174,7 @@ dat_all = PHENO.ANY_SN
 fit_all = glm(formula = THYROIDcancer ~ Thyroid_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + maxneckrtdose.category + epitxn_dose_5.category + 
-                smoker_former_or_never_yn + PhysicalActivity_yn + NOT_RiskyHeavyDrink_yn + Not_obese_yn +
+                # smoker_former_or_never_yn + PhysicalActivity_yn + NOT_RiskyHeavyDrink_yn + Not_obese_yn +
                 EAS + AFR,
               family = binomial,
               data = dat_all)
@@ -220,7 +220,7 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx,3)
-# 0.553
+# 0.721
 ##################
 ## P/LP and PRS ##
 ##################
@@ -233,7 +233,7 @@ dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "respon
 N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
 af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
 round(af_by_plp.prs,3)
-# 0.343
+# 0.506
 ###############
 ## Lifestyle ##
 ###############
@@ -249,7 +249,7 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_li
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# 0.889
+# 0
 #################################################
 ## Treatment, Genetics and Lifestyle, combined ##
 #################################################
@@ -279,7 +279,7 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx
 N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
-# 0.988
+# 0.87
 
 # PAFs can sum to more than 1 because some individuals with more than one risk
 # factor can have disease prevented in more than one way, and the prevented
