@@ -139,6 +139,8 @@ ALL.LIFESTYLE <- ALL.LIFESTYLE[-which((ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$s
 
 PHENO.ANY_SN <- PHENO.ANY_SN[PHENO.ANY_SN$sjlid %in% ALL.LIFESTYLE$SJLIFEID,]
 table(PHENO.ANY_SN$ANY_SN)
+# 0    1 
+# 3097  151 
 #############################
 ## Addd lifestyle to Pheno ##
 #############################
@@ -337,4 +339,4 @@ round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 
 SN.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
 SN.res
-# 0.315 0.063 0.755 0.899
+# 0.474 0.043 0.483 0.756

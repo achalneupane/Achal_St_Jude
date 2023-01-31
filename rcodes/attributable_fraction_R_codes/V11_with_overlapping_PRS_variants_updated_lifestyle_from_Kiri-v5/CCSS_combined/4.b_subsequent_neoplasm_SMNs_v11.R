@@ -24,8 +24,8 @@ PHENO.ANY_SN <- PHENO.ANY_SN[!(PHENO.ANY_SN$smoker_former_or_never_yn == "Unknow
                                  PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn == "Unknown" &
                                  PHENO.ANY_SN$Not_obese_yn == "Unknown" ),]
 
-# dim(PHENO.ANY_SN)
-# 7661   53
+dim(PHENO.ANY_SN)
+# 7667   53
 
 sum((PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey >= 18|
        PHENO.ANY_SN$PhysicalActivity_yn_agesurvey >= 18|
@@ -44,31 +44,29 @@ PHENO.ANY_SN <- PHENO.ANY_SN[which(PHENO.ANY_SN$smoker_former_or_never_yn_agesur
 
 
 ## SN diagnosis after survey age
-# sum(((PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)|
-#   (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$PhysicalActivity_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)|
-#   (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)|
-#   (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$Not_obese_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)), na.rm = T)
-
-sum(((PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)&
-       (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$PhysicalActivity_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)&
-       (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)&
+sum(((PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)|
+       (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$PhysicalActivity_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)|
+       (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)|
        (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$Not_obese_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)), na.rm = T)
-# 0
+# 589
 
-# PHENO.ANY_SN <- PHENO.ANY_SN[-which((PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)|
-#     (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$PhysicalActivity_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)|
-#     (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)|
-#     (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$Not_obese_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)),]
+# sum(((PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)&
+#        (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$PhysicalActivity_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)&
+#        (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)&
+#        (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$Not_obese_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)), na.rm = T)
 
-PHENO.ANY_SN <- PHENO.ANY_SN[!((PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)&
-                                 (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$PhysicalActivity_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)&
-                                 (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)&
-                                 (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$Not_obese_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)),]
+PHENO.ANY_SN <- PHENO.ANY_SN[-which((PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)|
+                                      (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$PhysicalActivity_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)|
+                                      (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)|
+                                      (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$Not_obese_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)),]
 
-# PHENO.ANY_SN <- PHENO.ANY_SN[PHENO.ANY_SN$sjlid %in% PHENO.ANY_SN$SJLIFEID,]
+# PHENO.ANY_SN <- PHENO.ANY_SN[!((PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)&
+#                                         (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$PhysicalActivity_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)&
+#                                         (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)&
+#                                         (PHENO.ANY_SN$CACO == 1 & PHENO.ANY_SN$Not_obese_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)),]
 table(PHENO.ANY_SN$SMN)
 # 0    1 
-# 6291 1376 
+# 6291  787 
 
 ######################################
 ## Attributable fraction of Any SNs ##
@@ -171,4 +169,4 @@ round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 
 SMN.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
 SMN.res
-# 0.291 0.063 0.274 0.601
+# 0.379  0.078 -0.078  0.385
