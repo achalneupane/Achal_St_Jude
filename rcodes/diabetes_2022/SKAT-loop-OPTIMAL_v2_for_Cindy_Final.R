@@ -320,7 +320,7 @@ chrALL.2.exposed <- NULL
 for (j in 1:length(treatments)){
   
   # subset data
-  com.data.sub <- com.data[com.data[treatments[j]] == "0"  ,] # Not exposed to treatment
+  com.data.sub <- com.data[com.data[treatments[j]] == "1"  ,] # Exposed to treatment
   
   
   genelist<-"GENE"
@@ -399,7 +399,7 @@ chrALL.2.not.exposed <- NULL
 for (j in 1:length(treatments)){
   
   # subset data
-  com.data.sub <- com.data[com.data[treatments[j]] == "1"  ,] # exposed to treatment
+  com.data.sub <- com.data[com.data[treatments[j]] == "0"  ,] # Not exposed to treatment
   
   
   genelist<-"GENE"
