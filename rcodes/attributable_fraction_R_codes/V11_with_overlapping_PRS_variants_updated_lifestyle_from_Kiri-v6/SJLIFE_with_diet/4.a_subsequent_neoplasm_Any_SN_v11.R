@@ -57,32 +57,51 @@ sum(!duplicated(subneo.within5$sjlid))
 subneo <- subneo[subneo$AGE.ANY_SN >= 18,]
 
 
+ALL.LIFESTYLE[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
+                "Not_obese_yn_agesurvey", "HEALTHY_Diet_yn_agesurvey")] <- sapply(ALL.LIFESTYLE[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
+                "Not_obese_yn_agesurvey", "HEALTHY_Diet_yn_agesurvey")], floor)
+
 ALL.LIFESTYLE$SURVEY_MIN <- apply(ALL.LIFESTYLE[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
-                                                        "Not_obese_yn_agesurvey", "HEALTHY_Diet_yn_agesurvey")], 1, min)
+                                                  "Not_obese_yn_agesurvey", "HEALTHY_Diet_yn_agesurvey")], 1, min)
 
 # Anyone before the first survey, remove them
 subneo$survey_First <- ALL.LIFESTYLE$SURVEY_MIN[match(subneo$sjlid,ALL.LIFESTYLE$SJLIFEID)]
 table(subneo$survey_First > subneo$AGE.ANY_SN)
 # FALSE  TRUE 
-# 912   615
+# 948   579 
+
+## Anyone not on the first survey age
+# ALL.LIFESTYLE[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
+#                 "Not_obese_yn_agesurvey", "HEALTHY_Diet_yn_agesurvey")] [ALL.LIFESTYLE[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey", 
+#                  "Not_obese_yn_agesurvey", "HEALTHY_Diet_yn_agesurvey")] != ALL.LIFESTYLE$SURVEY_MIN] <- NA
+# 
+# columns <- c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
+#              "Not_obese_yn_agesurvey", "HEALTHY_Diet_yn_agesurvey")
+
+ALL.LIFESTYLE$PhysicalActivity_yn[which(ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+ALL.LIFESTYLE$smoker_former_or_never_yn[which(ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn[which(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+ALL.LIFESTYLE$Not_obese_yn[which(ALL.LIFESTYLE$Not_obese_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+ALL.LIFESTYLE$HEALTHY_Diet_yn[which(ALL.LIFESTYLE$HEALTHY_Diet_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+
+
 
 subneo <- subneo[!subneo$survey_First > subneo$AGE.ANY_SN,]
-
-
+#############
 # Get SNs for the first time and Age at First SN.
 # For this, I will first sort the table by date
 library(data.table)
 ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 dim(ANY_SNs)
-# [1] 399  16
+# [1] 412  16
 
-##
+############
 
 
 # Removing samples with SN within the 5 years of childhood cancer
 ANY_SNs <- ANY_SNs[!ANY_SNs$sjlid %in% subneo.within5$sjlid,]
 dim(ANY_SNs)
-# 394
+# 407
 
 PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
 
@@ -190,10 +209,10 @@ as.data.frame(t(CROSS_CASES.df %>%
                         cross_cases(ANY_SN, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
 
-cc <- as.data.frame(t(CROSS_CASES.df %>%
+cc.SN <- as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(ANY_SN, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
-rownames(cc) <- NULL 
+rownames(cc.SN) <- NULL 
 # View(cc)
 ######################################
 ## Attributable fraction of Any SNs ##
@@ -298,4 +317,4 @@ round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 
 SN.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
 SN.res
-# 0.396 0.106 0.016 0.504
+# 0.431  0.131 -0.058  0.491

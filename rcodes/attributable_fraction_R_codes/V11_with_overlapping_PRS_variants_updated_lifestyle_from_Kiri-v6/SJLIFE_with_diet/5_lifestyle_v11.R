@@ -403,6 +403,7 @@ sjlid <- PHENO.ANY_SN$sjlid
 
 ALL.LIFESTYLE <- cbind.data.frame(SJLIFEID = sjlid, PhysicalActivity_yn = MET_iid_dob_18_uniq$PhysicalActivity_yn[match(sjlid, MET_iid_dob_18_uniq$SJLIFEID)])
 ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey <- MET_iid_dob_18_uniq$agesurvey[match(ALL.LIFESTYLE$SJLIFEID, MET_iid_dob_18_uniq$SJLIFEID)]
+ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey_date <- MET_iid_dob_18_uniq$datecomp[match(ALL.LIFESTYLE$SJLIFEID, MET_iid_dob_18_uniq$SJLIFEID)]
 ALL.LIFESTYLE$PhysicalActivity_yn[is.na(ALL.LIFESTYLE$PhysicalActivity_yn)] <- "Unknown"
 ALL.LIFESTYLE$PhysicalActivity_yn <- factor(ALL.LIFESTYLE$PhysicalActivity_yn, level = c(1, 0, "Unknown")) 
 table(ALL.LIFESTYLE$PhysicalActivity_yn)
@@ -411,6 +412,7 @@ table(ALL.LIFESTYLE$PhysicalActivity_yn)
 
 ALL.LIFESTYLE$smoker_former_or_never_yn <- smk_iid_dob_18_uniq.2$smoker_former_or_never_yn[match(ALL.LIFESTYLE$SJLIFEID, smk_iid_dob_18_uniq.2$SJLIFEID)]
 ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey <- smk_iid_dob_18_uniq.2$agesurvey[match(ALL.LIFESTYLE$SJLIFEID, smk_iid_dob_18_uniq.2$SJLIFEID)]
+ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey_date <- smk_iid_dob_18_uniq.2$datecomp[match(ALL.LIFESTYLE$SJLIFEID, smk_iid_dob_18_uniq.2$SJLIFEID)]
 ALL.LIFESTYLE$smoker_former_or_never_yn[is.na(ALL.LIFESTYLE$smoker_former_or_never_yn)] <- "Unknown"
 ALL.LIFESTYLE$smoker_former_or_never_yn <- factor(ALL.LIFESTYLE$smoker_former_or_never_yn, level = c(1, 0, "Unknown")) 
 table(ALL.LIFESTYLE$smoker_former_or_never_yn)
@@ -419,6 +421,7 @@ table(ALL.LIFESTYLE$smoker_former_or_never_yn)
 
 ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn <- drk_iid_dob_18_uniq.2$NOT_RiskyHeavyDrink_yn[match(ALL.LIFESTYLE$SJLIFEID, drk_iid_dob_18_uniq.2$SJLIFEID)]
 ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey <- drk_iid_dob_18_uniq.2$agesurvey[match(ALL.LIFESTYLE$SJLIFEID, drk_iid_dob_18_uniq.2$SJLIFEID)]
+ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey_date <- drk_iid_dob_18_uniq.2$datecomp[match(ALL.LIFESTYLE$SJLIFEID, drk_iid_dob_18_uniq.2$SJLIFEID)]
 ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn[is.na(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn)] <- "Unknown"
 ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn <- factor(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn, level = c(1, 0, "Unknown")) 
 table(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn)
@@ -427,6 +430,7 @@ table(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn)
 
 ALL.LIFESTYLE$Not_obese_yn <- bmi_iid_dob_18_uniq$Not_obese_yn[match(ALL.LIFESTYLE$SJLIFEID, bmi_iid_dob_18_uniq$sjlid)]
 ALL.LIFESTYLE$Not_obese_yn_agesurvey <- bmi_iid_dob_18_uniq$agebmi[match(ALL.LIFESTYLE$SJLIFEID, bmi_iid_dob_18_uniq$sjlid)]
+ALL.LIFESTYLE$Not_obese_yn_agesurvey_date <- bmi_iid_dob_18_uniq$assmntdate[match(ALL.LIFESTYLE$SJLIFEID, bmi_iid_dob_18_uniq$sjlid)]
 ALL.LIFESTYLE$Not_obese_yn[is.na(ALL.LIFESTYLE$Not_obese_yn)] <- "Unknown"
 ALL.LIFESTYLE$Not_obese_yn <- factor(ALL.LIFESTYLE$Not_obese_yn, level = c(1, 0, "Unknown")) 
 table(ALL.LIFESTYLE$Not_obese_yn)
@@ -435,6 +439,7 @@ table(ALL.LIFESTYLE$Not_obese_yn)
 
 ALL.LIFESTYLE$HEALTHY_Diet_yn <- diet_iid_dob_18_uniq$HEALTHY_Diet_yn[match(ALL.LIFESTYLE$SJLIFEID, diet_iid_dob_18_uniq$sjlid)]
 ALL.LIFESTYLE$HEALTHY_Diet_yn_agesurvey <- diet_iid_dob_18_uniq$agesurvey[match(ALL.LIFESTYLE$SJLIFEID, diet_iid_dob_18_uniq$sjlid)]
+ALL.LIFESTYLE$HEALTHY_Diet_yn_agesurvey_date <- diet_iid_dob_18_uniq$DateVisitStart[match(ALL.LIFESTYLE$SJLIFEID, diet_iid_dob_18_uniq$sjlid)]
 ALL.LIFESTYLE$HEALTHY_Diet_yn[is.na(ALL.LIFESTYLE$HEALTHY_Diet_yn)] <- "Unknown"
 ALL.LIFESTYLE$HEALTHY_Diet_yn <- factor(ALL.LIFESTYLE$HEALTHY_Diet_yn, level = c(1, 0, "Unknown")) 
 table(ALL.LIFESTYLE$HEALTHY_Diet_yn)
@@ -443,6 +448,7 @@ table(ALL.LIFESTYLE$HEALTHY_Diet_yn)
 
 ALL.LIFESTYLE$HEI2015_TOTAL_SCORE <- HEI2015_iid_dob_18_uniq$HEI2015_TOTAL_SCORE[match(ALL.LIFESTYLE$SJLIFEID, HEI2015_iid_dob_18_uniq$sjlid)]
 ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey <- HEI2015_iid_dob_18_uniq$agesurvey[match(ALL.LIFESTYLE$SJLIFEID, HEI2015_iid_dob_18_uniq$sjlid)]
+ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey_date <- HEI2015_iid_dob_18_uniq$DateVisitStart[match(ALL.LIFESTYLE$SJLIFEID, HEI2015_iid_dob_18_uniq$sjlid)]
 
 
 # save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")

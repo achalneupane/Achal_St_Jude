@@ -56,6 +56,9 @@ sum(!duplicated(subneo.within5$sjlid))
 ## GET SN 18 or older
 subneo <- subneo[subneo$AGE.ANY_SN >= 18,]
 
+ALL.LIFESTYLE[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
+                "Not_obese_yn_agesurvey", "HEALTHY_Diet_yn_agesurvey")] <- sapply(ALL.LIFESTYLE[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
+                                                                                                  "Not_obese_yn_agesurvey", "HEALTHY_Diet_yn_agesurvey")], floor)
 
 ALL.LIFESTYLE$SURVEY_MIN <- apply(ALL.LIFESTYLE[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
                                                   "Not_obese_yn_agesurvey", "HEALTHY_Diet_yn_agesurvey")], 1, min)
@@ -64,7 +67,13 @@ ALL.LIFESTYLE$SURVEY_MIN <- apply(ALL.LIFESTYLE[c("PhysicalActivity_yn_agesurvey
 subneo$survey_First <- ALL.LIFESTYLE$SURVEY_MIN[match(subneo$sjlid,ALL.LIFESTYLE$SJLIFEID)]
 table(subneo$survey_First > subneo$AGE.ANY_SN)
 # FALSE  TRUE 
-# 912   615
+# 948   579 
+
+ALL.LIFESTYLE$PhysicalActivity_yn[which(ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+ALL.LIFESTYLE$smoker_former_or_never_yn[which(ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn[which(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+ALL.LIFESTYLE$Not_obese_yn[which(ALL.LIFESTYLE$Not_obese_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+ALL.LIFESTYLE$HEALTHY_Diet_yn[which(ALL.LIFESTYLE$HEALTHY_Diet_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
 
 subneo <- subneo[!subneo$survey_First > subneo$AGE.ANY_SN,]
 ##############
@@ -72,13 +81,13 @@ subneo <- subneo[!subneo$survey_First > subneo$AGE.ANY_SN,]
 NMSCs <- subneo[grepl("basal cell|squamous cell", subneo$diag, ignore.case = T),]
 NMSCs <- setDT(NMSCs)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 nrow(NMSCs)
-# 160
+# 170
 table(NMSCs$diaggrp)
 
 # Removing samples with SNs within 5 years of childhood cancer
 NMSCs <- NMSCs[!NMSCs$sjlid %in% subneo.within5$sjlid,]
 nrow(NMSCs)
-# 158
+# 168
 PHENO.ANY_SN$NMSC <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% NMSCs$sjlid, 0, 1))
 
 #############################
@@ -174,12 +183,12 @@ CROSS_CASES.df <- apply_labels(CROSS_CASES.df, NMSC = "NMSC",
 as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(NMSC, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
-cc <- as.data.frame(t(CROSS_CASES.df %>%
+cc.NMSC <- as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(NMSC, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
 
-rownames(cc) <- NULL 
-# View(cc)
+rownames(cc.NMSC) <- NULL 
+# View(cc.NMSC)
 
 ##########################
 dat_all = PHENO.ANY_SN
@@ -277,4 +286,4 @@ af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 NMSC.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
 NMSC.res
-# 0.285  0.332 -0.237  0.433
+# 0.311  0.357 -0.375  0.396

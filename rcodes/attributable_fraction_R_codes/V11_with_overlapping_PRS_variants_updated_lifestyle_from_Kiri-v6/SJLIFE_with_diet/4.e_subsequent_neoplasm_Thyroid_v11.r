@@ -53,6 +53,30 @@ sum(!duplicated(subneo.within5$sjlid))
 #################### 
 ## Thyroid cancer ##
 ####################
+## GET SN 18 or older
+subneo <- subneo[subneo$AGE.ANY_SN >= 18,]
+
+ALL.LIFESTYLE[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
+                "Not_obese_yn_agesurvey", "HEALTHY_Diet_yn_agesurvey")] <- sapply(ALL.LIFESTYLE[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
+                                                                                                  "Not_obese_yn_agesurvey", "HEALTHY_Diet_yn_agesurvey")], floor)
+
+ALL.LIFESTYLE$SURVEY_MIN <- apply(ALL.LIFESTYLE[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
+                                                  "Not_obese_yn_agesurvey", "HEALTHY_Diet_yn_agesurvey")], 1, min)
+
+# Anyone before the first survey, remove them
+subneo$survey_First <- ALL.LIFESTYLE$SURVEY_MIN[match(subneo$sjlid,ALL.LIFESTYLE$SJLIFEID)]
+table(subneo$survey_First > subneo$AGE.ANY_SN)
+# FALSE  TRUE 
+# 948   579 
+
+ALL.LIFESTYLE$PhysicalActivity_yn[which(ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+ALL.LIFESTYLE$smoker_former_or_never_yn[which(ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn[which(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+ALL.LIFESTYLE$Not_obese_yn[which(ALL.LIFESTYLE$Not_obese_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+ALL.LIFESTYLE$HEALTHY_Diet_yn[which(ALL.LIFESTYLE$HEALTHY_Diet_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+
+subneo <- subneo[!subneo$survey_First > subneo$AGE.ANY_SN,]
+##############
 table(subneo$diag)
 
 
@@ -62,7 +86,7 @@ nrow(THYROIDcancer)
 # Removing samples with SNs within 5 years of childhood cancer
 THYROIDcancer <- THYROIDcancer[!THYROIDcancer$sjlid %in% subneo.within5$sjlid,]
 nrow(THYROIDcancer)
-# 86
+# 42
 PHENO.ANY_SN$THYROIDcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% THYROIDcancer$sjlid, 0, 1))
 table(THYROIDcancer$diaggrp)
 
@@ -93,8 +117,6 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$
 # Count missing
 PHENO.ANY_SN$missing.lifestyles <- rowSums(is.na(PHENO.ANY_SN[c("smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")]))
 table(PHENO.ANY_SN$missing.lifestyles)
-# 0    1    2    3    4    5 
-# 4333    2   27    9    4   26
 
 ## Relevel 6 lifestyle variables
 PHENO.ANY_SN$smoker_former_or_never_yn[is.na(PHENO.ANY_SN$smoker_former_or_never_yn)] <- "Unknown"
@@ -134,8 +156,6 @@ for(i in 1:length(HEI.to.categorize)){
 }
 
 table(PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category)
-# 3rd     2nd     1st Unknown 
-# 1166    1166    1168     901 
 
 #########################
 ## Extract Ethnicities ##
@@ -163,11 +183,11 @@ CROSS_CASES.df <- apply_labels(CROSS_CASES.df, THYROIDcancer = "THYROIDcancer",
 as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(THYROIDcancer, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
-cc <- as.data.frame(t(CROSS_CASES.df %>%
+cc.THYROID <- as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(THYROIDcancer, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
-rownames(cc) <- NULL 
-# View(cc)
+rownames(cc.THYROID) <- NULL 
+# View(cc.THYROID)
 
 ##########################
 dat_all = PHENO.ANY_SN
@@ -206,7 +226,6 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx,3)
-# 0.5552
 ##################
 ## P/LP and PRS ##
 ##################
@@ -219,7 +238,6 @@ dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "respon
 N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
 af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
 round(af_by_plp.prs,3)
-# 0.345
 ###############
 ## Lifestyle ##
 ###############
@@ -235,7 +253,6 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_li
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# 0.936
 #################################################
 ## Treatment, Genetics and Lifestyle, combined ##
 #################################################
@@ -265,7 +282,9 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx
 N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
-# 0.993
+THYROID.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
+THYROID.res
+# 0.662 0.621 0.333 0.922
 
 # PAFs can sum to more than 1 because some individuals with more than one risk
 # factor can have disease prevented in more than one way, and the prevented

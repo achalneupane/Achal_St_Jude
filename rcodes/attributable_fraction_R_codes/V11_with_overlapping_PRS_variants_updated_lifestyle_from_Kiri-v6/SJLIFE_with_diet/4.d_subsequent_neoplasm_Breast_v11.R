@@ -54,15 +54,40 @@ sum(!duplicated(subneo.within5$sjlid))
 ###################
 ## Breast cancer ##
 ###################
+## GET SN 18 or older
+subneo <- subneo[subneo$AGE.ANY_SN >= 18,]
+
+ALL.LIFESTYLE[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
+                "Not_obese_yn_agesurvey", "HEALTHY_Diet_yn_agesurvey")] <- sapply(ALL.LIFESTYLE[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
+                                                                                                  "Not_obese_yn_agesurvey", "HEALTHY_Diet_yn_agesurvey")], floor)
+
+ALL.LIFESTYLE$SURVEY_MIN <- apply(ALL.LIFESTYLE[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
+                                                  "Not_obese_yn_agesurvey", "HEALTHY_Diet_yn_agesurvey")], 1, min)
+
+# Anyone before the first survey, remove them
+subneo$survey_First <- ALL.LIFESTYLE$SURVEY_MIN[match(subneo$sjlid,ALL.LIFESTYLE$SJLIFEID)]
+table(subneo$survey_First > subneo$AGE.ANY_SN)
+# FALSE  TRUE 
+# 948   579 
+
+ALL.LIFESTYLE$PhysicalActivity_yn[which(ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+ALL.LIFESTYLE$smoker_former_or_never_yn[which(ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn[which(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+ALL.LIFESTYLE$Not_obese_yn[which(ALL.LIFESTYLE$Not_obese_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+ALL.LIFESTYLE$HEALTHY_Diet_yn[which(ALL.LIFESTYLE$HEALTHY_Diet_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
+
+subneo <- subneo[!subneo$survey_First > subneo$AGE.ANY_SN,]
+##############
+
 BREASTcancer <- subneo[grepl("breast", subneo$diag, ignore.case = T),]
 BREASTcancer <- setDT(BREASTcancer)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 nrow(BREASTcancer)
-# 78
+# 55
 table(BREASTcancer$diaggrp)
 # Removing samples with SNs within 5 years of childhood cancer
 BREASTcancer <- BREASTcancer[!BREASTcancer$sjlid %in% subneo.within5$sjlid,]
 nrow(BREASTcancer)
-# 76
+# 54
 PHENO.ANY_SN$BREASTcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% BREASTcancer$sjlid, 0, 1))
 
 #############################
@@ -132,8 +157,6 @@ for(i in 1:length(HEI.to.categorize)){
 }
 
 table(PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category)
-# 3rd     2nd     1st Unknown 
-# 1172    1171    1173     885
 
 #########################
 ## Extract Ethnicities ##
@@ -161,11 +184,11 @@ CROSS_CASES.df <- apply_labels(CROSS_CASES.df, BREASTcancer = "BREASTcancer",
 as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(BREASTcancer, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
-cc <- (as.data.frame(t(CROSS_CASES.df %>%
+cc.BREAST <- (as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(BREASTcancer, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn)))))
 
-rownames(cc) <- NULL 
-# View(cc)
+rownames(cc.BREAST) <- NULL 
+# View(cc.BREAST)
 
 ############################
 ## Attributable Fractions ##
@@ -208,7 +231,6 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx, 3)
-# 0.378
 ##################
 ## P/LP and PRS ##
 ##################
@@ -221,7 +243,6 @@ dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "respon
 N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
 af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
 round(af_by_plp.prs,3)
-# 0.286
 ###############
 ## Lifestyle ##
 ###############
@@ -238,7 +259,6 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_li
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# 0.935
 
 #################################################
 ## Treatment, Genetics and Lifestyle, combined ##
@@ -269,4 +289,6 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx
 N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
-#  0.983
+BREAST.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
+BREAST.res
+# 0.453 0.394 0.302 0.789
