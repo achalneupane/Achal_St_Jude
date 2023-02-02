@@ -78,6 +78,7 @@ dim(ANY_SNs)
 
 
 
+
 # Removing samples with SN within the 5 years of childhood cancer
 ANY_SNs <- ANY_SNs[!ANY_SNs$sjlid %in% subneo.within5$sjlid,]
 dim(ANY_SNs)
