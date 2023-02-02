@@ -161,11 +161,11 @@ CROSS_CASES.df <- apply_labels(CROSS_CASES.df, SMN = "SMN",
 as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(SMN, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
-cc <- as.data.frame(t(CROSS_CASES.df %>%
+cc.SMN <- as.data.frame(t(CROSS_CASES.df %>%
                         cross_cases(SMN, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
-rownames(cc) <- NULL 
-View(cc)
+rownames(cc.SMN) <- NULL 
+View(cc.SMN)
 ######################################
 ## Attributable fraction of Any SNs ##
 ######################################
@@ -268,4 +268,6 @@ N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lif
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 # 0.459
+SMN.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
+SMN.res
 
