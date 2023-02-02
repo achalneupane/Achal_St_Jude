@@ -21,6 +21,19 @@ load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHE
 # get additional adult health habits
 adult_habbits <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Survey Data/adult_healthhabits.sas7bdat')
 
+adult_habbits$sjlid <- adult_habbits$SJLIFEID
+## Fix data format
+# adult_habbits$datecomp <- paste(sapply(strsplit(adult_habbits$datecomp, "\\/"), `[`, 3), sapply(strsplit(adult_habbits$datecomp, "\\/"), `[`, 1), sapply(strsplit(adult_habbits$datecomp, "\\/"), `[`, 2), sep = "-")
+
+# remove duplicated rows
+adult_habbits <- distinct(adult_habbits)
+## Get DOB
+adult_habbits$DOB <- PHENO.ANY_SN$dob [match(adult_habbits$SJLIFEID, PHENO.ANY_SN$sjlid)]
+# adult_habbits <- adult_habbits[!is.na(adult_habbits$DOB),]
+# change the format of dates YYYY-MM-DD
+adult_habbits$agesurvey2 <- time_length(interval(as.Date(adult_habbits$DOB), as.Date(adult_habbits$datecomp)), "years")
+adult_habbits$agesurvey2[is.na(adult_habbits$agesurvey2)] <- adult_habbits$agesurvey[is.na(adult_habbits$agesurvey2)]
+adult_habbits$agesurvey <- adult_habbits$agesurvey2
 
 lifestyle <- adult_habbits
 
@@ -182,9 +195,11 @@ adlthabits$datecomp <- paste(sapply(strsplit(adlthabits$datecomp, "\\/"), `[`, 3
 adlthabits <- distinct(adlthabits)
 ## Get DOB
 adlthabits$DOB <- PHENO.ANY_SN$dob [match(adlthabits$SJLIFEID, PHENO.ANY_SN$sjlid)]
-adlthabits <- adlthabits[!is.na(adlthabits$DOB),]
+# adlthabits <- adlthabits[!is.na(adlthabits$DOB),]
 # change the format of dates YYYY-MM-DD
-adlthabits$agesurvey <- time_length(interval(as.Date(adlthabits$DOB), as.Date(adlthabits$datecomp)), "years")
+adlthabits$agesurvey2 <- time_length(interval(as.Date(adlthabits$DOB), as.Date(adlthabits$datecomp)), "years")
+adlthabits$agesurvey2[is.na(adlthabits$agesurvey2)] <- adlthabits$agesurvey[is.na(adlthabits$agesurvey2)]
+adlthabits$agesurvey <- adlthabits$agesurvey2
 
 adlthabits <- adlthabits[adlthabits$sjlid %in% PHENO.ANY_SN$sjlid,]
 
@@ -354,7 +369,9 @@ DIET$DT_SODI_yn <- as.numeric(ifelse(DIET$DT_SODI <= 2000, 1, 0))
 ## Define Healthy diet
 DIET$HEALTHY_Diet_yn <- ifelse(rowSums(DIET[,c("FRUITSRV_yn", "NUTSFREQ_yn", "VEGSRV_yn", "WGRAINS_yn", "NOTFRIEDFISHFREQ_yn", "DAIRYSRV_yn", "MIXEDBEEFPORKFREQ_yn", "DT_TFAT_cohort_median_yn", "SOFTDRINKSFREQ_yn", "DT_SODI_yn")]) >= 5, 1,0)
 
-DIET$agesurvey <- as.numeric(DIET$AGE)
+DIET$AGE_at_Visit[is.na(DIET$AGE_at_Visit)] <- DIET$AGE[is.na(DIET$AGE_at_Visit)]
+
+DIET$agesurvey <- as.numeric(DIET$AGE_at_Visit)
 
 ## Extract the unique ones by keeping the earliest age after 18 years
 
@@ -390,7 +407,7 @@ ALL.LIFESTYLE$PhysicalActivity_yn[is.na(ALL.LIFESTYLE$PhysicalActivity_yn)] <- "
 ALL.LIFESTYLE$PhysicalActivity_yn <- factor(ALL.LIFESTYLE$PhysicalActivity_yn, level = c(1, 0, "Unknown")) 
 table(ALL.LIFESTYLE$PhysicalActivity_yn)
 # 1       0 Unknown 
-# 1266    1267    1868
+# 1868    1696     837
 
 ALL.LIFESTYLE$smoker_former_or_never_yn <- smk_iid_dob_18_uniq.2$smoker_former_or_never_yn[match(ALL.LIFESTYLE$SJLIFEID, smk_iid_dob_18_uniq.2$SJLIFEID)]
 ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey <- smk_iid_dob_18_uniq.2$agesurvey[match(ALL.LIFESTYLE$SJLIFEID, smk_iid_dob_18_uniq.2$SJLIFEID)]
@@ -406,7 +423,7 @@ ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn[is.na(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn)
 ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn <- factor(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn, level = c(1, 0, "Unknown")) 
 table(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn)
 # 1       0 Unknown 
-# 1613     836    1952
+# 2210    1306     885
 
 ALL.LIFESTYLE$Not_obese_yn <- bmi_iid_dob_18_uniq$Not_obese_yn[match(ALL.LIFESTYLE$SJLIFEID, bmi_iid_dob_18_uniq$sjlid)]
 ALL.LIFESTYLE$Not_obese_yn_agesurvey <- bmi_iid_dob_18_uniq$agebmi[match(ALL.LIFESTYLE$SJLIFEID, bmi_iid_dob_18_uniq$sjlid)]
@@ -422,7 +439,7 @@ ALL.LIFESTYLE$HEALTHY_Diet_yn[is.na(ALL.LIFESTYLE$HEALTHY_Diet_yn)] <- "Unknown"
 ALL.LIFESTYLE$HEALTHY_Diet_yn <- factor(ALL.LIFESTYLE$HEALTHY_Diet_yn, level = c(1, 0, "Unknown")) 
 table(ALL.LIFESTYLE$HEALTHY_Diet_yn)
 # 1       0 Unknown 
-# 307    2848    1246 
+# 306    2850    1245
 
 ALL.LIFESTYLE$HEI2015_TOTAL_SCORE <- HEI2015_iid_dob_18_uniq$HEI2015_TOTAL_SCORE[match(ALL.LIFESTYLE$SJLIFEID, HEI2015_iid_dob_18_uniq$sjlid)]
 ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey <- HEI2015_iid_dob_18_uniq$agesurvey[match(ALL.LIFESTYLE$SJLIFEID, HEI2015_iid_dob_18_uniq$sjlid)]
