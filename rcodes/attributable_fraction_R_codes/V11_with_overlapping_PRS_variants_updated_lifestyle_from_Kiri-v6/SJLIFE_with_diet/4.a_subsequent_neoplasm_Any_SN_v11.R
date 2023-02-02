@@ -66,7 +66,7 @@ table(subneo$survey_First > subneo$AGE.ANY_SN)
 # FALSE  TRUE 
 # 912   615
 
-subneo <- subneo[subneo$survey_First > subneo$AGE.ANY_SN,]
+subneo <- subneo[!subneo$survey_First > subneo$AGE.ANY_SN,]
 
 
 # Get SNs for the first time and Age at First SN.
@@ -74,15 +74,15 @@ subneo <- subneo[subneo$survey_First > subneo$AGE.ANY_SN,]
 library(data.table)
 ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 dim(ANY_SNs)
-# [1] 235  16
+# [1] 399  16
 
-
+##
 
 
 # Removing samples with SN within the 5 years of childhood cancer
 ANY_SNs <- ANY_SNs[!ANY_SNs$sjlid %in% subneo.within5$sjlid,]
 dim(ANY_SNs)
-# 231
+# 394
 
 PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
 
@@ -91,10 +91,6 @@ PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 
 #############################
 ## Add Lifestyle variables ##
 #############################
-## First remove SN before 18
-PHENO.ANY_SN$AGE_AT_DIAGNOSIS
-
-
 # Define CA/CO status in lifestyle
 ALL.LIFESTYLE$CACO <- factor(ifelse(!ALL.LIFESTYLE$SJLIFEID %in% ANY_SNs$sjlid, 0, 1))
 
@@ -242,7 +238,6 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx,3)
-# 0.265
 ##################
 ## P/LP and PRS ##
 ##################
@@ -255,7 +250,6 @@ dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "respon
 N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
 af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
 round(af_by_plp.prs,3)
-# 0.071
 ###############
 ## Lifestyle ##
 ###############
@@ -271,7 +265,6 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_li
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# 0.785
 
 #################################################
 ## Treatment, Genetics and Lifestyle, combined ##
@@ -302,4 +295,7 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx
 N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
-# 0.92
+
+SN.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
+SN.res
+# 0.396 0.106 0.016 0.504
