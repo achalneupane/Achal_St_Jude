@@ -6,11 +6,11 @@ setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PH
 # # Since columns are same, we can simply rbind the dataframes
 # PHENO.ANY_SN <- rbind.data.frame(CCSS.org.ANY_SN, CCSS.exp.ANY_SN)
 # rm(list=setdiff(ls(), c("PHENO.ANY_SN")))
-# save.image("00.PHENO.ANY_SARCOMA_CCSS_combined_v11.Rdata")
-
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.PHENO.ANY_SARCOMA_CCSS_combined_v11.Rdata")
-
-table(PHENO.ANY_SN$CACO)
+# save.image("00.PHENO.ANY_SARCOMA_CCSS_combined_v11-6.Rdata")
+# 
+# load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.PHENO.ANY_SARCOMA_CCSS_combined_v11-6.Rdata")
+# 
+# table(PHENO.ANY_SN$CACO)
 # 0    1 
 # 7839  104
 

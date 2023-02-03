@@ -1,4 +1,4 @@
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_org_Genetic_data_P_LP_V11.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_org_Genetic_data_P_LP_V11-6.Rdata")
 
 library(haven)
 library(benchmarkme)
@@ -32,6 +32,32 @@ sum(!duplicated(subneo.within5$ccssid))
 ###################
 ## Breast cancer ##
 ###################
+## GET SN 18 or older
+subneo <- subneo[subneo$AGE.ANY_SN >= 18,]
+
+
+PHENO.ANY_SN[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
+               "Not_obese_yn_agesurvey")] <- sapply(PHENO.ANY_SN[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
+                                                                   "Not_obese_yn_agesurvey")], floor)
+
+PHENO.ANY_SN$SURVEY_MIN <- apply(PHENO.ANY_SN[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
+                                                "Not_obese_yn_agesurvey")], 1, min)
+
+# Anyone before the first survey, remove them
+subneo$survey_First <- PHENO.ANY_SN$SURVEY_MIN[match(subneo$ccssid,PHENO.ANY_SN$ccssid)]
+table(subneo$survey_First > subneo$AGE.ANY_SN)
+
+## Anyone not on the first survey age
+PHENO.ANY_SN$PhysicalActivity_yn[which(PHENO.ANY_SN$PhysicalActivity_yn_agesurvey != PHENO.ANY_SN$SURVEY_MIN)] <- NA
+PHENO.ANY_SN$smoker_former_or_never_yn[which(PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey != PHENO.ANY_SN$SURVEY_MIN)] <- NA
+PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn[which(PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey != PHENO.ANY_SN$SURVEY_MIN)] <- NA
+PHENO.ANY_SN$Not_obese_yn[which(PHENO.ANY_SN$Not_obese_yn_agesurvey != PHENO.ANY_SN$SURVEY_MIN)] <- NA
+
+
+
+subneo <- subneo[!subneo$survey_First > subneo$AGE.ANY_SN,]
+#############
+
 BREASTcancer <- subneo[grepl("breast", subneo$groupdx3, ignore.case = T),]
 BREASTcancer <- setDT(BREASTcancer)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
 nrow(BREASTcancer)

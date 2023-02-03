@@ -162,7 +162,7 @@ CROSS_CASES.df <- apply_labels(CROSS_CASES.df, THYROIDcancer = "THYROIDcancer",
 as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(THYROIDcancer, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
-cc <- as.data.frame(t(CROSS_CASES.df %>%
+cc.THYROID <- as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(THYROIDcancer, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
 rownames(cc.THYROID) <- NULL 
@@ -267,6 +267,7 @@ round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 # 0.766
 THYROID.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
 THYROID.res
+# 0.558 0.341 0.113 0.748
 
 # PAFs can sum to more than 1 because some individuals with more than one risk
 # factor can have disease prevented in more than one way, and the prevented

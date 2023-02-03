@@ -270,4 +270,4 @@ round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 # 0.459
 SMN.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
 SMN.res
-
+# 0.336 0.116 0.100 0.461

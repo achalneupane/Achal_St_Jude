@@ -269,3 +269,4 @@ round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 # 0.184
 NMSC.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
 NMSC.res
+# 0.189  0.197 -0.222  0.235

@@ -6,13 +6,40 @@ setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PH
 # # Since columns are same, we can simply rbind the dataframes
 # PHENO.ANY_SN <- rbind.data.frame(CCSS.org.ANY_SN, CCSS.exp.ANY_SN)
 # rm(list=setdiff(ls(), c("PHENO.ANY_SN")))
-# save.image("00.PHENO.ANY_NMSC_CCSS_combined_v11.Rdata")
+# save.image("00.PHENO.ANY_NMSC_CCSS_combined_v11-6.Rdata")
 
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.PHENO.ANY_NMSC_CCSS_combined_v11.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.PHENO.ANY_NMSC_CCSS_combined_v11-6.Rdata")
 
 table(PHENO.ANY_SN$CACO)
 # 0    1 
 # 7174  769 
+
+###########################################
+## Check data in each category/cross tab ##
+###########################################
+library(expss)
+
+# Getting counts for non-missing data only; 6 samples do not have admixture ancestry
+CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
+
+CROSS_CASES.df <- CROSS_CASES.df[c("NMSC", "smoker_former_or_never_yn", "PhysicalActivity_yn",
+                                   "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")]
+
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df, NMSC = "NMSC", 
+                               smoker_former_or_never_yn = "smoker_former_or_never_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
+                               NOT_RiskyHeavyDrink_yn = "NOT_RiskyHeavyDrink_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")
+
+as.data.frame(t(CROSS_CASES.df %>%
+                  cross_cases(NMSC, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
+
+cc.NMSC <- as.data.frame(t(CROSS_CASES.df %>%
+                             cross_cases(NMSC, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
+
+
+rownames(cc.NMSC) <- NULL 
+# View(cc.NMSC)
+
+##########################
 
 ##########################
 dat_all = PHENO.ANY_SN
@@ -107,3 +134,5 @@ N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lif
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 # 0.702
+NMSC.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
+NMSC.res

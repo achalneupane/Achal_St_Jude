@@ -278,3 +278,4 @@ round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 # 0.284
 SN.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
 SN.res
+# 0.269  0.077 -0.026  0.310

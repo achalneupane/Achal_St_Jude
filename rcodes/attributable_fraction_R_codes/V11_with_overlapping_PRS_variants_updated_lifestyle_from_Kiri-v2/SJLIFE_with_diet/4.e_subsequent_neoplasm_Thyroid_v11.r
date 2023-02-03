@@ -266,6 +266,9 @@ N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lif
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 # 0.993
+THYROID.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
+THYROID.res
+# 0.555 0.341 0.703 0.971
 
 # PAFs can sum to more than 1 because some individuals with more than one risk
 # factor can have disease prevented in more than one way, and the prevented

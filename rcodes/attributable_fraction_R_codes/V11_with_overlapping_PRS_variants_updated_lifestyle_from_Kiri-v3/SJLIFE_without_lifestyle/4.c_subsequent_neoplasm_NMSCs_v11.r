@@ -280,3 +280,6 @@ N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lif
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 # 0.647
+NMSC.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
+NMSC.res
+# 0.393 0.379 0.000 0.647

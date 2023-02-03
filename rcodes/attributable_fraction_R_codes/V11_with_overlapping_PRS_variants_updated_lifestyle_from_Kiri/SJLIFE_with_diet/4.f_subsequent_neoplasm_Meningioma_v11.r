@@ -261,3 +261,4 @@ round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 # 0.792
 MENINGIOMA.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
 MENINGIOMA.res
+# 0.776  0.000 -0.065  0.752
