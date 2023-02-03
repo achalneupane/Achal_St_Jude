@@ -99,7 +99,7 @@ lifestyle$CDC_PA <- ifelse(lifestyle$mvpawk < 150, 0,1) # Check this line
 
 ## Physical activity
 MET_iid_dob_18 = subset(lifestyle, agesurvey >= 18)
-MET_iid_dob_18 <- MET_iid_dob_18[!is.na(MET_iid_dob_18$CDC_PA), ]
+# MET_iid_dob_18 <- MET_iid_dob_18[!is.na(MET_iid_dob_18$CDC_PA), ]
 MET_iid_dob_18_sorted = MET_iid_dob_18[order(MET_iid_dob_18$sjlid, MET_iid_dob_18$agesurvey, decreasing = FALSE),]
 MET_iid_dob_18_uniq = MET_iid_dob_18_sorted[!duplicated(MET_iid_dob_18_sorted$sjlid),]
 
@@ -149,7 +149,7 @@ table(lifestyle$smkStat)
 
 ## smoker status
 smk_iid_dob_18 = subset(lifestyle, agesurvey >= 18)
-smk_iid_dob_18 <- smk_iid_dob_18[!is.na(smk_iid_dob_18$smkStat), ]
+# smk_iid_dob_18 <- smk_iid_dob_18[!is.na(smk_iid_dob_18$smkStat), ]
 smk_iid_dob_18_sorted = smk_iid_dob_18[order(smk_iid_dob_18$sjlid, smk_iid_dob_18$agesurvey, decreasing = FALSE),]
 smk_iid_dob_18_uniq = smk_iid_dob_18_sorted[!duplicated(smk_iid_dob_18_sorted$sjlid),]
 
@@ -162,7 +162,7 @@ smk_iid_dob_18_uniq$smoker_never_yn <- as.numeric(ifelse(smk_iid_dob_18_uniq$smk
 drk_iid_dob_18 = subset(lifestyle, agesurvey >= 18)
 # If heavy or risky drink any is 1, then Yes for RiskyHeavyDrink_yn
 drk_iid_dob_18$NOT_RiskyHeavyDrink_yn <- as.numeric(ifelse (rowSums(drk_iid_dob_18[c("heavydrink", "riskydrink")])==0, 1, 0))
-drk_iid_dob_18 <- drk_iid_dob_18[!is.na(drk_iid_dob_18$NOT_RiskyHeavyDrink_yn), ]
+# drk_iid_dob_18 <- drk_iid_dob_18[!is.na(drk_iid_dob_18$NOT_RiskyHeavyDrink_yn), ]
 drk_iid_dob_18_sorted = drk_iid_dob_18[order(drk_iid_dob_18$sjlid, drk_iid_dob_18$agesurvey, decreasing = FALSE),]
 drk_iid_dob_18_uniq = drk_iid_dob_18_sorted[!duplicated(drk_iid_dob_18_sorted$sjlid),]
 
@@ -206,7 +206,7 @@ adlthabits <- adlthabits[adlthabits$sjlid %in% PHENO.ANY_SN$sjlid,]
 
 ## 2.-------------- Smoker status ## from Siddhant
 smk_iid_dob_18.2 = subset(adlthabits, agesurvey >= 18)
-smk_iid_dob_18.2 <- smk_iid_dob_18.2[!is.na(smk_iid_dob_18.2$smoker), ]
+# smk_iid_dob_18.2 <- smk_iid_dob_18.2[!is.na(smk_iid_dob_18.2$smoker), ]
 smk_iid_dob_18_sorted.2 = smk_iid_dob_18.2[order(smk_iid_dob_18.2$sjlid, smk_iid_dob_18.2$agesurvey, decreasing = FALSE),]
 smk_iid_dob_18_uniq.2 = smk_iid_dob_18_sorted.2[!duplicated(smk_iid_dob_18_sorted.2$sjlid),]
 
@@ -233,7 +233,7 @@ adlthabits[grepl("bingedrink|heavydrink|riskydrink", colnames(adlthabits))][adlt
 drk_iid_dob_18.2 = subset(adlthabits, agesurvey >= 18)
 # If heavy or risky drink any is 1, then Yes for RiskyHeavyDrink_yn
 drk_iid_dob_18.2$NOT_RiskyHeavyDrink_yn <- as.numeric(ifelse (rowSums(drk_iid_dob_18.2[c("heavydrink", "riskydrink")])==0, 1, 0))
-drk_iid_dob_18.2 <- drk_iid_dob_18.2[!is.na(drk_iid_dob_18.2$NOT_RiskyHeavyDrink_yn), ]
+# drk_iid_dob_18.2 <- drk_iid_dob_18.2[!is.na(drk_iid_dob_18.2$NOT_RiskyHeavyDrink_yn), ]
 drk_iid_dob_18_sorted.2 = drk_iid_dob_18[order(drk_iid_dob_18.2$sjlid, drk_iid_dob_18.2$agesurvey, decreasing = FALSE),]
 drk_iid_dob_18_uniq.2 = drk_iid_dob_18_sorted.2[!duplicated(drk_iid_dob_18_sorted.2$sjlid),]
 
@@ -377,7 +377,7 @@ DIET$agesurvey <- as.numeric(DIET$AGE_at_Visit)
 
 diet_iid_dob_18 = subset(DIET, agesurvey >= 18)
 # If heavy or risky drink any is 1, then Yes for RiskyHeavyDrink_yn
-diet_iid_dob_18 <- diet_iid_dob_18[!is.na(diet_iid_dob_18$HEALTHY_Diet_yn), ]
+# diet_iid_dob_18 <- diet_iid_dob_18[!is.na(diet_iid_dob_18$HEALTHY_Diet_yn), ]
 diet_iid_dob_18_sorted = diet_iid_dob_18[order(diet_iid_dob_18$sjlid, diet_iid_dob_18$agesurvey, decreasing = FALSE),]
 diet_iid_dob_18_uniq = diet_iid_dob_18_sorted[!duplicated(diet_iid_dob_18_sorted$sjlid),]
 
@@ -385,7 +385,7 @@ diet_iid_dob_18_uniq = diet_iid_dob_18_sorted[!duplicated(diet_iid_dob_18_sorted
 
 HEI2015_iid_dob_18 = subset(DIET, agesurvey >= 18)
 # If heavy or risky drink any is 1, then Yes for RiskyHeavyDrink_yn
-HEI2015_iid_dob_18 <- HEI2015_iid_dob_18[!is.na(HEI2015_iid_dob_18$HEI2015_TOTAL_SCORE), ]
+# HEI2015_iid_dob_18 <- HEI2015_iid_dob_18[!is.na(HEI2015_iid_dob_18$HEI2015_TOTAL_SCORE), ]
 HEI2015_iid_dob_18_sorted = HEI2015_iid_dob_18[order(HEI2015_iid_dob_18$sjlid, HEI2015_iid_dob_18$agesurvey, decreasing = FALSE),]
 HEI2015_iid_dob_18_uniq = HEI2015_iid_dob_18_sorted[!duplicated(HEI2015_iid_dob_18_sorted$sjlid),]
 
@@ -451,6 +451,6 @@ ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey <- HEI2015_iid_dob_18_uniq$agesurvey
 ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey_date <- HEI2015_iid_dob_18_uniq$DateVisitStart[match(ALL.LIFESTYLE$SJLIFEID, HEI2015_iid_dob_18_uniq$sjlid)]
 
 
-# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
+# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11-6.RDATA")
 
 # load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
