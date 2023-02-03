@@ -281,7 +281,7 @@ SARCOMA.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favo
 SARCOMA.res
 # 0.575  0.139 -3.844 -1.334
 
-counts <- cbind.data.frame(cc.SN, cc.SMN, cc.NMSC, cc.BREAST, cc.THYROID, cc.MENINGIOMA, cc.THYROID)
+counts <- cbind.data.frame(cc.SN, cc.SMN, cc.NMSC, cc.BREAST, cc.THYROID, cc.MENINGIOMA, cc.SARCOMA)
 View(counts)
 
 all.res <- cbind.data.frame(SN=SN.res, SMN=SMN.res, NMSC=NMSC.res, BREAST=BREAST.res, THYROID=THYROID.res, MENINGIOMA=MENINGIOMA.res, SARCOMA=SARCOMA.res)
