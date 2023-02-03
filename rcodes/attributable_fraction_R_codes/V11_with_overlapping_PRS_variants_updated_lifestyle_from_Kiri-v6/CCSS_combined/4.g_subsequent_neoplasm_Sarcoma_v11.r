@@ -8,9 +8,9 @@ setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PH
 # rm(list=setdiff(ls(), c("PHENO.ANY_SN")))
 # save.image("00.PHENO.ANY_SARCOMA_CCSS_combined_v11-6.Rdata")
 # 
-# load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.PHENO.ANY_SARCOMA_CCSS_combined_v11-6.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.PHENO.ANY_SARCOMA_CCSS_combined_v11-6.Rdata")
 # 
-# table(PHENO.ANY_SN$CACO)
+table(PHENO.ANY_SN$CACO)
 # 0    1 
 # 7839  104
 
@@ -39,7 +39,7 @@ cc <- as.data.frame(t(CROSS_CASES.df %>%
                         cross_cases(SARCOMA, list( smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, Not_obese_yn, aa_class_dose_5.category))))
 
 rownames(cc) <- NULL 
-View(cc)
+# View(cc)
 
 
 ##########################
@@ -136,7 +136,7 @@ SARCOMA.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favo
 SARCOMA.res
 
 counts <- cbind.data.frame(cc.SN, cc.SMN, cc.NMSC, cc.BREAST, cc.THYROID, cc.MENINGIOMA, cc.THYROID)
-View(counts)
+# View(counts)
 
 all.res <- cbind.data.frame(SN=SN.res, SMN=SMN.res, NMSC=NMSC.res, BREAST=BREAST.res, THYROID=THYROID.res, MENINGIOMA=MENINGIOMA.res, SARCOMA=SARCOMA.res)
 # View(all.res)

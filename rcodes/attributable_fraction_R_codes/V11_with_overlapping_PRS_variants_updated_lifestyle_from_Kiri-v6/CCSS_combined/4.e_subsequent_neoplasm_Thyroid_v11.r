@@ -1,12 +1,12 @@
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/")
-CCSS.org.ANY_SN <- PHENO.ANY_SN # CCSS org
-CCSS.exp.ANY_SN <- PHENO.ANY_SN ## CCSS exp
-sum(colnames(CCSS.org.ANY_SN) == colnames(CCSS.exp.ANY_SN))
-# 53
-# Since columns are same, we can simply rbind the dataframes
-PHENO.ANY_SN <- rbind.data.frame(CCSS.org.ANY_SN, CCSS.exp.ANY_SN)
-rm(list=setdiff(ls(), c("PHENO.ANY_SN")))
-save.image("00.PHENO.ANY_THYROIDcancer_CCSS_combined_v11-6.Rdata")
+# CCSS.org.ANY_SN <- PHENO.ANY_SN # CCSS org
+# CCSS.exp.ANY_SN <- PHENO.ANY_SN ## CCSS exp
+# sum(colnames(CCSS.org.ANY_SN) == colnames(CCSS.exp.ANY_SN))
+# # 53
+# # Since columns are same, we can simply rbind the dataframes
+# PHENO.ANY_SN <- rbind.data.frame(CCSS.org.ANY_SN, CCSS.exp.ANY_SN)
+# rm(list=setdiff(ls(), c("PHENO.ANY_SN")))
+# save.image("00.PHENO.ANY_THYROIDcancer_CCSS_combined_v11-6.Rdata")
 
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.PHENO.ANY_THYROIDcancer_CCSS_combined_v11-6.Rdata")
 
@@ -22,17 +22,17 @@ library(expss)
 CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
 
 CROSS_CASES.df <- CROSS_CASES.df[c("THYROIDcancer", "smoker_former_or_never_yn", "PhysicalActivity_yn",
-                                   "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")]
+                                   "NOT_RiskyHeavyDrink_yn", Not_obese_yn = "Not_obese_yn")]
 
 CROSS_CASES.df <- apply_labels(CROSS_CASES.df, THYROIDcancer = "THYROIDcancer", 
                                smoker_former_or_never_yn = "smoker_former_or_never_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
-                               NOT_RiskyHeavyDrink_yn = "NOT_RiskyHeavyDrink_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")
+                               NOT_RiskyHeavyDrink_yn = "NOT_RiskyHeavyDrink_yn", Not_obese_yn = "Not_obese_yn")
 
 as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(THYROIDcancer, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
+                  cross_cases(THYROIDcancer, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, Not_obese_yn))))
 
 cc.THYROID <- as.data.frame(t(CROSS_CASES.df %>%
-                                cross_cases(THYROIDcancer, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
+                                cross_cases(THYROIDcancer, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, Not_obese_yn))))
 
 rownames(cc.THYROID) <- NULL 
 # View(cc.THYROID)

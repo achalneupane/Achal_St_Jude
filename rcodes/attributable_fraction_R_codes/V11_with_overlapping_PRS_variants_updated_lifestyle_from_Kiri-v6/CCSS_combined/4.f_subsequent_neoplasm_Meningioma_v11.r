@@ -23,17 +23,17 @@ library(expss)
 CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
 
 CROSS_CASES.df <- CROSS_CASES.df[c("MENINGIOMA", "smoker_former_or_never_yn", "PhysicalActivity_yn",
-                                   "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")]
+                                   "NOT_RiskyHeavyDrink_yn", Not_obese_yn = "Not_obese_yn")]
 
 CROSS_CASES.df <- apply_labels(CROSS_CASES.df, MENINGIOMA = "MENINGIOMA",  
                                smoker_former_or_never_yn = "smoker_former_or_never_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
-                               NOT_RiskyHeavyDrink_yn = "NOT_RiskyHeavyDrink_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")
+                               NOT_RiskyHeavyDrink_yn = "NOT_RiskyHeavyDrink_yn", Not_obese_yn = "Not_obese_yn")
 
 as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(MENINGIOMA, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
+                  cross_cases(MENINGIOMA, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, Not_obese_yn))))
 
 cc.MENINGIOMA <- as.data.frame(t(CROSS_CASES.df %>%
-                                   cross_cases(MENINGIOMA, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
+                                   cross_cases(MENINGIOMA, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, Not_obese_yn))))
 rownames(cc.MENINGIOMA) <- NULL 
 # View(cc.MENINGIOMA)
 
