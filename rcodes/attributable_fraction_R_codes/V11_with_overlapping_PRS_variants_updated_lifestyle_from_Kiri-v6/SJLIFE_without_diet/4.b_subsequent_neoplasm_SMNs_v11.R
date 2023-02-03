@@ -1,7 +1,7 @@
 #########################
 ## Load Phenotype data ##
 #########################
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11-6.RDATA")
 #########################
 ## Subsequent Neoplasm ##
 #########################
@@ -67,7 +67,7 @@ ALL.LIFESTYLE$SURVEY_MIN <- apply(ALL.LIFESTYLE[c("PhysicalActivity_yn_agesurvey
 subneo$survey_First <- ALL.LIFESTYLE$SURVEY_MIN[match(subneo$sjlid,ALL.LIFESTYLE$SJLIFEID)]
 table(subneo$survey_First > subneo$AGE.ANY_SN)
 # FALSE  TRUE 
-# 977   610
+# 981   613 
 
 ALL.LIFESTYLE$PhysicalActivity_yn[which(ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
 ALL.LIFESTYLE$smoker_former_or_never_yn[which(ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
@@ -88,7 +88,7 @@ table(SMNs$diaggrp)
 # Removing samples with SNs within 5 years of childhood cancer
 SMNs <- SMNs[!SMNs$sjlid %in% subneo.within5$sjlid,]
 nrow(SMNs)
-# 289
+# 309
 PHENO.ANY_SN$SMN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% SMNs$sjlid, 0, 1))
 
 #############################

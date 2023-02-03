@@ -93,7 +93,7 @@ subneo <- subneo[!subneo$survey_First > subneo$AGE.ANY_SN,]
 library(data.table)
 ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 dim(ANY_SNs)
-# [1] 412  16
+# [1] 424  16
 
 ############
 
@@ -101,7 +101,7 @@ dim(ANY_SNs)
 # Removing samples with SN within the 5 years of childhood cancer
 ANY_SNs <- ANY_SNs[!ANY_SNs$sjlid %in% subneo.within5$sjlid,]
 dim(ANY_SNs)
-# 407
+# 419
 
 PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
 

@@ -82,13 +82,13 @@ subneo <- subneo[!subneo$survey_First > subneo$AGE.ANY_SN,]
 SMNs <- subneo[!grepl("basal cell|squamous cell", subneo$diag, ignore.case = T),]
 SMNs <- setDT(SMNs)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 nrow(SMNs)
-# 293
+# 304
 table(SMNs$diaggrp)
 
 # Removing samples with SNs within 5 years of childhood cancer
 SMNs <- SMNs[!SMNs$sjlid %in% subneo.within5$sjlid,]
 nrow(SMNs)
-# 289
+# 300
 PHENO.ANY_SN$SMN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% SMNs$sjlid, 0, 1))
 
 #############################

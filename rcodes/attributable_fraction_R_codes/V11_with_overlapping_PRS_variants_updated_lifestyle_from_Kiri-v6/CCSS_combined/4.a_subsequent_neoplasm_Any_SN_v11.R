@@ -12,7 +12,7 @@ load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHE
 
 table(PHENO.ANY_SN$CACO)
 # 0    1 
-# 6332 1611 
+# 6496 1447 
 
 ###########################################
 ## Check data in each category/cross tab ##

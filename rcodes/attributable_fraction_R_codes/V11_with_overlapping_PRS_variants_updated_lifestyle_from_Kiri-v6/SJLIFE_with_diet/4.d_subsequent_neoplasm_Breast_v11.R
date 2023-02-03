@@ -82,12 +82,12 @@ subneo <- subneo[!subneo$survey_First > subneo$AGE.ANY_SN,]
 BREASTcancer <- subneo[grepl("breast", subneo$diag, ignore.case = T),]
 BREASTcancer <- setDT(BREASTcancer)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 nrow(BREASTcancer)
-# 55
+# 57
 table(BREASTcancer$diaggrp)
 # Removing samples with SNs within 5 years of childhood cancer
 BREASTcancer <- BREASTcancer[!BREASTcancer$sjlid %in% subneo.within5$sjlid,]
 nrow(BREASTcancer)
-# 54
+# 56
 PHENO.ANY_SN$BREASTcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% BREASTcancer$sjlid, 0, 1))
 
 #############################

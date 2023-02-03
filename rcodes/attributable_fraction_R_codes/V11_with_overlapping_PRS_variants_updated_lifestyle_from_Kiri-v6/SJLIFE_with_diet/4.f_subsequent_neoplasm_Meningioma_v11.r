@@ -67,7 +67,7 @@ ALL.LIFESTYLE$SURVEY_MIN <- apply(ALL.LIFESTYLE[c("PhysicalActivity_yn_agesurvey
 subneo$survey_First <- ALL.LIFESTYLE$SURVEY_MIN[match(subneo$sjlid,ALL.LIFESTYLE$SJLIFEID)]
 table(subneo$survey_First > subneo$AGE.ANY_SN)
 # FALSE  TRUE 
-# 948   579 
+# 961   596 
 
 ALL.LIFESTYLE$PhysicalActivity_yn[which(ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
 ALL.LIFESTYLE$smoker_former_or_never_yn[which(ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey != ALL.LIFESTYLE$SURVEY_MIN)] <- NA
@@ -81,11 +81,11 @@ subneo <- subneo[!subneo$survey_First > subneo$AGE.ANY_SN,]
 MENINGIOMA <- subneo[grepl("meningioma", subneo$diag, ignore.case = T),]
 MENINGIOMA <- setDT(MENINGIOMA)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 nrow(MENINGIOMA)
-# 99
+# 102
 # Removing samples with SNs within 5 years of childhood cancer
 MENINGIOMA <- MENINGIOMA[!MENINGIOMA$sjlid %in% subneo.within5$sjlid,]
 nrow(MENINGIOMA)
-# 99
+# 102
 PHENO.ANY_SN$MENINGIOMA <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% MENINGIOMA$sjlid, 0, 1))
 table(MENINGIOMA$diaggrp)
 

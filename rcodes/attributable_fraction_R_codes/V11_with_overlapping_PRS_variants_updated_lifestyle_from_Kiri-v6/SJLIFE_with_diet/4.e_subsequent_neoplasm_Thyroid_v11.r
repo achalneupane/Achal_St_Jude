@@ -83,10 +83,11 @@ table(subneo$diag)
 THYROIDcancer <- subneo[grepl("thyroid", subneo$diag, ignore.case = T),]
 THYROIDcancer <- setDT(THYROIDcancer)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 nrow(THYROIDcancer)
+# 44
 # Removing samples with SNs within 5 years of childhood cancer
 THYROIDcancer <- THYROIDcancer[!THYROIDcancer$sjlid %in% subneo.within5$sjlid,]
 nrow(THYROIDcancer)
-# 42
+# 43
 PHENO.ANY_SN$THYROIDcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% THYROIDcancer$sjlid, 0, 1))
 table(THYROIDcancer$diaggrp)
 
