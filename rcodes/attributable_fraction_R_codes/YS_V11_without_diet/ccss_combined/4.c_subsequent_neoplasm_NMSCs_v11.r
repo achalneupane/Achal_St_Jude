@@ -192,7 +192,29 @@ table(PHENO.ANY_SN$CACO)
 source("https://raw.githubusercontent.com/achalneupane/Achal_St_Jude/main/rcodes/attributable_fraction_R_codes/YS_V11_without_diet/get_missing_combination.R")
 get_missing_combinations(PHENO.ANY_SN[c("smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "Not_obese_yn")])
 
+###########################################
+## Check data in each category/cross tab ##
+###########################################
+library(expss)
 
+# Getting counts for non-missing data only; 6 samples do not have admixture ancestry
+CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
+
+CROSS_CASES.df <- CROSS_CASES.df[c("NMSC", "smoker_former_or_never_yn", "PhysicalActivity_yn",
+                                   "NOT_RiskyHeavyDrink_yn", Not_obese_yn = "Not_obese_yn")]
+
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df, NMSC = "NMSC", 
+                               smoker_former_or_never_yn = "smoker_former_or_never_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
+                               NOT_RiskyHeavyDrink_yn = "NOT_RiskyHeavyDrink_yn", Not_obese_yn = "Not_obese_yn")
+
+as.data.frame(t(CROSS_CASES.df %>%
+                  cross_cases(NMSC, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, Not_obese_yn))))
+
+cc.NMSC <- as.data.frame(t(CROSS_CASES.df %>%
+                             cross_cases(NMSC, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, Not_obese_yn))))
+
+
+rownames(cc.NMSC) <- NULL 
 ##########################
 dat_all = PHENO.ANY_SN
 fit_all = glm(formula = NMSC ~ BASALcell_PRS.tertile.category + SQUAMOUScell_PRS.tertile.category +
@@ -286,3 +308,6 @@ N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lif
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 # 0.702
+
+NMSC.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
+NMSC.res

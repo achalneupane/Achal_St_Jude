@@ -35,11 +35,10 @@ CROSS_CASES.df <- apply_labels(CROSS_CASES.df, SARCOMA = "SARCOMA",
 as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(SARCOMA, list( smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, Not_obese_yn, aa_class_dose_5.category))))
 
-cc <- as.data.frame(t(CROSS_CASES.df %>%
+cc.SARCOMA <- as.data.frame(t(CROSS_CASES.df %>%
                         cross_cases(SARCOMA, list( smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, Not_obese_yn, aa_class_dose_5.category))))
 
-rownames(cc) <- NULL 
-# View(cc)
+rownames(cc.SARCOMA) <- NULL 
 
 
 ##########################
