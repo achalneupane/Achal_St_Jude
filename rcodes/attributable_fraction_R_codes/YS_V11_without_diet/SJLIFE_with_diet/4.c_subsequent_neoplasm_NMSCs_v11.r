@@ -94,8 +94,6 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$
 # Count missing
 PHENO.ANY_SN$missing.lifestyles <- rowSums(is.na(PHENO.ANY_SN[c("smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")]))
 table(PHENO.ANY_SN$missing.lifestyles)
-# 0    1    2    3    4    5 
-# 4204    4   67   50   14   62
 
 ## Relevel 6 lifestyle variables
 PHENO.ANY_SN$smoker_former_or_never_yn[is.na(PHENO.ANY_SN$smoker_former_or_never_yn)] <- "Unknown"
@@ -113,30 +111,10 @@ PHENO.ANY_SN$HEALTHY_Diet_yn <- factor(PHENO.ANY_SN$HEALTHY_Diet_yn, level = c(1
 PHENO.ANY_SN$Not_obese_yn[is.na(PHENO.ANY_SN$Not_obese_yn)] <- "Unknown";
 PHENO.ANY_SN$Not_obese_yn <- factor(PHENO.ANY_SN$Not_obese_yn, level = c(1, 0, "Unknown")) 
 
-#########################
-## Create HEI tertiles ##
-#########################
-HEI.to.categorize <- c("HEI2015_TOTAL_SCORE")
+## Distribution of overlapping "Unknown" lifestyle factors
+source("https://raw.githubusercontent.com/achalneupane/Achal_St_Jude/main/rcodes/attributable_fraction_R_codes/YS_V11_without_diet/get_missing_combination.R")
+get_missing_combinations(PHENO.ANY_SN[c("smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")])
 
-## Tertile categories
-for(i in 1:length(HEI.to.categorize)){
-  TERT = unname(quantile(PHENO.ANY_SN[HEI.to.categorize[i]][PHENO.ANY_SN[HEI.to.categorize[i]] !=0], c(1/3, 2/3, 1), na.rm = T))
-  if(sum(duplicated(TERT)) > 0) next
-  print (HEI.to.categorize[i])
-  print(TERT)
-  
-  PHENO.ANY_SN$HEI.tmp.tert.category <- as.character(cut(PHENO.ANY_SN[,HEI.to.categorize[i]], breaks = c(0, TERT),
-                                                         labels = c("1st", "2nd", "3rd"),
-                                                         include.lowest = TRUE))
-  
-  PHENO.ANY_SN$HEI.tmp.tert.category[is.na(PHENO.ANY_SN$HEI.tmp.tert.category)] <- "Unknown"
-  PHENO.ANY_SN$HEI.tmp.tert.category <- factor(PHENO.ANY_SN$HEI.tmp.tert.category, levels = c("3rd", "2nd", "1st", "Unknown"))
-  colnames(PHENO.ANY_SN)[colnames(PHENO.ANY_SN) == "HEI.tmp.tert.category"] <- paste0(HEI.to.categorize[i], ".tertile.category")
-}
-
-table(PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category)
-# 3rd     2nd     1st Unknown 
-# 1138    1138    1139     986 
 
 #########################
 ## Extract Ethnicities ##
