@@ -159,10 +159,10 @@ CROSS_CASES.df <- apply_labels(CROSS_CASES.df, MENINGIOMA = "MENINGIOMA",
 as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(MENINGIOMA, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
-cc <- as.data.frame(t(CROSS_CASES.df %>%
+cc.MENINGIOMA <- as.data.frame(t(CROSS_CASES.df %>%
                         cross_cases(MENINGIOMA, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
-rownames(cc) <- NULL 
-View(cc)
+rownames(cc.MENINGIOMA) <- NULL 
+# View(cc)
 
 ##########################
 dat_all = PHENO.ANY_SN

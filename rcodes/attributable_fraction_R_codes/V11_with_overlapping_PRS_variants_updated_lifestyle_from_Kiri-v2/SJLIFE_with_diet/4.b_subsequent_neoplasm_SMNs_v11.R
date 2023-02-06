@@ -161,10 +161,10 @@ CROSS_CASES.df <- apply_labels(CROSS_CASES.df, SMN = "SMN",
 as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(SMN, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
-cc <- as.data.frame(t(CROSS_CASES.df %>%
+cc.SMN <- as.data.frame(t(CROSS_CASES.df %>%
                         cross_cases(SMN, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
-rownames(cc) <- NULL 
+rownames(cc.SMN) <- NULL 
 # View(cc)
 ######################################
 ## Attributable fraction of Any SNs ##

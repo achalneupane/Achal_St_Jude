@@ -158,11 +158,11 @@ CROSS_CASES.df <- apply_labels(CROSS_CASES.df, SARCOMA = "SARCOMA",
 as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(SARCOMA, list( smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
-cc <- as.data.frame(t(CROSS_CASES.df %>%
+cc.SARCOMA <- as.data.frame(t(CROSS_CASES.df %>%
                         cross_cases(SARCOMA, list( smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
-rownames(cc) <- NULL 
-View(cc)
+rownames(cc.SARCOMA) <- NULL 
+# View(cc)
 
 ##########################
 dat_all = PHENO.ANY_SN
@@ -259,6 +259,9 @@ round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 # 0.844
 SARCOMA.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
 SARCOMA.res
+
+counts <- cbind.data.frame(cc.SN, cc.SMN, cc.NMSC, cc.BREAST, cc.THYROID, cc.MENINGIOMA, cc.SARCOMA)
+View(counts)
 
 all.res <- cbind.data.frame(SN=SN.res, SMN=SMN.res, NMSC=NMSC.res, BREAST=BREAST.res, THYROID=THYROID.res, MENINGIOMA=MENINGIOMA.res, SARCOMA=SARCOMA.res)
 # View(all.res)

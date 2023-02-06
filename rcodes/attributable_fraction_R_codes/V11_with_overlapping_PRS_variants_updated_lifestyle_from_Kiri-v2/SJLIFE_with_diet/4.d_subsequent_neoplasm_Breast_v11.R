@@ -161,10 +161,10 @@ CROSS_CASES.df <- apply_labels(CROSS_CASES.df, BREASTcancer = "BREASTcancer",
 as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(BREASTcancer, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
-cc <- (as.data.frame(t(CROSS_CASES.df %>%
+cc.BREAST <- (as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(BREASTcancer, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn)))))
 
-rownames(cc) <- NULL 
+rownames(cc.BREAST) <- NULL 
 # View(cc)
 
 ############################
