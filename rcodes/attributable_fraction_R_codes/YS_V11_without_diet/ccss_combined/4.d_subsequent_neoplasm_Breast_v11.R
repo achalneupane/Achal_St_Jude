@@ -143,6 +143,11 @@ table(PHENO.ANY_SN$CACO)
 # 0    1 
 # 7649  294 
 
+## Distribution of overlapping "Unknown" lifestyle factors
+source("https://raw.githubusercontent.com/achalneupane/Achal_St_Jude/main/rcodes/attributable_fraction_R_codes/YS_V11_without_diet/get_missing_combination.R")
+get_missing_combinations(PHENO.ANY_SN[c("smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "Not_obese_yn")])
+
+
 ############################
 ## Attributable Fractions ##
 ############################

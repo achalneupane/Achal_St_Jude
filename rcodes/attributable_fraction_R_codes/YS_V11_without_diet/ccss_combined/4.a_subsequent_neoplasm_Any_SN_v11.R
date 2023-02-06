@@ -145,6 +145,13 @@ rm(list=setdiff(ls(), c("PHENO.ANY_SN")))
 table(PHENO.ANY_SN$CACO)
 # 0    1 
 # 6332 1611 
+
+## Distribution of overlapping "Unknown" lifestyle factors
+source("https://raw.githubusercontent.com/achalneupane/Achal_St_Jude/main/rcodes/attributable_fraction_R_codes/YS_V11_without_diet/get_missing_combination.R")
+get_missing_combinations(PHENO.ANY_SN[c("smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "Not_obese_yn")])
+
+
+
 ######################################
 ## Attributable fraction of Any SNs ##
 ######################################
@@ -246,3 +253,5 @@ N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lif
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 # 0.626
+SN.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
+SN.res

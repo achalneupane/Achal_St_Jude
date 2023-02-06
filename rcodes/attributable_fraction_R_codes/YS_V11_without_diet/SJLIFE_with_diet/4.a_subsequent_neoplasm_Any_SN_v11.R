@@ -152,7 +152,6 @@ cc.SN <- as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(ANY_SN, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
 
 rownames(cc.SN) <- NULL 
-# View(cc)
 ######################################
 ## Attributable fraction of Any SNs ##
 ######################################

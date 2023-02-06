@@ -127,30 +127,6 @@ ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Geno
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
 
 
-###########################################
-## Check data in each category/cross tab ##
-###########################################
-library(expss)
-
-# Getting counts for non-missing data only; 6 samples do not have admixture ancestry
-CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
-
-CROSS_CASES.df <- CROSS_CASES.df[c("ANY_SN", "smoker_former_or_never_yn", "PhysicalActivity_yn",
-                                   "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")]
-
-CROSS_CASES.df <- apply_labels(CROSS_CASES.df, ANY_SN = "ANY_SN", 
-                               smoker_former_or_never_yn = "smoker_former_or_never_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
-                               NOT_RiskyHeavyDrink_yn = "NOT_RiskyHeavyDrink_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn", Not_obese_yn = "Not_obese_yn")
-
-as.data.frame(t(CROSS_CASES.df %>%
-                        cross_cases(ANY_SN, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
-
-
-cc <- as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(ANY_SN, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Not_obese_yn))))
-
-rownames(cc) <- NULL 
-View(cc)
 ######################################
 ## Attributable fraction of Any SNs ##
 ######################################
