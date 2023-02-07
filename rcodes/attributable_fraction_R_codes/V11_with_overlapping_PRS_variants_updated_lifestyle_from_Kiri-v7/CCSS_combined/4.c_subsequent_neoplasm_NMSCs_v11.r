@@ -6,26 +6,46 @@ setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PH
 # # Since columns are same, we can simply rbind the dataframes
 # PHENO.ANY_SN <- rbind.data.frame(CCSS.org.ANY_SN, CCSS.exp.ANY_SN)
 # rm(list=setdiff(ls(), c("PHENO.ANY_SN")))
-# save.image("00.PHENO.ANY_BREASTcancer_CCSS_combined_v11.Rdata")
+# save.image("00.PHENO.ANY_NMSC_CCSS_combined_v11-6.Rdata")
 
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.PHENO.ANY_BREASTcancer_CCSS_combined_v11.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.PHENO.ANY_NMSC_CCSS_combined_v11-6.Rdata")
 
 table(PHENO.ANY_SN$CACO)
 # 0    1 
-# 7649  294 
+# 7236  707 
 
-############################
-## Attributable Fractions ##
-############################
+###########################################
+## Check data in each category/cross tab ##
+###########################################
+library(expss)
 
-## -------------------------------------- PRS 2019
+# Getting counts for non-missing data only; 6 samples do not have admixture ancestry
+CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
+
+CROSS_CASES.df <- CROSS_CASES.df[c("NMSC", "Current_smoker_yn", "PhysicalActivity_yn",
+                                   "RiskyHeavyDrink_yn", Obese_yn = "Obese_yn")]
+
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df, NMSC = "NMSC", 
+                               Current_smoker_yn = "Current_smoker_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
+                               RiskyHeavyDrink_yn = "RiskyHeavyDrink_yn", Obese_yn = "Obese_yn")
+
+as.data.frame(t(CROSS_CASES.df %>%
+                  cross_cases(NMSC, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, Obese_yn))))
+
+cc.NMSC <- as.data.frame(t(CROSS_CASES.df %>%
+                             cross_cases(NMSC, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, Obese_yn))))
+
+
+rownames(cc.NMSC) <- NULL 
+# View(cc.NMSC)
+
+##########################
+
+##########################
 dat_all = PHENO.ANY_SN
-fit_all = glm(formula = BREASTcancer ~ Mavaddat_2019_ER_POS_Breast_PRS.tertile.category +
-                Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category +
-                Mavaddat_2019_ER_NEG_Breast_PRS.tertile.category +
-                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2+ 
-                AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS +
-                maxchestrtdose.category + anthra_jco_dose_5.category +
+fit_all = glm(formula = NMSC ~ BASALcell_PRS.tertile.category + SQUAMOUScell_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                gender + maxsegrtdose.category + maxabdrtdose.category + maxpelvisrtdose.category +
                 Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
                 EAS + AFR,
               family = binomial,
@@ -41,11 +61,13 @@ dat_all$pred_all = predict(fit_all, newdat = dat_all, type = "response")
 ###############
 ## Treatment ##
 ###############
+
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx = dat_all
 
-dat_tx$maxchestrtdose.category =
-dat_tx$anthra_jco_dose_5.category = "None"
+dat_tx$maxsegrtdose.category =
+dat_tx$maxabdrtdose.category =
+dat_tx$maxpelvisrtdose.category = "None"
 
 dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
 
@@ -53,21 +75,21 @@ dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
 N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
-round(af_by_tx, 3)
-# 0.429
+round(af_by_tx,3)
+# 0.297
 ##################
 ## P/LP and PRS ##
 ##################
 ## P/LP Zhaoming, Qin without Zhaoming and PRS
 dat_plp.prs = dat_all
 # dat_plp.prs$Zhaoming_carriers = dat_plp.prs$Qin_without_Zhaoming_vars_carriers = "N"
-dat_plp.prs$Mavaddat_2019_ER_POS_Breast_PRS.tertile.category = dat_plp.prs$Mavaddat_2019_ER_NEG_Breast_PRS.tertile.category = dat_plp.prs$Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category = "1st"
+dat_plp.prs$SQUAMOUScell_PRS.tertile.category = dat_plp.prs$BASALcell_PRS.tertile.category = "1st"
 
 dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "response")
 N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
 af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
 round(af_by_plp.prs,3)
-# 0.261
+# 0.189
 ###############
 ## Lifestyle ##
 ###############
@@ -82,7 +104,7 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_li
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# 0.396
+# 0.311
 #################################################
 ## Treatment, Genetics and Lifestyle, combined ##
 #################################################
@@ -90,13 +112,14 @@ round(af_by_N_no_favorable_lifestyle.category,3)
 dat_tx.plp.prs.lifestyle = dat_all
 
 ## Nullify Treatment
-dat_tx.plp.prs.lifestyle$maxchestrtdose.category =
-  dat_tx.plp.prs.lifestyle$anthra_jco_dose_5.category = "None"
+dat_tx.plp.prs.lifestyle$maxsegrtdose.category =
+  dat_tx.plp.prs.lifestyle$maxabdrtdose.category =
+  dat_tx.plp.prs.lifestyle$maxpelvisrtdose.category = "None"
 
 
 ## Nullify Genetics
 # dat_tx.plp.prs.lifestyle$Zhaoming_carriers = dat_tx.plp.prs.lifestyle$Qin_without_Zhaoming_vars_carriers = "N";
-dat_tx.plp.prs.lifestyle$Mavaddat_2019_ER_POS_Breast_PRS.tertile.category = dat_tx.plp.prs.lifestyle$Mavaddat_2019_ER_NEG_Breast_PRS.tertile.category = dat_tx.plp.prs.lifestyle$Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category = "1st"
+dat_tx.plp.prs.lifestyle$SQUAMOUScell_PRS.tertile.category = dat_tx.plp.prs.lifestyle$BASALcell_PRS.tertile.category = "1st"
 
 ## Nullify Lifestyle
 dat_tx.plp.prs.lifestyle$Current_smoker_yn =
@@ -110,4 +133,6 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx
 N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
-# 0.804
+# 0.702
+NMSC.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
+NMSC.res

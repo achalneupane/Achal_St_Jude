@@ -1,4 +1,4 @@
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_exp_Genetic_data_P_LP_v11.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_org_Genetic_data_P_LP_V11-6.Rdata")
 
 library(haven)
 library(benchmarkme)
@@ -22,39 +22,63 @@ subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subne
 # How many SNs after 5 years
 subneo.after5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5,]
 length(unique(subneo.after5$ccssid))
-# 269
+# 1351
 
 subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
 sum(!duplicated(subneo.within5$ccssid))
-# 8
+# 19
+
+##############
+## Any SMNs ##
+##############
+## GET SN 18 or older
+subneo <- subneo[subneo$AGE.ANY_SN >= 18,]
 
 
+PHENO.ANY_SN[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
+               "Not_obese_yn_agesurvey")] <- sapply(PHENO.ANY_SN[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
+                                                                   "Not_obese_yn_agesurvey")], floor)
+
+PHENO.ANY_SN$SURVEY_MIN <- apply(PHENO.ANY_SN[c("PhysicalActivity_yn_agesurvey", "smoker_former_or_never_yn_agesurvey", "NOT_RiskyHeavyDrink_yn_agesurvey",
+                                                "Not_obese_yn_agesurvey")], 1, min)
+
+# Anyone before the first survey, remove them
+subneo$survey_First <- PHENO.ANY_SN$SURVEY_MIN[match(subneo$ccssid,PHENO.ANY_SN$ccssid)]
+table(subneo$survey_First > subneo$AGE.ANY_SN)
+
+## Anyone not on the first survey age
+PHENO.ANY_SN$PhysicalActivity_yn[which(PHENO.ANY_SN$PhysicalActivity_yn_agesurvey != PHENO.ANY_SN$SURVEY_MIN)] <- NA
+PHENO.ANY_SN$Current_smoker_yn[which(PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey != PHENO.ANY_SN$SURVEY_MIN)] <- NA
+PHENO.ANY_SN$RiskyHeavyDrink_yn[which(PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey != PHENO.ANY_SN$SURVEY_MIN)] <- NA
+PHENO.ANY_SN$Obese_yn[which(PHENO.ANY_SN$Not_obese_yn_agesurvey != PHENO.ANY_SN$SURVEY_MIN)] <- NA
+
+
+
+subneo <- subneo[!subneo$survey_First > subneo$AGE.ANY_SN,]
 #############
-## Any SNs ##
-#############
-# Get SNs for the first time and Age at First SN.
-# For this, I will first sort the table by date
-library(data.table)
-ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
 
+# This will include any SNs excluding NMSCs
+SMNs <- subneo[!grepl("skin", subneo$groupdx3, ignore.case = T),]
+SMNs <- setDT(SMNs)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
+nrow(SMNs)
+# 1332
+table(SMNs$groupdx3)
 
-# Removing samples with SN within the 5 years of childhood cancer
-ANY_SNs <- ANY_SNs[!ANY_SNs$ccssid %in% subneo.within5$ccssid,]
-dim(ANY_SNs)
-# 268
-
-PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% ANY_SNs$ccssid, 0, 1))
-table(PHENO.ANY_SN$ANY_SN)
+# Removing samples with SNs within 5 years of childhood cancer
+SMNs <- SMNs[!SMNs$ccssid %in% subneo.within5$ccssid,]
+nrow(SMNs)
+# 1314
+PHENO.ANY_SN$SMN <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% SMNs$ccssid, 0, 1))
+table(PHENO.ANY_SN$SMN)
 # 0    1 
-# 2668  268 
-PHENO.ANY_SN$AGE.ANY_SN <- ANY_SNs$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, ANY_SNs$ccssid)]
+# 3693 1314
 
+PHENO.ANY_SN$AGE.ANY_SN <- SMNs$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, SMNs$ccssid)]
 #############################
 ## Add Lifestyle variables ##
 #############################
 # Define CA/CO status in lifestyle
-PHENO.ANY_SN$CACO <- PHENO.ANY_SN$ANY_SN
-
+PHENO.ANY_SN$CACO <- PHENO.ANY_SN$SMN
 
 ## In CASES, if age survey is greater than age at diagnosis; NULLIFY the favorable_lifestyle.category. That information is not useful
 PHENO.ANY_SN[which(PHENO.ANY_SN$CACO == 1 & (PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey > PHENO.ANY_SN$AGE.ANY_SN)), "Current_smoker_yn"] <- "Unknown"
@@ -75,10 +99,10 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.A
 ######################################
 
 dat_all = PHENO.ANY_SN
-fit_all = glm(formula = ANY_SN ~ Pleiotropy_PRSWEB_PRS.tertile.category + 
+fit_all = glm(formula = SMN ~ Pleiotropy_PRSWEB_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
-                maxchestrtdose.category + epitxn_dose_5.category + 
+                maxchestrtdose.category + epitxn_dose_5.category +
                 Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
                 EAS + AFR,
               family = binomial,
@@ -86,7 +110,6 @@ fit_all = glm(formula = ANY_SN ~ Pleiotropy_PRSWEB_PRS.tertile.category +
 
 
 summary(fit_all)
-
 
 ##########################
 ## Get predicted values ##
@@ -112,20 +135,20 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx,3)
-# 0.263
+# 0.25
 ##################
 ## P/LP and PRS ##
 ##################
 ## P/LP Zhaoming, Qin without Zhaoming and PRS
 dat_plp.prs = dat_all
-# dat_plp.prs$Zhaoming_carriers = dat_plp.prs$Qin_without_Zhaoming_vars_carriers = "N";
+# dat_plp.prs$Zhaoming_carriers = dat_plp.prs$Qin_without_Zhaoming_vars_carriers = "N"
 dat_plp.prs$Pleiotropy_PRSWEB_PRS.tertile.category = "1st"
 
 dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "response")
 N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
 af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
 round(af_by_plp.prs,3)
-# 0.005
+# 0.055
 ###############
 ## Lifestyle ##
 ###############
@@ -140,7 +163,10 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_li
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# -0.045
+# -0.081
+
+
+
 #################################################
 ## Treatment, Genetics and Lifestyle, combined ##
 #################################################
@@ -153,19 +179,21 @@ dat_tx.plp.prs.lifestyle$maxsegrtdose.category [!grepl("Unknown", dat_tx.plp.prs
   dat_tx.plp.prs.lifestyle$maxchestrtdose.category [!grepl("Unknown", dat_tx.plp.prs.lifestyle$maxchestrtdose.category)] =
   dat_tx.plp.prs.lifestyle$epitxn_dose_5.category [!grepl("Unknown", dat_tx.plp.prs.lifestyle$epitxn_dose_5.category)] = "None"
 
+
 ## Nullify Genetics
 # dat_tx.plp.prs.lifestyle$Zhaoming_carriers = dat_tx.plp.prs.lifestyle$Qin_without_Zhaoming_vars_carriers = "N";
 dat_tx.plp.prs.lifestyle$Pleiotropy_PRSWEB_PRS.tertile.category = "1st"
 
 ## Nullify Lifestyle
 dat_tx.plp.prs.lifestyle$Current_smoker_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$Current_smoker_yn)] =
-dat_tx.plp.prs.lifestyle$PhysicalActivity_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$PhysicalActivity_yn)] =
-dat_tx.plp.prs.lifestyle$RiskyHeavyDrink_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$RiskyHeavyDrink_yn)] =
-dat_tx.plp.prs.lifestyle$Obese_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$Obese_yn)] = "1"
+  dat_tx.plp.prs.lifestyle$PhysicalActivity_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$PhysicalActivity_yn)] =
+  dat_tx.plp.prs.lifestyle$RiskyHeavyDrink_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$RiskyHeavyDrink_yn)] =
+  dat_tx.plp.prs.lifestyle$Obese_yn [!grepl("Unknown", dat_tx.plp.prs.lifestyle$Obese_yn)] = "1"
+
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx.plp.prs.lifestyle, type = "response")
 
 N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
-# 0.23
+# 0.237
