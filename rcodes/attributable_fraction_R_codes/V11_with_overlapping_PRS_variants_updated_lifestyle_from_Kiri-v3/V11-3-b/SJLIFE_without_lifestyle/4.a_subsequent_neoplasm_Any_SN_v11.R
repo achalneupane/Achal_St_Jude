@@ -5,9 +5,9 @@ load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHE
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
 ALL.LIFESTYLE <- edit_lifestyle(ALL.LIFESTYLE)
 ## replace these variables
-# smoker_former_or_never_yn >> Current_smoker_yn
-# NOT_RiskyHeavyDrink_yn > RiskyHeavyDrink_yn
-# Not_obese_yn >> Obese_yn
+# Current_smoker_yn >> Current_smoker_yn
+# RiskyHeavyDrink_yn > RiskyHeavyDrink_yn
+# Obese_yn >> Obese_yn
 
 
 #########################

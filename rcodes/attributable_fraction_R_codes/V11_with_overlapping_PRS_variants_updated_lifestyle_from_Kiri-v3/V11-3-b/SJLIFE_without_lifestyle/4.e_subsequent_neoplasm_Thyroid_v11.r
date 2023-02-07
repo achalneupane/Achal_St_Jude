@@ -264,7 +264,7 @@ af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 THYROID.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
 THYROID.res
-
+# 0.724 0.506 0.000 0.872
 # PAFs can sum to more than 1 because some individuals with more than one risk
 # factor can have disease prevented in more than one way, and the prevented
 # cases of these individuals could be counted more than once. (source:  DOI: 10.1016/j.amepre.2003.12.007)

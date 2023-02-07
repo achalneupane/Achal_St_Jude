@@ -9,6 +9,8 @@ setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PH
 # save.image("00.PHENO.ANY_NMSC_CCSS_combined_v11-6.Rdata")
 
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.PHENO.ANY_NMSC_CCSS_combined_v11-6.Rdata")
+source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
+PHENO.ANY_SN <- edit_lifestyle.ccss(PHENO.ANY_SN)
 
 table(PHENO.ANY_SN$CACO)
 # 0    1 
@@ -22,18 +24,18 @@ library(expss)
 # Getting counts for non-missing data only; 6 samples do not have admixture ancestry
 CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
 
-CROSS_CASES.df <- CROSS_CASES.df[c("NMSC", "smoker_former_or_never_yn", "PhysicalActivity_yn",
-                                   "NOT_RiskyHeavyDrink_yn", Not_obese_yn = "Not_obese_yn")]
+CROSS_CASES.df <- CROSS_CASES.df[c("NMSC", "Current_smoker_yn", "PhysicalActivity_yn",
+                                   "RiskyHeavyDrink_yn", Obese_yn = "Obese_yn")]
 
 CROSS_CASES.df <- apply_labels(CROSS_CASES.df, NMSC = "NMSC", 
-                               smoker_former_or_never_yn = "smoker_former_or_never_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
-                               NOT_RiskyHeavyDrink_yn = "NOT_RiskyHeavyDrink_yn", Not_obese_yn = "Not_obese_yn")
+                               Current_smoker_yn = "Current_smoker_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
+                               RiskyHeavyDrink_yn = "RiskyHeavyDrink_yn", Obese_yn = "Obese_yn")
 
 as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(NMSC, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, Not_obese_yn))))
+                  cross_cases(NMSC, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, Obese_yn))))
 
 cc.NMSC <- as.data.frame(t(CROSS_CASES.df %>%
-                             cross_cases(NMSC, list(smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, Not_obese_yn))))
+                             cross_cases(NMSC, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, Obese_yn))))
 
 
 rownames(cc.NMSC) <- NULL 
@@ -46,7 +48,7 @@ dat_all = PHENO.ANY_SN
 fit_all = glm(formula = NMSC ~ BASALcell_PRS.tertile.category + SQUAMOUScell_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 gender + maxsegrtdose.category + maxabdrtdose.category + maxpelvisrtdose.category +
-                smoker_former_or_never_yn + PhysicalActivity_yn + NOT_RiskyHeavyDrink_yn + Not_obese_yn +
+                Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
                 EAS + AFR,
               family = binomial,
               data = dat_all)
@@ -95,10 +97,11 @@ round(af_by_plp.prs,3)
 ###############
 dat_lifestyle = dat_all
 
-dat_lifestyle$smoker_former_or_never_yn =
-dat_lifestyle$PhysicalActivity_yn =
-dat_lifestyle$NOT_RiskyHeavyDrink_yn =
-dat_lifestyle$Not_obese_yn = "1"
+dat_lifestyle$Current_smoker_yn = "No"
+dat_lifestyle$PhysicalActivity_yn = "Yes"
+dat_lifestyle$RiskyHeavyDrink_yn = "No"
+# dat_lifestyle$HEALTHY_Diet_yn = "Yes"
+dat_lifestyle$Obese_yn = "No"
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
@@ -122,10 +125,11 @@ dat_tx.plp.prs.lifestyle$maxsegrtdose.category =
 dat_tx.plp.prs.lifestyle$SQUAMOUScell_PRS.tertile.category = dat_tx.plp.prs.lifestyle$BASALcell_PRS.tertile.category = "1st"
 
 ## Nullify Lifestyle
-dat_tx.plp.prs.lifestyle$smoker_former_or_never_yn =
-dat_tx.plp.prs.lifestyle$PhysicalActivity_yn =
-dat_tx.plp.prs.lifestyle$NOT_RiskyHeavyDrink_yn =
-dat_tx.plp.prs.lifestyle$Not_obese_yn = "1"
+dat_lifestyle$Current_smoker_yn = "No"
+dat_lifestyle$PhysicalActivity_yn = "Yes"
+dat_lifestyle$RiskyHeavyDrink_yn = "No"
+# dat_lifestyle$HEALTHY_Diet_yn = "Yes"
+dat_lifestyle$Obese_yn = "No"
 
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx.plp.prs.lifestyle, type = "response")

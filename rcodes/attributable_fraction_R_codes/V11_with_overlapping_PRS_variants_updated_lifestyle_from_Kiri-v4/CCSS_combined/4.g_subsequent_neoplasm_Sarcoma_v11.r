@@ -20,10 +20,10 @@ table(PHENO.ANY_SN$CACO)
 ############################################################################################
 ############################################################################################
 
-PHENO.ANY_SN <- PHENO.ANY_SN[!(PHENO.ANY_SN$smoker_former_or_never_yn == "Unknown" &
+PHENO.ANY_SN <- PHENO.ANY_SN[!(PHENO.ANY_SN$Current_smoker_yn == "Unknown" &
                                  PHENO.ANY_SN$PhysicalActivity_yn == "Unknown" &
-                                 PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn == "Unknown" &
-                                 PHENO.ANY_SN$Not_obese_yn == "Unknown" ),]
+                                 PHENO.ANY_SN$RiskyHeavyDrink_yn == "Unknown" &
+                                 PHENO.ANY_SN$Obese_yn == "Unknown" ),]
 
 dim(PHENO.ANY_SN)
 # 7831   54
@@ -79,18 +79,18 @@ library(expss)
 # Getting counts for non-missing data only; 6 samples do not have admixture ancestry
 CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
 
-CROSS_CASES.df <- CROSS_CASES.df[c("SARCOMA", "smoker_former_or_never_yn", "PhysicalActivity_yn",
-                                   "NOT_RiskyHeavyDrink_yn", "Not_obese_yn",  "aa_class_dose_5.category")]
+CROSS_CASES.df <- CROSS_CASES.df[c("SARCOMA", "Current_smoker_yn", "PhysicalActivity_yn",
+                                   "RiskyHeavyDrink_yn", "Obese_yn",  "aa_class_dose_5.category")]
 
 CROSS_CASES.df <- apply_labels(CROSS_CASES.df, SARCOMA = "SARCOMA",  
-                               smoker_former_or_never_yn = "smoker_former_or_never_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
-                               NOT_RiskyHeavyDrink_yn = "NOT_RiskyHeavyDrink_yn", Not_obese_yn = "Not_obese_yn", aa_class_dose_5.category= "aa_class_dose_5.category")
+                               Current_smoker_yn = "Current_smoker_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
+                               RiskyHeavyDrink_yn = "RiskyHeavyDrink_yn", Obese_yn = "Obese_yn", aa_class_dose_5.category= "aa_class_dose_5.category")
 
 as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(SARCOMA, list( smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, Not_obese_yn, aa_class_dose_5.category))))
+                  cross_cases(SARCOMA, list( Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, Obese_yn, aa_class_dose_5.category))))
 
 cc <- as.data.frame(t(CROSS_CASES.df %>%
-                        cross_cases(SARCOMA, list( smoker_former_or_never_yn, PhysicalActivity_yn, NOT_RiskyHeavyDrink_yn, Not_obese_yn, aa_class_dose_5.category))))
+                        cross_cases(SARCOMA, list( Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, Obese_yn, aa_class_dose_5.category))))
 
 rownames(cc) <- NULL 
 # View(cc)
@@ -101,7 +101,7 @@ dat_all = PHENO.ANY_SN
 fit_all = glm(formula = SARCOMA ~ Sarcoma_Machiela_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 gender + aa_class_dose_5.category +
-                smoker_former_or_never_yn + PhysicalActivity_yn + NOT_RiskyHeavyDrink_yn + Not_obese_yn +
+                Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
                 EAS + AFR,
               family = binomial,
               data = dat_all)
@@ -148,10 +148,10 @@ round(af_by_plp.prs,3)
 ###############
 dat_lifestyle = dat_all
 
-dat_lifestyle$smoker_former_or_never_yn =
+dat_lifestyle$Current_smoker_yn =
 dat_lifestyle$PhysicalActivity_yn =
-dat_lifestyle$NOT_RiskyHeavyDrink_yn =
-dat_lifestyle$Not_obese_yn = "1"
+dat_lifestyle$RiskyHeavyDrink_yn =
+dat_lifestyle$Obese_yn = "1"
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
@@ -172,10 +172,10 @@ dat_tx.plp.prs.lifestyle$aa_class_dose_5.category = "None"
 dat_tx.plp.prs.lifestyle$Sarcoma_Machiela_PRS.tertile.category = "1st"
 
 ## Nullify Lifestyle
-dat_tx.plp.prs.lifestyle$smoker_former_or_never_yn =
+dat_tx.plp.prs.lifestyle$Current_smoker_yn =
 dat_tx.plp.prs.lifestyle$PhysicalActivity_yn =
-dat_tx.plp.prs.lifestyle$NOT_RiskyHeavyDrink_yn =
-dat_tx.plp.prs.lifestyle$Not_obese_yn = "1"
+dat_tx.plp.prs.lifestyle$RiskyHeavyDrink_yn =
+dat_tx.plp.prs.lifestyle$Obese_yn = "1"
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx.plp.prs.lifestyle, type = "response")
 
