@@ -32,13 +32,13 @@ CROSS_CASES.df <- CROSS_CASES.df[c("SARCOMA", "Current_smoker_yn", "PhysicalActi
 
 CROSS_CASES.df <- apply_labels(CROSS_CASES.df, SARCOMA = "SARCOMA",  
                                Current_smoker_yn = "Current_smoker_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
-                               RiskyHeavyDrink_yn = "RiskyHeavyDrink_yn", Obese_yn = "Obese_yn", aa_class_dose_5.category= "aa_class_dose_5.category")
+                               RiskyHeavyDrink_yn = "RiskyHeavyDrink_yn", Obese_yn = "Obese_yn")
 
 as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(SARCOMA, list( Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, Obese_yn, aa_class_dose_5.category))))
+                  cross_cases(SARCOMA, list( Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, Obese_yn))))
 
 cc.SARCOMA <- as.data.frame(t(CROSS_CASES.df %>%
-                        cross_cases(SARCOMA, list( Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, Obese_yn, aa_class_dose_5.category))))
+                        cross_cases(SARCOMA, list( Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, Obese_yn))))
 
 rownames(cc.SARCOMA) <- NULL 
 
@@ -138,7 +138,7 @@ round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 SARCOMA.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
 SARCOMA.res
 
-counts <- cbind.data.frame(cc.SN, cc.SMN, cc.NMSC, cc.BREAST, cc.THYROID, cc.MENINGIOMA, cc.SARCOMA)
+# counts <- cbind.data.frame(cc.SN, cc.SMN, cc.NMSC, cc.BREAST, cc.THYROID, cc.MENINGIOMA, cc.SARCOMA)
 # View(counts)
 
 all.res <- cbind.data.frame(SN=SN.res, SMN=SMN.res, NMSC=NMSC.res, BREAST=BREAST.res, THYROID=THYROID.res, MENINGIOMA=MENINGIOMA.res, SARCOMA=SARCOMA.res)

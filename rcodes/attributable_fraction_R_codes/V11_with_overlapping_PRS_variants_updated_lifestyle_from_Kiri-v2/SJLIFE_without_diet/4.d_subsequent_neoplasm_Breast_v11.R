@@ -2,6 +2,8 @@
 ## Load Phenotype data ##
 #########################
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
+source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
+ALL.LIFESTYLE <- edit_lifestyle(ALL.LIFESTYLE)
 #########################
 ## Subsequent Neoplasm ##
 #########################
@@ -97,19 +99,19 @@ table(PHENO.ANY_SN$missing.lifestyles)
 
 ## Relevel 6 lifestyle variables
 PHENO.ANY_SN$Current_smoker_yn[is.na(PHENO.ANY_SN$Current_smoker_yn)] <- "Unknown"
-PHENO.ANY_SN$Current_smoker_yn <- factor(PHENO.ANY_SN$Current_smoker_yn, level = c(1, 0, "Unknown")) 
+PHENO.ANY_SN$Current_smoker_yn <- factor(PHENO.ANY_SN$Current_smoker_yn, level = c("No", "Yes", "Unknown")) 
 
 PHENO.ANY_SN$PhysicalActivity_yn[is.na(PHENO.ANY_SN$PhysicalActivity_yn)] <- "Unknown"
-PHENO.ANY_SN$PhysicalActivity_yn <- factor(PHENO.ANY_SN$PhysicalActivity_yn, level = c(1, 0, "Unknown")) 
+PHENO.ANY_SN$PhysicalActivity_yn <- factor(PHENO.ANY_SN$PhysicalActivity_yn, level = c("Yes", "No", "Unknown")) 
 
 PHENO.ANY_SN$RiskyHeavyDrink_yn[is.na(PHENO.ANY_SN$RiskyHeavyDrink_yn)] <- "Unknown"
-PHENO.ANY_SN$RiskyHeavyDrink_yn <- factor(PHENO.ANY_SN$RiskyHeavyDrink_yn, level = c(1, 0, "Unknown")) 
+PHENO.ANY_SN$RiskyHeavyDrink_yn <- factor(PHENO.ANY_SN$RiskyHeavyDrink_yn, level = c("No", "Yes", "Unknown")) 
 
 PHENO.ANY_SN$HEALTHY_Diet_yn[is.na(PHENO.ANY_SN$HEALTHY_Diet_yn)] <- "Unknown"
-PHENO.ANY_SN$HEALTHY_Diet_yn <- factor(PHENO.ANY_SN$HEALTHY_Diet_yn, level = c(1, 0, "Unknown")) 
+PHENO.ANY_SN$HEALTHY_Diet_yn <- factor(PHENO.ANY_SN$HEALTHY_Diet_yn, level = c("Yes", "No", "Unknown")) 
 
 PHENO.ANY_SN$Obese_yn[is.na(PHENO.ANY_SN$Obese_yn)] <- "Unknown";
-PHENO.ANY_SN$Obese_yn <- factor(PHENO.ANY_SN$Obese_yn, level = c(1, 0, "Unknown")) 
+PHENO.ANY_SN$Obese_yn <- factor(PHENO.ANY_SN$Obese_yn, level = c("No", "Yes", "Unknown")) 
 
 #########################
 ## Create HEI tertiles ##
@@ -166,7 +168,7 @@ cc <- (as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(BREASTcancer, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Obese_yn)))))
 
 rownames(cc) <- NULL 
-View(cc)
+# View(cc)
 
 ############################
 ## Attributable Fractions ##
@@ -242,11 +244,11 @@ round(af_by_plp.prs,3)
 ###############
 dat_lifestyle = dat_all
 
-dat_lifestyle$Current_smoker_yn =
-dat_lifestyle$PhysicalActivity_yn =
-dat_lifestyle$RiskyHeavyDrink_yn =
-# dat_lifestyle$HEALTHY_Diet_yn =
-dat_lifestyle$Obese_yn = "1"
+dat_lifestyle$Current_smoker_yn = "No"
+dat_lifestyle$PhysicalActivity_yn = "Yes"
+dat_lifestyle$RiskyHeavyDrink_yn = "No"
+# dat_lifestyle$HEALTHY_Diet_yn = "Yes"
+dat_lifestyle$Obese_yn = "No"
 
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
@@ -271,11 +273,11 @@ dat_tx.plp.prs.lifestyle$maxchestrtdose.category =
 dat_tx.plp.prs.lifestyle$Mavaddat_2019_ER_POS_Breast_PRS.tertile.category = dat_tx.plp.prs.lifestyle$Mavaddat_2019_ER_NEG_Breast_PRS.tertile.category = dat_tx.plp.prs.lifestyle$Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category = "1st"
 
 ## Nullify Lifestyle
-dat_tx.plp.prs.lifestyle$Current_smoker_yn =
-  dat_tx.plp.prs.lifestyle$PhysicalActivity_yn =
-  dat_tx.plp.prs.lifestyle$RiskyHeavyDrink_yn =
-  # dat_tx.plp.prs.lifestyle$HEALTHY_Diet_yn =
-  dat_tx.plp.prs.lifestyle$Obese_yn = "1"
+dat_lifestyle$Current_smoker_yn = "No"
+dat_lifestyle$PhysicalActivity_yn = "Yes"
+dat_lifestyle$RiskyHeavyDrink_yn = "No"
+# dat_lifestyle$HEALTHY_Diet_yn = "Yes"
+dat_lifestyle$Obese_yn = "No"
 
 
 
