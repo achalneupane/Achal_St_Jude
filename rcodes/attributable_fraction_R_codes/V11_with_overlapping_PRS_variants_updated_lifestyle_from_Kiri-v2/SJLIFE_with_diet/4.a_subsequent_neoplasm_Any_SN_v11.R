@@ -191,6 +191,10 @@ fit_all = glm(formula = ANY_SN ~ Pleiotropy_PRSWEB_PRS.tertile.category +
 
 summary(fit_all)
 
+(output <- summary(fit_all)$coefficients)
+as.data.frame(apply(output, 2, formatC, format="f", digits=4))
+options(scipen=999)
+View(setNames(data.frame(output[,-4], formatC(output[,4], format="G", digits=3)), colnames(output)))
 
 
 ##########################
