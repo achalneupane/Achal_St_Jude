@@ -173,9 +173,9 @@ View(cc)
 
 ## -------------------------------------- PRS 2019
 dat_all = PHENO.ANY_SN
-fit_all = glm(formula = BREASTcancer ~ Mavaddat_2019_ER_POS_Breast_PRS.tertile.category +
+fit_all = glm(formula = BREASTcancer ~ 
                 Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category +
-                Mavaddat_2019_ER_NEG_Breast_PRS.tertile.category +
+                
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2+ 
                 AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS +
                 maxchestrtdose.category + anthra_jco_dose_5.category +
@@ -188,9 +188,9 @@ summary(fit_all)
 
 # ## WIth Diet
 # fit_all = glm(formula = BREASTcancer ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
-#                 Mavaddat_2019_ER_POS_Breast_PRS.tertile.category +
+#                 
 #                 Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category +
-#                 Mavaddat_2019_ER_NEG_Breast_PRS.tertile.category +
+#                 
 #                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2+ 
 #                 AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS +
 #                 maxchestrtdose.category + anthra_jco_dose_5.category +
