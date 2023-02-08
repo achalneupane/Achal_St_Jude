@@ -185,19 +185,11 @@ fit_all = glm(formula = THYROIDcancer ~ Thyroid_PRS.tertile.category +
 
 summary(fit_all)
 
-# ## With Diet
-# dat_all = PHENO.ANY_SN
-# fit_all = glm(formula = THYROIDcancer ~ Thyroid_PRS.tertile.category +
-#                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-#                 AGE_AT_DIAGNOSIS + gender + maxneckrtdose.category + epitxn_dose_5.category + 
-#                 Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + HEALTHY_Diet_yn + Obese_yn +
-#                 EAS + AFR,
-#               family = binomial,
-#               data = dat_all)
-# 
-# 
-# 
-# summary(fit_all)
+(output <- summary(fit_all)$coefficients)
+as.data.frame(apply(output, 2, formatC, format="f", digits=4))
+options(scipen=999)
+thyroid.model <- (setNames(data.frame(output[,-4], formatC(output[,4], format="G", digits=3)), colnames(output)))[c(1,4)]
+
 
 ##########################
 ## Get predicted values ##

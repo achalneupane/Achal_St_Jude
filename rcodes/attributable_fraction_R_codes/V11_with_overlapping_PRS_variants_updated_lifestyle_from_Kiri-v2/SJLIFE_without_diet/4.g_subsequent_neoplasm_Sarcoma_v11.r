@@ -178,17 +178,11 @@ fit_all = glm(formula = SARCOMA ~ Sarcoma_Machiela_PRS.tertile.category +
 
 summary(fit_all)
 
-# # With Diet
-# fit_all = glm(formula = SARCOMA ~ Sarcoma_Machiela_PRS.tertile.category +
-#                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-#                 gender + aa_class_dose_5.category +
-#                 Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + HEALTHY_Diet_yn + Obese_yn +
-#                 EAS + AFR,
-#               family = binomial,
-#               data = dat_all)
-# 
-# 
-# summary(fit_all)
+(output <- summary(fit_all)$coefficients)
+as.data.frame(apply(output, 2, formatC, format="f", digits=4))
+options(scipen=999)
+sarcoma.model <- (setNames(data.frame(output[,-4], formatC(output[,4], format="G", digits=3)), colnames(output)))[c(1,4)]
+
 
 
 ##########################
@@ -277,3 +271,17 @@ SARCOMA.res
 all.res <- cbind.data.frame(SN=SN.res, SMN=SMN.res, NMSC=NMSC.res, BREAST=BREAST.res, THYROID=THYROID.res, MENINGIOMA=MENINGIOMA.res, SARCOMA=SARCOMA.res)
 # View(all.res)
 View(t(all.res))
+
+
+merge.all <- function(x, ..., by = "row.names") {
+  L <- list(...)
+  for (i in seq_along(L)) {
+    x <- merge(x, L[[i]], by = by, all = TRUE)
+    rownames(x) <- x$Row.names
+    x$Row.names <- NULL
+  }
+  return(x)
+}
+
+df <- merge.all(sn.model, smn.model,nmsc.model, breast.model, thyroid.model, meningioma.model, sarcoma.model)
+dim(df)
