@@ -262,11 +262,11 @@ dat_tx.plp.prs.lifestyle$maxchestrtdose.category =
 dat_tx.plp.prs.lifestyle$Mavaddat_2019_ER_POS_Breast_PRS.tertile.category = dat_tx.plp.prs.lifestyle$Mavaddat_2019_ER_NEG_Breast_PRS.tertile.category = dat_tx.plp.prs.lifestyle$Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category = "1st"
 
 ## Nullify Lifestyle
-dat_lifestyle$Current_smoker_yn = "No"
-dat_lifestyle$PhysicalActivity_yn = "Yes"
-dat_lifestyle$RiskyHeavyDrink_yn = "No"
-dat_lifestyle$HEALTHY_Diet_yn = "Yes"
-dat_lifestyle$Obese_yn = "No"
+dat_tx.plp.prs.lifestyle$Current_smoker_yn = "No"
+dat_tx.plp.prs.lifestyle$PhysicalActivity_yn = "Yes"
+dat_tx.plp.prs.lifestyle$RiskyHeavyDrink_yn = "No"
+dat_tx.plp.prs.lifestyle$HEALTHY_Diet_yn = "Yes"
+dat_tx.plp.prs.lifestyle$Obese_yn = "No"
 
 
 
