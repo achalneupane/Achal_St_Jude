@@ -10,3 +10,8 @@ find ./ -type f| grep V11_with_overlapping| egrep -v "Pheno|Rhistory|Merge_all_a
 
 
 find ./ -type f| grep V11_with_overlapping| egrep -v "Pheno|Rhistory|Merge_all_admixture" | xargs -I {} sed -i 's/\bsmoker_former_or_never_yn\b/Current_smoker_yn/g' {}
+
+
+
+
+find ./ -type f| grep V11_with_overlapping| egrep -v "Pheno|Rhistory|Merge_all_admixture" | xargs -I {} sed -i '/^## Nullify Lifestyle/,$s/dat_lifestyle/dat_tx.plp.prs.lifestyle/g' {}

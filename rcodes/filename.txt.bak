@@ -1,0 +1,12 @@
+dat_lifestyle$Current_smoker_yn = "No"
+dat_lifestyle$PhysicalActivity_yn = "Yes"
+dat_lifestyle$RiskyHeavyDrink_yn = "No"
+dat_lifestyle$HEALTHY_Diet_yn = "Yes"
+dat_lifestyle$Obese_yn = "No
+
+## Nullify Lifestyle
+dat_lifestyle$Current_smoker_yn = "No"
+dat_lifestyle$PhysicalActivity_yn = "Yes"
+dat_lifestyle$RiskyHeavyDrink_yn = "No"
+dat_lifestyle$HEALTHY_Diet_yn = "Yes"
+dat_lifestyle$Obese_yn = "No

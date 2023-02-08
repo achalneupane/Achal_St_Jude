@@ -239,11 +239,11 @@ dat_tx.plp.prs.lifestyle$aa_class_dose_5.category = "None"
 dat_tx.plp.prs.lifestyle$Sarcoma_Machiela_PRS.tertile.category = "1st"
 
 ## Nullify Lifestyle
-dat_lifestyle$Current_smoker_yn = "No"
-dat_lifestyle$PhysicalActivity_yn = "Yes"
-dat_lifestyle$RiskyHeavyDrink_yn = "No"
-# dat_lifestyle$HEALTHY_Diet_yn = "Yes"
-dat_lifestyle$Obese_yn = "No"
+dat_tx.plp.prs.lifestyle$Current_smoker_yn = "No"
+dat_tx.plp.prs.lifestyle$PhysicalActivity_yn = "Yes"
+dat_tx.plp.prs.lifestyle$RiskyHeavyDrink_yn = "No"
+# dat_tx.plp.prs.lifestyle$HEALTHY_Diet_yn = "Yes"
+dat_tx.plp.prs.lifestyle$Obese_yn = "No"
 
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx.plp.prs.lifestyle, type = "response")
