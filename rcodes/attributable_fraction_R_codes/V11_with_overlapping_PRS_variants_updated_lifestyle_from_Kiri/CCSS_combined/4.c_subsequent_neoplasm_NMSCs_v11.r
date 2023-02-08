@@ -16,7 +16,7 @@ table(PHENO.ANY_SN$CACO)
 
 ##########################
 dat_all = PHENO.ANY_SN
-fit_all = glm(formula = NMSC ~ BASALcell_PRS.tertile.category + SQUAMOUScell_PRS.tertile.category +
+fit_all = glm(formula = NMSC ~ BASALcell_PRS.tertile.category + 
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 gender + maxsegrtdose.category + maxabdrtdose.category + maxpelvisrtdose.category +
                 Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
