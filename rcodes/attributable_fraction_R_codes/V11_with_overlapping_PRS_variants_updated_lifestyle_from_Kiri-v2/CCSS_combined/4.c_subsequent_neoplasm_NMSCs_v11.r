@@ -27,6 +27,10 @@ fit_all = glm(formula = NMSC ~ BASALcell_PRS.tertile.category + SQUAMOUScell_PRS
               data = dat_all)
 
 summary(fit_all)
+(output <- summary(fit_all)$coefficients)
+as.data.frame(apply(output, 2, formatC, format="f", digits=4))
+options(scipen=999)
+nmsc.model <- (setNames(data.frame(output[,-4], formatC(output[,4], format="G", digits=3)), colnames(output)))[c(1,4)]
 
 ##########################
 ## Get predicted values ##
