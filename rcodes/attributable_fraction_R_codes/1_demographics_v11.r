@@ -42,6 +42,8 @@ wgsdiag <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/at
 head(wgsdiag)
 # table(wgsdiag$diaggrp)
 clinical.dat <- cbind.data.frame(clinical.dat, wgsdiag[match(clinical.dat$MRN, wgsdiag$MRN), c("diagdt", "diaggrp")])
+# clinical.dat <- cbind.data.frame(clinical.dat, wgsdiag[match(clinical.dat$MRN, wgsdiag$MRN), c("diagdt", "diaggrp", "diag")])
+# SARCOMA$primdx <- clinical.dat$diag[match(SARCOMA$sjlid, clinical.dat$sjlid)]
 
 ###############
 ## Radiation ##
