@@ -175,12 +175,17 @@ fit_all = glm(formula = SARCOMA ~ Sarcoma_Machiela_PRS.tertile.category +
 
 summary(fit_all)
 
-summary(fit_all)
 (output <- summary(fit_all)$coefficients)
 as.data.frame(apply(output, 2, formatC, format="f", digits=4))
-options(scipen=999)
-sarcoma.model <- (setNames(data.frame(output[,-4], formatC(output[,4], format="G", digits=3)), colnames(output)))[c(1,4)]
-
+# options(scipen=999)
+estimate <- format(round(output[,1],3), nsmall = 3)
+std.error <- format(round(output[,2],3), nsmall = 3)
+# P.val <- formatC(output[,4], format="G", digits=3)
+P.val <- output[,4]
+P.val[P.val < 0.001] <- "<0.001"
+P.val[!grepl("<", P.val)] <- format(round(as.numeric(P.val[!grepl("<", P.val)]), 3), nsmall = 3)
+sarcoma.model <- (setNames(cbind.data.frame(estimate, std.error, P.val
+), c("Estimate", "Std.error", "P")))
 ##########################
 ## Get predicted values ##
 ##########################
@@ -278,3 +283,5 @@ merge.all <- function(x, ..., by = "row.names") {
 
 df <- merge.all(sn.model, smn.model,nmsc.model, breast.model, thyroid.model, meningioma.model, sarcoma.model)
 dim(df)
+
+
