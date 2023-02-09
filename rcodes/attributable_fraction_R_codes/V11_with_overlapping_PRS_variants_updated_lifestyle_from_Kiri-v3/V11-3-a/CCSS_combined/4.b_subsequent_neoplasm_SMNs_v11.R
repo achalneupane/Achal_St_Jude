@@ -32,7 +32,17 @@ fit_all = glm(formula = SMN ~ Pleiotropy_PRSWEB_PRS.tertile.category +
 
 
 summary(fit_all)
-
+(output <- summary(fit_all)$coefficients)
+as.data.frame(apply(output, 2, formatC, format="f", digits=4))
+# options(scipen=999)
+estimate <- format(round(output[,1],3), nsmall = 3)
+std.error <- format(round(output[,2],3), nsmall = 3)
+# P.val <- formatC(output[,4], format="G", digits=3)
+P.val <- output[,4]
+P.val[P.val < 0.001] <- "<0.001"
+P.val[!grepl("<", P.val)] <- format(round(as.numeric(P.val[!grepl("<", P.val)]), 3), nsmall = 3)
+smn.model <- (setNames(cbind.data.frame(estimate, std.error, P.val
+), c("Estimate", "Std.error", "P")))
 ##########################
 ## Get predicted values ##
 ##########################
