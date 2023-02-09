@@ -158,8 +158,8 @@ target <- c("(Intercept)", "genderFemale", "AGE_AT_DIAGNOSIS5-9", "AGE_AT_DIAGNO
             "aa_class_dose_5.category1st","aa_class_dose_5.category2nd","aa_class_dose_5.category3rd","aa_class_dose_5.categoryUnknown",
             "anthra_jco_dose_5.category1st","anthra_jco_dose_5.category2nd","anthra_jco_dose_5.category3rd","anthra_jco_dose_5.categoryUnknown",
             "maxabdrtdose.category0-30", "maxabdrtdose.category>=30","maxabdrtdose.categoryUnknown",
-            "maxchestrtdose.category0-<20","maxchestrtdose.category>=20", "maxchestrtdose.categoryUnknown",
-            "maxneckrtdose.category0-<11", "maxneckrtdose.category11-20","maxneckrtdose.category20-30","maxneckrtdose.category>=30", "maxneckrtdose.categoryUnknown",
+            "maxchestrtdose.category0-20","maxchestrtdose.category>=20", "maxchestrtdose.categoryUnknown",
+            "maxneckrtdose.category0-11", "maxneckrtdose.category11-20","maxneckrtdose.category20-30","maxneckrtdose.category>=30", "maxneckrtdose.categoryUnknown",
             "maxpelvisrtdose.category0-20", "maxpelvisrtdose.category>=20","maxpelvisrtdose.categoryUnknown",
             "maxsegrtdose.category0-18", "maxsegrtdose.category18-30", "maxsegrtdose.category>=30","maxsegrtdose.categoryUnknown")
 

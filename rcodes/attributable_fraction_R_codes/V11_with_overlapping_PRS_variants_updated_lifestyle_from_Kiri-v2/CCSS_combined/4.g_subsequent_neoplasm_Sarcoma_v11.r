@@ -56,11 +56,18 @@ fit_all = glm(formula = SARCOMA ~ Sarcoma_Machiela_PRS.tertile.category +
 
 
 summary(fit_all)
+
 (output <- summary(fit_all)$coefficients)
 as.data.frame(apply(output, 2, formatC, format="f", digits=4))
-options(scipen=999)
-sarcoma.model <- (setNames(data.frame(output[,-4], formatC(output[,4], format="G", digits=3)), colnames(output)))[c(1,4)]
-
+# options(scipen=999)
+estimate <- format(round(output[,1],3), nsmall = 3)
+std.error <- format(round(output[,2],3), nsmall = 3)
+# P.val <- formatC(output[,4], format="G", digits=3)
+P.val <- output[,4]
+P.val[P.val < 0.001] <- "<0.001"
+P.val[!grepl("<", P.val)] <- format(round(as.numeric(P.val[!grepl("<", P.val)]), 3), nsmall = 3)
+sarcoma.model <- (setNames(cbind.data.frame(estimate, std.error, P.val
+), c("Estimate", "Std.error", "P")))
 
 ##########################
 ## Get predicted values ##
@@ -148,6 +155,16 @@ all.res <- cbind.data.frame(SN=SN.res, SMN=SMN.res, NMSC=NMSC.res, BREAST=BREAST
 View(t(all.res))
 
 
+ChangeNames <- function(x) {
+  row.names(x)[grepl("PRS.tertile.category2nd", row.names(x))] <- "PRS.tertile.category2nd"
+  row.names(x)[grepl("PRS.tertile.category3rd", row.names(x))] <- "PRS.tertile.category3rd"
+  return(x)
+}
+
+df_list <- list(sn.model=sn.model, smn.model=smn.model, nmsc.model=nmsc.model, breast.model=breast.model
+                ,thyroid.model=thyroid.model, meningioma.model = meningioma.model, sarcoma.model = sarcoma.model)
+df_list <- lapply(df_list, ChangeNames)
+list2env(df_list ,.GlobalEnv)
 merge.all <- function(x, ..., by = "row.names") {
   L <- list(...)
   for (i in seq_along(L)) {
@@ -159,4 +176,22 @@ merge.all <- function(x, ..., by = "row.names") {
 }
 
 df <- merge.all(sn.model, smn.model,nmsc.model, breast.model, thyroid.model, meningioma.model, sarcoma.model)
+df <- df[!grepl("AGE_AT_LAST_CONTACT", row.names(df)),]
 dim(df)
+
+target <- c("(Intercept)", "genderFemale", "AGE_AT_DIAGNOSIS5-9", "AGE_AT_DIAGNOSIS10-14", "AGE_AT_DIAGNOSIS>=15", "AFR", "EAS",
+            "PRS.tertile.category2nd","PRS.tertile.category3rd",
+            "epitxn_dose_5.category1st","epitxn_dose_5.category2nd","epitxn_dose_5.category3rd","epitxn_dose_5.categoryUnknown",
+            "aa_class_dose_5.category1st","aa_class_dose_5.category2nd","aa_class_dose_5.category3rd","aa_class_dose_5.categoryUnknown",
+            "anthra_jco_dose_5.category1st","anthra_jco_dose_5.category2nd","anthra_jco_dose_5.category3rd","anthra_jco_dose_5.categoryUnknown",
+            "maxabdrtdose.category0-30", "maxabdrtdose.category>=30","maxabdrtdose.categoryUnknown",
+            "maxchestrtdose.category0-20","maxchestrtdose.category>=20", "maxchestrtdose.categoryUnknown",
+            "maxneckrtdose.category0-11", "maxneckrtdose.category11-20","maxneckrtdose.category20-30","maxneckrtdose.category>=30", "maxneckrtdose.categoryUnknown",
+            "maxpelvisrtdose.category0-20", "maxpelvisrtdose.category>=20","maxpelvisrtdose.categoryUnknown",
+            "maxsegrtdose.category0-18", "maxsegrtdose.category18-30", "maxsegrtdose.category>=30","maxsegrtdose.categoryUnknown",
+            "Current_smoker_ynYes", "Current_smoker_ynUnknown", 
+            "RiskyHeavyDrink_ynYes", "RiskyHeavyDrink_ynUnknown",
+            "PhysicalActivity_ynNo", "PhysicalActivity_ynUnknown",
+            "Obese_ynYes", "Obese_ynUnknown")
+
+df <- df[match(target, rownames(df)),]
