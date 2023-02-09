@@ -65,7 +65,7 @@ nrow(SARCOMA)
 
 ## Samples with either retinoblastoma or germ cell tumor
 # retino.germ <- c("SJL5002218", "SJL5004118", "SJL5013318", "SJL5013918", "SJL5015118", "SJL5016518", "SJL5025005", "SJL5029618", "SJL5029918", "SJL5033218")
-SARCOMA <- SARCOMA[!SARCOMA$sjlid %in% retino.germ,]
+# SARCOMA <- SARCOMA[!SARCOMA$sjlid %in% retino.germ,]
 
 PHENO.ANY_SN$SARCOMA <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% SARCOMA$sjlid, 0, 1))
 
@@ -278,7 +278,6 @@ round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 SARCOMA.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
 SARCOMA.res
 # 0.373 0.023 0.541 0.744
-# 0.286 -0.116  0.714  0.788
 
 all.res <- cbind.data.frame(SN=SN.res, SMN=SMN.res, NMSC=NMSC.res, BREAST=BREAST.res, THYROID=THYROID.res, MENINGIOMA=MENINGIOMA.res, SARCOMA=SARCOMA.res)
 # View(all.res)
