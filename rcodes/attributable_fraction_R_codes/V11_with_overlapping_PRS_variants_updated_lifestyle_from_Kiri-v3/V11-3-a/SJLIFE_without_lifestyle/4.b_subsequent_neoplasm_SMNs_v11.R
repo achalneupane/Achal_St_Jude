@@ -182,6 +182,12 @@ fit_all = glm(formula = SMN ~ Pleiotropy_PRSWEB_PRS.tertile.category +
 
 summary(fit_all)
 
+summary(fit_all)
+(output <- summary(fit_all)$coefficients)
+as.data.frame(apply(output, 2, formatC, format="f", digits=4))
+options(scipen=999)
+smn.model <- (setNames(data.frame(output[,-4], formatC(output[,4], format="G", digits=3)), colnames(output)))[c(1,4)]
+
 
 ##########################
 ## Get predicted values ##
