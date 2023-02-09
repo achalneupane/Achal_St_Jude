@@ -312,6 +312,11 @@ target <- c("(Intercept)", "genderFemale", "AGE_AT_DIAGNOSIS5-9", "AGE_AT_DIAGNO
             "maxchestrtdose.category>0-<20","maxchestrtdose.category>=20", "maxchestrtdose.categoryUnknown",
             "maxneckrtdose.category>0-<11", "maxneckrtdose.category>=11-<20","maxneckrtdose.category>=20-<30","maxneckrtdose.category>=30", "maxneckrtdose.categoryUnknown",
             "maxpelvisrtdose.category>0-<20", "maxpelvisrtdose.category>=20","maxpelvisrtdose.categoryUnknown",
-            "maxsegrtdose.category>0-<18", "maxsegrtdose.category>=18-<30", "maxsegrtdose.category>=30","maxsegrtdose.categoryUnknown")
+            "maxsegrtdose.category>0-<18", "maxsegrtdose.category>=18-<30", "maxsegrtdose.category>=30","maxsegrtdose.categoryUnknown",
+            "Current_smoker_ynYes", "Current_smoker_ynUnknown", 
+            "RiskyHeavyDrink_ynYes", "RiskyHeavyDrink_ynUnknown",
+            "PhysicalActivity_ynNo", "PhysicalActivity_ynUnknown",
+            "Obese_ynYes", "Obese_ynUnknown", 
+            "HEALTHY_Diet_ynNo", "HEALTHY_Diet_ynUnknown")
 
 df <- df[match(target, rownames(df)),]
