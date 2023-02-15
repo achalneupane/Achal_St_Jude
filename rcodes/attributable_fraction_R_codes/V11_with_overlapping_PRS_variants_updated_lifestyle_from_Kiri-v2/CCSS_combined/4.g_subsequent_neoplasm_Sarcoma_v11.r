@@ -49,8 +49,14 @@ unique(SARCOMA$candxo3)
 sarcoma.icdo3 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V11_with_overlapping_PRS_variants_updated_lifestyle_from_Kiri-v2/CCSS_combined/site_types.txt", sep = "\t")
 sarcoma.icdo3$V1 <- gsub("\\/", ".", sarcoma.icdo3$V1)
 
-match(SARCOMA$candxo3, sarcoma.icdo3$V1)
+SARCOMA$new_SN_diagnosis_labels <- sarcoma.icdo3$V2[match(SARCOMA$candxo3, sarcoma.icdo3$V1)]
 table(SARCOMA$ANY_SN_TYPE)
+
+SN.question <- SARCOMA[grepl("Other soft tissue sarcomas|Unspecified", SARCOMA$ANY_SN_TYPE),]
+table(is.na(SN.question$new_SN_diagnosis_labels))
+# FALSE  TRUE 
+# 53    38 
+as.data.frame(table(SN.question$new_SN_diagnosis_labels))
 
 ###########################################
 ## Check data in each category/cross tab ##
