@@ -2,20 +2,18 @@
 # !pip install pikepdf
 # ! pip install requests
 # ! pip install PyPDF4
-
-
-
 import re
 import csv
 import PyPDF4
+import os
+os.chdir("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V11_with_overlapping_PRS_variants_updated_lifestyle_from_Kiri-v2/CCSS_combined")
 
 pdf_file = open('sitetype.icdo3.20220429.pdf', 'rb')
 pdf_reader = PyPDF4.PdfFileReader(pdf_file)
 
 # Create a regular expression pattern to match the site types
-# pattern = r"(\d{4}/\d{1,2})\s+(.+)"
 # pattern = r"\b(\d{4}/\d{1,2})\s+([A-Za-z\s-]+)"
-pattern = r"(\d{4}/\d{1,2})\s+([^.\n]+)"
+pattern = r"(\d{4}/\d{1,2})\s+([^\n]+)"
 
 # Create a CSV file to write the data to
 with open('site_types.csv', 'w', newline='') as csv_file:
