@@ -362,3 +362,9 @@ awk '{printf "chr%s\t%s\tchr%s:%s\t%s\t%s\t%s\n", $1, $3, $1, $3, $14, $4, $12}'
 
 awk 'BEGIN {FS=OFS="\t"} NR==1 {print; next} {print $0 | "sort -k2,2n"}' chr5_PCA_afr.assoc.logistic.clean.Psorted.withBETA.locus.txt> locus_zoom_chr5_afr
 awk 'BEGIN {FS=OFS="\t"} NR==1 {print; next} {print $0 | "sort -k2,2n"}' chr5_PCA_eur.assoc.logistic.clean.Psorted.withBETA.locus.txt> locus_zoom_chr5_eur
+
+
+
+## Calculate LD based on SJLIFE
+## https://statgen.github.io/localzoom/#instructions
+bcftools annotate -Oz --set-id '%CHROM\:%POS\_%REF\/%ALT' /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr5.preQC_biallelic_renamed_ID_edited.vcf.gz > EPACTS_ID_format_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr5.preQC_biallelic_renamed_ID_edited.vcf.gz

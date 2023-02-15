@@ -132,38 +132,32 @@ PHENO.ANY_SN$UNKNOWNS <- apply(PHENO.ANY_SN[columns], 1, function(x) {
 
 table(PHENO.ANY_SN$UNKNOWNS)
 
+library(purrr)
+library(stringr)
 ## Loop over nchar>= 2
 life.vars <- unique(PHENO.ANY_SN$UNKNOWNS[which(nchar(PHENO.ANY_SN$UNKNOWNS) >= 2)])
 for (i in 1:length(life.vars)){
-ifelse(grepl(life.vars[i], PHENO.ANY_SN$UNKNOWNS), 1,0)
-
-
-
-
-#########################
-## Create HEI tertiles ##
-#########################
-HEI.to.categorize <- c("HEI2015_TOTAL_SCORE")
-
-## Tertile categories
-for(i in 1:length(HEI.to.categorize)){
-  TERT = unname(quantile(PHENO.ANY_SN[HEI.to.categorize[i]][PHENO.ANY_SN[HEI.to.categorize[i]] !=0], c(1/3, 2/3, 1), na.rm = T))
-  if(sum(duplicated(TERT)) > 0) next
-  print (HEI.to.categorize[i])
-  print(TERT)
-  
-  PHENO.ANY_SN$HEI.tmp.tert.category <- as.character(cut(PHENO.ANY_SN[,HEI.to.categorize[i]], breaks = c(0, TERT),
-                                                     labels = c("1st", "2nd", "3rd"),
-                                                     include.lowest = TRUE))
-  
-  PHENO.ANY_SN$HEI.tmp.tert.category[is.na(PHENO.ANY_SN$HEI.tmp.tert.category)] <- "Unknown"
-  PHENO.ANY_SN$HEI.tmp.tert.category <- factor(PHENO.ANY_SN$HEI.tmp.tert.category, levels = c("3rd", "2nd", "1st", "Unknown"))
-  colnames(PHENO.ANY_SN)[colnames(PHENO.ANY_SN) == "HEI.tmp.tert.category"] <- paste0(HEI.to.categorize[i], ".tertile.category")
+  PHENO.ANY_SN$UNKNOWNS.tmp <- gsub(paste0("[^",life.vars[i],"]"), "", PHENO.ANY_SN$UNKNOWNS)
+  new_col_name <- paste0(life.vars[i], "_missing")
+  PHENO.ANY_SN[[new_col_name]] <- as.factor(ifelse(grepl(life.vars[i], PHENO.ANY_SN$UNKNOWNS.tmp), "Yes", "No"))
 }
 
-table(PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category)
-# 3rd     2nd     1st Unknown 
-# 1087    1087    1089    1138
+## Recode lifestyle variables to fit the model for missingness
+PHENO.ANY_SN$Current_smoker_yn[PHENO.ANY_SN$Current_smoker_yn == "Unknown"] <- "No"
+PHENO.ANY_SN$Current_smoker_yn <- droplevels(PHENO.ANY_SN$Current_smoker_yn)
+
+PHENO.ANY_SN$PhysicalActivity_yn[PHENO.ANY_SN$PhysicalActivity_yn == "Unknown"] <- "No"
+PHENO.ANY_SN$PhysicalActivity_yn <- droplevels(PHENO.ANY_SN$PhysicalActivity_yn)
+
+PHENO.ANY_SN$RiskyHeavyDrink_yn[PHENO.ANY_SN$RiskyHeavyDrink_yn == "Unknown"] <- "No"
+PHENO.ANY_SN$RiskyHeavyDrink_yn <- droplevels(PHENO.ANY_SN$RiskyHeavyDrink_yn)
+
+PHENO.ANY_SN$Obese_yn[PHENO.ANY_SN$Obese_yn == "Unknown"] <- "No"
+PHENO.ANY_SN$Obese_yn <- droplevels(PHENO.ANY_SN$Obese_yn)
+
+PHENO.ANY_SN$HEALTHY_Diet_yn[PHENO.ANY_SN$HEALTHY_Diet_yn == "Unknown"] <- "No"
+PHENO.ANY_SN$HEALTHY_Diet_yn <- droplevels(PHENO.ANY_SN$HEALTHY_Diet_yn)
+
 #########################
 ## Extract Ethnicities ##
 #########################
@@ -199,14 +193,15 @@ rownames(cc.SN) <- NULL
 ######################################
 ## Attributable fraction of Any SNs ##
 ######################################
-
+## Life vars: "CPRHO" "HO"    "CPRH"  "CPR"   "RHO"   "CR"    "RO"    "CRH"   "RH"    "PR"    "CPRO"  "CH"
 dat_all = PHENO.ANY_SN
 fit_all = glm(formula = ANY_SN ~ Pleiotropy_PRSWEB_PRS.tertile.category + 
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
                 maxchestrtdose.category + epitxn_dose_5.category + 
-                Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + HEALTHY_Diet_yn + Obese_yn +
-                EAS + AFR,
+                Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + HEALTHY_Diet_yn + Obese_yn + 
+                EAS + AFR +
+                CH_missing,
               family = binomial,
               data = dat_all)
 
