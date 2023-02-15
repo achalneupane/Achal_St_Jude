@@ -117,6 +117,22 @@ PHENO.ANY_SN$HEALTHY_Diet_yn <- factor(PHENO.ANY_SN$HEALTHY_Diet_yn, level = c("
 PHENO.ANY_SN$Obese_yn[is.na(PHENO.ANY_SN$Obese_yn)] <- "Unknown";
 PHENO.ANY_SN$Obese_yn <- factor(PHENO.ANY_SN$Obese_yn, level = c("No", "Yes", "Unknown")) 
 
+####################
+## Count Unknowns ##
+####################
+columns <- c("Current_smoker_yn", "PhysicalActivity_yn",
+             "RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Obese_yn")
+# Get the first letter of each column name
+col_names <- substr(columns, 1, 1)
+
+# Loop through each row of the dataframe
+PHENO.ANY_SN$UNKNOWNS <- apply(PHENO.ANY_SN[columns], 1, function(x) {
+  ifelse(sum(x == "Unknown") > 0, paste(col_names[x == "Unknown"], collapse = ""), NA)
+})
+
+table(PHENO.ANY_SN$UNKNOWNS)
+
+
 
 #########################
 ## Create HEI tertiles ##

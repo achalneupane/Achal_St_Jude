@@ -56,6 +56,7 @@ SN.question <- SARCOMA[grepl("Other soft tissue sarcomas|Unspecified", SARCOMA$A
 table(is.na(SN.question$new_SN_diagnosis_labels))
 # FALSE  TRUE 
 # 53    38 
+table(is.na(SARCOMA$candxo3))
 as.data.frame(table(SN.question$new_SN_diagnosis_labels))
 
 ###########################################
