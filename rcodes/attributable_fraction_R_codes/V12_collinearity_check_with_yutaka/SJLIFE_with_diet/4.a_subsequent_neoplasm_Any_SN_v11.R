@@ -130,7 +130,13 @@ PHENO.ANY_SN$UNKNOWNS <- apply(PHENO.ANY_SN[columns], 1, function(x) {
   ifelse(sum(x == "Unknown") > 0, paste(col_names[x == "Unknown"], collapse = ""), NA)
 })
 
-as.data.frame(table(PHENO.ANY_SN$UNKNOWNS))
+table(PHENO.ANY_SN$UNKNOWNS)
+
+## Loop over nchar>= 2
+life.vars <- unique(PHENO.ANY_SN$UNKNOWNS[which(nchar(PHENO.ANY_SN$UNKNOWNS) >= 2)])
+for (i in 1:length(life.vars)){
+ifelse(grepl(life.vars[i], PHENO.ANY_SN$UNKNOWNS), 1,0)
+
 
 
 

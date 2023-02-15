@@ -100,7 +100,6 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$
 PHENO.ANY_SN$missing.lifestyles <- rowSums(is.na(PHENO.ANY_SN[c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Obese_yn")]))
 table(PHENO.ANY_SN$missing.lifestyles)
 
-
 ## Relevel 6 lifestyle variables
 PHENO.ANY_SN$Current_smoker_yn[is.na(PHENO.ANY_SN$Current_smoker_yn)] <- "Unknown"
 PHENO.ANY_SN$Current_smoker_yn <- factor(PHENO.ANY_SN$Current_smoker_yn, level = c("No", "Yes", "Unknown")) 
@@ -116,22 +115,6 @@ PHENO.ANY_SN$HEALTHY_Diet_yn <- factor(PHENO.ANY_SN$HEALTHY_Diet_yn, level = c("
 
 PHENO.ANY_SN$Obese_yn[is.na(PHENO.ANY_SN$Obese_yn)] <- "Unknown";
 PHENO.ANY_SN$Obese_yn <- factor(PHENO.ANY_SN$Obese_yn, level = c("No", "Yes", "Unknown")) 
-
-####################
-## Count Unknowns ##
-####################
-columns <- c("Current_smoker_yn", "PhysicalActivity_yn",
-             "RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Obese_yn")
-# Get the first letter of each column name
-col_names <- substr(columns, 1, 1)
-
-# Loop through each row of the dataframe
-PHENO.ANY_SN$UNKNOWNS <- apply(PHENO.ANY_SN[columns], 1, function(x) {
-  ifelse(sum(x == "Unknown") > 0, paste(col_names[x == "Unknown"], collapse = ""), NA)
-})
-
-as.data.frame(table(PHENO.ANY_SN$UNKNOWNS))
-
 
 
 #########################
@@ -185,10 +168,10 @@ as.data.frame(t(CROSS_CASES.df %>%
                         cross_cases(ANY_SN, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Obese_yn))))
 
 
-cc.SN <- as.data.frame(t(CROSS_CASES.df %>%
+cc <- as.data.frame(t(CROSS_CASES.df %>%
                   cross_cases(ANY_SN, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Obese_yn))))
 
-rownames(cc.SN) <- NULL 
+rownames(cc) <- NULL 
 # View(cc)
 ######################################
 ## Attributable fraction of Any SNs ##
@@ -199,7 +182,7 @@ fit_all = glm(formula = ANY_SN ~ Pleiotropy_PRSWEB_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
                 maxchestrtdose.category + epitxn_dose_5.category + 
-                Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + HEALTHY_Diet_yn + Obese_yn +
+                Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
                 EAS + AFR,
               family = binomial,
               data = dat_all)
@@ -243,7 +226,6 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
 af_by_tx = (N_all - N_no_tx) / N_all
 round(af_by_tx,3)
-# 0.265
 ##################
 ## P/LP and PRS ##
 ##################
@@ -256,7 +238,6 @@ dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "respon
 N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
 af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
 round(af_by_plp.prs,3)
-# 0.071
 ###############
 ## Lifestyle ##
 ###############
@@ -265,14 +246,13 @@ dat_lifestyle = dat_all
 dat_lifestyle$Current_smoker_yn = "No"
 dat_lifestyle$PhysicalActivity_yn = "Yes"
 dat_lifestyle$RiskyHeavyDrink_yn = "No"
-dat_lifestyle$HEALTHY_Diet_yn = "Yes"
+# dat_lifestyle$HEALTHY_Diet_yn = "Yes"
 dat_lifestyle$Obese_yn = "No"
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# 0.785
 
 #################################################
 ## Treatment, Genetics and Lifestyle, combined ##
@@ -294,16 +274,15 @@ dat_tx.plp.prs.lifestyle$Pleiotropy_PRSWEB_PRS.tertile.category = "1st"
 dat_tx.plp.prs.lifestyle$Current_smoker_yn = "No"
 dat_tx.plp.prs.lifestyle$PhysicalActivity_yn = "Yes"
 dat_tx.plp.prs.lifestyle$RiskyHeavyDrink_yn = "No"
-dat_tx.plp.prs.lifestyle$HEALTHY_Diet_yn = "Yes"
+# dat_tx.plp.prs.lifestyle$HEALTHY_Diet_yn = "Yes"
 dat_tx.plp.prs.lifestyle$Obese_yn = "No"
+
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx.plp.prs.lifestyle, type = "response")
 
 N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
-# 0.92
+
 SN.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
 SN.res
-# 0.273 0.077 0.406 0.740
-
