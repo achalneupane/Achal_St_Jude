@@ -62,6 +62,19 @@ nrow(SARCOMA)
 SARCOMA <- SARCOMA[!SARCOMA$sjlid %in% subneo.within5$sjlid,]
 nrow(SARCOMA)
 # 32
+
+# # On 02-09-2023, Kiri sent and email with these datasets
+# KIRI.sjlife <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/subneoplasms.sas7bdat")
+# ## These are the same 32 samples I have for analysis
+# KIRI.sjlife <- KIRI.sjlife[grepl("Sarcoma", KIRI.sjlife$diag, ignore.case = T),]
+# unique(KIRI.sjlife$icdo3mcode)
+# # "M9180.3" "M8890.3" "M9041.3" "M9364.3" "M8832.3" "M9260.3" "M9220.3" "M8805.3" "M8800.3" "M8850.3" "M8804.3" "M8801.3" "M9755.3" "M9758.3"
+# unique(KIRI.sjlife$icdo3sitecd)
+# # "C41.0"  "C49.9"  "C64.9"  "C49.0"  "C67.9"  "C48.0"  "C41.3"  "C44.7"  "C34.9"  "C41.2"  "C40.2"  "C49.4"  "C49.2"  "C49.1"  " C67.2"
+# # "C76.2"  "C55.9"  "C74.9"  "C62.9"  "C40.9"  "C40.0"  ""       "C17.2"  "C41.1"  "C49.6"  "C41.9"
+# distinct(cbind.data.frame(KIRI.sjlife$icdo3sitecd, KIRI.sjlife$icdo3site, KIRI.sjlife$diag))
+
+
 PHENO.ANY_SN$SARCOMA <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% SARCOMA$sjlid, 0, 1))
 
 #############################

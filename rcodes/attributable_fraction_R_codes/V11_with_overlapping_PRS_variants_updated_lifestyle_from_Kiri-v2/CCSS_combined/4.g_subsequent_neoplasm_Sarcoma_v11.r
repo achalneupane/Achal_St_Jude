@@ -16,8 +16,95 @@ table(PHENO.ANY_SN$CACO)
 # 0    1 
 # 7839  104
 
+table(SARCOMA$ANY_SN_TYPE) # groupdx3
 
 
+library(haven)
+library(sas7bdat)
+library(benchmarkme)
+library(dplyr)
+library(plyr)
+library(data.table)
+library (birk)
+library(gtools)
+library(stringr)
+# library(tidyverse)
+library(lubridate)
+# install.packages("pdftools")
+library(pdftools)
+
+# RE: Kiri's email on 02-09-2023
+KIRI.ccss <- read_sas("Z:/SJShare/SJCOMMON/ECC/Ness Research Team/CCSS/CCSS 20200205/combined/others/combinedsn_final.sas7bdat")
+KIRI.ccss.format <- read_sas("Z:/SJShare/SJCOMMON/ECC/Ness Research Team/CCSS/CCSS 20200205/formats.sas7bcat")
+
+KIRI.ccss <- read_sas("Z:/SJShare/SJCOMMON/ECC/Ness Research Team/CCSS/CCSS 20200205/combined/others/combinedsn_final.sas7bdat", "Z:/SJShare/SJCOMMON/ECC/Ness Research Team/CCSS/CCSS 20200205/formats.sas7bcat")
+KIRI.ccss.format <- read.sas7bdat("Z:/SJShare/SJCOMMON/ECC/Ness Research Team/CCSS/CCSS 20200205/formats.sas7bcat")
+KIRI.ccss.format <- read.sas7bdat("C:/Users/aneupane/Downloads/formats.sas7bcat")
+
+SARCOMA <- PHENO.ANY_SN[PHENO.ANY_SN$SARCOMA == 1,]
+SARCOMA$ccssid <- gsub("_.*","",SARCOMA$ccssid)
+KIRI.ccss <- KIRI.ccss[KIRI.ccss$ccssid %in% SARCOMA$ccssid,]
+
+SARCOMA$candxo3 <- KIRI.ccss$candxo3[match(SARCOMA$ccssid, KIRI.ccss$ccssid)]
+unique(SARCOMA$candxo3)
+#  8260.3 8811.3 9560.0 9042.3  NA 9540.3 8501.2 8090.3 9120.3 8720.3 8801.3 8850.3 8500.3 9150.3 9180.3 8340.3 9140.3 8094.3 8500.2 8902.3 9260.3 8858.3 8830.3 8832.3 8800.3 9560.3 8312.3 8832.0 8070.2 9505.1 9161.1 9364.3 8850.0 8815.0 9540.0 9251.1 8822.1 8842.0 9181.3
+
+#    NA                 8858.3 8830.3 8832.3 8800.3 9560.3 8312.3 8832.0 8070.2 9505.1 9161.1 9364.3 8850.0 8815.0 9540.0 9251.1 8822.1 8842.0 9181.3
+# REF: https://seer.cancer.gov/icd-o-3/sitetype.icdo3.20220429.pdf
+SARCOMA$new_sarcomaSN_labels <- SARCOMA$ANY_SN_TYPE
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "8890.3"] <- "Leiomyosarcoma, NOS"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "8260.3"] <- "Papillary adenocarcinoma, NOS"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "8811.3"] <- "Fibromyxosarcoma"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "9560.0"] <- "Neurilemoma, NOS"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "9042.3"] <- "Synovial sarcoma, epithelioid cell"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "9540.3"] <- "Malignant peripheral nerve sheath tumor"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "8501.2"] <- "Comedocarcinoma, non-infiltrating"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "8090.3"] <- "Basal cell carcinoma, NOS"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "9120.3"] <- "Hemangiosarcoma"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "8720.3"] <- "Malignant melanoma, NOS"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "8801.3"] <- "Spindle cell sarcoma"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "8850.3"] <- "Liposarcoma, NOS"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "8500.3"] <- "Invasive carcinoma of no special type"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "9150.3"] <- "Hemangiopericytoma, malignant"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "9180.3"] <- "Osteosarcoma, NOS"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "8340.3"] <- "Papillary carcinoma, follicular variant"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "9140.3"] <- "Kaposi sarcoma"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "8094.3"] <- "Basosquamous carcinoma"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "8500.2"] <- "Intraductal carcinoma, noninfiltrating, NOS"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "8902.3"] <- "Mixed type rhabdomyosarcoma"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "9260.3"] <- "Ewing sarcoma"
+SARCOMA$new_sarcomaSN_labels [SARCOMA$candxo3 == "9260.3"] <- "Ewing sarcoma"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+KIRI.sjlife <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/subneoplasms.sas7bdat")
+## These are the same (32) samples I have for SJLIFE analysis
+KIRI.sjlife <- KIRI.sjlife[grepl("Sarcoma", KIRI.sjlife$diag, ignore.case = T),]
+unique(KIRI.sjlife$icdo3mcode)
+unique(KIRI.sjlife$icdo3sitecd)
+# "C41.0"  "C49.9"  "C64.9"  "C49.0"  "C67.9"  "C48.0"  "C41.3"  "C44.7"  "C34.9"  "C41.2"  "C40.2"  "C49.4"  "C49.2"  "C49.1"  " C67.2"
+# "C76.2"  "C55.9"  "C74.9"  "C62.9"  "C40.9"  "C40.0"  ""       "C17.2"  "C41.1"  "C49.6"  "C41.9"
+icdo3.sjlife <- distinct(cbind.data.frame(icdo3sitecd = KIRI.sjlife$icdo3sitecd, diag = KIRI.sjlife$diag))
+
+match(SARCOMA$cansite, icdo3.sjlife$icdo3sitecd)
+table(SARCOMA$ANY_SN_TYPE)
 
 ###########################################
 ## Check data in each category/cross tab ##

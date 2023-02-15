@@ -44,7 +44,7 @@ std.error <- format(round(output[,2],3), nsmall = 3)
 P.val <- output[,4]
 P.val[P.val < 0.001] <- "<0.001"
 P.val[!grepl("<", P.val)] <- format(round(as.numeric(P.val[!grepl("<", P.val)]), 3), nsmall = 3)
-sn.model <- (setNames(cbind.data.frame(estimate, std.error, P.val
+breast.model <- (setNames(cbind.data.frame(estimate, std.error, P.val
 ), c("Estimate", "Std.error", "P")))
 ##########################
 ## Get predicted values ##

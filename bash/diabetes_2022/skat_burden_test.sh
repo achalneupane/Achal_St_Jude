@@ -340,3 +340,25 @@ plink --bfile followup_24_2023 --keep EUR_samples.list --keep-allele-order --mak
 
 plink --bfile folowup_24_2023_AFR --keep-allele-order --recode A --out folowup_24_2023_AFR_recodeA
 plink --bfile folowup_24_2023_EUR --keep-allele-order --recode A --out folowup_24_2023_EUR_recodeA
+
+
+## Locus Zoom
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/diabetes/followup_jan_24_2023/locuszoom
+ln -s ../../chr1_22_PCA_eur.assoc.logistic.clean.Psorted.withBETA .
+ln -s ../../chr1_22_PCA_afr.assoc.logistic.clean.Psorted.withBETA .
+
+# grep chr5 only and get : chr5_PCA_eur.assoc.logistic.clean.Psorted.withBETA.locus and chr5_PCA_afr.assoc.logistic.clean.Psorted.withBETA.locus
+
+# with open("chr5_PCA_eur.assoc.logistic.clean.Psorted.withBETA.locus", "r") as f:
+#     lines = f.readlines()
+#     with open("chr5_PCA_eur.assoc.logistic.clean.Psorted.withBETA.locus.txt", "w") as out:
+#         for line in lines:
+#             elements = line.strip().split(" ")
+#             new_line = "chr" + elements[0] + "\t" + elements[1] + "\t" + "chr" + elements[0] + ":" + elements[1] + "\t" + elements[13] + "\t" + elements[3] + "\t" + elements[11] + "\n"
+#             out.write(new_line)
+
+awk '{printf "chr%s\t%s\tchr%s:%s\t%s\t%s\t%s\n", $1, $3, $1, $3, $14, $4, $12}'  chr5_PCA_afr.assoc.logistic.clean.Psorted.withBETA.locus > chr5_PCA_afr.assoc.logistic.clean.Psorted.withBETA.locus.txt
+awk '{printf "chr%s\t%s\tchr%s:%s\t%s\t%s\t%s\n", $1, $3, $1, $3, $14, $4, $12}'  chr5_PCA_eur.assoc.logistic.clean.Psorted.withBETA.locus > chr5_PCA_eur.assoc.logistic.clean.Psorted.withBETA.locus.txt
+
+awk 'BEGIN {FS=OFS="\t"} NR==1 {print; next} {print $0 | "sort -k2,2n"}' chr5_PCA_afr.assoc.logistic.clean.Psorted.withBETA.locus.txt> locus_zoom_chr5_afr
+awk 'BEGIN {FS=OFS="\t"} NR==1 {print; next} {print $0 | "sort -k2,2n"}' chr5_PCA_eur.assoc.logistic.clean.Psorted.withBETA.locus.txt> locus_zoom_chr5_eur

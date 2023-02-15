@@ -14,7 +14,14 @@ load("common_p_LP_rare_variants_gnomad_all_gnomad_NFE_lt_0.01.RData")
 
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/ALL_P_LP_combinations/rare_variant_analysis_v2/pablo_garcia_et_al_nine_genes")
 sjlife.raw <- read.table("sjlife_SNPS_maf_lt_0.01_gnomad_also_common_in_ccss_recodeA.raw", header = T)
-ccss.raw <- read.table("ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife_recodeA.raw", header = T)
+# ccss.raw <- read.table("ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife_recodeA.raw", header = T)
+
+# exclude younger samples from ccss exp
+ccss.raw <- read.table("ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife_without_younger_samples_recodeA.raw", header = T)
+sum(pheno.ccss_exp_eur$FID %in% ccss.raw$FID)
+# 1457
+pheno.ccss_exp_eur <- pheno.ccss_exp_eur[pheno.ccss_exp_eur$FID %in% ccss.raw$FID,]
+
 
 genes <- unique(sjlife_vars_bim$GENE)
 
