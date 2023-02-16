@@ -368,3 +368,4 @@ awk 'BEGIN {FS=OFS="\t"} NR==1 {print; next} {print $0 | "sort -k2,2n"}' chr5_PC
 ## Calculate LD based on SJLIFE
 ## https://statgen.github.io/localzoom/#instructions
 bcftools annotate -Oz --set-id '%CHROM\:%POS\_%REF\/%ALT' /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr5.preQC_biallelic_renamed_ID_edited.vcf.gz > EPACTS_ID_format_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr5.preQC_biallelic_renamed_ID_edited.vcf.gz
+bcftools norm -Oz --rm-dup all EPACTS_ID_format_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr5.preQC_biallelic_renamed_ID_edited.vcf.gz > EPACTS_ID_format_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr5.preQC_biallelic_renamed_ID_edited_rmdups.gz

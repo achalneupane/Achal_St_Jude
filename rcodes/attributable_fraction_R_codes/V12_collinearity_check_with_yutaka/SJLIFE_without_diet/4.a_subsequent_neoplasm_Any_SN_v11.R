@@ -125,43 +125,41 @@ columns <- c("Current_smoker_yn", "PhysicalActivity_yn",
 # Get the first letter of each column name
 col_names <- substr(columns, 1, 1)
 
-# Loop through each row of the dataframe
+## Loop through each row of the dataframe
+# PHENO.ANY_SN <- PHENO.ANY_SN[columns]
 PHENO.ANY_SN$UNKNOWNS <- apply(PHENO.ANY_SN[columns], 1, function(x) {
   ifelse(sum(x == "Unknown") > 0, paste(col_names[x == "Unknown"], collapse = ""), NA)
 })
 
 table(PHENO.ANY_SN$UNKNOWNS)
 
+
 library(purrr)
 library(stringr)
+library(gtools)
+library(data.table)
+
 ## Loop over nchar>= 2
-life.vars <- unique(PHENO.ANY_SN$UNKNOWNS[which(nchar(PHENO.ANY_SN$UNKNOWNS) >= 2)])
+# life.vars <- unique(PHENO.ANY_SN$UNKNOWNS[which(nchar(PHENO.ANY_SN$UNKNOWNS) >= 2)])
+elements <- c("C","O","P","R")
+combinations <- lapply(2:length(elements), function(i) combn(elements, i, simplify = FALSE))
+combinations <- unlist(combinations, recursive = FALSE)
+combinations <- unique(combinations)
+life.vars <- sapply(combinations, function(x) paste0(x, collapse = ""))
+
+life.vars <- sapply(base::strsplit(life.vars, ""), function(x) paste(sort(x), collapse = ""))
+# "CO"   "CP"   "CR"   "OP"   "OR"   "PR"   "COP"  "COR"  "CPR"  "OPR"  "COPR"
+
 for (i in 1:length(life.vars)){
   PHENO.ANY_SN$UNKNOWNS.tmp <- gsub(paste0("[^",life.vars[i],"]"), "", PHENO.ANY_SN$UNKNOWNS)
+  ## Sort the missing codes by letters
+  PHENO.ANY_SN$UNKNOWNS.tmp <- sapply(base::strsplit(PHENO.ANY_SN$UNKNOWNS.tmp, ""), function(x) paste(sort(x), collapse = ""))
+  table(PHENO.ANY_SN$UNKNOWNS.tmp)
   new_col_name <- paste0(life.vars[i], "_missing")
   PHENO.ANY_SN[[new_col_name]] <- as.factor(ifelse(grepl(life.vars[i], PHENO.ANY_SN$UNKNOWNS.tmp), "Yes", "No"))
 }
 
-## Recode lifestyle variables to fit the model for missingness
-PHENO.ANY_SN$Current_smoker_yn[PHENO.ANY_SN$Current_smoker_yn == "Unknown"] <- "No"
-PHENO.ANY_SN$Current_smoker_yn <- droplevels(PHENO.ANY_SN$Current_smoker_yn)
 
-PHENO.ANY_SN$PhysicalActivity_yn[PHENO.ANY_SN$PhysicalActivity_yn == "Unknown"] <- "No"
-PHENO.ANY_SN$PhysicalActivity_yn <- droplevels(PHENO.ANY_SN$PhysicalActivity_yn)
-
-PHENO.ANY_SN$RiskyHeavyDrink_yn[PHENO.ANY_SN$RiskyHeavyDrink_yn == "Unknown"] <- "No"
-PHENO.ANY_SN$RiskyHeavyDrink_yn <- droplevels(PHENO.ANY_SN$RiskyHeavyDrink_yn)
-
-PHENO.ANY_SN$Obese_yn[PHENO.ANY_SN$Obese_yn == "Unknown"] <- "No"
-PHENO.ANY_SN$Obese_yn <- droplevels(PHENO.ANY_SN$Obese_yn)
-
-
-#########################
-## Extract Ethnicities ##
-#########################
-## Add admixture ethnicity 
-ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
-PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
 
 
 ###########################################
@@ -188,13 +186,40 @@ cc <- as.data.frame(t(CROSS_CASES.df %>%
 
 rownames(cc) <- NULL 
 # View(cc)
+
+############################################################
+## Drop Unknown level from the lifestyle factor variables ##
+############################################################
+
+## Recode lifestyle variables to fit the model for missingness
+PHENO.ANY_SN$Current_smoker_yn[PHENO.ANY_SN$Current_smoker_yn == "Unknown"] <- "No"
+PHENO.ANY_SN$Current_smoker_yn <- droplevels(PHENO.ANY_SN$Current_smoker_yn)
+
+PHENO.ANY_SN$PhysicalActivity_yn[PHENO.ANY_SN$PhysicalActivity_yn == "Unknown"] <- "No"
+PHENO.ANY_SN$PhysicalActivity_yn <- droplevels(PHENO.ANY_SN$PhysicalActivity_yn)
+
+PHENO.ANY_SN$RiskyHeavyDrink_yn[PHENO.ANY_SN$RiskyHeavyDrink_yn == "Unknown"] <- "No"
+PHENO.ANY_SN$RiskyHeavyDrink_yn <- droplevels(PHENO.ANY_SN$RiskyHeavyDrink_yn)
+
+PHENO.ANY_SN$Obese_yn[PHENO.ANY_SN$Obese_yn == "Unknown"] <- "No"
+PHENO.ANY_SN$Obese_yn <- droplevels(PHENO.ANY_SN$Obese_yn)
+
+
+#########################
+## Extract Ethnicities ##
+#########################
+## Add admixture ethnicity 
+ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
+PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
+
+
 ######################################
 ## Attributable fraction of Any SNs ##
 ######################################
 # live.vars: "CPRO" "CPR"  "RO"   "CR"   "PR"
-colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] <- gsub("C", "Cigarette", colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))])
+colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] <- gsub("C", "Smoking", colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))])
 colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] <- gsub("P", "Physical", colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))])
-colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] <- gsub("R", "Riskyheavydrink", colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))])
+colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] <- gsub("R", "Heavydrink", colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))])
 colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] <- gsub("O", "Obese", colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))])
 
 # [1] "CigarettePhysicalRiskyheavydrinkObese_missing" "CigarettePhysicalRiskyheavydrink_missing"     
@@ -208,7 +233,7 @@ fit_all = glm(formula = ANY_SN ~ Pleiotropy_PRSWEB_PRS.tertile.category +
                 maxchestrtdose.category + epitxn_dose_5.category + 
                 Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
                 EAS + AFR +
-                CigarettePhysicalRiskyheavydrinkObese_missing,
+                PhysicalRiskyheavydrink_missing,
               family = binomial,
               data = dat_all)
 
