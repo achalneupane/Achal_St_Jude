@@ -34,30 +34,54 @@ library(lubridate)
 library(pdftools)
 
 # RE: Kiri's email on 02-09-2023
-KIRI.ccss <- read_sas("Z:/SJShare/SJCOMMON/ECC/Ness Research Team/CCSS/CCSS 20200205/combined/others/combinedsn_final.sas7bdat")
+# KIRI.ccss <- read_sas("Z:/SJShare/SJCOMMON/ECC/Ness Research Team/CCSS/CCSS 20200205/combined/others/combinedsn_final.sas7bdat")
 # KIRI.ccss.format <- read_sas("Z:/SJShare/SJCOMMON/ECC/Ness Research Team/CCSS/CCSS 20200205/formats.sas7bcat")
 # KIRI.ccss <- read_sas("Z:/SJShare/SJCOMMON/ECC/Ness Research Team/CCSS/CCSS 20200205/combined/others/combinedsn_final.sas7bdat", "Z:/SJShare/SJCOMMON/ECC/Ness Research Team/CCSS/CCSS 20200205/formats.sas7bcat")
+KIRI.ccss <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Kyla/combinedsn_final_02_17_2023.csv", header = T, sep = ",", stringsAsFactors = F)
+dim(KIRI.ccss)
+## Keep non-missing candxo3
+KIRI.ccss <- KIRI.ccss[!is.na(KIRI.ccss$candxo3),]
+# KIRI.ccss <- KIRI.ccss[KIRI.ccss$candxo3 !="",]
+KIRI.ccss <- KIRI.ccss[KIRI.ccss$d_candx !="",]
+dim(KIRI.ccss)
+KIRI.ccss$SN_diagnosis_date <- as.Date(KIRI.ccss$d_candx, format = "%d%b%Y")
+KIRI.ccss$SN_diagnosis_date <- format(KIRI.ccss$SN_diagnosis_date, "%m-%d-%Y") # 06-30-2008
+KIRI.ccss$KEY <- paste(KIRI.ccss$ccssid, KIRI.ccss$SN_diagnosis_date, sep = ":")
+
+PHENO.ANY_SN$SN_diagnosis_date <- as.Date(PHENO.ANY_SN$d_candx, format = "%d%b%Y")
+PHENO.ANY_SN$SN_diagnosis_date  <- format(PHENO.ANY_SN$SN_diagnosis_date, "%m-%d-%Y") # "08-23-2016"
+PHENO.ANY_SN$ccssid <- gsub("_.*","",PHENO.ANY_SN$ccssid)
+PHENO.ANY_SN$KEY <- paste(PHENO.ANY_SN$ccssid, PHENO.ANY_SN$SN_diagnosis_date, sep = ":")
+
+
+table(PHENO.ANY_SN$KEY %in% KIRI.ccss$KEY)
+# FALSE  TRUE 
+# 30  7913 
+
+
 
 SARCOMA <- PHENO.ANY_SN[PHENO.ANY_SN$SARCOMA == 1,]
-SARCOMA$ccssid <- gsub("_.*","",SARCOMA$ccssid)
 KIRI.ccss <- KIRI.ccss[KIRI.ccss$ccssid %in% SARCOMA$ccssid,]
 
-SARCOMA$candxo3 <- KIRI.ccss$candxo3[match(SARCOMA$ccssid, KIRI.ccss$ccssid)]
-unique(SARCOMA$candxo3)
-# REF: https://seer.cancer.gov/icd-o-3/sitetype.icdo3.20220429.pdf
+SARCOMA$ANY_SN_TYPE_NEW <- KIRI.ccss$candxo3[match(SARCOMA$KEY, KIRI.ccss$KEY)]
+# Not identified: 5146972 and 12127547
 
-sarcoma.icdo3 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V11_with_overlapping_PRS_variants_updated_lifestyle_from_Kiri-v2/CCSS_combined/site_types.txt", sep = "\t")
-sarcoma.icdo3$V1 <- gsub("\\/", ".", sarcoma.icdo3$V1)
-
-SARCOMA$new_SN_diagnosis_labels <- sarcoma.icdo3$V2[match(SARCOMA$candxo3, sarcoma.icdo3$V1)]
-table(SARCOMA$ANY_SN_TYPE)
-
-SN.question <- SARCOMA[grepl("Other soft tissue sarcomas|Unspecified", SARCOMA$ANY_SN_TYPE),]
-table(is.na(SN.question$new_SN_diagnosis_labels))
-# FALSE  TRUE 
-# 53    38 
-table(is.na(SARCOMA$candxo3))
-as.data.frame(table(SN.question$new_SN_diagnosis_labels))
+# SARCOMA$candxo3 <- KIRI.ccss$candxo3[match(SARCOMA$ccssid, KIRI.ccss$ccssid)]
+# unique(SARCOMA$candxo3)
+# # REF: https://seer.cancer.gov/icd-o-3/sitetype.icdo3.20220429.pdf
+# 
+# sarcoma.icdo3 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V11_with_overlapping_PRS_variants_updated_lifestyle_from_Kiri-v2/CCSS_combined/site_types.txt", sep = "\t")
+# sarcoma.icdo3$V1 <- gsub("\\/", ".", sarcoma.icdo3$V1)
+# 
+# SARCOMA$new_SN_diagnosis_labels <- sarcoma.icdo3$V2[match(SARCOMA$candxo3, sarcoma.icdo3$V1)]
+# table(SARCOMA$ANY_SN_TYPE)
+# 
+# SN.question <- SARCOMA[grepl("Other soft tissue sarcomas|Unspecified", SARCOMA$ANY_SN_TYPE),]
+# table(is.na(SN.question$new_SN_diagnosis_labels))
+# # FALSE  TRUE 
+# # 53    38 
+# table(is.na(SARCOMA$candxo3))
+# as.data.frame(table(SN.question$new_SN_diagnosis_labels))
 
 ###########################################
 ## Check data in each category/cross tab ##

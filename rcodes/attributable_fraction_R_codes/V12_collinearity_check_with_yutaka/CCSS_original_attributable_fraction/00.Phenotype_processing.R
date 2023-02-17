@@ -186,7 +186,7 @@ ccss_org <- ccss_org[!ccss_org$ccssid %in% overlaps$ccssid,]
 # ccss_org <- ccss_org[!duplicated(ccss_org$ccssid),]
 
 ## Age at last contact (cubic spline)
-source("https://raw.githubusercontent.com/achalneupane/Achal_St_Jude/main/rcodes/cubic_spline.r")
+source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/cubic_spline.r")
 
 breaks = seq(5, 95, 22.5)
 
@@ -263,7 +263,7 @@ ccss_org$maxpelvisrtdose.category <- factor(ccss_org$pelvisrtgrp, levels = c("No
 subneo <- ccss_org
 
 
-PHENO.ANY_SN <- ccss_org[c('ccssid', 'gender', 'agedx', 'diagnose', 'agelstcontact', 'AGE_AT_DIAGNOSIS', 
+PHENO.ANY_SN <- ccss_org[c('ccssid', 'gender', 'agedx', 'diagnose', "d_candx", 'agelstcontact', 'AGE_AT_DIAGNOSIS', 
                                "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", 
                                'maxchestrtdose.category', 'maxneckrtdose.category', 'maxabdrtdose.category', 'maxsegrtdose.category', 'maxpelvisrtdose.category',
                                'Not_obese_yn_agesurvey', 'Not_obese_yn', 'PhysicalActivity_yn_agesurvey', 'PhysicalActivity_yn', 
