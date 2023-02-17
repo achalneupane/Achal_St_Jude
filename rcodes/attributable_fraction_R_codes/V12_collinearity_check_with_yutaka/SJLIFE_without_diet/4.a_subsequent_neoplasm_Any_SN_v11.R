@@ -116,6 +116,14 @@ PHENO.ANY_SN$HEALTHY_Diet_yn <- factor(PHENO.ANY_SN$HEALTHY_Diet_yn, level = c("
 PHENO.ANY_SN$Obese_yn[is.na(PHENO.ANY_SN$Obese_yn)] <- "Unknown";
 PHENO.ANY_SN$Obese_yn <- factor(PHENO.ANY_SN$Obese_yn, level = c("No", "Yes", "Unknown")) 
 
+#########################
+## Extract Ethnicities ##
+#########################
+## Add admixture ethnicity 
+ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
+PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
+
+
 
 ####################
 ## Count Unknowns ##
@@ -148,7 +156,11 @@ combinations <- unique(combinations)
 life.vars <- sapply(combinations, function(x) paste0(x, collapse = ""))
 
 life.vars <- sapply(base::strsplit(life.vars, ""), function(x) paste(sort(x), collapse = ""))
+life.vars
 # "CO"   "CP"   "CR"   "OP"   "OR"   "PR"   "COP"  "COR"  "CPR"  "OPR"  "COPR"
+
+cont.table <- {}
+table(PHENO.ANY_SN$UNKNOWNS)
 
 for (i in 1:length(life.vars)){
   PHENO.ANY_SN$UNKNOWNS.tmp <- gsub(paste0("[^",life.vars[i],"]"), "", PHENO.ANY_SN$UNKNOWNS)
@@ -157,35 +169,44 @@ for (i in 1:length(life.vars)){
   table(PHENO.ANY_SN$UNKNOWNS.tmp)
   new_col_name <- paste0(life.vars[i], "_missing")
   PHENO.ANY_SN[[new_col_name]] <- as.factor(ifelse(grepl(life.vars[i], PHENO.ANY_SN$UNKNOWNS.tmp), "Yes", "No"))
+  
+  ## Get contingency table
+  # CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
+  CROSS_CASES.df <- PHENO.ANY_SN[c("ANY_SN", new_col_name)]
+  new_labels <- gsub("C", "Smoking", new_col_name)
+  new_labels <- gsub("P", "Physical", new_labels)
+  new_labels <- gsub("R", "Heavydrink", new_labels)
+  new_labels <- gsub("O", "Obese", new_labels)
+  new_labels <- gsub("(?<=[a-z])(?=[A-Z])", "_", new_labels)
+  colnames(CROSS_CASES.df)[2] <- new_labels
+  cont.table[[i]] <- table(CROSS_CASES.df[1:2])
 }
 
 
-
-
-###########################################
-## Check data in each category/cross tab ##
-###########################################
-library(expss)
-
-# Getting counts for non-missing data only; 6 samples do not have admixture ancestry
-CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
-
-CROSS_CASES.df <- CROSS_CASES.df[c("ANY_SN", "Current_smoker_yn", "PhysicalActivity_yn",
-                                   "RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", Obese_yn = "Obese_yn")]
-
-CROSS_CASES.df <- apply_labels(CROSS_CASES.df, ANY_SN = "ANY_SN", 
-                               Current_smoker_yn = "Current_smoker_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
-                               RiskyHeavyDrink_yn = "RiskyHeavyDrink_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn", Obese_yn = "Obese_yn")
-
-as.data.frame(t(CROSS_CASES.df %>%
-                        cross_cases(ANY_SN, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Obese_yn))))
-
-
-cc <- as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(ANY_SN, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Obese_yn))))
-
-rownames(cc) <- NULL 
-# View(cc)
+# ###########################################
+# ## Check data in each category/cross tab ##
+# ###########################################
+# library(expss)
+# 
+# # Getting counts for non-missing data only; 6 samples do not have admixture ancestry
+# CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
+# 
+# CROSS_CASES.df <- CROSS_CASES.df[c("ANY_SN", "Current_smoker_yn", "PhysicalActivity_yn",
+#                                    "RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", Obese_yn = "Obese_yn")]
+# 
+# CROSS_CASES.df <- apply_labels(CROSS_CASES.df, ANY_SN = "ANY_SN", 
+#                                Current_smoker_yn = "Current_smoker_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
+#                                RiskyHeavyDrink_yn = "RiskyHeavyDrink_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn", Obese_yn = "Obese_yn")
+# 
+# as.data.frame(t(CROSS_CASES.df %>%
+#                         cross_cases(ANY_SN, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Obese_yn))))
+# 
+# 
+# cc <- as.data.frame(t(CROSS_CASES.df %>%
+#                   cross_cases(ANY_SN, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Obese_yn))))
+# 
+# rownames(cc) <- NULL 
+# # View(cc)
 
 ############################################################
 ## Drop Unknown level from the lifestyle factor variables ##
@@ -195,7 +216,7 @@ rownames(cc) <- NULL
 PHENO.ANY_SN$Current_smoker_yn[PHENO.ANY_SN$Current_smoker_yn == "Unknown"] <- "No"
 PHENO.ANY_SN$Current_smoker_yn <- droplevels(PHENO.ANY_SN$Current_smoker_yn)
 
-PHENO.ANY_SN$PhysicalActivity_yn[PHENO.ANY_SN$PhysicalActivity_yn == "Unknown"] <- "No"
+PHENO.ANY_SN$PhysicalActivity_yn[PHENO.ANY_SN$PhysicalActivity_yn == "Unknown"] <- "Yes"
 PHENO.ANY_SN$PhysicalActivity_yn <- droplevels(PHENO.ANY_SN$PhysicalActivity_yn)
 
 PHENO.ANY_SN$RiskyHeavyDrink_yn[PHENO.ANY_SN$RiskyHeavyDrink_yn == "Unknown"] <- "No"
@@ -205,12 +226,6 @@ PHENO.ANY_SN$Obese_yn[PHENO.ANY_SN$Obese_yn == "Unknown"] <- "No"
 PHENO.ANY_SN$Obese_yn <- droplevels(PHENO.ANY_SN$Obese_yn)
 
 
-#########################
-## Extract Ethnicities ##
-#########################
-## Add admixture ethnicity 
-ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
-PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
 
 
 ######################################
@@ -221,19 +236,23 @@ colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] <- gsub("C", "
 colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] <- gsub("P", "Physical", colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))])
 colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] <- gsub("R", "Heavydrink", colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))])
 colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] <- gsub("O", "Obese", colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))])
+colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] <- gsub("(?<=[a-z])(?=[A-Z])", "_", colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))])
+colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] 
 
-# [1] "CigarettePhysicalRiskyheavydrinkObese_missing" "CigarettePhysicalRiskyheavydrink_missing"     
-# [3] "RiskyheavydrinkObese_missing"                  "CigaretteRiskyheavydrink_missing"             
-# [5] "PhysicalRiskyheavydrink_missing" 
+# [1] "Smoking_Obese_missing"                     "Smoking_Physical_missing"                  "Smoking_Heavydrink_missing"               
+# [4] "Obese_Physical_missing"                    "Obese_Heavydrink_missing"                  "Physical_Heavydrink_missing"              
+# [7] "Smoking_Obese_Physical_missing"            "Smoking_Obese_Heavydrink_missing"          "Smoking_Physical_Heavydrink_missing"      
+# [10] "Obese_Physical_Heavydrink_missing"         "Smoking_Obese_Physical_Heavydrink_missing"
+
+
+models.types <- colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] 
+
+sn.model <- {}
+for (i in 1:length(models.types)){
+formula = paste0("ANY_SN ~ Pleiotropy_PRSWEB_PRS.tertile.category + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category + Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn + EAS + AFR + ", models.types[i])
 
 dat_all = PHENO.ANY_SN
-fit_all = glm(formula = ANY_SN ~ Pleiotropy_PRSWEB_PRS.tertile.category + 
-                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
-                maxchestrtdose.category + epitxn_dose_5.category + 
-                Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
-                EAS + AFR +
-                PhysicalRiskyheavydrink_missing,
+fit_all = glm(formula = formula,
               family = binomial,
               data = dat_all)
 
@@ -249,8 +268,37 @@ std.error <- format(round(output[,2],3), nsmall = 3)
 P.val <- output[,4]
 P.val[P.val < 0.001] <- "<0.001"
 P.val[!grepl("<", P.val)] <- format(round(as.numeric(P.val[!grepl("<", P.val)]), 3), nsmall = 3)
-sn.model <- (setNames(cbind.data.frame(estimate, std.error, P.val
+sn.model[[i]] <- (setNames(cbind.data.frame(estimate, std.error, P.val
 ), c("Estimate", "Std.error", "P")))
+sn.model[[i]] <- sn.model[[i]][!grepl("AGE_AT_LAST_CONTACT", row.names(sn.model[[i]])),]
+}
+
+
+ChangeNames <- function(x) {
+  row.names(x)[grepl("PRS.tertile.category2nd", row.names(x))] <- "PRS.tertile.category2nd"
+  row.names(x)[grepl("PRS.tertile.category3rd", row.names(x))] <- "PRS.tertile.category3rd"
+  return(x)
+}
+
+## change PRS labels
+df_list <- sn.model
+df_list <- lapply(df_list, ChangeNames)
+
+names(df_list) <- models.types
+list2env(df_list ,.GlobalEnv)
+
+View(Smoking_Obese_missing)
+View(Smoking_Physical_missing)
+View(Smoking_Heavydrink_missing) 
+View(Obese_Physical_missing)
+View(Obese_Heavydrink_missing)
+View(Physical_Heavydrink_missing)
+View(Smoking_Obese_Physical_missing)
+View(Smoking_Obese_Heavydrink_missing)
+View(Smoking_Physical_Heavydrink_missing)
+View(Obese_Physical_Heavydrink_missing)
+View(Smoking_Obese_Physical_Heavydrink_missing)
+
 
 ##########################
 ## Get predicted values ##
