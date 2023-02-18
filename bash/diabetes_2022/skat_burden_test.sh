@@ -367,5 +367,20 @@ awk 'BEGIN {FS=OFS="\t"} NR==1 {print; next} {print $0 | "sort -k2,2n"}' chr5_PC
 
 ## Calculate LD based on SJLIFE
 ## https://statgen.github.io/localzoom/#instructions
+module load bcftools
+module load plink/1.90b
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/diabetes/followup_jan_24_2023/locuszoom
 bcftools annotate -Oz --set-id '%CHROM\:%POS\_%REF\/%ALT' /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr5.preQC_biallelic_renamed_ID_edited.vcf.gz > EPACTS_ID_format_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr5.preQC_biallelic_renamed_ID_edited.vcf.gz
-bcftools norm -Oz --rm-dup all EPACTS_ID_format_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr5.preQC_biallelic_renamed_ID_edited.vcf.gz > EPACTS_ID_format_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr5.preQC_biallelic_renamed_ID_edited_rmdups.gz
+bcftools norm -Oz --rm-dup all EPACTS_ID_format_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr5.preQC_biallelic_renamed_ID_edited.vcf.gz > EPACTS_ID_format_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr5.preQC_biallelic_renamed_ID_edited_rmdups.vcf.gz
+
+# tabix -p vcf EPACTS_ID_format_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr5.preQC_biallelic_renamed_ID_edited_rmdups.vcf.gz
+bcftools view -Oz -S AFR_VCF_samples.txt EPACTS_ID_format_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr5.preQC_biallelic_renamed_ID_edited_rmdups.vcf.gz > AFR_VCF_chr5_preQC.vcf.gz
+bcftools view -Oz -S EUR_VCF_samples.txt EPACTS_ID_format_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr5.preQC_biallelic_renamed_ID_edited_rmdups.vcf.gz > EUR_VCF_chr5_preQC.vcf.gz
+
+# chr5:9843018_T/C
+# chr5:9841183_C/G
+# chr5:9853032_G/C
+
+
+plink  --r2 --vcf AFR_VCF_chr5_preQC.vcf.gz --ld-window 499999 --ld-window-kb 500 --ld-window-r2 0.0 --ld-snp-list mysnplist.txt --out LD_AFR
+plink  --r2 --vcf EUR_VCF_chr5_preQC.vcf.gz --ld-window 499999 --ld-window-kb 500 --ld-window-r2 0.0 --ld-snp-list mysnplist.txt --out LD_EUR
