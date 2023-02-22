@@ -384,3 +384,11 @@ bcftools view -Oz -S EUR_VCF_samples.txt EPACTS_ID_format_MERGED.SJLIFE.1.2.GATK
 
 plink  --r2 --vcf AFR_VCF_chr5_preQC.vcf.gz --ld-window 499999 --ld-window-kb 500 --ld-window-r2 0.0 --ld-snp-list mysnplist.txt --out LD_AFR
 plink  --r2 --vcf EUR_VCF_chr5_preQC.vcf.gz --ld-window 499999 --ld-window-kb 500 --ld-window-r2 0.0 --ld-snp-list mysnplist.txt --out LD_EUR
+
+mysnplist_EUR_top.txt
+# chr5:12787518_C/T 
+plink  --r2 --vcf EUR_VCF_chr5_preQC.vcf.gz --ld-window 499999 --ld-window-kb 500 --ld-window-r2 0.0 --ld-snp-list mysnplist_EUR_top.txt --out LD_EUR_TOP_VAR
+
+
+cat LD_EUR.ld | tail -n+2 | sed 's/^[[:space:]]*//g' | sed 's/[[:space:]]*$//g' | tr -s ' ' '\t' | sort -k4,4 -k5,5n | bgzip > LD_EUR.ld.tab.gz && tabix -s4 -b5 -e5 LD_EUR.ld.tab.gz
+cat LD_AFR.ld | tail -n+2 | sed 's/^[[:space:]]*//g' | sed 's/[[:space:]]*$//g' | tr -s ' ' '\t' | sort -k4,4 -k5,5n | bgzip > LD_AFR.ld.tab.gz && tabix -s4 -b5 -e5 LD_AFR.ld.tab.gz

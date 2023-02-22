@@ -271,6 +271,14 @@ merged.dat <- rbind.data.frame(sjlife.to.concat, ccss_org.to.concat, ccss_exp.to
 write.table(merged.dat, "sjlife_ccss_org_ccss_exp_ttn_bag3.pheno", col.names = T, row.names = F, quote = F)
 write.table(merged.dat[1:2], "../sjlife_ccss_org_ccss_exp_samples.txt", col.names = T, row.names = F, quote = F)
 
+
+## CCSS_exp and SJLIFE only
+merged.dat <- rbind.data.frame(sjlife.to.concat, ccss_exp.to.concat)
+write.table(merged.dat, "sjlife_ccss_exp_ttn_bag3.pheno", col.names = T, row.names = F, quote = F)
+write.table(merged.dat[1:2], "../sjlife_ccss_exp_samples.txt", col.names = T, row.names = F, quote = F)
+
+
+
 #########################################
 
 

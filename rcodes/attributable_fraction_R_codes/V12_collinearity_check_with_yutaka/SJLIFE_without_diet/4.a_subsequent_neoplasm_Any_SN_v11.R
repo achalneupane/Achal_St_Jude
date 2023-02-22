@@ -82,13 +82,60 @@ ALL.LIFESTYLE$CACO <- factor(ifelse(!ALL.LIFESTYLE$SJLIFEID %in% ANY_SNs$sjlid, 
 ALL.LIFESTYLE$ANY.SN_gradedate <- ANY_SNs$gradedt[match(ALL.LIFESTYLE$SJLIFEID, ANY_SNs$sjlid)]
 ALL.LIFESTYLE$AGE.ANY_SN <- ANY_SNs$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, ANY_SNs$sjlid)]
 
+
+# cc <- ALL.LIFESTYLE[ALL.LIFESTYLE$Current_smoker_yn == "Unknown" & (ALL.LIFESTYLE$Obese_yn == "Yes"| ALL.LIFESTYLE$Obese_yn == "NO"),]
+#############################################
+## Missing due to exclusion of adolescents ##
+#############################################
+## uncomment the code to get the count
+# table(ALL.LIFESTYLE$SJLIFEID %in% unique(lifestyle$SJLIFEID))
+# ALL.LIFESTYLE <- ALL.LIFESTYLE [ALL.LIFESTYLE$SJLIFEID  %in% unique(lifestyle$SJLIFEID),]
+# table(PHENO.ANY_SN$ANY_SN)
+# bmi_iid_dob_18_uniq$CACO <- PHENO.ANY_SN$ANY_SN[match(bmi_iid_dob_18_uniq$sjlid, PHENO.ANY_SN$sjlid)]
+# table(bmi_iid_dob_18_uniq$CACO)
+
+table(PHENO.ANY_SN$ANY_SN) - table(ALL.LIFESTYLE$CACO)
+
+
+CROSS_CASES.df <- ALL.LIFESTYLE[c("CACO", "Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn", "HEALTHY_Diet_yn")]
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df, CACO = "CACO", 
+             Current_smoker_yn = "Current_smoker_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
+             RiskyHeavyDrink_yn = "RiskyHeavyDrink_yn", Obese_yn = "Obese_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn")
+count1 <- as.data.frame(t(CROSS_CASES.df %>%
+                  cross_cases(CACO, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, Obese_yn))))
+
+## Missing before any filter
+CROSS_CASES.df <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Obese_yn")])
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df, ANY_SN = "ANY_SN", 
+                               Current_smoker_yn = "Current_smoker_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
+                               RiskyHeavyDrink_yn = "RiskyHeavyDrink_yn", Obese_yn = "Obese_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn")
+count3 <- as.data.frame(t(CROSS_CASES.df %>%
+                            cross_cases(ANY_SN, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, Obese_yn))))
+count3
+###########################################
+
 ## In CASES, if age survey is greater than age at diagnosis; NULLIFY the favorable_lifestyle.category. That information is not useful
-ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("Current_smoker_yn")] <- NA
-ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("PhysicalActivity_yn")] <- NA
-ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("RiskyHeavyDrink_yn")] <- NA
-ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$HEALTHY_Diet_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("HEALTHY_Diet_yn")] <- NA
-ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$Not_obese_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("Obese_yn")] <- NA
-ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("HEI2015_TOTAL_SCORE")] <- NA
+ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("Current_smoker_yn")] <- "Unknown"
+ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("PhysicalActivity_yn")] <- "Unknown"
+ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("RiskyHeavyDrink_yn")] <- "Unknown"
+ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$HEALTHY_Diet_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("HEALTHY_Diet_yn")] <- "Unknown"
+ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$Not_obese_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("Obese_yn")] <- "Unknown"
+ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("HEI2015_TOTAL_SCORE")] <- "Unknown"
+
+
+###############################################
+## Missing due age at survey after diagnosis ##
+###############################################
+CROSS_CASES.df <- ALL.LIFESTYLE[c("CACO", "Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn", "HEALTHY_Diet_yn")]
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df, CACO = "CACO", 
+                               Current_smoker_yn = "Current_smoker_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
+                               RiskyHeavyDrink_yn = "RiskyHeavyDrink_yn", Obese_yn = "Obese_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn")
+count2 <- as.data.frame(t(CROSS_CASES.df %>%
+                  cross_cases(CACO, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, Obese_yn))))
+
+rownames(count1) <- NULL; rownames(count2) <- NULL
+as.matrix(count2[2:4])- as.matrix(count1[2:4])
+###########################################
 
 
 #############################
