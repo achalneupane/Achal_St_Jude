@@ -23,21 +23,19 @@ dim(NINE_GENES.annovar)
 
 ## Part 2
 
-## Read bim files from ccss and sjlife maf less than 0.01 and get common variants bettween the cohorts to keep.
-ccss_vars_bim <- read.table("all_ccss_exp_vars_lt_maf_0.01.txt")
-sjlife_vars_bim <- read.table("all_sjlife_vars_lt_maf_0.01.txt")
+## Read bim files from ccss_exp and sjlife maf less than 0.01.
+sjlife_ccss_exp_vars_bim <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined/sjlife_ccss_exp_merged_maxmaf_0.01.bim")
 
-colnames(ccss_vars_bim) <- c("CHROM", "SNP", "centi", "POS", "REF", "ALT")
-colnames(sjlife_vars_bim) <- c("CHROM", "SNP", "centi", "POS", "REF", "ALT")
+colnames(sjlife_ccss_exp_vars_bim) <- c("CHROM", "SNP", "centi", "POS", "REF", "ALT")
+# colnames(sjlife_vars_bim) <- c("CHROM", "SNP", "centi", "POS", "REF", "ALT")
 
 
 ## Flip alleles
-sjlife_vars_bim$REF_flipped <- chartr("acgtACGT", "tgcaTGCA", sjlife_vars_bim$REF)
-sjlife_vars_bim$ALT_flipped <- chartr("acgtACGT", "tgcaTGCA", sjlife_vars_bim$ALT)
+sjlife_ccss_exp_vars_bim$REF_flipped <- chartr("acgtACGT", "tgcaTGCA", sjlife_ccss_exp_vars_bim$REF)
+sjlife_ccss_exp_vars_bim$ALT_flipped <- chartr("acgtACGT", "tgcaTGCA", sjlife_ccss_exp_vars_bim$ALT)
 
 # Create positional keys
-ccss_vars_bim$KEY <- paste(ccss_vars_bim$CHROM, ccss_vars_bim$POS, sep = ":")
-sjlife_vars_bim$KEY <- paste(sjlife_vars_bim$CHROM, sjlife_vars_bim$POS, sep = ":")
+sjlife_ccss_exp_vars_bim$KEY <- paste(sjlife_ccss_exp_vars_bim$CHROM, sjlife_ccss_exp_vars_bim$POS, sep = ":")
 
 ## Keep gnomad rare variants
 NINE_GENES.annovar$KEY <- gsub("chr", "", paste(NINE_GENES.annovar$Otherinfo4, NINE_GENES.annovar$Otherinfo5, sep = ":"))
@@ -47,6 +45,7 @@ NINE_GENES.annovar$SNP <- paste0(NINE_GENES.annovar$Otherinfo4,":", NINE_GENES.a
 NINE_GENES.annovar$REF <- NINE_GENES.annovar$Otherinfo7
 NINE_GENES.annovar$ALT <- NINE_GENES.annovar$Otherinfo8
 
+sjlife_vars_bim <- sjlife_ccss_exp_vars_bim
 
 sjlife_vars_bim <- sjlife_vars_bim[sjlife_vars_bim$KEY %in% NINE_GENES.annovar$KEY,]
 
@@ -54,42 +53,6 @@ dim(sjlife_vars_bim)
 
 # cc <- NINE_GENES.annovar[NINE_GENES.annovar$Start >= 178525989 & NINE_GENES.annovar$Start <= 178807423,]
 # sum(cc$gnomAD_genome_ALL < 0.01 & cc$gnomAD_genome_NFE < 0.01, na.rm = T)
-
-for (i in 1:nrow(sjlife_vars_bim)){
-  print(paste0("Doing iteration: ", i))
-  if (sum(sjlife_vars_bim$KEY[i] %in% ccss_vars_bim$KEY) > 0){ # Only if position matches; do
-    match.index <- grep(paste0("chr",sjlife_vars_bim$KEY[i],":"), ccss_vars_bim$SNP)
-    for(j in 1:length(match.index)){ # direct match or match by swapping alleles
-      if(sjlife_vars_bim$REF[i] == ccss_vars_bim$REF[match.index[j]] & sjlife_vars_bim$ALT[i] == ccss_vars_bim$ALT[match.index[j]]|
-         sjlife_vars_bim$REF[i] == ccss_vars_bim$ALT[match.index[j]] & sjlife_vars_bim$ALT[i] == ccss_vars_bim$REF[match.index[j]]){
-        sjlife_vars_bim$MATCH_CCSS[i] <- "DIRECT_MATCH"
-        sjlife_vars_bim$CCSS_equivalent[i] <- ccss_vars_bim$SNP[match.index[j]]
-      } else if # match by flipping alleles
-      (sjlife_vars_bim$REF_flipped[i] == ccss_vars_bim$REF[match.index[j]] & sjlife_vars_bim$ALT_flipped[i] == ccss_vars_bim$ALT[match.index[j]]){
-        sjlife_vars_bim$MATCH_CCSS[i] <- "INDIRECT_MATCH1"
-        sjlife_vars_bim$CCSS_equivalent[i] <- ccss_vars_bim$SNP[match.index[j]]
-      } else if # match by swapping flipped alleles
-      (sjlife_vars_bim$REF_flipped[i] == ccss_vars_bim$ALT[match.index[j]] & sjlife_vars_bim$ALT_flipped[i] == ccss_vars_bim$REF[match.index[j]]){
-        sjlife_vars_bim$MATCH_CCSS[i] <- "INDIRECT_MATCH2"
-        sjlife_vars_bim$CCSS_equivalent[i] <- ccss_vars_bim$SNP[match.index[j]]
-      } else if # match by flipping one allele or by swapping one of the flipped alleles
-      ((sjlife_vars_bim$REF_flipped[i] == ccss_vars_bim$REF[match.index[j]] & sjlife_vars_bim$ALT[i] == ccss_vars_bim$ALT[match.index[j]])|
-       (sjlife_vars_bim$ALT_flipped[i] == ccss_vars_bim$REF[j] & sjlife_vars_bim$REF[i] == ccss_vars_bim$ALT[match.index[j]])){
-        sjlife_vars_bim$MATCH_CCSS[i] <- "INDIRECT_MATCH3"
-        sjlife_vars_bim$CCSS_equivalent[i] <- ccss_vars_bim$SNP[match.index[j]]
-      } else{
-        # sjlife_vars_bim$MATCH_CCSS[i] <- NA
-        # sjlife_vars_bim$CCSS_equivalent[i] <- NA
-        print(i,j)
-      }
-      
-    }
-  } else {
-    sjlife_vars_bim$MATCH_CCSS[i] <- NA
-    sjlife_vars_bim$CCSS_equivalent[i] <- NA
-  }
-  
-}
 
 
 
@@ -105,10 +68,13 @@ for (i in 1:nrow(sjlife_vars_bim)){
   print(paste0("Doing iteration: ", i))
   if (sum(sjlife_vars_bim$KEY[i] %in% nine.genes.pablo.garcia$KEY) > 0){ # Only if position matches; do
     match.index <- grep(paste0("chr",sjlife_vars_bim$KEY[i],":"), nine.genes.pablo.garcia$SNP)
-    for(j in 1:length(match.index)){ # direct match or match by swapping alleles
-      if(sjlife_vars_bim$REF[i] == nine.genes.pablo.garcia$REF[match.index[j]] & sjlife_vars_bim$ALT[i] == nine.genes.pablo.garcia$ALT[match.index[j]]|
-         sjlife_vars_bim$REF[i] == nine.genes.pablo.garcia$ALT[match.index[j]] & sjlife_vars_bim$ALT[i] == nine.genes.pablo.garcia$REF[match.index[j]]){
+    for(j in 1:length(match.index)) { # direct match or match by swapping alleles
+      if(sjlife_vars_bim$REF[i] == nine.genes.pablo.garcia$REF[match.index[j]] & sjlife_vars_bim$ALT[i] == nine.genes.pablo.garcia$ALT[match.index[j]]){
         sjlife_vars_bim$MATCH_gnomAD[i] <- "DIRECT_MATCH"
+        sjlife_vars_bim$gnomAD_equivalent[i] <- nine.genes.pablo.garcia$SNP[match.index[j]]
+      } else if
+        (sjlife_vars_bim$REF[i] == nine.genes.pablo.garcia$ALT[match.index[j]] & sjlife_vars_bim$ALT[i] == nine.genes.pablo.garcia$REF[match.index[j]]){
+        sjlife_vars_bim$MATCH_gnomAD[i] <- "INDIRECT_MATCH0"
         sjlife_vars_bim$gnomAD_equivalent[i] <- nine.genes.pablo.garcia$SNP[match.index[j]]
       } else if # match by flipping alleles
       (sjlife_vars_bim$REF_flipped[i] == nine.genes.pablo.garcia$REF[match.index[j]] & sjlife_vars_bim$ALT_flipped[i] == nine.genes.pablo.garcia$ALT[match.index[j]]){

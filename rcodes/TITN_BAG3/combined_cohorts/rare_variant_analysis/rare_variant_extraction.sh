@@ -242,16 +242,13 @@ plink \
 
 ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/sjlife_ccss_exp_samples.txt .
 
+## Merge plink files
+ls *all_vars.bim| grep bim| sed 's/.bim//' | sed -n '1d;p' > wanted_plink
+plink --bfile ccss_exp_BAG3_all_vars --merge-list wanted_plink --keep-allele-order --out merged_plink_PLP
+
 # subset to SJLIFE and CCSS_Exp EUR cohort
-for file in ls *all_vars.bim; do
-BFILE="$(echo ${file%.*})"
-plink --bfile ${BFILE} --keep sjlife_ccss_exp_samples.txt --make-bed --keep-allele-order --out ${BFILE}_final
-done
+plink --bfile merged_plink_PLP --keep sjlife_ccss_exp_samples.txt --max-maf 0.01 --make-bed --keep-allele-order --out sjlife_ccss_exp_merged_maxmaf_0.01
 
-
-
-cat ccss_exp*0.01_final.bim > all_ccss_exp_vars_lt_maf_0.01.txt
-cat sjlife*0.01_final.bim > all_sjlife_vars_lt_maf_0.01.txt
 
 ## Get allele count for each P/LP variants in nine gene in CCSS and SJLIFE using Rscipt Z:\ResearchHome\ClusterHome\aneupane\St_Jude\Achal_St_Jude\rcodes\TITN_BAG3\rare_variant_analysis_v2\0.Annotation_v2_allele_count.R
 ## Now read these two files in Rscipt Z:\ResearchHome\ClusterHome\aneupane\St_Jude\Achal_St_Jude\rcodes\TITN_BAG3\combined_cohorts\rare_variant_analysis\0.Annotation_v2; part 2

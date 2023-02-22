@@ -66,6 +66,10 @@ KIRI.ccss <- KIRI.ccss[KIRI.ccss$ccssid %in% SARCOMA$ccssid,]
 SARCOMA$ANY_SN_TYPE_NEW <- KIRI.ccss$candxo3[match(SARCOMA$KEY, KIRI.ccss$KEY)]
 # Not identified: 5146972 and 12127547
 
+write.table(SARCOMA[c("ccssid", "SN_diagnosis_date", "ANY_SN_TYPE", "ANY_SN_TYPE_NEW")], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/CCSS_combined_Sarcoma_cases_with_Unspecified_diagnosis.txt", col.names = T, sep = "\t", quote = F, row.names = F)
+
+
+
 # SARCOMA$candxo3 <- KIRI.ccss$candxo3[match(SARCOMA$ccssid, KIRI.ccss$ccssid)]
 # unique(SARCOMA$candxo3)
 # # REF: https://seer.cancer.gov/icd-o-3/sitetype.icdo3.20220429.pdf
