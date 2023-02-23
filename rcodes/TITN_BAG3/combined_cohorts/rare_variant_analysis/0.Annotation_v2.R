@@ -108,7 +108,6 @@ for (i in 1:nrow(sjlife_vars_bim)){
 
 
 
-sjlife_vars_bim <- sjlife_vars_bim[!is.na(sjlife_vars_bim$MATCH_CCSS),]
 sjlife_vars_bim <- sjlife_vars_bim[!is.na(sjlife_vars_bim$MATCH_gnomAD),]
 
 sjlife_vars_bim$gnomAD_genome_ALL <- NINE_GENES.annovar$gnomAD_genome_ALL[match(sjlife_vars_bim$gnomAD_equivalent , NINE_GENES.annovar$SNP)]
@@ -136,12 +135,12 @@ sjlife_vars_bim$SNP2 <- paste0("chr",sjlife_vars_bim$CHROM,":",sjlife_vars_bim$P
 sum(sjlife_vars_bim$SNP1 %in% LoF.unique$KEY)
 # 0
 sum(sjlife_vars_bim$SNP2 %in% LoF.unique$KEY)
-# 100
+# 212
 sjlife_vars_bim$ANN_EFFECT <- LoF.unique$`ANN[*].EFFECT`[match(sjlife_vars_bim$SNP2, LoF.unique$KEY)]
 sjlife_vars_bim$PRED_TYPE <- LoF.unique$PRED_TYPE[match(sjlife_vars_bim$SNP2, LoF.unique$KEY)]
 
 sum(sjlife_vars_bim$SNP %in% CLINVAR.unique$KEY)
-# 1
+# 5
 sjlife_vars_bim$ANN_EFFECT[is.na(sjlife_vars_bim$ANN_EFFECT)] <- CLINVAR.unique$`ANN[*].EFFECT`[match(sjlife_vars_bim$SNP2, CLINVAR.unique$KEY)][is.na(sjlife_vars_bim$ANN_EFFECT)]
 sjlife_vars_bim$PRED_TYPE[is.na(sjlife_vars_bim$PRED_TYPE)] <- CLINVAR.unique$PRED_TYPE[match(sjlife_vars_bim$SNP2, CLINVAR.unique$KEY)][is.na(sjlife_vars_bim$PRED_TYPE)]
 
@@ -178,9 +177,9 @@ sjlife_vars_bim$GENE[sjlife_vars_bim$CHROM == 2 &  (sjlife_vars_bim$POS >= 17852
 # save.image("common_p_LP_rare_variants_gnomad_all_gnomad_NFE_lt_0.01.RData")
 
 
-
-write.table(sjlife_vars_bim$SNP, "sjlife_SNPS_maf_lt_0.01_gnomad_also_common_in_ccss.txt", quote = FALSE, col.names = FALSE, row.names = F)
-write.table(sjlife_vars_bim$CCSS_equivalent, "ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife.txt", quote = FALSE, col.names = FALSE, row.names = F)
+# 
+# write.table(sjlife_vars_bim$SNP, "sjlife_SNPS_maf_lt_0.01_gnomad_also_common_in_ccss.txt", quote = FALSE, col.names = FALSE, row.names = F)
+# write.table(sjlife_vars_bim$CCSS_equivalent, "ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife.txt", quote = FALSE, col.names = FALSE, row.names = F)
 
 
 ## Now run shell script rare_variant_extraction.sh to extract ccss and sjlife overlapping variants
