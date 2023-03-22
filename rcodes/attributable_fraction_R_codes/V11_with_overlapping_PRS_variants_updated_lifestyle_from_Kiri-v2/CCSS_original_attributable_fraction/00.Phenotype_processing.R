@@ -180,13 +180,19 @@ sum(ccss_org$ccssid %in% overlaps$ccssid)
 ccss_org <- ccss_org[!ccss_org$ccssid %in% overlaps$ccssid,]
 
 
-
+subneo <- ccss_org
+PHENO.ANY_SN <- ccss_org[c('ccssid', 'SEX', 'agedx', 'diagnose', 'AGE_AT_DIAGNOSIS', 'agelstcontact', 'anth_DED5', 
+                  'alk_CED5', 'epipdose5', 'pt_cisED5', 'chestrtgrp', 'neckrtgrp', 'abdomenrtgrp', 'abdomenrtgrp', 'brainrtgrp', 'pelvisrtgrp', 
+                  'smoker_former_or_never_yn_agesurvey', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn_agesurvey', 'NOT_RiskyHeavyDrink_yn',
+                  'Not_obese_yn_agesurvey', 'Not_obese_yn', 'PhysicalActivity_yn_agesurvey', 'PhysicalActivity_yn')]
+PHENO.ANY_SN <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$ccssid),]
 
 # ## Subset Pheno data only for ccss_org
 # ccss_org <- ccss_org[!duplicated(ccss_org$ccssid),]
 
+add_cubic_spline <- function(ccss_org){
 ## Age at last contact (cubic spline)
-source("https://raw.githubusercontent.com/achalneupane/Achal_St_Jude/main/rcodes/cubic_spline.r")
+source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/cubic_spline.r")
 
 breaks = seq(5, 95, 22.5)
 
@@ -195,10 +201,11 @@ cp = quantile(ccss_org$agelstcontact, breaks/100, na.rm = T)
 cs = cubic_spline(ccss_org$agelstcontact, knots = cp)
 
 colnames(cs) <- c("AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4")
-ccss_org <- cbind.data.frame(ccss_org, cs)
 # Merge cs to your original data.frame and adjust in the logistic regression
-
-
+ccss_org <- cbind.data.frame(ccss_org, cs)
+# add cubic spline
+return(ccss_org)
+}
 
 
 ####################################################
@@ -206,6 +213,7 @@ ccss_org <- cbind.data.frame(ccss_org, cs)
 ####################################################
 ## Create tertiles for ccss org and ccss exp separately
 
+add_therapy_tertiles <- function(ccss_org){
 ## Anthracyclines (Y/N and Tertiles)
 ccss_org$anth_DED5 <- as.numeric(ccss_org$anth_DED5)
 ccss_org$anthra_jco_dose_5_yn <- factor(ifelse(ccss_org$anth_DED5 == 0, "N", "Y"))
@@ -258,29 +266,35 @@ ccss_org$maxneckrtdose.category <- factor(ccss_org$neckrtgrp, levels = c("None",
 ccss_org$maxabdrtdose.category <- factor(ccss_org$abdomenrtgrp, levels = c("None", "0-30", ">=30", "Unknown"))
 ccss_org$maxsegrtdose.category <- factor(ccss_org$brainrtgrp, levels = c("None", "0-18", "18-30", ">=30", "Unknown"))
 ccss_org$maxpelvisrtdose.category <- factor(ccss_org$pelvisrtgrp, levels = c("None", "0-20", ">=20", "Unknown"))
+return(ccss_org)
+}
 
 
-subneo <- ccss_org
 
 
-PHENO.ANY_SN <- ccss_org[c('ccssid', 'gender', 'agedx', 'diagnose', 'agelstcontact', 'AGE_AT_DIAGNOSIS', 
-                               "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", 
-                               'maxchestrtdose.category', 'maxneckrtdose.category', 'maxabdrtdose.category', 'maxsegrtdose.category', 'maxpelvisrtdose.category',
-                               'Not_obese_yn_agesurvey', 'Not_obese_yn', 'PhysicalActivity_yn_agesurvey', 'PhysicalActivity_yn', 
-                               'smoker_former_or_never_yn_agesurvey', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn_agesurvey', 'NOT_RiskyHeavyDrink_yn', 
-                               'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category')]
 
 
-# Now KEEP the unique PHENO samples
-sum(duplicated(PHENO.ANY_SN$ccssid))
-# 1662
-PHENO.ANY_SN <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$ccssid),]
+
+
+# # Now KEEP the unique PHENO samples
+# sum(duplicated(PHENO.ANY_SN$ccssid))
+# # 1662
+# 
+# ## Just to add the PRS tertiles
+# PHENO.ANY_SN.dups <- PHENO.ANY_SN
+# PHENO.ANY_SN <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$ccssid),]
 
 
 ################
 ## PRS scores ##
 ################
-
+add_PRS_to_PHENO <-function(PHENO.ANY_SN){
+PHENO.ANY_SN <- PHENO.ANY_SN[c('ccssid', 'gender', 'agedx', 'diagnose', 'agelstcontact', 'AGE_AT_DIAGNOSIS', 
+                                 "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", 
+                                 'maxchestrtdose.category', 'maxneckrtdose.category', 'maxabdrtdose.category', 'maxsegrtdose.category', 'maxpelvisrtdose.category',
+                                 'Not_obese_yn_agesurvey', 'Not_obese_yn', 'PhysicalActivity_yn_agesurvey', 'PhysicalActivity_yn', 
+                                 'smoker_former_or_never_yn_agesurvey', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn_agesurvey', 'NOT_RiskyHeavyDrink_yn', 
+                                 'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category')]
 ## Meningioma_prs.profile----------------
 Meningioma <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/prs_out/Meningioma_prs.profile", header = T)
 PHENO.ANY_SN$Meningioma_PRS <-  Meningioma$SCORE [match(PHENO.ANY_SN$ccssid, Meningioma$IID)]
@@ -348,6 +362,8 @@ for(i in 1:length(PRS.to.categorize)){
 
 
 
+return(PHENO.ANY_SN)
+}
 
 
 

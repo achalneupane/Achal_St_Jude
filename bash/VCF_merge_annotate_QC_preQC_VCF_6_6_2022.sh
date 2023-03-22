@@ -141,7 +141,7 @@ bsub \
 	-o "${WORKDIR}/logs/${INPUT_VCF%.vcf*}_dbSNP_annotated.%J" \
 	-n ${THREADS} \
 	-R "rusage[mem=8192]" \
-	"./entrypoint_VCFannotation.sh"; \
+	"/entrypoint_VCFannotation.sh"; \
 done; 
 
 

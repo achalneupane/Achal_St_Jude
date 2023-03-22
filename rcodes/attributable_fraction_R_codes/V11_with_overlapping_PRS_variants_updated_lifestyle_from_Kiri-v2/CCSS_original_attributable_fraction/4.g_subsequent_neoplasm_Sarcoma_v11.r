@@ -12,7 +12,15 @@ library(stringr)
 library(lubridate)
 # benchmarkme::get_ram()
 
-table(is.na(PHENO.ANY_SN$Current_smoker_yn))
+
+###############################################
+## Add age at last contact, tertiles and PRS ##
+###############################################
+PHENO.ANY_SN <- add_cubic_spline(PHENO.ANY_SN)
+PHENO.ANY_SN <- add_therapy_tertiles(PHENO.ANY_SN)
+PHENO.ANY_SN <- add_PRS_to_PHENO(PHENO.ANY_SN)
+
+
 #########################
 ## Subsequent neoplasm ##
 #########################
@@ -20,13 +28,13 @@ subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subne
 
 ########################################
 # How many SNs after 5 years
-subneo.after5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5,]
+subneo.after5 <- subneo[which(subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5),]
 length(unique(subneo.after5$ccssid))
-# 1351
+# 1350
 
-subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
-sum(!duplicated(subneo.within5$ccssid))
-# 19
+subneo.within5 <- subneo[which(subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5),]
+sum(duplicated(subneo.within5$ccssid))
+# 0
 
 
 #############
@@ -39,15 +47,20 @@ nrow(SARCOMA)
 # Removing samples with SNs within 5 years of childhood cancer
 SARCOMA <- SARCOMA[!SARCOMA$ccssid %in% subneo.within5$ccssid,]
 nrow(SARCOMA)
-# 86
+# 87
+
+
 PHENO.ANY_SN$SARCOMA <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% SARCOMA$ccssid, 0, 1))
 table(PHENO.ANY_SN$SARCOMA)
 # 0    1 
-# 4921   86 
+# 4921   87
 
 
+PHENO.ANY_SN$d_candx <-  SARCOMA$d_candx[match(PHENO.ANY_SN$ccssid, SARCOMA$ccssid)]
 PHENO.ANY_SN$AGE.ANY_SN <- SARCOMA$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, SARCOMA$ccssid)]
 PHENO.ANY_SN$ANY_SN_TYPE <- SARCOMA$groupdx3[match(PHENO.ANY_SN$ccssid, SARCOMA$ccssid)]
+
+
 #############################
 ## Add Lifestyle variables ##
 #############################

@@ -169,10 +169,19 @@ ccss_exp$AGE_AT_LAST_CONTACT <- factor(ccss_exp$AGE_AT_LAST_CONTACT, levels = c(
 ccss_exp$gradedt <- as.numeric(ccss_exp$a_candx)
 
 
+subneo <- ccss_exp
+PHENO.ANY_SN <- ccss_exp[c('ccssid', 'SEX', 'agedx', 'diagnose', 'AGE_AT_DIAGNOSIS', 'agelstcontact', 'anth_DED5', 
+                           'alk_CED5', 'epipdose5', 'pt_cisED5', 'chestrtgrp', 'neckrtgrp', 'abdomenrtgrp', 'abdomenrtgrp', 'brainrtgrp', 'pelvisrtgrp', 
+                           'smoker_former_or_never_yn_agesurvey', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn_agesurvey', 'NOT_RiskyHeavyDrink_yn',
+                           'Not_obese_yn_agesurvey', 'Not_obese_yn', 'PhysicalActivity_yn_agesurvey', 'PhysicalActivity_yn')]
+PHENO.ANY_SN <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$ccssid),]
 
-## Age at last contact (cubic spline)
-source("https://raw.githubusercontent.com/achalneupane/Achal_St_Jude/main/rcodes/cubic_spline.r")
 
+
+add_cubic_spline <- function(ccss_exp){
+  ## Age at last contact (cubic spline)
+source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/cubic_spline.r")
+  
 breaks = seq(5, 95, 22.5)
 
 cp = quantile(ccss_exp$agelstcontact, breaks/100, na.rm = T)
@@ -182,6 +191,9 @@ cs = cubic_spline(ccss_exp$agelstcontact, knots = cp)
 colnames(cs) <- c("AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4")
 ccss_exp <- cbind.data.frame(ccss_exp, cs)
 # Merge cs to your original data.frame and adjust in the logistic regression
+# add cubic spline
+return(ccss_exp)
+}
 
 
 
@@ -191,6 +203,7 @@ ccss_exp <- cbind.data.frame(ccss_exp, cs)
 ####################################################
 ## Create tertiles for ccss org and ccss exp separately
 
+add_therapy_tertiles <- function(ccss_exp){
 ## Anthracyclines (Y/N and Tertiles)
 ccss_exp$anth_DED5 <- as.numeric(ccss_exp$anth_DED5)
 ccss_exp$anthra_jco_dose_5_yn <- factor(ifelse(ccss_exp$anth_DED5 == 0, "N", "Y"))
@@ -246,24 +259,15 @@ ccss_exp$maxpelvisrtdose.category <- factor(ccss_exp$pelvisrtgrp, levels = c("No
 
 # table(PHENO.ANY_SN$cisplateq_dose_5.category)
 # table(ccss_exp$cisplateq_dose_5.category)
+return(ccss_exp)
+}
 
 
 
-
-subneo <- ccss_exp
-
-PHENO.ANY_SN <- ccss_exp[c('ccssid', 'gender', 'agedx', 'diagnose', 'agelstcontact', 'AGE_AT_DIAGNOSIS', 
-                           "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", 
-                           'maxchestrtdose.category', 'maxneckrtdose.category', 'maxabdrtdose.category', 'maxsegrtdose.category', 'maxpelvisrtdose.category',
-                           'Not_obese_yn_agesurvey', 'Not_obese_yn', 'PhysicalActivity_yn_agesurvey', 'PhysicalActivity_yn', 
-                           'smoker_former_or_never_yn_agesurvey', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn_agesurvey', 'NOT_RiskyHeavyDrink_yn', 
-                           'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category')]
-
-
-# Now KEEP the unique PHENO samples
-sum(duplicated(PHENO.ANY_SN$ccssid))
-# 142
-PHENO.ANY_SN <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$ccssid),]
+# # Now KEEP the unique PHENO samples
+# sum(duplicated(PHENO.ANY_SN$ccssid))
+# # 142
+# PHENO.ANY_SN <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$ccssid),]
 
 
 
@@ -271,7 +275,13 @@ PHENO.ANY_SN <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$ccssid),]
 ################
 ## PRS scores ##
 ################
-
+add_PRS_to_PHENO <-function(PHENO.ANY_SN){
+PHENO.ANY_SN <- PHENO.ANY_SN[c('ccssid', 'gender', 'agedx', 'diagnose', 'agelstcontact', 'AGE_AT_DIAGNOSIS', 
+                                 "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", 
+                                 'maxchestrtdose.category', 'maxneckrtdose.category', 'maxabdrtdose.category', 'maxsegrtdose.category', 'maxpelvisrtdose.category',
+                                 'Not_obese_yn_agesurvey', 'Not_obese_yn', 'PhysicalActivity_yn_agesurvey', 'PhysicalActivity_yn', 
+                                 'smoker_former_or_never_yn_agesurvey', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn_agesurvey', 'NOT_RiskyHeavyDrink_yn', 
+                                 'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category')]
 ## Meningioma_from_variants_also_in_CCSS_org_prs.profile-----------------------------------------------
 Meningioma <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Meningioma_from_variants_also_in_CCSS_org_prs.profile", header = T)
 PHENO.ANY_SN$Meningioma_PRS <-  Meningioma$SCORE [match(PHENO.ANY_SN$ccssid, Meningioma$IID)]
@@ -337,6 +347,9 @@ for(i in 1:length(PRS.to.categorize)){
   colnames(PHENO.ANY_SN)[colnames(PHENO.ANY_SN) == "tmp.tert.category"] <- paste0(PRS.to.categorize[i], ".tertile.category")
 }
 
+
+return(PHENO.ANY_SN)
+}
 
 # save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_exp_Genetic_data_P_LP_v11.Rdata")
 

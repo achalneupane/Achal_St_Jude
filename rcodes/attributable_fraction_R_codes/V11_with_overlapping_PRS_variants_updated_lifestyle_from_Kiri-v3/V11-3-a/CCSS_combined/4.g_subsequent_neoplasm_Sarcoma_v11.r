@@ -17,8 +17,23 @@ table(PHENO.ANY_SN$CACO)
 # 7839  104
 
 
+# remove as cases that are icdo3 as /1 or /0
+as.controls <- as.character(c(1004973, 1005736, 3012171, 4073492, 5097496, 5146972, 8217873, 9059523, 9203577,
+                              10085746, 11108731, 12083337, 13054941, 13231652, 16041746, 16045012, 17050333,
+                              18080902, 18141511, 20024771, 20027745, 20032881, 20033541, 21228953, 22091488,
+                              22155815, 22156111, 22200376, 25017727, 26016681, 26018907, 26020735, 26056273,
+                              1262696, 2511092, 2518314, 5362062, 6302298, 8356277, 15283414, 19295502, 22434302,
+                              26403512))
 
+as.controls <- paste0(as.controls, "_", as.controls)
+View(PHENO.ANY_SN)
 
+sum(PHENO.ANY_SN$ccssid %in% as.controls)
+# 33
+
+PHENO.ANY_SN$SARCOMA[PHENO.ANY_SN$ccssid %in% as.controls] <- 0
+
+table(PHENO.ANY_SN$SARCOMA)
 
 ##########################
 dat_all = PHENO.ANY_SN
@@ -122,6 +137,7 @@ af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 SARCOMA.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
 SARCOMA.res
+# 0.351 0.038 0.000 0.377
 
 all.res <- cbind.data.frame(SN=SN.res, SMN=SMN.res, NMSC=NMSC.res, BREAST=BREAST.res, THYROID=THYROID.res, MENINGIOMA=MENINGIOMA.res, SARCOMA=SARCOMA.res)
 # View(all.res)

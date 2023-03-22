@@ -61,12 +61,12 @@ table(PHENO.ANY_SN$KEY %in% KIRI.ccss$KEY)
 
 
 SARCOMA <- PHENO.ANY_SN[PHENO.ANY_SN$SARCOMA == 1,]
-KIRI.ccss <- KIRI.ccss[KIRI.ccss$ccssid %in% SARCOMA$ccssid,]
+KIRI.ccss <- KIRI.ccss[KIRI.ccss$KEY %in% SARCOMA$KEY,]
 
 SARCOMA$ANY_SN_TYPE_NEW <- KIRI.ccss$candxo3[match(SARCOMA$KEY, KIRI.ccss$KEY)]
 # Not identified: 5146972 and 12127547
 
-write.table(SARCOMA[c("ccssid", "SN_diagnosis_date", "ANY_SN_TYPE", "ANY_SN_TYPE_NEW")], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/CCSS_combined_Sarcoma_cases_with_Unspecified_diagnosis.txt", col.names = T, sep = "\t", quote = F, row.names = F)
+write.table(SARCOMA[c("ccssid", "KEY", "SN_diagnosis_date", "ANY_SN_TYPE", "ANY_SN_TYPE_NEW")], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Kyla/CCSS_combined_Sarcoma_cases_with_Unspecified_diagnosis_v2.txt", col.names = T, sep = "\t", quote = F, row.names = F)
 
 
 

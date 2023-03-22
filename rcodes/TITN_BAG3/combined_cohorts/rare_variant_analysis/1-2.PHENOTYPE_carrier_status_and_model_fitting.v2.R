@@ -7,17 +7,59 @@ pheno.sjlife_ttn_bag3$CMP <- factor(pheno.sjlife_ttn_bag3$CMP)
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/ALL_P_LP_combinations/rare_variant_analysis_v2/pablo_garcia_et_al_nine_genes")
 
 
-load("common_p_LP_rare_variants_gnomad_all_gnomad_NFE_lt_0.01.RData")
+load("p_LP_rare_variants_gnomad_all_gnomad_NFE_lt_0.01.RData")
 
-setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/ALL_P_LP_combinations/rare_variant_analysis_v2/pablo_garcia_et_al_nine_genes")
-sjlife.raw <- read.table("sjlife_SNPS_maf_lt_0.01_gnomad_also_common_in_ccss_recodeA.raw", header = T)
-# ccss.raw <- read.table("ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife_recodeA.raw", header = T)
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined")
+sjlife.raw <- read.table("sjlife_ccss_exp_SNPS_maf_lt_0.01_gnomad_recodeA.raw", header = T)
 
-# exclude younger samples from ccss exp
-ccss.raw <- read.table("ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife_without_younger_samples_recodeA.raw", header = T)
-sum(pheno.ccss_exp_eur$FID %in% ccss.raw$FID)
-# 1457
-pheno.ccss_exp_eur <- pheno.ccss_exp_eur[pheno.ccss_exp_eur$FID %in% ccss.raw$FID,]
+
+variants.raw <- colnames(sjlife.raw)[-c(1:6)]
+HEADER = sub(pattern="_[T,A,G,C,*]+",replacement="",variants.raw)
+HEADER = gsub(pattern=";rs\\d+",replacement="",HEADER)
+HEADER = gsub("._...DEL", "",HEADER)
+HEADER = gsub("....DEL.", ".<*:DEL>",HEADER)
+HEADER = gsub("\\.", ":", HEADER)
+
+sum(sjlife_vars_bim$SNP %in% HEADER)
+# 30
+sjlife_vars_bim <- sjlife_vars_bim[sjlife_vars_bim$SNP %in% HEADER,]
+
+sum(HEADER %in% sjlife_vars_bim$SNP)
+# HEADER [HEADER %in% sjlife_vars_bim$SNP]
+
+df <- read.table(text = "chr3:38562422:C:A
+chr1:156104763:A:C
+chr1:156134954:G:A
+chr1:156138821:C:T
+chr1:201361214:C:T
+chr1:201361215:G:A
+chr1:201361215:G:C
+chr1:201364335:CG:C
+chr2:178542266:A:G
+chr2:178577602:C:T
+chr2:178615321:A:G
+chr2:178630241:G:A
+chr2:178646559:T:C
+chr2:178651534:G:T
+chr2:178664926:G:C
+chr2:178665777:G:A
+chr2:178667719:A:T
+chr2:178669675:G:T
+chr2:178692016:C:T
+chr2:178693609:C:T
+chr2:178701528:C:G
+chr2:178702065:T:A
+chr2:178706956:T:G
+chr2:178728776:G:T
+chr2:178746079:G:A
+chr2:178756220:A:G
+chr2:178777856:A:G
+chr2:178778004:G:A
+chr2:178782806:C:T
+chr10:119672255:C:T
+", header = F)
+
+df$V1[!df$V1 %in% HEADER]
 
 
 genes <- unique(sjlife_vars_bim$GENE)
@@ -27,11 +69,26 @@ genes <- unique(sjlife_vars_bim$GENE)
 
 
 ## SJLIFE analysis
-
 for (i in 1:length(genes)){
   genes[i]
   rm(total.carriers, total.cases, carriers.cases, total.controls, carriers.controls, OR.CI, pvalue, OR.CI.adj, pvalue.adj)
   genes.carriers <-  sjlife.raw[c(2,grep(paste0(gsub(":" , "\\.",paste0("chr", sjlife_vars_bim$KEY[grepl(genes[i], sjlife_vars_bim$GENE)], ".")), collapse = "|"), colnames(sjlife.raw)))]
+  # See how many variants had carrier: Were there carriers in our data for all
+  # these variants? For example, if no one had variant for chr10:119672255:C:T,
+  # you would not have included in the generation of carrier status. This is what
+  # we include in the total numbers of variants used to perform the analysis
+  check.carriers <- genes.carriers[-1]
+  check.carriers
+  # df <- check.carriers[, complete.cases(check.carriers)]
+  # df <- check.carriers[, colSums(is.na(check.carriers)) == 0]
+  # "chr2.178542266.A.G_G" "chr2.178615321.A.G_G" "chr2.178630241.G.A_A" "chr2.178782806.C.T_T"
+  cols_with_ones <- na.omit(apply(check.carriers == 1, 2, any))
+  cols_with_ones
+  # Extract the names of the columns with at least one 1
+  n_vars_with_carriers <- length(names(cols_with_ones)[cols_with_ones])
+  print(paste0(genes[i],"=",  n_vars_with_carriers))
+# }
+  ###############################################
   genes.carriers$carrier <- factor(ifelse(rowSums(genes.carriers[-1]) != 0, "1", "0"))
   # table(genes.carriers$carrier)
   pheno.sjlife_ttn_bag3$carriers <- genes.carriers$carrier[match(pheno.sjlife_ttn_bag3$IID, genes.carriers$IID)]

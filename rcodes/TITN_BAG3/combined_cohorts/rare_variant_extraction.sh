@@ -259,22 +259,7 @@ plink --bfile merged_plink_PLP --keep sjlife_ccss_exp_samples.txt --max-maf 0.01
 ##################################################
 ## Extract ccss and sjlife overlapping variants ##
 ##################################################
-
-ls sjlife*0.01_final.bim| grep bim| sed 's/.bim//' | sed -n '1d;p' > sjlife_wanted_plink
-plink --bfile sjlife_BAG3_maf_lt_0.01_final --merge-list sjlife_wanted_plink --out sjlife_all_genes_maf_lt_0.01_final
-plink --bfile sjlife_all_genes_maf_lt_0.01_final --extract sjlife_SNPS_maf_lt_0.01_gnomad_also_common_in_ccss.txt --recodeA --out sjlife_SNPS_maf_lt_0.01_gnomad_also_common_in_ccss_recodeA
-
-ls ccss*0.01_final.bim| grep bim| sed 's/.bim//' | sed -n '1d;p' > ccss_wanted_plink
-
-## Before
-plink --bfile ccss_exp_BAG3_maf_lt_0.01_final --merge-list ccss_wanted_plink --out ccss_all_genes_maf_lt_0.01_final
-plink --bfile ccss_all_genes_maf_lt_0.01_final --extract ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife.txt --recodeA --out ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife_recodeA
-
-
-## Now, after removing the younger samples within 5 years of primary cancer
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/ALL_P_LP_combinations/rare_variant_analysis_v2/pablo_garcia_et_al_nine_genes
-
-plink --bfile ccss_all_genes_maf_lt_0.01_final --remove /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/ccss_exp.young.CA.to.remove.txt --make-bed --out ccss_all_genes_maf_lt_0.01_final_without_younger_samples
-plink --bfile ccss_all_genes_maf_lt_0.01_final_without_younger_samples --extract ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife.txt --recodeA --out ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife_without_younger_samples_recodeA
+## Run 0.Annotation_v2.R code to get the list of variants for analysis
+plink --bfile sjlife_ccss_exp_merged_maxmaf_0.01 --extract sjlife_ccss_exp_overlapping_SNPS_maf_lt_0.01_gnomad.txt --geno 0.01 --recodeA --out sjlife_ccss_exp_SNPS_maf_lt_0.01_gnomad_recodeA
 
 

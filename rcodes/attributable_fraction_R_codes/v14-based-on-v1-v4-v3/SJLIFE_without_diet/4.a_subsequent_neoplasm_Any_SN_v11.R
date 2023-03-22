@@ -1,0 +1,380 @@
+# Yutakas email on 03/08/2023: I think this result looks good to me.  The only
+# thing is that large (positive or negative) coefficients are clustered in
+# "Unknown" treatment categories.  This is presumably due to the same reason as
+# the lifestyle unknowns where "unknowns" of different items are overlapping.
+# In the case of treatment, if the survivor's medical record abstraction is
+# missing, all treatment variables will be unknown.  Thus, I suggest you do the
+# same for the treatment "Unknowns" as you did lifestyle "Unknowns", i.e.,
+# create an indicator variable "Any tx Unknown" and put everyone with "Unknown"
+# at any of the treatment variables there.  Then, you will remove "Unknown" from
+# each of the treatment variables and we will not have the large coefficients (I
+# think).
+#########################
+## Load Phenotype data ##
+#########################
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
+source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
+ALL.LIFESTYLE <- edit_lifestyle(ALL.LIFESTYLE)
+#########################
+## Subsequent Neoplasm ##
+#########################
+
+library(haven)
+library(benchmarkme)
+library(dplyr)
+library(plyr)
+library(data.table)
+library (birk)
+library(gtools)
+library(stringr)
+# library(tidyverse)
+library(lubridate)
+# benchmarkme::get_ram()
+
+
+subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
+head(subneo)
+table(subneo$diaggrp)
+dim(subneo)
+# 1731 9
+
+subneo <- subneo[subneo$sjlid %in% PHENO.ANY_SN$sjlid ,]
+dim(subneo)
+# 1717
+# add diagnosis date 
+subneo$diagdt <-  PHENO.ANY_SN$diagdt [match(subneo$sjlid , PHENO.ANY_SN$sjlid)]
+subneo$agedx <-  PHENO.ANY_SN$agedx [match(subneo$sjlid , PHENO.ANY_SN$sjlid)]
+# add DOB
+subneo$DOB <- PHENO.ANY_SN$dob[match(subneo$sjlid, PHENO.ANY_SN$sjlid)]
+
+subneo$AGE.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
+
+## These two dates should be the (almost) same
+subneo$AGE.ANY_SN.after.childhood.cancer <- time_length(interval(as.Date(subneo$diagdt), as.Date(subneo$gradedt)), "years")
+subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subneo$agedx
+
+
+########################################
+# How many SNs after 5 years
+subneo.after5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5,]
+length(unique(subneo.after5$sjlid))
+# 612
+
+subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
+sum(!duplicated(subneo.within5$sjlid))
+# 22
+#############
+## Any SNs ##
+#############
+# Get SNs for the first time and Age at First SN.
+# For this, I will first sort the table by date
+library(data.table)
+ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+
+
+# ## Removing samples with SN within the 5 years of childhood cancer
+# ANY_SNs <- ANY_SNs[!ANY_SNs$sjlid %in% subneo.within5$sjlid,]
+# dim(ANY_SNs)
+# # 605
+
+PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
+
+## Remove SNs if younger than 18
+PHENO.ANY_SN$AGE.ANY_SN <- ANY_SNs$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, ANY_SNs$sjlid)]
+PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
+# # table(PHENO.ANY_SN$ANY_SN)
+# 0    1 
+# 3796  568 
+
+# write.table(PHENO.ANY_SN$sjlid, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/4401_attributable_fraction_ids.txt", col.names = F, row.names = F, quote = F)
+
+#############################
+## Add Lifestyle variables ##
+#############################
+# Define CA/CO status in lifestyle
+ALL.LIFESTYLE$CACO <- factor(ifelse(!ALL.LIFESTYLE$SJLIFEID %in% ANY_SNs$sjlid, 0, 1))
+
+
+
+## Get date (gradedt) and age at diagnosis of SN
+ALL.LIFESTYLE$ANY.SN_gradedate <- ANY_SNs$gradedt[match(ALL.LIFESTYLE$SJLIFEID, ANY_SNs$sjlid)]
+ALL.LIFESTYLE$AGE.ANY_SN <- ANY_SNs$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, ANY_SNs$sjlid)]
+
+
+############################################################################################
+############################################################################################
+#################################### Work for V11-4-v2 #####################################
+############################################################################################
+############################################################################################
+# Yutaka's email 02/23/2023: The number of SN should decrease
+# in the new analysis because those who developed SN before the first adult
+# survey should be out of the analysis.  Also, we should use the "any missing in
+# the lifestyle variables" rather than using the individual missing (with
+# missing combined to the reference in each lifestyle variable).
+
+ALL.LIFESTYLE <- ALL.LIFESTYLE[!(ALL.LIFESTYLE$Current_smoker_yn == "Unknown" &
+                                   ALL.LIFESTYLE$PhysicalActivity_yn == "Unknown" &
+                                   ALL.LIFESTYLE$RiskyHeavyDrink_yn == "Unknown" &
+                                   ALL.LIFESTYLE$Obese_yn == "Unknown" ),]
+
+dim(ALL.LIFESTYLE)
+# [1] 3692   16
+
+sum((ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey >= 18|
+       ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey >= 18|
+       ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey >= 18|
+       ALL.LIFESTYLE$Not_obese_yn_agesurvey >= 18), na.rm = T)
+# 3692
+
+
+# ALL.LIFESTYLE.test <- ALL.LIFESTYLE
+
+
+ALL.LIFESTYLE <- ALL.LIFESTYLE[which(ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey >= 18 |
+                                       ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey >= 18 |
+                                       ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey >= 18 |
+                                       ALL.LIFESTYLE$Not_obese_yn_agesurvey >= 18),]
+
+cols <- c(
+  "smoker_former_or_never_yn_agesurvey",
+  "PhysicalActivity_yn_agesurvey",
+  "NOT_RiskyHeavyDrink_yn_agesurvey",
+  "Not_obese_yn_agesurvey"
+)
+
+## round to nearest integer
+# saved.cc <- ALL.LIFESTYLE[, c("SJLIFEID", cols)]
+ALL.LIFESTYLE[, cols] <- apply(ALL.LIFESTYLE[, cols], 2, round)
+library(matrixStats)
+ALL.LIFESTYLE$survey_min <- rowMins(as.matrix(ALL.LIFESTYLE[, cols]), na.rm = TRUE)
+# cc <- ALL.LIFESTYLE[, c("SJLIFEID", cols, "survey_min")]
+ALL.LIFESTYLE$Current_smoker_yn [which(ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey != ALL.LIFESTYLE$survey_min)] <- "Unknown"
+ALL.LIFESTYLE$PhysicalActivity_yn [which(ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey != ALL.LIFESTYLE$survey_min)] <- "Unknown"
+ALL.LIFESTYLE$RiskyHeavyDrink_yn [which(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey != ALL.LIFESTYLE$survey_min)] <- "Unknown"
+ALL.LIFESTYLE$Obese_yn [which(ALL.LIFESTYLE$Not_obese_yn_agesurvey != ALL.LIFESTYLE$survey_min)] <- "Unknown"
+
+
+to.remove <- ALL.LIFESTYLE$SJLIFEID[which(ALL.LIFESTYLE$survey_min > ALL.LIFESTYLE$AGE.ANY_SN)]
+PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% to.remove,]
+
+sum(PHENO.ANY_SN$sjlid %in% ALL.LIFESTYLE$SJLIFEID)
+# 3400
+
+## Remove any samples that do not have lifestyle
+PHENO.ANY_SN  <- PHENO.ANY_SN[PHENO.ANY_SN$sjlid %in% ALL.LIFESTYLE$SJLIFEID,]
+
+#############################
+## Addd lifestyle to Pheno ##
+#############################
+PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("HEI2015_TOTAL_SCORE", "Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Obese_yn")])
+
+
+## Add any missing to each lifestyle variable
+# PHENO.ANY_SN[c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn")]
+PHENO.ANY_SN$any_lifestyle_missing <- apply(PHENO.ANY_SN[c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn")], 1, function(x) any("Unknown" %in% x))
+PHENO.ANY_SN$any_lifestyle_missing  <- factor(ifelse(PHENO.ANY_SN$any_lifestyle_missing == FALSE, "No", "Yes"))
+
+########################################
+## Do the same for missing treatments ##
+########################################
+PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category", "epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
+PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
+
+#########################
+## Extract Ethnicities ##
+#########################
+## Add admixture ethnicity 
+ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
+PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
+
+
+############################################################
+## Drop Unknown level from the lifestyle factor variables ##
+############################################################
+
+## Missing lifestyle
+## Recode lifestyle variables to fit the model for missingness
+PHENO.ANY_SN$Current_smoker_yn[PHENO.ANY_SN$Current_smoker_yn == "Unknown"] <- "No"
+PHENO.ANY_SN$Current_smoker_yn <- droplevels(PHENO.ANY_SN$Current_smoker_yn)
+
+PHENO.ANY_SN$PhysicalActivity_yn[PHENO.ANY_SN$PhysicalActivity_yn == "Unknown"] <- "Yes"
+PHENO.ANY_SN$PhysicalActivity_yn <- droplevels(PHENO.ANY_SN$PhysicalActivity_yn)
+
+PHENO.ANY_SN$RiskyHeavyDrink_yn[PHENO.ANY_SN$RiskyHeavyDrink_yn == "Unknown"] <- "No"
+PHENO.ANY_SN$RiskyHeavyDrink_yn <- droplevels(PHENO.ANY_SN$RiskyHeavyDrink_yn)
+
+PHENO.ANY_SN$Obese_yn[PHENO.ANY_SN$Obese_yn == "Unknown"] <- "No"
+PHENO.ANY_SN$Obese_yn <- droplevels(PHENO.ANY_SN$Obese_yn)
+
+
+## Missing tx
+PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxsegrtdose.category <- droplevels(PHENO.ANY_SN$maxsegrtdose.category)
+
+PHENO.ANY_SN$maxabdrtdose.category[PHENO.ANY_SN$maxabdrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxabdrtdose.category <- droplevels(PHENO.ANY_SN$maxabdrtdose.category)
+
+PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$maxchestrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxchestrtdose.category <- droplevels(PHENO.ANY_SN$maxchestrtdose.category)
+
+PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "Unknown"] <- "None"
+PHENO.ANY_SN$epitxn_dose_5.category <- droplevels(PHENO.ANY_SN$epitxn_dose_5.category)
+
+
+################
+## Cross tabs ##
+################
+library(expss)
+
+# Getting counts for non-missing data only; 6 samples do not have admixture ancestry
+CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
+
+CROSS_CASES.df <- PHENO.ANY_SN
+
+CROSS_CASES.df <- CROSS_CASES.df[,c("ANY_SN", "maxsegrtdose.category", "maxchestrtdose.category")]
+
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df, ANY_SN = "ANY_SN", 
+                               maxsegrtdose.category = "maxsegrtdose.category", maxchestrtdose.category = "maxchestrtdose.category")
+
+as.data.frame(t(CROSS_CASES.df %>%
+                  cross_cases(ANY_SN, list(maxsegrtdose.category, maxchestrtdose.category))))
+
+
+cc <- as.data.frame(t(CROSS_CASES.df %>%
+                        cross_cases(ANY_SN, list(maxsegrtdose.category, maxchestrtdose.category))))
+
+rownames(cc) <- NULL 
+cc
+
+
+# Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for cases
+cases_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$ANY_SN == 1],
+                     Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$ANY_SN == 1])
+
+# Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for controls
+control_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$ANY_SN == 0],
+                     Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$ANY_SN == 0])
+
+
+# Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
+PHENO.ANY_SN$maxsegrtdose.category <- as.character(PHENO.ANY_SN$maxsegrtdose.category)
+PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">0-<18"] <- ">0-<30"
+PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">=18-<30"] <- ">0-<30"
+PHENO.ANY_SN$maxsegrtdose.category <- factor(PHENO.ANY_SN$maxsegrtdose.category, levels = c("None", ">0-<30", ">=30"))
+
+######################################
+## Attributable fraction of Any SNs ##
+######################################
+  formula = paste0("ANY_SN ~ Pleiotropy_PRSWEB_PRS.tertile.category + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category + Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn + EAS + AFR + any_lifestyle_missing + any_tx_missing")
+  
+  dat_all = PHENO.ANY_SN
+  fit_all = glm(formula = formula,
+                family = binomial,
+                data = dat_all)
+  
+  
+  summary(fit_all)
+  
+  (output <- summary(fit_all)$coefficients)
+  as.data.frame(apply(output, 2, formatC, format="f", digits=4))
+  # options(scipen=999)
+  estimate <- format(round(output[,1],3), nsmall = 3)
+  std.error <- format(round(output[,2],3), nsmall = 3)
+  # P.val <- formatC(output[,4], format="G", digits=3)
+  P.val <- output[,4]
+  P.val[P.val < 0.001] <- "<0.001"
+  P.val[!grepl("<", P.val)] <- format(round(as.numeric(P.val[!grepl("<", P.val)]), 3), nsmall = 3)
+  sn.model <- (setNames(cbind.data.frame(estimate, std.error, P.val
+  ), c("Estimate", "Std.error", "P")))
+  sn.model <- sn.model[!grepl("AGE_AT_LAST_CONTACT", row.names(sn.model)),]
+  sn.model
+
+
+summary(fit_all)
+
+
+##########################
+## Get predicted values ##
+##########################
+dat_all$pred_all = predict(fit_all, newdat = dat_all, type = "response")
+
+###############
+## Treatment ##
+###############
+
+## Move relevant treatment exposures for everyone to no exposure
+dat_tx = dat_all
+
+dat_tx$maxsegrtdose.category =
+dat_tx$maxabdrtdose.category =
+dat_tx$maxchestrtdose.category =
+dat_tx$epitxn_dose_5.category = "None"
+
+dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
+
+## Attributable fraction calculation. First get the "predicted" number of SNs based on the model including all variables
+N_all = sum(dat_all$pred_all, na.rm = TRUE)
+N_no_tx = sum(dat_all$pred_no_tx, na.rm = TRUE)
+af_by_tx = (N_all - N_no_tx) / N_all
+round(af_by_tx,3)
+##################
+## P/LP and PRS ##
+##################
+## P/LP Zhaoming, Qin without Zhaoming and PRS
+dat_plp.prs = dat_all
+# dat_plp.prs$Zhaoming_carriers = dat_plp.prs$Qin_without_Zhaoming_vars_carriers = "N";
+dat_plp.prs$Pleiotropy_PRSWEB_PRS.tertile.category = "1st"
+
+dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "response")
+N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
+af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
+round(af_by_plp.prs,3)
+###############
+## Lifestyle ##
+###############
+dat_lifestyle = dat_all
+
+dat_lifestyle$Current_smoker_yn =
+dat_lifestyle$PhysicalActivity_yn =
+dat_lifestyle$RiskyHeavyDrink_yn =
+# dat_lifestyle$HEALTHY_Diet_yn =
+dat_lifestyle$Obese_yn = "1"
+
+dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
+N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
+af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
+round(af_by_N_no_favorable_lifestyle.category,3)
+
+#################################################
+## Treatment, Genetics and Lifestyle, combined ##
+#################################################
+
+dat_tx.plp.prs.lifestyle = dat_all
+
+## Nullify Treatment
+dat_tx.plp.prs.lifestyle$maxsegrtdose.category =
+  dat_tx.plp.prs.lifestyle$maxabdrtdose.category =
+  dat_tx.plp.prs.lifestyle$maxchestrtdose.category =
+  dat_tx.plp.prs.lifestyle$epitxn_dose_5.category = "None"
+
+## Nullify Genetics
+# dat_tx.plp.prs.lifestyle$Zhaoming_carriers = dat_tx.plp.prs.lifestyle$Qin_without_Zhaoming_vars_carriers = "N";
+dat_tx.plp.prs.lifestyle$Pleiotropy_PRSWEB_PRS.tertile.category = "1st"
+
+## Nullify Lifestyle
+dat_tx.plp.prs.lifestyle$Current_smoker_yn =
+  dat_tx.plp.prs.lifestyle$PhysicalActivity_yn =
+  dat_tx.plp.prs.lifestyle$RiskyHeavyDrink_yn =
+  # dat_tx.plp.prs.lifestyle$HEALTHY_Diet_yn =
+  dat_tx.plp.prs.lifestyle$Obese_yn = "1"
+
+
+dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx.plp.prs.lifestyle, type = "response")
+
+N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
+af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
+round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
+
+SN.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
+SN.res
+# 0.315 0.063 0.755 0.899

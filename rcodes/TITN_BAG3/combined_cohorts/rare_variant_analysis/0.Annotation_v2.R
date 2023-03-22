@@ -1,5 +1,6 @@
 # save.image("SNPEFF_clinvar_metaSVM_LoF_from_R_filtering_process_PreQC_VCF.RData")
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/SNPEFF_clinvar_metaSVM_LoF_from_R_filtering_process_PreQC_VCF.RData")
+library("dplyr")
 
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/ALL_P_LP_combinations/rare_variant_analysis_v2/pablo_garcia_et_al_nine_genes")
 ## Extract variants regrions from nine genes: BAG3, DSP, LMNA, MYH7, SCN5A, TCAP, TNNC1, TNNT2, and TTN 
@@ -15,7 +16,7 @@ NINE_GENES.annovar$gnomAD_genome_NFE <- as.numeric(NINE_GENES.annovar$gnomAD_gen
 
 
 NINE_GENES.annovar <- NINE_GENES.annovar %>%
-  filter(!(is.na(gnomAD_genome_ALL) & is.na(gnomAD_genome_NFE)))
+  dplyr::filter(!(is.na(gnomAD_genome_ALL) & is.na(gnomAD_genome_NFE)))
 
 NINE_GENES.annovar <- NINE_GENES.annovar[which(NINE_GENES.annovar$gnomAD_genome_ALL < 0.01 & NINE_GENES.annovar$gnomAD_genome_NFE < 0.01),]
 dim(NINE_GENES.annovar)
@@ -50,7 +51,7 @@ sjlife_vars_bim <- sjlife_ccss_exp_vars_bim
 sjlife_vars_bim <- sjlife_vars_bim[sjlife_vars_bim$KEY %in% NINE_GENES.annovar$KEY,]
 
 dim(sjlife_vars_bim)
-
+# 10612     9
 # cc <- NINE_GENES.annovar[NINE_GENES.annovar$Start >= 178525989 & NINE_GENES.annovar$Start <= 178807423,]
 # sum(cc$gnomAD_genome_ALL < 0.01 & cc$gnomAD_genome_NFE < 0.01, na.rm = T)
 
@@ -64,6 +65,9 @@ nine.genes.pablo.garcia <- cbind.data.frame(SNP=NINE_GENES.annovar$SNP, ref=NINE
 # i=470; chr10:119663435
 # 119670135
 
+sjlife_vars_bim$MATCH_gnomAD <- NA
+sjlife_vars_bim$gnomAD_equivalent <- NA
+
 for (i in 1:nrow(sjlife_vars_bim)){
   print(paste0("Doing iteration: ", i))
   if (sum(sjlife_vars_bim$KEY[i] %in% nine.genes.pablo.garcia$KEY) > 0){ # Only if position matches; do
@@ -74,20 +78,20 @@ for (i in 1:nrow(sjlife_vars_bim)){
         sjlife_vars_bim$gnomAD_equivalent[i] <- nine.genes.pablo.garcia$SNP[match.index[j]]
       } else if
         (sjlife_vars_bim$REF[i] == nine.genes.pablo.garcia$ALT[match.index[j]] & sjlife_vars_bim$ALT[i] == nine.genes.pablo.garcia$REF[match.index[j]]){
-        sjlife_vars_bim$MATCH_gnomAD[i] <- "INDIRECT_MATCH0"
+        sjlife_vars_bim$MATCH_gnomAD[i] <- "INDIRECT_MATCH"
         sjlife_vars_bim$gnomAD_equivalent[i] <- nine.genes.pablo.garcia$SNP[match.index[j]]
       } else if # match by flipping alleles
       (sjlife_vars_bim$REF_flipped[i] == nine.genes.pablo.garcia$REF[match.index[j]] & sjlife_vars_bim$ALT_flipped[i] == nine.genes.pablo.garcia$ALT[match.index[j]]){
-        sjlife_vars_bim$MATCH_gnomAD[i] <- "INDIRECT_MATCH1"
+        sjlife_vars_bim$MATCH_gnomAD[i] <- "flip_MATCH"
         sjlife_vars_bim$gnomAD_equivalent[i] <- nine.genes.pablo.garcia$SNP[match.index[j]]
       } else if # match by swapping flipped alleles
       (sjlife_vars_bim$REF_flipped[i] == nine.genes.pablo.garcia$ALT[match.index[j]] & sjlife_vars_bim$ALT_flipped[i] == nine.genes.pablo.garcia$REF[match.index[j]]){
-        sjlife_vars_bim$MATCH_gnomAD[i] <- "INDIRECT_MATCH2"
+        sjlife_vars_bim$MATCH_gnomAD[i] <- "flip.swap_MATCH"
         sjlife_vars_bim$gnomAD_equivalent[i] <- nine.genes.pablo.garcia$SNP[match.index[j]]
       } else if # match by flipping one allele or by swapping one of the flipped alleles
         ((sjlife_vars_bim$REF_flipped[i] == nine.genes.pablo.garcia$REF[match.index[j]] & sjlife_vars_bim$ALT[i] == nine.genes.pablo.garcia$ALT[match.index[j]])|
         (sjlife_vars_bim$ALT_flipped[i] == nine.genes.pablo.garcia$REF[match.index[j]] & sjlife_vars_bim$REF[i] == nine.genes.pablo.garcia$ALT[match.index[j]])){
-        sjlife_vars_bim$MATCH_gnomAD[i] <- "INDIRECT_MATCH3"
+        sjlife_vars_bim$MATCH_gnomAD[i] <- "flip1orswap1_match"
         sjlife_vars_bim$gnomAD_equivalent[i] <- nine.genes.pablo.garcia$SNP[match.index[j]]
       } else{
         # sjlife_vars_bim$MATCH_gnomAD[i] <- NA
@@ -121,10 +125,10 @@ LoF.unique$KEY1 <- paste0(LoF.unique$CHROM, ":", LoF.unique$POS)
 
 sjlife.CLINVAR.by.pos <- sjlife_vars_bim[sjlife_vars_bim$KEY %in% gsub("chr", "", CLINVAR.unique$KEY1),]
 dim(sjlife.CLINVAR.by.pos)
-# [1]  1 17
+# [1]  3 17
 sjlife.LoF.by.pos <- sjlife_vars_bim[sjlife_vars_bim$KEY %in% gsub("chr", "", LoF.unique$KEY1),]
 dim(sjlife.LoF.by.pos)
-# [1] 100  17
+# [1] 207  17
 
 sjlife_vars_bim <- rbind.data.frame(sjlife.CLINVAR.by.pos, sjlife.LoF.by.pos)
 
@@ -135,7 +139,7 @@ sjlife_vars_bim$SNP2 <- paste0("chr",sjlife_vars_bim$CHROM,":",sjlife_vars_bim$P
 sum(sjlife_vars_bim$SNP1 %in% LoF.unique$KEY)
 # 0
 sum(sjlife_vars_bim$SNP2 %in% LoF.unique$KEY)
-# 212
+# 208
 sjlife_vars_bim$ANN_EFFECT <- LoF.unique$`ANN[*].EFFECT`[match(sjlife_vars_bim$SNP2, LoF.unique$KEY)]
 sjlife_vars_bim$PRED_TYPE <- LoF.unique$PRED_TYPE[match(sjlife_vars_bim$SNP2, LoF.unique$KEY)]
 
@@ -150,8 +154,8 @@ sjlife_vars_bim <- sjlife_vars_bim[!sjlife_vars_bim$ANN_EFFECT %in% c("splice_re
                                                                       "splice_region_variant&synonymous_variant"),]
 
 # Since all SNP ids match we can now use this dataframe for logistic regression analysis on nine genes
-
-
+sum(is.na(sjlife_vars_bim$ANN_EFFECT))
+sjlife_vars_bim <- sjlife_vars_bim[!is.na(sjlife_vars_bim$ANN_EFFECT),]
 ####################
 ## Annotate genes ##
 ####################
@@ -174,12 +178,12 @@ sjlife_vars_bim$GENE[sjlife_vars_bim$CHROM == 1 &  (sjlife_vars_bim$POS >= 20135
 # TTN
 sjlife_vars_bim$GENE[sjlife_vars_bim$CHROM == 2 &  (sjlife_vars_bim$POS >= 178525989 & sjlife_vars_bim$POS <= 178807423)] <- "TTN"
 
-# save.image("common_p_LP_rare_variants_gnomad_all_gnomad_NFE_lt_0.01.RData")
+# rm(list = setdiff(ls(), "sjlife_vars_bim"))
+# save.image("p_LP_rare_variants_gnomad_all_gnomad_NFE_lt_0.01.RData")
 
 
-# 
-# write.table(sjlife_vars_bim$SNP, "sjlife_SNPS_maf_lt_0.01_gnomad_also_common_in_ccss.txt", quote = FALSE, col.names = FALSE, row.names = F)
-# write.table(sjlife_vars_bim$CCSS_equivalent, "ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife.txt", quote = FALSE, col.names = FALSE, row.names = F)
+
+# write.table(sjlife_vars_bim$SNP, "sjlife_ccss_exp_overlapping_SNPS_maf_lt_0.01_gnomad.txt", quote = FALSE, col.names = FALSE, row.names = F)
 
 
 ## Now run shell script rare_variant_extraction.sh to extract ccss and sjlife overlapping variants

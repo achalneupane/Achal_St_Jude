@@ -185,4 +185,7 @@ ASSOC.results$MAF_SJLIFE <- freq.df$MAF[match(ASSOC.results$bim_SNP, freq.df$SNP
 ASSOC.results$new_OR <- paste0(ASSOC.results$OR, " (", ASSOC.results$L95, "-", ASSOC.results$U95, ")")
 
 
-write.table(ASSOC.results, "sjlife_ccss_org_ccss_exp_ttn_bag3.assoc.final", col.names = T, row.names = F, quote = F, sep = "\t")
+# write.table(ASSOC.results, "sjlife_ccss_org_ccss_exp_ttn_bag3.assoc.final", col.names = T, row.names = F, quote = F, sep = "\t")
+
+ASSOC.results <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/sjlife_ccss_org_ccss_exp_ttn_bag3.assoc.final", header = T, sep = "\t")
+

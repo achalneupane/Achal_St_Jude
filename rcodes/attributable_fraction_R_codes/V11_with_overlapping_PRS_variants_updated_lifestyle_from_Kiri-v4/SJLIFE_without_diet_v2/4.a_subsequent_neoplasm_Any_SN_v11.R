@@ -68,6 +68,13 @@ dim(ANY_SNs)
 
 PHENO.ANY_SN$ANY_SN <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
 
+## Remove SNs if younger than 18
+PHENO.ANY_SN$AGE.ANY_SN <- ANY_SNs$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, ANY_SNs$sjlid)]
+PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
+# # table(PHENO.ANY_SN$ANY_SN)
+# 0    1 
+# 3796  568 
+
 # write.table(PHENO.ANY_SN$sjlid, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/4401_attributable_fraction_ids.txt", col.names = F, row.names = F, quote = F)
 
 #############################
@@ -83,59 +90,74 @@ ALL.LIFESTYLE$ANY.SN_gradedate <- ANY_SNs$gradedt[match(ALL.LIFESTYLE$SJLIFEID, 
 ALL.LIFESTYLE$AGE.ANY_SN <- ANY_SNs$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, ANY_SNs$sjlid)]
 
 
-# cc <- ALL.LIFESTYLE[ALL.LIFESTYLE$Current_smoker_yn == "Unknown" & (ALL.LIFESTYLE$Obese_yn == "Yes"| ALL.LIFESTYLE$Obese_yn == "NO"),]
-#############################################
-## Missing due to exclusion of adolescents ##
-#############################################
-## uncomment the code to get the count
-# table(ALL.LIFESTYLE$SJLIFEID %in% unique(lifestyle$SJLIFEID))
-# ALL.LIFESTYLE <- ALL.LIFESTYLE [ALL.LIFESTYLE$SJLIFEID  %in% unique(lifestyle$SJLIFEID),]
-# table(PHENO.ANY_SN$ANY_SN)
-# bmi_iid_dob_18_uniq$CACO <- PHENO.ANY_SN$ANY_SN[match(bmi_iid_dob_18_uniq$sjlid, PHENO.ANY_SN$sjlid)]
-# table(bmi_iid_dob_18_uniq$CACO)
+############################################################################################
+############################################################################################
+#################################### Work for V11-4-v2 ########################################
+############################################################################################
+############################################################################################
+# Yutaka's email 02/23/2023: The number of SN should decrease
+# in the new analysis because those who developed SN before the first adult
+# survey should be out of the analysis.  Also, we should use the "any missing in
+# the lifestyle variables" rather than using the individual missing (with
+# missing combined to the reference in each lifestyle variable).
 
-table(PHENO.ANY_SN$ANY_SN) - table(ALL.LIFESTYLE$CACO)
+ALL.LIFESTYLE <- ALL.LIFESTYLE[!(ALL.LIFESTYLE$Current_smoker_yn == "Unknown" &
+                                   ALL.LIFESTYLE$PhysicalActivity_yn == "Unknown" &
+                                   ALL.LIFESTYLE$RiskyHeavyDrink_yn == "Unknown" &
+                                   ALL.LIFESTYLE$Obese_yn == "Unknown" ),]
 
+dim(ALL.LIFESTYLE)
+# [1] 3692   16
 
-CROSS_CASES.df <- ALL.LIFESTYLE[c("CACO", "Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn", "HEALTHY_Diet_yn")]
-CROSS_CASES.df <- apply_labels(CROSS_CASES.df, CACO = "CACO", 
-             Current_smoker_yn = "Current_smoker_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
-             RiskyHeavyDrink_yn = "RiskyHeavyDrink_yn", Obese_yn = "Obese_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn")
-count1 <- as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(CACO, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, Obese_yn))))
-
-## Missing before any filter
-CROSS_CASES.df <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Obese_yn")])
-CROSS_CASES.df <- apply_labels(CROSS_CASES.df, ANY_SN = "ANY_SN", 
-                               Current_smoker_yn = "Current_smoker_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
-                               RiskyHeavyDrink_yn = "RiskyHeavyDrink_yn", Obese_yn = "Obese_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn")
-count3 <- as.data.frame(t(CROSS_CASES.df %>%
-                            cross_cases(ANY_SN, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, Obese_yn))))
-count3
-###########################################
-
-## In CASES, if age survey is greater than age at diagnosis; NULLIFY the favorable_lifestyle.category. That information is not useful
-ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("Current_smoker_yn")] <- "Unknown"
-ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("PhysicalActivity_yn")] <- "Unknown"
-ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("RiskyHeavyDrink_yn")] <- "Unknown"
-ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$HEALTHY_Diet_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("HEALTHY_Diet_yn")] <- "Unknown"
-ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$Not_obese_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("Obese_yn")] <- "Unknown"
-ALL.LIFESTYLE[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN), c("HEI2015_TOTAL_SCORE")] <- "Unknown"
+sum((ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey >= 18|
+       ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey >= 18|
+       ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey >= 18|
+       ALL.LIFESTYLE$Not_obese_yn_agesurvey >= 18), na.rm = T)
+# 3692
 
 
-###############################################
-## Missing due age at survey after diagnosis ##
-###############################################
-CROSS_CASES.df <- ALL.LIFESTYLE[c("CACO", "Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn", "HEALTHY_Diet_yn")]
-CROSS_CASES.df <- apply_labels(CROSS_CASES.df, CACO = "CACO", 
-                               Current_smoker_yn = "Current_smoker_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
-                               RiskyHeavyDrink_yn = "RiskyHeavyDrink_yn", Obese_yn = "Obese_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn")
-count2 <- as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(CACO, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, Obese_yn))))
+# ALL.LIFESTYLE.test <- ALL.LIFESTYLE
 
-rownames(count1) <- NULL; rownames(count2) <- NULL
-as.matrix(count2[2:4])- as.matrix(count1[2:4])
-###########################################
+
+ALL.LIFESTYLE <- ALL.LIFESTYLE[which(ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey >= 18 |
+                                       ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey >= 18 |
+                                       ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey >= 18 |
+                                       ALL.LIFESTYLE$Not_obese_yn_agesurvey >= 18),]
+
+cols <- c(
+  "smoker_former_or_never_yn_agesurvey",
+  "PhysicalActivity_yn_agesurvey",
+  "NOT_RiskyHeavyDrink_yn_agesurvey",
+  "Not_obese_yn_agesurvey"
+)
+
+## round to nearest integer
+# saved.cc <- ALL.LIFESTYLE[, c("SJLIFEID", cols)]
+ALL.LIFESTYLE[, cols] <- apply(ALL.LIFESTYLE[, cols], 2, round)
+library(matrixStats)
+ALL.LIFESTYLE$survey_min <- rowMins(as.matrix(ALL.LIFESTYLE[, cols]), na.rm = TRUE)
+# cc <- ALL.LIFESTYLE[, c("SJLIFEID", cols, "survey_min")]
+ALL.LIFESTYLE$Current_smoker_yn [which(ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey != ALL.LIFESTYLE$survey_min)] <- "Unknown"
+ALL.LIFESTYLE$PhysicalActivity_yn [which(ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey != ALL.LIFESTYLE$survey_min)] <- "Unknown"
+ALL.LIFESTYLE$RiskyHeavyDrink_yn [which(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey != ALL.LIFESTYLE$survey_min)] <- "Unknown"
+ALL.LIFESTYLE$Obese_yn [which(ALL.LIFESTYLE$Not_obese_yn_agesurvey != ALL.LIFESTYLE$survey_min)] <- "Unknown"
+
+
+to.remove <- ALL.LIFESTYLE$SJLIFEID[which(ALL.LIFESTYLE$survey_min > ALL.LIFESTYLE$AGE.ANY_SN)]
+PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% to.remove,]
+
+sum(PHENO.ANY_SN$sjlid %in% ALL.LIFESTYLE$SJLIFEID)
+# 3400
+
+## Remove any samples that do not have lifestyle
+PHENO.ANY_SN  <- PHENO.ANY_SN[PHENO.ANY_SN$sjlid %in% ALL.LIFESTYLE$SJLIFEID,]
+
+
+# current.smoker.missing <- ALL.LIFESTYLE$SJLIFEID[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN)]
+# physical.activity.missing <- ALL.LIFESTYLE$SJLIFEID[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN)]
+# risky.heavydrink.missing <- ALL.LIFESTYLE$SJLIFEID[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN)]
+# obesity.missing <- ALL.LIFESTYLE$SJLIFEID[which(ALL.LIFESTYLE$CACO == 1 & ALL.LIFESTYLE$Not_obese_yn_agesurvey > ALL.LIFESTYLE$AGE.ANY_SN)]
+# SN.before.lifestyle <- unique(c(current.smoker.missing, physical.activity.missing, risky.heavydrink.missing, obesity.missing))
 
 
 #############################
@@ -143,9 +165,11 @@ as.matrix(count2[2:4])- as.matrix(count1[2:4])
 #############################
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("HEI2015_TOTAL_SCORE", "Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Obese_yn")])
 
-# Count missing
-PHENO.ANY_SN$missing.lifestyles <- rowSums(is.na(PHENO.ANY_SN[c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Obese_yn")]))
-table(PHENO.ANY_SN$missing.lifestyles)
+
+## Add any missing to each lifestyle variable
+# PHENO.ANY_SN[c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn")]
+PHENO.ANY_SN$any_missing <- apply(PHENO.ANY_SN[c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn")], 1, function(x) any("Unknown" %in% x))
+PHENO.ANY_SN$any_missing  <- factor(ifelse(PHENO.ANY_SN$any_missing == FALSE, "No", "Yes"))
 
 ## Relevel 6 lifestyle variables
 PHENO.ANY_SN$Current_smoker_yn[is.na(PHENO.ANY_SN$Current_smoker_yn)] <- "Unknown"
@@ -163,6 +187,7 @@ PHENO.ANY_SN$HEALTHY_Diet_yn <- factor(PHENO.ANY_SN$HEALTHY_Diet_yn, level = c("
 PHENO.ANY_SN$Obese_yn[is.na(PHENO.ANY_SN$Obese_yn)] <- "Unknown";
 PHENO.ANY_SN$Obese_yn <- factor(PHENO.ANY_SN$Obese_yn, level = c("No", "Yes", "Unknown")) 
 
+
 #########################
 ## Extract Ethnicities ##
 #########################
@@ -171,6 +196,9 @@ ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Geno
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
 
 
+###############################################################
+###############################################################
+###############################################################
 
 ####################
 ## Count Unknowns ##
@@ -230,30 +258,6 @@ for (i in 1:length(life.vars)){
 }
 
 
-# ###########################################
-# ## Check data in each category/cross tab ##
-# ###########################################
-# library(expss)
-# 
-# # Getting counts for non-missing data only; 6 samples do not have admixture ancestry
-# CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
-# 
-# CROSS_CASES.df <- CROSS_CASES.df[c("ANY_SN", "Current_smoker_yn", "PhysicalActivity_yn",
-#                                    "RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", Obese_yn = "Obese_yn")]
-# 
-# CROSS_CASES.df <- apply_labels(CROSS_CASES.df, ANY_SN = "ANY_SN", 
-#                                Current_smoker_yn = "Current_smoker_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
-#                                RiskyHeavyDrink_yn = "RiskyHeavyDrink_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn", Obese_yn = "Obese_yn")
-# 
-# as.data.frame(t(CROSS_CASES.df %>%
-#                         cross_cases(ANY_SN, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Obese_yn))))
-# 
-# 
-# cc <- as.data.frame(t(CROSS_CASES.df %>%
-#                   cross_cases(ANY_SN, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Obese_yn))))
-# 
-# rownames(cc) <- NULL 
-# # View(cc)
 
 ############################################################
 ## Drop Unknown level from the lifestyle factor variables ##
@@ -283,7 +287,7 @@ colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] <- gsub("C", "
 colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] <- gsub("P", "Physical", colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))])
 colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] <- gsub("R", "Heavydrink", colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))])
 colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] <- gsub("O", "Obese", colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))])
-colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] <- gsub("(?<=[a-z])(?=[A-Z])", "_", colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))])
+colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] <- gsub("(?!^)([[:upper:]])", "_\\1", colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))], perl = TRUE)
 colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] 
 
 # [1] "Smoking_Obese_missing"                     "Smoking_Physical_missing"                  "Smoking_Heavydrink_missing"               
@@ -294,31 +298,35 @@ colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))]
 
 models.types <- colnames(PHENO.ANY_SN)[grepl("_missing", colnames(PHENO.ANY_SN))] 
 
+
+
 sn.model <- {}
-for (i in 1:length(models.types)){
-formula = paste0("ANY_SN ~ Pleiotropy_PRSWEB_PRS.tertile.category + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category + Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn + EAS + AFR + ", models.types[i])
-
-dat_all = PHENO.ANY_SN
-fit_all = glm(formula = formula,
-              family = binomial,
-              data = dat_all)
-
-
-summary(fit_all)
-
-(output <- summary(fit_all)$coefficients)
-as.data.frame(apply(output, 2, formatC, format="f", digits=4))
-# options(scipen=999)
-estimate <- format(round(output[,1],3), nsmall = 3)
-std.error <- format(round(output[,2],3), nsmall = 3)
-# P.val <- formatC(output[,4], format="G", digits=3)
-P.val <- output[,4]
-P.val[P.val < 0.001] <- "<0.001"
-P.val[!grepl("<", P.val)] <- format(round(as.numeric(P.val[!grepl("<", P.val)]), 3), nsmall = 3)
-sn.model[[i]] <- (setNames(cbind.data.frame(estimate, std.error, P.val
-), c("Estimate", "Std.error", "P")))
-sn.model[[i]] <- sn.model[[i]][!grepl("AGE_AT_LAST_CONTACT", row.names(sn.model[[i]])),]
-}
+# for (i in 1:length(models.types)){
+  i = 1 # only with "any_missing"
+  # if(sum(PHENO.ANY_SN[models.types[i]] == "Yes") == 0) next
+  formula = paste0("ANY_SN ~ Pleiotropy_PRSWEB_PRS.tertile.category + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category + Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn + EAS + AFR + ", models.types[i])
+  
+  dat_all = PHENO.ANY_SN
+  fit_all = glm(formula = formula,
+                family = binomial,
+                data = dat_all)
+  
+  
+  summary(fit_all)
+  
+  (output <- summary(fit_all)$coefficients)
+  as.data.frame(apply(output, 2, formatC, format="f", digits=4))
+  # options(scipen=999)
+  estimate <- format(round(output[,1],3), nsmall = 3)
+  std.error <- format(round(output[,2],3), nsmall = 3)
+  # P.val <- formatC(output[,4], format="G", digits=3)
+  P.val <- output[,4]
+  P.val[P.val < 0.001] <- "<0.001"
+  P.val[!grepl("<", P.val)] <- format(round(as.numeric(P.val[!grepl("<", P.val)]), 3), nsmall = 3)
+  sn.model[[i]] <- (setNames(cbind.data.frame(estimate, std.error, P.val
+  ), c("Estimate", "Std.error", "P")))
+  sn.model[[i]] <- sn.model[[i]][!grepl("AGE_AT_LAST_CONTACT", row.names(sn.model[[i]])),]
+# }
 
 
 ChangeNames <- function(x) {
@@ -345,6 +353,67 @@ View(Smoking_Obese_Heavydrink_missing)
 View(Smoking_Physical_Heavydrink_missing)
 View(Obese_Physical_Heavydrink_missing)
 View(Smoking_Obese_Physical_Heavydrink_missing)
+
+
+###############################################################
+###############################################################
+###############################################################
+
+###########################################
+## Check data in each category/cross tab ##
+###########################################
+library(expss)
+
+# Getting counts for non-missing data only; 6 samples do not have admixture ancestry
+CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
+
+CROSS_CASES.df <- CROSS_CASES.df[c("ANY_SN", "Current_smoker_yn", "PhysicalActivity_yn",
+                                   "RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", Obese_yn = "Obese_yn")]
+
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df, ANY_SN = "ANY_SN", 
+                               Current_smoker_yn = "Current_smoker_yn", PhysicalActivity_yn = "PhysicalActivity_yn",
+                               RiskyHeavyDrink_yn = "RiskyHeavyDrink_yn", HEALTHY_Diet_yn = "HEALTHY_Diet_yn", Obese_yn = "Obese_yn")
+
+as.data.frame(t(CROSS_CASES.df %>%
+                        cross_cases(ANY_SN, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Obese_yn))))
+
+
+cc <- as.data.frame(t(CROSS_CASES.df %>%
+                  cross_cases(ANY_SN, list(Current_smoker_yn, PhysicalActivity_yn, RiskyHeavyDrink_yn, HEALTHY_Diet_yn, Obese_yn))))
+
+rownames(cc) <- NULL 
+# View(cc)
+######################################
+## Attributable fraction of Any SNs ##
+######################################
+
+dat_all = PHENO.ANY_SN
+fit_all = glm(formula = ANY_SN ~ Pleiotropy_PRSWEB_PRS.tertile.category + 
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+                maxchestrtdose.category + epitxn_dose_5.category + 
+                Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
+                EAS + AFR,
+              family = binomial,
+              data = dat_all)
+
+
+summary(fit_all)
+
+
+## With Diet
+# dat_all = PHENO.ANY_SN
+# fit_all = glm(formula = ANY_SN ~ Pleiotropy_PRSWEB_PRS.tertile.category + 
+#                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+#                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
+#                 maxchestrtdose.category + epitxn_dose_5.category + 
+#                 Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + HEALTHY_Diet_yn + Obese_yn +
+#                 EAS + AFR,
+#               family = binomial,
+#               data = dat_all)
+# 
+# 
+# summary(fit_all)
 
 
 ##########################
@@ -388,11 +457,11 @@ round(af_by_plp.prs,3)
 ###############
 dat_lifestyle = dat_all
 
-dat_lifestyle$Current_smoker_yn = "No"
-dat_lifestyle$PhysicalActivity_yn = "Yes"
-dat_lifestyle$RiskyHeavyDrink_yn = "No"
-# dat_lifestyle$HEALTHY_Diet_yn = "Yes"
-dat_lifestyle$Obese_yn = "No"
+dat_lifestyle$Current_smoker_yn =
+dat_lifestyle$PhysicalActivity_yn =
+dat_lifestyle$RiskyHeavyDrink_yn =
+# dat_lifestyle$HEALTHY_Diet_yn =
+dat_lifestyle$Obese_yn = "1"
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
@@ -416,11 +485,11 @@ dat_tx.plp.prs.lifestyle$maxsegrtdose.category =
 dat_tx.plp.prs.lifestyle$Pleiotropy_PRSWEB_PRS.tertile.category = "1st"
 
 ## Nullify Lifestyle
-dat_tx.plp.prs.lifestyle$Current_smoker_yn = "No"
-dat_tx.plp.prs.lifestyle$PhysicalActivity_yn = "Yes"
-dat_tx.plp.prs.lifestyle$RiskyHeavyDrink_yn = "No"
-# dat_tx.plp.prs.lifestyle$HEALTHY_Diet_yn = "Yes"
-dat_tx.plp.prs.lifestyle$Obese_yn = "No"
+dat_tx.plp.prs.lifestyle$Current_smoker_yn =
+  dat_tx.plp.prs.lifestyle$PhysicalActivity_yn =
+  dat_tx.plp.prs.lifestyle$RiskyHeavyDrink_yn =
+  # dat_tx.plp.prs.lifestyle$HEALTHY_Diet_yn =
+  dat_tx.plp.prs.lifestyle$Obese_yn = "1"
 
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx.plp.prs.lifestyle, type = "response")
@@ -431,3 +500,4 @@ round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
 
 SN.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
 SN.res
+# 0.315 0.063 0.755 0.899
