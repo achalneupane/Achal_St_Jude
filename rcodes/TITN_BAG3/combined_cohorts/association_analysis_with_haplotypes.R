@@ -5,8 +5,10 @@ setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3")
 ###############################
 ## After extracting haplotypes with extract_haplotypes.py, now check the association of the haplotypes
 pheno <- read.table("pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno", header = T)
-haplotypes <- read.table("haplotypes_ttn.txt", header = F)
-haplotypes$haplo <- gsub('\\(|\\)|\\[|\\]',"", apply(haplotypes[2:11], 1, function(x) paste(x, collapse = "")))
+# haplotypes <- read.table("haplotypes_ttn.txt", header = F) # r2 < 0.8
+haplotypes <- read.table("haplotypes_ttn_r2_0.2.txt", header = F) # r2 < 0.2
+# haplotypes$haplo <- gsub('\\(|\\)|\\[|\\]',"", apply(haplotypes[2:11], 1, function(x) paste(x, collapse = "")))
+haplotypes$haplo <- gsub('\\(|\\)|\\[|\\]',"", apply(haplotypes[2:8], 1, function(x) paste(x, collapse = "")))
 # haplotypes$haplo <- apply(haplotypes[2:11], 1, function(x) paste(x, collapse = ""))
 length(table(haplotypes$haplo))
 # 34 # 0010000101 and 0000001101 haplotypes were not found
@@ -39,26 +41,38 @@ for (i in 1:length(haplos)){
   haplo.test.adj <- glm(formula = formulas, family = binomial,
                         data = pheno)
   print(summary(haplo.test.adj))
-  Sys.sleep(3)
+  Sys.sleep(5)
 }
 
 # ## Only these two haplotypes were found significant:
-# haplo_0111111101, haplo_1000000010
-haplo.test.adj <- glm(formula = CMP ~  haplo_0111111101 + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, 
+# haplo_0111111101, haplo_1000000010 ## r2 < 0.8
+# haplo_0111101, haplo_1000010 ## r2 < 0.2
+# haplo.test.adj <- glm(formula = CMP ~  haplo_0111111101 + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, 
+#                       family = binomial,
+#                       data = pheno)
+# summary(haplo.test.adj)
+# 
+# 
+# haplo.test.adj <- glm(formula = CMP ~  haplo_1000000010 + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, 
+#                       family = binomial,
+#                       data = pheno)
+# summary(haplo.test.adj)
+
+haplo.test.adj <- glm(formula = CMP ~  haplo_0111101 + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, 
                       family = binomial,
                       data = pheno)
 summary(haplo.test.adj)
 
 
-haplo.test.adj <- glm(formula = CMP ~  haplo_1000000010 + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, 
+haplo.test.adj <- glm(formula = CMP ~  haplo_1000010 + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, 
                       family = binomial,
                       data = pheno)
 summary(haplo.test.adj)
-
 ##########################################################################
 ## Association of significant haplotypes with respect to echo in SJLIFE ##
 ##########################################################################
-haplo <- pheno[c("FID", "haplo_0111111101", "haplo_1000000010")]
+# haplo <- pheno[c("FID", "haplo_0111111101", "haplo_1000000010")]
+haplo <- pheno[c("FID", "haplo_0111101", "haplo_1000010")]
 
 ## Extract echo measures
 # rm(list=ls())
@@ -77,8 +91,8 @@ pheno_final = merge(pheno_gwas, echo_data, by.x = 'FID', by.y = 'sjlid')
 dat_final = merge(pheno_final, haplo, by = 'FID')
 
 ## Analyze both variants wrt each echo measures
-# 0111111101 haplotype
-haplo.0111111101 = NULL
+# 0111101 haplotype
+haplo.0111101 = NULL
 echo_phenotypes = colnames(echo_data)[-c(1:4)]
 for (p in 1:length(echo_phenotypes)){
   dat_eff = subset(dat_final, !is.na(dat_final[echo_phenotypes[p]]))
@@ -87,21 +101,21 @@ for (p in 1:length(echo_phenotypes)){
   # Adjust for BSA; two (LVMass2D_Index and LA_Volume_Index) are already done
   if (!(echo_phenotypes[p] == "LVMass2D_Index" | echo_phenotypes[p] == "LA_Volume_Index"| 
         echo_phenotypes[p] == "LV_Ejection_Fraction_3D" | echo_phenotypes[p] == "LV_Cardiac_Output_3D" | echo_phenotypes[p] == "LV_GLPS_AVG")){
-    fit = lm(scale(dat_eff[,echo_phenotypes[p]]/BodySurfaceArea)~haplo_0111111101+agedx+agelstcontact+gender+anthra_jco_dose_any+hrtavg+
+    fit = lm(scale(dat_eff[,echo_phenotypes[p]]/BodySurfaceArea)~haplo_0111101+agedx+agelstcontact+gender+anthra_jco_dose_any+hrtavg+
                PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10,data=dat_eff)
   } else {
-    fit = lm(scale(dat_eff[,echo_phenotypes[p]])~haplo_0111111101+agedx+agelstcontact+gender+anthra_jco_dose_any+hrtavg+
+    fit = lm(scale(dat_eff[,echo_phenotypes[p]])~haplo_0111101+agedx+agelstcontact+gender+anthra_jco_dose_any+hrtavg+
                PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10,data=dat_eff)
   }
   beta = summary(fit)$coef[2,1]
   se = summary(fit)$coef[2,2]
   pval = summary(fit)$coef[2,4]
-  haplo.0111111101 = rbind(haplo.0111111101, data.frame(phenotype=echo_phenotypes[p], beta, se, pval, n=nrow(dat_eff)))
+  haplo.0111101 = rbind(haplo.0111101, data.frame(phenotype=echo_phenotypes[p], beta, se, pval, n=nrow(dat_eff)))
 }
-haplo.0111111101$p_BH = p.adjust(haplo.0111111101$pval, method = "BH")
+haplo.0111101$p_BH = p.adjust(haplo.0111101$pval, method = "BH")
 
-# 1000000010 haplotype
-haplo.1000000010 = NULL
+# 1000010 haplotype
+haplo.1000010 = NULL
 for (p in 1:length(echo_phenotypes)){
   dat_eff = subset(dat_final, !is.na(dat_final[echo_phenotypes[p]]))
   # Remove values with >3 sd away from the absolute value
@@ -109,17 +123,17 @@ for (p in 1:length(echo_phenotypes)){
   # Adjust for BSA; two (LVMass2D_Index and LA_Volume_Index) are already done
   if (!(echo_phenotypes[p] == "LVMass2D_Index" | echo_phenotypes[p] == "LA_Volume_Index"| 
         echo_phenotypes[p] == "LV_Ejection_Fraction_3D" | echo_phenotypes[p] == "LV_Cardiac_Output_3D" | echo_phenotypes[p] == "LV_GLPS_AVG")){
-    fit = lm(scale(dat_eff[,echo_phenotypes[p]]/BodySurfaceArea)~haplo_1000000010+agedx+agelstcontact+gender+anthra_jco_dose_any+hrtavg+
+    fit = lm(scale(dat_eff[,echo_phenotypes[p]]/BodySurfaceArea)~haplo_1000010+agedx+agelstcontact+gender+anthra_jco_dose_any+hrtavg+
                PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10,data=dat_eff)
   } else {
-    fit = lm(scale(dat_eff[,echo_phenotypes[p]])~haplo_1000000010+agedx+agelstcontact+gender+anthra_jco_dose_any+hrtavg+
+    fit = lm(scale(dat_eff[,echo_phenotypes[p]])~haplo_1000010+agedx+agelstcontact+gender+anthra_jco_dose_any+hrtavg+
                PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10,data=dat_eff)
   }
   beta = summary(fit)$coef[2,1]
   se = summary(fit)$coef[2,2]
   pval = summary(fit)$coef[2,4]
-  haplo.1000000010 = rbind(haplo.1000000010, data.frame(phenotype=echo_phenotypes[p], beta, se, pval, n=nrow(dat_eff)))
+  haplo.1000010 = rbind(haplo.1000010, data.frame(phenotype=echo_phenotypes[p], beta, se, pval, n=nrow(dat_eff)))
 }
-haplo.1000000010$p_BH = p.adjust(haplo.1000000010$pval, method = "BH")
+haplo.1000010$p_BH = p.adjust(haplo.1000010$pval, method = "BH")
 
-print(haplo.0111111101); print(haplo.1000000010)
+print(haplo.0111101); print(haplo.1000010)

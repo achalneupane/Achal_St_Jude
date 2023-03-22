@@ -460,3 +460,15 @@ plink --bfile ttn_significant_ld --extract plink.prune.in --keep-allele-order --
 
 ## Run convert_raw_to_phasing_v2.R script, then run PHASE
  PHASE haplotype_input_edited.txt haplotype_phase.out
+
+
+ ## Repeat with r2 0.2
+ ## LD check (based on Kateryna's email on 03/17/2023)
+# 2 (window size kb, needs to be more than 2) 1 (step size, it could be 1 or 2 in such a small dataset) and 0.2 (it is r2 threshold), generated  plink.prune.in will contain variants that pass the threshold.
+# also, just to note, this is a random pruning, so I guess we will need to make sure that after pruning our snp of interest remains in the list (we could just repeat the pruning with different step if it is removed - instead of 1 use 2 or 3 for example)
+plink --bfile ttn_significant_ld --indep-pairwise 2 1 0.2 --out prune_0.02
+
+# ## Keep PED with plink.prune.in variants
+# plink --bfile ttn_significant_ld --extract plink.prune.in --keep-allele-order --recode --out haplotype_input
+plink --bfile ttn_significant_ld --extract prune_0.02.prune.in --keep-allele-order --recodeA --out haplotype_input_0.2
+PHASE haplotype_input_edited_0.2.txt haplotype_phase_0.2.out
