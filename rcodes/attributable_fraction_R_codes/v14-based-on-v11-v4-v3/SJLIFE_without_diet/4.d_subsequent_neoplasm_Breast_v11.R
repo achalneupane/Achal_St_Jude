@@ -174,7 +174,7 @@ PHENO.ANY_SN$any_lifestyle_missing  <- factor(ifelse(PHENO.ANY_SN$any_lifestyle_
 ########################################
 ## Do the same for missing treatments ##
 ########################################
-PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category", "epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
+PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxchestrtdose.category", "anthra_jco_dose_5.category")], 1, function(x) any("Unknown" %in% x))
 PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
 
 #########################
@@ -216,6 +216,9 @@ PHENO.ANY_SN$maxchestrtdose.category <- droplevels(PHENO.ANY_SN$maxchestrtdose.c
 PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "Unknown"] <- "None"
 PHENO.ANY_SN$epitxn_dose_5.category <- droplevels(PHENO.ANY_SN$epitxn_dose_5.category)
 
+PHENO.ANY_SN$anthra_jco_dose_5.category[PHENO.ANY_SN$anthra_jco_dose_5.category == "Unknown"] <- "None"
+PHENO.ANY_SN$anthra_jco_dose_5.category <- droplevels(PHENO.ANY_SN$anthra_jco_dose_5.category)
+
 
 ################
 ## Cross tabs ##
@@ -227,28 +230,28 @@ CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
 
 CROSS_CASES.df <- PHENO.ANY_SN
 
-CROSS_CASES.df <- CROSS_CASES.df[,c("BREASTcancer", "maxsegrtdose.category", "maxchestrtdose.category")]
+CROSS_CASES.df <- CROSS_CASES.df[,c("BREASTcancer", "maxchestrtdose.category", "anthra_jco_dose_5.category")]
 
 CROSS_CASES.df <- apply_labels(CROSS_CASES.df, BREASTcancer = "BREASTcancer", 
-                               maxsegrtdose.category = "maxsegrtdose.category", maxchestrtdose.category = "maxchestrtdose.category")
+                               maxchestrtdose.category = "maxchestrtdose.category", anthra_jco_dose_5.category = "anthra_jco_dose_5.category")
 
 as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(BREASTcancer, list(maxsegrtdose.category, maxchestrtdose.category))))
+                  cross_cases(BREASTcancer, list(maxchestrtdose.category, anthra_jco_dose_5.category))))
 
 
 cc <- as.data.frame(t(CROSS_CASES.df %>%
-                        cross_cases(BREASTcancer, list(maxsegrtdose.category, maxchestrtdose.category))))
+                        cross_cases(BREASTcancer, list(maxchestrtdose.category, anthra_jco_dose_5.category))))
 
 rownames(cc) <- NULL 
 cc
 
 
 # Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for cases
-cases_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$BREASTcancer == 1],
+cases_table <- table(Anthra_jco = PHENO.ANY_SN$anthra_jco_dose_5.category[PHENO.ANY_SN$BREASTcancer == 1],
                      Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$BREASTcancer == 1])
 
 # Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for controls
-control_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$BREASTcancer == 0],
+control_table <- table(Anthra_jco = PHENO.ANY_SN$anthra_jco_dose_5.category[PHENO.ANY_SN$BREASTcancer == 0],
                      Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$BREASTcancer == 0])
 
 
