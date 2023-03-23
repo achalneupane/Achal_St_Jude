@@ -1,5 +1,5 @@
 # load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.NMSCs.V14-4-3.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.BREASTcancer.V14-4-3.Rdata")
 
 # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 PHENO.ANY_SN$maxsegrtdose.category <- as.character(PHENO.ANY_SN$maxsegrtdose.category)
@@ -12,17 +12,16 @@ PHENO.ANY_SN$maxsegrtdose.category <- factor(PHENO.ANY_SN$maxsegrtdose.category,
 ######################################
 dat_all = PHENO.ANY_SN
 
-fit_all = glm(formula = NMSC ~ BASALcell_PRS.tertile.category + 
-                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-                gender + maxsegrtdose.category + maxabdrtdose.category + maxpelvisrtdose.category +
+fit_all = glm(formula = BREASTcancer ~ 
+                Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + 
+                AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS +
+                maxchestrtdose.category + anthra_jco_dose_5.category +
                 Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
                 EAS + AFR +
                 any_lifestyle_missing + any_tx_missing,
               family = binomial,
               data = dat_all)
-
-summary(fit_all)
-
 
 summary(fit_all)
 
