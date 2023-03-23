@@ -208,6 +208,9 @@ PHENO.ANY_SN$Obese_yn <- droplevels(PHENO.ANY_SN$Obese_yn)
 PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxsegrtdose.category <- droplevels(PHENO.ANY_SN$maxsegrtdose.category)
 
+PHENO.ANY_SN$maxneckrtdose.category[PHENO.ANY_SN$maxneckrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxneckrtdose.category <- droplevels(PHENO.ANY_SN$maxneckrtdose.category)
+
 PHENO.ANY_SN$maxabdrtdose.category[PHENO.ANY_SN$maxabdrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxabdrtdose.category <- droplevels(PHENO.ANY_SN$maxabdrtdose.category)
 
@@ -234,17 +237,18 @@ CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
 
 CROSS_CASES.df <- PHENO.ANY_SN
 
-CROSS_CASES.df <- CROSS_CASES.df[,c("ANY_SNs", "maxsegrtdose.category", "maxchestrtdose.category")]
+CROSS_CASES.df <- CROSS_CASES.df[,c("ANY_SNs", "maxsegrtdose.category", "maxchestrtdose.category", "maxabdrtdose.category", "epitxn_dose_5.category")]
 
 CROSS_CASES.df <- apply_labels(CROSS_CASES.df, ANY_SNs = "ANY_SNs", 
-                               maxsegrtdose.category = "maxsegrtdose.category", maxchestrtdose.category = "maxchestrtdose.category")
+                               maxsegrtdose.category = "maxsegrtdose.category", maxchestrtdose.category = "maxchestrtdose.category", 
+                               maxabdrtdose.category = "maxabdrtdose.category", epitxn_dose_5.category = "epitxn_dose_5.category")
 
 as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(ANY_SNs, list(maxsegrtdose.category, maxchestrtdose.category))))
+                  cross_cases(ANY_SNs, list(maxsegrtdose.category, maxchestrtdose.category, maxabdrtdose.category, epitxn_dose_5.category))))
 
 
 cc <- as.data.frame(t(CROSS_CASES.df %>%
-                        cross_cases(ANY_SNs, list(maxsegrtdose.category, maxchestrtdose.category))))
+                        cross_cases(ANY_SNs, list(maxsegrtdose.category, maxchestrtdose.category, maxabdrtdose.category, epitxn_dose_5.category))))
 
 rownames(cc) <- NULL 
 cc
@@ -259,5 +263,5 @@ control_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category
                      Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$ANY_SNs == 0])
 
 
-rm(list = setdiff(ls(), "PHENO.ANY_SN"))
+rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.Any_SNs.V14-4-3.Rdata")

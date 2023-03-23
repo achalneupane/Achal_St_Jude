@@ -211,6 +211,9 @@ PHENO.ANY_SN$Obese_yn <- droplevels(PHENO.ANY_SN$Obese_yn)
 PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxsegrtdose.category <- droplevels(PHENO.ANY_SN$maxsegrtdose.category)
 
+PHENO.ANY_SN$maxneckrtdose.category[PHENO.ANY_SN$maxneckrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxneckrtdose.category <- droplevels(PHENO.ANY_SN$maxneckrtdose.category)
+
 PHENO.ANY_SN$maxabdrtdose.category[PHENO.ANY_SN$maxabdrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxabdrtdose.category <- droplevels(PHENO.ANY_SN$maxabdrtdose.category)
 
@@ -255,14 +258,6 @@ rownames(cc) <- NULL
 cc
 
 
-# Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for cases
-cases_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$NMSCs == 1],
-                     Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$NMSCs == 1])
 
-# Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for controls
-control_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$NMSCs == 0],
-                     Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$NMSCs == 0])
-
-
-rm(list = setdiff(ls(), "PHENO.ANY_SN"))
+rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.NMSCs.V14-4-3.Rdata")

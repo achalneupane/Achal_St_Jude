@@ -14,7 +14,8 @@ dat_all = PHENO.ANY_SN
 
 fit_all = glm(formula = SARCOMA ~ Sarcoma_Machiela_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-                gender + aa_class_dose_5.category +
+                gender + 
+                aa_class_dose_5.category +
                 Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
                 EAS + AFR + 
                 any_lifestyle_missing + any_tx_missing,

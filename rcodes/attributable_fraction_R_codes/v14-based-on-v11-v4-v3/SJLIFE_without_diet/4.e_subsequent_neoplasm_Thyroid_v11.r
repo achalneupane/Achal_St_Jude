@@ -71,8 +71,11 @@ sum(!duplicated(subneo.within5$sjlid))
 library(data.table)
 THYROIDcancer <- subneo[grepl("thyroid", subneo$diag, ignore.case = T),]
 THYROIDcancer <- setDT(THYROIDcancer)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+
+## Remove SNs as cases that are within 5 years of primary diagnosis
+THYROIDcancer <- THYROIDcancer[!THYROIDcancer$sjlid %in% subneo.within5$sjlid,]
 nrow(THYROIDcancer)
-# 78
+# 86
 
 PHENO.ANY_SN$THYROIDcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% THYROIDcancer$sjlid, 0, 1))
 
@@ -83,7 +86,7 @@ PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 }
 table(PHENO.ANY_SN$THYROIDcancer)
 # 0    1 
-# 4313 83
+# 4315 81
 
 #############################
 ## Add Lifestyle variables ##
@@ -174,7 +177,7 @@ PHENO.ANY_SN$any_lifestyle_missing  <- factor(ifelse(PHENO.ANY_SN$any_lifestyle_
 ########################################
 ## Do the same for missing treatments ##
 ########################################
-PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category", "epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
+PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxneckrtdose.category", "epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
 PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
 
 #########################
@@ -207,11 +210,17 @@ PHENO.ANY_SN$Obese_yn <- droplevels(PHENO.ANY_SN$Obese_yn)
 PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxsegrtdose.category <- droplevels(PHENO.ANY_SN$maxsegrtdose.category)
 
+PHENO.ANY_SN$maxneckrtdose.category[PHENO.ANY_SN$maxneckrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxneckrtdose.category <- droplevels(PHENO.ANY_SN$maxneckrtdose.category)
+
 PHENO.ANY_SN$maxabdrtdose.category[PHENO.ANY_SN$maxabdrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxabdrtdose.category <- droplevels(PHENO.ANY_SN$maxabdrtdose.category)
 
 PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$maxchestrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxchestrtdose.category <- droplevels(PHENO.ANY_SN$maxchestrtdose.category)
+
+PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$maxpelvisrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxpelvisrtdose.category <- droplevels(PHENO.ANY_SN$maxpelvisrtdose.category)
 
 PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "Unknown"] <- "None"
 PHENO.ANY_SN$epitxn_dose_5.category <- droplevels(PHENO.ANY_SN$epitxn_dose_5.category)
@@ -230,17 +239,17 @@ CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
 
 CROSS_CASES.df <- PHENO.ANY_SN
 
-CROSS_CASES.df <- CROSS_CASES.df[,c("THYROIDcancer", "maxsegrtdose.category", "maxchestrtdose.category")]
+CROSS_CASES.df <- CROSS_CASES.df[,c("THYROIDcancer", "maxneckrtdose.category", "epitxn_dose_5.category")]
 
 CROSS_CASES.df <- apply_labels(CROSS_CASES.df, THYROIDcancer = "THYROIDcancer", 
-                               maxsegrtdose.category = "maxsegrtdose.category", maxchestrtdose.category = "maxchestrtdose.category")
+                               maxneckrtdose.category = "maxneckrtdose.category", epitxn_dose_5.category = "epitxn_dose_5.category")
 
 as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(THYROIDcancer, list(maxsegrtdose.category, maxchestrtdose.category))))
+                  cross_cases(THYROIDcancer, list(maxneckrtdose.category, epitxn_dose_5.category))))
 
 
 cc <- as.data.frame(t(CROSS_CASES.df %>%
-                        cross_cases(THYROIDcancer, list(maxsegrtdose.category, maxchestrtdose.category))))
+                        cross_cases(THYROIDcancer, list(maxneckrtdose.category, epitxn_dose_5.category))))
 
 rownames(cc) <- NULL 
 cc
@@ -255,5 +264,5 @@ control_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category
                      Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$THYROIDcancer == 0])
 
 
-rm(list = setdiff(ls(), "PHENO.ANY_SN"))
+rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.THYROIDcancer.V14-4-3.Rdata")

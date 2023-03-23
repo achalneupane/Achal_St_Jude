@@ -14,7 +14,8 @@ dat_all = PHENO.ANY_SN
 
 fit_all = glm(formula = MENINGIOMA ~ Meningioma_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-                AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + epitxn_dose_5.category + 
+                AGE_AT_DIAGNOSIS + gender + 
+                maxsegrtdose.category + epitxn_dose_5.category + 
                 Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
                 EAS + AFR +
                 any_lifestyle_missing + any_tx_missing

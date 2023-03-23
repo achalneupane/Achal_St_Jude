@@ -71,6 +71,10 @@ sum(!duplicated(subneo.within5$sjlid))
 library(data.table)
 MENINGIOMA <- subneo[grepl("meningioma", subneo$diag, ignore.case = T),]
 MENINGIOMA <- setDT(MENINGIOMA)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+
+## Remove SNs as cases that are within 5 years of primary diagnosis
+MENINGIOMA <- MENINGIOMA[!MENINGIOMA$sjlid %in% subneo.within5$sjlid,]
+nrow(MENINGIOMA)
 nrow(MENINGIOMA)
 # 149
 
@@ -174,7 +178,7 @@ PHENO.ANY_SN$any_lifestyle_missing  <- factor(ifelse(PHENO.ANY_SN$any_lifestyle_
 ########################################
 ## Do the same for missing treatments ##
 ########################################
-PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category", "epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
+PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
 PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
 
 #########################
@@ -207,11 +211,17 @@ PHENO.ANY_SN$Obese_yn <- droplevels(PHENO.ANY_SN$Obese_yn)
 PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxsegrtdose.category <- droplevels(PHENO.ANY_SN$maxsegrtdose.category)
 
+PHENO.ANY_SN$maxneckrtdose.category[PHENO.ANY_SN$maxneckrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxneckrtdose.category <- droplevels(PHENO.ANY_SN$maxneckrtdose.category)
+
 PHENO.ANY_SN$maxabdrtdose.category[PHENO.ANY_SN$maxabdrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxabdrtdose.category <- droplevels(PHENO.ANY_SN$maxabdrtdose.category)
 
 PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$maxchestrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxchestrtdose.category <- droplevels(PHENO.ANY_SN$maxchestrtdose.category)
+
+PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$maxpelvisrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxpelvisrtdose.category <- droplevels(PHENO.ANY_SN$maxpelvisrtdose.category)
 
 PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "Unknown"] <- "None"
 PHENO.ANY_SN$epitxn_dose_5.category <- droplevels(PHENO.ANY_SN$epitxn_dose_5.category)
@@ -230,30 +240,21 @@ CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
 
 CROSS_CASES.df <- PHENO.ANY_SN
 
-CROSS_CASES.df <- CROSS_CASES.df[,c("MENINGIOMA", "maxsegrtdose.category", "maxchestrtdose.category")]
+CROSS_CASES.df <- CROSS_CASES.df[,c("MENINGIOMA", "maxsegrtdose.category", "epitxn_dose_5.category")]
 
 CROSS_CASES.df <- apply_labels(CROSS_CASES.df, MENINGIOMA = "MENINGIOMA", 
-                               maxsegrtdose.category = "maxsegrtdose.category", maxchestrtdose.category = "maxchestrtdose.category")
+                               maxsegrtdose.category = "maxsegrtdose.category", epitxn_dose_5.category = "epitxn_dose_5.category")
 
 as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(MENINGIOMA, list(maxsegrtdose.category, maxchestrtdose.category))))
+                  cross_cases(MENINGIOMA, list(maxsegrtdose.category, epitxn_dose_5.category))))
 
 
 cc <- as.data.frame(t(CROSS_CASES.df %>%
-                        cross_cases(MENINGIOMA, list(maxsegrtdose.category, maxchestrtdose.category))))
+                        cross_cases(MENINGIOMA, list(maxsegrtdose.category, epitxn_dose_5.category))))
 
 rownames(cc) <- NULL 
 cc
 
 
-# Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for cases
-cases_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$MENINGIOMA == 1],
-                     Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$MENINGIOMA == 1])
-
-# Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for controls
-control_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$MENINGIOMA == 0],
-                     Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$MENINGIOMA == 0])
-
-
-rm(list = setdiff(ls(), "PHENO.ANY_SN"))
+rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.MENINGIOMA.V14-4-3.Rdata")

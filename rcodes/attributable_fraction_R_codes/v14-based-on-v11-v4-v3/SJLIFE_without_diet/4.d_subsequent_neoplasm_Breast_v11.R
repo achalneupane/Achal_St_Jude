@@ -71,8 +71,11 @@ sum(!duplicated(subneo.within5$sjlid))
 library(data.table)
 BREASTcancer <- subneo[grepl("breast", subneo$diag, ignore.case = T),]
 BREASTcancer <- setDT(BREASTcancer)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+
+## Remove SNs as cases that are within 5 years of primary diagnosis
+BREASTcancer <- BREASTcancer[!BREASTcancer$sjlid %in% subneo.within5$sjlid,]
 nrow(BREASTcancer)
-# 78
+# 76
 
 PHENO.ANY_SN$BREASTcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% BREASTcancer$sjlid, 0, 1))
 
@@ -155,7 +158,7 @@ to.remove <- ALL.LIFESTYLE$SJLIFEID[which(ALL.LIFESTYLE$survey_min > ALL.LIFESTY
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% to.remove,]
 
 sum(PHENO.ANY_SN$sjlid %in% ALL.LIFESTYLE$SJLIFEID)
-# 3667
+# 3669
 
 ## Remove any samples that do not have lifestyle
 PHENO.ANY_SN  <- PHENO.ANY_SN[PHENO.ANY_SN$sjlid %in% ALL.LIFESTYLE$SJLIFEID,]
@@ -207,11 +210,17 @@ PHENO.ANY_SN$Obese_yn <- droplevels(PHENO.ANY_SN$Obese_yn)
 PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxsegrtdose.category <- droplevels(PHENO.ANY_SN$maxsegrtdose.category)
 
+PHENO.ANY_SN$maxneckrtdose.category[PHENO.ANY_SN$maxneckrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxneckrtdose.category <- droplevels(PHENO.ANY_SN$maxneckrtdose.category)
+
 PHENO.ANY_SN$maxabdrtdose.category[PHENO.ANY_SN$maxabdrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxabdrtdose.category <- droplevels(PHENO.ANY_SN$maxabdrtdose.category)
 
 PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$maxchestrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxchestrtdose.category <- droplevels(PHENO.ANY_SN$maxchestrtdose.category)
+
+PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$maxpelvisrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxpelvisrtdose.category <- droplevels(PHENO.ANY_SN$maxpelvisrtdose.category)
 
 PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "Unknown"] <- "None"
 PHENO.ANY_SN$epitxn_dose_5.category <- droplevels(PHENO.ANY_SN$epitxn_dose_5.category)
@@ -246,14 +255,7 @@ rownames(cc) <- NULL
 cc
 
 
-# Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for cases
-cases_table <- table(Anthra_jco = PHENO.ANY_SN$anthra_jco_dose_5.category[PHENO.ANY_SN$BREASTcancer == 1],
-                     Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$BREASTcancer == 1])
-
-# Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for controls
-control_table <- table(Anthra_jco = PHENO.ANY_SN$anthra_jco_dose_5.category[PHENO.ANY_SN$BREASTcancer == 0],
-                     Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$BREASTcancer == 0])
 
 
-rm(list = setdiff(ls(), "PHENO.ANY_SN"))
+rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.BREASTcancer.V14-4-3.Rdata")
