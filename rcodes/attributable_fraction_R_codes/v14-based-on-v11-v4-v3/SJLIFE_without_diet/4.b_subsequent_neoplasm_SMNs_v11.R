@@ -71,6 +71,9 @@ sum(!duplicated(subneo.within5$sjlid))
 library(data.table)
 SMNs <- subneo[!grepl("basal cell|squamous cell", subneo$diag, ignore.case = T),]
 SMNs <- setDT(SMNs)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+
+## Remove SNs as cases that are within 5 years of primary diagnosis
+SMNs <- SMNs[!SMNs$sjlid %in% subneo.within5$sjlid,]
 nrow(SMNs)
 
 PHENO.ANY_SN$SMNs <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% SMNs$sjlid, 0, 1))
@@ -83,7 +86,7 @@ PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 }
 table(PHENO.ANY_SN$SMNs)
 # 0    1 
-# 3925  428 
+# 3925  424
 
 #############################
 ## Add Lifestyle variables ##
@@ -212,6 +215,9 @@ PHENO.ANY_SN$maxabdrtdose.category <- droplevels(PHENO.ANY_SN$maxabdrtdose.categ
 
 PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$maxchestrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxchestrtdose.category <- droplevels(PHENO.ANY_SN$maxchestrtdose.category)
+
+PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$maxpelvisrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxpelvisrtdose.category <- droplevels(PHENO.ANY_SN$maxpelvisrtdose.category)
 
 PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "Unknown"] <- "None"
 PHENO.ANY_SN$epitxn_dose_5.category <- droplevels(PHENO.ANY_SN$epitxn_dose_5.category)
