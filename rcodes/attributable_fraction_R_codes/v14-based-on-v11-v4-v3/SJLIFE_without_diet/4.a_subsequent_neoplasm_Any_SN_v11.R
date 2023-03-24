@@ -71,20 +71,22 @@ sum(!duplicated(subneo.within5$sjlid))
 library(data.table)
 ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 
-## Remove SNs as cases that are within 5 years of primary diagnosis
-ANY_SNs <- ANY_SNs[!ANY_SNs$sjlid %in% subneo.within5$sjlid,]
-nrow(ANY_SNs)
-
-PHENO.ANY_SN$ANY_SNs <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
-
 ## Remove SNs if younger than 18
 PHENO.ANY_SN$AGE.ANY_SN <- ANY_SNs$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, ANY_SNs$sjlid)]
 if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 }
+
+## remove within 5 years of diagnosis
+sum(PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid)
+# 3
+PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid,]
+
+PHENO.ANY_SN$ANY_SNs <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
+
 table(PHENO.ANY_SN$ANY_SNs)
 # 0    1 
-# 3796  568 
+# 3774  568 
 
 #############################
 ## Add Lifestyle variables ##

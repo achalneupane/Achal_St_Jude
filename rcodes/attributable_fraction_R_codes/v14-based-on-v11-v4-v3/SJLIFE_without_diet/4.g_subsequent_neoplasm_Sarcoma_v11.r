@@ -77,16 +77,23 @@ SARCOMA <- SARCOMA[!SARCOMA$sjlid %in% subneo.within5$sjlid,]
 nrow(SARCOMA)
 # 32
 
-PHENO.ANY_SN$SARCOMA <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% SARCOMA$sjlid, 0, 1))
 
 ## Remove SARCOMA if younger than 18
 PHENO.ANY_SN$AGE.ANY_SN <- SARCOMA$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, SARCOMA$sjlid)]
 if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 }
+
+## remove within 5 years of diagnosis
+sum(PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid)
+# 22
+PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid,]
+
+PHENO.ANY_SN$SARCOMA <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% SARCOMA$sjlid, 0, 1))
+
 table(PHENO.ANY_SN$SARCOMA)
 # 0    1 
-# 4252 28
+# 4347 28
 
 #############################
 ## Add Lifestyle variables ##

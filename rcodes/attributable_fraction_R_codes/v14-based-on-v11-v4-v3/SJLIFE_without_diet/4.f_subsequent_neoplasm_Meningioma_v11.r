@@ -78,16 +78,22 @@ nrow(MENINGIOMA)
 nrow(MENINGIOMA)
 # 149
 
-PHENO.ANY_SN$MENINGIOMA <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% MENINGIOMA$sjlid, 0, 1))
-
 ## Remove MENINGIOMA if younger than 18
 PHENO.ANY_SN$AGE.ANY_SN <- MENINGIOMA$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, MENINGIOMA$sjlid)]
 if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 }
+
+## remove within 5 years of diagnosis
+sum(PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid)
+# 22
+PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid,]
+
+PHENO.ANY_SN$MENINGIOMA <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% MENINGIOMA$sjlid, 0, 1))
+
 table(PHENO.ANY_SN$MENINGIOMA)
 # 0    1 
-# 4252 139
+# 4230 139
 
 #############################
 ## Add Lifestyle variables ##

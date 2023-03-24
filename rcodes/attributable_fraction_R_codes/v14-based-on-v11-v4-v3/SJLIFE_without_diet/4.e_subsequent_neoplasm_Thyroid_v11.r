@@ -77,16 +77,22 @@ THYROIDcancer <- THYROIDcancer[!THYROIDcancer$sjlid %in% subneo.within5$sjlid,]
 nrow(THYROIDcancer)
 # 86
 
-PHENO.ANY_SN$THYROIDcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% THYROIDcancer$sjlid, 0, 1))
-
 ## Remove THYROIDcancer if younger than 18
 PHENO.ANY_SN$AGE.ANY_SN <- THYROIDcancer$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, THYROIDcancer$sjlid)]
 if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 }
+
+## remove within 5 years of diagnosis
+sum(PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid)
+# 22
+PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid,]
+
+PHENO.ANY_SN$THYROIDcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% THYROIDcancer$sjlid, 0, 1))
+
 table(PHENO.ANY_SN$THYROIDcancer)
 # 0    1 
-# 4315 81
+# 4293 81
 
 #############################
 ## Add Lifestyle variables ##

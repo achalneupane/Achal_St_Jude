@@ -77,7 +77,6 @@ NMSCs <- NMSCs[!NMSCs$sjlid %in% subneo.within5$sjlid,]
 nrow(NMSCs)
 # 249
 
-PHENO.ANY_SN$NMSCs <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% NMSCs$sjlid, 0, 1))
 
 ## Remove NMSCs if younger than 18
 PHENO.ANY_SN$AGE.ANY_SN <- NMSCs$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, NMSCs$sjlid)]
@@ -85,9 +84,16 @@ PHENO.ANY_SN$AGE.ANY_SN <- NMSCs$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, NMSCs$sjl
 if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 }
+
+## remove within 5 years of diagnosis
+sum(PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid)
+# 22
+PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid,]
+
+PHENO.ANY_SN$NMSCs <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% NMSCs$sjlid, 0, 1))
 table(PHENO.ANY_SN$NMSCs)
 # 0    1 
-# 4152  240
+# 4130  240
 
 #############################
 ## Add Lifestyle variables ##
