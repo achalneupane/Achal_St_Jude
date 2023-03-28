@@ -163,3 +163,8 @@ plink --bfile $bfile --freq --out ${bfile}_freq
 done
 
 # compare frequency with /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/1kGP/1000genomes_merged_freq.out.frq
+
+
+## double check the genotype
+bcftools query -s JW10-1 -f '%CHROM %POS  %REF  %ALT [ %GT]\n'  chr1.snp.indel.recalibrated_edited.PASS.vcf.gz > chr1.genotype_JW10-1.txt
+bcftools query -s JW6 -f '%CHROM %POS  %REF  %ALT [ %GT]\n'  chr1.snp.indel.recalibrated_edited.PASS.vcf.gz > chr1.genotype_JW6.txt

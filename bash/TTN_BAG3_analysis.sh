@@ -441,6 +441,7 @@ plink --bfile ccss_org_to_concat --bmerge ccss_exp_to_concat --make-bed --out me
 
 ## LD check (based on Kateryna's email on 03/17/2023)
 # 2 (window size kb, needs to be more than 2) 1 (step size, it could be 1 or 2 in such a small dataset) and 0.8 (it is r2 threshold), generated  plink.prune.in will contain variants that pass the threshold.
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3
 plink --bfile ttn_significant_ld --indep-pairwise 2 1 0.8
 
 

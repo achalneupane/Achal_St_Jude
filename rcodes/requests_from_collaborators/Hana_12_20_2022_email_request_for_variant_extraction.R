@@ -188,3 +188,23 @@ dd <- dd[c("SNP_ID","CHROM","POS","REF","ALT","VQSR_PASS","JW1-12","JW10-1",
      "cosmic70","nci60","CLNSIG","REVEL")]
 
 write.table(dd, "Hana_EMD_genotype.txt", sep = "\t", col.names = T, quote = F, row.names = F)
+
+
+## on 03/27/2023, Hana requested to double check
+LMNA.Pos <- read.table("LMNA_Pos_key.txt", sep = "\t", header = T)
+LMNA.Pos$KEY <- paste(LMNA.Pos$CHROM, LMNA.Pos$POS, LMNA.Pos$REF, LMNA.Pos$ALT, sep = ":")
+jw6 <- read.table("chr1.genotype_JW6.txt")
+jw6$KEY <- gsub("chr","", paste(jw6$V1, jw6$V2, jw6$V3, jw6$V4, sep = ":"))
+
+JW6.LMNA <- cbind.data.frame(LMNA.Pos,jw6[match(LMNA.Pos$KEY, jw6$KEY),])
+
+
+write.table(JW6.LMNA, "JW6.LMNA.geno.txt", sep = "\t", quote = F, row.names = F, col.names = T)
+
+
+jw10_1 <- read.table("chr1.genotype_JW10-1.txt")
+jw10_1$KEY <- gsub("chr","", paste(jw10_1$V1, jw10_1$V2, jw10_1$V3, jw10_1$V4, sep = ":"))
+jw10_1.LMNA <- cbind.data.frame(LMNA.Pos,jw10_1[match(LMNA.Pos$KEY, jw10_1$KEY),])
+
+
+write.table(jw10_1.LMNA, "jw10_1.LMNA.geno.txt", sep = "\t", quote = F, row.names = F, col.names = T)
