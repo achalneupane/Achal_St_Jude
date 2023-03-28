@@ -365,9 +365,10 @@ for(i in 1:length(PRS.to.categorize)){
 return(PHENO.ANY_SN)
 }
 
+PHENO.ANY_SN <- add_cubic_spline(PHENO.ANY_SN)
+PHENO.ANY_SN <- add_therapy_tertiles(PHENO.ANY_SN)
+PHENO.ANY_SN <- add_PRS_to_PHENO(PHENO.ANY_SN)
 
+rm(list=ls()[!grepl(c("PHENO.ANY_SN|subneo"), ls())])
 
-
-
-
-# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_org_Genetic_data_P_LP_v11.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_org_Genetic_data_P_LP_v14.Rdata")
