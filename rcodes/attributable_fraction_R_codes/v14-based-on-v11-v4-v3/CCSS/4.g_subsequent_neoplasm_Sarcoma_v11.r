@@ -49,8 +49,8 @@ to.remove <- as.character(c(1004973, 1005736, 3012171, 4073492, 5097496, 5146972
                                            18080902, 18141511, 20024771, 20027745, 20032881, 20033541, 21228953, 22091488,
                                            22155815, 22156111, 22200376, 25017727, 26016681, 26018907, 26020735, 26056273,
                                            1262696, 2511092, 2518314, 5362062, 6302298, 8356277, 15283414, 19295502, 22434302,
-                                           26403512,
-                                           27408157, 32612598, 22434151, 18232408, 13205948, 13084147, 11113508, 9204017, 9039178, 9037083, 8224368))
+                                           26403512))
+                                           
 
 
 ## remove samples
@@ -58,7 +58,7 @@ PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% to.remove,]
 
 ## Remove SNs if younger than 18 **
 dim(PHENO.ANY_SN)
-# 7943   50
+# 7900   50
 
 PHENO.ANY_SN$AGE.ANY_SN <- SARCOMA$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, SARCOMA$ccssid)]
 if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
@@ -66,20 +66,20 @@ if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 }
 
 dim(PHENO.ANY_SN)
-## 7928 51 ** END
+## 7889 51 ** END
 
 # Removing samples with SN within the 5 years of childhood cancer **
 sum(PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid)
 # 22
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid,]
 dim(PHENO.ANY_SN)
-# 7906 ** END
+# 7967 ** END
 
 ## CA CO status
 PHENO.ANY_SN$SARCOMA <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% SARCOMA$ccssid, 0, 1))
 table(PHENO.ANY_SN$SARCOMA)
 # 0    1 
-# 7814  92
+# 7814  53
 
 
 ######################### **
@@ -101,13 +101,13 @@ PHENO.ANY_SN <- PHENO.ANY_SN[!(PHENO.ANY_SN$Current_smoker_yn == "Unknown" &
                                  PHENO.ANY_SN$Obese_yn == "Unknown" ),]
 
 dim(PHENO.ANY_SN)
-# [1] 7822  52
+# [1] 7783  52
 
 sum((PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey >= 18|
        PHENO.ANY_SN$PhysicalActivity_yn_agesurvey >= 18|
        PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey >= 18|
        PHENO.ANY_SN$Not_obese_yn_agesurvey >= 18), na.rm = T)
-# 7822
+# 7783
 
 
 PHENO.ANY_SN <- PHENO.ANY_SN[which(PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey >= 18 |
@@ -136,7 +136,7 @@ PHENO.ANY_SN$Obese_yn [which(PHENO.ANY_SN$Not_obese_yn_agesurvey != PHENO.ANY_SN
 ## Remove SN cases if the diagnosis date is prior to the youngest adult survey date
 PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$survey_min > PHENO.ANY_SN$AGE.ANY_SN),]
 dim(PHENO.ANY_SN)
-# 7806  53
+# 7773  53
 ######################### ** END
 
 
@@ -147,7 +147,7 @@ PHENO.ANY_SN$any_lifestyle_missing  <- factor(ifelse(PHENO.ANY_SN$any_lifestyle_
 
 table(PHENO.ANY_SN$any_lifestyle_missing)
 # No  Yes 
-# 69 7727
+# 72 7701
 ########################################
 ## Do the same for missing treatments ##
 ########################################
@@ -156,7 +156,7 @@ PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FAL
 
 table(PHENO.ANY_SN$any_tx_missing)
 # No  Yes 
-# 7155  641
+# 7132  641
 #########################
 ## Extract Ethnicities ##
 #########################

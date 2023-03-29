@@ -41,6 +41,40 @@ library(data.table)
 SMNs <- subneo[!grepl("skin", subneo$groupdx3, ignore.case = T),]
 SMNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
 
+##########################################
+## Find out benign SMNs and remove them ##
+##########################################
+## This file is from Kyla
+KIRI.ccss <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Kyla/combinedsn_final_02_17_2023.csv", header = T, sep = ",", stringsAsFactors = F)
+dim(KIRI.ccss)
+## Keep non-missing candxo3
+KIRI.ccss <- KIRI.ccss[!is.na(KIRI.ccss$candxo3),]
+# KIRI.ccss <- KIRI.ccss[KIRI.ccss$candxo3 !="",]
+KIRI.ccss <- KIRI.ccss[KIRI.ccss$d_candx !="",]
+dim(KIRI.ccss)
+KIRI.ccss$SN_diagnosis_date <- as.Date(KIRI.ccss$d_candx, format = "%d%b%Y")
+KIRI.ccss$SN_diagnosis_date <- format(KIRI.ccss$SN_diagnosis_date, "%m-%d-%Y") # 06-30-2008
+KIRI.ccss$KEY <- paste(KIRI.ccss$ccssid, KIRI.ccss$SN_diagnosis_date, sep = ":")
+
+PHENO.ANY_SN$SN_diagnosis_date <- as.Date(PHENO.ANY_SN$d_candx, format = "%d%b%Y")
+PHENO.ANY_SN$SN_diagnosis_date  <- format(PHENO.ANY_SN$SN_diagnosis_date, "%m-%d-%Y") # "08-23-2016"
+PHENO.ANY_SN$ccssid <- gsub("_.*","",PHENO.ANY_SN$ccssid)
+PHENO.ANY_SN$KEY <- paste(PHENO.ANY_SN$ccssid, PHENO.ANY_SN$SN_diagnosis_date, sep = ":")
+
+
+table(PHENO.ANY_SN$KEY %in% KIRI.ccss$KEY)
+# FALSE  TRUE 
+# 7840  103
+
+
+
+SARCOMA <- PHENO.ANY_SN[PHENO.ANY_SN$SARCOMA == 1,]
+KIRI.ccss <- KIRI.ccss[KIRI.ccss$KEY %in% SARCOMA$KEY,]
+
+SARCOMA$ANY_SN_TYPE_NEW <- KIRI.ccss$candxo3[match(SARCOMA$KEY, KIRI.ccss$KEY)]
+##########################################
+
+
 ## Remove SNs if younger than 18 **
 dim(PHENO.ANY_SN)
 # 7943   50
