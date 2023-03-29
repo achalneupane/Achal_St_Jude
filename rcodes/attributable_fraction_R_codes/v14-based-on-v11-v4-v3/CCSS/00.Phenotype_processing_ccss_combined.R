@@ -10,4 +10,11 @@ sum(colnames(ccss_org.PHENO.ANY_SN) != colnames(ccss_exp.PHENO.ANY_SN))
 sum(colnames(ccss_org.subneo) != colnames(ccss_exp.subneo))
 
 PHENO.ANY_SN <- rbind.data.frame(ccss_org.PHENO.ANY_SN, ccss_exp.PHENO.ANY_SN)
+PHENO.ANY_SN$ccssid <- sapply(strsplit(PHENO.ANY_SN$ccssid,"_"), `[`, 1)
+
 subneo <- rbind.data.frame(ccss_org.subneo, ccss_exp.subneo)
+subneo$ccssid <- sapply(strsplit(subneo$ccssid,"_"), `[`, 1)
+
+rm(list=ls()[!grepl(c("PHENO.ANY_SN|subneo"), ls())])
+
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_combined_Genetic_data_P_LP_v14.Rdata")
