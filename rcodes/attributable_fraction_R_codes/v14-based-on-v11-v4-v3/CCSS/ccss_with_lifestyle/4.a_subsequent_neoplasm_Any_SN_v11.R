@@ -39,35 +39,32 @@ sum(!duplicated(subneo.within5$ccssid))
 # Get SNs for the first time and Age at First SN.
 # For this, I will first sort the table by date
 library(data.table)
-BREASTcancer <- subneo[grepl("breast", subneo$groupdx3, ignore.case = T),]
-BREASTcancer <- setDT(BREASTcancer)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
-nrow(BREASTcancer)
-# 295
+ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
 
 ## Remove SNs if younger than 18 **
 dim(PHENO.ANY_SN)
 # 7943   50
 
-PHENO.ANY_SN$AGE.ANY_SN <- BREASTcancer$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, BREASTcancer$ccssid)]
+PHENO.ANY_SN$AGE.ANY_SN <- ANY_SNs$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, ANY_SNs$ccssid)]
 if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
   PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 }
 
 dim(PHENO.ANY_SN)
-## 7943 51 ** END
+## 7870 51 ** END
 
 # Removing samples with SN within the 5 years of childhood cancer **
 sum(PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid)
-# 25
+# 7
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid,]
 dim(PHENO.ANY_SN)
-# 7918 ** END
+# 7863 ** END
 
 ## CA CO status
-PHENO.ANY_SN$BREASTcancer <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% BREASTcancer$ccssid, 0, 1))
-table(PHENO.ANY_SN$BREASTcancer)
+PHENO.ANY_SN$ANY_SNs <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% ANY_SNs$ccssid, 0, 1))
+table(PHENO.ANY_SN$ANY_SNs)
 # 0    1 
-# 7624  294 
+# 6307 1556
 
 
 ######################### **
@@ -89,13 +86,13 @@ PHENO.ANY_SN <- PHENO.ANY_SN[!(PHENO.ANY_SN$Current_smoker_yn == "Unknown" &
                                  PHENO.ANY_SN$Obese_yn == "Unknown" ),]
 
 dim(PHENO.ANY_SN)
-# [1] 7834   52
+# [1] 7780   52
 
 sum((PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey >= 18|
        PHENO.ANY_SN$PhysicalActivity_yn_agesurvey >= 18|
        PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey >= 18|
        PHENO.ANY_SN$Not_obese_yn_agesurvey >= 18), na.rm = T)
-# 7834
+# 7780
 
 
 PHENO.ANY_SN <- PHENO.ANY_SN[which(PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey >= 18 |
@@ -124,7 +121,7 @@ PHENO.ANY_SN$Obese_yn [which(PHENO.ANY_SN$Not_obese_yn_agesurvey != PHENO.ANY_SN
 ## Remove SN cases if the diagnosis date is prior to the youngest adult survey date
 PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$survey_min > PHENO.ANY_SN$AGE.ANY_SN),]
 dim(PHENO.ANY_SN)
-# 7821  53
+# 7636   53
 ######################### ** END
 
 
@@ -134,8 +131,7 @@ PHENO.ANY_SN$any_lifestyle_missing <- apply(PHENO.ANY_SN[c("Current_smoker_yn", 
 PHENO.ANY_SN$any_lifestyle_missing  <- factor(ifelse(PHENO.ANY_SN$any_lifestyle_missing == FALSE, "No", "Yes"))
 
 table(PHENO.ANY_SN$any_lifestyle_missing)
-# No  Yes 
-# 72 7749
+
 ########################################
 ## Do the same for missing treatments ##
 ########################################
@@ -143,8 +139,7 @@ PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "ma
 PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
 
 table(PHENO.ANY_SN$any_tx_missing)
-# No  Yes 
-# 7177  644
+
 #########################
 ## Extract Ethnicities ##
 #########################
@@ -208,23 +203,32 @@ CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
 
 CROSS_CASES.df <- PHENO.ANY_SN
 
-CROSS_CASES.df <- CROSS_CASES.df[,c("BREASTcancer", "maxchestrtdose.category", "anthra_jco_dose_5.category")]
+CROSS_CASES.df <- CROSS_CASES.df[,c("ANY_SNs", "maxsegrtdose.category", "maxchestrtdose.category", "maxabdrtdose.category", "epitxn_dose_5.category")]
 
-CROSS_CASES.df <- apply_labels(CROSS_CASES.df, BREASTcancer = "BREASTcancer", 
-                               maxchestrtdose.category = "maxchestrtdose.category", anthra_jco_dose_5.category = "anthra_jco_dose_5.category")
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df, ANY_SNs = "ANY_SNs", 
+                               maxsegrtdose.category = "maxsegrtdose.category", maxchestrtdose.category = "maxchestrtdose.category", 
+                               maxabdrtdose.category = "maxabdrtdose.category", epitxn_dose_5.category = "epitxn_dose_5.category")
 
 as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(BREASTcancer, list(maxchestrtdose.category, anthra_jco_dose_5.category))))
+                  cross_cases(ANY_SNs, list(maxsegrtdose.category, maxchestrtdose.category, maxabdrtdose.category, epitxn_dose_5.category))))
 
 
 cc <- as.data.frame(t(CROSS_CASES.df %>%
-                        cross_cases(BREASTcancer, list(maxchestrtdose.category, anthra_jco_dose_5.category))))
+                        cross_cases(ANY_SNs, list(maxsegrtdose.category, maxchestrtdose.category, maxabdrtdose.category, epitxn_dose_5.category))))
 
 rownames(cc) <- NULL 
 cc
 
 
+# Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for cases
+cases_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$ANY_SNs == 1],
+                     Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$ANY_SNs == 1])
+
+# Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for controls
+control_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$ANY_SNs == 0],
+                       Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$ANY_SNs == 0])
+
 
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.BREASTcancer.V14.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.Any_SNs.V14.Rdata")
 

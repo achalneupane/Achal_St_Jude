@@ -39,35 +39,48 @@ sum(!duplicated(subneo.within5$ccssid))
 # Get SNs for the first time and Age at First SN.
 # For this, I will first sort the table by date
 library(data.table)
-BREASTcancer <- subneo[grepl("breast", subneo$groupdx3, ignore.case = T),]
-BREASTcancer <- setDT(BREASTcancer)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
-nrow(BREASTcancer)
-# 295
+SARCOMA <- subneo[grepl("sarcoma", subneo$groupdx3, ignore.case = T),]
+SARCOMA <- setDT(SARCOMA)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
+nrow(SARCOMA)
+# 109
+
+# # based on Yadav's email on 03/09/2023, I am removing all benign diagnoses from the list of 52 survivors
+# to.remove <- as.character(c(1004973, 1005736, 3012171, 4073492, 5097496, 5146972, 8217873, 9059523, 9203577,
+#                                            10085746, 11108731, 12083337, 13054941, 13231652, 16041746, 16045012, 17050333,
+#                                            18080902, 18141511, 20024771, 20027745, 20032881, 20033541, 21228953, 22091488,
+#                                            22155815, 22156111, 22200376, 25017727, 26016681, 26018907, 26020735, 26056273,
+#                                            1262696, 2511092, 2518314, 5362062, 6302298, 8356277, 15283414, 19295502, 22434302,
+#                                            26403512))
+                                           
+
+
+## remove samples
+# PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% to.remove,]
 
 ## Remove SNs if younger than 18 **
 dim(PHENO.ANY_SN)
-# 7943   50
+# 7943   51
 
-PHENO.ANY_SN$AGE.ANY_SN <- BREASTcancer$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, BREASTcancer$ccssid)]
+PHENO.ANY_SN$AGE.ANY_SN <- SARCOMA$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, SARCOMA$ccssid)]
 if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
   PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 }
 
 dim(PHENO.ANY_SN)
-## 7943 51 ** END
+## 7928 52 ** END
 
 # Removing samples with SN within the 5 years of childhood cancer **
 sum(PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid)
-# 25
+# 22
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid,]
 dim(PHENO.ANY_SN)
-# 7918 ** END
+# 7906  52 ** END
 
 ## CA CO status
-PHENO.ANY_SN$BREASTcancer <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% BREASTcancer$ccssid, 0, 1))
-table(PHENO.ANY_SN$BREASTcancer)
+PHENO.ANY_SN$SARCOMA <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% SARCOMA$ccssid, 0, 1))
+table(PHENO.ANY_SN$SARCOMA)
 # 0    1 
-# 7624  294 
+# 7814  92
 
 
 ######################### **
@@ -89,13 +102,13 @@ PHENO.ANY_SN <- PHENO.ANY_SN[!(PHENO.ANY_SN$Current_smoker_yn == "Unknown" &
                                  PHENO.ANY_SN$Obese_yn == "Unknown" ),]
 
 dim(PHENO.ANY_SN)
-# [1] 7834   52
+# [1] 7822  53
 
 sum((PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey >= 18|
        PHENO.ANY_SN$PhysicalActivity_yn_agesurvey >= 18|
        PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey >= 18|
        PHENO.ANY_SN$Not_obese_yn_agesurvey >= 18), na.rm = T)
-# 7834
+# 7822
 
 
 PHENO.ANY_SN <- PHENO.ANY_SN[which(PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey >= 18 |
@@ -124,7 +137,7 @@ PHENO.ANY_SN$Obese_yn [which(PHENO.ANY_SN$Not_obese_yn_agesurvey != PHENO.ANY_SN
 ## Remove SN cases if the diagnosis date is prior to the youngest adult survey date
 PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$survey_min > PHENO.ANY_SN$AGE.ANY_SN),]
 dim(PHENO.ANY_SN)
-# 7821  53
+# 7806  54
 ######################### ** END
 
 
@@ -135,7 +148,7 @@ PHENO.ANY_SN$any_lifestyle_missing  <- factor(ifelse(PHENO.ANY_SN$any_lifestyle_
 
 table(PHENO.ANY_SN$any_lifestyle_missing)
 # No  Yes 
-# 72 7749
+# 72 7734
 ########################################
 ## Do the same for missing treatments ##
 ########################################
@@ -144,7 +157,7 @@ PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FAL
 
 table(PHENO.ANY_SN$any_tx_missing)
 # No  Yes 
-# 7177  644
+# 7161  645
 #########################
 ## Extract Ethnicities ##
 #########################
@@ -197,6 +210,43 @@ PHENO.ANY_SN$anthra_jco_dose_5.category <- droplevels(PHENO.ANY_SN$anthra_jco_do
 PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "Unknown"] <- "None"
 PHENO.ANY_SN$aa_class_dose_5.category <- droplevels(PHENO.ANY_SN$aa_class_dose_5.category)
 
+###############################################
+## Find out benign Sarcoma's and remove them ##
+###############################################
+# # based on Yadav's email on 03/09/2023, I am removing all benign diagnoses from the list of 52 survivors
+## This file is from Kyla
+KIRI.ccss <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Kyla/combinedsn_final_02_17_2023.csv", header = T, sep = ",", stringsAsFactors = F)
+dim(KIRI.ccss)
+## Keep non-missing candxo3
+KIRI.ccss <- KIRI.ccss[!is.na(KIRI.ccss$candxo3),]
+# KIRI.ccss <- KIRI.ccss[KIRI.ccss$candxo3 !="",]
+KIRI.ccss <- KIRI.ccss[KIRI.ccss$d_candx !="",]
+dim(KIRI.ccss)
+KIRI.ccss$SN_diagnosis_date <- as.Date(KIRI.ccss$d_candx, format = "%d%b%Y")
+KIRI.ccss$SN_diagnosis_date <- format(KIRI.ccss$SN_diagnosis_date, "%m-%d-%Y") # 06-30-2008
+KIRI.ccss$KEY <- paste(KIRI.ccss$ccssid, KIRI.ccss$SN_diagnosis_date, sep = ":")
+
+PHENO.ANY_SN$SN_diagnosis_date <- as.Date(PHENO.ANY_SN$d_candx, format = "%d%b%Y")
+PHENO.ANY_SN$SN_diagnosis_date  <- format(PHENO.ANY_SN$SN_diagnosis_date, "%m-%d-%Y") # "08-23-2016"
+PHENO.ANY_SN$ccssid <- gsub("_.*","",PHENO.ANY_SN$ccssid)
+PHENO.ANY_SN$KEY <- paste(PHENO.ANY_SN$ccssid, PHENO.ANY_SN$SN_diagnosis_date, sep = ":")
+
+
+table(PHENO.ANY_SN$KEY %in% KIRI.ccss$KEY)
+# FALSE  TRUE 
+# 6250  1556 
+
+
+
+SARCOMA <- PHENO.ANY_SN[PHENO.ANY_SN$SARCOMA == 1,]
+KIRI.ccss <- KIRI.ccss[KIRI.ccss$KEY %in% SARCOMA$KEY,]
+KIRI.save <- KIRI.ccss
+KIRI.ccss <- KIRI.ccss[grepl("\\/0|\\/1", KIRI.ccss$candxo3),]
+
+PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% KIRI.ccss$ccssid,]
+table(PHENO.ANY_SN$SARCOMA)
+# 7730   52
+##########################################
 
 ################
 ## Cross tabs ##
@@ -208,23 +258,22 @@ CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
 
 CROSS_CASES.df <- PHENO.ANY_SN
 
-CROSS_CASES.df <- CROSS_CASES.df[,c("BREASTcancer", "maxchestrtdose.category", "anthra_jco_dose_5.category")]
+CROSS_CASES.df <- CROSS_CASES.df[,c("SARCOMA", "aa_class_dose_5.category")]
 
-CROSS_CASES.df <- apply_labels(CROSS_CASES.df, BREASTcancer = "BREASTcancer", 
-                               maxchestrtdose.category = "maxchestrtdose.category", anthra_jco_dose_5.category = "anthra_jco_dose_5.category")
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df, SARCOMA = "SARCOMA", 
+                               aa_class_dose_5.category = "aa_class_dose_5.category")
 
 as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(BREASTcancer, list(maxchestrtdose.category, anthra_jco_dose_5.category))))
+                  cross_cases(SARCOMA, list(aa_class_dose_5.category))))
 
 
 cc <- as.data.frame(t(CROSS_CASES.df %>%
-                        cross_cases(BREASTcancer, list(maxchestrtdose.category, anthra_jco_dose_5.category))))
+                        cross_cases(SARCOMA, list(aa_class_dose_5.category))))
 
 rownames(cc) <- NULL 
 cc
 
 
-
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.BREASTcancer.V14.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA.V14.Rdata")
 

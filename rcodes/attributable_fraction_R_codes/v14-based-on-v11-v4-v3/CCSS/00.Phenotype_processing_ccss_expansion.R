@@ -1,5 +1,5 @@
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/CCSS_Data_from_Huiqi/RE__CCSS_phenotype_data2")
-
+rm()
 
 CCSS_data <- read.delim("ExportedCCSS_data.txt", header = T, sep = "\t", stringsAsFactors = F)
 
@@ -170,7 +170,7 @@ ccss_exp$gradedt <- as.numeric(ccss_exp$a_candx)
 
 
 subneo <- ccss_exp
-PHENO.ANY_SN <- ccss_exp[c('ccssid', 'SEX', 'agedx', 'diagnose', 'AGE_AT_DIAGNOSIS', 'agelstcontact', 'anth_DED5', 
+PHENO.ANY_SN <- ccss_exp[c('ccssid', 'SEX', 'agedx', 'd_candx', 'diagnose', 'AGE_AT_DIAGNOSIS', 'agelstcontact', 'anth_DED5', 
                            'alk_CED5', 'epipdose5', 'pt_cisED5', 'chestrtgrp', 'neckrtgrp', 'abdomenrtgrp', 'abdomenrtgrp', 'brainrtgrp', 'pelvisrtgrp', 
                            'smoker_former_or_never_yn_agesurvey', 'smoker_former_or_never_yn', 'NOT_RiskyHeavyDrink_yn_agesurvey', 'NOT_RiskyHeavyDrink_yn',
                            'Not_obese_yn_agesurvey', 'Not_obese_yn', 'PhysicalActivity_yn_agesurvey', 'PhysicalActivity_yn')]
@@ -276,7 +276,7 @@ return(ccss_exp)
 ## PRS scores ##
 ################
 add_PRS_to_PHENO <-function(PHENO.ANY_SN){
-PHENO.ANY_SN <- PHENO.ANY_SN[c('ccssid', 'gender', 'agedx', 'diagnose', 'agelstcontact', 'AGE_AT_DIAGNOSIS', 
+PHENO.ANY_SN <- PHENO.ANY_SN[c('ccssid', 'gender', 'agedx', 'd_candx', 'diagnose', 'agelstcontact', 'AGE_AT_DIAGNOSIS', 
                                  "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", 
                                  'maxchestrtdose.category', 'maxneckrtdose.category', 'maxabdrtdose.category', 'maxsegrtdose.category', 'maxpelvisrtdose.category',
                                  'Not_obese_yn_agesurvey', 'Not_obese_yn', 'PhysicalActivity_yn_agesurvey', 'PhysicalActivity_yn', 

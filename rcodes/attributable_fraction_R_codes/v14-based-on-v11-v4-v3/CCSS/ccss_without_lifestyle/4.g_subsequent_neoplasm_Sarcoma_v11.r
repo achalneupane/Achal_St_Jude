@@ -59,7 +59,7 @@ nrow(SARCOMA)
 
 ## Remove SNs if younger than 18 **
 dim(PHENO.ANY_SN)
-# 7900   50
+# 7943   50
 
 PHENO.ANY_SN$AGE.ANY_SN <- SARCOMA$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, SARCOMA$ccssid)]
 if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
@@ -67,88 +67,24 @@ if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 }
 
 dim(PHENO.ANY_SN)
-## 7889 51 ** END
+## 7928 52 ** END
 
 # Removing samples with SN within the 5 years of childhood cancer **
 sum(PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid)
 # 22
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid,]
 dim(PHENO.ANY_SN)
-# 7967 ** END
+# 7906 ** END
 
 ## CA CO status
 PHENO.ANY_SN$SARCOMA <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% SARCOMA$ccssid, 0, 1))
 table(PHENO.ANY_SN$SARCOMA)
 # 0    1 
-# 7814  53
+# 7814   92
 
 
 ######################### **
-############################################################################################
-############################################################################################
-#################################### Work for V11-4-v2 #####################################
-############################################################################################
-############################################################################################
-# Yutaka's email 02/23/2023: The number of SN should decrease
-# in the new analysis because those who developed SN before the first adult
-# survey should be out of the analysis.  Also, we should use the "any missing in
-# the lifestyle variables" rather than using the individual missing (with
-# missing combined to the reference in each lifestyle variable).
 
-## remove all lifestyle missing
-PHENO.ANY_SN <- PHENO.ANY_SN[!(PHENO.ANY_SN$Current_smoker_yn == "Unknown" &
-                                 PHENO.ANY_SN$PhysicalActivity_yn == "Unknown" &
-                                 PHENO.ANY_SN$RiskyHeavyDrink_yn == "Unknown" &
-                                 PHENO.ANY_SN$Obese_yn == "Unknown" ),]
-
-dim(PHENO.ANY_SN)
-# [1] 7783  52
-
-sum((PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey >= 18|
-       PHENO.ANY_SN$PhysicalActivity_yn_agesurvey >= 18|
-       PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey >= 18|
-       PHENO.ANY_SN$Not_obese_yn_agesurvey >= 18), na.rm = T)
-# 7783
-
-
-PHENO.ANY_SN <- PHENO.ANY_SN[which(PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey >= 18 |
-                                     PHENO.ANY_SN$PhysicalActivity_yn_agesurvey >= 18 |
-                                     PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey >= 18 |
-                                     PHENO.ANY_SN$Not_obese_yn_agesurvey >= 18),]
-
-cols <- c(
-  "smoker_former_or_never_yn_agesurvey",
-  "PhysicalActivity_yn_agesurvey",
-  "NOT_RiskyHeavyDrink_yn_agesurvey",
-  "Not_obese_yn_agesurvey"
-)
-
-## round to nearest integer
-# saved.cc <- ALL.LIFESTYLE[, c("SJLIFEID", cols)]
-# ALL.LIFESTYLE[, cols] <- apply(PHENO.ANY_SN[, cols], 2, round)
-library(matrixStats)
-PHENO.ANY_SN$survey_min <- rowMins(as.matrix(PHENO.ANY_SN[, cols]), na.rm = TRUE)
-# cc <- PHENO.ANY_SN[, c("SJLIFEID", cols, "survey_min")]
-PHENO.ANY_SN$Current_smoker_yn [which(PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey != PHENO.ANY_SN$survey_min)] <- "Unknown"
-PHENO.ANY_SN$PhysicalActivity_yn [which(PHENO.ANY_SN$PhysicalActivity_yn_agesurvey != PHENO.ANY_SN$survey_min)] <- "Unknown"
-PHENO.ANY_SN$RiskyHeavyDrink_yn [which(PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey != PHENO.ANY_SN$survey_min)] <- "Unknown"
-PHENO.ANY_SN$Obese_yn [which(PHENO.ANY_SN$Not_obese_yn_agesurvey != PHENO.ANY_SN$survey_min)] <- "Unknown"
-
-## Remove SN cases if the diagnosis date is prior to the youngest adult survey date
-PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$survey_min > PHENO.ANY_SN$AGE.ANY_SN),]
-dim(PHENO.ANY_SN)
-# 7773  53
-######################### ** END
-
-
-## Add any missing to each lifestyle variable
-# PHENO.ANY_SN[c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn")]
-PHENO.ANY_SN$any_lifestyle_missing <- apply(PHENO.ANY_SN[c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn")], 1, function(x) any("Unknown" %in% x))
-PHENO.ANY_SN$any_lifestyle_missing  <- factor(ifelse(PHENO.ANY_SN$any_lifestyle_missing == FALSE, "No", "Yes"))
-
-table(PHENO.ANY_SN$any_lifestyle_missing)
-# No  Yes 
-# 72 7701
 ########################################
 ## Do the same for missing treatments ##
 ########################################
@@ -157,7 +93,7 @@ PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FAL
 
 table(PHENO.ANY_SN$any_tx_missing)
 # No  Yes 
-# 7132  641
+# 7255  651
 #########################
 ## Extract Ethnicities ##
 #########################
@@ -170,21 +106,7 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.A
 ############################################################
 ## Drop Unknown level from the lifestyle factor variables ##
 ############################################################
-## Recode lifestyle variables to fit the model for missingness
-## Missing lifestyle
-PHENO.ANY_SN$Current_smoker_yn[PHENO.ANY_SN$Current_smoker_yn == "Unknown"] <- "No"
-PHENO.ANY_SN$Current_smoker_yn <- droplevels(PHENO.ANY_SN$Current_smoker_yn)
-
-PHENO.ANY_SN$PhysicalActivity_yn[PHENO.ANY_SN$PhysicalActivity_yn == "Unknown"] <- "Yes"
-PHENO.ANY_SN$PhysicalActivity_yn <- droplevels(PHENO.ANY_SN$PhysicalActivity_yn)
-
-PHENO.ANY_SN$RiskyHeavyDrink_yn[PHENO.ANY_SN$RiskyHeavyDrink_yn == "Unknown"] <- "No"
-PHENO.ANY_SN$RiskyHeavyDrink_yn <- droplevels(PHENO.ANY_SN$RiskyHeavyDrink_yn)
-
-PHENO.ANY_SN$Obese_yn[PHENO.ANY_SN$Obese_yn == "Unknown"] <- "No"
-PHENO.ANY_SN$Obese_yn <- droplevels(PHENO.ANY_SN$Obese_yn)
-
-
+## Recode tx variables to fit the model for missingness
 ## Missing tx
 PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxsegrtdose.category <- droplevels(PHENO.ANY_SN$maxsegrtdose.category)
@@ -234,7 +156,7 @@ PHENO.ANY_SN$KEY <- paste(PHENO.ANY_SN$ccssid, PHENO.ANY_SN$SN_diagnosis_date, s
 
 table(PHENO.ANY_SN$KEY %in% KIRI.ccss$KEY)
 # FALSE  TRUE 
-# 6250  1556 
+# 6326  1580 
 
 
 
@@ -245,7 +167,7 @@ KIRI.ccss <- KIRI.ccss[grepl("\\/0|\\/1", KIRI.ccss$candxo3),]
 
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% KIRI.ccss$ccssid,]
 table(PHENO.ANY_SN$SARCOMA)
-# 7730   52
+# 7814   62
 ##########################################
 
 ################
@@ -275,5 +197,5 @@ cc
 
 
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA.V14.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA_without_lifestyle.V14.Rdata")
 
