@@ -112,7 +112,7 @@ lifestyle$smnow <- adult_habbits$smnow[match(lifestyle$SJLIFEID, adult_habbits$S
 lifestyle$cigmo <- adult_habbits$cigmo[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
 lifestyle$cigd <- adult_habbits$cigd[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
 lifestyle$smyr <- adult_habbits$smyr[match(lifestyle$SJLIFEID, adult_habbits$SJLIFEID)]
-lifestyle$smnvr <- NA
+
 
 
 # if evsm=2 then do ; smnow=2 ; cigmo=2 ; cigd=0 ; smyr=0 ; end ;
@@ -121,12 +121,13 @@ lifestyle$cigmo[which(lifestyle$evsm == 2)] <- 2
 lifestyle$cigd[which(lifestyle$evsm == 2)] <- 0
 lifestyle$smyr[which(lifestyle$evsm == 2)] <- 0
 
-# if smnvr=1 then do ; evsm=2 ; smnow=2 ; cigmo=2 ; cigd=0 ; smyr=0 ; end ;
-lifestyle$evsm[which(lifestyle$smnvr == 1)] <- 2
-lifestyle$smnow[which(lifestyle$smnvr == 1)] <- 2
-lifestyle$cigmo[which(lifestyle$smnvr == 1)] <- 2
-lifestyle$cigd[which(lifestyle$smnvr == 1)] <- 0
-lifestyle$smyr[which(lifestyle$smnvr == 1)] <- 0
+# lifestyle$smnvr <- NA
+# # if smnvr=1 then do ; evsm=2 ; smnow=2 ; cigmo=2 ; cigd=0 ; smyr=0 ; end ;
+# lifestyle$evsm[which(lifestyle$smnvr == 1)] <- 2
+# lifestyle$smnow[which(lifestyle$smnvr == 1)] <- 2
+# lifestyle$cigmo[which(lifestyle$smnvr == 1)] <- 2
+# lifestyle$cigd[which(lifestyle$smnvr == 1)] <- 0
+# lifestyle$smyr[which(lifestyle$smnvr == 1)] <- 0
 
 # if evsm=. and smnow=1 then do ; evsm=1 ; end ;
 lifestyle$evsm[which(is.na(lifestyle$evsm) & lifestyle$smnow == 1)] <- 1

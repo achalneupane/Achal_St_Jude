@@ -472,4 +472,4 @@ plink --bfile ttn_significant_ld --indep-pairwise 2 1 0.2 --out prune_0.02
 # ## Keep PED with plink.prune.in variants
 # plink --bfile ttn_significant_ld --extract plink.prune.in --keep-allele-order --recode --out haplotype_input
 plink --bfile ttn_significant_ld --extract prune_0.02.prune.in --keep-allele-order --recodeA --out haplotype_input_0.2
-PHASE haplotype_input_edited_0.2.txt haplotype_phase_0.2.out
+PHASE -c haplotype_input_edited_0.2.txt haplotype_phase_0.2.out

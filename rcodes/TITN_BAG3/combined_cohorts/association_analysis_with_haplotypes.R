@@ -83,6 +83,7 @@ pheno$CMP <- as.factor(pheno$CMP)
 
 haplos <- colnames(pheno)[grepl("haplo_", colnames(pheno))]
 
+wanted.vars <- {}
 ## Check association of haplotypes
 for (i in 1:length(haplos)){
   print(paste0("Doing: ", haplos[i]))
@@ -90,7 +91,20 @@ for (i in 1:length(haplos)){
   haplo.test.adj <- glm(formula = formulas, family = binomial,
                         data = pheno)
   print(summary(haplo.test.adj))
-  Sys.sleep(5)
+  # Sys.sleep(5)
+  wanted.haplo <- gsub("haplo_", "", haplos[i], )
+  wanted.freq <- freq$freq[match(wanted.haplo, freq$haplotype)]
+  wanted.freq <- freq$freq[match(wanted.haplo, freq$haplotype)]
+  summary_table <- summary(haplo.test.adj)$coefficients[, c(1, 2, 4)]
+  ROW <- match(haplos[i], rownames(summary_table))
+  P <- summary_table[ROW,3]
+  OR <- exp(summary_table[ROW,1])
+  CI1 <- paste0(" (",round(exp(summary_table[ROW,1]) -1.96*summary_table[ROW,2],2), 
+                " to ", round(exp(summary_table[ROW,1]) +1.96*summary_table[ROW,2], 2),")")
+  OR <- paste0(OR, CI1)
+  
+  wanted.vars.tmp <- c(wanted.haplo, wanted.freq, OR, P)
+  wanted.vars <- rbind(wanted.vars, wanted.vars.tmp)
 }
 
 # ## Only these two haplotypes were found significant:
