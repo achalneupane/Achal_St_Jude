@@ -56,7 +56,9 @@ dat_all$pred_all = predict(fit_all, newdat = dat_all, type = "response")
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx = dat_all
 
-dat_tx$maxsegrtdose.category =
+dat_tx$any_tx_missing <- "No"
+
+dat_tx$maxsegrtdose.category = 
   dat_tx$epitxn_dose_5.category = "None"
 
 dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
@@ -73,7 +75,7 @@ round(af_by_tx,3)
 ## P/LP Zhaoming, Qin without Zhaoming and PRS
 dat_plp.prs = dat_all
 # dat_plp.prs$Zhaoming_carriers = dat_plp.prs$Qin_without_Zhaoming_vars_carriers = "N"
-dat_plp.prs$dat_prs$Meningioma_PRS.tertile.category = "1st"
+dat_plp.prs$Meningioma_PRS.tertile.category = "1st"
 
 dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "response")
 N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
@@ -84,6 +86,8 @@ round(af_by_plp.prs,3)
 ## Lifestyle ##
 ###############
 dat_lifestyle = dat_all
+
+dat_lifestyle$any_lifestyle_missing <- "No"
 
 dat_lifestyle$Current_smoker_yn = "No"
 dat_lifestyle$PhysicalActivity_yn = "Yes"
@@ -102,8 +106,11 @@ round(af_by_N_no_favorable_lifestyle.category,3)
 #################################################
 dat_tx.plp.prs.lifestyle = dat_all
 
+dat_tx.plp.prs.lifestyle$any_tx_missing <- "No"
+dat_tx.plp.prs.lifestyle$any_lifestyle_missing <- "No"
+
 ## Nullify Treatment
-dat_tx.plp.prs.lifestyle$maxsegrtdose.category =
+dat_tx.plp.prs.lifestyle$maxsegrtdose.category = 
   dat_tx.plp.prs.lifestyle$epitxn_dose_5.category = "None"
 
 
