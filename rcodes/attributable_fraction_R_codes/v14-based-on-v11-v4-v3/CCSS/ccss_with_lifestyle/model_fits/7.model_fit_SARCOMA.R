@@ -57,6 +57,8 @@ dat_all$pred_all = predict(fit_all, newdat = dat_all, type = "response")
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx = dat_all
 
+dat_tx$any_tx_missing <- "No"
+
 dat_tx$aa_class_dose_5.category = "None"
 
 dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
@@ -85,6 +87,8 @@ round(af_by_plp.prs,3)
 ###############
 dat_lifestyle = dat_all
 
+dat_lifestyle$any_lifestyle_missing <- "No"
+
 dat_lifestyle$Current_smoker_yn = "No"
 dat_lifestyle$PhysicalActivity_yn = "Yes"
 dat_lifestyle$RiskyHeavyDrink_yn = "No"
@@ -102,6 +106,9 @@ round(af_by_N_no_favorable_lifestyle.category,3)
 #################################################
 
 dat_tx.plp.prs.lifestyle = dat_all
+
+dat_tx.plp.prs.lifestyle$any_tx_missing <- "No"
+dat_tx.plp.prs.lifestyle$any_lifestyle_missing <- "No"
 
 ## Nullify Treatment
 dat_tx.plp.prs.lifestyle$aa_class_dose_5.category = "None"
