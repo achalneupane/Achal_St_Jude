@@ -94,7 +94,8 @@ for (i in 1:length(haplos)){
   # Sys.sleep(5)
   wanted.haplo <- gsub("haplo_", "", haplos[i], )
   wanted.freq <- freq$freq[match(wanted.haplo, freq$haplotype)]
-  wanted.freq <- freq$freq[match(wanted.haplo, freq$haplotype)]
+  wanted.freq.SD <- freq$SE[match(wanted.haplo, freq$haplotype)]
+  wanted.freq <- paste0(wanted.freq, " (", wanted.freq.SD, ")")
   summary_table <- summary(haplo.test.adj)$coefficients[, c(1, 2, 4)]
   ROW <- match(haplos[i], rownames(summary_table))
   P <- summary_table[ROW,3]
