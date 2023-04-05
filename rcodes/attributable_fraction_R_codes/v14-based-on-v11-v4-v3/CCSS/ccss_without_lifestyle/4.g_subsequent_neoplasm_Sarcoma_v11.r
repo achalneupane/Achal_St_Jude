@@ -44,18 +44,18 @@ SARCOMA <- setDT(SARCOMA)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, dec
 nrow(SARCOMA)
 # 109
 
-# # based on Yadav's email on 03/09/2023, I am removing all benign diagnoses from the list of 52 survivors
-# to.remove <- as.character(c(1004973, 1005736, 3012171, 4073492, 5097496, 5146972, 8217873, 9059523, 9203577,
-#                                            10085746, 11108731, 12083337, 13054941, 13231652, 16041746, 16045012, 17050333,
-#                                            18080902, 18141511, 20024771, 20027745, 20032881, 20033541, 21228953, 22091488,
-#                                            22155815, 22156111, 22200376, 25017727, 26016681, 26018907, 26020735, 26056273,
-#                                            1262696, 2511092, 2518314, 5362062, 6302298, 8356277, 15283414, 19295502, 22434302,
-#                                            26403512))
+# based on Yadav's email on 03/09/2023, I am removing all benign diagnoses from the list of 52 survivors
+to.remove <- as.character(c(1004973, 1005736, 3012171, 4073492, 5097496, 5146972, 8217873, 9059523, 9203577,
+                                           10085746, 11108731, 12083337, 13054941, 13231652, 16041746, 16045012, 17050333,
+                                           18080902, 18141511, 20024771, 20027745, 20032881, 20033541, 21228953, 22091488,
+                                           22155815, 22156111, 22200376, 25017727, 26016681, 26018907, 26020735, 26056273,
+                                           1262696, 2511092, 2518314, 5362062, 6302298, 8356277, 15283414, 19295502, 22434302,
+                                           26403512))
                                            
 
 
 ## remove samples
-# PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% to.remove,]
+PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% to.remove,]
 
 ## Remove SNs if younger than 18 **
 dim(PHENO.ANY_SN)
@@ -132,42 +132,42 @@ PHENO.ANY_SN$anthra_jco_dose_5.category <- droplevels(PHENO.ANY_SN$anthra_jco_do
 PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "Unknown"] <- "None"
 PHENO.ANY_SN$aa_class_dose_5.category <- droplevels(PHENO.ANY_SN$aa_class_dose_5.category)
 
-###############################################
-## Find out benign Sarcoma's and remove them ##
-###############################################
-# # based on Yadav's email on 03/09/2023, I am removing all benign diagnoses from the list of 52 survivors
-## This file is from Kyla
-KIRI.ccss <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Kyla/combinedsn_final_02_17_2023.csv", header = T, sep = ",", stringsAsFactors = F)
-dim(KIRI.ccss)
-## Keep non-missing candxo3
-KIRI.ccss <- KIRI.ccss[!is.na(KIRI.ccss$candxo3),]
-# KIRI.ccss <- KIRI.ccss[KIRI.ccss$candxo3 !="",]
-KIRI.ccss <- KIRI.ccss[KIRI.ccss$d_candx !="",]
-dim(KIRI.ccss)
-KIRI.ccss$SN_diagnosis_date <- as.Date(KIRI.ccss$d_candx, format = "%d%b%Y")
-KIRI.ccss$SN_diagnosis_date <- format(KIRI.ccss$SN_diagnosis_date, "%m-%d-%Y") # 06-30-2008
-KIRI.ccss$KEY <- paste(KIRI.ccss$ccssid, KIRI.ccss$SN_diagnosis_date, sep = ":")
+# ###############################################
+# ## Find out benign Sarcoma's and remove them ##
+# ###############################################
+# # # based on Yadav's email on 03/09/2023, I am removing all benign diagnoses from the list of 52 survivors
+# ## This file is from Kyla
+# KIRI.ccss <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Kyla/combinedsn_final_02_17_2023.csv", header = T, sep = ",", stringsAsFactors = F)
+# dim(KIRI.ccss)
+# ## Keep non-missing candxo3
+# KIRI.ccss <- KIRI.ccss[!is.na(KIRI.ccss$candxo3),]
+# # KIRI.ccss <- KIRI.ccss[KIRI.ccss$candxo3 !="",]
+# KIRI.ccss <- KIRI.ccss[KIRI.ccss$d_candx !="",]
+# dim(KIRI.ccss)
+# KIRI.ccss$SN_diagnosis_date <- as.Date(KIRI.ccss$d_candx, format = "%d%b%Y")
+# KIRI.ccss$SN_diagnosis_date <- format(KIRI.ccss$SN_diagnosis_date, "%m-%d-%Y") # 06-30-2008
+# KIRI.ccss$KEY <- paste(KIRI.ccss$ccssid, KIRI.ccss$SN_diagnosis_date, sep = ":")
+# 
+# PHENO.ANY_SN$SN_diagnosis_date <- as.Date(PHENO.ANY_SN$d_candx, format = "%d%b%Y")
+# PHENO.ANY_SN$SN_diagnosis_date  <- format(PHENO.ANY_SN$SN_diagnosis_date, "%m-%d-%Y") # "08-23-2016"
+# PHENO.ANY_SN$ccssid <- gsub("_.*","",PHENO.ANY_SN$ccssid)
+# PHENO.ANY_SN$KEY <- paste(PHENO.ANY_SN$ccssid, PHENO.ANY_SN$SN_diagnosis_date, sep = ":")
+# 
+# 
+# table(PHENO.ANY_SN$KEY %in% KIRI.ccss$KEY)
+# # FALSE  TRUE 
+# # 6326  1580 
 
-PHENO.ANY_SN$SN_diagnosis_date <- as.Date(PHENO.ANY_SN$d_candx, format = "%d%b%Y")
-PHENO.ANY_SN$SN_diagnosis_date  <- format(PHENO.ANY_SN$SN_diagnosis_date, "%m-%d-%Y") # "08-23-2016"
-PHENO.ANY_SN$ccssid <- gsub("_.*","",PHENO.ANY_SN$ccssid)
-PHENO.ANY_SN$KEY <- paste(PHENO.ANY_SN$ccssid, PHENO.ANY_SN$SN_diagnosis_date, sep = ":")
 
 
-table(PHENO.ANY_SN$KEY %in% KIRI.ccss$KEY)
-# FALSE  TRUE 
-# 6326  1580 
-
-
-
-SARCOMA <- PHENO.ANY_SN[PHENO.ANY_SN$SARCOMA == 1,]
-KIRI.ccss <- KIRI.ccss[KIRI.ccss$KEY %in% SARCOMA$KEY,]
-KIRI.save <- KIRI.ccss
-KIRI.ccss <- KIRI.ccss[grepl("\\/0|\\/1", KIRI.ccss$candxo3),]
-
-PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% KIRI.ccss$ccssid,]
+# SARCOMA <- PHENO.ANY_SN[PHENO.ANY_SN$SARCOMA == 1,]
+# KIRI.ccss <- KIRI.ccss[KIRI.ccss$KEY %in% SARCOMA$KEY,]
+# KIRI.save <- KIRI.ccss
+# KIRI.ccss <- KIRI.ccss[grepl("\\/0|\\/1", KIRI.ccss$candxo3),]
+# 
+# PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% KIRI.ccss$ccssid,]
 table(PHENO.ANY_SN$SARCOMA)
-# 7814   62
+# 7814   53
 ##########################################
 
 ################
