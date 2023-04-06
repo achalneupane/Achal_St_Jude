@@ -1,16 +1,19 @@
 # load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.SARCOMA.V14-4-3.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA.V14.Rdata")
+
+# PHENO.ANY_SN$any_lifestyle_missing <- relevel(PHENO.ANY_SN$any_lifestyle_missing, ref = "Yes")
+# PHENO.ANY_SN$any_tx_missing <- relevel(PHENO.ANY_SN$any_tx_missing, ref = "Yes")
 
 # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 cc
 filtered_cc <- cc[cc[, 2] < 10 | cc[, 3] < 10, 1]
 filtered_cc
 
-# PHENO.ANY_SN$aa_class_dose_5.category <- as.character(PHENO.ANY_SN$aa_class_dose_5.category)
-# PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "None"] <- "1st"
-# PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "2nd"] <- "2nd-3rd"
-# PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "3rd"] <- "2nd-3rd"
-# PHENO.ANY_SN$aa_class_dose_5.category <- factor(PHENO.ANY_SN$aa_class_dose_5.category, levels = c("1st", "2nd-3rd"))
+PHENO.ANY_SN$aa_class_dose_5.category <- as.character(PHENO.ANY_SN$aa_class_dose_5.category)
+PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "None"] <- "1st"
+PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "2nd"] <- "2nd-3rd"
+PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "3rd"] <- "2nd-3rd"
+PHENO.ANY_SN$aa_class_dose_5.category <- factor(PHENO.ANY_SN$aa_class_dose_5.category, levels = c("1st", "2nd-3rd"))
 
 ######################################
 ## Attributable fraction of Any SNs ##
@@ -59,7 +62,7 @@ dat_tx = dat_all
 
 dat_tx$any_tx_missing <- "No"
 
-dat_tx$aa_class_dose_5.category = "None"
+dat_tx$aa_class_dose_5.category = "1st"
 
 dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
 
@@ -85,7 +88,7 @@ round(af_by_plp.prs,3)
 ###############
 dat_lifestyle = dat_all
 
-dat_lifestyle$any_lifestyle_missing <- "No"
+# dat_lifestyle$any_lifestyle_missing <- "No"
 
 dat_lifestyle$Current_smoker_yn = "No"
 dat_lifestyle$PhysicalActivity_yn = "Yes"
@@ -98,17 +101,18 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_li
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
+# 0.774
 #################################################
 ## Treatment, Genetics and Lifestyle, combined ##
 #################################################
 
 dat_tx.plp.prs.lifestyle = dat_all
 
-dat_tx.plp.prs.lifestyle$any_tx_missing <- "No"
-dat_tx.plp.prs.lifestyle$any_lifestyle_missing <- "No"
+# dat_tx.plp.prs.lifestyle$any_tx_missing <- "No"
+# dat_tx.plp.prs.lifestyle$any_lifestyle_missing <- "No"
 
 ## Nullify Treatment
-dat_tx.plp.prs.lifestyle$aa_class_dose_5.category = "None"
+dat_tx.plp.prs.lifestyle$aa_class_dose_5.category = "1st"
 
 
 ## Nullify Genetics
@@ -128,11 +132,13 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx
 N_no_favorable_tx.plp.prs.lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_tx.plp.prs.lifestyle.category = (N_all - N_no_favorable_tx.plp.prs.lifestyle.category) / N_all
 round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3)
+# 0.877
 SARCOMA.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favorable_lifestyle.category,3), round(af_by_N_no_favorable_tx.plp.prs.lifestyle.category,3))
 SARCOMA.res
-# 0.373 0.023 0.541 0.744
+# 0.204 -0.006  0.147  0.324
+# 0.272 0.064 0.109 0.402
 
-all.res <- cbind.data.frame(SN=SN.res, SMN=SMN.res, NMSC=NMSC.res, BREAST=BREAST.res, THYROID=THYROID.res, MENINGIOMA=MENINGIOMA.res, SARCOMA.res)
+all.res <- cbind.data.frame(SN=SN.res, SMN=SMN.res, NMSC=NMSC.res, BREAST=BREAST.res, THYROID=THYROID.res, MENINGIOMA=MENINGIOMA.res, SARCOMA=SARCOMA.res)
 # View(all.res)
 View(t(all.res))
 

@@ -1,5 +1,5 @@
 # load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.MENINGIOMA.V14-4-3.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.MENINGIOMA.V14.Rdata")
 
 # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 cc
@@ -19,6 +19,7 @@ PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "1st"
 PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "2nd"] <- "Any"
 PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "3rd"] <- "Any"
 PHENO.ANY_SN$epitxn_dose_5.category <- factor(PHENO.ANY_SN$epitxn_dose_5.category, levels = c("None", "Any"))
+
 ######################################
 ## Attributable fraction of Any SNs ##
 ######################################
@@ -63,7 +64,7 @@ dat_all$pred_all = predict(fit_all, newdat = dat_all, type = "response")
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx = dat_all
 
-dat_tx$any_tx_missing <- "No"
+# dat_tx$any_tx_missing <- "No"
 
 dat_tx$maxsegrtdose.category = "<30"
 dat_tx$epitxn_dose_5.category = "None"
@@ -94,7 +95,7 @@ round(af_by_plp.prs,3)
 ###############
 dat_lifestyle = dat_all
 
-dat_lifestyle$any_lifestyle_missing <- "No"
+# dat_lifestyle$any_lifestyle_missing <- "No"
 
 dat_lifestyle$Current_smoker_yn = "No"
 dat_lifestyle$PhysicalActivity_yn = "Yes"
@@ -113,12 +114,13 @@ round(af_by_N_no_favorable_lifestyle.category,3)
 #################################################
 dat_tx.plp.prs.lifestyle = dat_all
 
-dat_tx.plp.prs.lifestyle$any_tx_missing <- "No"
-dat_tx.plp.prs.lifestyle$any_lifestyle_missing <- "No"
+# dat_tx.plp.prs.lifestyle$any_tx_missing <- "No"
+# dat_tx.plp.prs.lifestyle$any_lifestyle_missing <- "No"
 
 ## Nullify Treatment
 dat_tx.plp.prs.lifestyle$maxsegrtdose.category = "<30"
 dat_tx.plp.prs.lifestyle$epitxn_dose_5.category = "None"
+
 
 ## Nullify Genetics
 # dat_tx.plp.prs.lifestyle$Zhaoming_carriers = dat_tx.plp.prs.lifestyle$Qin_without_Zhaoming_vars_carriers = "N";
