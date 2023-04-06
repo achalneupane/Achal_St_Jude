@@ -1,5 +1,5 @@
 # load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.THYROIDcancer_without_lifestyle.V14.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.THYROIDcancer.V14-4-3.Rdata")
 
 # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 cc
@@ -13,6 +13,7 @@ PHENO.ANY_SN$maxneckrtdose.category[PHENO.ANY_SN$maxneckrtdose.category == ">=20
 PHENO.ANY_SN$maxneckrtdose.category <- factor(PHENO.ANY_SN$maxneckrtdose.category, levels = c("None", ">0-<30", ">=30"))
 
 table(PHENO.ANY_SN$maxneckrtdose.category[PHENO.ANY_SN$THYROIDcancer == 1])
+
 
 ######################################
 ## Attributable fraction of Any SNs ##
@@ -59,7 +60,7 @@ dat_all$pred_all = predict(fit_all, newdat = dat_all, type = "response")
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx = dat_all
 
-dat_tx$any_tx_missing <- "No"
+# dat_tx$any_tx_missing <- "No"
 
 dat_tx$maxneckrtdose.category =
   dat_tx$epitxn_dose_5.category = "None"
@@ -90,7 +91,7 @@ round(af_by_plp.prs,3)
 ###############
 dat_lifestyle = dat_all
 
-dat_lifestyle$any_lifestyle_missing <- "No"
+# dat_lifestyle$any_lifestyle_missing <- "No"
 
 dat_lifestyle$Current_smoker_yn = "No"
 dat_lifestyle$PhysicalActivity_yn = "Yes"
@@ -109,8 +110,8 @@ round(af_by_N_no_favorable_lifestyle.category,3)
 
 dat_tx.plp.prs.lifestyle = dat_all
 
-dat_tx.plp.prs.lifestyle$any_tx_missing <- "No"
-dat_tx.plp.prs.lifestyle$any_lifestyle_missing <- "No"
+# dat_tx.plp.prs.lifestyle$any_tx_missing <- "No"
+# dat_tx.plp.prs.lifestyle$any_lifestyle_missing <- "No"
 
 ## Nullify Treatment
 dat_tx.plp.prs.lifestyle$maxneckrtdose.category =
