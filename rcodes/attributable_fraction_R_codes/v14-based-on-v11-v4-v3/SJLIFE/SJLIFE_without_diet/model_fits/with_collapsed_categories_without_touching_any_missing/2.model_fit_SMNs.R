@@ -2,6 +2,30 @@
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.SMNs.V14-4-3.Rdata")
 
 
+df <- cbind.data.frame(any_lifestyle_missing= PHENO.ANY_SN$any_lifestyle_missing,any_tx_missing= PHENO.ANY_SN$any_tx_missing,SMNs= PHENO.ANY_SN$SMNs)
+library(dplyr)
+
+tx <- round(as.numeric(as.data.frame(t(df %>%
+                                         group_by(SMNs, any_tx_missing) %>%
+                                         dplyr::summarise(n = n()) %>%
+                                         group_by(SMNs) %>%
+                                         dplyr::mutate(percentage = n / sum(n) * 100) %>%
+                                         ungroup() %>%
+                                         pivot_wider(names_from = any_tx_missing, values_from = c(n, percentage)) )[c(1,5),])[2,]),2)
+
+
+lifestyle <- round(as.numeric(as.data.frame(t(df %>%
+                                                group_by(SMNs, any_lifestyle_missing) %>%
+                                                dplyr::summarise(n = n()) %>%
+                                                group_by(SMNs) %>%
+                                                dplyr::mutate(percentage = n / sum(n) * 100) %>%
+                                                ungroup() %>%
+                                                pivot_wider(names_from = any_lifestyle_missing, values_from = c(n, percentage)) )[c(1,5),])[2,]), 2)
+
+
+missing.smn <- c(tx, lifestyle)
+# 1.33  1.59 35.10 31.35
+
 # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 cc
 filtered_cc <- cc[cc[, 2] < 10 | cc[, 3] < 10, 1]
