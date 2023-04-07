@@ -1,6 +1,33 @@
 # load ANY SN data
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA.V14.Rdata")
 
+df <- cbind.data.frame(any_lifestyle_missing= PHENO.ANY_SN$any_lifestyle_missing,any_tx_missing= PHENO.ANY_SN$any_tx_missing,SARCOMA= PHENO.ANY_SN$SARCOMA)
+library(dplyr)
+
+tx <- round(as.numeric(as.data.frame(t(df %>%
+                                         group_by(SARCOMA, any_tx_missing) %>%
+                                         dplyr::summarise(n = n()) %>%
+                                         group_by(SARCOMA) %>%
+                                         dplyr::mutate(percentage = n / sum(n) * 100) %>%
+                                         ungroup() %>%
+                                         pivot_wider(names_from = any_tx_missing, values_from = c(n, percentage)) )[c(1,5),])[2,]),2)
+
+
+lifestyle <- round(as.numeric(as.data.frame(t(df %>%
+                                                group_by(SARCOMA, any_lifestyle_missing) %>%
+                                                dplyr::summarise(n = n()) %>%
+                                                group_by(SARCOMA) %>%
+                                                dplyr::mutate(percentage = n / sum(n) * 100) %>%
+                                                ungroup() %>%
+                                                pivot_wider(names_from = any_lifestyle_missing, values_from = c(n, percentage)) )[c(1,5),])[2,]), 2)
+
+
+missing.SARCOMA <- c(tx, lifestyle)
+
+cg <- rbind(SN=missing.ANY_SNs, SMN=missing.SMNs, NMSC=missing.NMSCs, Breast=missing.BREASTcancer, Thyroid=missing.THYROID, Meningioma=missing.MENINGIOMA, Sarcoma=missing.SARCOMA)
+View(cg)
+
+
 # PHENO.ANY_SN$any_lifestyle_missing <- relevel(PHENO.ANY_SN$any_lifestyle_missing, ref = "Yes")
 # PHENO.ANY_SN$any_tx_missing <- relevel(PHENO.ANY_SN$any_tx_missing, ref = "Yes")
 

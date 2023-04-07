@@ -40,3 +40,11 @@ Dendrogram visualization: Visualize the results of the hierarchical clustering u
 Cluster assignment: Based on the dendrogram, assign samples or genes/transcripts to clusters based on their position in the tree. The number of clusters can be chosen based on visual inspection of the dendrogram or using statistical methods such as the elbow method or silhouette score.
 
 There are various tools and software packages available for performing hierarchical clustering of RNA sequencing data, including R packages such as hclust and dendextend, as well as web-based tools such as ClustVis and Heatmapper. These tools typically provide functions or interfaces for performing the various steps of the clustering process.
+
+
+
+# Check all downloaded MD5
+for file in *.fastq.gz; do
+echo $file
+md5sum $file >> all.checked.md5
+done

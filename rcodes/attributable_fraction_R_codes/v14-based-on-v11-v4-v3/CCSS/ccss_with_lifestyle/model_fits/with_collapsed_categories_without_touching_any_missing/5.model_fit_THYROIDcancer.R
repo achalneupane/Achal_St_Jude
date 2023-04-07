@@ -1,6 +1,29 @@
 # load ANY SN data
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.THYROIDcancer.V14.Rdata")
 
+df <- cbind.data.frame(any_lifestyle_missing= PHENO.ANY_SN$any_lifestyle_missing,any_tx_missing= PHENO.ANY_SN$any_tx_missing,THYROID= PHENO.ANY_SN$THYROID)
+library(dplyr)
+
+tx <- round(as.numeric(as.data.frame(t(df %>%
+                                         group_by(THYROID, any_tx_missing) %>%
+                                         dplyr::summarise(n = n()) %>%
+                                         group_by(THYROID) %>%
+                                         dplyr::mutate(percentage = n / sum(n) * 100) %>%
+                                         ungroup() %>%
+                                         pivot_wider(names_from = any_tx_missing, values_from = c(n, percentage)) )[c(1,5),])[2,]),2)
+
+
+lifestyle <- round(as.numeric(as.data.frame(t(df %>%
+                                                group_by(THYROID, any_lifestyle_missing) %>%
+                                                dplyr::summarise(n = n()) %>%
+                                                group_by(THYROID) %>%
+                                                dplyr::mutate(percentage = n / sum(n) * 100) %>%
+                                                ungroup() %>%
+                                                pivot_wider(names_from = any_lifestyle_missing, values_from = c(n, percentage)) )[c(1,5),])[2,]), 2)
+
+
+missing.THYROID <- c(tx, lifestyle)
+
 # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 cc
 filtered_cc <- cc[cc[, 2] < 10 | cc[, 3] < 10, 1]

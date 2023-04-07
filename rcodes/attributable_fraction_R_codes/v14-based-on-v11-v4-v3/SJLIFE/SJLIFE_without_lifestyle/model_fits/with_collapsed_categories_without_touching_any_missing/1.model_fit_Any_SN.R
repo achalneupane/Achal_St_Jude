@@ -1,6 +1,19 @@
 # load ANY SN data
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.Any_SNs.V14-4-3.Rdata")
 
+df <- cbind.data.frame(any_tx_missing= PHENO.ANY_SN$any_tx_missing,ANY_SNs= PHENO.ANY_SN$ANY_SNs)
+library(dplyr)
+
+tx <- round(as.numeric(as.data.frame(t(df %>%
+                                         group_by(ANY_SNs, any_tx_missing) %>%
+                                         dplyr::summarise(n = n()) %>%
+                                         group_by(ANY_SNs) %>%
+                                         dplyr::mutate(percentage = n / sum(n) * 100) %>%
+                                         ungroup() %>%
+                                         pivot_wider(names_from = any_tx_missing, values_from = c(n, percentage)) )[c(1,5),])[2,]),2)
+
+missing.ANY_SNs <- c(tx)
+
 # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 cc
 filtered_cc <- cc[cc[, 2] < 10 | cc[, 3] < 10, 1]

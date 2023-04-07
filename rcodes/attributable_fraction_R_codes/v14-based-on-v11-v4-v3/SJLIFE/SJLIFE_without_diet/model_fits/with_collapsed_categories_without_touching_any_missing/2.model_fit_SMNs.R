@@ -23,7 +23,7 @@ lifestyle <- round(as.numeric(as.data.frame(t(df %>%
                                                 pivot_wider(names_from = any_lifestyle_missing, values_from = c(n, percentage)) )[c(1,5),])[2,]), 2)
 
 
-missing.smn <- c(tx, lifestyle)
+missing.SMNs <- c(tx, lifestyle)
 # 1.33  1.59 35.10 31.35
 
 # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
