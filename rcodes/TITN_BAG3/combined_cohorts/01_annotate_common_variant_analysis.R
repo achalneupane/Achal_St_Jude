@@ -189,3 +189,63 @@ ASSOC.results$new_OR <- paste0(ASSOC.results$OR, " (", ASSOC.results$L95, "-", A
 
 ASSOC.results <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/sjlife_ccss_org_ccss_exp_ttn_bag3.assoc.final", header = T, sep = "\t")
 
+
+##################
+## Forest plots ##
+##################
+df <- read.table(text = "SNP	rsID
+chr2:178461008:C:G	rs17304212
+chr2:178633315:T:C	rs6723526
+chr2:178580212:C:T	rs2303838
+chr2:178566270:G:A	rs3731746
+chr2:178586693:G:A	rs2042996
+chr2:178556967:A:G	rs9808377
+chr2:178599800:T:C	rs1001238
+chr2:178571293:G:A	rs744426
+chr2:178532834:C:T	rs3829747
+chr2:178562809:T:C	rs3829746
+chr2:178541464:C:T	rs3731749
+chr2:178592420:G:A	rs16866406
+chr10:119670121:T:C	rs2234962
+chr2:178593864:C:T	rs2288569
+chr2:178693639:T:C	rs2042995", header = T)
+
+sum(ASSOC.results$SNP %in% df$SNP)
+ASSOC.results <- ASSOC.results[ASSOC.results$SNP %in% df$SNP,]
+ASSOC.results$rsID <- df$rsID[match(ASSOC.results$SNP, df$SNP)]
+
+ASSOC.results$lower <- ASSOC.results$L95
+ASSOC.results$upper <- ASSOC.results$U95
+
+summary_table <- ASSOC.results[c("rsID", "OR", "lower", "upper", "P")]
+
+library(ggplot2)
+ggplot(data = summary_table, aes(x = OR, y = rsID)) +
+  geom_point(size = 3) +
+  geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0) +
+  geom_vline(xintercept = 1, linetype = "dashed") +
+  scale_x_continuous(limits = c(0.6, 2), breaks = seq(0.6, 2, 0.2)) +
+  xlab("OR (95% CI)") +
+  ylab("rsID") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        # panel.border = element_blank(),
+        panel.background = element_blank())
+
+
+ggplot(data = summary_table, aes(x = OR, y = rsID)) +
+  geom_point(size = 3) +
+  geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0) +
+  geom_vline(xintercept = 1, linetype = "dashed") +
+  scale_x_continuous(limits = c(0.6, 2), breaks = seq(0.6, 2, 0.2)) +
+  xlab("OR (95% CI)") +
+  ylab("rsID") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank()) +
+  geom_text(aes(x = 0.58, label = paste0("p = ", format(round(P, 3), nsmall = 3))), 
+            size = 3, hjust = 0, fontface = "italic", color = "gray40")

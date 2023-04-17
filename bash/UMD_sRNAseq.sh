@@ -46,5 +46,11 @@ There are various tools and software packages available for performing hierarchi
 # Check all downloaded MD5
 for file in *.fastq.gz; do
 echo $file
-md5sum $file >> all.checked.md5
+md5sum $file >> all.checked2.md5
 done
+
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/CAB/common/UMD_sRNA_seq
+
+# Count Fastq
+module load parallel
+ls *_R1_001.fastq.gz| sort -V | parallel -j30 'var=$(echo {}|sed s/_R1_001.fastq.gz/_R2_001.fastq.gz/g); echo {} has $(zcat -n {} | wc -l) lines and $var has $(zcat $var | wc -l)'  >> all_fastq_line_counts.txt

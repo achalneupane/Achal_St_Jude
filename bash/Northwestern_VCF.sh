@@ -166,5 +166,5 @@ done
 
 
 ## double check the genotype
-bcftools query -s JW10-1 -f '%CHROM %POS  %REF  %ALT [ %GT]\n'  chr1.snp.indel.recalibrated_edited.PASS.vcf.gz > chr1.genotype_JW10-1.txt
-bcftools query -s JW6 -f '%CHROM %POS  %REF  %ALT [ %GT]\n'  chr1.snp.indel.recalibrated_edited.PASS.vcf.gz > chr1.genotype_JW6.txt
+bcftools query -s JW10-1 -f '%CHROM %POS  %REF  %ALT [ %GT]\n'  chr1.snp.indel.recalibrated_edited.vcf.gz > chr1.genotype_JW10-1.txt
+bcftools query -s JW6 -f '%CHROM %POS  %REF  %ALT [ %GT]\n'  chr1.snp.indel.recalibrated_edited.vcf.gz > chr1.genotype_JW6.txt

@@ -68,3 +68,242 @@ for (p in 1:length(echo_phenotypes)){
 res_ttn$p_BH = p.adjust(res_ttn$pval, method = "BH")
 
 print(res_bag3); print(res_ttn)
+
+#################
+## Forest plot ##
+#################
+res_bag3$phenotype <- gsub("_", " ", res_bag3$phenotype)
+res_ttn$phenotype <- gsub("_", " ", res_ttn$phenotype)
+
+## BAG3
+summary_table <- res_bag3[c("phenotype", "beta", "se", "p_BH", "n")]
+summary_table$P <- summary_table[,"p_BH"]
+summary_table$OR <- exp(summary_table[,"beta"])
+
+
+# # For Beta
+summary_table$lower <- round(summary_table[,"beta"] -1.96*summary_table[,"se"],2)
+summary_table$upper <- round(summary_table[,"beta"] +1.96*summary_table[,"se"], 2)
+
+# # For OR
+# summary_table$lower <- round(exp(summary_table[,"beta"]) -1.96*summary_table[,"se"],2)
+# summary_table$upper <- round(exp(summary_table[,"beta"]) +1.96*summary_table[,"se"], 2)
+
+
+
+library(ggplot2)
+library(meta)
+
+# # Create a new data frame with non-missing n values
+summary_table_n_bag3 <- subset(summary_table, !is.na(n))
+# 
+# # Plot the data with labels for n
+# ggplot(data = summary_table_n_bag3, aes(x = beta, y = phenotype)) +
+#   geom_point(size = 3) +
+#   geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0) +
+#   geom_vline(xintercept = 0, linetype = "dashed") +
+#   geom_text(aes(x = -0.4, y = phenotype, label = paste0("n = ", n)), hjust = 0, size = 3) +
+#   scale_x_continuous(limits = c(-0.4, 0.25), breaks = seq(-0.4, 0.25, 0.1)) +
+#   xlab("Estimates (95% CI)") +
+#   ylab("Echo measures") +
+#   theme_bw() +
+#   theme(plot.title = element_text(hjust = 0.5),
+#         panel.grid.major = element_blank(),
+#         panel.grid.minor = element_blank(),
+#         # panel.border = element_blank(),
+#         panel.background = element_blank())
+
+
+## TTN
+summary_table <- res_ttn[c("phenotype", "beta", "se", "p_BH", "n")]
+summary_table$P <- summary_table[,"p_BH"]
+summary_table$OR <- exp(summary_table[,"beta"])
+
+# # For Beta
+summary_table$lower <- round(summary_table[,"beta"] -1.96*summary_table[,"se"],2)
+summary_table$upper <- round(summary_table[,"beta"] +1.96*summary_table[,"se"], 2)
+
+# # For OR
+# summary_table$lower <- round(exp(summary_table[,"beta"]) -1.96*summary_table[,"se"],2)
+# summary_table$upper <- round(exp(summary_table[,"beta"]) +1.96*summary_table[,"se"], 2)
+
+
+library(ggplot2)
+library(meta)
+
+# Create a new data frame with non-missing n values
+summary_table_n_ttn <- subset(summary_table, !is.na(n))
+
+# # Plot the data with labels for n
+# p2 <- ggplot(data = summary_table_n_ttn, aes(x = beta, y = phenotype)) +
+#   geom_point(size = 3) +
+#   geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0) +
+#   geom_vline(xintercept = 1, linetype = "dashed") +
+#   geom_text(aes(x = -0.4, y = phenotype, label = paste0("n = ", n)), hjust = 0, size = 3) +
+#   scale_x_continuous(limits = c(-0.4, 0.25), breaks = seq(-0.4, 0.25, 0.2)) +
+#   xlab("Estimates (95% CI)") +
+#   ylab("Echo measures") +
+#   theme_bw() +
+#   theme(plot.title = element_text(hjust = 0.5),
+#         panel.grid.major = element_blank(),
+#         panel.grid.minor = element_blank(),
+#         # panel.border = element_blank(),
+#         panel.background = element_blank())
+
+
+## Combined plot
+# library(gridExtra)
+# grid.arrange(p1, p2, ncol = 2)
+
+# Add a 'variable' column to each data frame
+summary_table_n_bag3$variable <- "BAG3"
+summary_table_n_ttn$variable <- "TTN"
+
+# Combine the data frames
+summary_table <- rbind(summary_table_n_bag3, summary_table_n_ttn)
+
+# # Create the combined plot with facet_wrap
+# combined_plot <- ggplot(summary_table, aes(x = beta, y = phenotype)) +
+#   geom_point(size = 3) +
+#   geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0) +
+#   geom_vline(xintercept = 0, linetype = "dashed") +
+#   geom_text(aes(x = -0.4, y = phenotype, label = paste0("n = ", n)), hjust = 0, size = 3) +
+#   scale_x_continuous(limits = c(-0.4, 0.25), breaks = seq(-0.4, 0.25, 0.2)) +
+#   xlab("Estimates (95% CI)") +
+#   ylab("Echo measures") +
+#   facet_wrap(~ variable, ncol = 2) +
+#   theme_bw() +
+#   theme(plot.title = element_text(hjust = 0.5),
+#         panel.grid.major = element_blank(),
+#         panel.grid.minor = element_blank(),
+#         panel.background = element_blank())
+
+# N in phenotype
+summary_table$phenotype <- as.factor(summary_table$phenotype)
+combined_plot <- ggplot(summary_table, aes(x = beta, y = paste0(phenotype, " (n = ", n, ")"))) +
+  geom_point(size = 3) +
+  geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0) +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_text(aes(x = -0.4, y = paste0(phenotype, " (n = ", n, ")"), label = ""), hjust = 0, size = 3) +
+  scale_x_continuous(limits = c(-0.4, 0.25), breaks = seq(-0.4, 0.25, 0.2)) +
+  xlab("Estimates (95% CI)") +
+  ylab("Echo measures") +
+  facet_wrap(~ variable, ncol = 2) +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank())
+
+combined_plot
+ggsave("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Figures/echo_measures_n.tiff", combined_plot, dpi = 300, width = 5, height = 3, units = "in")
+
+
+
+
+##################################################################################################################
+# ############################################## 
+# #################
+# ## Forest plot ##
+# #################
+# res_bag3$phenotype <- gsub("_", " ", res_bag3$phenotype)
+# res_ttn$phenotype <- gsub("_", " ", res_ttn$phenotype)
+# 
+# ## BAG3
+# summary_table <- res_bag3[c("phenotype", "beta", "se", "p_BH", "n")]
+# summary_table$P <- summary_table[,"p_BH"]
+# summary_table$OR <- exp(summary_table[,"beta"])
+# 
+# # For OR
+# summary_table$lower <- round(exp(summary_table[,"beta"]) -1.96*summary_table[,"se"],2)
+# summary_table$upper <- round(exp(summary_table[,"beta"]) +1.96*summary_table[,"se"], 2)
+# 
+# 
+# 
+# library(ggplot2)
+# library(meta)
+# 
+# # Create a new data frame with non-missing n values
+# summary_table_n_bag3 <- subset(summary_table, !is.na(n))
+# 
+# # Plot the data with labels for n
+# p1 <- ggplot(data = summary_table_n_bag3, aes(x = OR, y = phenotype)) +
+#   geom_point(size = 3) +
+#   geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0) +
+#   geom_vline(xintercept = 1, linetype = "dashed") +
+#   geom_text(aes(x = 0.5, y = phenotype, label = paste0("n = ", n)), hjust = 0, size = 3) +
+#   scale_x_continuous(limits = c(0.5, 1.5), breaks = seq(0.5, 1.5, 0.3)) +
+#   xlab("Odds ratio (95% CI)") +
+#   ylab("Echo measures") +
+#   theme_bw() +
+#   theme(plot.title = element_text(hjust = 0.5),
+#         panel.grid.major = element_blank(),
+#         panel.grid.minor = element_blank(),
+#         # panel.border = element_blank(),
+#         panel.background = element_blank())
+# 
+# 
+# ## TTN
+# summary_table <- res_ttn[c("phenotype", "beta", "se", "p_BH", "n")]
+# summary_table$P <- summary_table[,"p_BH"]
+# summary_table$OR <- exp(summary_table[,"beta"])
+# 
+# summary_table$lower <- round(exp(summary_table[,"beta"]) -1.96*summary_table[,"se"],2)
+# summary_table$upper <- round(exp(summary_table[,"beta"]) +1.96*summary_table[,"se"], 2)
+# 
+# 
+# library(ggplot2)
+# library(meta)
+# 
+# # Create a new data frame with non-missing n values
+# summary_table_n_ttn <- subset(summary_table, !is.na(n))
+# 
+# # Plot the data with labels for n
+# p2 <- ggplot(data = summary_table_n_ttn, aes(x = OR, y = phenotype)) +
+#   geom_point(size = 3) +
+#   geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0) +
+#   geom_vline(xintercept = 1, linetype = "dashed") +
+#   geom_text(aes(x = 0.5, y = phenotype, label = paste0("n = ", n)), hjust = 0, size = 3) +
+#   scale_x_continuous(limits = c(0.5, 1.5), breaks = seq(0.5, 1.5, 0.3)) +
+#   xlab("Odds ratio (95% CI)") +
+#   ylab("Echo measures") +
+#   theme_bw() +
+#   theme(plot.title = element_text(hjust = 0.5),
+#         panel.grid.major = element_blank(),
+#         panel.grid.minor = element_blank(),
+#         # panel.border = element_blank(),
+#         panel.background = element_blank())
+# 
+# 
+# ## Combined plot
+# # library(gridExtra)
+# # grid.arrange(p1, p2, ncol = 2)
+# 
+# # Add a 'variable' column to each data frame
+# summary_table_n_bag3$variable <- "BAG3"
+# summary_table_n_ttn$variable <- "TTN"
+# 
+# # Combine the data frames
+# summary_table <- rbind(summary_table_n_bag3, summary_table_n_ttn)
+# 
+# # Create the combined plot with facet_wrap
+# combined_plot <- ggplot(summary_table, aes(x = OR, y = phenotype)) +
+#   geom_point(size = 3) +
+#   geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0) +
+#   geom_vline(xintercept = 1, linetype = "dashed") +
+#   geom_text(aes(x = 0.5, y = phenotype, label = paste0("n = ", n)), hjust = 0, size = 3) +
+#   scale_x_continuous(limits = c(0.5, 1.5), breaks = seq(0.5, 1.5, 0.3)) +
+#   xlab("Odds ratio (95% CI)") +
+#   ylab("Echo measures") +
+#   facet_wrap(~ variable, ncol = 2) +
+#   theme_bw() +
+#   theme(plot.title = element_text(hjust = 0.5),
+#         panel.grid.major = element_blank(),
+#         panel.grid.minor = element_blank(),
+#         panel.background = element_blank())
+# 
+# combined_plot
+# 
+# library(sjPlot)
+# plot_model(fit)
+
