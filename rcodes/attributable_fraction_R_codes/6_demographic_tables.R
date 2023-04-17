@@ -104,8 +104,11 @@ pelvisRT <- sum(PHENO.ANY_SN$maxpelvisrtdose > 200, na.rm = T)
 ## Chemotherapy ##
 ##################
 alkylating <- sum(PHENO.ANY_SN$aa_class_dose_5_yn == "Y", na.rm = T)
+# table(PHENO.ANY_SN$aa_class_dose_5 > 0)
 anthracyclines <- sum(PHENO.ANY_SN$anthra_jco_dose_5_yn == "Y", na.rm = T)
+# table(PHENO.ANY_SN$anthra_cog_dose_5 > 0)
 epipodophyllotoxins <- sum(PHENO.ANY_SN$epitxn_dose_5_yn == "Y", na.rm = T)
+# table(PHENO.ANY_SN$epitxn_dose_5 > 0)
 
 ## age at diagnosis
 median.agedx <- round(median(PHENO.ANY_SN$agedx), 1)
@@ -214,18 +217,19 @@ carcinoma <- sum(grepl("carcinoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
 ##################
 ## Radiotherapy ##
 ##################
-brainRT <- sum(PHENO.ANY_SN$brainorheadrt_yn == "Y", na.rm = T)
-neckRT <- sum(PHENO.ANY_SN$neckrt_yn == "Y", na.rm = T)
-chestRT <- sum(PHENO.ANY_SN$chestrt_yn == "Y", na.rm = T)
-abdomenRT <- sum(PHENO.ANY_SN$abdomenrt_yn == "Y", na.rm = T)
-pelvisRT <- sum(PHENO.ANY_SN$pelvisrt_yn == "Y", na.rm = T)
+##
+brainRT <- sum(PHENO.ANY_SN$maxsegrtdose > 200, na.rm = T)
+neckRT <- sum(PHENO.ANY_SN$neckmaxrtdose > 200, na.rm = T)
+chestRT <- sum(PHENO.ANY_SN$chestmaxrtdose > 200, na.rm = T)
+abdomenRT <- sum(PHENO.ANY_SN$abdmaxrtdose > 200, na.rm = T)
+pelvisRT <- sum(PHENO.ANY_SN$pelvismaxrtdose > 200, na.rm = T)
 
 ##################
 ## Chemotherapy ##
 ##################
-alkylating <- sum(PHENO.ANY_SN$aa_class_dose_5_yn == "Y", na.rm = T)
-anthracyclines <- sum(PHENO.ANY_SN$anthra_jco_dose_5_yn == "Y", na.rm = T)
-epipodophyllotoxins <- sum(PHENO.ANY_SN$epitxn_dose_5_yn == "Y", na.rm = T)
+alkylating <- sum(PHENO.ANY_SN$alk_CED5 > 0, na.rm = T)
+anthracyclines <- sum(PHENO.ANY_SN$anth_DED5 > 0, na.rm = T)
+epipodophyllotoxins <- sum(PHENO.ANY_SN$epipdose5 > 0, na.rm = T)
 
 ## age at diagnosis
 median.agedx <- round(median(PHENO.ANY_SN$agedx), 1)
