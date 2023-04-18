@@ -47,43 +47,52 @@ as.data.frame(table(PHENO.ANY_SN$diaggrp))
 ## DIAGNOSIS ##
 ###############
 
-## Acute lymphoblastic leukemia
-ALL <- sum(grepl("lymphoblastic", PHENO.ANY_SN$diaggrp, ignore.case = T))
-AML <- sum(grepl("Acute myeloid leukemia", PHENO.ANY_SN$diaggrp, ignore.case = T))
-other.leukemia <- sum(grepl("Other leukemia|Chronic myeloid leukemia", PHENO.ANY_SN$diaggrp, ignore.case = T))
+# ## Acute lymphoblastic leukemia
+# ALL <- sum(grepl("lymphoblastic", PHENO.ANY_SN$diaggrp, ignore.case = T))
+# AML <- sum(grepl("Acute myeloid leukemia", PHENO.ANY_SN$diaggrp, ignore.case = T))
+# other.leukemia <- sum(grepl("Other leukemia|Chronic myeloid leukemia", PHENO.ANY_SN$diaggrp, ignore.case = T))
+# 
+# ## CNS
+# CNS.tumors <- PHENO.ANY_SN[PHENO.ANY_SN$diaggrp == "Central nervous system (CNS)",]
+# CNS.counts <- nrow(CNS.tumors)
+# astrocytoma_glioma <- sum(grepl("astrocytoma|glioma", CNS.tumors$diag, ignore.case = T))
+# medulloblastoma_PNET <- sum(grepl("Medulloblastoma|PNET", CNS.tumors$diag, ignore.case = T))
+# ependymoma <- sum(grepl("Ependymoma", CNS.tumors$diag, ignore.case = T))
+# other_CNS.tumor <- CNS.counts - (astrocytoma_glioma + medulloblastoma_PNET + ependymoma)
+# 
+# ## Lymphoma
+# hodgkin.lymphoma <- sum(grepl("^Hodgkin lymphoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
+# non.hodgkin.lymphoma <- sum(grepl("non-Hodgkin lymphoma", PHENO.ANY_SN$diaggrp, ignore.case = T)) 
+# 
+# ## Sarcoma
+# sarcoma <- sum(grepl("sarcoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
+# ewing.sarcoma <- sum(grepl("ewing", PHENO.ANY_SN$diaggrp, ignore.case = T))
+# osteosarcoma <- sum(grepl("osteosarcoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
+# rhabdomyosarcoma <- sum(grepl("^Rhabdomyosarcoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
+# nonrhabdomyosarcoma <- sum(grepl("Soft tissue sarcoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
+# 
+# 
+# ## Embryonal
+# wilms <- sum(grepl("wilms", PHENO.ANY_SN$diaggrp, ignore.case = T))
+# neuroblastoma <- sum(grepl("neuroblastoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
+# germ.cell.tumor <- sum(grepl("Germ cell tumor", PHENO.ANY_SN$diaggrp, ignore.case = T))
+# retinoblastoma <- sum(grepl("Retinoblastoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
+# hepatoblastoma <- sum(grepl("Liver malignancies", PHENO.ANY_SN$diaggrp, ignore.case = T))
+# 
+# ## Other
+# melanoma <- sum(grepl("melanoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
+# carcinoma <- sum(grepl("carcinoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
+# # Others
 
-## CNS
-CNS.tumors <- PHENO.ANY_SN[PHENO.ANY_SN$diaggrp == "Central nervous system (CNS)",]
-CNS.counts <- nrow(CNS.tumors)
-astrocytoma_glioma <- sum(grepl("astrocytoma|glioma", CNS.tumors$diag, ignore.case = T))
-medulloblastoma_PNET <- sum(grepl("Medulloblastoma|PNET", CNS.tumors$diag, ignore.case = T))
-ependymoma <- sum(grepl("Ependymoma", CNS.tumors$diag, ignore.case = T))
-other_CNS.tumor <- CNS.counts - (astrocytoma_glioma + medulloblastoma_PNET + ependymoma)
-
-## Lymphoma
-hodgkin.lymphoma <- sum(grepl("^Hodgkin lymphoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
-non.hodgkin.lymphoma <- sum(grepl("non-Hodgkin lymphoma", PHENO.ANY_SN$diaggrp, ignore.case = T)) 
-
-## Sarcoma
-sarcoma <- sum(grepl("sarcoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
-ewing.sarcoma <- sum(grepl("ewing", PHENO.ANY_SN$diaggrp, ignore.case = T))
-osteosarcoma <- sum(grepl("osteosarcoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
-rhabdomyosarcoma <- sum(grepl("^Rhabdomyosarcoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
-nonrhabdomyosarcoma <- sum(grepl("Soft tissue sarcoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
-
-
-## Embryonal
-wilms <- sum(grepl("wilms", PHENO.ANY_SN$diaggrp, ignore.case = T))
-neuroblastoma <- sum(grepl("neuroblastoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
-germ.cell.tumor <- sum(grepl("Germ cell tumor", PHENO.ANY_SN$diaggrp, ignore.case = T))
-retinoblastoma <- sum(grepl("Retinoblastoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
-hepatoblastoma <- sum(grepl("Liver malignancies", PHENO.ANY_SN$diaggrp, ignore.case = T))
-
-## Other
-melanoma <- sum(grepl("melanoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
-carcinoma <- sum(grepl("carcinoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
-# Others
-
+## Diagnosis as in CCSS (with common disease types)
+bone.cancer <- sum(grepl("Osteosarcoma|Ewing sarcoma family of tumors", PHENO.ANY_SN$diaggrp, ignore.case = T))
+CNS <- sum(grepl("Central nervous system", PHENO.ANY_SN$diaggrp, ignore.case = T))
+leukemia  <- sum(grepl("Acute lymphoblastic leukemia|Acute myeloid leukemia|Other leukemia|MDS/Acute myeloid", PHENO.ANY_SN$diaggrp, ignore.case = T))
+neuroblastoma  <- sum(grepl("Neuroblastoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
+wilms  <- sum(grepl("Wilms tumor", PHENO.ANY_SN$diaggrp, ignore.case = T))
+HD  <- sum(grepl("^Hodgkin lymphoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
+NHL  <- sum(grepl("Non-Hodgkin lymphoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
+soft.tissue.sarcoma  <- sum(grepl("Soft tissue sarcoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
 ##################
 ## Radiotherapy ##
 ##################
@@ -131,8 +140,11 @@ lenght.followup <- paste0(median.length.followup, " (", length.followup.IQR, ")"
 
 
 ## rbind all
-df <- as.data.frame(t(cbind.data.frame(Male, Female, White, Black, Other, ALL, AML, other.leukemia, astrocytoma_glioma, medulloblastoma_PNET, ependymoma, other_CNS.tumor, hodgkin.lymphoma, non.hodgkin.lymphoma, ewing.sarcoma, osteosarcoma, rhabdomyosarcoma, nonrhabdomyosarcoma, wilms, neuroblastoma, germ.cell.tumor, retinoblastoma, hepatoblastoma, melanoma, carcinoma, brainRT, neckRT, chestRT, abdomenRT, pelvisRT, alkylating, anthracyclines, epipodophyllotoxins, agedx, age.at.followup, lenght.followup)))
-df$percent <- c(round((as.numeric(df$V1[1:33])/4401)*100, 1), NA, NA, NA)
+# df <- as.data.frame(t(cbind.data.frame(Male, Female, White, Black, Other, ALL, AML, other.leukemia, astrocytoma_glioma, medulloblastoma_PNET, ependymoma, other_CNS.tumor, hodgkin.lymphoma, non.hodgkin.lymphoma, ewing.sarcoma, osteosarcoma, rhabdomyosarcoma, nonrhabdomyosarcoma, wilms, neuroblastoma, germ.cell.tumor, retinoblastoma, hepatoblastoma, melanoma, carcinoma, brainRT, neckRT, chestRT, abdomenRT, pelvisRT, alkylating, anthracyclines, epipodophyllotoxins, agedx, age.at.followup, lenght.followup)))
+
+
+df.sjlife <- as.data.frame(t(cbind.data.frame(Male, Female, bone.cancer, CNS, HD, wilms, leukemia, neuroblastoma, NHL, soft.tissue.sarcoma, brainRT, neckRT, chestRT, abdomenRT, pelvisRT, alkylating, anthracyclines, epipodophyllotoxins, agedx, age.at.followup, lenght.followup)))
+df.sjlife$percent <- c(round((as.numeric(df.sjlife$V1[1:18])/4401)*100, 1), NA, NA, NA)
 
 
 ###############################
@@ -175,45 +187,15 @@ as.data.frame(table(PHENO.ANY_SN$diagnose))
 ###############
 ## DIAGNOSIS ##
 ###############
-
-## Acute lymphoblastic leukemia
-ALL <- sum(grepl("lymphoblastic", PHENO.ANY_SN$diaggrpm, ignore.case = T))
-AML <- sum(grepl("Acute myeloid leukemia", PHENO.ANY_SN$diaggrp, ignore.case = T))
-other.leukemia <- sum(grepl("Other leukemia|Chronic myeloid leukemia", PHENO.ANY_SN$diaggrp, ignore.case = T))
-
-## CNS
-CNS.tumors <- PHENO.ANY_SN[PHENO.ANY_SN$diaggrp == "Central nervous system (CNS)",]
-CNS.tumors <- as.data.frame(sort(table(CNS.tumors$diag), decreasing = T))
-CNS.counts <- nrow(CNS.tumors)
-astrocytoma_glioma <- sum(grepl("astrocytoma|glioma", CNS.tumors$diag, ignore.case = T))
-medulloblastoma_PNET <- sum(grepl("Medulloblastoma|PNET", CNS.tumors$diag, ignore.case = T))
-ependymoma <- sum(grepl("Ependymoma", CNS.tumors$diag, ignore.case = T))
-other_CNS.tumor <- CNS.counts - (astrocytoma_glioma + medulloblastoma_PNET + ependymoma)
-
-## Lymphoma
-hodgkin.lymphoma <- sum(grepl("^Hodgkin lymphoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
-non.hodgkin.lymphoma <- sum(grepl("non-Hodgkin lymphoma", PHENO.ANY_SN$diaggrp, ignore.case = T)) 
-
-## Sarcoma
-sarcoma <- sum(grepl("sarcoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
-ewing.sarcoma <- sum(grepl("ewing", PHENO.ANY_SN$diaggrp, ignore.case = T))
-osteosarcoma <- sum(grepl("osteosarcoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
-rhabdomyosarcoma <- sum(grepl("^Rhabdomyosarcoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
-nonrhabdomyosarcoma <- sum(grepl("Soft tissue sarcoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
-
-
-## Embryonal
-wilms <- sum(grepl("wilms", PHENO.ANY_SN$diaggrp, ignore.case = T))
-neuroblastoma <- sum(grepl("neuroblastoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
-germ.cell.tumor <- sum(grepl("Germ cell tumor", PHENO.ANY_SN$diaggrp, ignore.case = T))
-retinoblastoma <- sum(grepl("Retinoblastoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
-hepatoblastoma <- sum(grepl("Liver malignancies", PHENO.ANY_SN$diaggrp, ignore.case = T))
-
-## Other
-melanoma <- sum(grepl("melanoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
-carcinoma <- sum(grepl("carcinoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
-# Others
-
+bone.cancer <- sum(PHENO.ANY_SN$diagnose == "Bone cancer", na.rm = T)
+CNS <- sum(PHENO.ANY_SN$diagnose == "CNS", na.rm = T)
+HD <- sum(PHENO.ANY_SN$diagnose == "HD", na.rm = T)
+wilms <- sum(PHENO.ANY_SN$diagnose == "Kidney (Wilms)", na.rm = T)
+leukemia <- sum(PHENO.ANY_SN$diagnose == "Leukemia", na.rm = T)
+neuroblastoma <- sum(PHENO.ANY_SN$diagnose == "Neuroblastoma", na.rm = T)
+NHL <- sum(PHENO.ANY_SN$diagnose == "NHL", na.rm = T)
+NHL <- sum(PHENO.ANY_SN$diagnose == "NHL", na.rm = T)
+soft.tissue.sarcoma <- sum(PHENO.ANY_SN$diagnose == "Soft tissue sarcoma", na.rm = T)
 ##################
 ## Radiotherapy ##
 ##################
@@ -250,3 +232,23 @@ length.followup.IQR <- paste0(unname(round((quantile(PHENO.ANY_SN$length.followu
 length.followup.IQR <- gsub(" ", "-", length.followup.IQR)
 lenght.followup <- paste0(median.length.followup, " (", length.followup.IQR, ")")
 
+
+## Common primary dx in CCSS and SJLIFE
+# CCSS: SJLIFE
+# Bone cancer: Osteosarcoma|Ewing sarcoma family of tumors|
+#   CNS: Central nervous system (CNS)
+# Leukemia: Acute lymphoblastic leukemia|Acute myeloid leukemia|Other leukemia|MDS/Acute myeloid leukemia|Chronic myeloid leukemia
+# Neuroblastoma: Neuroblastoma
+# Kidney (Wilms): Wilms tumor
+# HD: Hodgkin lymphoma
+# NHL: Non-Hodgkin lymphoma
+# Soft tissue sarcoma: Soft tissue sarcoma
+
+
+df.ccss <- as.data.frame(t(cbind.data.frame(Male, Female, bone.cancer, CNS, HD, wilms, leukemia, neuroblastoma, NHL, soft.tissue.sarcoma, brainRT, neckRT, chestRT, abdomenRT, pelvisRT, alkylating, anthracyclines, epipodophyllotoxins, agedx, age.at.followup, lenght.followup)))
+df.ccss$percent <- c(round((as.numeric(df.ccss$V1[1:18])/7943)*100, 1), NA, NA, NA)
+
+colnames(df.sjlife) <- c("SJLIFE (n)", "sjlife%")
+colnames(df.ccss) <- c("CCSS (n)", "CCSS%")
+
+df <- cbind(df.sjlife, df.ccss)

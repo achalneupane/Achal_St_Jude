@@ -8,8 +8,8 @@
 # df <- merged.dat_with_CMP
 # n = nrow(merged.dat_with_CMP)
 
-df <- merged.dat_without_CMP
-n = nrow(merged.dat_without_CMP)
+# df <- merged.dat_without_CMP
+# n = nrow(merged.dat_without_CMP)
 
 
 get_demographic <- function(df, n){
@@ -292,6 +292,10 @@ ccss_exp.to.concat <- ccss_exp.to.concat[c("FID", "IID", "CMP", "agedx", "agelst
 colnames(sjlife.to.concat)
 colnames(ccss_org.to.concat)
 colnames(ccss_exp.to.concat)
+
+sjlife.to.concat$cohort <- 1
+ccss_org.to.concat$cohort <- 2
+ccss_exp.to.concat$cohort <- 3
 
 merged.dat <- rbind.data.frame(sjlife.to.concat, ccss_org.to.concat, ccss_exp.to.concat)
 write.table(merged.dat, "sjlife_ccss_org_ccss_exp_ttn_bag3.pheno", col.names = T, row.names = F, quote = F)

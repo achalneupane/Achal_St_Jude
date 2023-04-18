@@ -413,7 +413,7 @@ plink --bfile sjlife_ccss_org_ccss_exp_samples --freq --keep-allele-order --out 
  --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
  --pheno-name CMP \
  --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
- --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+ --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10,cohort \
  --out sjlife_ccss_org_ccss_exp_samples_results
 
 
