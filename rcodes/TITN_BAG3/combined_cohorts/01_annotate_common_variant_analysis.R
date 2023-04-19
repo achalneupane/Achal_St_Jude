@@ -219,33 +219,48 @@ ASSOC.results$upper <- ASSOC.results$U95
 
 summary_table <- ASSOC.results[c("rsID", "OR", "lower", "upper", "P")]
 
-library(ggplot2)
-ggplot(data = summary_table, aes(x = OR, y = rsID)) +
+library(dplyr)
+summary_table <- summary_table %>% arrange(factor(rsID, levels = df$rsID))
+
+# library(ggplot2)
+# P <- ggplot(data = summary_table, aes(x = OR, y = reorder(rsID, -P))) +
+#   geom_point(size = 3) +
+#   geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0) +
+#   geom_vline(xintercept = 1, linetype = "dashed") +
+#   scale_x_continuous(limits = c(0.6, 2), breaks = seq(0.6, 2, 0.2)) +
+#   xlab("OR (95% CI)") +
+#   ylab("rsID") +
+#   scale_y_discrete(labels = c("rs17304212", "rs6723526", "rs2303838", expression(bold(rs3829746)), "rs2042996", "rs9808377",
+#                               "rs1001238", "rs744426", "rs3829747", "rs3829746", "rs3731749", "rs16866406",
+#                               expression(bold(rs2234962)), "rs2288569", "rs2042995")) +
+#   theme_bw() +
+#   theme(plot.title = element_text(hjust = 0.5),
+#         panel.grid.major = element_blank(),
+#         panel.grid.minor = element_blank(),
+#         panel.background = element_blank())
+
+
+library(gridExtra)
+
+custom_face <- ifelse(summary_table$rsID %in% c("rs3829746", "rs2234962"), "bold", "plain")
+
+P <- ggplot(data = summary_table, aes(x = OR, y = reorder(rsID, -P))) +
   geom_point(size = 3) +
   geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0) +
   geom_vline(xintercept = 1, linetype = "dashed") +
   scale_x_continuous(limits = c(0.6, 2), breaks = seq(0.6, 2, 0.2)) +
   xlab("OR (95% CI)") +
-  ylab("rsID") +
+  ylab("") +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         # panel.border = element_blank(),
-        panel.background = element_blank())
+        panel.background = element_blank(),
+        axis.text.y = element_text(face = rev(custom_face))
+  )
 
 
-ggplot(data = summary_table, aes(x = OR, y = rsID)) +
-  geom_point(size = 3) +
-  geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0) +
-  geom_vline(xintercept = 1, linetype = "dashed") +
-  scale_x_continuous(limits = c(0.6, 2), breaks = seq(0.6, 2, 0.2)) +
-  xlab("OR (95% CI)") +
-  ylab("rsID") +
-  theme_bw() +
-  theme(plot.title = element_text(hjust = 0.5),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.background = element_blank()) +
-  geom_text(aes(x = 0.58, label = paste0("p = ", format(round(P, 3), nsmall = 3))), 
-            size = 3, hjust = 0, fontface = "italic", color = "gray40")
+
+P
+ggsave("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Figures/common_variant_analysis.tiff", P, dpi = 600, width = 5, height = 3, units = "in")
