@@ -89,29 +89,8 @@ summary_table$upper <- round(summary_table[,"beta"] +1.96*summary_table[,"se"], 
 # summary_table$lower <- round(exp(summary_table[,"beta"]) -1.96*summary_table[,"se"],2)
 # summary_table$upper <- round(exp(summary_table[,"beta"]) +1.96*summary_table[,"se"], 2)
 
-
-
-library(ggplot2)
-library(meta)
-
-# # Create a new data frame with non-missing n values
+# # # Create a new data frame with non-missing n values
 summary_table_n_bag3 <- subset(summary_table, !is.na(n))
-# 
-# # Plot the data with labels for n
-# ggplot(data = summary_table_n_bag3, aes(x = beta, y = phenotype)) +
-#   geom_point(size = 3) +
-#   geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0) +
-#   geom_vline(xintercept = 0, linetype = "dashed") +
-#   geom_text(aes(x = -0.4, y = phenotype, label = paste0("n = ", n)), hjust = 0, size = 3) +
-#   scale_x_continuous(limits = c(-0.4, 0.25), breaks = seq(-0.4, 0.25, 0.1)) +
-#   xlab("Estimates (95% CI)") +
-#   ylab("Echo measures") +
-#   theme_bw() +
-#   theme(plot.title = element_text(hjust = 0.5),
-#         panel.grid.major = element_blank(),
-#         panel.grid.minor = element_blank(),
-#         # panel.border = element_blank(),
-#         panel.background = element_blank())
 
 
 ## TTN
@@ -128,11 +107,50 @@ summary_table$upper <- round(summary_table[,"beta"] +1.96*summary_table[,"se"], 
 # summary_table$upper <- round(exp(summary_table[,"beta"]) +1.96*summary_table[,"se"], 2)
 
 
+# Create a new data frame with non-missing n values
+summary_table_n_ttn <- subset(summary_table, !is.na(n))
+
+
+# Add a 'variable' column to each data frame
+summary_table_n_bag3$variable <- "rs2234962 (BAG3)"
+summary_table_n_ttn$variable <- "rs3829746 (TTN)"
+
+# Combine the data frames
+summary_table <- rbind(summary_table_n_bag3, summary_table_n_ttn)
+
+## Keep the right variables
+summary_table$phenotype <- as.factor(summary_table$phenotype)
+
+wanted <- c("LV Ejection Fraction 3D","LV End Diastolic Volume 3D","LV End Systolic Volume 3D",
+"LV Stroke Volume 3D","LVMass2D Index","LA Volume Index","TAPSE MM","LV GLPS AVG","LV Relative Wall Thickness")
+
+summary_table <- summary_table[summary_table$phenotype %in% wanted,]
+summary_table$phenotype <- gsub("2D|3D| 3D|MM", "", summary_table$phenotype)
+
 library(ggplot2)
 library(meta)
 
-# Create a new data frame with non-missing n values
-summary_table_n_ttn <- subset(summary_table, !is.na(n))
+combined_plot <- ggplot(summary_table, aes(x = beta, y = phenotype)) +
+  geom_point(size = 3) +
+  geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0) +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  scale_x_continuous(limits = c(-0.4, 0.25), breaks = seq(-0.4, 0.25, 0.2)) +
+  xlab("Estimates (95% CI)") +
+  ylab("Echo measures") +
+  facet_wrap(~ variable, ncol = 2) +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank())
+
+combined_plot
+ggsave("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Figures/echo_measures.tiff", combined_plot, dpi = 600, width = 5, height = 3, units = "in")
+
+
+##################################################################################################################
+
+
 
 # # Plot the data with labels for n
 # p2 <- ggplot(data = summary_table_n_ttn, aes(x = beta, y = phenotype)) +
@@ -155,12 +173,22 @@ summary_table_n_ttn <- subset(summary_table, !is.na(n))
 # library(gridExtra)
 # grid.arrange(p1, p2, ncol = 2)
 
-# Add a 'variable' column to each data frame
-summary_table_n_bag3$variable <- "BAG3"
-summary_table_n_ttn$variable <- "TTN"
-
-# Combine the data frames
-summary_table <- rbind(summary_table_n_bag3, summary_table_n_ttn)
+# # 
+# # # Plot the data with labels for n
+# # ggplot(data = summary_table_n_bag3, aes(x = beta, y = phenotype)) +
+# #   geom_point(size = 3) +
+# #   geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0) +
+# #   geom_vline(xintercept = 0, linetype = "dashed") +
+# #   geom_text(aes(x = -0.4, y = phenotype, label = paste0("n = ", n)), hjust = 0, size = 3) +
+# #   scale_x_continuous(limits = c(-0.4, 0.25), breaks = seq(-0.4, 0.25, 0.1)) +
+# #   xlab("Estimates (95% CI)") +
+# #   ylab("Echo measures") +
+# #   theme_bw() +
+# #   theme(plot.title = element_text(hjust = 0.5),
+# #         panel.grid.major = element_blank(),
+# #         panel.grid.minor = element_blank(),
+# #         # panel.border = element_blank(),
+# #         panel.background = element_blank())
 
 # # Create the combined plot with facet_wrap
 # combined_plot <- ggplot(summary_table, aes(x = beta, y = phenotype)) +
@@ -195,28 +223,7 @@ summary_table <- rbind(summary_table_n_bag3, summary_table_n_ttn)
 #         panel.grid.minor = element_blank(),
 #         panel.background = element_blank())
 
-summary_table$phenotype <- as.factor(summary_table$phenotype)
-combined_plot <- ggplot(summary_table, aes(x = beta, y = phenotype)) +
-  geom_point(size = 3) +
-  geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0) +
-  geom_vline(xintercept = 0, linetype = "dashed") +
-  scale_x_continuous(limits = c(-0.4, 0.25), breaks = seq(-0.4, 0.25, 0.2)) +
-  xlab("Estimates (95% CI)") +
-  ylab("Echo measures") +
-  facet_wrap(~ variable, ncol = 2) +
-  theme_bw() +
-  theme(plot.title = element_text(hjust = 0.5),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.background = element_blank())
 
-combined_plot
-ggsave("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Figures/echo_measures.tiff", combined_plot, dpi = 600, width = 5, height = 3, units = "in")
-
-
-
-
-##################################################################################################################
 # ############################################## 
 # #################
 # ## Forest plot ##

@@ -260,7 +260,5 @@ P <- ggplot(data = summary_table, aes(x = OR, y = reorder(rsID, -P))) +
         axis.text.y = element_text(face = rev(custom_face))
   )
 
-
-
 P
 ggsave("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Figures/common_variant_analysis.tiff", P, dpi = 600, width = 5, height = 3, units = "in")
