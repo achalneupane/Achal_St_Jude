@@ -131,20 +131,21 @@ age.followup.IQR <- paste0(unname(round((quantile(PHENO.ANY_SN$agelstcontact, pr
 age.followup.IQR <- gsub(" ", "-", age.followup.IQR)
 age.at.followup <- paste0(median.age.followup, " (", age.followup.IQR, ")")
 
-## Length of follow up
-PHENO.ANY_SN$length.followup <- PHENO.ANY_SN$agelstcontact -PHENO.ANY_SN$agedx
-median.length.followup <- round(median(PHENO.ANY_SN$length.followup), 1)
-length.followup.IQR <- paste0(unname(round((quantile(PHENO.ANY_SN$length.followup, prob=c(.25,.5,.75), type=1, na.rm = T))[c(1,3)], 1)), collapse = " ")
-length.followup.IQR <- gsub(" ", "-", length.followup.IQR)
-lenght.followup <- paste0(median.length.followup, " (", length.followup.IQR, ")")
+# ## Length of follow up
+# PHENO.ANY_SN$length.followup <- PHENO.ANY_SN$agelstcontact -PHENO.ANY_SN$agedx
+# median.length.followup <- round(median(PHENO.ANY_SN$length.followup), 1)
+# length.followup.IQR <- paste0(unname(round((quantile(PHENO.ANY_SN$length.followup, prob=c(.25,.5,.75), type=1, na.rm = T))[c(1,3)], 1)), collapse = " ")
+# length.followup.IQR <- gsub(" ", "-", length.followup.IQR)
+# lenght.followup <- paste0(median.length.followup, " (", length.followup.IQR, ")")
 
 
 ## rbind all
 # df <- as.data.frame(t(cbind.data.frame(Male, Female, White, Black, Other, ALL, AML, other.leukemia, astrocytoma_glioma, medulloblastoma_PNET, ependymoma, other_CNS.tumor, hodgkin.lymphoma, non.hodgkin.lymphoma, ewing.sarcoma, osteosarcoma, rhabdomyosarcoma, nonrhabdomyosarcoma, wilms, neuroblastoma, germ.cell.tumor, retinoblastoma, hepatoblastoma, melanoma, carcinoma, brainRT, neckRT, chestRT, abdomenRT, pelvisRT, alkylating, anthracyclines, epipodophyllotoxins, agedx, age.at.followup, lenght.followup)))
 
 
-df.sjlife <- as.data.frame(t(cbind.data.frame(Male, Female, bone.cancer, CNS, HD, wilms, leukemia, neuroblastoma, NHL, soft.tissue.sarcoma, brainRT, neckRT, chestRT, abdomenRT, pelvisRT, alkylating, anthracyclines, epipodophyllotoxins, agedx, age.at.followup, lenght.followup)))
-df.sjlife$percent <- c(round((as.numeric(df.sjlife$V1[1:18])/4401)*100, 1), NA, NA, NA)
+# df.sjlife <- as.data.frame(t(cbind.data.frame(Male, Female, bone.cancer, CNS, HD, wilms, leukemia, neuroblastoma, NHL, soft.tissue.sarcoma, brainRT, neckRT, chestRT, abdomenRT, pelvisRT, alkylating, anthracyclines, epipodophyllotoxins, agedx, age.at.followup, lenght.followup)))
+df.sjlife <- as.data.frame(t(cbind.data.frame(Male, Female, bone.cancer, CNS, HD, wilms, leukemia, neuroblastoma, NHL, soft.tissue.sarcoma, brainRT, neckRT, chestRT, abdomenRT, pelvisRT, alkylating, anthracyclines, epipodophyllotoxins, agedx, age.at.followup)))
+df.sjlife$percent <- c(round((as.numeric(df.sjlife$V1[1:18])/4401)*100, 1), NA, NA)
 
 
 ###############################
@@ -226,11 +227,11 @@ age.followup.IQR <- gsub(" ", "-", age.followup.IQR)
 age.at.followup <- paste0(median.age.followup, " (", age.followup.IQR, ")")
 
 ## Length of follow up
-PHENO.ANY_SN$length.followup <- PHENO.ANY_SN$agelstcontact -PHENO.ANY_SN$agedx
-median.length.followup <- round(median(PHENO.ANY_SN$length.followup), 1)
-length.followup.IQR <- paste0(unname(round((quantile(PHENO.ANY_SN$length.followup, prob=c(.25,.5,.75), type=1, na.rm = T))[c(1,3)], 1)), collapse = " ")
-length.followup.IQR <- gsub(" ", "-", length.followup.IQR)
-lenght.followup <- paste0(median.length.followup, " (", length.followup.IQR, ")")
+# PHENO.ANY_SN$length.followup <- PHENO.ANY_SN$agelstcontact -PHENO.ANY_SN$agedx
+# median.length.followup <- round(median(PHENO.ANY_SN$length.followup), 1)
+# length.followup.IQR <- paste0(unname(round((quantile(PHENO.ANY_SN$length.followup, prob=c(.25,.5,.75), type=1, na.rm = T))[c(1,3)], 1)), collapse = " ")
+# length.followup.IQR <- gsub(" ", "-", length.followup.IQR)
+# lenght.followup <- paste0(median.length.followup, " (", length.followup.IQR, ")")
 
 
 ## Common primary dx in CCSS and SJLIFE
@@ -245,8 +246,9 @@ lenght.followup <- paste0(median.length.followup, " (", length.followup.IQR, ")"
 # Soft tissue sarcoma: Soft tissue sarcoma
 
 
-df.ccss <- as.data.frame(t(cbind.data.frame(Male, Female, bone.cancer, CNS, HD, wilms, leukemia, neuroblastoma, NHL, soft.tissue.sarcoma, brainRT, neckRT, chestRT, abdomenRT, pelvisRT, alkylating, anthracyclines, epipodophyllotoxins, agedx, age.at.followup, lenght.followup)))
-df.ccss$percent <- c(round((as.numeric(df.ccss$V1[1:18])/7943)*100, 1), NA, NA, NA)
+# df.ccss <- as.data.frame(t(cbind.data.frame(Male, Female, bone.cancer, CNS, HD, wilms, leukemia, neuroblastoma, NHL, soft.tissue.sarcoma, brainRT, neckRT, chestRT, abdomenRT, pelvisRT, alkylating, anthracyclines, epipodophyllotoxins, agedx, age.at.followup, lenght.followup)))
+df.ccss <- as.data.frame(t(cbind.data.frame(Male, Female, bone.cancer, CNS, HD, wilms, leukemia, neuroblastoma, NHL, soft.tissue.sarcoma, brainRT, neckRT, chestRT, abdomenRT, pelvisRT, alkylating, anthracyclines, epipodophyllotoxins, agedx, age.at.followup)))
+df.ccss$percent <- c(round((as.numeric(df.ccss$V1[1:18])/7943)*100, 1), NA, NA)
 
 colnames(df.sjlife) <- c("SJLIFE (n)", "sjlife%")
 colnames(df.ccss) <- c("CCSS (n)", "CCSS%")
