@@ -5,6 +5,7 @@ load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHE
 #########################
 ## Subsequent Neoplasm ##
 #########################
+ALL.LIFESTYLE[c("smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_obese_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")] <- lapply(ALL.LIFESTYLE[c("smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_obese_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")], function(x) ifelse(x == "Unknown", NA, as.numeric(as.character(x))))
 
 library(haven)
 library(benchmarkme)
@@ -96,7 +97,7 @@ ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score <- rowSums(!is.na(ALL.LIFESTYL
 ALL.LIFESTYLE.IMPUTE$SCORE [ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score == 5] <-  rowSums(ALL.LIFESTYLE.IMPUTE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score == 5, wanted.cols])
 
 ## For missing items, per Qi: "For people with missing items, mean of non-missing items were taken and then multiplied by the # of items to get the score"
-ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items <- rowMeans(ALL.LIFESTYLE[wanted.cols], na.rm = T)
+ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items <- rowMeans(ALL.LIFESTYLE.IMPUTE[wanted.cols], na.rm = T)
 ALL.LIFESTYLE.IMPUTE$imputedSCORE <- ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items * ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score
 
 # replace the score values with imputed score for missing ones; this was applied to rows where items available (non-missing ones) are >= 3 & < 5 
@@ -125,8 +126,8 @@ ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score <- rowSums(!is.na(ALL.LIFESTYL
 # If all 4 (after removing HEALTHY_Diet_yn) items are available; they were simply summed up to get the score 
 ALL.LIFESTYLE.IMPUTE$SCORE [ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score == 4] <-  rowSums(ALL.LIFESTYLE.IMPUTE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score == 4, wanted.cols])
 
-## For missing items, per Qi: "For people with missing items, mean of non-missing items were taken and then multiplied by the # of items to get the score"
-ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items <- rowMeans(ALL.LIFESTYLE[wanted.cols], na.rm = T)
+## ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items <- rowMeans(ALL.LIFESTYLE.IMPUTE[wanted.cols], na.rm = T): "For people with missing items, mean of non-missing items were taken and then multiplied by the # of items to get the score"
+ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items <- rowMeans(ALL.LIFESTYLE.IMPUTE[wanted.cols], na.rm = T)
 ALL.LIFESTYLE.IMPUTE$imputedSCORE <- ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items * ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score
 
 # replace the score values with imputed score for missing ones; this was applied to rows where items available (non-missing ones) are >= 3 & < 5 
@@ -155,7 +156,7 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$
 PHENO.ANY_SN$missing.lifestyles <- rowSums(is.na(PHENO.ANY_SN[c("smoker_former_or_never_yn", "PhysicalActivity_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Not_obese_yn")]))
 table(PHENO.ANY_SN$missing.lifestyles)
 # 0    1    2    3    4    5 
-# 2670  567   46   54   78  986 
+# 3052  481   32   54   74  708 
 
 ## Relevel 6 lifestyle variables
 # PHENO.ANY_SN$smoker_never_yn[is.na(PHENO.ANY_SN$smoker_never_yn)] <- "Unknown"; PHENO.ANY_SN$smoker_never_yn <- factor(PHENO.ANY_SN$smoker_never_yn, level = c(0, "Unknown", 1)) 
@@ -201,7 +202,7 @@ for(i in 1:length(HEI.to.categorize)){
 
 table(PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category)
 # 3rd     2nd     1st Unknown 
-# 1090    1090    1091    1130
+# 1180    1179    1181     861 
 #########################
 ## Extract Ethnicities ##
 #########################
@@ -259,7 +260,7 @@ fit_all = glm(formula = ANY_SN ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_c
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category +
                 maxchestrtdose.category + epitxn_dose_5.category + 
-                LIFESTYLE_STATUS_WO_DIET +
+                LIFESTYLE_STATUS +
                 EAS + AMR + SAS + AFR,
               family = binomial,
               data = dat_all)
@@ -309,8 +310,7 @@ dat_all$pred_no_plp.prs = predict(fit_all, newdata = dat_plp.prs, type = "respon
 N_no_plp.prs = sum(dat_all$pred_no_plp.prs, na.rm = TRUE)
 af_by_plp.prs = (N_all - N_no_plp.prs) / N_all
 round(af_by_plp.prs,3)
-# 0.094
-# 0.089 Without diet
+
 ###############
 ## Lifestyle ##
 ###############
@@ -323,6 +323,7 @@ dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_li
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
 round(af_by_N_no_favorable_lifestyle.category,3)
-# -0.02
-# -0.01 Without diet
+
+sn.model <- c(round(af_by_tx,3), round(af_by_plp.prs,3), round(af_by_N_no_favorable_lifestyle.category,3))
+
 ################################################################ GENDER SPECIFIC #########################################################################

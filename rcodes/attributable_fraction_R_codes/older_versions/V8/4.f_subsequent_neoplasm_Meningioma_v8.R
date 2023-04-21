@@ -4,7 +4,8 @@
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v2.RDATA")
 #########################
 ## Subsequent Neoplasm ##
-#########################
+########################
+ALL.LIFESTYLE[c("smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_obese_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")] <- lapply(ALL.LIFESTYLE[c("smoker_former_or_never_yn", "PhysicalActivity_yn", "Not_obese_yn", "NOT_RiskyHeavyDrink_yn", "HEALTHY_Diet_yn")], function(x) ifelse(x == "Unknown", NA, as.numeric(as.character(x))))
 
 library(haven)
 library(benchmarkme)
@@ -97,7 +98,7 @@ ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score <- rowSums(!is.na(ALL.LIFESTYL
 ALL.LIFESTYLE.IMPUTE$SCORE [ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score == 5] <-  rowSums(ALL.LIFESTYLE.IMPUTE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score == 5, wanted.cols])
 
 ## For missing items, per Qi: "For people with missing items, mean of non-missing items were taken and then multiplied by the # of items to get the score"
-ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items <- rowMeans(ALL.LIFESTYLE[wanted.cols], na.rm = T)
+ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items <- rowMeans(ALL.LIFESTYLE.IMPUTE[wanted.cols], na.rm = T)
 ALL.LIFESTYLE.IMPUTE$imputedSCORE <- ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items * ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score
 
 # replace the score values with imputed score for missing ones; this was applied to rows where items available (non-missing ones) are >= 3 & < 5 
@@ -127,7 +128,7 @@ ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score <- rowSums(!is.na(ALL.LIFESTYL
 ALL.LIFESTYLE.IMPUTE$SCORE [ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score == 4] <-  rowSums(ALL.LIFESTYLE.IMPUTE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score == 4, wanted.cols])
 
 ## For missing items, per Qi: "For people with missing items, mean of non-missing items were taken and then multiplied by the # of items to get the score"
-ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items <- rowMeans(ALL.LIFESTYLE[wanted.cols], na.rm = T)
+ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items <- rowMeans(ALL.LIFESTYLE.IMPUTE[wanted.cols], na.rm = T)
 ALL.LIFESTYLE.IMPUTE$imputedSCORE <- ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items * ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score
 
 # replace the score values with imputed score for missing ones; this was applied to rows where items available (non-missing ones) are >= 3 & < 5 
@@ -254,7 +255,7 @@ fit_all = glm(formula = MENINGIOMA ~ Zhaoming_carriers + Qin_without_Zhaoming_va
                 Meningioma_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + epitxn_dose_5.category + 
-                LIFESTYLE_STATUS_WO_DIET +
+                LIFESTYLE_STATUS +
                 EAS + AMR + SAS + AFR,
               family = binomial,
               data = dat_all)
@@ -308,8 +309,8 @@ round(af_by_plp.prs,3)
 ###############
 dat_lifestyle = dat_all
 
-# dat_lifestyle$LIFESTYLE_STATUS [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS)] = "favorable"
-dat_lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable" # Without diet
+dat_lifestyle$LIFESTYLE_STATUS [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS)] = "favorable"
+# dat_lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable" # Without diet
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
@@ -317,3 +318,5 @@ af_by_N_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.cate
 round(af_by_N_no_favorable_lifestyle.category,3)
 # -0.03
 # -0.033 (Without diet)
+
+meningioma.model <- c(round(af_by_tx,3), round(af_by_plp.prs,3), round(af_by_N_no_favorable_lifestyle.category,3))
