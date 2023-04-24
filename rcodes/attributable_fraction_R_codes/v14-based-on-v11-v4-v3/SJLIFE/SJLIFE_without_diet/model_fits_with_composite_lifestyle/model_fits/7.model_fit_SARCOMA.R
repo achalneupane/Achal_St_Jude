@@ -90,7 +90,7 @@ round(af_by_plp.prs,3)
 ###############
 dat_lifestyle = dat_all
 
-dat_lifestyle$LIFESTYLE_STATUS [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS)] = "favorable"
+dat_lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable"
 
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
@@ -115,7 +115,7 @@ dat_tx.plp.prs.lifestyle$aa_class_dose_5.category = "None"
 dat_tx.plp.prs.lifestyle$Sarcoma_Machiela_PRS.tertile.category = "1st"
 
 ## Nullify Lifestyle
-dat_lifestyle$LIFESTYLE_STATUS [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS)] = "favorable"
+dat_lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable"
 
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx.plp.prs.lifestyle, type = "response")
