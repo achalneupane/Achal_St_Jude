@@ -66,20 +66,20 @@ sum(!duplicated(subneo.within5$sjlid))
 ################
 ## Meningioma ##
 ################
-# Get SARCOMA for the first time and Age at First SARCOMA.
+# Get MENINGIOMA for the first time and Age at First MENINGIOMA.
 # For this, I will first sort the table by date
 library(data.table)
-SARCOMA <- subneo[grepl("sarcoma", subneo$diag, ignore.case = T),]
-SARCOMA <- setDT(SARCOMA)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+MENINGIOMA <- subneo[grepl("meningioma", subneo$diag, ignore.case = T),]
+MENINGIOMA <- setDT(MENINGIOMA)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 
 ## Remove SNs as cases that are within 5 years of primary diagnosis
-SARCOMA <- SARCOMA[!SARCOMA$sjlid %in% subneo.within5$sjlid,]
-nrow(SARCOMA)
-# 32
+MENINGIOMA <- MENINGIOMA[!MENINGIOMA$sjlid %in% subneo.within5$sjlid,]
+nrow(MENINGIOMA)
+nrow(MENINGIOMA)
+# 149
 
-
-## Remove SARCOMA if younger than 18
-PHENO.ANY_SN$AGE.ANY_SN <- SARCOMA$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, SARCOMA$sjlid)]
+## Remove MENINGIOMA if younger than 18
+PHENO.ANY_SN$AGE.ANY_SN <- MENINGIOMA$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, MENINGIOMA$sjlid)]
 if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 }
@@ -89,23 +89,23 @@ sum(PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid)
 # 22
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid,]
 
-PHENO.ANY_SN$SARCOMA <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% SARCOMA$sjlid, 0, 1))
+PHENO.ANY_SN$MENINGIOMA <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% MENINGIOMA$sjlid, 0, 1))
 
-table(PHENO.ANY_SN$SARCOMA)
+table(PHENO.ANY_SN$MENINGIOMA)
 # 0    1 
-# 4347 28
+# 4230 139
 
 #############################
 ## Add Lifestyle variables ##
 #############################
 # Define CA/CO status in lifestyle
-ALL.LIFESTYLE$CACO <- factor(ifelse(!ALL.LIFESTYLE$SJLIFEID %in% SARCOMA$sjlid, 0, 1))
+ALL.LIFESTYLE$CACO <- factor(ifelse(!ALL.LIFESTYLE$SJLIFEID %in% MENINGIOMA$sjlid, 0, 1))
 
 
 
 ## Get date (gradedt) and age at diagnosis of SN
-ALL.LIFESTYLE$ANY.SN_gradedate <- SARCOMA$gradedt[match(ALL.LIFESTYLE$SJLIFEID, SARCOMA$sjlid)]
-ALL.LIFESTYLE$AGE.ANY_SN <- SARCOMA$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, SARCOMA$sjlid)]
+ALL.LIFESTYLE$ANY.SN_gradedate <- MENINGIOMA$gradedt[match(ALL.LIFESTYLE$SJLIFEID, MENINGIOMA$sjlid)]
+ALL.LIFESTYLE$AGE.ANY_SN <- MENINGIOMA$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, MENINGIOMA$sjlid)]
 
 
 ############################################################################################
@@ -165,7 +165,7 @@ to.remove <- ALL.LIFESTYLE$SJLIFEID[which(ALL.LIFESTYLE$survey_min > ALL.LIFESTY
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% to.remove,]
 
 sum(PHENO.ANY_SN$sjlid %in% ALL.LIFESTYLE$SJLIFEID)
-# 3675
+# 3627
 
 ## Remove any samples that do not have lifestyle
 PHENO.ANY_SN  <- PHENO.ANY_SN[PHENO.ANY_SN$sjlid %in% ALL.LIFESTYLE$SJLIFEID,]
@@ -257,7 +257,14 @@ PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET <- ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS_W
 PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET[is.na(PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET)] <- "Unknown"
 PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET <- factor(PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET, level = c("favorable", "intermediate", "unfavorable", "Unknown"))
 
+############################
+## Add missing treatments ##
+############################
+## Add any missing to each tx variable
+PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
+PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
 
+table(PHENO.ANY_SN$any_tx_missing)
 
 #########################
 ## Extract Ethnicities ##
@@ -265,6 +272,35 @@ PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET <- factor(PHENO.ANY_SN$LIFESTYLE_STATUS_WO
 ## Add admixture ethnicity 
 ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
+
+############################################################
+## Drop Unknown level from the lifestyle factor variables ##
+############################################################
+## Recode tx variables to fit the model for missingness
+## Missing tx
+PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxsegrtdose.category <- droplevels(PHENO.ANY_SN$maxsegrtdose.category)
+
+PHENO.ANY_SN$maxneckrtdose.category[PHENO.ANY_SN$maxneckrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxneckrtdose.category <- droplevels(PHENO.ANY_SN$maxneckrtdose.category)
+
+PHENO.ANY_SN$maxabdrtdose.category[PHENO.ANY_SN$maxabdrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxabdrtdose.category <- droplevels(PHENO.ANY_SN$maxabdrtdose.category)
+
+PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$maxchestrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxchestrtdose.category <- droplevels(PHENO.ANY_SN$maxchestrtdose.category)
+
+PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$maxpelvisrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxpelvisrtdose.category <- droplevels(PHENO.ANY_SN$maxpelvisrtdose.category)
+
+PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "Unknown"] <- "None"
+PHENO.ANY_SN$epitxn_dose_5.category <- droplevels(PHENO.ANY_SN$epitxn_dose_5.category)
+
+PHENO.ANY_SN$anthra_jco_dose_5.category[PHENO.ANY_SN$anthra_jco_dose_5.category == "Unknown"] <- "None"
+PHENO.ANY_SN$anthra_jco_dose_5.category <- droplevels(PHENO.ANY_SN$anthra_jco_dose_5.category)
+
+PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "Unknown"] <- "None"
+PHENO.ANY_SN$aa_class_dose_5.category <- droplevels(PHENO.ANY_SN$aa_class_dose_5.category)
 
 
 ################
@@ -277,21 +313,21 @@ CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
 
 CROSS_CASES.df <- PHENO.ANY_SN
 
-CROSS_CASES.df <- CROSS_CASES.df[,c("SARCOMA", "aa_class_dose_5.category")]
+CROSS_CASES.df <- CROSS_CASES.df[,c("MENINGIOMA", "maxsegrtdose.category", "epitxn_dose_5.category")]
 
-CROSS_CASES.df <- apply_labels(CROSS_CASES.df, SARCOMA = "SARCOMA", 
-                               aa_class_dose_5.category = "aa_class_dose_5.category")
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df, MENINGIOMA = "MENINGIOMA", 
+                               maxsegrtdose.category = "maxsegrtdose.category", epitxn_dose_5.category = "epitxn_dose_5.category")
 
 as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(SARCOMA, list(aa_class_dose_5.category))))
+                  cross_cases(MENINGIOMA, list(maxsegrtdose.category, epitxn_dose_5.category))))
 
 
 cc <- as.data.frame(t(CROSS_CASES.df %>%
-                        cross_cases(SARCOMA, list(aa_class_dose_5.category))))
+                        cross_cases(MENINGIOMA, list(maxsegrtdose.category, epitxn_dose_5.category))))
 
 rownames(cc) <- NULL 
 cc
 
 
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.SARCOMA.V14-4-3_with_composite_lifestyle.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.MENINGIOMA.V14-4-3_with_composite_lifestyle.Rdata")

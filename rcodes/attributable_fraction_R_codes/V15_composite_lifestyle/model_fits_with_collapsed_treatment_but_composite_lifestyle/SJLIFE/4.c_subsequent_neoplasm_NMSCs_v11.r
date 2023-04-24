@@ -66,19 +66,20 @@ sum(!duplicated(subneo.within5$sjlid))
 #############
 ## Any SNs ##
 #############
-# Get SMNs for the first time and Age at First SMNs.
+# Get NMSCs for the first time and Age at First NMSCs.
 # For this, I will first sort the table by date
 library(data.table)
-SMNs <- subneo[!grepl("basal cell|squamous cell", subneo$diag, ignore.case = T),]
-SMNs <- setDT(SMNs)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+NMSCs <- subneo[grepl("basal cell|squamous cell", subneo$diag, ignore.case = T),]
+NMSCs <- setDT(NMSCs)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 
 ## Remove SNs as cases that are within 5 years of primary diagnosis
-SMNs <- SMNs[!SMNs$sjlid %in% subneo.within5$sjlid,]
-nrow(SMNs)
+NMSCs <- NMSCs[!NMSCs$sjlid %in% subneo.within5$sjlid,]
+nrow(NMSCs)
+# 249
 
 
-## Remove SMNs if younger than 18
-PHENO.ANY_SN$AGE.ANY_SN <- SMNs$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, SMNs$sjlid)]
+## Remove NMSCs if younger than 18
+PHENO.ANY_SN$AGE.ANY_SN <- NMSCs$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, NMSCs$sjlid)]
 
 if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
@@ -89,23 +90,22 @@ sum(PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid)
 # 22
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid,]
 
-PHENO.ANY_SN$SMNs <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% SMNs$sjlid, 0, 1))
-
-table(PHENO.ANY_SN$SMNs)
+PHENO.ANY_SN$NMSCs <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% NMSCs$sjlid, 0, 1))
+table(PHENO.ANY_SN$NMSCs)
 # 0    1 
-# 3925  424
+# 4130  240
 
 #############################
 ## Add Lifestyle variables ##
 #############################
 # Define CA/CO status in lifestyle
-ALL.LIFESTYLE$CACO <- factor(ifelse(!ALL.LIFESTYLE$SJLIFEID %in% SMNs$sjlid, 0, 1))
+ALL.LIFESTYLE$CACO <- factor(ifelse(!ALL.LIFESTYLE$SJLIFEID %in% NMSCs$sjlid, 0, 1))
 
 
 
 ## Get date (gradedt) and age at diagnosis of SN
-ALL.LIFESTYLE$ANY.SN_gradedate <- SMNs$gradedt[match(ALL.LIFESTYLE$SJLIFEID, SMNs$sjlid)]
-ALL.LIFESTYLE$AGE.ANY_SN <- SMNs$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, SMNs$sjlid)]
+ALL.LIFESTYLE$ANY.SN_gradedate <- NMSCs$gradedt[match(ALL.LIFESTYLE$SJLIFEID, NMSCs$sjlid)]
+ALL.LIFESTYLE$AGE.ANY_SN <- NMSCs$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, NMSCs$sjlid)]
 
 
 ############################################################################################
@@ -125,7 +125,7 @@ ALL.LIFESTYLE <- ALL.LIFESTYLE[!(ALL.LIFESTYLE$Current_smoker_yn == "Unknown" &
                                    ALL.LIFESTYLE$Obese_yn == "Unknown" ),]
 
 dim(ALL.LIFESTYLE)
-# [1] 3692   16
+# [1] 3692   25
 
 sum((ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey >= 18|
        ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey >= 18|
@@ -165,7 +165,7 @@ to.remove <- ALL.LIFESTYLE$SJLIFEID[which(ALL.LIFESTYLE$survey_min > ALL.LIFESTY
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% to.remove,]
 
 sum(PHENO.ANY_SN$sjlid %in% ALL.LIFESTYLE$SJLIFEID)
-# 3480
+# 3562
 
 ## Remove any samples that do not have lifestyle
 PHENO.ANY_SN  <- PHENO.ANY_SN[PHENO.ANY_SN$sjlid %in% ALL.LIFESTYLE$SJLIFEID,]
@@ -257,7 +257,14 @@ PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET <- ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS_W
 PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET[is.na(PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET)] <- "Unknown"
 PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET <- factor(PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET, level = c("favorable", "intermediate", "unfavorable", "Unknown"))
 
+############################
+## Add missing treatments ##
+############################
+## Add any missing to each tx variable
+PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "maxabdrtdose.category", "maxpelvisrtdose.category")], 1, function(x) any("Unknown" %in% x))
+PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
 
+table(PHENO.ANY_SN$any_tx_missing)
 
 #########################
 ## Extract Ethnicities ##
@@ -265,6 +272,37 @@ PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET <- factor(PHENO.ANY_SN$LIFESTYLE_STATUS_WO
 ## Add admixture ethnicity 
 ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
+
+
+############################################################
+## Drop Unknown level from the lifestyle factor variables ##
+############################################################
+## Recode tx variables to fit the model for missingness
+## Missing tx
+PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxsegrtdose.category <- droplevels(PHENO.ANY_SN$maxsegrtdose.category)
+
+PHENO.ANY_SN$maxneckrtdose.category[PHENO.ANY_SN$maxneckrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxneckrtdose.category <- droplevels(PHENO.ANY_SN$maxneckrtdose.category)
+
+PHENO.ANY_SN$maxabdrtdose.category[PHENO.ANY_SN$maxabdrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxabdrtdose.category <- droplevels(PHENO.ANY_SN$maxabdrtdose.category)
+
+PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$maxchestrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxchestrtdose.category <- droplevels(PHENO.ANY_SN$maxchestrtdose.category)
+
+PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$maxpelvisrtdose.category == "Unknown"] <- "None"
+PHENO.ANY_SN$maxpelvisrtdose.category <- droplevels(PHENO.ANY_SN$maxpelvisrtdose.category)
+
+PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "Unknown"] <- "None"
+PHENO.ANY_SN$epitxn_dose_5.category <- droplevels(PHENO.ANY_SN$epitxn_dose_5.category)
+
+PHENO.ANY_SN$anthra_jco_dose_5.category[PHENO.ANY_SN$anthra_jco_dose_5.category == "Unknown"] <- "None"
+PHENO.ANY_SN$anthra_jco_dose_5.category <- droplevels(PHENO.ANY_SN$anthra_jco_dose_5.category)
+
+PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "Unknown"] <- "None"
+PHENO.ANY_SN$aa_class_dose_5.category <- droplevels(PHENO.ANY_SN$aa_class_dose_5.category)
+
 
 ################
 ## Cross tabs ##
@@ -276,30 +314,21 @@ CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
 
 CROSS_CASES.df <- PHENO.ANY_SN
 
-CROSS_CASES.df <- CROSS_CASES.df[,c("SMNs", "maxsegrtdose.category", "maxchestrtdose.category", "maxabdrtdose.category", "epitxn_dose_5.category")]
+CROSS_CASES.df <- CROSS_CASES.df[,c("NMSCs", "maxsegrtdose.category", "maxabdrtdose.category", "maxpelvisrtdose.category")]
 
-CROSS_CASES.df <- apply_labels(CROSS_CASES.df, SMNs = "SMNs", 
-                               maxsegrtdose.category = "maxsegrtdose.category", maxchestrtdose.category = "maxchestrtdose.category", 
-                               maxabdrtdose.category = "maxabdrtdose.category", epitxn_dose_5.category = "epitxn_dose_5.category")
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df, NMSCs = "NMSCs", 
+                               maxsegrtdose.category = "maxsegrtdose.category", maxabdrtdose.category="maxabdrtdose.category", maxpelvisrtdose.category = "maxpelvisrtdose.category")
 
 as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(SMNs, list(maxsegrtdose.category, maxchestrtdose.category, maxabdrtdose.category, epitxn_dose_5.category))))
+                  cross_cases(NMSCs, list(maxsegrtdose.category, maxabdrtdose.category, maxpelvisrtdose.category))))
 
 
 cc <- as.data.frame(t(CROSS_CASES.df %>%
-                        cross_cases(SMNs, list(maxsegrtdose.category, maxchestrtdose.category, maxabdrtdose.category, epitxn_dose_5.category))))
+                        cross_cases(NMSCs, list(maxsegrtdose.category, maxabdrtdose.category, maxpelvisrtdose.category))))
 
 rownames(cc) <- NULL 
 cc
 
 
-# Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for cases
-cases_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$SMNs == 1],
-                     Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$SMNs == 1])
-
-# Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for controls
-control_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$SMNs == 0],
-                       Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$SMNs == 0])
-
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.SMNs.V14-4-3_with_composite_lifestyle.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.NMSCs.V14-4-3_with_composite_lifestyle.Rdata")
