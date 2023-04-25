@@ -24,7 +24,7 @@ fit_all = glm(formula = SARCOMA ~ Sarcoma_Machiela_PRS.tertile.category +
                 aa_class_dose_5.category +
                 Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
                 EAS + AFR + 
-                LIFESTYLE_STATUS_WO_DIET,
+                LIFESTYLE_STATUS_WO_DIET + any_tx_missing, 
               family = binomial,
               data = dat_all)
 
@@ -62,7 +62,7 @@ dat_all$pred_all = predict(fit_all, newdat = dat_all, type = "response")
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx = dat_all
 
-# dat_tx$any_tx_missing <- "No"
+dat_tx$any_tx_missing <- "No"
 
 dat_tx$aa_class_dose_5.category = "None"
 
@@ -103,7 +103,7 @@ round(af_by_N_no_favorable_lifestyle.category,3)
 
 dat_tx.plp.prs.lifestyle = dat_all
 
-# dat_tx.plp.prs.lifestyle$any_tx_missing <- "No"
+dat_tx.plp.prs.lifestyle$any_tx_missing <- "No"
 # dat_tx.plp.prs.lifestyle$any_lifestyle_missing <- "No"
 
 ## Nullify Treatment
