@@ -141,17 +141,53 @@ dim(PHENO.ANY_SN)
 ######################### ** END
 
 
-## Add any missing to each lifestyle variable
-# PHENO.ANY_SN[c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn")]
-PHENO.ANY_SN$any_lifestyle_missing <- apply(PHENO.ANY_SN[c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn")], 1, function(x) any("Unknown" %in% x))
-PHENO.ANY_SN$any_lifestyle_missing  <- factor(ifelse(PHENO.ANY_SN$any_lifestyle_missing == FALSE, "No", "Yes"))
+##################################
+## Imputation of missing values ##
+##################################
+# wanted items
+wanted.cols <- wanted.cols <- c("Current_smoker_yn", "PhysicalActivity_yn", "Obese_yn", "RiskyHeavyDrink_yn")
 
-table(PHENO.ANY_SN$any_lifestyle_missing)
-# No  Yes 
-# 72 7734
-########################################
-## Do the same for missing treatments ##
-########################################
+ALL.LIFESTYLE.IMPUTE <- PHENO.ANY_SN[c("ccssid", wanted.cols)]
+
+## create composite without diet
+
+ALL.LIFESTYLE.IMPUTE[c("Current_smoker_yn", "PhysicalActivity_yn", "Obese_yn", "RiskyHeavyDrink_yn")] <- lapply(ALL.LIFESTYLE.IMPUTE[c("Current_smoker_yn", "PhysicalActivity_yn", "Obese_yn", "RiskyHeavyDrink_yn")], function(x) ifelse(x == "Unknown", NA, as.character(x)))
+
+## Making healthy outcomes as 1 else 0
+ALL.LIFESTYLE.IMPUTE$Current_smoker_yn <- ifelse(ALL.LIFESTYLE.IMPUTE$Current_smoker_yn == "No", 1, 0)
+ALL.LIFESTYLE.IMPUTE$RiskyHeavyDrink_yn <- ifelse(ALL.LIFESTYLE.IMPUTE$RiskyHeavyDrink_yn == "No", 1, 0)
+ALL.LIFESTYLE.IMPUTE$Obese_yn <- ifelse(ALL.LIFESTYLE.IMPUTE$Obese_yn == "No", 1, 0)
+ALL.LIFESTYLE.IMPUTE$PhysicalActivity_yn <- ifelse(ALL.LIFESTYLE.IMPUTE$PhysicalActivity_yn == "Yes", 1, 0)
+
+## Number of items available to get scores
+ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score <- rowSums(!is.na(ALL.LIFESTYLE.IMPUTE[wanted.cols]))
+
+# If all 4 (after removing HEALTHY_Diet_yn) items are available; they were simply summed up to get the score 
+ALL.LIFESTYLE.IMPUTE$SCORE [ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score == 4] <-  rowSums(ALL.LIFESTYLE.IMPUTE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score == 4, wanted.cols])
+
+## For missing items, per Qi: "For people with missing items, mean of non-missing items were taken and then multiplied by the # of items to get the score"
+ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items <- rowMeans(ALL.LIFESTYLE.IMPUTE[wanted.cols], na.rm = T)
+ALL.LIFESTYLE.IMPUTE$imputedSCORE <- ALL.LIFESTYLE.IMPUTE$mean_of_non_missing_items * ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score
+
+# replace the score values with imputed score for missing ones; this was applied to rows where items available (non-missing ones) are >= 2 & < 4 
+ALL.LIFESTYLE.IMPUTE$SCORE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score >= 2 & ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score < 4] <- ALL.LIFESTYLE.IMPUTE$imputedSCORE[ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score >= 2 & ALL.LIFESTYLE.IMPUTE$number_of_items_to_get_score < 4]
+
+# Define favorable, intermediate and unfavorable----
+ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS_WO_DIET[ALL.LIFESTYLE.IMPUTE$SCORE>= 3] <- "favorable" # favorable [at least 3 of the five health lifestyle factors]
+ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS_WO_DIET[ALL.LIFESTYLE.IMPUTE$SCORE == 2] <- "intermediate" # intermediate [two healthy lifestyle factors] 
+ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS_WO_DIET[ALL.LIFESTYLE.IMPUTE$SCORE <= 1] <- "unfavorable" # unfavorable [no or only one healthy lifestyle factor] 
+
+## Add to PHENO
+PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET <- ALL.LIFESTYLE.IMPUTE$LIFESTYLE_STATUS_WO_DIET[match(PHENO.ANY_SN$ccssid, ALL.LIFESTYLE.IMPUTE$ccssid)]
+
+# relevel factors
+PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET[is.na(PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET)] <- "Unknown"
+PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET <- factor(PHENO.ANY_SN$LIFESTYLE_STATUS_WO_DIET, level = c("favorable", "intermediate", "unfavorable", "Unknown"))
+
+
+############################
+## Add missing treatments ##
+############################
 PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("aa_class_dose_5.category")], 1, function(x) any("Unknown" %in% x))
 PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
 
@@ -167,24 +203,10 @@ ethnicity.admixture$INDIVIDUAL <- sapply(strsplit(ethnicity.admixture$INDIVIDUAL
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$ccssid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
 
 
-############################################################
-## Drop Unknown level from the lifestyle factor variables ##
-############################################################
-## Recode lifestyle variables to fit the model for missingness
-## Missing lifestyle
-PHENO.ANY_SN$Current_smoker_yn[PHENO.ANY_SN$Current_smoker_yn == "Unknown"] <- "No"
-PHENO.ANY_SN$Current_smoker_yn <- droplevels(PHENO.ANY_SN$Current_smoker_yn)
-
-PHENO.ANY_SN$PhysicalActivity_yn[PHENO.ANY_SN$PhysicalActivity_yn == "Unknown"] <- "Yes"
-PHENO.ANY_SN$PhysicalActivity_yn <- droplevels(PHENO.ANY_SN$PhysicalActivity_yn)
-
-PHENO.ANY_SN$RiskyHeavyDrink_yn[PHENO.ANY_SN$RiskyHeavyDrink_yn == "Unknown"] <- "No"
-PHENO.ANY_SN$RiskyHeavyDrink_yn <- droplevels(PHENO.ANY_SN$RiskyHeavyDrink_yn)
-
-PHENO.ANY_SN$Obese_yn[PHENO.ANY_SN$Obese_yn == "Unknown"] <- "No"
-PHENO.ANY_SN$Obese_yn <- droplevels(PHENO.ANY_SN$Obese_yn)
-
-
+#####################################################
+## Drop Unknown level from the tx factor variables ##
+#####################################################
+## Recode tx variables to fit the model for missingness
 ## Missing tx
 PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxsegrtdose.category <- droplevels(PHENO.ANY_SN$maxsegrtdose.category)
@@ -209,44 +231,6 @@ PHENO.ANY_SN$anthra_jco_dose_5.category <- droplevels(PHENO.ANY_SN$anthra_jco_do
 
 PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "Unknown"] <- "None"
 PHENO.ANY_SN$aa_class_dose_5.category <- droplevels(PHENO.ANY_SN$aa_class_dose_5.category)
-
-# ###############################################
-# ## Find out benign Sarcoma's and remove them ##
-# ###############################################
-# # # based on Yadav's email on 03/09/2023, I am removing all benign diagnoses from the list of 52 survivors
-# ## This file is from Kyla
-# KIRI.ccss <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Kyla/combinedsn_final_02_17_2023.csv", header = T, sep = ",", stringsAsFactors = F)
-# dim(KIRI.ccss)
-# ## Keep non-missing candxo3
-# KIRI.ccss <- KIRI.ccss[!is.na(KIRI.ccss$candxo3),]
-# # KIRI.ccss <- KIRI.ccss[KIRI.ccss$candxo3 !="",]
-# KIRI.ccss <- KIRI.ccss[KIRI.ccss$d_candx !="",]
-# dim(KIRI.ccss)
-# KIRI.ccss$SN_diagnosis_date <- as.Date(KIRI.ccss$d_candx, format = "%d%b%Y")
-# KIRI.ccss$SN_diagnosis_date <- format(KIRI.ccss$SN_diagnosis_date, "%m-%d-%Y") # 06-30-2008
-# KIRI.ccss$KEY <- paste(KIRI.ccss$ccssid, KIRI.ccss$SN_diagnosis_date, sep = ":")
-# 
-# PHENO.ANY_SN$SN_diagnosis_date <- as.Date(PHENO.ANY_SN$d_candx, format = "%d%b%Y")
-# PHENO.ANY_SN$SN_diagnosis_date  <- format(PHENO.ANY_SN$SN_diagnosis_date, "%m-%d-%Y") # "08-23-2016"
-# PHENO.ANY_SN$ccssid <- gsub("_.*","",PHENO.ANY_SN$ccssid)
-# PHENO.ANY_SN$KEY <- paste(PHENO.ANY_SN$ccssid, PHENO.ANY_SN$SN_diagnosis_date, sep = ":")
-# 
-# 
-# table(PHENO.ANY_SN$KEY %in% KIRI.ccss$KEY)
-# # FALSE  TRUE 
-# # 6250  1556 
-# 
-# 
-# 
-# SARCOMA <- PHENO.ANY_SN[PHENO.ANY_SN$SARCOMA == 1,]
-# KIRI.ccss <- KIRI.ccss[KIRI.ccss$KEY %in% SARCOMA$KEY,]
-# KIRI.save <- KIRI.ccss
-# KIRI.ccss <- KIRI.ccss[grepl("\\/0|\\/1", KIRI.ccss$candxo3),]
-# 
-# PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% KIRI.ccss$ccssid,]
-table(PHENO.ANY_SN$SARCOMA)
-# 7730   43
-##########################################
 
 ################
 ## Cross tabs ##
@@ -275,5 +259,5 @@ cc
 
 
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA.V14.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA.V15_with_composite_lifestyle.Rdata")
 
