@@ -30,7 +30,6 @@ fit_all = glm(formula = BREASTcancer ~
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + 
                 AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS +
                 maxchestrtdose.category + anthra_jco_dose_5.category +
-                Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
                 EAS + AFR +
                 LIFESTYLE_STATUS_WO_DIET + any_tx_missing, 
               family = binomial,
@@ -126,7 +125,7 @@ dat_tx.plp.prs.lifestyle$maxchestrtdose.category =
 dat_tx.plp.prs.lifestyle$Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category = "1st"
 
 ## Nullify Lifestyle
-dat_lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable"
+dat_tx.plp.prs.lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_tx.plp.prs.lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable"
 
 
 

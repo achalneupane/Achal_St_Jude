@@ -22,7 +22,6 @@ fit_all = glm(formula = SARCOMA ~ Sarcoma_Machiela_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 gender + 
                 aa_class_dose_5.category +
-                Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
                 EAS + AFR + 
                 LIFESTYLE_STATUS_WO_DIET + any_tx_missing, 
               family = binomial,
@@ -115,7 +114,7 @@ dat_tx.plp.prs.lifestyle$aa_class_dose_5.category = "None"
 dat_tx.plp.prs.lifestyle$Sarcoma_Machiela_PRS.tertile.category = "1st"
 
 ## Nullify Lifestyle
-dat_lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable"
+dat_tx.plp.prs.lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_tx.plp.prs.lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable"
 
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx.plp.prs.lifestyle, type = "response")
@@ -127,7 +126,7 @@ SARCOMA.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favo
 SARCOMA.res
 # 0.373 0.023 0.541 0.744
 
-all.res <- cbind.data.frame(SN=SN.res, SMN=SMN.res, NMSC=NMSC.res, BREAST=BREAST.res, THYROID=THYROID.res, MENINGIOMA=MENINGIOMA.res, SARCOMA.res)
+all.res <- cbind.data.frame(SN=SN.res, SMN=SMN.res, NMSC=NMSC.res, BREAST=BREAST.res, THYROID=THYROID.res, MENINGIOMA=MENINGIOMA.res, SARCOMA=SARCOMA.res)
 # View(all.res)
 View(t(all.res))
 

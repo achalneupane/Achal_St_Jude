@@ -1,5 +1,5 @@
 # load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.Any_SNs.V14.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.Any_SNs.V15_with_composite_lifestyle.Rdata")
 
 # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 cc
@@ -21,9 +21,8 @@ fit_all = glm(formula = ANY_SNs ~ Pleiotropy_PRSWEB_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + 
                 maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category +
-                Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
                 EAS + AFR + 
-                any_lifestyle_missing + any_tx_missing,
+                LIFESTYLE_STATUS_WO_DIET + any_tx_missing,
               family = binomial,
               data = dat_all)
 
@@ -89,13 +88,7 @@ round(af_by_plp.prs,3)
 ###############
 dat_lifestyle = dat_all
 
-dat_lifestyle$any_lifestyle_missing <- "No"
-
-dat_lifestyle$Current_smoker_yn = "No"
-dat_lifestyle$PhysicalActivity_yn = "Yes"
-dat_lifestyle$RiskyHeavyDrink_yn = "No"
-# dat_lifestyle$HEALTHY_Diet_yn = "Yes"
-dat_lifestyle$Obese_yn = "No"
+dat_lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable"
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
@@ -122,11 +115,7 @@ dat_tx.plp.prs.lifestyle$maxsegrtdose.category =
 dat_tx.plp.prs.lifestyle$Pleiotropy_PRSWEB_PRS.tertile.category = "1st"
 
 ## Nullify Lifestyle
-dat_tx.plp.prs.lifestyle$Current_smoker_yn = "No"
-dat_tx.plp.prs.lifestyle$PhysicalActivity_yn = "Yes"
-dat_tx.plp.prs.lifestyle$RiskyHeavyDrink_yn = "No"
-# dat_tx.plp.prs.lifestyle$HEALTHY_Diet_yn = "Yes"
-dat_tx.plp.prs.lifestyle$Obese_yn = "No"
+dat_tx.plp.prs.lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_tx.plp.prs.lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable"
 
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx.plp.prs.lifestyle, type = "response")

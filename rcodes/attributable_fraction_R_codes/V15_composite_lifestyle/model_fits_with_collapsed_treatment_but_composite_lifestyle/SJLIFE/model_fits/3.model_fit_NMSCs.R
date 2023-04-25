@@ -26,7 +26,6 @@ dat_all = PHENO.ANY_SN
 fit_all = glm(formula = NMSCs ~ BASALcell_PRS.tertile.category + 
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 gender + maxsegrtdose.category + maxabdrtdose.category + maxpelvisrtdose.category +
-                Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
                 EAS + AFR +
                 LIFESTYLE_STATUS_WO_DIET + any_tx_missing,  
               family = binomial,
@@ -128,7 +127,7 @@ dat_tx.plp.prs.lifestyle$maxsegrtdose.category =
 dat_tx.plp.prs.lifestyle$SQUAMOUScell_PRS.tertile.category = dat_tx.plp.prs.lifestyle$BASALcell_PRS.tertile.category = "1st"
 
 ## Nullify Lifestyle
-dat_lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable"
+dat_tx.plp.prs.lifestyle$LIFESTYLE_STATUS_WO_DIET [!grepl("Unknown", dat_tx.plp.prs.lifestyle$LIFESTYLE_STATUS_WO_DIET)] = "favorable"
 
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_tx.plp.prs.lifestyle, type = "response")
