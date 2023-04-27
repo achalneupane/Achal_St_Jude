@@ -41,18 +41,17 @@ subneo <- as.data.frame(subneo[c("sjlid", "gradedt", "diag", "diaggrp")])
 merged_df <- merge(dat1, subneo, by = "sjlid", all = TRUE)
 # View(merged_df)
 
-rm(list=ls()[!grepl("merged_df", ls())])
+# rm(list=ls()[!grepl("merged_df", ls())])
+# ## De-identify IDs
+# deidentify <- function(x) {
+#   return(paste0("DE_Identified_", match(x, unique(x))))
+# }
 
-## De-identify IDs
-deidentify <- function(x) {
-  return(paste0("DE_Identified_", match(x, unique(x))))
-}
+# merged_df$sjlid <- deidentify(merged_df$sjlid)
 
-merged_df$sjlid <- deidentify(merged_df$sjlid)
-
-# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/merged_df.RData")
-
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/merged_df.RData")
+# # save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/merged_df.RData")
+# 
+# load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/merged_df.RData")
 
 data <- merged_df[c("sjlid", "dob", "agelstcontact", "agedx", "gradedt" )]
 
