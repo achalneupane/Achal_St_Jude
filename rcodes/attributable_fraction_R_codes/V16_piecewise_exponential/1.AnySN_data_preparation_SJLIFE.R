@@ -1,57 +1,6 @@
-library(lubridate)
 library("survival")
 
 rm(list=ls())
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
-PHENO.ANY_SN
-
-dat1 <- PHENO.ANY_SN[c("sjlid", "dob", "agelstcontact", "agedx")]
-
-## SN
-subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
-head(subneo)
-table(subneo$diaggrp)
-dim(subneo)
-# 1731 9
-
-sum(subneo$sjlid %in% PHENO.ANY_SN$sjlid)
-subneo <- subneo[subneo$sjlid %in% PHENO.ANY_SN$sjlid,] ## exclude those not in WGS
-
-subneo$dob <- PHENO.ANY_SN$dob[match(subneo$sjlid, PHENO.ANY_SN$sjlid)]
-# subneo$diagdt <- PHENO.ANY_SN$diagdt[match(subneo$sjlid, PHENO.ANY_SN$sjlid)]
-subneo$agedx <- PHENO.ANY_SN$agedx[match(subneo$sjlid, PHENO.ANY_SN$sjlid)]
-
-## Remove SN within 5 years of primary cancer
-subneo$AGE.ANY_SN <- time_length(interval(as.Date(subneo$dob), as.Date(subneo$gradedt)), "years")
-
-## These two dates should be the (almost) same
-# subneo$AGE.ANY_SN.after.childhood.cancer <- time_length(interval(as.Date(subneo$diagdt), as.Date(subneo$gradedt)), "years")
-subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subneo$agedx
-
-# How many SNs after 5 years
-subneo <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5,]
-length(unique(subneo$sjlid))
-# 613
-
-
-## For Any SN
-subneo <- as.data.frame(subneo[c("sjlid", "gradedt", "diag", "diaggrp")])
-# ## For breast cancer
-# subneo <- subneo[grepl("breast", subneo$diag, ignore.case = T),]
-merged_df <- merge(dat1, subneo, by = "sjlid", all = TRUE)
-# View(merged_df)
-
-rm(list=ls()[!grepl("merged_df", ls())])
-
-## De-identify IDs
-deidentify <- function(x) {
-  return(paste0("DE_Identified_", match(x, unique(x))))
-}
-
-merged_df$sjlid <- deidentify(merged_df$sjlid)
-
-# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/merged_df.RData")
-
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/merged_df.RData")
 
 data <- merged_df[c("sjlid", "dob", "agelstcontact", "agedx", "gradedt" )]
@@ -107,9 +56,17 @@ table(adata$event)## Double check event numebr is correct
 
 ###any stop time <=start time
 any <- adata[adata$end<=adata$start,]
-### 2 people had the stroke date on the Fu date. In this case, either get rid of the 2 lines [i.e, no time is follow-up after the last event date], or add 1 day on end date of these 2 segments, assuming there were followed up 1 more day. Will not make much difference. 1 day out of 365 days is 0.0027.
+### 467 lines or 166 people had the SN date on the Fu date or the next date. In this case, either get rid of the 467 lines [i.e, no time is follow-up after the last event date], or add 1 day on end date of these segments, assuming there were followed up 1 more day. Will not make much difference. 1 day out of 365 days.
 dim(adata)
+# 6095
+# adding 1 day to any
+adata$end[adata$end<=adata$start] <- adata$end[adata$end<=adata$start] + 1/365
+
+## There were still 75 lines with SN date before Fu date. Getting rid of these lines
+any <- adata[adata$end<=adata$start,]
 final <- adata[adata$end>adata$start,]
+dim(final)
+# 6020
 
 minimum  <-  min(final$start, na.rm = TRUE) - 1
 if (minimum < 0) minimum <- 0
@@ -119,82 +76,4 @@ table(SNs_py$event)   ## Double check event numebr is correct
 #### If you need the rows for first event analysis, take evt1=1
 length(unique(SNs_py$sjlid[SNs_py$event==1]))
 length(unique(SNs_py$sjlid[SNs_py$event==1 & SNs_py$evt1==1 ]))
-
-################################
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#########################################################
-
-
-## Adult habits
-adult_habbits <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Survey Data/adult_healthhabits.sas7bdat')
-
-
-demog <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/demog.sas7bdat")
-head(demog)
-demog <- demog[,c("MRN", "dob", "gender", "race", "ethnic", "agedx", "agelstcontact")]
-
-
-
-
-
-
-
-
-
-subneo <- subneo[subneo$sjlid %in% PHENO.ANY_SN$sjlid ,]
-dim(subneo)
-# 1717
-# add diagnosis date 
-subneo$diagdt <-  PHENO.ANY_SN$diagdt [match(subneo$sjlid , PHENO.ANY_SN$sjlid)]
-subneo$agedx <-  PHENO.ANY_SN$agedx [match(subneo$sjlid , PHENO.ANY_SN$sjlid)]
-# add DOB
-subneo$DOB <- PHENO.ANY_SN$dob[match(subneo$sjlid, PHENO.ANY_SN$sjlid)]
-
-subneo$AGE.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
-
-## These two dates should be the (almost) same
-subneo$AGE.ANY_SN.after.childhood.cancer <- time_length(interval(as.Date(subneo$diagdt), as.Date(subneo$gradedt)), "years")
-subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subneo$agedx
-
-# How many SNs after 5 years
-subneo.after5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5,]
-length(unique(subneo.after5$sjlid))
-# 612
-
-subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
-sum(!duplicated(subneo.within5$sjlid))
-
-
-
-
-
-
-##################################################################################
-# CCSS
 
