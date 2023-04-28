@@ -1,4 +1,8 @@
-
+library(dplyr)
+library(tidyr)
+library(DESeq2)
+library(ggplot2)
+library(pheatmap)
 
 #########################################
 ## Pre-processing of raw file metadata ##
@@ -73,6 +77,9 @@ clinical <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/CAB/common/UMD_
 colnames(clinical) <- gsub("[_]+", "_", gsub(" |\\/|\\(", "_", colnames(clinical)))
 colnames(clinical) <- gsub("\\)", "", colnames(clinical))
 
+colnames(clinical) <- gsub('^3', 'three', colnames(clinical))
+colnames(clinical) <- gsub('^12', 'twelve', colnames(clinical))
+
 ##########################################################
 
 ##############
@@ -88,45 +95,91 @@ colnames(clinical) <- gsub("\\)", "", colnames(clinical))
 
 
 
-df.test <- df[1:10, 1:11]
-clinical.test <- clinical[grepl("R022|R044", clinical$Subject_ID),]
 
-library(dplyr)
-library(tidyr)
-library(DESeq2)
-library(ggplot2)
-library(pheatmap)
+clinical_3P <- clinical %>% mutate(Subject_ID = paste0(Subject_ID, "_3P"))
+clinical_12P <- clinical %>% mutate(Subject_ID = paste0(Subject_ID, "_12P"))
 
+clinical_3P$time_point <- "three_P"
+clinical_12P$time_point <- "twelve_P"
 
+clinical_alt <- rbind(clinical_3P[order(clinical_3P$Subject_ID), ],
+                      clinical_12P[order(clinical_12P$Subject_ID), ])
+clinical <- rbind(clinical_3P, clinical_12P)[order(c(seq(1,nrow(clinical_3P)*2,2),seq(2,nrow(clinical_12P)*2,2))),]
 
+rownames(df) <- df$Tag_name
+df <- select(df, -c(Tag_name))
 
-
-## 1.
-# Convert count data to matrix
-countData <- as.matrix(df[,grepl("_12P", colnames(df))])
-
-# Create a column metadata data frame
-colData <- clinical[,c("Subject_ID", "12_month_status")]
-
-# Rename column names in colData to match column names in countData
-colnames(colData)[1] <- "sample"
-
-# Remove rows with missing values in colData
-colData <- colData[complete.cases(colData),]
+df.test <- df[1:10, c(grep("R022|R044|R046|R058|R085", colnames(df)))]
+clinical.test <- clinical[grepl("R022|R044|R046|R058|R085", clinical$Subject_ID), c("Subject_ID", "twelve_month_status", "Overall_status", "time_point", "Donor_Age", "Donor_Gender_M_F")]
 
 
 
-# Create DESeq2 object
-dds <- DESeqDataSetFromMatrix(countData, colData, ~ sample)
 
+# 1. Cross-sectional Comparisons:
+# a. 3 months: Poor vs Good function
+# Define the comparison
+contrast_3P <- c("three_month_status", "Poor", "Good")
+contrast_12P <- c("twelve_month_status", "Poor", "Good")
 
-
-# Run DESeq2 analysis
+# Run DESeq2 with the contrast
+dds <- DESeqDataSetFromMatrix(countData = df, colData = clinical, design = ~ three_month_status + Donor_Age + Donor_Gender_M_F)
 dds <- DESeq(dds)
+res_3P <- results(dds, contrast = contrast_3P)
+# b. 12 months: Poor vs Good function
+dds <- DESeqDataSetFromMatrix(countData = df, colData = clinical, design = ~ twelve_month_status + Donor_Age + Donor_Gender_M_F)
+dds <- DESeq(dds)
+res_12P <- results(dds, contrast = contrast_12P)
 
-# Get differential expression results for 3 month status
-res_3mo <- results(dds, contrast=c("3_month_status", "Poor", "Good"))
 
-# Get differential expression results for 12 month status
-res_12mo <- results(dds, contrast=c("12_month_status", "Poor", "Good"))
+# Create the volcano plots
+# Volcano plot for 3 months
+res_3P.df <- as.data.frame(res_3P)
+res_3P.df <- res_3P.df[!is.na(res_3P.df$padj),]
+ggplot(res_3P.df, aes(x = log2FoldChange, y = -log10(padj))) +
+  geom_point(aes(color = ifelse(padj < 0.05, "significant", "not_significant")), alpha = 5, size = 5) +
+  scale_color_manual(values = c("red", "black")) +
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") +
+  geom_vline(xintercept = c(-1, 1), linetype = "dashed") +
+  # geom_text(aes(label = ifelse(padj < 0.05, rownames(res_3P.df), "")), vjust = 2.5, size = 3) +
+  labs(x = "log2 Fold Change", y = "-log10(adjusted p-value)", color = "Significance") +
+  ggtitle("Volcano Plot for Small RNA seq Data (3 months)") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        # panel.border = element_blank(),
+        panel.background = element_blank()
+  )
+
+
+
+# Volcano plot for 12 months
+res_12P.df <- as.data.frame(res_12P)
+res_12P.df <- res_12P.df[!is.na(res_12P.df$padj),]
+ggplot(res_12P.df, aes(x = log2FoldChange, y = -log10(padj))) +
+  geom_point(aes(color = ifelse(padj < 0.05, "significant", "not_significant")), alpha = 5, size = 5) +
+  scale_color_manual(values = c("red", "black")) +
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") +
+  geom_vline(xintercept = c(-1, 1), linetype = "dashed") +
+  # geom_text(aes(label = ifelse(padj < 0.05, rownames(res_3P.df), "")), vjust = 2.5, size = 3) +
+  labs(x = "log2 Fold Change", y = "-log10(adjusted p-value)", color = "Significance") +
+  ggtitle("Volcano Plot for Small RNA seq Data (12 months)") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        # panel.border = element_blank(),
+        panel.background = element_blank()
+  )
+
+
+# 2. Longitudinal comparison: 
+# Longitudinal comparison: 
+#   3 months Good vs 12 months Good
+threeM.g.12M.g <- clinical.test[grepl("Good", clinical.test$Overall_status),]
+
+#   3 months Poor vs 12 months Poor
+
+
+
 
