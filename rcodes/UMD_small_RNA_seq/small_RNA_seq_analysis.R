@@ -66,11 +66,6 @@ clinical <- rbind(clinical_3P, clinical_12P)[order(c(seq(1,nrow(clinical_3P)*2,2
 rownames(df) <- df$Tag_name
 df <- select(df, -c(Tag_name))
 
-# df.test <- df[1:10, c(grep("R022|R044|R046|R058|R085", colnames(df)))]
-# clinical.test <- clinical[grepl("R022|R044|R046|R058|R085", clinical$Subject_ID), c("Subject_ID", "twelve_month_status", "Overall_status", "time_point", "Donor_Age", "Donor_Gender_M_F")]
-
-
-
 
 # 1. Cross-sectional Comparisons:
 ########################################
@@ -106,6 +101,17 @@ ggplot(res_3P.df, aes(x = log2FoldChange, y = -log10(padj))) +
         panel.background = element_blank()
   )
 
+
+# unsupervised hierarchical clustering
+vsd <- varianceStabilizingTransformation(dds)
+# extract normalized count data
+norm_counts <- assay(vsd)
+# perform hierarchical clustering
+dist_matrix <- dist(t(norm_counts))
+hc <- hclust(dist_matrix)
+plot(hc, main="Hierarchical clustering of small RNA-seq data")
+
+
 #########################################
 ## b. 12 months: Poor vs Good function ##
 #########################################
@@ -131,6 +137,16 @@ ggplot(res_12P.df, aes(x = log2FoldChange, y = -log10(padj))) +
         # panel.border = element_blank(),
         panel.background = element_blank()
   )
+
+
+# unsupervised hierarchical clustering
+vsd <- varianceStabilizingTransformation(dds)
+# extract normalized count data
+norm_counts <- assay(vsd)
+# perform hierarchical clustering
+dist_matrix <- dist(t(norm_counts))
+hc <- hclust(dist_matrix)
+plot(hc, main="Hierarchical clustering of small RNA-seq data")
 
 # 2. Longitudinal comparison: 
 # Longitudinal comparison: 
@@ -205,45 +221,4 @@ ggplot(res_poor.df, aes(x = log2FoldChange, y = -log10(padj))) +
   )
 
 ################################
-## 3. Unsupervised hierarchical clustering
-# Load necessary libraries
-library(DESeq2)
-library(pheatmap)
-
-# Read count data into a DESeq2 data object
-dds <- DESeqDataSetFromMatrix(countData = df, colData = clinical, design = ~ twelve_month_status)
-
-# Perform differential expression analysis to get variance stabilized counts
-dds <- DESeq(dds)
-
-# Get variance stabilized counts for clustering
-vsd <- assay(vst(dds))
-
-# Perform unsupervised hierarchical clustering
-distance_matrix <- dist(t(vsd))
-clusters <- hclust(distance_matrix, method = "ward.D2")
-
-# Plot the dendrogram
-plot(clusters, main = "Unsupervised Hierarchical Clustering")
-
-
-
-
-library(DESeq2)
-
-# create DESeqDataSet object
-dds <- DESeqDataSetFromMatrix(countData = df,
-                              colData = clinical,
-                              design = ~ twelve_month_status)
-
-# normalize data using varianceStabilizingTransformation
-vsd <- varianceStabilizingTransformation(dds)
-
-# extract normalized count data
-norm_counts <- assay(vsd)
-
-# perform hierarchical clustering
-dist_matrix <- dist(t(norm_counts))
-hc <- hclust(dist_matrix)
-plot(hc, main="Hierarchical clustering of small RNA-seq data")
 
