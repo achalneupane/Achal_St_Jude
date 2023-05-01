@@ -5,6 +5,7 @@ library(ggplot2)
 library(pheatmap)
 library(ComplexHeatmap)
 library(gplots)
+library("genefilter")
 #############
 ## Analyis ##
 #############
@@ -77,10 +78,10 @@ df <- select(df, -c(Tag_name))
 ########################################
 # Define the comparison
 contrast_3P <- c("three_month_status", "Poor", "Good")
-
+df_filtered = df[rowSums(df)>40,]
 
 # Run DESeq2 with the contrast
-dds <- DESeqDataSetFromMatrix(countData = df, colData = clinical, design = ~ three_month_status + Donor_Age + Donor_Gender_M_F)
+dds <- DESeqDataSetFromMatrix(countData = df_filtered, colData = clinical, design = ~ three_month_status + Donor_Age + Donor_Gender_M_F)
 dds <- DESeq(dds)
 res_3P <- results(dds, contrast = contrast_3P)
 
@@ -89,7 +90,7 @@ res_3P <- results(dds, contrast = contrast_3P)
 # Volcano plot for 3 months
 res_3P.df <- as.data.frame(res_3P)
 res_3P.df <- res_3P.df[!is.na(res_3P.df$padj),]
-# top20 <- res_3P.df[head(order(res_3P.df$padj, decreasing = FALSE ), 20),]
+top20 <- res_3P.df[head(order(res_3P.df$padj, decreasing = FALSE ), 20),]
 ggplot(res_3P.df, aes(x = log2FoldChange, y = -log10(padj))) +
   geom_point(aes(color = ifelse(padj < 0.05, "significant", "not_significant")), alpha = 5, size = 5) +
   scale_color_manual(values = c("red", "black")) +
@@ -120,15 +121,16 @@ norm_counts <- assay(vsd)
 # Perform unsupervised hierarchical clustering of the samples using the heatmap.2 function from the gplots package:
 # scale the data
 # Filter dds to include only the top 20 genes by log2 fold change
-top_20_genes <- head(order(results(dds)$log2FoldChange, decreasing = TRUE), 20)
-dds_top_20 <- dds[top_20_genes,]
-
+# top_20_genes <- head(order(results(dds)$log2FoldChange, decreasing = TRUE), 20)
+# dds_top_20 <- dds[top_20_genes,]
+top_genes <- rownames(norm_counts)[order(rowVars(norm_counts), decreasing = TRUE)[1:100]]
+top_norm_counts <- norm_counts[top_genes, ]
 # Scale the gene expression data
 scaled_data <- t(scale(t(counts(dds_top_20)), center = TRUE, scale = TRUE))
 
 
 ## create a heatmap of the samples using unsupervised hierarchical clustering
-heatmap.2(scaled_data,
+heatmap.2(top_norm_counts,
           Colv=TRUE,
           Rowv=TRUE,
           distfun = dist,
@@ -150,7 +152,8 @@ heatmap.2(scaled_data,
 #########################################
 ## b. 12 months: Poor vs Good function ##
 #########################################
-dds <- DESeqDataSetFromMatrix(countData = df, colData = clinical, design = ~ twelve_month_status + Donor_Age + Donor_Gender_M_F)
+df_filtered = df[rowSums(df)>40,]
+dds <- DESeqDataSetFromMatrix(countData = df_filtered, colData = clinical, design = ~ twelve_month_status + Donor_Age + Donor_Gender_M_F)
 dds <- DESeq(dds)
 contrast_12P <- c("twelve_month_status", "Poor", "Good")
 res_12P <- results(dds, contrast = contrast_12P)
@@ -158,6 +161,7 @@ res_12P <- results(dds, contrast = contrast_12P)
 # Volcano plot for 12 months
 res_12P.df <- as.data.frame(res_12P)
 res_12P.df <- res_12P.df[!is.na(res_12P.df$padj),]
+top20 <- res_12P.df[head(order(res_12P.df$padj, decreasing = FALSE ), 20),]
 ggplot(res_12P.df, aes(x = log2FoldChange, y = -log10(padj))) +
   geom_point(aes(color = ifelse(padj < 0.05, "significant", "not_significant")), alpha = 5, size = 5) +
   scale_color_manual(values = c("red", "black")) +
@@ -184,35 +188,42 @@ ggplot(res_12P.df, aes(x = log2FoldChange, y = -log10(padj))) +
 # hc <- hclust(dist_matrix)
 # plot(hc, main="Hierarchical clustering of small RNA-seq data")
 
-# Perform unsupervised hierarchical clustering of the samples using the heatmap.2 function from the gplots package:
-# scale the data
-# Filter dds to include only the top 20 genes by log2 fold change
-top_20_genes <- head(order(results(dds)$log2FoldChange, decreasing = TRUE), 20)
-dds_top_20 <- dds[top_20_genes,]
+# # Perform unsupervised hierarchical clustering of the samples using the heatmap.2 function from the gplots package:
+# # scale the data
+# # Filter dds to include only the top 20 genes by log2 fold change
+# top_20_genes <- head(order(results(dds)$log2FoldChange, decreasing = TRUE), 20)
+# dds_top_20 <- dds[top_20_genes,]
+# 
+# # Scale the gene expression data
+# scaled_data <- t(scale(t(counts(dds_top_20)), center = TRUE, scale = TRUE))
+# 
+# 
+# ## create a heatmap of the samples using unsupervised hierarchical clustering
+# rld <- rlog( dds )
+# assay(rld)[ 1:3, 1:3]
+# sampleDists <- dist( t( assay(rld) ) )
+# as.matrix( sampleDists )[ 1:3, 1:3 ]
+# 
+# topVarGenes <- head( order( rowVars( assay(rld) ), decreasing=TRUE ), 35 )
+# heatmap.2(assay(rld)[ topVarGenes, ],
+#           Colv=TRUE,
+#           Rowv=TRUE,
+#           distfun = dist,
+#           hclustfun = hclust,
+#           # dendrogram="col",
+#           trace="none",
+#           margins=c(10,10),
+#           key=TRUE,
+#           keysize=1.5,
+#           key.title="Log2 Count",
+#           key.xlab="",
+#           cexRow=0.8,
+#           cexCol=0.8,
+#           reorderfun = function(d, w) reorder(d, w),
+#           labCol=rownames(design),
+#           density.info="none",
+#           main="12 months poor Vs good")
 
-# Scale the gene expression data
-scaled_data <- t(scale(t(counts(dds_top_20)), center = TRUE, scale = TRUE))
-
-
-## create a heatmap of the samples using unsupervised hierarchical clustering
-heatmap.2(scaled_data,
-          Colv=TRUE,
-          Rowv=TRUE,
-          distfun = dist,
-          hclustfun = hclust,
-          # dendrogram="col",
-          trace="none",
-          margins=c(10,10),
-          key=TRUE,
-          keysize=1.5,
-          key.title="Log2 Count",
-          key.xlab="",
-          cexRow=0.8,
-          cexCol=0.8,
-          reorderfun = function(d, w) reorder(d, w),
-          labCol=rownames(design),
-          density.info="none",
-          main="12 months poor Vs good")
 
 
 # 2. Longitudinal comparison: 
@@ -224,6 +235,7 @@ three_months_good_samples <- clinical$Subject_ID[clinical$time_point == "three_P
 twelve_months_good_samples <- clinical$Subject_ID[clinical$time_point == "twelve_P" & clinical$twelve_month_status == "Good"]
 good_samples <- c(three_months_good_samples, twelve_months_good_samples)
 df_filtered <- df[, good_samples]
+df_filtered = df_filtered[rowSums(df_filtered)>40,]
 clinical_filtered <- clinical[clinical$Subject_ID %in% good_samples,]
 
 
@@ -232,11 +244,12 @@ dds <- DESeqDataSetFromMatrix(countData = df_filtered, colData = clinical_filter
 
 # Run differential expression analysis
 dds <- DESeq(dds)
-contrast <- c("time_point", "twelve_P", "three_P")
+contrast <- c("time_point", "three_P", "twelve_P")
 res_good <-  results(dds, contrast = contrast)
 
 res_good.df <- as.data.frame(res_good)
 res_good.df <- res_good.df[!is.na(res_good.df$padj),]
+top20 <- res_good.df[head(order(res_good.df$padj, decreasing = FALSE ), 20),]
 ggplot(res_good.df, aes(x = log2FoldChange, y = -log10(padj))) +
   geom_point(aes(color = ifelse(padj < 0.05, "significant", "not_significant")), alpha = 5, size = 5) +
   scale_color_manual(values = c("red", "black")) +
@@ -260,6 +273,7 @@ three_months_poor_samples <- clinical$Subject_ID[clinical$time_point == "three_P
 twelve_months_poor_samples <- clinical$Subject_ID[clinical$time_point == "twelve_P" & clinical$twelve_month_status == "Poor"]
 poor_samples <- c(three_months_poor_samples, twelve_months_poor_samples)
 df_filtered <- df[, poor_samples]
+df_filtered = df_filtered[rowSums(df_filtered)>40,]
 clinical_filtered <- clinical[clinical$Subject_ID %in% poor_samples,]
 
 # Create DESeqDataSet object using count matrix and the properties data
@@ -267,11 +281,12 @@ dds <- DESeqDataSetFromMatrix(countData = df_filtered, colData = clinical_filter
 
 # Run differential expression analysis
 dds <- DESeq(dds)
-contrast <- c("time_point", "twelve_P", "three_P")
+contrast <- c("time_point", "three_P", "twelve_P")
 res_poor <-  results(dds, contrast = contrast)
 
 res_poor.df <- as.data.frame(res_poor)
 res_poor.df <- res_poor.df[!is.na(res_poor.df$padj),]
+top20 <- res_poor.df[head(order(res_poor.df$padj, decreasing = FALSE ), 20),]
 ggplot(res_poor.df, aes(x = log2FoldChange, y = -log10(padj))) +
   geom_point(aes(color = ifelse(padj < 0.05, "significant", "not_significant")), alpha = 5, size = 5) +
   scale_color_manual(values = c("red", "black")) +
