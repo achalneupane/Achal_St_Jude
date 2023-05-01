@@ -3,7 +3,8 @@ library(tidyr)
 library(DESeq2)
 library(ggplot2)
 library(pheatmap)
-
+library(ComplexHeatmap)
+library(gplots)
 #############
 ## Analyis ##
 #############
@@ -112,6 +113,28 @@ hc <- hclust(dist_matrix)
 plot(hc, main="Hierarchical clustering of small RNA-seq data")
 
 
+# Perform unsupervised hierarchical clustering of the samples using the heatmap.2 function from the gplots package:
+# scale the data
+scaled_data <- t(scale(t(counts(dds)), center = TRUE, scale = TRUE))
+
+# create a heatmap of the samples using unsupervised hierarchical clustering
+heatmap.2(scaled_data,
+          Colv=FALSE,
+          Rowv=TRUE,
+          dendrogram="row",
+          trace="none",
+          margins=c(10,10),
+          key=TRUE,
+          keysize=1.5,
+          key.title="Log2 Count",
+          key.xlab="",
+          cexRow=0.8,
+          cexCol=0.8,
+          labCol=rownames(design),
+          density.info="none",
+          main="Unsupervised Hierarchical Clustering Heatmap")
+
+
 #########################################
 ## b. 12 months: Poor vs Good function ##
 #########################################
@@ -147,6 +170,8 @@ norm_counts <- assay(vsd)
 dist_matrix <- dist(t(norm_counts))
 hc <- hclust(dist_matrix)
 plot(hc, main="Hierarchical clustering of small RNA-seq data")
+
+
 
 # 2. Longitudinal comparison: 
 # Longitudinal comparison: 
