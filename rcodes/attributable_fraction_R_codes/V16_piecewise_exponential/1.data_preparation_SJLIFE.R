@@ -1,14 +1,17 @@
 library(lubridate)
 library("survival")
+library(haven)
+library(dplyr)
 
 rm(list=ls())
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
-PHENO.ANY_SN
 
 dat1 <- PHENO.ANY_SN[c("sjlid", "dob", "agelstcontact", "agedx")]
 
 ## SN
 subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
+deaths <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Tracking Data//deathsummary.sas7bdat")
+
 head(subneo)
 table(subneo$diaggrp)
 dim(subneo)
@@ -22,6 +25,7 @@ subneo$dob <- PHENO.ANY_SN$dob[match(subneo$sjlid, PHENO.ANY_SN$sjlid)]
 subneo$agedx <- PHENO.ANY_SN$agedx[match(subneo$sjlid, PHENO.ANY_SN$sjlid)]
 
 ## Remove SN within 5 years of primary cancer
+subneo$gradedt[grepl("3003-04-22", subneo$gradedt)] <- "2003-04-22"
 subneo$AGE.ANY_SN <- time_length(interval(as.Date(subneo$dob), as.Date(subneo$gradedt)), "years")
 
 ## These two dates should be the (almost) same
@@ -31,11 +35,13 @@ subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subne
 # How many SNs after 5 years
 subneo <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5,]
 length(unique(subneo$sjlid))
-# 613
+# 612
 
 
 ## For Any SN
-subneo <- as.data.frame(subneo[c("sjlid", "gradedt", "diag", "diaggrp")])
+subneo <- as.data.frame(subneo[c("sjlid", "gradedt", "diag", "diaggrp", "AGE.ANY_SN")])
+subneo$agedeath <- deaths$agedeath[match(subneo$sjlid, deaths$sjlid)]
+  
 # ## For breast cancer
 # subneo <- subneo[grepl("breast", subneo$diag, ignore.case = T),]
 merged_df <- merge(dat1, subneo, by = "sjlid", all = TRUE)
@@ -53,7 +59,39 @@ merged_df <- merge(dat1, subneo, by = "sjlid", all = TRUE)
 # 
 # load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/merged_df.RData")
 
-data <- merged_df[c("sjlid", "dob", "agelstcontact", "agedx", "gradedt" )]
+data <- merged_df[c("sjlid", "dob", "agelstcontact", "agedx", "gradedt", "AGE.ANY_SN", "agedeath")]
+
+data <- distinct(data)
+data <- data %>% arrange(sjlid, gradedt)
+
+## Merge Phenotype to it
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.Any_SNs.V14-4-3.Rdata")
+data <- data[data$sjlid %in% PHENO.ANY_SN$sjlid,]
+
+data <- cbind.data.frame(data, PHENO.ANY_SN[match(data$sjlid, PHENO.ANY_SN$sjlid), c("Pleiotropy_PRSWEB_PRS.tertile.category",
+  "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4",
+  "AGE_AT_DIAGNOSIS", "gender", 
+  "maxsegrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category", "epitxn_dose_5.category",
+  "Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn",
+  "EAS", "AFR", 
+  "any_lifestyle_missing", "any_tx_missing")])
+
+
+
+
+sum(data$AGE.ANY_SN > data$agelstcontact, na.rm = T) # e.g., SJL1391401
+# SN.after.agelst <- cbind.data.frame(sjlid = data$sjlid[which(data$AGE.ANY_SN > data$agelstcontact)],
+#                                     agelstcontact = data$agelstcontact[which(data$AGE.ANY_SN > data$agelstcontact)],
+#                                     AGE.ANY_SN = data$AGE.ANY_SN[which(data$AGE.ANY_SN > data$agelstcontact)],
+#                                     agediff = abs(data$agelstcontact[which(data$AGE.ANY_SN > data$agelstcontact)]- data$AGE.ANY_SN[which(data$AGE.ANY_SN > data$agelstcontact)]),
+#                                     ageatdeath = data$agedeath[which(data$AGE.ANY_SN > data$agelstcontact)])
+
+
+
+cc1 <- data[which(data$AGE.ANY_SN > data$agelstcontact),]
+cc1$new_agelstcontact <- data$AGE.ANY_SN[which(data$AGE.ANY_SN > data$agelstcontact)]
+data$agelstcontact[which(data$AGE.ANY_SN > data$agelstcontact)] <- data$AGE.ANY_SN[which(data$AGE.ANY_SN > data$agelstcontact)]
+
 
 data$event <- ifelse(!is.na(data$gradedt), 1, 0) # those with SN grade dates
 
@@ -71,11 +109,12 @@ alldata <- merge(data,event.number,by.x="sjlid",by.y="sjlid")
 alldata$start <- NULL
 alldata$end <- NULL
 ### For those without event, start is agedx and end is Fu date === for SN, analysis starts from 5 years post DX (SNs within 5 years have been removed from the analysis)
-alldata$start[alldata$event==0] <- alldata$agedx[alldata$event==0]
-alldata$end[alldata$event==0] <- alldata$agelstcontact[alldata$event==0]
+alldata$start[alldata$event==0] <- alldata$agedx[alldata$event==0] + 5
+### Qi: You said the analysis start from 5 years post DX, then the above line should be revised to: alldata$start[alldata$event==0] <- alldata$agedx[alldata$event==0]+5
+alldata$end[alldata$event==0] <- alldata$agelstcontact[alldata$event==0] 
 
 ### For the first event, start is agedx and end is first event time
-alldata$start[alldata$event==1 & alldata$first==1] <- alldata$agedx[alldata$event==1 & alldata$first==1]
+alldata$start[alldata$event==1 & alldata$first==1] <- alldata$agedx[alldata$event==1 & alldata$first==1] 
 alldata$end[alldata$event==1 & alldata$first==1] <- as.numeric(difftime(alldata$gradedt[alldata$event==1 & alldata$first==1],alldata$dob[alldata$event==1 & alldata$first==1], units = 'days')/365.25)
 
 #### For events that are not the first, segments are from the previous event date to this event date
@@ -105,8 +144,10 @@ adata <- adata[order(adata$sjlid, adata$start, decreasing = FALSE),]
 table(adata$event)## Double check event numebr is correct
 
 ###any stop time <=start time
-any <- adata[adata$end<=adata$start,]
+adata$end[adata$end<=adata$start] <- adata$end[adata$end<=adata$start] + 1/365
+any <- adata[adata$end<=adata$start,] # SJL1302101, SJL1305301 
 ### 2 people had the stroke date on the Fu date. In this case, either get rid of the 2 lines [i.e, no time is follow-up after the last event date], or add 1 day on end date of these 2 segments, assuming there were followed up 1 more day. Will not make much difference. 1 day out of 365 days is 0.0027.
+diff=any$start-any$end ###Qi: These are people who had SN after the last contact date. Just wonder why this could happen. While it may not make the results differ, I wonder is there any reason to keep the events but change last contact date to be SN+1day? Depends on why there are SN after last contact date.
 dim(adata)
 final <- adata[adata$end>adata$start,]
 
@@ -119,32 +160,14 @@ table(SNs_py$event)   ## Double check event numebr is correct
 length(unique(SNs_py$sjlid[SNs_py$event==1]))
 length(unique(SNs_py$sjlid[SNs_py$event==1 & SNs_py$evt1==1 ]))
 
+SNs_py$PY <- SNs_py$end-SNs_py$start
+
 ################################
+library("geepack")
+formula = 'event ~ Pleiotropy_PRSWEB_PRS.tertile.category + AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category + Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn + EAS + AFR + any_lifestyle_missing + any_tx_missing'
+geeglm(formula = formula, family = "poisson", id = "sjlid", corstr = "independence",  std.err = "san.se", data = data)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+fit_all <- geeglm(formula = SNs_py$event ~ SNs_py$gender, family = "poisson", offset = log(SNs_py$PY), id = SNs_py$sjlid, corstr = "independence",  std.err = "san.se")
 
 
 #########################################################
