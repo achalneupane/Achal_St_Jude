@@ -83,7 +83,7 @@ table(stroke_py$event)   ## Double check event numebr is correct
 length(unique(stroke_py$sjlid[stroke_py$event==1]))
 length(unique(stroke_py$sjlid[stroke_py$event==1 & stroke_py$evt1==1 ]))
 
+stroke_py$PY <- stroke_py$end-stroke_py$start
 
 
-
-
+geeglm(formula = event ~ agedx, family = "poisson", offset = log(stroke_py$PY), id = stroke_py$sjlid, corstr = "independence",  std.err = "san.se", data = stroke_py)
