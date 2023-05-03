@@ -5,7 +5,6 @@ library(ggplot2)
 library(pheatmap)
 library(ComplexHeatmap)
 library(gplots)
-library("genefilter")
 #############
 ## Analyis ##
 #############
@@ -39,21 +38,6 @@ colnames(clinical) <- gsub("\\)", "", colnames(clinical))
 colnames(clinical) <- gsub('^3', 'three', colnames(clinical))
 colnames(clinical) <- gsub('^12', 'twelve', colnames(clinical))
 
-##########################################################
-
-##############
-## Analysis ##
-##############
-# Cross-sectional Comparisons:
-#   3 months: Poor vs Good function
-#   12 months: Poor vs Good function
-# Longitudinal comparison: 
-#   3 months Good vs 12 months Good
-#   3 months Poor vs 12 months Poor
-# If possible, could you also request an unsupervised hierarchical clustering? 
-
-
-
 
 clinical_3P <- clinical %>% mutate(Subject_ID = paste0(Subject_ID, "_3P"))
 clinical_12P <- clinical %>% mutate(Subject_ID = paste0(Subject_ID, "_12P"))
@@ -67,7 +51,18 @@ clinical <- rbind(clinical_3P, clinical_12P)[order(c(seq(1,nrow(clinical_3P)*2,2
 
 rownames(df) <- df$Tag_name
 df <- select(df, -c(Tag_name))
+##########################################################
 
+##############
+## Analysis ##
+##############
+# Cross-sectional Comparisons:
+#   3 months: Poor vs Good function
+#   12 months: Poor vs Good function
+# Longitudinal comparison: 
+#   3 months Good vs 12 months Good
+#   3 months Poor vs 12 months Poor
+# If possible, could you also request an unsupervised hierarchical clustering? 
 
 # clinical.test <- clinical[grepl("R022_|R044_|R046_|R058_|R085_", clinical$Subject_ID), c("Subject_ID", "three_month_status", "twelve_month_status", "time_point", "Donor_Age", "Donor_Gender_M_F")]
 # df.test <- df[1:10, colnames(df) %in% clinical.test$Subject_ID]
@@ -108,46 +103,7 @@ ggplot(res_3P.df, aes(x = log2FoldChange, y = -log10(padj))) +
   )
 
 
-# unsupervised hierarchical clustering
-vsd <- varianceStabilizingTransformation(dds)
-# extract normalized count data
-norm_counts <- assay(vsd)
-# perform hierarchical clustering
-# dist_matrix <- dist(t(norm_counts))
-# hc <- hclust(dist_matrix)
-# plot(hc, main="Hierarchical clustering of small RNA-seq data")
 
-
-# Perform unsupervised hierarchical clustering of the samples using the heatmap.2 function from the gplots package:
-# scale the data
-# Filter dds to include only the top 20 genes by log2 fold change
-# top_20_genes <- head(order(results(dds)$log2FoldChange, decreasing = TRUE), 20)
-# dds_top_20 <- dds[top_20_genes,]
-top_genes <- rownames(norm_counts)[order(rowVars(norm_counts), decreasing = TRUE)[1:100]]
-top_norm_counts <- norm_counts[top_genes, ]
-# Scale the gene expression data
-scaled_data <- t(scale(t(counts(dds_top_20)), center = TRUE, scale = TRUE))
-
-
-## create a heatmap of the samples using unsupervised hierarchical clustering
-heatmap.2(top_norm_counts,
-          Colv=TRUE,
-          Rowv=TRUE,
-          distfun = dist,
-          hclustfun = hclust,
-          # dendrogram="col",
-          trace="none",
-          margins=c(10,10),
-          key=TRUE,
-          keysize=1.5,
-          key.title="Log2 Count",
-          key.xlab="",
-          cexRow=0.8,
-          cexCol=0.8,
-          reorderfun = function(d, w) reorder(d, w),
-          labCol=rownames(design),
-          density.info="none",
-          main="3 months poor Vs good")
 
 #########################################
 ## b. 12 months: Poor vs Good function ##
@@ -177,52 +133,6 @@ ggplot(res_12P.df, aes(x = log2FoldChange, y = -log10(padj))) +
         # panel.border = element_blank(),
         panel.background = element_blank()
   )
-
-
-## unsupervised hierarchical clustering
-# vsd <- varianceStabilizingTransformation(dds)
-# extract normalized count data
-# norm_counts <- assay(vsd)
-# perform hierarchical clustering
-# dist_matrix <- dist(t(norm_counts))
-# hc <- hclust(dist_matrix)
-# plot(hc, main="Hierarchical clustering of small RNA-seq data")
-
-# # Perform unsupervised hierarchical clustering of the samples using the heatmap.2 function from the gplots package:
-# # scale the data
-# # Filter dds to include only the top 20 genes by log2 fold change
-# top_20_genes <- head(order(results(dds)$log2FoldChange, decreasing = TRUE), 20)
-# dds_top_20 <- dds[top_20_genes,]
-# 
-# # Scale the gene expression data
-# scaled_data <- t(scale(t(counts(dds_top_20)), center = TRUE, scale = TRUE))
-# 
-# 
-# ## create a heatmap of the samples using unsupervised hierarchical clustering
-# rld <- rlog( dds )
-# assay(rld)[ 1:3, 1:3]
-# sampleDists <- dist( t( assay(rld) ) )
-# as.matrix( sampleDists )[ 1:3, 1:3 ]
-# 
-# topVarGenes <- head( order( rowVars( assay(rld) ), decreasing=TRUE ), 35 )
-# heatmap.2(assay(rld)[ topVarGenes, ],
-#           Colv=TRUE,
-#           Rowv=TRUE,
-#           distfun = dist,
-#           hclustfun = hclust,
-#           # dendrogram="col",
-#           trace="none",
-#           margins=c(10,10),
-#           key=TRUE,
-#           keysize=1.5,
-#           key.title="Log2 Count",
-#           key.xlab="",
-#           cexRow=0.8,
-#           cexCol=0.8,
-#           reorderfun = function(d, w) reorder(d, w),
-#           labCol=rownames(design),
-#           density.info="none",
-#           main="12 months poor Vs good")
 
 
 
@@ -303,5 +213,65 @@ ggplot(res_poor.df, aes(x = log2FoldChange, y = -log10(padj))) +
         panel.background = element_blank()
   )
 
-################################
+############################################# # 4. Unsupervised hierarchical
+#clustering ## ############################################ we will use no
+#design parameter as specified "~1". It is a formula notation in R to indicate
+#the intercept-only model, which means that there is no specific variable used
+#for normalization or comparison between groups.
+dds <- DESeqDataSetFromMatrix(countData = df, colData = clinical, design=~1)
+dds <- DESeq(dds)
 
+# unsupervised hierarchical clustering
+vsd <- varianceStabilizingTransformation(dds)
+# extract normalized count data
+norm_counts <- assay(vsd)
+# Perform unsupervised hierarchical clustering of the samples using the heatmap.2 function from the gplots package:
+# scale the data
+# Filter dds to include only the top 20 genes by log2 fold change
+# top_20_genes <- head(order(results(dds)$log2FoldChange, decreasing = TRUE), 20)
+# dds_top_20 <- dds[top_20_genes,]
+top_genes <- rownames(norm_counts)[order(rowVars(norm_counts), decreasing = TRUE)[1:100]]
+top_norm_counts <- norm_counts[top_genes, ]
+# Scale the gene expression data
+# scaled_data <- t(scale(t(counts(dds_top_20)), center = TRUE, scale = TRUE))
+
+
+## create a heatmap of the samples using unsupervised hierarchical clustering
+condition_labels <- factor(design$condition, levels = c("condition1", "condition2"))
+heatmap.2(top_norm_counts,
+          Colv=TRUE,
+          Rowv=TRUE,
+          distfun = dist,
+          hclustfun = hclust,
+          # dendrogram="col",
+          trace="none",
+          margins=c(10,10),
+          key=TRUE,
+          keysize=1.5,
+          key.title="Log2 Count",
+          key.xlab="",
+          cexRow=0.8,
+          cexCol=0.8,
+          reorderfun = function(d, w) reorder(d, w),
+          labCol=rownames(design),
+          density.info="none",
+          main="")
+
+
+heatmap.2(top_norm_counts,
+          Colv=TRUE,
+          Rowv=TRUE,
+          distfun = dist,
+          hclustfun = hclust,
+          trace="none",
+          margins=c(10,10),
+          key=TRUE,
+          keysize=1.5,
+          key.title="Log2 Count",
+          key.xlab="",
+          cexRow=0.8,
+          cexCol=0.8,
+          reorderfun = function(d, w) reorder(d, w),
+          labCol=condition_labels,  # provide the vector of column labels with the correct order of conditions
+          density.info="none",
+          main="")
