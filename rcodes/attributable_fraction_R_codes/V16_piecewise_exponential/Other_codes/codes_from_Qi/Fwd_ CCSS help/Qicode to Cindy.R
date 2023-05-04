@@ -3,7 +3,7 @@
 
 
 rm(list=ls())
-load("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V16_piecewise_exponential/codes_from_Qi/Fwd_ CCSS help/STROKE_counting_process_data_to_check_for_Qi.RData")
+load("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V16_piecewise_exponential/Other_codes/codes_from_Qi/Fwd_ CCSS help/STROKE_counting_process_data_to_check_for_Qi.RData")
 
 library("survival")
 
