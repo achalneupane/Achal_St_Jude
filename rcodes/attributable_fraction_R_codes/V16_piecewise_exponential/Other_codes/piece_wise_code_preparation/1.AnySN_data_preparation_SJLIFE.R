@@ -3,7 +3,7 @@ library("survival")
 rm(list=ls())
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/merged_df.RData")
 
-data <- merged_df[c("sjlid", "dob", "agelstcontact", "agedx", "gradedt" )]
+# data <- merged_df[c("sjlid", "dob", "agelstcontact", "agedx", "gradedt" )]
 
 data$event <- ifelse(!is.na(data$gradedt), 1, 0) # those with SN grade dates
 
@@ -25,7 +25,7 @@ alldata$start[alldata$event==0] <- alldata$agedx[alldata$event==0]
 alldata$end[alldata$event==0] <- alldata$agelstcontact[alldata$event==0]
 
 ### For the first event, start is agedx and end is first event time
-alldata$start[alldata$event==1 & alldata$first==1] <- alldata$agedx[alldata$event==1 & alldata$first==1]
+alldata$start[alldata$event==1 & alldata$first==1] <- alldata$agedx[alldata$event==1 & alldata$first==1] +5
 alldata$end[alldata$event==1 & alldata$first==1] <- as.numeric(difftime(alldata$gradedt[alldata$event==1 & alldata$first==1],alldata$dob[alldata$event==1 & alldata$first==1], units = 'days')/365.25)
 
 #### For events that are not the first, segments are from the previous event date to this event date
@@ -33,7 +33,7 @@ alldata$previous <- as.Date(c(NA,alldata$gradedt[1:length(alldata$gradedt)-1]),o
 alldata[1:10,]
 ### if first>1 (i.e, 2 or more events, previous event time remained, others are missing)
 alldata$previous[alldata$first==1] <- NA
-alldata$start[alldata$first>1] <- as.numeric(difftime(alldata$previous[alldata$first>1],alldata$dob[alldata$first>1], units = 'days')/365.25)
+alldata$start[alldata$first>1] <- as.numeric(difftime(alldata$previous[alldata$first>1],alldata$dob[alldata$first>1], units = 'days')/365.25) +5
 alldata$end[alldata$first>1] <- as.numeric(difftime(alldata$gradedt[alldata$first>1],alldata$dob[alldata$first>1], units = 'days')/365.25)
 
 

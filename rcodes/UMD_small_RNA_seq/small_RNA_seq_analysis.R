@@ -64,8 +64,10 @@ df <- select(df, -c(Tag_name))
 #   3 months Poor vs 12 months Poor
 # If possible, could you also request an unsupervised hierarchical clustering? 
 
-# clinical.test <- clinical[grepl("R022_|R044_|R046_|R058_|R085_", clinical$Subject_ID), c("Subject_ID", "three_month_status", "twelve_month_status", "time_point", "Donor_Age", "Donor_Gender_M_F")]
-# df.test <- df[1:10, colnames(df) %in% clinical.test$Subject_ID]
+# # clinical.test <- clinical[grepl("R022_|R044_|R046_|R058_|R085_", clinical$Subject_ID), c("Subject_ID", "three_month_status", "twelve_month_status", "time_point", "Donor_Age", "Donor_Gender_M_F")]
+# clinical.test <- clinical[c(22,3,23,10,29,28,7,26,9,21,25,14,13,12,16,30,27,17,4,6), c("Subject_ID", "three_month_status", "twelve_month_status", "time_point", "Donor_Age", "Donor_Gender_M_F")]
+# # df.test <- df[1:10, colnames(df) %in% clinical.test$Subject_ID]
+# df.test <- df[1:30, colnames(df) %in% clinical.test$Subject_ID]
 
 # 1. Cross-sectional Comparisons:
 ########################################
@@ -235,29 +237,15 @@ top_norm_counts <- norm_counts[top_genes, ]
 # Scale the gene expression data
 # scaled_data <- t(scale(t(counts(dds_top_20)), center = TRUE, scale = TRUE))
 
-
 ## create a heatmap of the samples using unsupervised hierarchical clustering
-condition_labels <- factor(design$condition, levels = c("condition1", "condition2"))
-heatmap.2(top_norm_counts,
-          Colv=TRUE,
-          Rowv=TRUE,
-          distfun = dist,
-          hclustfun = hclust,
-          # dendrogram="col",
-          trace="none",
-          margins=c(10,10),
-          key=TRUE,
-          keysize=1.5,
-          key.title="Log2 Count",
-          key.xlab="",
-          cexRow=0.8,
-          cexCol=0.8,
-          reorderfun = function(d, w) reorder(d, w),
-          labCol=rownames(design),
-          density.info="none",
-          main="")
+
+# Create a vector of colors based on twelve_month_status
+# color_vector <- ifelse(clinical$three_month_status == "Good", "green", "red")
+color_vector <- ifelse(clinical$twelve_month_status == "Good", "green", "red")
 
 
+
+# Plot the heatmap with colored column names
 heatmap.2(top_norm_counts,
           Colv=TRUE,
           Rowv=TRUE,
@@ -272,6 +260,15 @@ heatmap.2(top_norm_counts,
           cexRow=0.8,
           cexCol=0.8,
           reorderfun = function(d, w) reorder(d, w),
-          labCol=condition_labels,  # provide the vector of column labels with the correct order of conditions
           density.info="none",
-          main="")
+          main="",
+          ColSideColors=color_vector)
+
+# Define the colors for the legend
+colors <- c("Good" = "green", "Poor" = "red")
+
+# Add the legend
+legend("top", legend = levels(factor(clinical$twelve_month_status)), col = colors, pch = 15, horiz = T)
+
+
+
