@@ -1,9 +1,9 @@
-## *******
+## **
 # Following Qi's email on 05/03/2023 (subject: [Encrypt] CCSS help). Running Piecewise-exponential regression.
+rm(list=ls())
 #########################
 ## Load Phenotype data ##
 #########################
-rm(list=ls())
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
 ALL.LIFESTYLE <- edit_lifestyle(ALL.LIFESTYLE)
@@ -63,8 +63,9 @@ sum(!duplicated(subneo.within5$sjlid))
 library(data.table)
 ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 
-# ## Remove SNs if younger than 18 *******
-# PHENO.ANY_SN$AGE.ANY_SN <- ANY_SNs$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, ANY_SNs$sjlid)]
+# ## Remove SNs if younger than 18 **
+PHENO.ANY_SN$gradedt <- ANY_SNs$gradedt[match(PHENO.ANY_SN$sjlid, ANY_SNs$sjlid)]
+PHENO.ANY_SN$AGE.ANY_SN <- ANY_SNs$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, ANY_SNs$sjlid)]
 # if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 # PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 # }
@@ -74,9 +75,8 @@ sum(PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid)
 # 3
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid,]
 
+
 PHENO.ANY_SN$ANY_SNs <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% ANY_SNs$sjlid, 0, 1))
-PHENO.ANY_SN$gradedt <- ANY_SNs$gradedt[match(PHENO.ANY_SN$sjlid, ANY_SNs$sjlid)]
-PHENO.ANY_SN$AGE.ANY_SN <- ANY_SNs$AGE.ANY_SN[match(PHENO.ANY_SN$sjlid, ANY_SNs$sjlid)]
 
 table(PHENO.ANY_SN$ANY_SNs)
 # 0    1 
@@ -162,7 +162,7 @@ control_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category
                      Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$ANY_SNs == 0])
 
 
-# *******
+# **
 ########################################
 ## Prepare data accoding to Qi's code ## 
 ########################################
@@ -244,12 +244,15 @@ SNs_py$PY <- SNs_py$end-SNs_py$start
 ###############
 ## Model fit ##
 ###############
-PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.category",
-                   "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4",
-                   "AGE_AT_DIAGNOSIS", "gender", 
-                   "maxsegrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category", "epitxn_dose_5.category", 
-                   "EAS", "AFR", 
-                   "any_tx_missing", "PY","evt1")]
+PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.category", "BASALcell_PRS.tertile.category", 
+                         "Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category", "Thyroid_PRS.tertile.category",
+                         "Meningioma_PRS.tertile.category", "Sarcoma_Machiela_PRS.tertile.category",
+                         "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4",
+                         "AGE_AT_DIAGNOSIS", "gender", 
+                         "maxsegrtdose.category", "maxneckrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category",
+                         "maxpelvisrtdose.category", "epitxn_dose_5.category", "anthra_jco_dose_5.category", "aa_class_dose_5.category",
+                         "EAS", "AFR", 
+                         "any_tx_missing", "PY","evt1")]
 
 
 
@@ -257,5 +260,5 @@ PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.catego
 
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
 
-## *******
+## **
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.Any_SNs.V16.Rdata")
