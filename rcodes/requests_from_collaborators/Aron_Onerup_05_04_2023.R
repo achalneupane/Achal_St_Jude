@@ -3,12 +3,14 @@
 ##################
 
 # setwd("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/Aron_Onerup_05_04_2023/")
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/Survivor_WGS/Aron_Onerup_05_04_2023")
 
 library(dplyr)
 
 raw <- read.delim("aron_bfile_recodeA.raw", sep = " ", header = T, check.names = F)
 dim(raw)
 head(raw)
+colnames(raw)[7] <- "chr5:609978:C:T"
 
 HEADER = sub(pattern="_[T,A,G,C,*]+",replacement="",colnames(raw))
 HEADER = gsub(pattern=";rs\\d+",replacement="",HEADER)
@@ -46,7 +48,7 @@ cc <- cc[c("samples", "chr5:609978:C:T")]
 df <- read.table("QCed_samples")
 
 sum(cc$samples %in% df$V1 )
-cc$VQSR_samples <- ifelse(cc$samples %in% df$V1, "PASS", "FAIL")
+# cc$VQSR_samples <- ifelse(cc$samples %in% df$V1, "PASS", "FAIL")
 
 write.table(cc, "Aron_genotype_rs924607.txt", sep = "\t", col.names = T, quote = F, row.names = F)
 

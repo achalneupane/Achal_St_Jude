@@ -210,7 +210,5 @@ Work with Rcode: Northwestern_DOC_KO.r; part 3
 chrX.snp.indel.recalibrated.vcf.gz
 
 
-bcftools query -s <sample_name> -f '%GT\n' <vcf_file> <chromosome>:<position>-<position>
 
-bcftools query -s JW10-1 -f '%GT\n' chrX:154380193-154380194
 

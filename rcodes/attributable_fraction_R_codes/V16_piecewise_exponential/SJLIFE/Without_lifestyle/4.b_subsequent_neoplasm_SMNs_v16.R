@@ -174,7 +174,7 @@ control_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category
 data <- PHENO.ANY_SN[!grepl("MRN", colnames(PHENO.ANY_SN))]
 
 ## Age at last contact for cases is SN diagnosis data
-data$agelstcontact[data$AGE.ANY_SN[!is.na(data$AGE.ANY_SN)]] <- data$AGE.ANY_SN[!is.na(data$AGE.ANY_SN)]
+data$agelstcontact[!is.na(data$AGE.ANY_SN)] <- data$AGE.ANY_SN[!is.na(data$AGE.ANY_SN)]
 
 data$event <- ifelse(!is.na(data$gradedt), 1, 0)
 

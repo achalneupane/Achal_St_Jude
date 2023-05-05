@@ -169,7 +169,7 @@ control_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category
 data <- PHENO.ANY_SN[!grepl("MRN", colnames(PHENO.ANY_SN))]
 
 ## Age at last contact for cases is SN diagnosis data
-data$agelstcontact[data$AGE.ANY_SN[!is.na(data$AGE.ANY_SN)]] <- data$AGE.ANY_SN[!is.na(data$AGE.ANY_SN)]
+data$agelstcontact[!is.na(data$AGE.ANY_SN)] <- data$AGE.ANY_SN[!is.na(data$AGE.ANY_SN)]
 
 data$event <- ifelse(!is.na(data$gradedt), 1, 0)
 
@@ -229,6 +229,10 @@ any <- adata[adata$end<=adata$start,] #
 diff=any$start-any$end ###Qi: These are people who had SN after the last contact date. Just wonder why this could happen. While it may not make the results differ, I wonder is there any reason to keep the events but change last contact date to be SN+1day? Depends on why there are SN after last contact date.
 dim(adata)
 final <- adata[adata$end>adata$start,]
+
+# final$sjlid[duplicated(final$sjlid)]
+# cc.final <- final[, c(1,(ncol(final)-11):ncol(final))]
+# cc.data <- data[, c(1,(ncol(data)-11):ncol(data))]
 
 minimum  <-  min(final$start, na.rm = TRUE) - 1
 if (minimum < 0) minimum <- 0
