@@ -1,4 +1,4 @@
-# Following Qi's email on 05/03/2023 (subject: [Encrypt] CCSS help). Running Piecewise-exponential regression.
+# Following Qi's email on 05/03/2023 (subject: [Encrypt] CCSS help). Running Piecewise-exponential regression. **
 rm(list=ls())
 #########################
 ## Load Phenotype data ##
@@ -270,10 +270,11 @@ data <- PHENO.ANY_SN[!grepl("MRN", colnames(PHENO.ANY_SN))]
 
 ## Age at last contact for cases is SN diagnosis data
 data$agelstcontact[!is.na(data$AGE.ANY_SN)] <- data$AGE.ANY_SN[!is.na(data$AGE.ANY_SN)]
-# If age at adult survey is greater than age at last contact for Controls, Use aget at survey as age at last contact **
-BOOL <- data$survey_min[data$ANY_SNs== 0] > data$agelstcontact[data$ANY_SNs== 0]
+# If age at adult survey is greater than age at last contact for Controls, Use age at survey as age at last contact **
+BOOL <- is.na(data$AGE.ANY_SN) & data$agelstcontact < data$survey_min
 data$agelstcontact[BOOL] <- data$survey_min[BOOL]
-data$sjlid[BOOL]
+# data$sjlid[BOOL]
+
 
 data$event <- ifelse(!is.na(data$gradedt), 1, 0)
 
@@ -360,8 +361,9 @@ PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.catego
                          "maxsegrtdose.category", "maxneckrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category",
                          "maxpelvisrtdose.category", "epitxn_dose_5.category", "anthra_jco_dose_5.category", "aa_class_dose_5.category",
                          "EAS", "AFR", 
-                         "any_tx_missing", "PY","evt1")]
+                         "Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn", 
+                         "any_lifestyle_missing", "any_tx_missing", "PY","evt1")]
 
 
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.Any_SNs.V14-4-3.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.Any_SNs.V16.Rdata")

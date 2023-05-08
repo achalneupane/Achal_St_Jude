@@ -1,14 +1,5 @@
-# Yutakas email on 03/08/2023: I think this result looks good to me.  The only
-# thing is that large (positive or negative) coefficients are clustered in
-# "Unknown" treatment categories.  This is presumably due to the same reason as
-# the lifestyle unknowns where "unknowns" of different items are overlapping.
-# In the case of treatment, if the survivor's medical record abstraction is
-# missing, all treatment variables will be unknown.  Thus, I suggest you do the
-# same for the treatment "Unknowns" as you did lifestyle "Unknowns", i.e.,
-# create an indicator variable "Any tx Unknown" and put everyone with "Unknown"
-# at any of the treatment variables there.  Then, you will remove "Unknown" from
-# each of the treatment variables and we will not have the large coefficients (I
-# think).
+# Following Qi's email on 05/03/2023 (subject: [Encrypt] CCSS help). Running Piecewise-exponential regression. **
+rm(list=ls())
 #########################
 ## Load Phenotype data ##
 #########################
