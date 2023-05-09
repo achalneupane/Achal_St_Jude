@@ -180,15 +180,15 @@ SNs_py <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.category",
 ### Qi output the data to fit in SAS.
 write.csv(SNs_py,file="R:/Biostatistics/Biostatistics2/Qi/QiCommon/St Jude/Achal/data.csv")
 
-library("geepack")
-fit_all <- geeglm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
-         AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-         AGE_AT_DIAGNOSIS + gender + 
-         maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category + 
-         Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn + 
-         EAS + AFR + 
-         any_lifestyle_missing + any_tx_missing,
-       family = "poisson", id = SNs_py$sjlid, offset = log(SNs_py$PY), corstr = "independence",  std.err = "san.se", data = SNs_py)
+# library("geepack")
+# fit_all <- geeglm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
+#          AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+#          AGE_AT_DIAGNOSIS + gender + 
+#          maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category + 
+#          Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn + 
+#          EAS + AFR + 
+#          any_lifestyle_missing + any_tx_missing,
+#        family = "poisson", id = SNs_py$sjlid, offset = log(SNs_py$PY), corstr = "independence",  std.err = "san.se", data = SNs_py)
 #####Qi: I tried the above model in SAS. If using corstr=cs in SAS, it had convergence issue. If I used type=ind then it converged in SAS. PRS not significant though, with p-value 0.17 and 0.14 below from SAS.
 # Pleiotropy_PRSWEB_PR 2nd        0.2368   0.1729  -0.1021   0.5758    1.37   0.1709
 # Pleiotropy_PRSWEB_PR 3rd        0.2401   0.1646  -0.0826   0.5628    1.46   0.1448
@@ -204,7 +204,7 @@ fit_all <- glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
          maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category + 
          Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn + 
          EAS + AFR + 
-         any_lifestyle_missing,
+         any_lifestyle_missing + any_tx_missing,
        family = "poisson", offset = log(SNs_py2$PY), data = SNs_py2)
 #### to get PAF. 
 #### First get the precited count from the original data and fit, the expected count should be the same as the # of events.	   
@@ -218,5 +218,7 @@ table(pynew$Pleiotropy_PRSWEB_PRS.tertile.category)
 bb=predict(fit_all,type="response",newdata=pynew)
 PAF=(sum(aa)-sum(bb, na.rm = T))/sum(aa)  ##about 15%
 PAF
+
+
 
 
