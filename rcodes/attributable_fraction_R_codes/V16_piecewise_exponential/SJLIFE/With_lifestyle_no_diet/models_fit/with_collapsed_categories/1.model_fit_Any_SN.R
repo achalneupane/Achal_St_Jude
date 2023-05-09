@@ -20,7 +20,6 @@ dat_all = PHENO.ANY_SN
 
 # dat_all <- dat_all[complete.cases(dat_all),]
 
-library("geepack")
 dat_all=dat_all[dat_all$evt1==1,]
 fit_all = glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
@@ -28,7 +27,7 @@ fit_all = glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
                 maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category +
                 Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
                 EAS + AFR + 
-                any_lifestyle_missing + any_tx_missing,
+                any_lifestyle_missing + any_chemo_missing + any_rt_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
 summary(fit_all)
@@ -57,8 +56,8 @@ N_all.gteq.35 = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx = dat_all
 
-dat_tx$any_tx_missing <- "No"
-dat_tx$epitxn_dose_5.category = "None"
+dat_tx$any_chemo_missing <- "No" # **
+dat_tx$epitxn_dose_5.category = "None" ## **
 
 dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
 
@@ -100,12 +99,12 @@ af_by_tx.gteq.35
 ## Move relevant treatment exposures for everyone to no exposure
 dat_rt = dat_all
 
-dat_rt$any_tx_missing <- "No"
+dat_rt$any_rt_missing <- "No" # **
 
 
 dat_rt$maxsegrtdose.category =
   dat_rt$maxabdrtdose.category =
-  dat_rt$maxchestrtdose.category = "None"
+  dat_rt$maxchestrtdose.category = "None" ## **
 
 dat_all$pred_no_rt = predict(fit_all, newdata = dat_rt, type = "response")
 
@@ -113,7 +112,8 @@ dat_all$pred_no_rt = predict(fit_all, newdata = dat_rt, type = "response")
 N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_rt = sum(dat_all$pred_no_rt, na.rm = TRUE)
 af_by_rt = (N_all - N_no_rt) / N_all
-round(af_by_rt,3)
+af_by_rt <- round(af_by_rt,3)
+af_by_rt
 
 ## Male
 N_no_rt = sum(dat_all$pred_no_rt[dat_all$gender == "Male"], na.rm = TRUE)
@@ -146,12 +146,13 @@ af_by_rt.gteq.35
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx.rt = dat_all
 
-dat_tx.rt$any_tx_missing <- "No"
+dat_tx.rt$any_chemo_missing <- "No" ## **
+dat_tx.rt$any_rt_missing <- "No" ## **
 
 dat_tx.rt$maxsegrtdose.category =
   dat_tx.rt$maxabdrtdose.category =
   dat_tx.rt$maxchestrtdose.category =
-  dat_tx.rt$epitxn_dose_5.category = "None"
+  dat_tx.rt$epitxn_dose_5.category = "None" ## **
 
 dat_all$pred_no_tx.rt = predict(fit_all, newdata = dat_tx.rt, type = "response")
 
@@ -159,7 +160,7 @@ dat_all$pred_no_tx.rt = predict(fit_all, newdata = dat_tx.rt, type = "response")
 N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx.rt = sum(dat_all$pred_no_tx.rt, na.rm = TRUE)
 af_by_tx.rt = (N_all - N_no_tx.rt) / N_all
-round(af_by_tx.rt,3)
+af_by_tx.rt <- round(af_by_tx.rt,3)
 
 ## Male
 N_no_tx.rt = sum(dat_all$pred_no_tx.rt[dat_all$gender == "Male"], na.rm = TRUE)
@@ -190,12 +191,13 @@ af_by_tx.rt.gteq.35
 ## P/LP Zhaoming, Qin without Zhaoming and PRS
 dat_prs = dat_all
 # dat_plp.prs$Zhaoming_carriers = dat_plp.prs$Qin_without_Zhaoming_vars_carriers = "N";
-dat_prs$Pleiotropy_PRSWEB_PRS.tertile.category = "1st"
+dat_prs$Pleiotropy_PRSWEB_PRS.tertile.category = "1st"  # **
 
 dat_all$pred_no_prs = predict(fit_all, newdata = dat_prs, type = "response")
 N_no_prs = sum(dat_all$pred_no_prs, na.rm = TRUE)
 af_by_prs = (N_all - N_no_prs) / N_all
-round(af_by_prs,3)
+af_by_prs <- round(af_by_prs,3)
+af_by_prs
 
 ## Male
 N_no_prs = sum(dat_all$pred_no_prs[dat_all$gender == "Male"], na.rm = TRUE)
@@ -236,8 +238,8 @@ dat_lifestyle$Obese_yn = "No"
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
 af_by_no_favorable_lifestyle.category = (N_all - N_no_favorable_lifestyle.category) / N_all
-round(af_by_no_favorable_lifestyle.category,3)
-
+af_by_no_favorable_lifestyle.category <- round(af_by_no_favorable_lifestyle.category,3)
+af_by_no_favorable_lifestyle.category
 
 ## Male
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category[dat_all$gender == "Male"], na.rm = TRUE)
@@ -269,18 +271,20 @@ af_by_no_favorable_lifestyle.category.gteq.35
 
 dat_tx.prs.lifestyle = dat_all
 
-dat_tx.prs.lifestyle$any_tx_missing <- "No"
+dat_tx.prs.lifestyle$any_chemo_missing <- "No" ## **
+dat_tx.prs.lifestyle$any_rt_missing <- "No" ## **
+
 dat_tx.prs.lifestyle$any_lifestyle_missing <- "No"
 
 ## Nullify Treatment
 dat_tx.prs.lifestyle$maxsegrtdose.category =
   dat_tx.prs.lifestyle$maxabdrtdose.category =
   dat_tx.prs.lifestyle$maxchestrtdose.category =
-  dat_tx.prs.lifestyle$epitxn_dose_5.category = "None"
+  dat_tx.prs.lifestyle$epitxn_dose_5.category = "None" ## **
 
 ## Nullify Genetics
 # dat_tx.plp.prs.lifestyle$Zhaoming_carriers = dat_tx.plp.prs.lifestyle$Qin_without_Zhaoming_vars_carriers = "N";
-dat_tx.prs.lifestyle$Pleiotropy_PRSWEB_PRS.tertile.category = "1st"
+dat_tx.prs.lifestyle$Pleiotropy_PRSWEB_PRS.tertile.category = "1st" ## **
 
 ## Nullify Lifestyle
 dat_tx.prs.lifestyle$Current_smoker_yn = "No"
@@ -294,8 +298,8 @@ dat_all$pred_no_combined = predict(fit_all, newdata = dat_tx.prs.lifestyle, type
 
 N_no_combined = sum(dat_all$pred_no_combined, na.rm = TRUE)
 af_by_combined = (N_all - N_no_combined) / N_all
-round(af_by_combined,3)
-
+af_by_combined <- round(af_by_combined,3)
+af_by_combined
 
 
 ## Male
@@ -323,26 +327,26 @@ af_by_combined.gteq.35 <- round(af_by_combined.gteq.35,3)
 af_by_combined.gteq.35
 
 ##
-SN.res <- data.frame(RT=af_by_rt, RT_female=af_by_rt.female, RT_male=af_by_rt.male, RT_lt_35=af_by_rt.lt.35, RT_gt_35=af_by_rt.gteq.35,
+SN.res <- t(data.frame(RT=af_by_rt, RT_female=af_by_rt.female, RT_male=af_by_rt.male, RT_lt_35=af_by_rt.lt.35, RT_gt_35=af_by_rt.gteq.35,
                      TX=af_by_tx, TX_female=af_by_tx.female, TX_male=af_by_tx.male, TX_lt_35=af_by_tx.lt.35, TX_gt_35=af_by_tx.gteq.35,
                      TX_RT=af_by_tx.rt, TX_RT_female=af_by_tx.rt.female, TX_RT_male=af_by_tx.rt.male, TX_RT_lt_35=af_by_tx.rt.lt.35, TX_RT_gt_35=af_by_tx.rt.gteq.35,
                      PRS=af_by_prs, PRS_female=af_by_prs.female, PRS_male=af_by_prs.male, PRS_lt_35=af_by_prs.lt.35, PRS_gt_35=af_by_prs.gteq.35,
                      Lifestyle=af_by_no_favorable_lifestyle.category, Lifestyle_female=af_by_no_favorable_lifestyle.category.female, Lifestyle_male=af_by_no_favorable_lifestyle.category.male, Lifestyle_lt_35=af_by_no_favorable_lifestyle.category.lt.35, Lifestyle_gt_35=af_by_no_favorable_lifestyle.category.gteq.35,
-                     Combined=af_by_combined, Combined_female=af_by_combined.female, Combined_male=af_by_combined.male, Combined_lt_35=af_by_combined.lt.35, Combined_gt_35=af_by_combined.gteq.35)
-
+                     Combined=af_by_combined, Combined_female=af_by_combined.female, Combined_male=af_by_combined.male, Combined_lt_35=af_by_combined.lt.35, Combined_gt_35=af_by_combined.gteq.35))
+View(SN.res)
 
 
 #########################################
 ## Check PRS and treatment interaction ##
 #########################################
-dat_all=dat_all[dat_all$evt1==1,]
+dat_all=PHENO.ANY_SN[PHENO.ANY_SN$evt1==1,]
 fit_all = glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + 
                 maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category +
                 Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
                 EAS + AFR + 
-                any_lifestyle_missing + any_tx_missing +
+                any_lifestyle_missing + any_chemo_missing + any_rt_missing +
                 maxsegrtdose.category*Pleiotropy_PRSWEB_PRS.tertile.category + 
                 maxabdrtdose.category*Pleiotropy_PRSWEB_PRS.tertile.category + 
                 maxchestrtdose.category*Pleiotropy_PRSWEB_PRS.tertile.category + 
@@ -364,3 +368,4 @@ sn.model <- (setNames(cbind.data.frame(estimate, std.error, P.val
 ), c("Estimate", "Std.error", "P")))
 sn.model <- sn.model[!grepl("AGE_AT_LAST_CONTACT", row.names(sn.model)),]
 sn.model
+View(sn.model)

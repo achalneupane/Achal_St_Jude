@@ -93,6 +93,12 @@ table(PHENO.ANY_SN$MENINGIOMA)
 PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
 PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
 
+PHENO.ANY_SN$any_chemo_missing <- apply(PHENO.ANY_SN[c("epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
+PHENO.ANY_SN$any_chemo_missing  <- factor(ifelse(PHENO.ANY_SN$any_chemo_missing == FALSE, "No", "Yes"))
+
+PHENO.ANY_SN$any_rt_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category")], 1, function(x) any("Unknown" %in% x))
+PHENO.ANY_SN$any_rt_missing  <- factor(ifelse(PHENO.ANY_SN$any_rt_missing == FALSE, "No", "Yes"))
+
 #########################
 ## Extract Ethnicities ##
 #########################
@@ -244,7 +250,8 @@ PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.catego
                          "maxsegrtdose.category", "maxneckrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category",
                          "maxpelvisrtdose.category", "epitxn_dose_5.category", "anthra_jco_dose_5.category", "aa_class_dose_5.category",
                          "EAS", "AFR", 
-                         "any_tx_missing", "PY","evt1")]
+                         "any_tx_missing", "any_chemo_missing", "any_rt_missing",
+                         "PY","evt1")]
 
 
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
