@@ -151,7 +151,7 @@ dat_tx.rt = dat_all
 dat_tx.rt$any_chemo_missing <- "No" ## **
 dat_tx.rt$any_rt_missing <- "No" ## **
 
-dat_rt$maxsegrtdose.category = "<30"
+dat_tx.rt$maxsegrtdose.category = "<30"
 dat_tx.rt$epitxn_dose_5.category = "None" ## **
 
 dat_all$pred_no_tx.rt = predict(fit_all, newdata = dat_tx.rt, type = "response")
@@ -278,8 +278,8 @@ dat_tx.prs.lifestyle$any_rt_missing <- "No" ## **
 dat_tx.prs.lifestyle$any_lifestyle_missing <- "No"
 
 ## Nullify Treatment
-dat_rt$maxsegrtdose.category = "<30"
-dat_tx.rt$epitxn_dose_5.category = "None" ## **
+dat_tx.prs.lifestyle$maxsegrtdose.category = "<30"
+dat_tx.prs.lifestyle$epitxn_dose_5.category = "None" ## **
 
 ## Nullify Genetics
 # dat_tx.plp.prs.lifestyle$Zhaoming_carriers = dat_tx.plp.prs.lifestyle$Qin_without_Zhaoming_vars_carriers = "N";
