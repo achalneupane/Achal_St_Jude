@@ -327,12 +327,15 @@ af_by_combined.gteq.35 <- round(af_by_combined.gteq.35,3)
 af_by_combined.gteq.35
 
 ##
-Thyroid.res <- t(data.frame(RT=af_by_rt, RT_female=af_by_rt.female, RT_male=af_by_rt.male, RT_lt_35=af_by_rt.lt.35, RT_gt_35=af_by_rt.gteq.35,
-                       RX=af_by_tx, RX_female=af_by_tx.female, RX_male=af_by_tx.male, RX_lt_35=af_by_tx.lt.35, RX_gt_35=af_by_tx.gteq.35,
-                       RX_RT=af_by_tx.rt, RX_RT_female=af_by_tx.rt.female, RX_RT_male=af_by_tx.rt.male, RX_RT_lt_35=af_by_tx.rt.lt.35, RX_RT_gt_35=af_by_tx.rt.gteq.35,
-                       PRS=af_by_prs, PRS_female=af_by_prs.female, PRS_male=af_by_prs.male, PRS_lt_35=af_by_prs.lt.35, PRS_gt_35=af_by_prs.gteq.35,
-                       Lifestyle=af_by_no_favorable_lifestyle.category, Lifestyle_female=af_by_no_favorable_lifestyle.category.female, Lifestyle_male=af_by_no_favorable_lifestyle.category.male, Lifestyle_lt_35=af_by_no_favorable_lifestyle.category.lt.35, Lifestyle_gt_35=af_by_no_favorable_lifestyle.category.gteq.35,
-                       Combined=af_by_combined, Combined_female=af_by_combined.female, Combined_male=af_by_combined.male, Combined_lt_35=af_by_combined.lt.35, Combined_gt_35=af_by_combined.gteq.35))
+Thyroid.res <- data.frame(
+  Variable = c("Radiation", "Chemo", "All treatments", "PRS", "Lifestyle", "Combined"),
+  Overall = c(af_by_rt, af_by_tx, af_by_tx.rt, af_by_prs, af_by_no_favorable_lifestyle.category, af_by_combined),
+  Female = c(af_by_rt.female, af_by_tx.female, af_by_tx.rt.female, af_by_prs.female, af_by_no_favorable_lifestyle.category.female, af_by_combined.female),
+  Male = c(af_by_rt.male, af_by_tx.male, af_by_tx.rt.male, af_by_prs.male, af_by_no_favorable_lifestyle.category.male, af_by_combined.male),
+  age.lt35 = c(af_by_rt.lt.35, af_by_tx.lt.35, af_by_tx.rt.lt.35, af_by_prs.lt.35, af_by_no_favorable_lifestyle.category.lt.35, af_by_combined.lt.35),
+  age.gteq = c(af_by_rt.gteq.35, af_by_tx.gteq.35, af_by_tx.rt.gteq.35, af_by_prs.gteq.35, af_by_no_favorable_lifestyle.category.gteq.35, af_by_combined.gteq.35)
+)
+
 View(Thyroid.res)
 
 
