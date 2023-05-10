@@ -1,5 +1,8 @@
 # load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.SARCOMA.V16.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA.V16.Rdata")
+
+# PHENO.ANY_SN$any_lifestyle_missing <- relevel(PHENO.ANY_SN$any_lifestyle_missing, ref = "Yes")
+# PHENO.ANY_SN$any_tx_missing <- relevel(PHENO.ANY_SN$any_tx_missing, ref = "Yes")
 
 # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 cc
@@ -302,42 +305,6 @@ Sarcoma.res <- data.frame(
 Sarcoma.res
 
 
-all.res <- rbind.data.frame(SN=SN.res, SMN=SMN.res, NMSC=NMSC.res, BREAST=Breast.res, THYROID=Thyroid.res, MENINGIOMA=Meningioma.res)
+all.res <- rbind.data.frame(SN=SN.res, SMN=SMN.res, NMSC=NMSC.res, BREAST=Breast.res, THYROID=Thyroid.res, MENINGIOMA=Meningioma.res, SARCOMA=Sarcoma.res)
 # View(all.res)
 View(all.res)
-
-
-
-
-
-#########################################
-## Check PRS and treatment interaction ##
-#########################################
-dat_all = PHENO.ANY_SN
-dat_all=dat_all[dat_all$evt1==1,]
-
-fit_all = glm(formula = event ~ Sarcoma_Machiela_PRS.tertile.category +
-                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-                gender + 
-                aa_class_dose_5.category +
-                Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
-                EAS + AFR + 
-                any_lifestyle_missing + any_chemo_missing,
-              family = "poisson", offset = log(dat_all$PY), data = dat_all)
-
-summary(fit_all)
-
-
-(output <- summary(fit_all)$coefficients)
-as.data.frame(apply(output, 2, formatC, format="f", digits=4))
-# options(scipen=999)
-estimate <- format(round(output[,1],3), nsmall = 3)
-std.error <- format(round(output[,2],3), nsmall = 3)
-# P.val <- formatC(output[,4], format="G", digits=3)
-P.val <- output[,4]
-P.val[P.val < 0.001] <- "<0.001"
-P.val[!grepl("<", P.val)] <- format(round(as.numeric(P.val[!grepl("<", P.val)]), 3), nsmall = 3)
-sn.model <- (setNames(cbind.data.frame(estimate, std.error, P.val
-), c("Estimate", "Std.error", "P")))
-sn.model <- sn.model[!grepl("AGE_AT_LAST_CONTACT", row.names(sn.model)),]
-sn.model
