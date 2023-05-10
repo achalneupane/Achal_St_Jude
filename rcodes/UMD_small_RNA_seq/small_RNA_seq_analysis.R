@@ -87,7 +87,7 @@ res_3P <- results(dds, contrast = contrast_3P)
 # Volcano plot for 3 months
 res_3P.df <- as.data.frame(res_3P)
 res_3P.df <- res_3P.df[!is.na(res_3P.df$padj),]
-top20 <- res_3P.df[head(order(res_3P.df$padj, decreasing = FALSE ), 20),]
+top100 <- res_3P.df[head(order(res_3P.df$padj, decreasing = FALSE ), 100),]
 ggplot(res_3P.df, aes(x = log2FoldChange, y = -log10(padj))) +
   geom_point(aes(color = ifelse(padj < 0.05, "significant", "not_significant")), alpha = 5, size = 5) +
   scale_color_manual(values = c("red", "black")) +
@@ -119,7 +119,7 @@ res_12P <- results(dds, contrast = contrast_12P)
 # Volcano plot for 12 months
 res_12P.df <- as.data.frame(res_12P)
 res_12P.df <- res_12P.df[!is.na(res_12P.df$padj),]
-top20 <- res_12P.df[head(order(res_12P.df$padj, decreasing = FALSE ), 20),]
+top100 <- res_12P.df[head(order(res_12P.df$padj, decreasing = FALSE ), 100),]
 ggplot(res_12P.df, aes(x = log2FoldChange, y = -log10(padj))) +
   geom_point(aes(color = ifelse(padj < 0.05, "significant", "not_significant")), alpha = 5, size = 5) +
   scale_color_manual(values = c("red", "black")) +
@@ -161,7 +161,7 @@ res_good <-  results(dds, contrast = contrast)
 
 res_good.df <- as.data.frame(res_good)
 res_good.df <- res_good.df[!is.na(res_good.df$padj),]
-top20 <- res_good.df[head(order(res_good.df$padj, decreasing = FALSE ), 20),]
+top100 <- res_good.df[head(order(res_good.df$padj, decreasing = FALSE ), 100),]
 ggplot(res_good.df, aes(x = log2FoldChange, y = -log10(padj))) +
   geom_point(aes(color = ifelse(padj < 0.05, "significant", "not_significant")), alpha = 5, size = 5) +
   scale_color_manual(values = c("red", "black")) +
@@ -198,7 +198,7 @@ res_poor <-  results(dds, contrast = contrast)
 
 res_poor.df <- as.data.frame(res_poor)
 res_poor.df <- res_poor.df[!is.na(res_poor.df$padj),]
-top20 <- res_poor.df[head(order(res_poor.df$padj, decreasing = FALSE ), 20),]
+top100 <- res_poor.df[head(order(res_poor.df$padj, decreasing = FALSE ), 100),]
 ggplot(res_poor.df, aes(x = log2FoldChange, y = -log10(padj))) +
   geom_point(aes(color = ifelse(padj < 0.05, "significant", "not_significant")), alpha = 5, size = 5) +
   scale_color_manual(values = c("red", "black")) +

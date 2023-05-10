@@ -132,48 +132,6 @@ SARCOMA.res <- c(round(af_by_tx,3), round(af_by_plp.prs,3),round(af_by_N_no_favo
 SARCOMA.res
 # 0.373 0.023 0.541 0.744
 
-all.res <- cbind.data.frame(SN=SN.res, SMN=SMN.res, NMSC=NMSC.res, BREAST=BREAST.res, THYROID=THYROID.res, MENINGIOMA=MENINGIOMA.res, SARCOMA.res)
+all.res <- cbind.data.frame(SN=SN.res, SMN=SMN.res, NMSC=NMSC.res, BREAST=Breast.res, THYROID=Thyroid.res, MENINGIOMA=Meningioma.res)
 # View(all.res)
-View(t(all.res))
-
-
-ChangeNames <- function(x) {
-  row.names(x)[grepl("PRS.tertile.category2nd", row.names(x))] <- "PRS.tertile.category2nd"
-  row.names(x)[grepl("PRS.tertile.category3rd", row.names(x))] <- "PRS.tertile.category3rd"
-  return(x)
-}
-
-df_list <- list(sn.model=sn.model, smn.model=smn.model, nmsc.model=nmsc.model, breast.model=breast.model
-                ,thyroid.model=thyroid.model, meningioma.model = meningioma.model, sarcoma.model = sarcoma.model)
-df_list <- lapply(df_list, ChangeNames)
-list2env(df_list ,.GlobalEnv)
-merge.all <- function(x, ..., by = "row.names") {
-  L <- list(...)
-  for (i in seq_along(L)) {
-    x <- merge(x, L[[i]], by = by, all = TRUE)
-    rownames(x) <- x$Row.names
-    x$Row.names <- NULL
-  }
-  return(x)
-}
-
-df <- merge.all(sn.model, smn.model,nmsc.model, breast.model, thyroid.model, meningioma.model, sarcoma.model)
-df <- df[!grepl("AGE_AT_LAST_CONTACT", row.names(df)),]
-dim(df)
-
-target <- c("(Intercept)", "genderFemale", "AGE_AT_DIAGNOSIS5-9", "AGE_AT_DIAGNOSIS10-14", "AGE_AT_DIAGNOSIS>=15", "AFR", "EAS",
-            "PRS.tertile.category2nd","PRS.tertile.category3rd",
-            "epitxn_dose_5.category1st","epitxn_dose_5.category2nd","epitxn_dose_5.category3rd","epitxn_dose_5.categoryUnknown",
-            "aa_class_dose_5.category1st","aa_class_dose_5.category2nd","aa_class_dose_5.category3rd","aa_class_dose_5.categoryUnknown",
-            "anthra_jco_dose_5.category1st","anthra_jco_dose_5.category2nd","anthra_jco_dose_5.category3rd","anthra_jco_dose_5.categoryUnknown",
-            "maxabdrtdose.category>0-<30", "maxabdrtdose.category>=30","maxabdrtdose.categoryUnknown",
-            "maxchestrtdose.category>0-<20","maxchestrtdose.category>=20", "maxchestrtdose.categoryUnknown",
-            "maxneckrtdose.category>0-<11", "maxneckrtdose.category>=11-<20","maxneckrtdose.category>=20-<30","maxneckrtdose.category>=30", "maxneckrtdose.categoryUnknown",
-            "maxpelvisrtdose.category>0-<20", "maxpelvisrtdose.category>=20","maxpelvisrtdose.categoryUnknown",
-            "maxsegrtdose.category>0-<18", "maxsegrtdose.category>=18-<30", "maxsegrtdose.category>=30","maxsegrtdose.categoryUnknown",
-            "Current_smoker_ynYes", "Current_smoker_ynUnknown", 
-            "RiskyHeavyDrink_ynYes", "RiskyHeavyDrink_ynUnknown",
-            "PhysicalActivity_ynNo", "PhysicalActivity_ynUnknown",
-            "Obese_ynYes", "Obese_ynUnknown")
-
-df <- df[match(target, rownames(df)),]
+View(all.res)
