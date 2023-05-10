@@ -17,10 +17,8 @@ table(PHENO.ANY_SN$maxsegrtdose.category)
 ## Attributable fraction of Any SNs ##
 ######################################
 dat_all = PHENO.ANY_SN
-
-# dat_all <- dat_all[complete.cases(dat_all),]
-
 dat_all=dat_all[dat_all$evt1==1,]
+
 fit_all = glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + 
@@ -161,6 +159,7 @@ N_all = sum(dat_all$pred_all, na.rm = TRUE)
 N_no_tx.rt = sum(dat_all$pred_no_tx.rt, na.rm = TRUE)
 af_by_tx.rt = (N_all - N_no_tx.rt) / N_all
 af_by_tx.rt <- round(af_by_tx.rt,3)
+af_by_tx.rt
 
 ## Male
 N_no_tx.rt = sum(dat_all$pred_no_tx.rt[dat_all$gender == "Male"], na.rm = TRUE)
@@ -328,11 +327,11 @@ af_by_combined.gteq.35
 
 ##
 SN.res <- t(data.frame(RT=af_by_rt, RT_female=af_by_rt.female, RT_male=af_by_rt.male, RT_lt_35=af_by_rt.lt.35, RT_gt_35=af_by_rt.gteq.35,
-                     TX=af_by_tx, TX_female=af_by_tx.female, TX_male=af_by_tx.male, TX_lt_35=af_by_tx.lt.35, TX_gt_35=af_by_tx.gteq.35,
-                     TX_RT=af_by_tx.rt, TX_RT_female=af_by_tx.rt.female, TX_RT_male=af_by_tx.rt.male, TX_RT_lt_35=af_by_tx.rt.lt.35, TX_RT_gt_35=af_by_tx.rt.gteq.35,
-                     PRS=af_by_prs, PRS_female=af_by_prs.female, PRS_male=af_by_prs.male, PRS_lt_35=af_by_prs.lt.35, PRS_gt_35=af_by_prs.gteq.35,
-                     Lifestyle=af_by_no_favorable_lifestyle.category, Lifestyle_female=af_by_no_favorable_lifestyle.category.female, Lifestyle_male=af_by_no_favorable_lifestyle.category.male, Lifestyle_lt_35=af_by_no_favorable_lifestyle.category.lt.35, Lifestyle_gt_35=af_by_no_favorable_lifestyle.category.gteq.35,
-                     Combined=af_by_combined, Combined_female=af_by_combined.female, Combined_male=af_by_combined.male, Combined_lt_35=af_by_combined.lt.35, Combined_gt_35=af_by_combined.gteq.35))
+                       RX=af_by_tx, RX_female=af_by_tx.female, RX_male=af_by_tx.male, RX_lt_35=af_by_tx.lt.35, RX_gt_35=af_by_tx.gteq.35,
+                       RX_RT=af_by_tx.rt, RX_RT_female=af_by_tx.rt.female, RX_RT_male=af_by_tx.rt.male, RX_RT_lt_35=af_by_tx.rt.lt.35, RX_RT_gt_35=af_by_tx.rt.gteq.35,
+                       PRS=af_by_prs, PRS_female=af_by_prs.female, PRS_male=af_by_prs.male, PRS_lt_35=af_by_prs.lt.35, PRS_gt_35=af_by_prs.gteq.35,
+                       Lifestyle=af_by_no_favorable_lifestyle.category, Lifestyle_female=af_by_no_favorable_lifestyle.category.female, Lifestyle_male=af_by_no_favorable_lifestyle.category.male, Lifestyle_lt_35=af_by_no_favorable_lifestyle.category.lt.35, Lifestyle_gt_35=af_by_no_favorable_lifestyle.category.gteq.35,
+                       Combined=af_by_combined, Combined_female=af_by_combined.female, Combined_male=af_by_combined.male, Combined_lt_35=af_by_combined.lt.35, Combined_gt_35=af_by_combined.gteq.35))
 View(SN.res)
 
 
