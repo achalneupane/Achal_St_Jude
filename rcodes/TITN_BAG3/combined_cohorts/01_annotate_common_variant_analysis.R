@@ -252,12 +252,14 @@ P <- ggplot(data = summary_table, aes(x = OR, y = reorder(rsID, -P))) +
   xlab("OR (95% CI)") +
   ylab("") +
   theme_bw() +
-  theme(plot.title = element_text(hjust = 0.5),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        # panel.border = element_blank(),
-        panel.background = element_blank(),
-        axis.text.y = element_text(face = rev(custom_face))
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    # panel.border = element_blank(),
+    panel.background = element_blank(),
+    axis.text.x = element_text(color = "black"),
+    axis.text.y = element_text(face = rev(custom_face), color = "black")
   )
 
 P

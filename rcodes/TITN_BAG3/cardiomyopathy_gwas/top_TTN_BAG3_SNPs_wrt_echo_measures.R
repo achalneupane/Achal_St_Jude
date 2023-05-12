@@ -144,7 +144,15 @@ combined_plot <- ggplot(summary_table, aes(x = beta, y = phenotype)) +
         panel.grid.minor = element_blank(),
         panel.background = element_blank())
 
-combined_plot
+
+combined_plot <- combined_plot +
+  theme(axis.text.x = element_text(color = "black"),
+        axis.text.y = element_text(color = "black"))
+
+
+
+
+combined_plot 
 ggsave("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Figures/echo_measures.tiff", combined_plot, dpi = 600, width = 5, height = 3, units = "in")
 
 
