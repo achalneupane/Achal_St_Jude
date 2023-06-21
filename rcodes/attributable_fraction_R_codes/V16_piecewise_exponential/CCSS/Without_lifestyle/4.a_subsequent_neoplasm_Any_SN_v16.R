@@ -14,6 +14,7 @@ library(stringr)
 # library(tidyverse)
 library(lubridate)
 # benchmarkme::get_ram()
+library(survival)
 
 ## Edit lifestyle variables
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
@@ -47,9 +48,9 @@ ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decr
 dim(PHENO.ANY_SN)
 # 7943   50
 
-## Remove SNs if younger than 18 **
+
 PHENO.ANY_SN$AGE.ANY_SN <- ANY_SNs$gradedt[match(PHENO.ANY_SN$ccssid, ANY_SNs$ccssid)] ## 2009-02-12
-## **
+## Remove SNs if younger than 18 **
 # if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 #   PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 # }
@@ -89,9 +90,9 @@ table(PHENO.ANY_SN$ANY_SNs)
 # 6307 1611
 
 
-########################################
-## Do the same for missing treatments ##
-########################################
+#################
+## Missingness ##
+#################
 PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category", "epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
 PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
 

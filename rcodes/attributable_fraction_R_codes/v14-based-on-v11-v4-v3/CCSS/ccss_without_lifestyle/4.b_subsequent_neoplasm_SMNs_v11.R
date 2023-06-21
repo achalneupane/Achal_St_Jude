@@ -40,7 +40,7 @@ sum(!duplicated(subneo.within5$ccssid))
 # For this, I will first sort the table by date
 library(data.table)
 SMNs <- subneo[!grepl("skin", subneo$groupdx3, ignore.case = T),]
-SMNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
+SMNs <- setDT(SMNs)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
 
 ## Remove SNs if younger than 18 **
 dim(PHENO.ANY_SN)

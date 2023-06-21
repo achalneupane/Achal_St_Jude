@@ -13,7 +13,7 @@ library(stringr)
 # library(tidyverse)
 library(lubridate)
 # benchmarkme::get_ram()
-
+library(survival)
 ## Edit lifestyle variables
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
 PHENO.ANY_SN <- edit_lifestyle.ccss(PHENO.ANY_SN)
@@ -40,8 +40,36 @@ sum(!duplicated(subneo.within5$ccssid))
 # Get SNs for the first time and Age at First SN.
 # For this, I will first sort the table by date
 library(data.table)
-SMNs <- subneo[!grepl("skin", subneo$groupdx3, ignore.case = T),]
-SMNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
+
+## Read NMSC data from Qi
+data1 = read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_from_Qi_Liu/sns2022.sas7bdat")
+data1=as.data.frame(data1)
+# data1$ccssid <- paste0(data1$ccssid, "_", data1$ccssid)
+data1$KEY <- paste0(data1$ccssid,":",data1$d_candx)
+
+######################
+## ADD NMSC from Qi ##
+######################
+subneo$d_candx <- as.Date(subneo$d_candx, format = "%d%b%Y")
+subneo$KEY <- paste0(subneo$ccssid,":",subneo$d_candx)
+table(subneo$KEY %in% data1$KEY)
+# FALSE  TRUE 
+# 6307  3440 
+table(data1$KEY %in% subneo$KEY)
+# FALSE  TRUE 
+# 4629  4434 
+subneo$nmsc <- data1$nmsc[match(subneo$KEY, data1$KEY)]
+subneo$nmscYN <- ifelse(subneo$nmsc ==1| (subneo$nmsc == 2 & subneo$groupdx3 == "Skin"), "Yes", "No")
+table(subneo$nmscYN )
+# FALSE  TRUE 
+# 1484  1956 
+############
+SMNs <- subneo[!grepl("Yes", subneo$nmscYN),]
+SMNs <- setDT(SMNs)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
+
+dim(SMNs)
+# 9304
+
 
 ## Remove SNs if younger than 18 **
 dim(PHENO.ANY_SN)

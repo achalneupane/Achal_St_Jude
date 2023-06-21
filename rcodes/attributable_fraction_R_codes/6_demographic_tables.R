@@ -1,6 +1,9 @@
 #################################
 ## 1....................SJLIFE ##
 #################################
+## Diagnosis variable mapping based on SJLIFE <-> CCSS DXs mapping; Yadav's email: on 05/02/2023
+
+
 library(haven)
 ## Load PHenotype
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
@@ -87,12 +90,14 @@ as.data.frame(table(PHENO.ANY_SN$diaggrp))
 ## Diagnosis as in CCSS (with common disease types)
 bone.cancer <- sum(grepl("Osteosarcoma|Ewing sarcoma family of tumors", PHENO.ANY_SN$diaggrp, ignore.case = T))
 CNS <- sum(grepl("Central nervous system", PHENO.ANY_SN$diaggrp, ignore.case = T))
-leukemia  <- sum(grepl("Acute lymphoblastic leukemia|Acute myeloid leukemia|Other leukemia|MDS/Acute myeloid", PHENO.ANY_SN$diaggrp, ignore.case = T))
+leukemia <- sum(grepl("leukemia", PHENO.ANY_SN$diaggrp, ignore.case = T))
+# leukemia  <- sum(grepl("Acute lymphoblastic leukemia|Acute myeloid leukemia|Other leukemia|MDS/Acute myeloid", PHENO.ANY_SN$diaggrp, ignore.case = T))
 neuroblastoma  <- sum(grepl("Neuroblastoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
 wilms  <- sum(grepl("Wilms tumor", PHENO.ANY_SN$diaggrp, ignore.case = T))
 HD  <- sum(grepl("^Hodgkin lymphoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
 NHL  <- sum(grepl("Non-Hodgkin lymphoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
 soft.tissue.sarcoma  <- sum(grepl("Soft tissue sarcoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
+Rhabdomyosarcoma  <- sum(grepl("Rhabdomyosarcoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
 ##################
 ## Radiotherapy ##
 ##################
@@ -144,8 +149,8 @@ age.at.followup <- paste0(median.age.followup, " (", age.followup.IQR, ")")
 
 
 # df.sjlife <- as.data.frame(t(cbind.data.frame(Male, Female, bone.cancer, CNS, HD, wilms, leukemia, neuroblastoma, NHL, soft.tissue.sarcoma, brainRT, neckRT, chestRT, abdomenRT, pelvisRT, alkylating, anthracyclines, epipodophyllotoxins, agedx, age.at.followup, lenght.followup)))
-df.sjlife <- as.data.frame(t(cbind.data.frame(Male, Female, bone.cancer, CNS, HD, wilms, leukemia, neuroblastoma, NHL, soft.tissue.sarcoma, brainRT, neckRT, chestRT, abdomenRT, pelvisRT, alkylating, anthracyclines, epipodophyllotoxins, agedx, age.at.followup)))
-df.sjlife$percent <- c(round((as.numeric(df.sjlife$V1[1:18])/4401)*100, 1), NA, NA)
+df.sjlife <- as.data.frame(t(cbind.data.frame(Male, Female, bone.cancer, Rhabdomyosarcoma, CNS, HD, wilms, leukemia, neuroblastoma, NHL, soft.tissue.sarcoma, brainRT, neckRT, chestRT, abdomenRT, pelvisRT, alkylating, anthracyclines, epipodophyllotoxins, agedx, age.at.followup)))
+df.sjlife$percent <- c(round((as.numeric(df.sjlife$V1[!grepl("agedx|age.at", rownames(df.sjlife))])/4401)*100, 1), NA, NA)
 
 
 ###############################
@@ -197,6 +202,7 @@ neuroblastoma <- sum(PHENO.ANY_SN$diagnose == "Neuroblastoma", na.rm = T)
 NHL <- sum(PHENO.ANY_SN$diagnose == "NHL", na.rm = T)
 NHL <- sum(PHENO.ANY_SN$diagnose == "NHL", na.rm = T)
 soft.tissue.sarcoma <- sum(PHENO.ANY_SN$diagnose == "Soft tissue sarcoma", na.rm = T)
+Rhabdomyosarcoma  <- sum(grepl("Rhabdomyosarcoma", PHENO.ANY_SN$diaggrp, ignore.case = T))
 ##################
 ## Radiotherapy ##
 ##################
@@ -247,10 +253,11 @@ age.at.followup <- paste0(median.age.followup, " (", age.followup.IQR, ")")
 
 
 # df.ccss <- as.data.frame(t(cbind.data.frame(Male, Female, bone.cancer, CNS, HD, wilms, leukemia, neuroblastoma, NHL, soft.tissue.sarcoma, brainRT, neckRT, chestRT, abdomenRT, pelvisRT, alkylating, anthracyclines, epipodophyllotoxins, agedx, age.at.followup, lenght.followup)))
-df.ccss <- as.data.frame(t(cbind.data.frame(Male, Female, bone.cancer, CNS, HD, wilms, leukemia, neuroblastoma, NHL, soft.tissue.sarcoma, brainRT, neckRT, chestRT, abdomenRT, pelvisRT, alkylating, anthracyclines, epipodophyllotoxins, agedx, age.at.followup)))
-df.ccss$percent <- c(round((as.numeric(df.ccss$V1[1:18])/7943)*100, 1), NA, NA)
+df.ccss <- as.data.frame(t(cbind.data.frame(Male, Female, bone.cancer, Rhabdomyosarcoma, CNS, HD, wilms, leukemia, neuroblastoma, NHL, soft.tissue.sarcoma, brainRT, neckRT, chestRT, abdomenRT, pelvisRT, alkylating, anthracyclines, epipodophyllotoxins, agedx, age.at.followup)))
+df.ccss$percent <- c(round((as.numeric(df.ccss$V1[!grepl("agedx|age.at", rownames(df.ccss))])/7943)*100, 1), NA, NA)
 
 colnames(df.sjlife) <- c("SJLIFE (n)", "sjlife%")
 colnames(df.ccss) <- c("CCSS (n)", "CCSS%")
 
 df <- cbind(df.sjlife, df.ccss)
+

@@ -21,7 +21,7 @@ library(stringr)
 # library(tidyverse)
 library(lubridate)
 # benchmarkme::get_ram()
-
+library(survival)
 
 subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
 head(subneo)
@@ -85,11 +85,11 @@ PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid,]
 PHENO.ANY_SN$NMSCs <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% NMSCs$sjlid, 0, 1))
 table(PHENO.ANY_SN$NMSCs)
 # 0    1 
-# 4130  240
+# 4130  249
 
-########################################
-## Do the same for missing treatments ##
-########################################
+#################
+## missingness ##
+#################
 PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "maxabdrtdose.category", "maxpelvisrtdose.category")], 1, function(x) any("Unknown" %in% x))
 PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
 
@@ -223,8 +223,7 @@ table(adata$event)## Double check event numebr is correct
 ###any stop time <=start time
 adata$end[adata$end<=adata$start] <- adata$end[adata$end<=adata$start] + 1/365
 any <- adata[adata$end<=adata$start,] # 
-### 2 people had the stroke date on the Fu date. In this case, either get rid of the 2 lines [i.e, no time is follow-up after the last event date], or add 1 day on end date of these 2 segments, assuming there were followed up 1 more day. Will not make much difference. 1 day out of 365 days is 0.0027.
-diff=any$start-any$end ###Qi: These are people who had SN after the last contact date. Just wonder why this could happen. While it may not make the results differ, I wonder is there any reason to keep the events but change last contact date to be SN+1day? Depends on why there are SN after last contact date.
+diff=any$start-any$end 
 dim(adata)
 final <- adata[adata$end>adata$start,]
 

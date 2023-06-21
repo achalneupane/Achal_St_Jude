@@ -13,7 +13,7 @@ library(stringr)
 # library(tidyverse)
 library(lubridate)
 # benchmarkme::get_ram()
-
+library(survival)
 ## Edit lifestyle variables
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
 PHENO.ANY_SN <- edit_lifestyle.ccss(PHENO.ANY_SN)
@@ -89,9 +89,9 @@ table(PHENO.ANY_SN$MENINGIOMA)
 
 ######################### **
 
-########################################
-## Do the same for missing treatments ##
-########################################
+#################
+## Missingness ##
+#################
 PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
 PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
 
