@@ -40,12 +40,37 @@ sum(!duplicated(subneo.within5$ccssid))
 # Get SNs for the first time and Age at First SN.
 # For this, I will first sort the table by date
 library(data.table)
-SMNs <- subneo[!grepl("skin", subneo$groupdx3, ignore.case = T),]
-SMNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
+
+## Read NMSC data from Qi
+data1 = read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_from_Qi_Liu/sns2022.sas7bdat")
+data1=as.data.frame(data1)
+# data1$ccssid <- paste0(data1$ccssid, "_", data1$ccssid)
+data1$KEY <- paste0(data1$ccssid,":",data1$d_candx)
+
+######################
+## ADD NMSC from Qi ##
+######################
+subneo$d_candx <- as.Date(subneo$d_candx, format = "%d%b%Y")
+subneo$KEY <- paste0(subneo$ccssid,":",subneo$d_candx)
+table(subneo$KEY %in% data1$KEY)
+# FALSE  TRUE 
+# 6307  3440 
+table(data1$KEY %in% subneo$KEY)
+# FALSE  TRUE 
+# 4629  4434 
+subneo$nmsc <- data1$nmsc[match(subneo$KEY, data1$KEY)]
+subneo$nmscYN <- ifelse(subneo$nmsc ==1| (subneo$nmsc == 2 & subneo$groupdx3 == "Skin"), "Yes", "No")
+table(subneo$nmscYN )
+# FALSE  TRUE 
+# 1484  1956 
+############
+SMNs <- subneo[!grepl("Yes", subneo$nmscYN),]
+SMNs <- setDT(SMNs)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
+
 
 ## Remove SNs if younger than 18 **
 dim(PHENO.ANY_SN)
-# 7943   50
+# 7943   60
 
 PHENO.ANY_SN$AGE.ANY_SN <- SMNs$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, SMNs$ccssid)]
 if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
@@ -53,7 +78,7 @@ if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 }
 
 dim(PHENO.ANY_SN)
-## 7870 51 ** END
+## 7876 51 ** END
 
 # Removing samples with SN within the 5 years of childhood cancer **
 sum(PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid)
@@ -77,13 +102,13 @@ PHENO.ANY_SN$gradedt <- SMNs$gradedt[match(PHENO.ANY_SN$ccssid, SMNs$ccssid)] ##
 
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid,]
 dim(PHENO.ANY_SN)
-# 7863 ** END
+# 7869 ** END
 
 ## CA CO status
 PHENO.ANY_SN$SMNs <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% SMNs$ccssid, 0, 1))
 table(PHENO.ANY_SN$SMNs)
 # 0    1 
-# 6307 1556 
+# 6833 1063 
 
 
 
@@ -106,7 +131,7 @@ PHENO.ANY_SN <- PHENO.ANY_SN[!(PHENO.ANY_SN$Current_smoker_yn == "Unknown" &
                                  PHENO.ANY_SN$Obese_yn == "Unknown" ),]
 
 dim(PHENO.ANY_SN)
-# [1] 7780   52
+# [1] 7786   54
 
 sum((PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey >= 18|
        PHENO.ANY_SN$PhysicalActivity_yn_agesurvey >= 18|
