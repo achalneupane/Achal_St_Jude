@@ -23,7 +23,9 @@ library(lubridate)
 # benchmarkme::get_ram()
 library(survival)
 
-subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
+# subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
+subneo <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_07_22_2023_subneo.txt", header = T, stringsAsFactors = F)
+
 head(subneo)
 table(subneo$diaggrp)
 dim(subneo)
@@ -38,6 +40,7 @@ subneo$agedx <-  PHENO.ANY_SN$agedx [match(subneo$sjlid , PHENO.ANY_SN$sjlid)]
 # add DOB
 subneo$DOB <- PHENO.ANY_SN$dob[match(subneo$sjlid, PHENO.ANY_SN$sjlid)]
 
+subneo$gradedt <- as.Date(subneo$gradedt, "%m/%d/%Y") ## **
 subneo$AGE.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
 
 subneo$AGE.ANY_SN.after.childhood.cancer <- time_length(interval(as.Date(subneo$diagdt), as.Date(subneo$gradedt)), "years")
@@ -59,6 +62,9 @@ sum(!duplicated(subneo.within5$sjlid))
 # Get SMNs for the first time and Age at First SMNs.
 # For this, I will first sort the table by date
 library(data.table)
+
+subneo <- subneo[!grepl("benign", subneo$icdo3behavior, ignore.case = T),] 
+
 SMNs <- subneo[!grepl("basal cell|squamous cell|meningioma", subneo$diag, ignore.case = T),]
 SMNs <- setDT(SMNs)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 
@@ -66,6 +72,7 @@ SMNs <- setDT(SMNs)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing
 SMNs <- SMNs[!SMNs$sjlid %in% subneo.within5$sjlid,]
 nrow(SMNs)
 
+table(SMNs$icdo3behavior)
 
 PHENO.ANY_SN$gradedt <- SMNs$gradedt[match(PHENO.ANY_SN$sjlid, SMNs$sjlid)]
 PHENO.ANY_SN$AGE.ANY_SN <- SMNs$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, SMNs$sjlid)]
