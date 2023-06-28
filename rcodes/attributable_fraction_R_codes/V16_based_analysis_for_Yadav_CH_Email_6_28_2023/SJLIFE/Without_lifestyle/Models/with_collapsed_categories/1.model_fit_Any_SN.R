@@ -13,6 +13,11 @@ PHENO.ANY_SN$maxsegrtdose.category <- factor(PHENO.ANY_SN$maxsegrtdose.category,
 
 table(PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$event == 1]) ## **
 
+
+testPRS <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/Yadav_CH_related_06_28_2023/CH_related_PRSs_sjlife.txt", header = T)
+PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, testPRS[match(PHENO.ANY_SN$sjlid, testPRS$IID),])
+
+
 ######################################
 ## Attributable fraction of Any SNs ##
 ######################################
