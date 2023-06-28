@@ -17,6 +17,15 @@ table(PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$event == 1]) ## **
 testPRS <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/Yadav_CH_related_06_28_2023/CH_related_PRSs_sjlife.txt", header = T)
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, testPRS[match(PHENO.ANY_SN$sjlid, testPRS$IID),])
 
+# [31] "SCORE_chip"                                           "SCORE_mCA"                                           
+# [33] "SCORE_LOY"                                            "SCORE_telomere_length"                               
+# [35] "SCORE_chip_cat"                                       "SCORE_mCA_cat"                                       
+# [37] "SCORE_LOY_cat"                                        "SCORE_telomere_length_cat" 
+
+PHENO.ANY_SN$SCORE_chip_cat <- as.factor(PHENO.ANY_SN$SCORE_chip_cat)
+PHENO.ANY_SN$SCORE_mCA_cat <- as.factor(PHENO.ANY_SN$SCORE_mCA_cat)
+PHENO.ANY_SN$SCORE_LOY_cat <- as.factor(PHENO.ANY_SN$SCORE_LOY_cat)
+PHENO.ANY_SN$SCORE_telomere_length_cat <- as.factor(PHENO.ANY_SN$SCORE_telomere_length_cat)
 
 ######################################
 ## Attributable fraction of Any SNs ##
@@ -24,7 +33,7 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, testPRS[match(PHENO.ANY_SN$sjlid,
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 
-fit_all = glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
+fit_all = glm(formula = event ~ SCORE_mCA_cat +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + 
                 maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category +
@@ -33,6 +42,24 @@ fit_all = glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
 summary(fit_all)
+
+
+(output <- summary(fit_all)$coefficients)
+as.data.frame(apply(output, 2, formatC, format="f", digits=4))
+# options(scipen=999)
+estimate <- format(round(output[,1],3), nsmall = 3)
+std.error <- format(round(output[,2],3), nsmall = 3)
+# P.val <- formatC(output[,4], format="G", digits=3)
+P.val <- output[,4]
+P.val[P.val < 0.001] <- "<0.001"
+P.val[!grepl("<", P.val)] <- format(round(as.numeric(P.val[!grepl("<", P.val)]), 3), nsmall = 3)
+sn.model <- (setNames(cbind.data.frame(estimate, std.error, P.val
+), c("Estimate", "Std.error", "P")))
+sn.model <- sn.model[!grepl("AGE_AT_LAST_CONTACT", row.names(sn.model)),]
+sn.model
+View(sn.model)
+
+
 
 
 ##########################
