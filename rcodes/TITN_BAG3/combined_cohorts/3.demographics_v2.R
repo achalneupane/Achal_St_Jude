@@ -320,6 +320,10 @@ n=nrow(merged.dat_without_CMP)
 get_demographic(merged.dat_without_CMP, n)
 
 
+# ALL
+n = nrow(merged.dat)
+get_demographic(merged.dat, n)
+
 ########################################
 
 ##############################
