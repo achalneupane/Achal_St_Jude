@@ -65,7 +65,9 @@ library(data.table)
 
 subneo <- subneo[!grepl("benign", subneo$icdo3behavior, ignore.case = T),] 
 
-SMNs <- subneo[!grepl("basal cell|squamous cell|meningioma", subneo$diag, ignore.case = T),]
+# SMNs <- subneo[!grepl("basal cell|squamous cell|meningioma", subneo$diag, ignore.case = T),]
+
+SMN <- subneo
 SMNs <- setDT(SMNs)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 
 ## Remove SNs as cases that are within 5 years of primary diagnosis
