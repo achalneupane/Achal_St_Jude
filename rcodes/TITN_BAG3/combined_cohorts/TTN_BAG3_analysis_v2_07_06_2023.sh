@@ -8,6 +8,9 @@ plink --bfile ccss_org --keep sjlife_ccss_org_ccss_exp_samples.txt --keep-allele
 plink --bfile ccss_exp --keep sjlife_ccss_org_ccss_exp_samples.txt --keep-allele-order --make-bed --out ccss_exp_to_concat
 
 
+
+# Run the Rscript to fix problematic alleles: combine_variants_from_sjlife_ccss_exp_and_ccss_org.R
+
 ## Merge the above three
 plink --bfile sjlife_to_concat --merge-list merge_list.txt --keep-allele-order --out sjlife_ccss_org_ccss_exp_samples
 
@@ -66,16 +69,18 @@ Final analysis results are saved as sjlife_ccss_org_ccss_exp__ttn_bag3.assoc.fin
 plink --bfile ccss_org_to_concat --bmerge ccss_exp_to_concat --make-bed --out merged_ccss
 
 
- plink \
- --allow-no-sex \
- --bfile merged_ccss \
- --maf 0.01 \
- --hwe 1e-06 \
- --logistic hide-covar \
- --extract assoc_test_two_vars.txt \
- --ci 0.95 \
- --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
- --pheno-name CMP \
- --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
- --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
- --out sccss_org_ccss_exp_vars
+# Then Run the Rscript 01_annotate_common_variant_analysis_v2_07_06_2023.R for annotation.
+
+ # plink \
+ # --allow-no-sex \
+ # --bfile merged_ccss \
+ # --maf 0.01 \
+ # --hwe 1e-06 \
+ # --logistic hide-covar \
+ # --extract assoc_test_two_vars.txt \
+ # --ci 0.95 \
+ # --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
+ # --pheno-name CMP \
+ # --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
+ # --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+ # --out sccss_org_ccss_exp_vars
