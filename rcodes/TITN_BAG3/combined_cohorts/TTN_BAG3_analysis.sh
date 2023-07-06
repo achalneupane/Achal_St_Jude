@@ -2,12 +2,16 @@
 ## Common variant analysis ##
 #############################
 ## On 02/20/2023, Combined all three datasets (sjlife, CCSS_org and CCSS_exp) and run the assocation analysis on the merged data; see Concatenated analysis on 02/20/2023 for phenotype file in 3.demographics_v2.R
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3
 plink --bfile sjlife --keep sjlife_ccss_org_ccss_exp_samples.txt --keep-allele-order --make-bed --out sjlife_to_concat
 plink --bfile ccss_org --keep sjlife_ccss_org_ccss_exp_samples.txt --keep-allele-order --make-bed --out ccss_org_to_concat
 plink --bfile ccss_exp --keep sjlife_ccss_org_ccss_exp_samples.txt --keep-allele-order --make-bed --out ccss_exp_to_concat
 
+
 ## Merge the above three
 plink --bfile sjlife_to_concat --merge-list merge_list.txt --keep-allele-order --out sjlife_ccss_org_ccss_exp_samples
+
+grep "Warning" sjlife_ccss_org_ccss_exp_samples.log | awk -F "'" '{print $2}'|awk -F "[: ]" '{print $1":"$2}'|sort -V| uniq > warnings.txt
 
 ## Calculate frequency
 plink --bfile sjlife_ccss_org_ccss_exp_samples --freq --keep-allele-order --out sjlife_ccss_org_ccss_exp_samples_freq_out
