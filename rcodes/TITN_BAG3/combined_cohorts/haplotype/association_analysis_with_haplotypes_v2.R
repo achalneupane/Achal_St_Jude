@@ -115,13 +115,13 @@ for (i in 1:length(haplos)){
 #                       data = pheno)
 # summary(haplo.test.adj)
 
-haplo.test.adj <- glm(formula = CMP ~  haplo_11110 + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, 
+haplo.test.adj <- glm(formula = CMP ~  haplo_111101 + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, 
                       family = binomial,
                       data = pheno)
 summary(haplo.test.adj)
 
 
-haplo.test.adj <- glm(formula = CMP ~  haplo_00001 + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, 
+haplo.test.adj <- glm(formula = CMP ~  haplo_000010 + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, 
                       family = binomial,
                       data = pheno)
 summary(haplo.test.adj)
