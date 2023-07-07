@@ -1,6 +1,6 @@
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3")
 df <- read.table("z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/sjlife_ccss_org_ccss_exp_samples.bim")
-warnings <- read.table("z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/warnings.txt")
+warnings <- read.table("z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/warnings.txt")  ## These are the list of variants from plink warnings when merging datasets
 dim(df)
 df$KEY <- paste0("chr",df$V1, ":", df$V4)
 
