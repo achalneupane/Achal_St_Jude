@@ -1,0 +1,189 @@
+---
+title: "scRNAseq analysis"
+author: "Achal Neupane"
+date: "07/14/2023"
+output: word_document
+knit: (
+  function(inputFile, encoding) { 
+  
+    pSubTitle <- 'scRNAseq_analysis_for_hana_scanpy.docx'
+  
+    rmarkdown::render( 
+      input       = inputFile, 
+      encoding    = encoding, 
+      params      = list(sub_title = pSubTitle),      
+      output_file = pSubTitle) })
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+use_python("C:/Users/aneupane/AppData/Local/r-miniconda/envs/r-reticulate/python.exe")
+```
+
+```{python}
+import numpy as np
+import pandas as pd
+import scanpy as sc
+import scipy
+import os
+import scipy.io as sio
+
+data_path = "Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/S_combined/all-well/DGE_filtered/"
+```
+
+
+# Adjusting scanpy default settings
+Scanpy allows you to customize various aspects of the default package behavior.
+
+```{python}
+sc.settings.verbosity = 1 # verbosity: errors (0), warnings (1), info (2), hints (3)
+sc.settings.set_figure_params(dpi=100, fontsize=10, dpi_save=300, figsize=(5,4), format='png')
+sc.settings.figdir = 'Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures/'
+```
+
+
+# Reading in data
+After reading in the data we'll perform basic filtering on our expression matrix to remove low-quality cells and uninformative genes. The parameter "min_genes" will keep cells that have at least 300 genes, and similarly, "min_cells" will keep genes that are expressed in at least 5 cells.
+
+```{python}
+# The DGE_filtered folder contains the expression matrix, genes, and files
+# NOTE: split-pipe versions older than 1.1.0 used 'DGE.mtx'
+adata = sc.read_mtx(data_path + 'DGE.mtx')
+
+# reading in gene and cell data
+gene_data = pd.read_csv(data_path + 'all_genes.csv')
+cell_meta = pd.read_csv(data_path + 'cell_metadata.csv')
+
+# find genes with nan values and filter
+gene_data = gene_data[gene_data.gene_name.notnull()]
+notNa = gene_data.index
+notNa = notNa.to_list()
+
+# remove genes with nan values and assign gene names
+adata = adata[:,notNa]
+adata.var = gene_data
+adata.var.set_index('gene_name', inplace=True)
+adata.var.index.name = None
+adata.var_names_make_unique()
+
+# add cell meta data to anndata object
+adata.obs = cell_meta
+adata.obs.set_index('bc_wells', inplace=True)
+adata.obs.index.name = None
+adata.obs_names_make_unique()
+
+sc.pp.filter_cells(adata, min_genes=300)
+sc.pp.filter_genes(adata, min_cells=5)
+
+# Returns the dimensions of the expression matrix (cells, genes)
+adata.shape
+```
+
+
+# Cell quality control
+In this step we'll perform cell quality control to prevent outlier cells from influencing downstream analyses. Cells that have an unusually high transcript or gene counts are very likely to be multiplets, which is a term for two or more cells that have identical barcodes. Conversely, cells that have very low transcript or genes counts are a consequence of barcoding cells with damaged membranes, or barcoding ambient RNA.
+
+Filtering outliers can be accomplished by generating a violin plot for each cell feature and manually selecting the threshold we wish to remove cells. We'll also add another important cell feature that shows the percentage of mitochondrial genes expressed in each cell. Cells with high mitochondrial gene percentages should be removed, as they are likely to have lost cytoplasmic RNA from lysis or may have increased apoptosis (Luecken and Theis 2019).
+
+```{python}
+adata.var['mt'] = adata.var_names.str.startswith('MT-')
+sc.pp.calculate_qc_metrics(adata, qc_vars=['mt'], percent_top=None, log1p=False, inplace=True)
+
+# Scanpy will prepend the string in the save argument with "violin"
+# and save it to our figure directory defined in the first step.
+sc.pl.violin(adata, ['n_genes_by_counts'], save='_n_genes', jitter=0.4)
+sc.pl.violin(adata, ['total_counts'], save='_total_counts', jitter=0.4)
+sc.pl.violin(adata, ['pct_counts_mt'], save='_mito_pct', jitter=0.4)
+```
+
+
+
+
+```{python}
+# Filter the data
+adata = adata[adata.obs.n_genes_by_counts < 5000,:]
+adata = adata[adata.obs.total_counts < 20000,:]
+adata = adata[adata.obs.pct_counts_mt < 15,:]
+adata.shape # Checking number of cells remaining
+```
+
+Lets visualize the results of our filtered data and print the updated median transcript and gene counts.
+
+```{python}
+sc.pl.scatter(adata, x='total_counts', y='n_genes_by_counts', save='_gene_vs_transcript_counts')
+print('median transcript count per cell: ' + str(adata.obs['tscp_count'].median(0)))
+print('median gene count per cell: ' + str(adata.obs['gene_count'].median(0)))
+```
+
+Now that we've removed the outlier cells, we can normalize the matrix to 10,000 reads per cell and log transform the results.
+
+```{python}
+sc.pp.normalize_total(adata, target_sum=1e4)
+sc.pp.log1p(adata)
+```
+
+# Identify highly-variable genes and regress out transcript counts
+Our next goal is to identify genes with the greatest amount of variance (i.e. genes that are likely to be the most informative). This subset of genes will be used to calculate a set of principal components which will determine how our cells are classified using Leiden clustering and UMAP. You can fine tune variable gene selection by adjusting the min/max mean expression and min/max dispersion.
+
+The regress out function is used to correct for biases in cell attributes, such as the number transcripts per cell. It's important to note that this step can merge cell populations with subtle differences in gene expression, which may or may not align with your analysis goals. You can always start a separate analysis without this feature to see which model suits your objectives.
+
+```{python}
+sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.25)
+sc.pl.highly_variable_genes(adata, save='') # scanpy generates the filename automatically
+
+# Save raw expression values before variable gene subset
+adata.raw = adata
+
+adata = adata[:, adata.var.highly_variable]
+sc.pp.regress_out(adata, ['total_counts'])
+sc.pp.scale(adata, max_value=10)
+```
+
+
+# Principal component analysis
+Now that we've extracted the most "informative" cells and genes from our dataset, we can start the process of dimensional reduction by generating a list of principal components (PCs). Principal component analysis will reduce the number of columns (variable gene expression values) to set of PCs which explain the variance in our dataset. Here we're using a simple and effective method for choosing the PCs by plotting the variance ratio for each PC and choosing the last PC where the ratio starts to "flatten" out. For this particular dataset we've chosen 30 PCs, which will be passed to the "sc.pp.neighbors" function in the next step.
+
+```{python}
+sc.tl.pca(adata, svd_solver='arpack')
+sc.pl.pca_variance_ratio(adata, log=True, n_pcs=50, save='') # scanpy generates the filename automatically
+```
+
+# UMAP and Leiden Clustering
+This step will involve reducing the dimensionality of our data into two dimensions using uniform manifold approximation (UMAP), allowing us to visualize our cell populations as they are binned into discrete populations using Leiden clustering. The "n_neighbors" parameter in the "sc.pp.neighbors" function will determine the size of each cell cluster; lower values will translate to a greater number of clusters by breaking up the dataset into smaller communities, and visa versa for larger values. We can also fine tune the number of clusters using the resolution parameter in the "sc.tl.leiden" function.
+
+```{python}
+sc.pp.neighbors(adata, n_neighbors=10, n_pcs=30)
+sc.tl.umap(adata)
+sc.tl.leiden(adata, resolution=0.5)
+sc.pl.umap(adata, color=['leiden'], legend_fontsize=8, save='_leiden')
+```
+
+# Finding cluster markers
+After determining the appropriate number clusters, we'll perform a statistical test to find genes enriched in each cell population. For this example we'll use the simplest and quickest method, the t-test. Scanpy provides a number of different statistical tests which can be found [here] (https://scanpy-tutorials.readthedocs.io/en/latest/pbmc3k.html#Finding-marker-genes).
+
+```{python}
+sc.tl.rank_genes_groups(adata, 'leiden', method='t-test')
+
+# The head function returns the top n genes per cluster
+top_markers = pd.DataFrame(adata.uns['rank_genes_groups']['names']).head(5)
+print(top_markers)
+```
+
+## Save/load the results
+
+```{python}
+adata.write(data_path + 'adata_after_diffexp.h5ad')
+adata = sc.read(data_path + 'adata_after_diffexp.h5ad')
+```
+
+# Merging clusters and labeling cell types
+A common goal of single cell RNA-seq analysis is to eventually classify all clusters into a cell "type". But what constitutes a cell type? Does a cluster represent a cell type, or a cell in a temporary state as it transitions from one type to the next? Because the appropriate number of clusters depends on the nature of the dataset and specific analysis goals, it's usually a good idea to experiment with models that vary in cluster number.
+
+There may be situations where one can't seem to get the "right" number of clusters to build an accurate model of cell types (or cell states) in their system of interest. That is, you may have a  cluster that perfectly describe cells in one population, but another population may have too many subdivisions. In the following example we'll demonstrate how to merge multiple clusters into a single unit to classify basic PBMC cell types, but it's important to note that this strategy can be used in any scenario where one wishes to customize cell classification.
+
+First we'll take a look at the markers from the Seurat official tutorial and see which genes correspond to cell type, and then plot each gene on a UMAP plot to see which cluster they localize with.
+
+Table: XXX
+
+Note that the platelet marker PPBP isn't present in this dataset. We also have a couple unclassified clusters that aren't present in the official tutorial. We'll name these two clusters after their top marker genes, IGHA2 and ZNF385D.

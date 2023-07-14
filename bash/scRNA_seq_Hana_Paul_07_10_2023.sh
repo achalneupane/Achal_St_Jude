@@ -3,6 +3,8 @@ cd /research_jude/rgs01_jude/groups/sapkogrp/projects/RNAseq/common/scRNAseq_Pau
 zcat Sub_library_1_CKDL230017038-1A*_L*_1* | gzip -c > S1_R1.fq.gz
 zcat Sub_library_1_CKDL230017038-1A*_L*_2* | gzip -c > S1_R2.fq.gz
 
+
+## Process sublibraries
 split-pipe \
     --mode all \
     --chemistry v2 \
