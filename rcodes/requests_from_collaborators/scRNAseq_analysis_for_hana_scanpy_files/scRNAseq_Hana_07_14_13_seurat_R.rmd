@@ -24,6 +24,7 @@ setwd("Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_card
 rm(list = ls())
 
 fig_path <- 'Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures/'
+data_path <- 'Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures/'
 
 ```
 
@@ -183,6 +184,7 @@ In particular DimHeatmap allows for easy exploration of the primary sources of h
 plot <- DimHeatmap(pbmc, dims = 1, cells = 500, balanced = TRUE, fast = FALSE)
 SaveFigure(plot, "dim_heatmap1", width = 8, height = 6)
 ```
+
 ```{r, echo=TRUE}
 plot <- DimHeatmap(pbmc, dims = 1:15, cells = 500, balanced = TRUE, fast = FALSE)
 SaveFigure(plot, "dim_heatmap1_15", width = 12, height = 18)
@@ -254,17 +256,101 @@ SaveFigure(plot, "umap_louvain_res_p3", width = 9, height = 8)
 You can save the object at this point so that it can easily be loaded back in without having to rerun the computationally intensive steps performed above, or easily shared with collaborators.
 
 ```{r, echo=TRUE}
-# SaveObject(pbmc, "seurat_obj_clustered")
-pbmc <- ReadObject("seurat_obj_clustered")
+SaveObject(pbmc, "seurat_obj_clustered")
+# pbmc <- ReadObject("seurat_obj_clustered")
+```
+
+# Differential gene expression (finding cluster markers)
+Seurat can help you find markers that define clusters via differential expression. By default, it identifies positive and negative markers of a single cluster (specified in ident.1), compared to all other cells. FindAllMarkers automates this process for all clusters, but you can also test groups of clusters vs. each other, or against all cells.
+
+The min.pct argument requires a feature to be detected at a minimum percentage in either of the two groups of cells, and the thresh.test argument requires a feature to be differentially expressed (on average) by some amount between the two groups. You can set both of these to 0, but with a dramatic increase in time - since this will test a large number of features that are unlikely to be highly discriminatory. As another option to speed up these computations, max.cells.per.ident can be set. This will downsample each identity class to have no more cells than whatever this is set to. While there is generally going to be a loss in power, the speed increases can be significant and the most highly deferentially expressed features will likely still rise to the top.
+
+
+```{r, echo=TRUE}
+pbmc_markers <- FindAllMarkers(pbmc, min.pct = 0.25, logfc.threshold = 0.25)
+pbmc_markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_logFC)
+```
+
+We include several tools for visualizing marker expression. VlnPlot (shows expression probability distributions across clusters), and FeaturePlot (visualizes feature expression on a tSNE or PCA plot) are our most commonly used visualizations. We also suggest exploring RidgePlot, CellScatter, and DotPlot as additional methods to view your dataset.
+
+```{r, echo=TRUE}
+plot <- VlnPlot(pbmc, features = c("MS4A1", "CD79A"), group.by = "tree.ident")
+SaveFigure(plot, "vln_exp1", width = 16, height = 8)
 ```
 
 
 
+```{r, echo=TRUE}
+# you can plot raw counts as well
+plot <- VlnPlot(pbmc, features = c("NKG7", "GNLY"), slot = "counts", log = TRUE)
+SaveFigure(plot, "vln_exp2", width = 16, height = 8)
+```
 
 
+# Visualizing the top n genes per cluster
+The Seurat PBMC tutorial makes use of the function DoHeatmapfor visualizing the top n genes per cluster in a single figure. This method works well for a  few thousand cells, but loses resolution as the number of cells increase because individual columns have to be interpolated. The DotPlot function addresses this by displaying the average expression for all cells in a cluster.
+
+```{r, echo=TRUE}
+top5 <- pbmc_markers %>% group_by(cluster) %>% top_n(n = 5, wt = avg_logFC)
+to_plot <- unique(top5$gene)
+plot <- DotPlot(pbmc, features = to_plot, group.by = "tree.ident") + coord_flip()
+SaveFigure(plot, "dplot_top5", width = 9, height = 20)
+```
+
+# Merging clusters and labeling cell types
+A common goal of single cell RNA-seq analysis is to eventually classify all clusters into a cell "type". But what constitutes a cell type? Does a cluster represent a cell type, or a cell in a temporary state as it transitions from one type to the next? Because the appropriate number of clusters depends on the nature of the dataset and specific analysis goals, it's usually a good idea to experiment with models that vary in cluster number.
+
+However, there may be situations where one can't seem to get the "right" number of clusters. That is, you may have a  cluster that perfectly describe cells in one population, but another population may have too many subdivisions. In the following example we'll demonstrate how to merge multiple clusters into a single unit to classify basic PBMC cell types, but it's important to note that this strategy can be used in any scenario where one wishes to customize cell classification.
+
+First we'll take a look at the markers from the official tutorial and see which genes correspond to cell type, and then plot each gene on a UMAP plot to see which cluster they localize with.
+
+# Note:
+
+Note that the platelet marker PPBP isn't present in this dataset. We also have a couple unclassified clusters that aren't present in the official tutorial. We'll name these two clusters after their top marker genes, IGHA2 and ZNF385D.
+
+```{r, echo=TRUE}
+# Plotting PBMC markers
+markers <- c("IL7R", "CCR7", "S100A4", "CD14", "LYZ", "MS4A1", "CD8A",
+"FCGR3A", "MS4A7", "GNLY", "NKG7", "FCER1A", "CST3", "PPBP", "IGHA2", "ZNF385D")
+
+pbmc_markers <- FeaturePlot(pbmc, features = markers)
+SaveFigure(pbmc_markers, "pbmc_markers", width = 30, height = 30)
+```
+
+Next, lets generate a UMAP plot with the clusters explicitly labeled so it's a easier to see which cluster corresponds with our PBMC markers. You'll notice that the cluster numbers tend to follow an ordered pattern (e.g. the green clusters on the bottom left contain 5, 6, and 7). This is a consequence of running the BuildClusterTree function and should make it easier to assign them to a single group (in the next step).
+
+```{r, echo=TRUE}
+plot <- DimPlot(pbmc, reduction = "umap", label = TRUE) + NoAxes() + NoLegend
+SaveFigure(plot, "umap_louvain_nolegend", width = 8, height = 7)
+```
+
+The last step involves generating a list where each cell type is assigned multiple clusters so they can be merged. You may wonder why the cell names in the list look different the label names. It's because R list names don't accept spaces or special characters like "+".The last step involves generating a list where each cell type is assigned multiple clusters so they can be merged. You may wonder why the cell names in the list look different the label names. It's because R list names don't accept spaces or special characters like "+".
 
 
+```{r, echo=TRUE}
+# New IDs from official tutorial
+new_ids <- c("Naive CD4 T", "Memory CD4 T", "CD14+ Mono", "B", "CD8 T",
+  "FCGR3A+ Mono", "NK", "DC", "IGHA", "ZNF385D")
 
+new_id_list <- list(Naive.CD4.T = c(17,19,20), Memory.CD4.T = c(15,16,18),
+  CD14.Mono = c(2), B = c(5:7), CD8.T = 13, FCGR3A.Mono = 1, NK = c(10:12,14),
+  DC = c(3,8), IGHA = 4, ZNF385D = 9)
+
+for (i in 1:length(new_id_list)) {
+  ind <- which(pbmc@meta.data$tree.ident %in% new_id_list[[i]])
+  pbmc@meta.data$collapsed[ind] <- names(new_id_list)[i]
+}
+
+pbmc@meta.data$collapsed <- factor(
+  pbmc@meta.data$collapsed, levels = names(new_id_list), ordered = TRUE)
+Idents(pbmc) <- pbmc@meta.data$collapsed
+
+names(new_ids) <- levels(pbmc)
+pbmc <- RenameIdents(pbmc, new_ids)
+
+plot <- DimPlot(pbmc, reduction = "umap", label = TRUE) + NoAxes() + NoLegend()
+SaveFigure(plot, "umap_louvain_nolegend_names", width = 8, height = 7)
+```
 
 
 

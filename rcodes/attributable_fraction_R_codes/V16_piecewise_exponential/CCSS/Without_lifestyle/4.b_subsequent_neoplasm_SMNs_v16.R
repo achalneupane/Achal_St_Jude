@@ -34,6 +34,8 @@ malignantStatus$malKey <- paste(malignantStatus$ccssid, malignantStatus$groupdx3
 
 ## Add malignant status
 subneo$seersmn <- malignantStatus$seersmn[match(subneo$malKey, malignantStatus$malKey)]
+
+subneo$seersmn
 ########################################
 # How many SNs after 5 years
 subneo.after5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5,]
