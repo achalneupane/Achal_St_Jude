@@ -268,13 +268,13 @@ The min.pct argument requires a feature to be detected at a minimum percentage i
 
 ```{r, echo=TRUE}
 pbmc_markers <- FindAllMarkers(pbmc, min.pct = 0.25, logfc.threshold = 0.25)
-pbmc_markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_logFC)
+pbmc_markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC)
 ```
 
 We include several tools for visualizing marker expression. VlnPlot (shows expression probability distributions across clusters), and FeaturePlot (visualizes feature expression on a tSNE or PCA plot) are our most commonly used visualizations. We also suggest exploring RidgePlot, CellScatter, and DotPlot as additional methods to view your dataset.
 
 ```{r, echo=TRUE}
-plot <- VlnPlot(pbmc, features = c("MS4A1", "CD79A"), group.by = "tree.ident")
+plot <- VlnPlot(pbmc, features = c("HELLS", "MYH7"), group.by = "tree.ident")
 SaveFigure(plot, "vln_exp1", width = 16, height = 8)
 ```
 
@@ -282,7 +282,7 @@ SaveFigure(plot, "vln_exp1", width = 16, height = 8)
 
 ```{r, echo=TRUE}
 # you can plot raw counts as well
-plot <- VlnPlot(pbmc, features = c("NKG7", "GNLY"), slot = "counts", log = TRUE)
+plot <- VlnPlot(pbmc, features = c("HELLS", "MYH7"), slot = "counts", log = TRUE)
 SaveFigure(plot, "vln_exp2", width = 16, height = 8)
 ```
 
@@ -291,7 +291,7 @@ SaveFigure(plot, "vln_exp2", width = 16, height = 8)
 The Seurat PBMC tutorial makes use of the function DoHeatmapfor visualizing the top n genes per cluster in a single figure. This method works well for a  few thousand cells, but loses resolution as the number of cells increase because individual columns have to be interpolated. The DotPlot function addresses this by displaying the average expression for all cells in a cluster.
 
 ```{r, echo=TRUE}
-top5 <- pbmc_markers %>% group_by(cluster) %>% top_n(n = 5, wt = avg_logFC)
+top5 <- pbmc_markers %>% group_by(cluster) %>% top_n(n = 5, wt = avg_log2FC)
 to_plot <- unique(top5$gene)
 plot <- DotPlot(pbmc, features = to_plot, group.by = "tree.ident") + coord_flip()
 SaveFigure(plot, "dplot_top5", width = 9, height = 20)
@@ -320,7 +320,7 @@ SaveFigure(pbmc_markers, "pbmc_markers", width = 30, height = 30)
 Next, lets generate a UMAP plot with the clusters explicitly labeled so it's a easier to see which cluster corresponds with our PBMC markers. You'll notice that the cluster numbers tend to follow an ordered pattern (e.g. the green clusters on the bottom left contain 5, 6, and 7). This is a consequence of running the BuildClusterTree function and should make it easier to assign them to a single group (in the next step).
 
 ```{r, echo=TRUE}
-plot <- DimPlot(pbmc, reduction = "umap", label = TRUE) + NoAxes() + NoLegend
+plot <- DimPlot(pbmc, reduction = "umap", label = TRUE) + NoAxes() + NoLegend()
 SaveFigure(plot, "umap_louvain_nolegend", width = 8, height = 7)
 ```
 
@@ -332,10 +332,13 @@ The last step involves generating a list where each cell type is assigned multip
 new_ids <- c("Naive CD4 T", "Memory CD4 T", "CD14+ Mono", "B", "CD8 T",
   "FCGR3A+ Mono", "NK", "DC", "IGHA", "ZNF385D")
 
+
 new_id_list <- list(Naive.CD4.T = c(17,19,20), Memory.CD4.T = c(15,16,18),
   CD14.Mono = c(2), B = c(5:7), CD8.T = 13, FCGR3A.Mono = 1, NK = c(10:12,14),
   DC = c(3,8), IGHA = 4, ZNF385D = 9)
 
+
+pbmc@meta.data$collapsed <- ""
 for (i in 1:length(new_id_list)) {
   ind <- which(pbmc@meta.data$tree.ident %in% new_id_list[[i]])
   pbmc@meta.data$collapsed[ind] <- names(new_id_list)[i]
