@@ -29,7 +29,7 @@ data_path <- 'Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Pa
 ```
 
 
-Below we've included a few convenience functions for saving images and reading/writing your Seurat object to disk. When you're working with larger datasets, it's usually a good idea to save your progress after computationally intensive steps so you can back track if you wish to do so.
+Below we've included a few convenience functions for saving images and reading/writing Seurat object to disk. When we're working with larger datasets, it's usually a good idea to save progress after computationally intensive steps so we can back track if we wish to do so.
 
 ```{r, echo=FALSE}
 # Convenience functions
@@ -55,7 +55,7 @@ ReadObject <- function(name){
 ```
 
 # Reading in data
-After reading in the data we'll perform basic filtering a on our expression matrix to remove low quality cells and uninformative genes. The parameter "min_genes" will keep cells that have at least 300 genes, and similarly, "min_cells" will keep genes that are expressed in at least 5 cells. Note: Seurat version 4.1 includes a convenience function to read Parse data from the DGE folder. If you would like to use this function, please skip the code block below and see the section "Reading in data with Seurat >= 4.1"
+After reading in the data we'll perform basic filtering a on our expression matrix to remove low quality cells and uninformative genes. The parameter "min_genes" will keep cells that have at least 300 genes, and similarly, "min_cells" will keep genes that are expressed in at least 5 cells. Note: Seurat version 4.1 includes a convenience function to read Parse data from the DGE folder. If we would like to use this function, please skip the code block below and see the section "Reading in data with Seurat >= 4.1"
 
 ```{r, echo= TRUE}
 DGE_folder <- "Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/S_combined/all-well/DGE_filtered/"
@@ -105,10 +105,13 @@ Filtering outliers can be accomplished by generating a violin plot for each cell
 pbmc[["percent.mt"]] <- PercentageFeatureSet(pbmc, pattern = "^MT-")
 plot <- VlnPlot(pbmc, pt.size = 0.10,
 features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+plot
 SaveFigure(plot, "vln_QC", width = 12, height = 6)
 
 plot1 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "percent.mt")
+plot1
 plot2 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot2
 SaveFigure((plot1 + plot2),"scatter_QC", width = 12, height = 6, res = 200)
 ```
 
@@ -133,7 +136,9 @@ pbmc <- FindVariableFeatures(pbmc, selection.method = "vst", nfeatures = 2000)
 top10 <- head(VariableFeatures(pbmc), 10)
 # plot variable features with and without labels
 plot1 <- VariableFeaturePlot(pbmc)
+plot1
 plot2 <- LabelPoints(plot = plot1, points = top10, repel = TRUE)
+plot2
 SaveFigure((plot1 + plot2), "var_features", width = 12, height = 6)
 ```
 # Scaling the data
@@ -144,7 +149,7 @@ Scales the expression of each gene, so that the variance across cells is 1
 This step gives equal weight in downstream analyses, so that highly-expressed genes do not dominate
 The results of this are stored in pbmc[["RNA"]]@scale.data
 
-Warning! Generating a scaled data matrix can require a significant amount of RAM for large datasets and potentially crash your session. We therefore chose to use the default setting which only uses the variable gene set in the previous step. It's important to note that scaling the variable gene subset does not affect clustering; it only limits the number of genes available for plotting in the DoHeatMap function.
+Warning! Generating a scaled data matrix can require a significant amount of RAM for large datasets and potentially crash session. We therefore chose to use the default setting which only uses the variable gene set in the previous step. It's important to note that scaling the variable gene subset does not affect clustering; it only limits the number of genes available for plotting in the DoHeatMap function.
 
 ```{r, echo=TRUE}
 pbmc <- ScaleData(pbmc)
@@ -152,7 +157,7 @@ pbmc <- ScaleData(pbmc)
 
 
 # Perform linear dimensional reduction
-Next we perform PCA on the scaled data. By default, only the previously determined variable features are used as input, but can be defined using features argument if you wish to choose a different subset.
+Next we perform PCA on the scaled data. By default, only the previously determined variable features are used as input, but can be defined using features argument if we wish to choose a different subset.
 Seurat provides several useful ways of visualizing both cells and features that define the PCA, including VizDimReduction, DimPlot, and DimHeatmap
 
 ```{r, echo=TRUE}
@@ -168,11 +173,13 @@ print(pbmc[["pca"]], dims = 1:5, nfeatures = 5)
 
 ```{r, echo=TRUE}
 plot <- VizDimLoadings(pbmc, dims = 1:2, reduction = "pca")
+plot
 SaveFigure(plot, "viz_PCA_loadings", width = 10, height = 8)
 ```
 
 ```{r, echo=TRUE}
 plot <- DimPlot(pbmc, reduction = "pca", group.by = "orig.ident")
+plot
 SaveFigure(plot, "pc1_2_scatter", width = 8, height = 6)
 ```
 
@@ -182,11 +189,13 @@ In particular DimHeatmap allows for easy exploration of the primary sources of h
 ```{r, echo=TRUE}
 # Image doesn't save as png unless fast = FALSE
 plot <- DimHeatmap(pbmc, dims = 1, cells = 500, balanced = TRUE, fast = FALSE)
+plot
 SaveFigure(plot, "dim_heatmap1", width = 8, height = 6)
 ```
 
 ```{r, echo=TRUE}
 plot <- DimHeatmap(pbmc, dims = 1:15, cells = 500, balanced = TRUE, fast = FALSE)
+plot
 SaveFigure(plot, "dim_heatmap1_15", width = 12, height = 18)
 ```
 # Determine the 'dimensionality' of the dataset
@@ -208,6 +217,7 @@ For this particular dataset, we chose not to use the jackstraw plot for PC selec
 
 ```{r, echo=TRUE}
 plot <- ElbowPlot(pbmc,ndims = 50)
+plot
 SaveFigure(plot, "PC_elbow_plot", width = 8, height = 10)
 ```
 Identifying the true dimensionality of a dataset -- can be challenging/uncertain for the user. We therefore suggest these three approaches to consider. The first is more supervised, exploring PCs to determine relevant sources of heterogeneity, and could be used in conjunction with GSEA for example. The second implements a statistical test based on a random null model, but is time-consuming for large datasets, and may not return a clear PC cutoff. The third is a heuristic that is commonly used, and can be calculated instantly. In this example, all three approaches yielded similar results, but we might have been justified in choosing anything between PC 7-12 as a cutoff.
@@ -215,7 +225,7 @@ Identifying the true dimensionality of a dataset -- can be challenging/uncertain
 We chose 10 here, but encourage users to consider the following:
 
 Dendritic cell and NK aficionados may recognize that genes strongly associated with PCs 12 and 13 define rare immune subsets (i.e. MZB1 is a marker for plasmacytoid DCs). However, these groups are so rare, they are difficult to distinguish from background noise for a dataset of this size without prior knowledge.
-We encourage users to repeat downstream analyses with a different number of PCs (10, 15, or even 50!). As you will observe, the results often do not differ dramatically.
+We encourage users to repeat downstream analyses with a different number of PCs (10, 15, or even 50!). As we will observe, the results often do not differ dramatically.
 We advise users to err on the higher side when choosing this parameter. For example, performing downstream analyses with only 5 PCs does significantly and adversely affect results.
 
 # Cluster the cells
@@ -250,10 +260,11 @@ Seurat offers several non-linear dimensional reduction techniques, such as tSNE 
 ```{r, echo=TRUE}
 pbmc <- RunUMAP(pbmc, dims = 1:30)
 plot <- DimPlot(pbmc, reduction = "umap")
+plot
 SaveFigure(plot, "umap_louvain_res_p3", width = 9, height = 8)
 ```
 
-You can save the object at this point so that it can easily be loaded back in without having to rerun the computationally intensive steps performed above, or easily shared with collaborators.
+We can save the object at this point so that it can easily be loaded back in without having to rerun the computationally intensive steps performed above, or easily shared with collaborators.
 
 ```{r, echo=TRUE}
 SaveObject(pbmc, "seurat_obj_clustered")
@@ -261,9 +272,9 @@ SaveObject(pbmc, "seurat_obj_clustered")
 ```
 
 # Differential gene expression (finding cluster markers)
-Seurat can help you find markers that define clusters via differential expression. By default, it identifies positive and negative markers of a single cluster (specified in ident.1), compared to all other cells. FindAllMarkers automates this process for all clusters, but you can also test groups of clusters vs. each other, or against all cells.
+Seurat can help us find markers that define clusters via differential expression. By default, it identifies positive and negative markers of a single cluster (specified in ident.1), compared to all other cells. FindAllMarkers automates this process for all clusters, but we can also test groups of clusters vs. each other, or against all cells.
 
-The min.pct argument requires a feature to be detected at a minimum percentage in either of the two groups of cells, and the thresh.test argument requires a feature to be differentially expressed (on average) by some amount between the two groups. You can set both of these to 0, but with a dramatic increase in time - since this will test a large number of features that are unlikely to be highly discriminatory. As another option to speed up these computations, max.cells.per.ident can be set. This will downsample each identity class to have no more cells than whatever this is set to. While there is generally going to be a loss in power, the speed increases can be significant and the most highly deferentially expressed features will likely still rise to the top.
+The min.pct argument requires a feature to be detected at a minimum percentage in either of the two groups of cells, and the thresh.test argument requires a feature to be differentially expressed (on average) by some amount between the two groups. We can set both of these to 0, but with a dramatic increase in time - since this will test a large number of features that are unlikely to be highly discriminatory. As another option to speed up these computations, max.cells.per.ident can be set. This will downsample each identity class to have no more cells than whatever this is set to. While there is generally going to be a loss in power, the speed increases can be significant and the most highly deferentially expressed features will likely still rise to the top.
 
 
 ```{r, echo=TRUE}
@@ -271,18 +282,20 @@ pbmc_markers <- FindAllMarkers(pbmc, min.pct = 0.25, logfc.threshold = 0.25)
 pbmc_markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC)
 ```
 
-We include several tools for visualizing marker expression. VlnPlot (shows expression probability distributions across clusters), and FeaturePlot (visualizes feature expression on a tSNE or PCA plot) are our most commonly used visualizations. We also suggest exploring RidgePlot, CellScatter, and DotPlot as additional methods to view your dataset.
+We include several tools for visualizing marker expression. VlnPlot (shows expression probability distributions across clusters), and FeaturePlot (visualizes feature expression on a tSNE or PCA plot) are our most commonly used visualizations. We also suggest exploring RidgePlot, CellScatter, and DotPlot as additional methods to view dataset.
 
 ```{r, echo=TRUE}
 plot <- VlnPlot(pbmc, features = c("HELLS", "MYH7"), group.by = "tree.ident")
+plot
 SaveFigure(plot, "vln_exp1", width = 16, height = 8)
 ```
 
 
 
 ```{r, echo=TRUE}
-# you can plot raw counts as well
+# we can plot raw counts as well
 plot <- VlnPlot(pbmc, features = c("HELLS", "MYH7"), slot = "counts", log = TRUE)
+plot
 SaveFigure(plot, "vln_exp2", width = 16, height = 8)
 ```
 
@@ -294,13 +307,14 @@ The Seurat PBMC tutorial makes use of the function DoHeatmapfor visualizing the 
 top5 <- pbmc_markers %>% group_by(cluster) %>% top_n(n = 5, wt = avg_log2FC)
 to_plot <- unique(top5$gene)
 plot <- DotPlot(pbmc, features = to_plot, group.by = "tree.ident") + coord_flip()
+plot
 SaveFigure(plot, "dplot_top5", width = 9, height = 20)
 ```
 
 # Merging clusters and labeling cell types
 A common goal of single cell RNA-seq analysis is to eventually classify all clusters into a cell "type". But what constitutes a cell type? Does a cluster represent a cell type, or a cell in a temporary state as it transitions from one type to the next? Because the appropriate number of clusters depends on the nature of the dataset and specific analysis goals, it's usually a good idea to experiment with models that vary in cluster number.
 
-However, there may be situations where one can't seem to get the "right" number of clusters. That is, you may have a  cluster that perfectly describe cells in one population, but another population may have too many subdivisions. In the following example we'll demonstrate how to merge multiple clusters into a single unit to classify basic PBMC cell types, but it's important to note that this strategy can be used in any scenario where one wishes to customize cell classification.
+However, there may be situations where one can't seem to get the "right" number of clusters. That is, we may have a  cluster that perfectly describe cells in one population, but another population may have too many subdivisions. In the following example we'll demonstrate how to merge multiple clusters into a single unit to classify basic PBMC cell types, but it's important to note that this strategy can be used in any scenario where one wishes to customize cell classification.
 
 First we'll take a look at the markers from the official tutorial and see which genes correspond to cell type, and then plot each gene on a UMAP plot to see which cluster they localize with.
 
@@ -314,17 +328,19 @@ markers <- c("IL7R", "CCR7", "S100A4", "CD14", "LYZ", "MS4A1", "CD8A",
 "FCGR3A", "MS4A7", "GNLY", "NKG7", "FCER1A", "CST3", "PPBP", "IGHA2", "ZNF385D")
 
 pbmc_markers <- FeaturePlot(pbmc, features = markers)
+pbmc_markers
 SaveFigure(pbmc_markers, "pbmc_markers", width = 30, height = 30)
 ```
 
-Next, lets generate a UMAP plot with the clusters explicitly labeled so it's a easier to see which cluster corresponds with our PBMC markers. You'll notice that the cluster numbers tend to follow an ordered pattern (e.g. the green clusters on the bottom left contain 5, 6, and 7). This is a consequence of running the BuildClusterTree function and should make it easier to assign them to a single group (in the next step).
+Next, lets generate a UMAP plot with the clusters explicitly labeled so it's a easier to see which cluster corresponds with our PBMC markers. We'll notice that the cluster numbers tend to follow an ordered pattern (e.g. the green clusters on the bottom left contain 5, 6, and 7). This is a consequence of running the BuildClusterTree function and should make it easier to assign them to a single group (in the next step).
 
 ```{r, echo=TRUE}
 plot <- DimPlot(pbmc, reduction = "umap", label = TRUE) + NoAxes() + NoLegend()
+plot
 SaveFigure(plot, "umap_louvain_nolegend", width = 8, height = 7)
 ```
 
-The last step involves generating a list where each cell type is assigned multiple clusters so they can be merged. You may wonder why the cell names in the list look different the label names. It's because R list names don't accept spaces or special characters like "+".The last step involves generating a list where each cell type is assigned multiple clusters so they can be merged. You may wonder why the cell names in the list look different the label names. It's because R list names don't accept spaces or special characters like "+".
+The last step involves generating a list where each cell type is assigned multiple clusters so they can be merged. We may wonder why the cell names in the list look different the label names. It's because R list names don't accept spaces or special characters like "+".The last step involves generating a list where each cell type is assigned multiple clusters so they can be merged. We may wonder why the cell names in the list look different the label names. It's because R list names don't accept spaces or special characters like "+".
 
 
 ```{r, echo=TRUE}
@@ -352,6 +368,7 @@ names(new_ids) <- levels(pbmc)
 pbmc <- RenameIdents(pbmc, new_ids)
 
 plot <- DimPlot(pbmc, reduction = "umap", label = TRUE) + NoAxes() + NoLegend()
+plot
 SaveFigure(plot, "umap_louvain_nolegend_names", width = 8, height = 7)
 ```
 
