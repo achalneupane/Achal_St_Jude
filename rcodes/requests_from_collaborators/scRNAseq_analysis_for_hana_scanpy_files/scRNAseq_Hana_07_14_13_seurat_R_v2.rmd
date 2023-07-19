@@ -19,6 +19,7 @@ library(Seurat)
 # packageVersion("Seurat")
 library(dplyr)
 library(ggplot2)
+library(cowplot)
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures/")
 
 rm(list = ls())
