@@ -349,8 +349,8 @@ We can then run FindMarkers between the groups (i.e., treatment Vs controls)
 
 ```{r, echo=TRUE}
 # Idents(pbmc) <- "grouping_var1"
-# pbmc_markers <- FindMarkers(pbmc, ident.1 = "cardiomyopathy", ident.2 = "control", min.pct = 0.25, logfc.threshold = 0.25)
-# pbmc_markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC)
+pbmc_markers <- FindAllMarkers(pbmc, min.pct = 0.25, logfc.threshold = 0.25)
+pbmc_markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC)
 
 ```
 
