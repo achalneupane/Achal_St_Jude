@@ -10,6 +10,19 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
+
+# Project description
+The cells here are from cardiac organoids made by mixing 15% endocardial cells and 85% cardiomyocytes. These organoids are then treated with factors to induce trabeculation. In our analysis so far, we have noticed that all group except for LVNC respond to this stimulation. 
+
+The samples are as below:
+S25: Control 
+GW64: Cardiomyopathy (LVNC: Left Ventricular Non-compaction Cardiomyopathy)
+GW129: Cardiomyopathy (HCM: Hypertrophic Cardiomyopathy)
+GW168: Cardiomyopathy (DCM: Dilated Cardiomyopathy)
+
+The first question is to see differences between control and cardiomyopathy group. The second and more important question is that what is the differences between LVNC and other cardiomyopathy groups. Specifically, we are interested in the trabecular/compaction process and how the trabeculations is different between LVNC and two other cardiomyopathy group. 
+
+
 # Loading libraries and setting location paths
 ```{r}
 # remove.packages('Matrix')
@@ -22,7 +35,7 @@ library(ggplot2)
 library(cowplot)
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures/")
 
-rm(list = ls())
+# rm(list = ls())
 
 fig_path <- 'Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures/'
 data_path <- 'Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures/'
@@ -56,7 +69,7 @@ ReadObject <- function(name){
 ```
 
 # Reading in data
-After reading in the data we'll perform basic filtering a on our expression matrix to remove low quality cells and uninformative genes. The parameter "min_genes" will keep cells that have at least 300 genes, and similarly, "min_cells" will keep genes that are expressed in at least 5 cells. Note: Seurat version 4.1 includes a convenience function to read Parse data from the DGE folder. If we would like to use this function, please skip the code block below and see the section "Reading in data with Seurat >= 4.1"
+After reading in the data we'll perform basic filtering on our expression matrix to remove low quality cells and uninformative genes. The parameter "min_genes" will keep cells that have at least 300 genes, and similarly, "min_cells" will keep genes that are expressed in at least 5 cells. Note: Seurat version 4.1 includes a convenience function to read Parse data from the DGE folder. If we would like to use this function, please skip the code block below and see the section "Reading in data with Seurat >= 4.1"
 
 ```{r, echo= TRUE}
 DGE_folder <- "Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/S_combined/all-well/DGE_filtered/"
@@ -92,8 +105,8 @@ When we create our Seurat object the plate well numbers (column names in the exp
 pbmc@meta.data$orig.ident <- factor(rep("pbmc", nrow(pbmc@meta.data)))
 Idents(pbmc) <- pbmc@meta.data$orig.ident
 
-SaveObject(pbmc, "seurat_obj_before_QC")
-pbmc <- ReadObject("seurat_obj_before_QC")
+# SaveObject(pbmc, "seurat_obj_before_QC")
+# pbmc <- ReadObject("seurat_obj_before_QC")
 ```
 
 
@@ -110,13 +123,17 @@ plot
 SaveFigure(plot, "vln_QC", width = 12, height = 6)
 
 plot1 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "percent.mt")
-# plot1
+plot1
 plot2 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
-# plot2
+plot2
 
-plot_grid(plot1, plot2)
+# plot_grid(plot1, plot2)
 SaveFigure((plot1 + plot2),"scatter_QC", width = 12, height = 6, res = 200)
 ```
+
+Let's break down the conditions in the subset argument below:
+
+nFeature_RNA is the number of genes detected in each cell. nCount_RNA is the total number of molecules detected within a cell. Low nFeature_RNA for a cell indicates that it may be dead/dying or an empty droplet. High nCount_RNA and/or nFeature_RNA indicates that the "cell" may in fact be a doublet (or multiplet). In combination with %mitochondrial reads, removing outliers from these groups removes most doublets/dead cells/empty droplets, hence why filtering is a common pre-processing step.
 
 ```{r, echo=TRUE}
 # Perform the filtering
@@ -130,6 +147,19 @@ After removing unwanted cells from the dataset, the next step is to normalize th
 pbmc <- NormalizeData(pbmc, normalization.method = "LogNormalize", scale.factor = 10000)
 ```
 
+
+## We are interested in these two questions:
+1. The first question is to see differences between control and cardiomyopathy group
+2. The second and more important question is that what is the differences between LVNC and other cardiomyopathy groups. Specifically, we are interested in the trabecular/compaction process and how the trabeculations is different between LVNC and two other cardiomyopathy group. 
+
+So let's create the grouping variables as required for our analysis
+```{r, echo=TRUE}
+pbmc$grouping_var1 <- ifelse(grepl("S_25", pbmc$sample), "control", "cardiomyopathy")
+pbmc$grouping_var2 <- "control"
+pbmc$grouping_var2[grepl("GW64",pbmc$sample)] <- "LVNC"
+pbmc$grouping_var2[!grepl("GW64|S_25",pbmc$sample)] <- "other_cardiomypathy"
+```
+
 # Identification of highly variable features
 We next calculate a subset of features that exhibit high cell-to-cell variation in the dataset (i.e, they are highly expressed in some cells, and lowly expressed in others). We and others have found that focusing on these genes in downstream analysis helps to highlight biological signal in single-cell datasets. Our procedure in Seurat3 is described in detail here, and improves on previous versions by directly modeling the mean-variance relationship inherent in single-cell data, and is implemented in the FindVariableFeatures function. By default, we return 2,000 features per dataset. These will be used in downstream analysis, like PCA.
 
@@ -139,10 +169,10 @@ pbmc <- FindVariableFeatures(pbmc, selection.method = "vst", nfeatures = 2000)
 top10 <- head(VariableFeatures(pbmc), 10)
 # plot variable features with and without labels
 plot1 <- VariableFeaturePlot(pbmc)
-# plot1
+plot1
 plot2 <- LabelPoints(plot = plot1, points = top10, repel = TRUE)
-# plot2
-plot_grid(plot1, plot2)
+plot2
+# plot_grid(plot1, plot2)
 SaveFigure((plot1 + plot2), "var_features", width = 12, height = 6)
 ```
 # Scaling the data
@@ -166,7 +196,7 @@ Seurat provides several useful ways of visualizing both cells and features that 
 
 ```{r, echo=TRUE}
 pbmc <- RunPCA(pbmc)
-SaveObject(pbmc, "seurat_obj_after_PCA")
+# SaveObject(pbmc, "seurat_obj_after_PCA")
 
 # pbmc <- ReadObject("seurat_obj_after_PCA")
 
@@ -181,10 +211,12 @@ plot
 SaveFigure(plot, "viz_PCA_loadings", width = 10, height = 8)
 ```
 
+
 ```{r, echo=TRUE}
-plot <- DimPlot(pbmc, reduction = "pca", group.by = "orig.ident")
+# plot <- DimPlot(pbmc, reduction = "pca", group.by = "orig.ident")
+plot <- DimPlot(pbmc, reduction = "pca", group.by = "grouping_var1")
 plot
-SaveFigure(plot, "pc1_2_scatter", width = 8, height = 6)
+SaveFigure(plot, "pc1_2_scatter_control_vs_cardiomyopathy", width = 8, height = 6) # **
 ```
 
 In particular DimHeatmap allows for easy exploration of the primary sources of heterogeneity in a dataset, and can be useful when trying to decide which PCs to include for further downstream analyses. Both cells and features are ordered according to their PCA scores. Setting cells to a number plots the 'extreme' cells on both ends of the spectrum, which dramatically speeds plotting for large datasets. Though clearly a supervised analysis, we find this to be a valuable tool for exploring correlated feature sets.
@@ -247,7 +279,7 @@ To cluster the cells, we next apply modularity optimization techniques such as t
 # library(Matrix)
 # update.packages(ask = FALSE)
 pbmc <- FindNeighbors(pbmc, dims = 1:30)
-pbmc <- FindClusters(pbmc, resolution = 0.30)
+pbmc <- FindClusters(pbmc, resolution = 0.50)
 ```
 
 # Reorder clusters according to their similarity
@@ -263,17 +295,35 @@ Seurat offers several non-linear dimensional reduction techniques, such as tSNE 
 
 ```{r, echo=TRUE}
 pbmc <- RunUMAP(pbmc, dims = 1:30)
-plot <- DimPlot(pbmc, reduction = "umap")
-plot
-SaveFigure(plot, "umap_louvain_res_p3", width = 9, height = 8)
+# plot <- DimPlot(pbmc, reduction = "umap")
+plot1 <- DimPlot(pbmc, reduction = "umap", group.by = "grouping_var1") # can use tsne instead of umap
+plot1
+plot2 <- DimPlot(pbmc, reduction = "umap", label = TRUE, repel = TRUE)
+plot2
+SaveFigure(plot1, "umap_louvain_res_p3", width = 9, height = 8)
+SaveFigure(plot2, "umap_louvain_res_p3_all", width = 9, height = 8)
+```
+
+
+To visualize the two conditions side-by-side, we can use the split.by argument to show each condition colored by cluster.
+
+```{r, echo=TRUE}
+DimPlot(pbmc, reduction = "umap", split.by = "grouping_var1")
 ```
 
 We can save the object at this point so that it can easily be loaded back in without having to rerun the computationally intensive steps performed above, or easily shared with collaborators.
 
 ```{r, echo=TRUE}
-SaveObject(pbmc, "seurat_obj_clustered")
+# SaveObject(pbmc, "seurat_obj_clustered")
 # pbmc <- ReadObject("seurat_obj_clustered")
 ```
+
+# End of QC!
+
+# Identify conserved cell type markers
+
+# 1. The first question is to see differences between control and cardiomyopathy group
+
 
 # Differential gene expression (finding cluster markers)
 Seurat can help us find markers that define clusters via differential expression. By default, it identifies positive and negative markers of a single cluster (specified in ident.1), compared to all other cells. FindAllMarkers automates this process for all clusters, but we can also test groups of clusters vs. each other, or against all cells.
@@ -281,24 +331,84 @@ Seurat can help us find markers that define clusters via differential expression
 The min.pct argument requires a feature to be detected at a minimum percentage in either of the two groups of cells, and the thresh.test argument requires a feature to be differentially expressed (on average) by some amount between the two groups. We can set both of these to 0, but with a dramatic increase in time - since this will test a large number of features that are unlikely to be highly discriminatory. As another option to speed up these computations, max.cells.per.ident can be set. This will downsample each identity class to have no more cells than whatever this is set to. While there is generally going to be a loss in power, the speed increases can be significant and the most highly deferentially expressed features will likely still rise to the top.
 
 
+Note: FindAllMarkers function helps to identify gene markers for each cluster relative to all other clusters. The expression for a given gene among cells in a given cluster is compared against the expression of that gene among cells in all other clusters. In the output, pct.1 is the percentage of cells in the cluster where the gene is detected, while pct.2 is the percentage of cells on average in all the other clusters where the gene is detected. A gene to be considered as an IDEAL cluster marker is expected to be expressed exclusively in that cluster and silenced in all others and thus pct.1 will be more towards 1 and pct.2 towards 0. (ref: https://satijalab.org/seurat/archive/v3.0/de_vignette.html)
+
+We can use different function in Seurat for this:
+FindMarkers will find markers between two different identity groups - we have to specify both identity groups. This is useful for comparing the differences between two specific groups.
+
+FindAllMarkers will find markers differentially expressed in each identity group by comparing it to all of the others - we don't have to manually define anything. Note that markers may bleed over between closely-related groups - they are not forced to be specific to only one group.
+
+FindConservedMarkers will find markers that are conserved between two groups - this can be useful if we want to find markers that are conserved between a treated and untreated condition for a specific cell type or group of cells. It means they are differentially expressed compared to other groups, but have similar expression between the two groups you're actually comparing.
+
+p_val : p_val (unadjusted)
+avg_logFC : log fold-chage of the average expression between the two groups. Positive values indicate that the feature is more highly
+p_val_adj : Adjusted p-value, based on bonferroni correction using all features in the dataset.
+
+
+We can then run FindMarkers between the groups (i.e., treatment Vs controls)
+
 ```{r, echo=TRUE}
-pbmc_markers <- FindAllMarkers(pbmc, min.pct = 0.25, logfc.threshold = 0.25)
-pbmc_markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC)
+# Idents(pbmc) <- "grouping_var1"
+# pbmc_markers <- FindMarkers(pbmc, ident.1 = "cardiomyopathy", ident.2 = "control", min.pct = 0.25, logfc.threshold = 0.25)
+# pbmc_markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC)
+
 ```
+
+
+We can explore these marker genes between subgroups.
+```{r, echo=TRUE}
+# loop over clusters
+# Look up identities or clusters with Idents() ; set identity with SetIdent()
+pbmc.tmp <- pbmc
+Idents(pbmc.tmp) <- "grouping_var1"
+# DefaultAssay(pbmc.tmp) <- "RNA"
+pbmc_markers <- FindMarkers(pbmc.tmp, ident.1 = "control", ident.2 = "cardiomyopathy", min.pct = 0.25, logfc.threshold = 0.25)
+pbmc_markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC)
+pbmc_markers_sorted <- pbmc_markers[order(-pbmc_markers$avg_log2FC), ]
+```
+
+
+<!-- We can explore these marker genes for each cluster and use them to annotate our clusters as specific cell types. -->
+<!-- ```{r, echo=TRUE} -->
+<!-- # loop over clusters -->
+<!-- # Look up identities or clusters with Idents() ; set identity with SetIdent() -->
+<!-- # cc <- pbmc -->
+<!-- # Idents(pbmc) <- "grouping_var1" -->
+<!-- # DefaultAssay(pbmc) <- "RNA" -->
+<!-- top.markers <- {} -->
+<!-- top.markers.df <- list() -->
+<!-- for(i in 1:length(unique(Idents(pbmc)))){ -->
+<!-- print(paste0("Doing i: ", i)) -->
+<!-- pbmc_markers <- FindConservedMarkers(pbmc, ident.1 = i, grouping.var = "grouping_var1", verbose = FALSE) -->
+<!-- # pbmc_markers <- FindAllMarkers(pbmc, min.pct = 0.25, logfc.threshold = 0.25) -->
+<!-- # pbmc_markers <- FindMarkers(pbmc, ident.1 = "control", ident.2 = "cardiomyopathy", min.pct = 0.25, logfc.threshold = 0.25) -->
+<!-- # pbmc_markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC) -->
+<!-- top.markers.tmp <- rownames(head(pbmc_markers,1)) -->
+<!-- top.markers <- c(top.markers, top.markers.tmp) -->
+<!-- top.markers.df.tmp <- pbmc_markers -->
+<!-- top.markers.df.tmp$cluster <- i -->
+<!-- top.markers.df[[i]] <- top.markers.df.tmp -->
+<!-- } -->
+<!-- # > top.markers -->
+<!-- c('CFH','VCAN','MEGF11','ST8SIA4','COL9A2','CSMD3','FGR','NEBL','ANLN','TTN','FBN2','SLC7A11','LDB3','ANLN','KIF20A') -->
+
+<!-- ``` -->
+
+
 
 We include several tools for visualizing marker expression. VlnPlot (shows expression probability distributions across clusters), and FeaturePlot (visualizes feature expression on a tSNE or PCA plot) are our most commonly used visualizations. We also suggest exploring RidgePlot, CellScatter, and DotPlot as additional methods to view dataset.
 
 ```{r, echo=TRUE}
-plot <- VlnPlot(pbmc, features = c("HELLS", "MYH7"), group.by = "tree.ident")
+# plot <- VlnPlot(pbmc, features = c("HELLS", "MYH7"), group.by = "tree.ident")
+plot <- VlnPlot(pbmc, features = c("LINGO2", "GRIK1", "EFNA5", "COL15A1", "PDZRN4", "PDE1A", "SPP1",  "H19", "MIR924HG", "ANKRD1", "ADCY5", "HSPA5", "FREM1", "ENSG00000289950", "MIR924HG", "CENPF"), group.by = "grouping_var1")
 plot
 SaveFigure(plot, "vln_exp1", width = 16, height = 8)
 ```
 
 
-
+We can plot raw counts as well
 ```{r, echo=TRUE}
-# we can plot raw counts as well
-plot <- VlnPlot(pbmc, features = c("HELLS", "MYH7"), slot = "counts", log = TRUE)
+plot <- VlnPlot(pbmc, features = c("CFH", "MYH7"), slot = "counts", group.by = "grouping_var1", log = TRUE)
 plot
 SaveFigure(plot, "vln_exp2", width = 16, height = 8)
 ```
@@ -328,8 +438,7 @@ Note that the platelet marker PPBP isn't present in this dataset. We also have a
 
 ```{r, echo=TRUE}
 # Plotting PBMC markers
-markers <- c("IL7R", "CCR7", "S100A4", "CD14", "LYZ", "MS4A1", "CD8A",
-"FCGR3A", "MS4A7", "GNLY", "NKG7", "FCER1A", "CST3", "PPBP", "IGHA2", "ZNF385D")
+markers <- c("LINGO2", "GRIK1", "EFNA5", "COL15A1", "PDZRN4", "PDE1A", "SPP1",  "H19", "MIR924HG", "ANKRD1", "ADCY5", "HSPA5", "FREM1", "ENSG00000289950", "MIR924HG", "CENPF")
 
 pbmc_markers <- FeaturePlot(pbmc, features = markers)
 pbmc_markers
@@ -374,6 +483,8 @@ pbmc <- RenameIdents(pbmc, new_ids)
 plot <- DimPlot(pbmc, reduction = "umap", label = TRUE) + NoAxes() + NoLegend()
 plot
 SaveFigure(plot, "umap_louvain_nolegend_names", width = 8, height = 7)
+
+save.image("Final_analysis.RData")
 ```
 
 
