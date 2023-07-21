@@ -1,4 +1,4 @@
-# Following Qi's email on 05/03/2023 (subject: [Encrypt] CCSS help). Running Piecewise-exponential regression.
+# Following Qi's email on 05/03/2023 (subject: [Encrypt] CCSS help). Running Piecewise-exponential regression. **
 rm(list=ls())
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_combined_Genetic_data_P_LP_v14.Rdata")
 
@@ -13,7 +13,7 @@ library(stringr)
 # library(tidyverse)
 library(lubridate)
 # benchmarkme::get_ram()
-library(survival)
+
 ## Edit lifestyle variables
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
 PHENO.ANY_SN <- edit_lifestyle.ccss(PHENO.ANY_SN)
@@ -23,6 +23,17 @@ PHENO.ANY_SN <- edit_lifestyle.ccss(PHENO.ANY_SN)
 #########################
 subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subneo$agedx
 
+#########################
+## Keep malignant only ##
+#########################
+subneo$malKey <- paste(subneo$ccssid, subneo$groupdx3, subneo$a_candx, subneo$count, sep = ":")
+malignantStatus <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/CCSS_Data_from_Huiqi/RE__CCSS_phenotype_data2/ExportedCCSS_data_update_malignant.txt", header = T, stringsAsFactors = F)
+malignantStatus <- malignantStatus[malignantStatus$a_candx !=".",]
+malignantStatus$malKey <- paste(malignantStatus$ccssid, malignantStatus$groupdx3, malignantStatus$a_candx, malignantStatus$count, sep = ":")
+# malignantStatus$dupli <- duplicated(malignantStatus$Key)
+
+## Add malignant status
+subneo$seersmn <- malignantStatus$seersmn[match(subneo$malKey, malignantStatus$malKey)]
 
 ########################################
 # How many SNs after 5 years
@@ -41,49 +52,26 @@ sum(!duplicated(subneo.within5$ccssid))
 # Get SNs for the first time and Age at First SN.
 # For this, I will first sort the table by date
 library(data.table)
+ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
 
-## Read NMSC data from Qi
-data1 = read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_from_Qi_Liu/sns2022.sas7bdat")
-data1=as.data.frame(data1)
-# data1$ccssid <- paste0(data1$ccssid, "_", data1$ccssid)
-data1$KEY <- paste0(data1$ccssid,":",data1$d_candx)
-
-######################
-## ADD NMSC from Qi ##
-######################
-subneo$d_candx <- as.Date(subneo$d_candx, format = "%d%b%Y")
-subneo$KEY <- paste0(subneo$ccssid,":",subneo$d_candx)
-table(subneo$KEY %in% data1$KEY)
-# FALSE  TRUE 
-# 6307  3440 
-table(data1$KEY %in% subneo$KEY)
-# FALSE  TRUE 
-# 4629  4434 
-subneo$nmsc <- data1$nmsc[match(subneo$KEY, data1$KEY)]
-subneo$nmscYN <- ifelse(subneo$nmsc ==1| (subneo$nmsc == 2 & subneo$groupdx3 == "Skin"), "Yes", "No")
-table(subneo$nmscYN )
-# FALSE  TRUE 
-# 1484  1956 
-############
-SMNs <- subneo[!grepl("Yes", subneo$nmscYN),]
-SMNs <- setDT(SMNs)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
-
-dim(SMNs)
-# 1109
-
-
-## Remove SNs if younger than 18 **
+## Remove SNs if younger than 18 
 dim(PHENO.ANY_SN)
 # 7943   50
 
+PHENO.ANY_SN$AGE.ANY_SN <- ANY_SNs$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, ANY_SNs$ccssid)]
+if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
+  PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
+}
 
-PHENO.ANY_SN$AGE.ANY_SN <- SMNs$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, SMNs$ccssid)]
-# if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
-#   PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
-# }
+dim(PHENO.ANY_SN)
+## 7870 51 
+
+# Removing samples with SN within the 5 years of childhood cancer **
+sum(PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid)
+# 7
 
 
-
+## **
 # "a_dx"  : Primary cancer diagnosis age
 # "a_end" : age at last contact
 # "d_candx" : Date when second cancer was diagnosed                                    
@@ -91,32 +79,87 @@ PHENO.ANY_SN$AGE.ANY_SN <- SMNs$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, SMNs$ccssi
 
 
 # dat[,c("ccssid","strokedt","event","dob","agelstcontact","agedx")]
-SMNs$gradeage <- SMNs$gradedt
-SMNs$gradedt <- as.Date(SMNs$d_candx, format = "%d%b%Y")
+ANY_SNs$gradeage <- ANY_SNs$AGE.ANY_SN
+ANY_SNs$gradedt <- as.Date(ANY_SNs$d_candx, format = "%d%b%Y")
 ## Calculate DOB
-SMNs$dob <- SMNs$gradedt - as.numeric(SMNs$gradeage) * 365.2422
-PHENO.ANY_SN$dob <- SMNs$dob[match(PHENO.ANY_SN$ccssid, SMNs$ccssid)] ## 2009-02-12
-PHENO.ANY_SN$gradedt <- SMNs$gradedt[match(PHENO.ANY_SN$ccssid, SMNs$ccssid)] ## 2009-02-12
+ANY_SNs$dob <- ANY_SNs$gradedt - as.numeric(ANY_SNs$gradeage) * 365.2422
+PHENO.ANY_SN$dob <- ANY_SNs$dob[match(PHENO.ANY_SN$ccssid, ANY_SNs$ccssid)] ## 2009-02-12
+PHENO.ANY_SN$gradedt <- ANY_SNs$gradedt[match(PHENO.ANY_SN$ccssid, ANY_SNs$ccssid)] ## 2009-02-12
+###################
 
-dim(PHENO.ANY_SN)
-## 7870 51 ** END
-
-# Removing samples with SN within the 5 years of childhood cancer **
-sum(PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid)
-# 7
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid,]
 dim(PHENO.ANY_SN)
-# 7863 ** END
+# 7863 
 
 ## CA CO status
-PHENO.ANY_SN$SMNs <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% SMNs$ccssid, 0, 1))
-table(PHENO.ANY_SN$SMNs)
+PHENO.ANY_SN$ANY_SNs <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% ANY_SNs$ccssid, 0, 1))
+table(PHENO.ANY_SN$ANY_SNs)
 # 0    1 
-# 6307 1611 
+# 6307 1556
 
 
+############################################################################################
+############################################################################################
+#################################### Work for V11-4-v2 #####################################
+############################################################################################
+############################################################################################
+# Yutaka's email 02/23/2023: The number of SN should decrease
+# in the new analysis because those who developed SN before the first adult
+# survey should be out of the analysis.  Also, we should use the "any missing in
+# the lifestyle variables" rather than using the individual missing (with
+# missing combined to the reference in each lifestyle variable).
 
-######################### **
+## remove all lifestyle missing
+PHENO.ANY_SN <- PHENO.ANY_SN[!(PHENO.ANY_SN$Current_smoker_yn == "Unknown" &
+                                 PHENO.ANY_SN$PhysicalActivity_yn == "Unknown" &
+                                 PHENO.ANY_SN$RiskyHeavyDrink_yn == "Unknown" &
+                                 PHENO.ANY_SN$Obese_yn == "Unknown" ),]
+
+dim(PHENO.ANY_SN)
+# [1] 7780   52
+
+sum((PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey >= 18|
+       PHENO.ANY_SN$PhysicalActivity_yn_agesurvey >= 18|
+       PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey >= 18|
+       PHENO.ANY_SN$Not_obese_yn_agesurvey >= 18), na.rm = T)
+# 7780
+
+
+PHENO.ANY_SN <- PHENO.ANY_SN[which(PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey >= 18 |
+                                     PHENO.ANY_SN$PhysicalActivity_yn_agesurvey >= 18 |
+                                     PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey >= 18 |
+                                     PHENO.ANY_SN$Not_obese_yn_agesurvey >= 18),]
+
+cols <- c(
+  "smoker_former_or_never_yn_agesurvey",
+  "PhysicalActivity_yn_agesurvey",
+  "NOT_RiskyHeavyDrink_yn_agesurvey",
+  "Not_obese_yn_agesurvey"
+)
+
+## round to nearest integer
+# saved.cc <- ALL.LIFESTYLE[, c("SJLIFEID", cols)]
+# ALL.LIFESTYLE[, cols] <- apply(PHENO.ANY_SN[, cols], 2, round)
+library(matrixStats)
+PHENO.ANY_SN$survey_min <- rowMins(as.matrix(PHENO.ANY_SN[, cols]), na.rm = TRUE)
+# cc <- PHENO.ANY_SN[, c("SJLIFEID", cols, "survey_min")]
+PHENO.ANY_SN$Current_smoker_yn [which(PHENO.ANY_SN$smoker_former_or_never_yn_agesurvey != PHENO.ANY_SN$survey_min)] <- "Unknown"
+PHENO.ANY_SN$PhysicalActivity_yn [which(PHENO.ANY_SN$PhysicalActivity_yn_agesurvey != PHENO.ANY_SN$survey_min)] <- "Unknown"
+PHENO.ANY_SN$RiskyHeavyDrink_yn [which(PHENO.ANY_SN$NOT_RiskyHeavyDrink_yn_agesurvey != PHENO.ANY_SN$survey_min)] <- "Unknown"
+PHENO.ANY_SN$Obese_yn [which(PHENO.ANY_SN$Not_obese_yn_agesurvey != PHENO.ANY_SN$survey_min)] <- "Unknown"
+
+## Remove SN cases if the diagnosis date is prior to the youngest adult survey date
+PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$survey_min > PHENO.ANY_SN$AGE.ANY_SN),]
+dim(PHENO.ANY_SN)
+# 7636   53
+
+
+## Add any missing to each lifestyle variable
+# PHENO.ANY_SN[c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn")]
+PHENO.ANY_SN$any_lifestyle_missing <- apply(PHENO.ANY_SN[c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn")], 1, function(x) any("Unknown" %in% x))
+PHENO.ANY_SN$any_lifestyle_missing  <- factor(ifelse(PHENO.ANY_SN$any_lifestyle_missing == FALSE, "No", "Yes"))
+
+table(PHENO.ANY_SN$any_lifestyle_missing)
 
 ########################################
 ## Do the same for missing treatments ##
@@ -144,7 +187,21 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.A
 ############################################################
 ## Drop Unknown level from the lifestyle factor variables ##
 ############################################################
-## Recode tx variables to fit the model for missingness
+## Recode lifestyle variables to fit the model for missingness
+## Missing lifestyle
+PHENO.ANY_SN$Current_smoker_yn[PHENO.ANY_SN$Current_smoker_yn == "Unknown"] <- "No"
+PHENO.ANY_SN$Current_smoker_yn <- droplevels(PHENO.ANY_SN$Current_smoker_yn)
+
+PHENO.ANY_SN$PhysicalActivity_yn[PHENO.ANY_SN$PhysicalActivity_yn == "Unknown"] <- "Yes"
+PHENO.ANY_SN$PhysicalActivity_yn <- droplevels(PHENO.ANY_SN$PhysicalActivity_yn)
+
+PHENO.ANY_SN$RiskyHeavyDrink_yn[PHENO.ANY_SN$RiskyHeavyDrink_yn == "Unknown"] <- "No"
+PHENO.ANY_SN$RiskyHeavyDrink_yn <- droplevels(PHENO.ANY_SN$RiskyHeavyDrink_yn)
+
+PHENO.ANY_SN$Obese_yn[PHENO.ANY_SN$Obese_yn == "Unknown"] <- "No"
+PHENO.ANY_SN$Obese_yn <- droplevels(PHENO.ANY_SN$Obese_yn)
+
+
 ## Missing tx
 PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxsegrtdose.category <- droplevels(PHENO.ANY_SN$maxsegrtdose.category)
@@ -171,44 +228,6 @@ PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "
 PHENO.ANY_SN$aa_class_dose_5.category <- droplevels(PHENO.ANY_SN$aa_class_dose_5.category)
 
 
-##########################################
-## Find out benign SMNs and remove them ##
-##########################################
-# # based on Yadav's email on 03/09/2023, I am removing all benign diagnoses
-## This file is from Kyla
-KIRI.ccss <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Kyla/combinedsn_final_02_17_2023.csv", header = T, sep = ",", stringsAsFactors = F)
-dim(KIRI.ccss)
-## Keep non-missing candxo3
-KIRI.ccss <- KIRI.ccss[!is.na(KIRI.ccss$candxo3),]
-# KIRI.ccss <- KIRI.ccss[KIRI.ccss$candxo3 !="",]
-KIRI.ccss <- KIRI.ccss[KIRI.ccss$d_candx !="",]
-dim(KIRI.ccss)
-KIRI.ccss$SN_diagnosis_date <- as.Date(KIRI.ccss$d_candx, format = "%d%b%Y")
-KIRI.ccss$SN_diagnosis_date <- format(KIRI.ccss$SN_diagnosis_date, "%m-%d-%Y") # 06-30-2008
-KIRI.ccss$KEY <- paste(KIRI.ccss$ccssid, KIRI.ccss$SN_diagnosis_date, sep = ":")
-
-PHENO.ANY_SN$SN_diagnosis_date <- as.Date(PHENO.ANY_SN$d_candx, format = "%d%b%Y")
-PHENO.ANY_SN$SN_diagnosis_date  <- format(PHENO.ANY_SN$SN_diagnosis_date, "%m-%d-%Y") # "08-23-2016"
-PHENO.ANY_SN$ccssid <- gsub("_.*","",PHENO.ANY_SN$ccssid)
-PHENO.ANY_SN$KEY <- paste(PHENO.ANY_SN$ccssid, PHENO.ANY_SN$SN_diagnosis_date, sep = ":")
-
-
-table(PHENO.ANY_SN$KEY %in% KIRI.ccss$KEY)
-# FALSE  TRUE 
-# 6326   1537
-
-
-
-SMNs <- PHENO.ANY_SN[PHENO.ANY_SN$SMNs == 1,]
-KIRI.ccss <- KIRI.ccss[KIRI.ccss$KEY %in% SMNs$KEY,]
-
-KIRI.ccss <- KIRI.ccss[grepl("\\/0|\\/1", KIRI.ccss$candxo3),]
-
-PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% KIRI.ccss$ccssid,]
-table(PHENO.ANY_SN$SMNs)
-# 6307 1276
-##########################################
-
 ################
 ## Cross tabs ##
 ################
@@ -219,30 +238,45 @@ CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
 
 CROSS_CASES.df <- PHENO.ANY_SN
 
-CROSS_CASES.df <- CROSS_CASES.df[,c("SMNs", "maxsegrtdose.category", "maxchestrtdose.category", "maxabdrtdose.category", "epitxn_dose_5.category")]
+CROSS_CASES.df <- CROSS_CASES.df[,c("ANY_SNs", "maxsegrtdose.category", "maxchestrtdose.category", "maxabdrtdose.category", "epitxn_dose_5.category")]
 
-CROSS_CASES.df <- apply_labels(CROSS_CASES.df, SMNs = "SMNs", 
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df, ANY_SNs = "ANY_SNs", 
                                maxsegrtdose.category = "maxsegrtdose.category", maxchestrtdose.category = "maxchestrtdose.category", 
                                maxabdrtdose.category = "maxabdrtdose.category", epitxn_dose_5.category = "epitxn_dose_5.category")
 
 as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(SMNs, list(maxsegrtdose.category, maxchestrtdose.category, maxabdrtdose.category, epitxn_dose_5.category))))
+                  cross_cases(ANY_SNs, list(maxsegrtdose.category, maxchestrtdose.category, maxabdrtdose.category, epitxn_dose_5.category))))
 
 
 cc <- as.data.frame(t(CROSS_CASES.df %>%
-                        cross_cases(SMNs, list(maxsegrtdose.category, maxchestrtdose.category, maxabdrtdose.category, epitxn_dose_5.category))))
+                        cross_cases(ANY_SNs, list(maxsegrtdose.category, maxchestrtdose.category, maxabdrtdose.category, epitxn_dose_5.category))))
 
 rownames(cc) <- NULL 
 cc
 
 
+# Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for cases
+cases_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$ANY_SNs == 1],
+                     Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$ANY_SNs == 1])
+
+# Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for controls
+control_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$ANY_SNs == 0],
+                       Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$ANY_SNs == 0])
+
+
+## **
 ########################################
 ## Prepare data accoding to Qi's code ## 
-########################################
+########################################  ## change agedx to survey_min which is the age at first adult survey
 data <- PHENO.ANY_SN
 
 ## Age at last contact for cases is SN diagnosis data
 data$agelstcontact[!is.na(data$AGE.ANY_SN)] <- data$AGE.ANY_SN[!is.na(data$AGE.ANY_SN)]
+# If age at adult survey is greater than age at last contact for Controls, Use age at survey as age at last contact **
+BOOL <- is.na(data$AGE.ANY_SN) & data$agelstcontact < data$survey_min
+data$agelstcontact[BOOL] <- data$survey_min[BOOL]
+# data$ccssid[BOOL]
+
 
 data$event <- ifelse(!is.na(data$gradedt), 1, 0)
 
@@ -259,14 +293,12 @@ alldata <- merge(data,event.number,by.x="ccssid",by.y="ccssid")
 
 alldata$start <- NULL
 alldata$end <- NULL
-### For those without event, start is agedx and end is Fu date === for SN, analysis starts from 5 years post DX (SNs within 5 years have been removed from the analysis)
-alldata$start[alldata$event==0] <- alldata$agedx[alldata$event==0] + 5
-### Achal: Since the analysis start from 5 years post DX, the above line has been revised to: alldata$start[alldata$event==0] <- alldata$agedx[alldata$event==0]+5
+### For those without event, start is first age at adult survey and end is Fu date === for SN, analysis starts from age at first adult survey
+alldata$start[alldata$event==0] <- alldata$survey_min[alldata$event==0]
 alldata$end[alldata$event==0] <- alldata$agelstcontact[alldata$event==0] 
 
-### For the first event, start is agedx and end is first event time
-alldata$start[alldata$event==1 & alldata$first==1] <- alldata$agedx[alldata$event==1 & alldata$first==1] + 5
-### Achal: also added +5 in the above line
+### For the first event, start is survey_min and end is first event time
+alldata$start[alldata$event==1 & alldata$first==1] <- alldata$survey_min[alldata$event==1 & alldata$first==1] 
 alldata$end[alldata$event==1 & alldata$first==1] <- as.numeric(difftime(alldata$gradedt[alldata$event==1 & alldata$first==1],alldata$dob[alldata$event==1 & alldata$first==1], units = 'days')/365.25)
 
 #### For events that are not the first, segments are from the previous event date to this event date
@@ -278,7 +310,7 @@ alldata$start[alldata$first>1] <- as.numeric(difftime(alldata$previous[alldata$f
 alldata$end[alldata$first>1] <- as.numeric(difftime(alldata$gradedt[alldata$first>1],alldata$dob[alldata$first>1], units = 'days')/365.25)
 
 
-### If one person has only 1 event, we need to have segment from agedx to event date (handled above), and then from event date to end of FU
+### If one person has only 1 event, we need to have segment from survey_min to event date (handled above), and then from event date to end of FU
 ### If one person has multiple events, we need to add segments from the last event to end of Fu.
 row_add <- alldata[alldata$event==1 & alldata$first==alldata$maxE,] ## this includes (1) people with only 1 event (2) The last row for people with multiple events
 row_add$start <- as.numeric(difftime(row_add$gradedt, row_add$dob, units = 'days')/365.25)
@@ -303,6 +335,9 @@ diff=any$start-any$end ###Qi: These are people who had SN after the last contact
 dim(adata)
 final <- adata[adata$end>adata$start,]
 
+final$ccssid[duplicated(final$ccssid)]
+
+
 minimum  <-  min(final$start, na.rm = TRUE) - 1
 if (minimum < 0) minimum <- 0
 maximum  <-  max(final$end, na.rm = TRUE) + 1
@@ -325,10 +360,11 @@ PHENO.ANY_SN <- SNs_py[c("ccssid", "event", "Pleiotropy_PRSWEB_PRS.tertile.categ
                          "maxsegrtdose.category", "maxneckrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category",
                          "maxpelvisrtdose.category", "epitxn_dose_5.category", "anthra_jco_dose_5.category", "aa_class_dose_5.category",
                          "EAS", "AFR", 
-                         "any_tx_missing", "any_chemo_missing", "any_rt_missing",
+                         "Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn", 
+                         "any_lifestyle_missing", "any_tx_missing", "any_chemo_missing", "any_rt_missing",
                          "PY","evt1")]
 
 
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SMNs_without_lifestyle.V16.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.Any_SNs.V17_without_diet.Rdata")
 

@@ -1,6 +1,14 @@
 # Following Qi's email on 05/03/2023 (subject: [Encrypt] CCSS help). Running Piecewise-exponential regression.
 rm(list=ls())
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_combined_Genetic_data_P_LP_v14.Rdata")
+#########################
+## Load Phenotype data ##
+#########################
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
+source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
+ALL.LIFESTYLE <- edit_lifestyle(ALL.LIFESTYLE)
+#########################
+## Subsequent Neoplasm ##
+#########################
 
 library(haven)
 library(benchmarkme)
@@ -14,117 +22,78 @@ library(stringr)
 library(lubridate)
 # benchmarkme::get_ram()
 library(survival)
-## Edit lifestyle variables
-source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
-PHENO.ANY_SN <- edit_lifestyle.ccss(PHENO.ANY_SN)
 
-#########################
-## Subsequent neoplasm ##
-#########################
+# subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
+subneo <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_07_22_2023_subneo.txt", header = T, stringsAsFactors = F)
+
+head(subneo)
+table(subneo$diaggrp)
+dim(subneo)
+# 1731 9
+
+subneo <- subneo[subneo$sjlid %in% PHENO.ANY_SN$sjlid ,]
+dim(subneo)
+# 1717
+# add diagnosis date 
+subneo$diagdt <-  PHENO.ANY_SN$diagdt [match(subneo$sjlid , PHENO.ANY_SN$sjlid)]
+subneo$agedx <-  PHENO.ANY_SN$agedx [match(subneo$sjlid , PHENO.ANY_SN$sjlid)]
+# add DOB
+subneo$DOB <- PHENO.ANY_SN$dob[match(subneo$sjlid, PHENO.ANY_SN$sjlid)]
+
+subneo$gradedt <- as.Date(subneo$gradedt, "%m/%d/%Y") ## **
+subneo$AGE.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
+
+subneo$AGE.ANY_SN.after.childhood.cancer <- time_length(interval(as.Date(subneo$diagdt), as.Date(subneo$gradedt)), "years")
 subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subneo$agedx
 
 
 ########################################
 # How many SNs after 5 years
 subneo.after5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5,]
-length(unique(subneo.after5$ccssid))
-# 1619
+length(unique(subneo.after5$sjlid))
+# 612
 
 subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
-sum(!duplicated(subneo.within5$ccssid))
-# 26
-
-
+sum(!duplicated(subneo.within5$sjlid))
+# 22
 #############
 ## Any SNs ##
 #############
-# Get SNs for the first time and Age at First SN.
+# Get SMNs for the first time and Age at First SMNs.
 # For this, I will first sort the table by date
 library(data.table)
 
-## Read NMSC data from Qi
-data1 = read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_from_Qi_Liu/sns2022.sas7bdat")
-data1=as.data.frame(data1)
-# data1$ccssid <- paste0(data1$ccssid, "_", data1$ccssid)
-data1$KEY <- paste0(data1$ccssid,":",data1$d_candx)
+SMNs <- subneo[!grepl("basal cell|squamous cell|meningioma", subneo$diag, ignore.case = T),]
+SMNs <- setDT(SMNs)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 
-######################
-## ADD NMSC from Qi ##
-######################
-subneo$d_candx <- as.Date(subneo$d_candx, format = "%d%b%Y")
-subneo$KEY <- paste0(subneo$ccssid,":",subneo$d_candx)
-table(subneo$KEY %in% data1$KEY)
-# FALSE  TRUE 
-# 6307  3440 
-table(data1$KEY %in% subneo$KEY)
-# FALSE  TRUE 
-# 4629  4434 
-subneo$nmsc <- data1$nmsc[match(subneo$KEY, data1$KEY)]
-subneo$nmscYN <- ifelse(subneo$nmsc ==1| (subneo$nmsc == 2 & subneo$groupdx3 == "Skin"), "Yes", "No")
-table(subneo$nmscYN )
-# FALSE  TRUE 
-# 1484  1956 
-############
-SMNs <- subneo[!grepl("Yes", subneo$nmscYN),]
-SMNs <- setDT(SMNs)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
+## Remove SNs as cases that are within 5 years of primary diagnosis
+SMNs <- SMNs[!SMNs$sjlid %in% subneo.within5$sjlid,]
+nrow(SMNs)
 
-dim(SMNs)
-# 1109
+table(SMNs$icdo3behavior)
+
+PHENO.ANY_SN$gradedt <- SMNs$gradedt[match(PHENO.ANY_SN$sjlid, SMNs$sjlid)]
+PHENO.ANY_SN$AGE.ANY_SN <- SMNs$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, SMNs$sjlid)]
 
 
-## Remove SNs if younger than 18 **
-dim(PHENO.ANY_SN)
-# 7943   50
+## remove within 5 years of diagnosis
+sum(PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid)
+# 22
+PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid,]
+
+PHENO.ANY_SN$SMNs <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% SMNs$sjlid, 0, 1))
 
 
-PHENO.ANY_SN$AGE.ANY_SN <- SMNs$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, SMNs$ccssid)]
-# if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
-#   PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
-# }
-
-
-
-# "a_dx"  : Primary cancer diagnosis age
-# "a_end" : age at last contact
-# "d_candx" : Date when second cancer was diagnosed                                    
-# "a_candx": Age at second cancer diagnosis
-
-
-# dat[,c("ccssid","strokedt","event","dob","agelstcontact","agedx")]
-SMNs$gradeage <- SMNs$gradedt
-SMNs$gradedt <- as.Date(SMNs$d_candx, format = "%d%b%Y")
-## Calculate DOB
-SMNs$dob <- SMNs$gradedt - as.numeric(SMNs$gradeage) * 365.2422
-PHENO.ANY_SN$dob <- SMNs$dob[match(PHENO.ANY_SN$ccssid, SMNs$ccssid)] ## 2009-02-12
-PHENO.ANY_SN$gradedt <- SMNs$gradedt[match(PHENO.ANY_SN$ccssid, SMNs$ccssid)] ## 2009-02-12
-
-dim(PHENO.ANY_SN)
-## 7870 51 ** END
-
-# Removing samples with SN within the 5 years of childhood cancer **
-sum(PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid)
-# 7
-PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid,]
-dim(PHENO.ANY_SN)
-# 7863 ** END
-
-## CA CO status
-PHENO.ANY_SN$SMNs <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% SMNs$ccssid, 0, 1))
 table(PHENO.ANY_SN$SMNs)
 # 0    1 
-# 6307 1611 
+# 4056  323
 
 
-
-######################### **
-
-########################################
-## Do the same for missing treatments ##
-########################################
+#################
+## missingness ##
+#################
 PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category", "epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
 PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
-
-table(PHENO.ANY_SN$any_tx_missing)
 
 PHENO.ANY_SN$any_chemo_missing <- apply(PHENO.ANY_SN[c("epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
 PHENO.ANY_SN$any_chemo_missing  <- factor(ifelse(PHENO.ANY_SN$any_chemo_missing == FALSE, "No", "Yes"))
@@ -137,14 +106,12 @@ PHENO.ANY_SN$any_rt_missing  <- factor(ifelse(PHENO.ANY_SN$any_rt_missing == FAL
 #########################
 ## Add admixture ethnicity 
 ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
-ethnicity.admixture$INDIVIDUAL <- sapply(strsplit(ethnicity.admixture$INDIVIDUAL,"_"), `[`, 1)
-PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$ccssid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
+PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
 
 
 ############################################################
 ## Drop Unknown level from the lifestyle factor variables ##
 ############################################################
-## Recode tx variables to fit the model for missingness
 ## Missing tx
 PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxsegrtdose.category <- droplevels(PHENO.ANY_SN$maxsegrtdose.category)
@@ -170,44 +137,6 @@ PHENO.ANY_SN$anthra_jco_dose_5.category <- droplevels(PHENO.ANY_SN$anthra_jco_do
 PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "Unknown"] <- "None"
 PHENO.ANY_SN$aa_class_dose_5.category <- droplevels(PHENO.ANY_SN$aa_class_dose_5.category)
 
-
-##########################################
-## Find out benign SMNs and remove them ##
-##########################################
-# # based on Yadav's email on 03/09/2023, I am removing all benign diagnoses
-## This file is from Kyla
-KIRI.ccss <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Kyla/combinedsn_final_02_17_2023.csv", header = T, sep = ",", stringsAsFactors = F)
-dim(KIRI.ccss)
-## Keep non-missing candxo3
-KIRI.ccss <- KIRI.ccss[!is.na(KIRI.ccss$candxo3),]
-# KIRI.ccss <- KIRI.ccss[KIRI.ccss$candxo3 !="",]
-KIRI.ccss <- KIRI.ccss[KIRI.ccss$d_candx !="",]
-dim(KIRI.ccss)
-KIRI.ccss$SN_diagnosis_date <- as.Date(KIRI.ccss$d_candx, format = "%d%b%Y")
-KIRI.ccss$SN_diagnosis_date <- format(KIRI.ccss$SN_diagnosis_date, "%m-%d-%Y") # 06-30-2008
-KIRI.ccss$KEY <- paste(KIRI.ccss$ccssid, KIRI.ccss$SN_diagnosis_date, sep = ":")
-
-PHENO.ANY_SN$SN_diagnosis_date <- as.Date(PHENO.ANY_SN$d_candx, format = "%d%b%Y")
-PHENO.ANY_SN$SN_diagnosis_date  <- format(PHENO.ANY_SN$SN_diagnosis_date, "%m-%d-%Y") # "08-23-2016"
-PHENO.ANY_SN$ccssid <- gsub("_.*","",PHENO.ANY_SN$ccssid)
-PHENO.ANY_SN$KEY <- paste(PHENO.ANY_SN$ccssid, PHENO.ANY_SN$SN_diagnosis_date, sep = ":")
-
-
-table(PHENO.ANY_SN$KEY %in% KIRI.ccss$KEY)
-# FALSE  TRUE 
-# 6326   1537
-
-
-
-SMNs <- PHENO.ANY_SN[PHENO.ANY_SN$SMNs == 1,]
-KIRI.ccss <- KIRI.ccss[KIRI.ccss$KEY %in% SMNs$KEY,]
-
-KIRI.ccss <- KIRI.ccss[grepl("\\/0|\\/1", KIRI.ccss$candxo3),]
-
-PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% KIRI.ccss$ccssid,]
-table(PHENO.ANY_SN$SMNs)
-# 6307 1276
-##########################################
 
 ################
 ## Cross tabs ##
@@ -236,26 +165,35 @@ rownames(cc) <- NULL
 cc
 
 
+# Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for cases
+cases_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$SMNs == 1],
+                     Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$SMNs == 1])
+
+# Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for controls
+control_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$SMNs == 0],
+                     Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$SMNs == 0])
+
+
 ########################################
 ## Prepare data accoding to Qi's code ## 
 ########################################
-data <- PHENO.ANY_SN
+data <- PHENO.ANY_SN[!grepl("MRN", colnames(PHENO.ANY_SN))]
 
 ## Age at last contact for cases is SN diagnosis data
 data$agelstcontact[!is.na(data$AGE.ANY_SN)] <- data$AGE.ANY_SN[!is.na(data$AGE.ANY_SN)]
 
 data$event <- ifelse(!is.na(data$gradedt), 1, 0)
 
-data$first <- ave(data$agelstcontact, data$ccssid, FUN = seq_along)
+data$first <- ave(data$agelstcontact, data$sjlid, FUN = seq_along)
 M <- max(data$first, na.rm = T)  ### maximum number of events
-data[data$first==M,]$ccssid  #the id for the person with the maximum number of rows.
-data[data$ccssid==data[data$first==M,]$ccssid,]
+data[data$first==M,]$sjlid  #the id for the person with the maximum number of rows.
+data[data$sjlid==data[data$first==M,]$sjlid,]
 
 ### Take the last row so we know the maximum number of events per person
-event.number <- do.call(rbind, lapply(split(data, data$ccssid), tail, 1))[,c("ccssid","first")]
-colnames(event.number) <- c("ccssid","maxE")
+event.number <- do.call(rbind, lapply(split(data, data$sjlid), tail, 1))[,c("sjlid","first")]
+colnames(event.number) <- c("sjlid","maxE")
 
-alldata <- merge(data,event.number,by.x="ccssid",by.y="ccssid")
+alldata <- merge(data,event.number,by.x="sjlid",by.y="sjlid")
 
 alldata$start <- NULL
 alldata$end <- NULL
@@ -292,14 +230,13 @@ alldata$evt1 <- 0;
 alldata$evt1[alldata$first==1] <- 1
 adata <- rbind(alldata,row_add)
 #### order by person and start date
-adata <- adata[order(adata$ccssid, adata$start, decreasing = FALSE),]
+adata <- adata[order(adata$sjlid, adata$start, decreasing = FALSE),]
 table(adata$event)## Double check event numebr is correct
 
 ###any stop time <=start time
 adata$end[adata$end<=adata$start] <- adata$end[adata$end<=adata$start] + 1/365
-any <- adata[adata$end<=adata$start,] # 
-### 2 people had the stroke date on the Fu date. In this case, either get rid of the 2 lines [i.e, no time is follow-up after the last event date], or add 1 day on end date of these 2 segments, assuming there were followed up 1 more day. Will not make much difference. 1 day out of 365 days is 0.0027.
-diff=any$start-any$end ###Qi: These are people who had SN after the last contact date. Just wonder why this could happen. While it may not make the results differ, I wonder is there any reason to keep the events but change last contact date to be SN+1day? Depends on why there are SN after last contact date.
+any <- adata[adata$end<=adata$start,] 
+diff=any$start-any$end 
 dim(adata)
 final <- adata[adata$end>adata$start,]
 
@@ -309,15 +246,15 @@ maximum  <-  max(final$end, na.rm = TRUE) + 1
 SNs_py <-  survSplit(final, cut=seq(minimum, maximum, 1), end="end",start="start",event="event") 
 table(SNs_py$event)   ## Double check event numebr is correct
 #### If you need the rows for first event analysis, take evt1=1
-length(unique(SNs_py$ccssid[SNs_py$event==1]))
-length(unique(SNs_py$ccssid[SNs_py$event==1 & SNs_py$evt1==1 ]))
+length(unique(SNs_py$sjlid[SNs_py$event==1]))
+length(unique(SNs_py$sjlid[SNs_py$event==1 & SNs_py$evt1==1 ]))
 
 SNs_py$PY <- SNs_py$end-SNs_py$start
 
 ###############
 ## Model fit ##
 ###############
-PHENO.ANY_SN <- SNs_py[c("ccssid", "event", "Pleiotropy_PRSWEB_PRS.tertile.category", "BASALcell_PRS.tertile.category", 
+PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.category", "BASALcell_PRS.tertile.category", 
                          "Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category", "Thyroid_PRS.tertile.category",
                          "Meningioma_PRS.tertile.category", "Sarcoma_Machiela_PRS.tertile.category",
                          "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4",
@@ -330,5 +267,4 @@ PHENO.ANY_SN <- SNs_py[c("ccssid", "event", "Pleiotropy_PRSWEB_PRS.tertile.categ
 
 
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SMNs_without_lifestyle.V16.Rdata")
-
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.SMNs.V16.Rdata")

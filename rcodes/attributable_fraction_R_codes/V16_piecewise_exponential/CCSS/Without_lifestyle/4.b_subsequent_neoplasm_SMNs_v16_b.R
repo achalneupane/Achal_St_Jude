@@ -23,17 +23,17 @@ PHENO.ANY_SN <- edit_lifestyle.ccss(PHENO.ANY_SN)
 #########################
 subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subneo$agedx
 
-#########################
-## Keep malignant only ##
-#########################
-subneo$malKey <- paste(subneo$ccssid, subneo$groupdx3, subneo$a_candx, subneo$count, sep = ":")
-malignantStatus <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/CCSS_Data_from_Huiqi/RE__CCSS_phenotype_data2/ExportedCCSS_data_update_malignant.txt", header = T, stringsAsFactors = F)
-malignantStatus <- malignantStatus[malignantStatus$a_candx !=".",]
-malignantStatus$malKey <- paste(malignantStatus$ccssid, malignantStatus$groupdx3, malignantStatus$a_candx, malignantStatus$count, sep = ":")
-# malignantStatus$dupli <- duplicated(malignantStatus$Key)
-
-## Add malignant status
-subneo$seersmn <- malignantStatus$seersmn[match(subneo$malKey, malignantStatus$malKey)]
+# #########################
+# ## Keep malignant only ##
+# #########################
+# subneo$malKey <- paste(subneo$ccssid, subneo$groupdx3, subneo$a_candx, subneo$count, sep = ":")
+# malignantStatus <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/CCSS_Data_from_Huiqi/RE__CCSS_phenotype_data2/ExportedCCSS_data_update_malignant.txt", header = T, stringsAsFactors = F)
+# malignantStatus <- malignantStatus[malignantStatus$a_candx !=".",]
+# malignantStatus$malKey <- paste(malignantStatus$ccssid, malignantStatus$groupdx3, malignantStatus$a_candx, malignantStatus$count, sep = ":")
+# # malignantStatus$dupli <- duplicated(malignantStatus$Key)
+# 
+# ## Add malignant status
+# subneo$seersmn <- malignantStatus$seersmn[match(subneo$malKey, malignantStatus$malKey)]
 
 ########################################
 # How many SNs after 5 years
@@ -75,7 +75,8 @@ subneo$nmscYN <- ifelse(subneo$nmsc ==1| (subneo$nmsc == 2 & subneo$groupdx3 == 
 table(subneo$nmscYN)
 # FALSE  TRUE 
 # 1484  1956 
-############
+
+########################
 SMNs <- subneo[!grepl("meningioma", subneo$groupdx3, ignore.case = TRUE) & !grepl("Yes", subneo$nmscYN),]
 SMNs <- setDT(SMNs)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
 
