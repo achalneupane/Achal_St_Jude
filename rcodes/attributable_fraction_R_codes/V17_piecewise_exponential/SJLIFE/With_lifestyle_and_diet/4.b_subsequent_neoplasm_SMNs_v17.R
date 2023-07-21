@@ -148,7 +148,8 @@ cols <- c(
   "smoker_former_or_never_yn_agesurvey",
   "PhysicalActivity_yn_agesurvey",
   "NOT_RiskyHeavyDrink_yn_agesurvey",
-  "Not_obese_yn_agesurvey"
+  "Not_obese_yn_agesurvey",
+  "HEALTHY_Diet_yn_agesurvey"
 )
 
 ## round to nearest integer
@@ -167,7 +168,7 @@ to.remove <- ALL.LIFESTYLE$SJLIFEID[which(ALL.LIFESTYLE$survey_min > ALL.LIFESTY
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% to.remove,]
 
 sum(PHENO.ANY_SN$sjlid %in% ALL.LIFESTYLE$SJLIFEID)
-# 3449
+# 3450
 
 ## Remove any samples that do not have lifestyle
 PHENO.ANY_SN  <- PHENO.ANY_SN[PHENO.ANY_SN$sjlid %in% ALL.LIFESTYLE$SJLIFEID,]

@@ -143,8 +143,10 @@ cols <- c(
   "smoker_former_or_never_yn_agesurvey",
   "PhysicalActivity_yn_agesurvey",
   "NOT_RiskyHeavyDrink_yn_agesurvey",
-  "Not_obese_yn_agesurvey"
+  "Not_obese_yn_agesurvey",
+  "HEALTHY_Diet_yn_agesurvey"
 )
+
 
 ## round to nearest integer
 # saved.cc <- ALL.LIFESTYLE[, c("SJLIFEID", cols)]
