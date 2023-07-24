@@ -336,3 +336,36 @@ SMN.res <- data.frame(
 View(SMN.res)
 
 
+#########################################
+## Check PRS and treatment interaction ##
+#########################################
+dat_all=PHENO.ANY_SN[PHENO.ANY_SN$evt1==1,]
+fit_all = glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+                AGE_AT_DIAGNOSIS + gender + 
+                maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category +
+                Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
+                EAS + AFR + 
+                any_lifestyle_missing + any_chemo_missing + any_rt_missing +
+                maxsegrtdose.category*Pleiotropy_PRSWEB_PRS.tertile.category + 
+                maxabdrtdose.category*Pleiotropy_PRSWEB_PRS.tertile.category + 
+                maxchestrtdose.category*Pleiotropy_PRSWEB_PRS.tertile.category + 
+                epitxn_dose_5.category*Pleiotropy_PRSWEB_PRS.tertile.category,
+              family = "poisson", offset = log(dat_all$PY), data = dat_all)
+
+summary(fit_all)
+
+(output <- summary(fit_all)$coefficients)
+as.data.frame(apply(output, 2, formatC, format="f", digits=4))
+# options(scipen=999)
+estimate <- format(round(output[,1],3), nsmall = 3)
+std.error <- format(round(output[,2],3), nsmall = 3)
+# P.val <- formatC(output[,4], format="G", digits=3)
+P.val <- output[,4]
+P.val[P.val < 0.001] <- "<0.001"
+P.val[!grepl("<", P.val)] <- format(round(as.numeric(P.val[!grepl("<", P.val)]), 3), nsmall = 3)
+sn.model <- (setNames(cbind.data.frame(estimate, std.error, P.val
+), c("Estimate", "Std.error", "P")))
+sn.model <- sn.model[!grepl("AGE_AT_LAST_CONTACT", row.names(sn.model)),]
+sn.model
+View(sn.model)
