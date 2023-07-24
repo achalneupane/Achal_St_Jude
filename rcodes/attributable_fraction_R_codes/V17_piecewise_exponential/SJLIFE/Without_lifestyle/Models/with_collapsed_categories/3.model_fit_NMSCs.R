@@ -1,5 +1,5 @@
 # load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.NMSCs.V16.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.NMSCs.V17.Rdata")
 
 # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 cc
@@ -272,37 +272,37 @@ NMSC.res <- data.frame(
   age.lt35 = c(af_by_rt.lt.35, af_by_tx.lt.35, af_by_tx.rt.lt.35, af_by_prs.lt.35, af_by_no_favorable_lifestyle.category.lt.35, af_by_combined.lt.35),
   age.gteq = c(af_by_rt.gteq.35, af_by_tx.gteq.35, af_by_tx.rt.gteq.35, af_by_prs.gteq.35, af_by_no_favorable_lifestyle.category.gteq.35, af_by_combined.gteq.35)
 )
-
-View(NMSC.res)
-
-
-#########################################
-## Check PRS and treatment interaction ##
-#########################################
-dat_all=PHENO.ANY_SN[PHENO.ANY_SN$evt1==1,]
-fit_all = glm(formula = event ~ BASALcell_PRS.tertile.category + 
-                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-                gender + maxsegrtdose.category + maxabdrtdose.category + maxpelvisrtdose.category +
-                EAS + AFR +
-                any_rt_missing +
-                maxsegrtdose.category*BASALcell_PRS.tertile.category + 
-                maxabdrtdose.category*BASALcell_PRS.tertile.category + 
-                maxpelvisrtdose.category*BASALcell_PRS.tertile.category, 
-              family = "poisson", offset = log(dat_all$PY), data = dat_all)
-
-summary(fit_all)
-
-(output <- summary(fit_all)$coefficients)
-as.data.frame(apply(output, 2, formatC, format="f", digits=4))
-# options(scipen=999)
-estimate <- format(round(output[,1],3), nsmall = 3)
-std.error <- format(round(output[,2],3), nsmall = 3)
-# P.val <- formatC(output[,4], format="G", digits=3)
-P.val <- output[,4]
-P.val[P.val < 0.001] <- "<0.001"
-P.val[!grepl("<", P.val)] <- format(round(as.numeric(P.val[!grepl("<", P.val)]), 3), nsmall = 3)
-sn.model <- (setNames(cbind.data.frame(estimate, std.error, P.val
-), c("Estimate", "Std.error", "P")))
-sn.model <- sn.model[!grepl("AGE_AT_LAST_CONTACT", row.names(sn.model)),]
-sn.model
-View(sn.model)
+# 
+# View(NMSC.res)
+# 
+# 
+# #########################################
+# ## Check PRS and treatment interaction ##
+# #########################################
+# dat_all=PHENO.ANY_SN[PHENO.ANY_SN$evt1==1,]
+# fit_all = glm(formula = event ~ BASALcell_PRS.tertile.category + 
+#                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+#                 gender + maxsegrtdose.category + maxabdrtdose.category + maxpelvisrtdose.category +
+#                 EAS + AFR +
+#                 any_rt_missing +
+#                 maxsegrtdose.category*BASALcell_PRS.tertile.category + 
+#                 maxabdrtdose.category*BASALcell_PRS.tertile.category + 
+#                 maxpelvisrtdose.category*BASALcell_PRS.tertile.category, 
+#               family = "poisson", offset = log(dat_all$PY), data = dat_all)
+# 
+# summary(fit_all)
+# 
+# (output <- summary(fit_all)$coefficients)
+# as.data.frame(apply(output, 2, formatC, format="f", digits=4))
+# # options(scipen=999)
+# estimate <- format(round(output[,1],3), nsmall = 3)
+# std.error <- format(round(output[,2],3), nsmall = 3)
+# # P.val <- formatC(output[,4], format="G", digits=3)
+# P.val <- output[,4]
+# P.val[P.val < 0.001] <- "<0.001"
+# P.val[!grepl("<", P.val)] <- format(round(as.numeric(P.val[!grepl("<", P.val)]), 3), nsmall = 3)
+# sn.model <- (setNames(cbind.data.frame(estimate, std.error, P.val
+# ), c("Estimate", "Std.error", "P")))
+# sn.model <- sn.model[!grepl("AGE_AT_LAST_CONTACT", row.names(sn.model)),]
+# sn.model
+# View(sn.model)
