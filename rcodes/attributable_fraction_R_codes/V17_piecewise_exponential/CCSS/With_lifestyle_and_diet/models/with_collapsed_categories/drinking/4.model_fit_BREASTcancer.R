@@ -1,18 +1,24 @@
 # load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.Any_SNs.V17_without_diet.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.BREASTcancer.V17_without_diet.Rdata")
 
 # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 cc
 filtered_cc <- cc[cc[, 2] < 10 | cc[, 3] < 10, 1]
 filtered_cc
 
-PHENO.ANY_SN$maxsegrtdose.category <- as.character(PHENO.ANY_SN$maxsegrtdose.category)
-PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">0-<18"] <- ">0-<30"
-PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">=18-<30"] <- ">0-<30"
-PHENO.ANY_SN$maxsegrtdose.category <- factor(PHENO.ANY_SN$maxsegrtdose.category, levels = c("None", ">0-<30", ">=30"))
+PHENO.ANY_SN$maxchestrtdose.category <- as.character(PHENO.ANY_SN$maxchestrtdose.category)
+PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$maxchestrtdose.category == ">0-<20"] <- "Any"
+PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$maxchestrtdose.category == ">=20"] <- "Any"
+PHENO.ANY_SN$maxchestrtdose.category <- factor(PHENO.ANY_SN$maxchestrtdose.category, levels = c("None", "Any"))
 
-table(PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$ANY_SNs == 0])
-table(PHENO.ANY_SN$maxsegrtdose.category)
+# table(PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$BREASTcancer == 1])
+
+PHENO.ANY_SN$anthra_jco_dose_5.category <- as.character(PHENO.ANY_SN$anthra_jco_dose_5.category)
+PHENO.ANY_SN$anthra_jco_dose_5.category[PHENO.ANY_SN$anthra_jco_dose_5.category == "1st"] <- "1st-2nd"
+PHENO.ANY_SN$anthra_jco_dose_5.category[PHENO.ANY_SN$anthra_jco_dose_5.category == "2nd"] <- "1st-2nd"
+PHENO.ANY_SN$anthra_jco_dose_5.category <- factor(PHENO.ANY_SN$anthra_jco_dose_5.category, levels = c("None", "1st-2nd", "3rd"))
+
+# table(PHENO.ANY_SN$anthra_jco_dose_5.category[PHENO.ANY_SN$BREASTcancer == 1])
 
 ######################################
 ## Attributable fraction of Any SNs ##
@@ -20,17 +26,17 @@ table(PHENO.ANY_SN$maxsegrtdose.category)
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 
-fit_all = glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
-                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-                AGE_AT_DIAGNOSIS + gender + 
-                maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category +
-                PhysicalActivity_yn +
-                EAS + AFR + 
+fit_all = glm(formula = event ~ 
+                Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category +
+                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + 
+                AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS +
+                maxchestrtdose.category + anthra_jco_dose_5.category +
+                RiskyHeavyDrink_yn +
+                EAS + AFR +
                 any_chemo_missing + any_rt_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
 summary(fit_all)
-
 
 ##########################
 ## Get predicted values ##
@@ -51,12 +57,11 @@ N_all.gteq.35 = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.
 #############
 ## tx only ##
 #############
-
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx = dat_all
 
 dat_tx$any_chemo_missing <- "No" # **
-dat_tx$epitxn_dose_5.category = "None" ## **
+dat_tx$anthra_jco_dose_5.category = "None" ## **
 
 dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
 
@@ -100,10 +105,7 @@ dat_rt = dat_all
 
 dat_rt$any_rt_missing <- "No" # **
 
-
-dat_rt$maxsegrtdose.category =
-  dat_rt$maxabdrtdose.category =
-  dat_rt$maxchestrtdose.category = "None" ## **
+dat_rt$maxchestrtdose.category = "None" ## **
 
 dat_all$pred_no_rt = predict(fit_all, newdata = dat_rt, type = "response")
 
@@ -148,10 +150,8 @@ dat_tx.rt = dat_all
 dat_tx.rt$any_chemo_missing <- "No" ## **
 dat_tx.rt$any_rt_missing <- "No" ## **
 
-dat_tx.rt$maxsegrtdose.category =
-  dat_tx.rt$maxabdrtdose.category =
-  dat_tx.rt$maxchestrtdose.category =
-  dat_tx.rt$epitxn_dose_5.category = "None" ## **
+dat_tx.rt$maxchestrtdose.category =
+  dat_tx.rt$anthra_jco_dose_5.category = "None" ## **
 
 dat_all$pred_no_tx.rt = predict(fit_all, newdata = dat_tx.rt, type = "response")
 
@@ -191,7 +191,7 @@ af_by_tx.rt.gteq.35
 ## P/LP Zhaoming, Qin without Zhaoming and PRS
 dat_prs = dat_all
 # dat_plp.prs$Zhaoming_carriers = dat_plp.prs$Qin_without_Zhaoming_vars_carriers = "N";
-dat_prs$Pleiotropy_PRSWEB_PRS.tertile.category = "1st"  # **
+dat_prs$Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category = "1st"  # **
 
 dat_all$pred_no_prs = predict(fit_all, newdata = dat_prs, type = "response")
 N_no_prs = sum(dat_all$pred_no_prs, na.rm = TRUE)
@@ -268,7 +268,6 @@ af_by_no_favorable_lifestyle.category.gteq.35
 #################################################
 ## Treatment, Genetics and Lifestyle, combined ##
 #################################################
-
 dat_tx.prs.lifestyle = dat_all
 
 dat_tx.prs.lifestyle$any_chemo_missing <- "No" ## **
@@ -277,14 +276,12 @@ dat_tx.prs.lifestyle$any_rt_missing <- "No" ## **
 dat_tx.prs.lifestyle$any_lifestyle_missing <- "No"
 
 ## Nullify Treatment
-dat_tx.prs.lifestyle$maxsegrtdose.category =
-  dat_tx.prs.lifestyle$maxabdrtdose.category =
-  dat_tx.prs.lifestyle$maxchestrtdose.category =
-  dat_tx.prs.lifestyle$epitxn_dose_5.category = "None" ## **
+dat_tx.prs.lifestyle$maxchestrtdose.category =
+  dat_tx.prs.lifestyle$anthra_jco_dose_5.category = "None" ## **
 
 ## Nullify Genetics
 # dat_tx.plp.prs.lifestyle$Zhaoming_carriers = dat_tx.plp.prs.lifestyle$Qin_without_Zhaoming_vars_carriers = "N";
-dat_tx.prs.lifestyle$Pleiotropy_PRSWEB_PRS.tertile.category = "1st" ## **
+dat_tx.prs.lifestyle$Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category = "1st" ## **
 
 ## Nullify Lifestyle
 dat_tx.prs.lifestyle$Current_smoker_yn = "No"
@@ -326,8 +323,8 @@ af_by_combined.gteq.35 = (N_all.gteq.35 - N_no_combined) / N_all.gteq.35
 af_by_combined.gteq.35 <- round(af_by_combined.gteq.35,3)
 af_by_combined.gteq.35
 
-
-SN.res <- data.frame(
+##
+Breast.res <- data.frame(
   Variable = c("Radiation", "Chemo", "All treatments", "PRS", "Lifestyle", "Combined"),
   Overall = c(af_by_rt, af_by_tx, af_by_tx.rt, af_by_prs, af_by_no_favorable_lifestyle.category, af_by_combined),
   Female = c(af_by_rt.female, af_by_tx.female, af_by_tx.rt.female, af_by_prs.female, af_by_no_favorable_lifestyle.category.female, af_by_combined.female),
@@ -336,24 +333,27 @@ SN.res <- data.frame(
   age.gteq = c(af_by_rt.gteq.35, af_by_tx.gteq.35, af_by_tx.rt.gteq.35, af_by_prs.gteq.35, af_by_no_favorable_lifestyle.category.gteq.35, af_by_combined.gteq.35)
 )
 
-
-SN.res
-
+# View(Breast.res)
+# 
+# 
+# 
+# 
 # #########################################
 # ## Check PRS and treatment interaction ##
 # #########################################
-# dat_all=PHENO.ANY_SN[PHENO.ANY_SN$evt1==1,]
-# fit_all = glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
-#                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-#                 AGE_AT_DIAGNOSIS + gender + 
-#                 maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category +
+# dat_all = PHENO.ANY_SN
+# dat_all=dat_all[dat_all$evt1==1,]
+# 
+# fit_all = glm(formula = event ~ 
+#                 Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category +
+#                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + 
+#                 AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS +
+#                 maxchestrtdose.category + anthra_jco_dose_5.category +
 #                 Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn +
-#                 EAS + AFR + 
+#                 EAS + AFR +
 #                 any_lifestyle_missing + any_chemo_missing + any_rt_missing +
-#                 maxsegrtdose.category*Pleiotropy_PRSWEB_PRS.tertile.category + 
-#                 maxabdrtdose.category*Pleiotropy_PRSWEB_PRS.tertile.category + 
-#                 maxchestrtdose.category*Pleiotropy_PRSWEB_PRS.tertile.category + 
-#                 epitxn_dose_5.category*Pleiotropy_PRSWEB_PRS.tertile.category,
+#                 maxchestrtdose.category * Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category +
+#                 anthra_jco_dose_5.category * Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category,
 #               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 # 
 # summary(fit_all)
@@ -371,4 +371,3 @@ SN.res
 # ), c("Estimate", "Std.error", "P")))
 # sn.model <- sn.model[!grepl("AGE_AT_LAST_CONTACT", row.names(sn.model)),]
 # sn.model
-# View(sn.model)

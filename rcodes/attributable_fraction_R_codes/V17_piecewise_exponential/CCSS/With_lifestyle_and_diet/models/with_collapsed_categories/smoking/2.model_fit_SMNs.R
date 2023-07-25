@@ -1,5 +1,6 @@
 # load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.Any_SNs.V17_without_diet.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SMNs.V17_without_diet.Rdata")
+
 
 # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 cc
@@ -11,26 +12,22 @@ PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">0-<18
 PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">=18-<30"] <- ">0-<30"
 PHENO.ANY_SN$maxsegrtdose.category <- factor(PHENO.ANY_SN$maxsegrtdose.category, levels = c("None", ">0-<30", ">=30"))
 
-table(PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$ANY_SNs == 0])
-table(PHENO.ANY_SN$maxsegrtdose.category)
-
 ######################################
 ## Attributable fraction of Any SNs ##
 ######################################
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
-
 fit_all = glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
-                AGE_AT_DIAGNOSIS + gender + 
+                AGE_AT_DIAGNOSIS + gender +
                 maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category +
-                PhysicalActivity_yn +
+                Current_smoker_yn +
                 EAS + AFR + 
                 any_chemo_missing + any_rt_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
-summary(fit_all)
 
+summary(fit_all)
 
 ##########################
 ## Get predicted values ##
@@ -326,8 +323,8 @@ af_by_combined.gteq.35 = (N_all.gteq.35 - N_no_combined) / N_all.gteq.35
 af_by_combined.gteq.35 <- round(af_by_combined.gteq.35,3)
 af_by_combined.gteq.35
 
-
-SN.res <- data.frame(
+##
+SMN.res <- data.frame(
   Variable = c("Radiation", "Chemo", "All treatments", "PRS", "Lifestyle", "Combined"),
   Overall = c(af_by_rt, af_by_tx, af_by_tx.rt, af_by_prs, af_by_no_favorable_lifestyle.category, af_by_combined),
   Female = c(af_by_rt.female, af_by_tx.female, af_by_tx.rt.female, af_by_prs.female, af_by_no_favorable_lifestyle.category.female, af_by_combined.female),
@@ -336,8 +333,8 @@ SN.res <- data.frame(
   age.gteq = c(af_by_rt.gteq.35, af_by_tx.gteq.35, af_by_tx.rt.gteq.35, af_by_prs.gteq.35, af_by_no_favorable_lifestyle.category.gteq.35, af_by_combined.gteq.35)
 )
 
+# View(SMN.res)
 
-SN.res
 
 # #########################################
 # ## Check PRS and treatment interaction ##
