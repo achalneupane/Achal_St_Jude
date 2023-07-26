@@ -1,3 +1,162 @@
+# V17_without_lifestyle_variable
+mydf <- read.table(text = "Cohort	SN_types	Variables	Overall	Female	Male	Age<35	Age≥35
+SJLIFE	Any SN (605)	Radiation	0.432	0.426	0.441	0.322	0.456
+SJLIFE	Any SN (605)	Chemo	0.04	0.041	0.04	0.072	0.034
+SJLIFE	Any SN (605)	All treatments	0.454	0.448	0.461	0.368	0.472
+SJLIFE	Any SN (605)	PRS	0.118	0.115	0.12	0.117	0.118
+SJLIFE	Any SN (605)	Lifestyle	NA	NA	NA	NA	NA
+SJLIFE	Any SN (605)	Combined	0.518	0.513	0.526	0.443	0.534
+SJLIFE	SMN (462)	Radiation	0.383	0.382	0.383	0.268	0.406
+SJLIFE	SMN (462)	Chemo	0.003	0.003	0.003	0.012	0.001
+SJLIFE	SMN (462)	All treatments	0.384	0.384	0.383	0.275	0.406
+SJLIFE	SMN (462)	PRS	0.115	0.113	0.117	0.113	0.115
+SJLIFE	SMN (462)	Lifestyle	NA	NA	NA	NA	NA
+SJLIFE	SMN (462)	Combined	0.455	0.454	0.455	0.357	0.474
+SJLIFE	NMSC (249)	Radiation	0.392	0.384	0.4	0.31	0.399
+SJLIFE	NMSC (249)	Chemo	NA	NA	NA	NA	NA
+SJLIFE	NMSC (249)	All treatments	0.392	0.384	0.4	0.31	0.399
+SJLIFE	NMSC (249)	PRS	0.428	0.417	0.44	0.421	0.428
+SJLIFE	NMSC (249)	Lifestyle	NA	NA	NA	NA	NA
+SJLIFE	NMSC (249)	Combined	0.652	0.644	0.662	0.601	0.657
+SJLIFE	Breast cancer (76)	Radiation	0.509	0.532	0.486	0.446	0.513
+SJLIFE	Breast cancer (76)	Chemo	0.075	0.076	0.075	0.06	0.076
+SJLIFE	Breast cancer (76)	All treatments	0.55	0.572	0.53	0.486	0.554
+SJLIFE	Breast cancer (76)	PRS	0.27	0.276	0.265	0.269	0.27
+SJLIFE	Breast cancer (76)	Lifestyle	NA	NA	NA	NA	NA
+SJLIFE	Breast cancer (76)	Combined	0.672	0.689	0.655	0.622	0.675
+SJLIFE	Thyroid cancer (86)	Radiation	0.624	0.626	0.622	0.545	0.647
+SJLIFE	Thyroid cancer (86)	Chemo	0.2	0.203	0.195	0.312	0.168
+SJLIFE	Thyroid cancer (86)	All treatments	0.714	0.716	0.712	0.68	0.724
+SJLIFE	Thyroid cancer (86)	PRS	0.52	0.523	0.517	0.525	0.519
+SJLIFE	Thyroid cancer (86)	Lifestyle	NA	NA	NA	NA	NA
+SJLIFE	Thyroid cancer (86)	Combined	0.862	0.863	0.861	0.844	0.867
+SJLIFE	Meningioma (149)	Radiation	0.196	0.176	0.224	0.266	0.183
+SJLIFE	Meningioma (149)	Chemo	0.379	0.392	0.361	0.563	0.342
+SJLIFE	Meningioma (149)	All treatments	0.501	0.492	0.512	0.704	0.46
+SJLIFE	Meningioma (149)	PRS	NA0.125	NA0.116	NA0.137	NA0.13	NA0.124
+SJLIFE	Meningioma (149)	Lifestyle	NA	NA	NA	NA	NA
+SJLIFE	Meningioma (149)	Combined	0.438	0.433	0.446	0.666	0.393
+SJLIFE	Sarcoma (32)	Radiation	NA	NA	NA	NA	NA
+SJLIFE	Sarcoma (32)	Chemo	0.367	0.37	0.365	0.319	0.395
+SJLIFE	Sarcoma (32)	All treatments	0.367	0.37	0.365	0.319	0.395
+SJLIFE	Sarcoma (32)	PRS	0.006	0.006	0.007	0.007	0.006
+SJLIFE	Sarcoma (32)	Lifestyle	NA	NA	NA	NA	NA
+SJLIFE	Sarcoma (32)	Combined	0.371	0.374	0.369	0.324	0.398
+CCSS	Any SN (1611)	Radiation	0.378	0.372	0.387	0.3	0.397
+CCSS	Any SN (1611)	Chemo	0.017	0.016	0.018	0.04	0.011
+CCSS	Any SN (1611)	All treatments	0.389	0.383	0.399	0.328	0.404
+CCSS	Any SN (1611)	PRS	0.053	0.052	0.053	0.052	0.053
+CCSS	Any SN (1611)	Lifestyle	NA	NA	NA	NA	NA
+CCSS	Any SN (1611)	Combined	0.421	0.415	0.43	0.363	0.435
+CCSS	SMN (762)	Radiation	0.268	0.269	0.265	0.171	0.293
+CCSS	SMN (762)	Chemo	0.023	0.023	0.023	0.055	0.015
+CCSS	SMN (762)	All treatments	0.287	0.288	0.286	0.217	0.305
+CCSS	SMN (762)	PRS	0.056	0.056	0.057	0.055	0.056
+CCSS	SMN (762)	Lifestyle	NA	NA	NA	NA	NA
+CCSS	SMN (762)	Combined	0.327	0.328	0.326	0.26	0.344
+CCSS	NMSC (769)	Radiation	0.375	0.371	0.381	0.299	0.387
+CCSS	NMSC (769)	Chemo	NA	NA	NA	NA	NA
+CCSS	NMSC (769)	All treatments	0.375	0.371	0.381	0.299	0.387
+CCSS	NMSC (769)	PRS	0.289	0.291	0.287	0.29	0.289
+CCSS	NMSC (769)	Lifestyle	NA	NA	NA	NA	NA
+CCSS	NMSC (769)	Combined	0.557	0.555	0.558	0.504	0.565
+CCSS	Breast cancer (294)	Radiation	0.469	0.474	0.464	0.374	0.476
+CCSS	Breast cancer (294)	Chemo	0.132	0.125	0.14	0.174	0.129
+CCSS	Breast cancer (294)	All treatments	0.555	0.556	0.554	0.484	0.56
+CCSS	Breast cancer (294)	PRS	0.319	0.318	0.32	0.316	0.319
+CCSS	Breast cancer (294)	Lifestyle	NA	NA	NA	NA	NA
+CCSS	Breast cancer (294)	Combined	0.697	0.698	0.697	0.646	0.701
+CCSS	Thyroid cancer (163)	Radiation	0.448	0.448	0.448	0.345	0.484
+CCSS	Thyroid cancer (163)	Chemo	0.041	0.041	0.042	0.096	0.022
+CCSS	Thyroid cancer (163)	All treatments	0.473	0.472	0.474	0.405	0.497
+CCSS	Thyroid cancer (163)	PRS	0.352	0.356	0.346	0.347	0.354
+CCSS	Thyroid cancer (163)	Lifestyle	NA	NA	NA	NA	NA
+CCSS	Thyroid cancer (163)	Combined	0.659	0.659	0.658	0.613	0.675
+CCSS	Meningioma (255)	Radiation	0.365	0.333	0.411	0.385	0.359
+CCSS	Meningioma (255)	Chemo	0.076	0.071	0.084	0.16	0.048
+CCSS	Meningioma (255)	All treatments	0.418	0.387	0.462	0.487	0.394
+CCSS	Meningioma (255)	PRS	0.027	0.026	0.027	0.031	0.025
+CCSS	Meningioma (255)	Lifestyle	NA	NA	NA	NA	NA
+CCSS	Meningioma (255)	Combined	0.433	0.402	0.477	0.503	0.41
+CCSS	Sarcoma (60)	Radiation	NA	NA	NA	NA	NA
+CCSS	Sarcoma (60)	Chemo	0.328	0.313	0.345	0.316	0.333
+CCSS	Sarcoma (60)	All treatments	0.328	0.313	0.345	0.316	0.333
+CCSS	Sarcoma (60)	PRS	0.024	0.027	0.022	0.021	0.025
+CCSS	Sarcoma (60)	Lifestyle	NA	NA	NA	NA	NA
+CCSS	Sarcoma (60)	Combined	0.345	0.331	0.36	0.331	0.35
+", header = T, sep = "\t", check.names = F)
+
+
+
+
+# df <-  mydf
+# df_subset <- df[df$SN_Types == "Any SN (303)",]
+
+# df_subset <- df[, c("SN_Types", "Variables", "Overall_all_lifestyles", "Female_all_lifestyles", "Male_all_lifestyles")]
+# df_subset <- df[, c("SN_Types", "Variables", "Overall_all_lifestyles")]
+
+df_subset <- mydf[grepl("Any SN", mydf$SN_types),]
+df_subset$Cohort <- paste(df_subset$Cohort, df_subset$Variables, sep = "_")
+
+# Melt the data to long format
+library(reshape2)
+df_melted <- melt(df_subset, id.vars = c("SN_types", "Cohort", "Variables"))
+df_melted$value <- as.numeric(df_melted$value)
+
+library(RColorBrewer)
+
+# Define the number of colors you need (corresponding to the number of variables)
+num_colors <- length(unique(df_melted$variable))
+color_palette <- brewer.pal(num_colors, "Set1")
+# Create a grouped bar plot using ggplot2
+library(ggplot2)
+ggplot(df_melted, aes(x = Cohort, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Conditions", y = "Attributable Fraction") +
+  # facet_wrap(~SN_types, scales = "free_y", ncol = 1) +
+  theme_minimal() +
+  theme(legend.position = "top", axis.text.x = element_text(angle = 45, hjust = 0.2)) +
+  scale_y_continuous(limits = c(-0.2, 1), breaks = seq(-0.2, 1, 0.4)) +
+scale_fill_manual(values = color_palette)
+
+
+###########
+ggplot(df_melted, aes(x = Variables, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "group") +
+  geom_text(aes(label = ifelse(value >= 0, round(value, 2), paste0("(", round(value, 2), ")"))),
+            position = position_stack(vjust = 0.5), color = "black", size = 3) +
+  labs(x = "Conditions", y = "Attributable Fraction") +
+  facet_wrap(~ SN_types, scales = "free_y", ncol = 1) +
+  theme_minimal() +
+  theme(legend.position = "top", axis.text.x = element_text(angle = 45, hjust = 0.2)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = seq(-1, 1, 0.2)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+#########################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 mydf <- read.table(text="Variables	Overall	Female	Male	Age<35	Age≥35	Overall	Female	Male	Age<35	Age≥35	Overall	Female	Male	Age<35	Age≥35	Overall	Female	Male	Age<35	Age≥35	Overall	Female	Male	Age<35	Age≥35	Overall	Female	Male	Age<35	Age≥35
 Radiation	0.435	0.424	0.449	0.345	0.455	0.438	0.428	0.45	0.347	0.458	0.438	0.429	0.449	0.346	0.458	0.439	0.43	0.45	0.347	0.459	0.439	0.43	0.451	0.347	0.46	0.439	0.428	0.452	0.347	0.459
 Chemo	0.034	0.034	0.034	0.06	0.028	0.035	0.035	0.035	0.062	0.029	0.036	0.036	0.036	0.064	0.029	0.036	0.036	0.036	0.065	0.03	0.036	0.036	0.036	0.065	0.03	0.036	0.037	0.036	0.064	0.03
@@ -51,11 +210,43 @@ colnames(mydf)[-1] <- paste(current_names, new_names, sep = "_")
 sn_vars <- c("Any SN (303)", "SMN (234)", "NMSC (118)", "Breast cancer (53)", "Thyroid cancer (43)", "Meningioma (81)")
 mydf$SN_Types <- rep(sn_vars, each = 6)
 
-df <-  mydf
-
 mydf[mydf == "-"] <- NA
 
 mydf[!grepl("Variables|SN_Types", colnames(mydf))] <- sapply(mydf[!grepl("Variables|SN_Types", colnames(mydf))], as.numeric)
+
+df <-  mydf
+
+
+df_subset <- df[df$SN_Types == "Any SN (303)",]
+
+df_subset <- df[, c("SN_Types", "Variables", "Overall_all_lifestyles", "Female_all_lifestyles", "Male_all_lifestyles")]
+df_subset <- df[, c("SN_Types", "Variables", "Overall_all_lifestyles")]
+
+
+
+# Melt the data to long format
+library(reshape2)
+df_melted <- melt(df_subset, id.vars = c("SN_Types", "Variables"))
+
+# Create a grouped bar plot using ggplot2
+library(ggplot2)
+ggplot(df_melted, aes(x = Variables, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Conditions", y = "Attributable Fraction") +
+  facet_wrap(~SN_Types, scales = "free_y", ncol = 1) +
+  theme_minimal() +
+  theme(legend.position = "top", axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = seq(-1, 1, 0.4))
+
+
+
+
+
+
+
+
+
+
 
 # Plot the bar plot
 ggplot(mydf, aes(x = Variables, y = Overall_all_lifestyles, fill = SN_Types)) +
@@ -64,6 +255,13 @@ ggplot(mydf, aes(x = Variables, y = Overall_all_lifestyles, fill = SN_Types)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_fill_discrete(name = "Subsequent Neoplasms") +
 theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+ggplot(mydf, aes(x = Variables, y = Overall_all_lifestyles, fill = SN_Types)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~ SN_Types, scales = "free") +
+  # scale_fill_discrete(name = "Subsequent Neoplasms") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 # Reshape the dataframe to long format
@@ -78,43 +276,6 @@ ggplot(mydf_long, aes(x = Variables, y = Attributable_Fraction, fill = SN_Types)
   scale_fill_discrete(name = "Subsequent Neoplasms")
 
 
-
-
-ggplot(mydf_long, aes(x = Variables, y = Attributable_Fraction, group = SN_Types, color = Variables)) +
-  geom_line() +
-  geom_point() +
-  labs(x = "Subsequent Neoplasms", y = "Attributable Fraction", title = "Trends of Attributable Fraction for Different Variables Across Subsequent Neoplasms") +
-  scale_x_continuous(breaks = 1:length(unique(mydf$SN_Types)), labels = unique(mydf$SN_Types)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_color_discrete(name = "Variables")
-# library(ggplot2)
-# 
-# # Create a new dataframe with the data in long format
-# mydf_long <- tidyr::pivot_longer(mydf, cols = c("Overall", "Female", "Male", "Age_less_than_35", "Age_greater_than_or_equal_to_35"), 
-#                                  names_to = "Gender_and_Age_Group", values_to = "Value")
-# 
-# # Create a stacked bar chart
-# ggplot(mydf_long, aes(x = SN_types_N_cases, y = Value, fill = Gender_and_Age_Group)) +
-#   geom_bar(stat = "identity") +
-#   labs(title = "Comparison of Different Variables by SN Types",
-#        x = "SN Types (N Cases)", y = "Proportion",
-#        fill = "Gender and Age Group") +
-#   theme_minimal() +
-#   theme(legend.position = "bottom")
-
-
-mydf_long <- gather(mydf, key = "AgeGroup", value = "AttributableFraction", Overall:Age_greater_than_or_equal_to_35)
-
-# Plot
-ggplot(mydf_long, aes(x = SN_types_N_cases, y = AttributableFraction, fill = Variables)) +
-  geom_bar(position = "dodge", stat = "identity", width = 0.7) +
-  labs(title = "Attributable Fraction for Different Subsequent Neoplasms",
-       x = "Subsequent Neoplasms (N cases)",
-       y = "Attributable Fraction",
-       fill = "Variables") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_fill_brewer(palette = "Set1")
 
 
 
