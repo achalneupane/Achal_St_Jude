@@ -132,9 +132,9 @@ ggplot(df_melted, aes(x = Variables, y = value, fill = factor(variable))) +
 
 
 ##########################################################
-# Create the plot with facets on the left and right
+# Create the plot with facets on the left and right and with %
 ggplot(df_melted, aes(x = Variables, y = value, fill = factor(variable))) +
-  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.2) +
   labs(x = "Variables", y = "Attributable Fraction (%)", fill = "Variables") +
   scale_fill_manual(values = color_palette) +
   theme_minimal() +
@@ -151,7 +151,7 @@ ggplot(df_melted, aes(x = Variables, y = value, fill = factor(variable))) +
                      limits = c(0, 100), breaks = seq(0, 100, 30)) +
   guides(fill = guide_legend(nrow = 1)) +  # Limits the legend to one row
   geom_text(aes(label = paste0(round(value, 2), "%")),   # Add percentage symbol to the label
-            position = position_dodge(width = 0.6), 
+            position = position_dodge(width = 0.8), 
             hjust = -0.1,                                 # Adjust vertical position of the labels above the bars
             size = 3,
             angle = 90) 
@@ -198,8 +198,8 @@ ggplot(df_melted, aes(x = Variables, y = value, fill = factor(variable))) +
 #   facet_grid(Cohort ~ SN_types, scales = "free_y", space = "free_y", switch = "y") +
 #   scale_y_continuous(limits = c(-0.2, 1), breaks = seq(-0.2, 1, 0.2)) +
 #   guides(fill = guide_legend(nrow = 1)) +  # Limits the legend to one row
-#   geom_text(aes(label = round(value, 2)), 
-#             position = position_dodge(width = 0.8), 
-#             hjust = -0.1, 
+#   geom_text(aes(label = round(value, 2)),
+#             position = position_dodge(width = 0.8),
+#             hjust = -0.1,
 #             size = 3,
-#             angle = 90) 
+#             angle = 90)

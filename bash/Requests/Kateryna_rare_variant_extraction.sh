@@ -1,3 +1,5 @@
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff
+## SnpEff annotation (Clinvar and LOF variants)
 head -1 MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr10.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155-FIELDS-simple.txt > LoF_variants.txt
 cat $(ls *.dbSNP155-FIELDS-simple.txt| sort -V)| egrep 'frameshift_variant|start_lost|stop_gained|splice|splice_region_variant' >> LoF_variants.txt
 awk '{ print $3 }' LoF_variants.txt| cut -d";" -f1 > LoF_variants_ID.txt
@@ -73,7 +75,7 @@ FINAL.VCF$KEY <- paste(FINAL.VCF$CHROM, FINAL.VCF$POS, FINAL.VCF$REF, FINAL.VCF$
 #############
 ## Clinvar ##
 #############
-CLINVAR <- FINAL.VCF[FINAL.VCF$PRED_TYPE == "Clinvar",]
+CLINVAR <- FINAL.VCF[FINAL.VCF$PRED_TYPE == "Clinvar",] ## You need this
 table(CLINVAR$CLNSIG)
 nrow(CLINVAR)
 # 60892
@@ -99,7 +101,7 @@ nrow(MetaSVM.unique)
 LoF <- read.delim("LoF_variants.txt",  sep = "\t", header = T, check.names = F)
 LoF$PRED_TYPE <- "LoF"
 LoF$KEY <- paste(LoF$CHROM, LoF$POS, LoF$REF, LoF$ALT, sep = ":")
-# LoF.unique <- LoF[!duplicated(LoF$KEY),]
+LoF.unique <- LoF[!duplicated(LoF$KEY),]
 nrow(LoF.unique)
 # 316386
 
@@ -117,9 +119,39 @@ dim(NO.splice.region)
 LOF.keep <- rbind.data.frame(non.splice.region, NO.splice.region)
 dim(LOF.keep)
 
-Predicted.vars.inVCF.Unique <-  rbind.data.frame(CLINVAR.unique, LOF.keep, MetaSVM.unique)
+Predicted.vars.inVCF.Unique <-  rbind.data.frame(CLINVAR.unique, LOF.keep)
 
-####################################
-## Revel is in annovar annotation ##
-####################################
-REVEL > 0.5 is considered pathogenic
+
+
+
+
+# Then, get the gnomAD MAF for EUR and ALL samples.
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/annovar
+# For chr17: ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr17.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt
+
+## Extract gnomAD with maf < 0.01 lines
+head -1 /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/annovar/ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr5.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt | sed 's/\t/\n/g' | nl
+# head -1 /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/annovar/ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr5.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/diabetes/gnomAD_maf_lt_0.01.txt
+
+for i in {1..22}; do
+CHROM="chr${i}"
+echo "Doing ${CHROM}"
+head -1 /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/annovar/ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr5.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt| awk '{print $178"\t"$179"\t"$181"\t"$182"\t"$38"\t"$39"\t"$44}' > /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/diabetes/gnomAD_maf_lt_0.01_${CHROM}.txt	
+awk -F'\t' '{if($38 != "." && $38 < 0.01) print $178"\t"$179"\t"$181"\t"$182"\t"$38"\t"$39"\t"$44}' "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/annovar/ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.${CHROM}.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt" >> /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/diabetes/gnomAD_maf_lt_0.01_${CHROM}.txt
+done
+
+
+
+
+gnomAD_genome_ALL gnomAD_exome_NFE gnomAD_genome_AFR 
+
+df <- df[df$gnomAD_genome_ALL < 1% & df$gnomAD_exome_NFE < 1%,]
+
+
+
+
+# Extract haplotype
+cd  /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/gwas/haplotype
+cut -d' ' -f1,2 pheno/sjlife_afr_dox_only_pcs.pheno > haplotype/AFRsamples
+plink --vcf ../../../../Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr16.PASS.decomposed.vcf.gz --make-bed --keep EURsamples --extract significant --out haplotype_input_eur
+plink --vcf ../../../../Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr16.PASS.decomposed.vcf.gz --make-bed --keep AFRsamples --extract significant --out haplotype_input_afr
