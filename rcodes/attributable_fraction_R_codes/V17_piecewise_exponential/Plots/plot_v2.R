@@ -107,31 +107,7 @@ library(RColorBrewer)
 num_colors <- length(unique(df_melted$variable))
 color_palette <- brewer.pal(num_colors, "Set1")
 
-#########################################################
-## With n
-n_df <- df %>%
-  group_by(SN_types, Cohort) %>%
-  summarise(n = first(n))
-
-ggplot(df_melted, aes(x = Variables, y = value, fill = factor(variable))) +
-  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
-  labs(x = "Variables", y = "Attributable Fraction (%)", fill = "Variables") +
-  scale_fill_manual(values = color_palette) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = "top",
-        strip.text = element_text(size = 10),  # Adjust the size of facet text
-        strip.background = element_blank(),    # Remove facet background color
-        strip.placement = "outside",           # Place facet labels outside the plot
-        panel.border = element_rect(color = "black", fill = NA, size = 1)  # Add border between facets
-  ) +
-  facet_grid(SN_types ~ Cohort, scales = "free_x", space = "free_x", switch = "x", ) +
-  # facet_grid(.~ Cohort, scales = "free_x", space = "free_x", switch = "x", ) +
-  scale_y_continuous(labels = scales::percent_format(scale = 1),    # Format Y-axis labels as percentages
-                     limits = c(0, 100), breaks = seq(0, 100, 30))
-
-
-##########################################################
+###########################################################
 # Create the plot with facets on the left and right and with %
 ggplot(df_melted, aes(x = Variables, y = value, fill = factor(variable))) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.2) +

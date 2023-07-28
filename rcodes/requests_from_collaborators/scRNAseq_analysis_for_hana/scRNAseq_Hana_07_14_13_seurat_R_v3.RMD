@@ -322,44 +322,16 @@ We can then run FindMarkers between the groups (i.e., treatment Vs controls)
 
 ```{r, echo=TRUE}
 pbmc_markers <- FindAllMarkers(pbmc, min.pct = 0.25, logfc.threshold = 0.25)
-pbmc_markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC)
-
+cc <- pbmc_markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC)
+cc
 ```
-
-
-
-<!-- We can explore these marker genes for each cluster and use them to annotate our clusters as specific cell types. -->
-<!-- ```{r, echo=TRUE} -->
-<!-- # loop over clusters -->
-<!-- # Look up identities or clusters with Idents() ; set identity with SetIdent() -->
-<!-- # cc <- pbmc -->
-<!-- # Idents(pbmc) <- "grouping_var1" -->
-<!-- # DefaultAssay(pbmc) <- "RNA" -->
-<!-- top.markers <- {} -->
-<!-- top.markers.df <- list() -->
-<!-- for(i in 1:length(unique(Idents(pbmc)))){ -->
-<!-- print(paste0("Doing i: ", i)) -->
-<!-- pbmc_markers <- FindConservedMarkers(pbmc, ident.1 = i, grouping.var = "grouping_var1", verbose = FALSE) -->
-<!-- # pbmc_markers <- FindAllMarkers(pbmc, min.pct = 0.25, logfc.threshold = 0.25) -->
-<!-- # pbmc_markers <- FindMarkers(pbmc, ident.1 = "control", ident.2 = "cardiomyopathy", min.pct = 0.25, logfc.threshold = 0.25) -->
-<!-- # pbmc_markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC) -->
-<!-- top.markers.tmp <- rownames(head(pbmc_markers,1)) -->
-<!-- top.markers <- c(top.markers, top.markers.tmp) -->
-<!-- top.markers.df.tmp <- pbmc_markers -->
-<!-- top.markers.df.tmp$cluster <- i -->
-<!-- top.markers.df[[i]] <- top.markers.df.tmp -->
-<!-- } -->
-<!-- # > top.markers -->
-<!-- c('CFH','VCAN','MEGF11','ST8SIA4','COL9A2','CSMD3','FGR','NEBL','ANLN','TTN','FBN2','SLC7A11','LDB3','ANLN','KIF20A') -->
-
-<!-- ``` -->
-
 
 
 We include several tools for visualizing marker expression. VlnPlot (shows expression probability distributions across clusters), and FeaturePlot (visualizes feature expression on a tSNE or PCA plot) are our most commonly used visualizations. We also suggest exploring RidgePlot, CellScatter, and DotPlot as additional methods to view dataset.
 
 ```{r, echo=TRUE}
-plot <- VlnPlot(pbmc, features = c("HELLS", "MYH7"), group.by = "tree.ident")
+markers <- c("LINGO2", "GRIK1", "EFNA5", "COL15A1", "PDZRN4", "PDE1A", "SPP1",  "H19", "MIR924HG", "ANKRD1", "ADCY5", "HSPA5", "FREM1", "ENSG00000289950", "MIR924HG", "CENPF")
+plot <- VlnPlot(pbmc, features = markers, group.by = "tree.ident")
 plot
 SaveFigure(plot, "vln_exp1", width = 16, height = 8)
 ```
@@ -367,7 +339,7 @@ SaveFigure(plot, "vln_exp1", width = 16, height = 8)
 
 We can plot raw counts as well
 ```{r, echo=TRUE}
-plot <- VlnPlot(pbmc, features = c("NKG7", "GNLY"), slot = "counts", log = TRUE)
+plot <- VlnPlot(pbmc, features = markers, slot = "counts", log = TRUE)
 SaveFigure(plot, "vln_exp2", width = 16, height = 8)
 ```
 
@@ -398,9 +370,9 @@ Note that the platelet marker PPBP isn't present in this dataset. We also have a
 # Plotting PBMC markers
 markers <- c("LINGO2", "GRIK1", "EFNA5", "COL15A1", "PDZRN4", "PDE1A", "SPP1",  "H19", "MIR924HG", "ANKRD1", "ADCY5", "HSPA5", "FREM1", "ENSG00000289950", "MIR924HG", "CENPF")
 
-pbmc_markers <- FeaturePlot(pbmc, features = markers)
-pbmc_markers
-SaveFigure(pbmc_markers, "pbmc_markers", width = 30, height = 30)
+pbmc_markers_featurePLT <- FeaturePlot(pbmc, features = markers)
+pbmc_markers_featurePLT
+SaveFigure(pbmc_markers_featurePLT, "pbmc_markers", width = 30, height = 30)
 ```
 
 Next, lets generate a UMAP plot with the clusters explicitly labeled so it's a easier to see which cluster corresponds with our PBMC markers. We'll notice that the cluster numbers tend to follow an ordered pattern (e.g. the green clusters on the bottom left contain 5, 6, and 7). This is a consequence of running the BuildClusterTree function and should make it easier to assign them to a single group (in the next step).
