@@ -37,14 +37,14 @@ library(dplyr)
 library(ggplot2)
 library(cowplot)
 library(readr)
-setwd("Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures/integrated_analysis/")
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures/integrated_analysis/cardiomyopathy_vs_LVNC/")
 
 # rm(list = ls())
 
-fig_path <- 'Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures/integrated_analysis/'
+fig_path <- 'Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures/integrated_analysis/cardiomyopathy_vs_LVNC/'
 # fig_path <- "/research_jude/rgs01_jude/groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures/integrated_analysis/"
 
-data_path <- 'Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures//integrated_analysis/'
+data_path <- 'Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures//integrated_analysis/cardiomyopathy_vs_LVNC/'
 # data_path <- "/research_jude/rgs01_jude/groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures/integrated_analysis/"
 
 
@@ -80,41 +80,41 @@ ReadObject <- function(name){
 After reading in the data we'll perform basic filtering on our expression matrix to remove low quality cells and uninformative genes. The parameter "min_genes" will keep cells that have at least 300 genes, and similarly, "min_cells" will keep genes that are expressed in at least 5 cells. Note: Seurat version 4.1 includes a convenience function to read Parse data from the DGE folder. If we would like to use this function, please skip the code block below and see the section "Reading in data with Seurat >= 4.1"
 
 ```{r, echo= TRUE}
-# DGE_folder <- "Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/S_combined/all-well/DGE_filtered/"
-# 
-# # split-pipe versions older than 1.1.0 used "DGE.mtx"
-# mat <- readMM(paste0(DGE_folder, "DGE.mtx"))
-# 
-# cell_meta <- read.delim(paste0(DGE_folder, "cell_metadata.csv"),
-#                   stringsAsFactor = FALSE, sep = ",")
-# genes <- read.delim(paste0(DGE_folder, "all_genes.csv"),
-#                     stringsAsFactor = FALSE, sep = ",")
-# 
-# cell_meta$bc_wells <- make.unique(cell_meta$bc_wells, sep = "_dup")
-# rownames(cell_meta) <- cell_meta$bc_wells
-# genes$gene_name <- make.unique(genes$gene_name, sep = "_dup")
-# 
-# # Setting column and rownames to expression matrix
-# colnames(mat) <- genes$gene_name
-# rownames(mat) <- rownames(cell_meta)
-# mat_t <- t(mat)
-# 
-# # Remove empty rownames, if they exist
-# mat_t <- mat_t[(rownames(mat_t) != ""),]
-# 
-# # Seurat version 5 or greater uses "min.features" instead of "min.genes"
-# pbmc <- CreateSeuratObject(mat_t, min.features = 100, min.cells = 2, meta.data = cell_meta)
+DGE_folder <- "Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/S_combined/all-well/DGE_filtered/"
+
+# split-pipe versions older than 1.1.0 used "DGE.mtx"
+mat <- readMM(paste0(DGE_folder, "DGE.mtx"))
+
+cell_meta <- read.delim(paste0(DGE_folder, "cell_metadata.csv"),
+                  stringsAsFactor = FALSE, sep = ",")
+genes <- read.delim(paste0(DGE_folder, "all_genes.csv"),
+                    stringsAsFactor = FALSE, sep = ",")
+
+cell_meta$bc_wells <- make.unique(cell_meta$bc_wells, sep = "_dup")
+rownames(cell_meta) <- cell_meta$bc_wells
+genes$gene_name <- make.unique(genes$gene_name, sep = "_dup")
+
+# Setting column and rownames to expression matrix
+colnames(mat) <- genes$gene_name
+rownames(mat) <- rownames(cell_meta)
+mat_t <- t(mat)
+
+# Remove empty rownames, if they exist
+mat_t <- mat_t[(rownames(mat_t) != ""),]
+
+# Seurat version 5 or greater uses "min.features" instead of "min.genes"
+pbmc <- CreateSeuratObject(mat_t, min.features = 100, min.cells = 2, meta.data = cell_meta)
 ```
 
 When we create our Seurat object with the plate well numbers (column names in the expression matrix) from the experiment will automatically be assigned to the cell identity slot. In other words, the program assumes this how we want to initially classify our cells. In general, we would like to avoid this behavior so there isn't a bias towards a particular cell class when removing outliers.
 
 ```{r, echo=TRUE}
 # Setting our initial cell class to a single type, this will changer after clustering. 
-# pbmc@meta.data$orig.ident <- factor(rep("pbmc", nrow(pbmc@meta.data)))
-# Idents(pbmc) <- pbmc@meta.data$orig.ident
-# 
-# # SaveObject(pbmc, "seurat_obj_before_QC")
-pbmc <- ReadObject("seurat_obj_before_QC")
+pbmc@meta.data$orig.ident <- factor(rep("pbmc", nrow(pbmc@meta.data)))
+Idents(pbmc) <- pbmc@meta.data$orig.ident
+
+# SaveObject(pbmc, "seurat_obj_before_QC")
+# pbmc <- ReadObject("seurat_obj_before_QC")
 ```
 
 
@@ -156,45 +156,47 @@ After removing unwanted cells from the dataset, the next step is to normalize th
 We next calculate a subset of features that exhibit high cell-to-cell variation in the dataset (i.e, they are highly expressed in some cells, and lowly expressed in others). We and others have found that focusing on these genes in downstream analysis helps to highlight biological signal in single-cell datasets. Our procedure in Seurat3 is described in detail here, and improves on previous versions by directly modeling the mean-variance relationship inherent in single-cell data, and is implemented in the FindVariableFeatures function. By default, we return 2,000 features per dataset. These will be used in downstream analysis, like PCA.
 
 ```{r, echo=TRUE}
-# # split the dataset into a list of seurat objects by samples
-# ifnb.list <- SplitObject(pbmc, split.by = "sample")
-# 
+# split the dataset into a list of seurat objects by samples
+ifnb.list <- SplitObject(pbmc, split.by = "sample")
+
 # sample_name <- names(ifnb.list)
-# ## For question 1
-# for (sample_name in names(ifnb.list)) {
-#   seurat_obj <- ifnb.list[[sample_name]]
-#   
-#   # Assuming you have a condition column in the Seurat object that indicates "Case" or "Control"
-#   # Replace "condition_column_name" with the actual name of your condition column
-#   # Assuming the condition is defined as "control" if the sample name contains "S_25"
-#   seurat_obj$grouping_var1 <- ifelse(grepl("S_25", sample_name), "control", "cardiomyopathy")
-#   Idents(seurat_obj) <-  ifelse(grepl("S_25", sample_name), "control", "cardiomyopathy")
-#   ifnb.list[[sample_name]] <- seurat_obj
-# }
-# 
-# 
-# 
-# # normalize and identify variable features for each dataset independently
-# ifnb.list <- lapply(X = ifnb.list, FUN = function(x) {
-#     x <- subset(x, subset = nFeature_RNA < 5000 & nCount_RNA < 20000 & percent.mt < 15)
-#     x <- NormalizeData(x, normalization.method = "LogNormalize", scale.factor = 10000)
-#     x <- FindVariableFeatures(x, selection.method = "vst", nfeatures = 2000)
-# })
-# 
-# 
-# # select features that are repeatedly variable across datasets for integration
-# features <- SelectIntegrationFeatures(object.list = ifnb.list)
+## For question 2, we will remove controls from the analysis and only keep three cardiomyopathy samples
+ifnb.list$S_25 <- NULL
+
+for (sample_name in names(ifnb.list)) {
+  seurat_obj <- ifnb.list[[sample_name]]
+  
+  # Assuming you have a condition column in the Seurat object that indicates "Case" or "Control"
+  # Replace "condition_column_name" with the actual name of your condition column
+  # Assuming the condition is defined as "control" if the sample name contains "S_25"
+  seurat_obj$grouping_var1 <- ifelse(grepl("GW64", sample_name), "LVNC", "cardiomyopathy")
+  Idents(seurat_obj) <-  ifelse(grepl("GW64", sample_name), "LVNC", "cardiomyopathy")
+  ifnb.list[[sample_name]] <- seurat_obj
+}
+
+
+
+# normalize and identify variable features for each dataset independently
+ifnb.list <- lapply(X = ifnb.list, FUN = function(x) {
+    x <- subset(x, subset = nFeature_RNA < 5000 & nCount_RNA < 20000 & percent.mt < 15)
+    x <- NormalizeData(x, normalization.method = "LogNormalize", scale.factor = 10000)
+    x <- FindVariableFeatures(x, selection.method = "vst", nfeatures = 2000)
+})
+
+
+# select features that are repeatedly variable across datasets for integration
+features <- SelectIntegrationFeatures(object.list = ifnb.list)
 
 ```
 
 
 ```{r, echo=TRUE}
-# immune.anchors <- FindIntegrationAnchors(object.list = ifnb.list, anchor.features = features)
-# # this command creates an 'integrated' data assay
-# immune.combined <- IntegrateData(anchorset = immune.anchors)
-# 
-# # SaveObject(immune.combined, "seurat_obj_post_integration")
-immune.combined <- ReadObject("seurat_obj_post_integration")
+immune.anchors <- FindIntegrationAnchors(object.list = ifnb.list, anchor.features = features)
+# this command creates an 'integrated' data assay
+immune.combined <- IntegrateData(anchorset = immune.anchors)
+
+# SaveObject(immune.combined, "seurat_obj_post_integration_LVNC")
+# immune.combined <- ReadObject("seurat_obj_post_integration_LVNC")
 ```
 
 
@@ -234,46 +236,44 @@ We can explore these marker genes for each cluster and use them to annotate our 
 ```{r, echo=TRUE}
 # For performing differential expression after integration, we switch back to the original data
 DefaultAssay(immune.combined) <- "RNA"
-# # loop over clusters
-# top.markers <- {}
-# top.markers.df <- list()
-# identities <- sort(unique(Idents(immune.combined)))
-# for(i in 1:length(identities)){
-# ident <- identities[i]  
-# print(paste0("Doing identity: ", ident))
-# immune.combined_markers <- FindConservedMarkers(immune.combined, ident.1 = ident, grouping.var = "grouping_var1", verbose = FALSE)
-# top.markers.tmp <- rownames(head(immune.combined_markers,1))
-# top.markers <- c(top.markers, top.markers.tmp)
-# top.markers.df.tmp <- immune.combined_markers
-# top.markers.df.tmp$cluster <- ident
-# top.markers.df[[i]] <- top.markers.df.tmp
-# }
-# 
-# 
-# # [1] "Doing identity: 0"
-# # [1] "Doing identity: 1"
-# # [1] "Doing identity: 2"
-# # [1] "Doing identity: 3"
-# # [1] "Doing identity: 4"
-# # [1] "Doing identity: 5"
-# # [1] "Doing identity: 6"
-# # [1] "Doing identity: 7"
-# # [1] "Doing identity: 8"
-# # [1] "Doing identity: 9"
-# # [1] "Doing identity: 10"
-# # [1] "Doing identity: 11"
-# # [1] "Doing identity: 12"
-# # Warning: Identity: 12 not present in group control. Skipping controlWarning: Only a single group was tested[1] "Doing identity: 13"
-# # Warning: control has fewer than 3 cells in Identity: 13. Skipping controlWarning: Only a single group was tested[1] "Doing identity: 14"
-# # [1] "Doing identity: 15"
-# # Warning: Identity: 15 not present in group control. Skipping controlWarning: Only a single group was tested
-# 
-# # SaveObject(top.markers, "seurat_obj_top_markers")
-# # SaveObject(top.markers.df, "seurat_obj_top_markers_dataframe_list")
-
-top.markers.df <- ReadObject(top.markers.df, "seurat_obj_top_markers_dataframe_list")
+# loop over clusters
+top.markers <- {}
+top.markers.df <- list()
+identities <- sort(unique(Idents(immune.combined)))
+for(i in 1:length(identities)){
+ident <- identities[i]  
+print(paste0("Doing identity: ", ident))
+immune.combined_markers <- FindConservedMarkers(immune.combined, ident.1 = ident, grouping.var = "grouping_var1", verbose = FALSE)
+top.markers.tmp <- rownames(head(immune.combined_markers,1))
+top.markers <- c(top.markers, top.markers.tmp)
+top.markers.df.tmp <- immune.combined_markers
+top.markers.df.tmp$cluster <- ident
+top.markers.df[[i]] <- top.markers.df.tmp
+}
 
 lapply(top.markers.df, head, 4)
+
+# [1] "Doing identity: 0"
+# [1] "Doing identity: 1"
+# [1] "Doing identity: 2"
+# [1] "Doing identity: 3"
+# [1] "Doing identity: 4"
+# [1] "Doing identity: 5"
+# [1] "Doing identity: 6"
+# [1] "Doing identity: 7"
+# [1] "Doing identity: 8"
+# [1] "Doing identity: 9"
+# [1] "Doing identity: 10"
+# [1] "Doing identity: 11"
+# [1] "Doing identity: 12"
+# Warning: Identity: 12 not present in group control. Skipping controlWarning: Only a single group was tested[1] "Doing identity: 13"
+# Warning: control has fewer than 3 cells in Identity: 13. Skipping controlWarning: Only a single group was tested[1] "Doing identity: 14"
+# [1] "Doing identity: 15"
+# Warning: Identity: 15 not present in group control. Skipping controlWarning: Only a single group was tested
+
+# SaveObject(top.markers, "seurat_obj_top_markers")
+# SaveObject(top.markers.df, "seurat_obj_top_markers_dataframe_list")
+
 
 # > top.markers
 top.markers <- c("FBN2", "TTN", "ADGRL3", "PCDH9", "CLSPN", "NR2F1-AS1", "ANLN", "CDH19", "CENPF", "CNTNAP2", "SLC7A11", "CDH19", "LUM", "SHOX2", "FGR", "NOS2")
