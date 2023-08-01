@@ -487,7 +487,7 @@ pbmc_markers_trt_control_sorted <- pbmc_markers_trt_control[order(-pbmc_markers_
 Another useful way to visualize these changes in gene expression is with the split.by option to the FeaturePlot() or VlnPlot() function. This will display FeaturePlots of the list of given genes, split by a grouping variable (stimulation condition here)
 
 ```{r, echo=TRUE}
-FeaturePlot(pbmc, features = c("CD3D", "GNLY", "IFI6"), split.by = "stim", max.cutoff = 3,
+FeaturePlot(pbmc, features = c("IGF2", "LINC02899", "COL1A1"), split.by = "grouping_var1", max.cutoff = 3,
     cols = c("grey", "red"))
 ```
 

@@ -33,6 +33,7 @@ library(Seurat)
 library(dplyr)
 library(ggplot2)
 library(cowplot)
+library(readr)
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures/")
 
 # rm(list = ls())
@@ -105,8 +106,8 @@ When we create our Seurat object the plate well numbers (column names in the exp
 pbmc@meta.data$orig.ident <- factor(rep("pbmc", nrow(pbmc@meta.data)))
 Idents(pbmc) <- pbmc@meta.data$orig.ident
 
-SaveObject(pbmc, "seurat_obj_before_QC")
-pbmc <- ReadObject("seurat_obj_before_QC")
+# SaveObject(pbmc, "seurat_obj_before_QC")
+# pbmc <- ReadObject("seurat_obj_before_QC")
 ```
 
 
@@ -120,7 +121,7 @@ pbmc[["percent.mt"]] <- PercentageFeatureSet(pbmc, pattern = "^MT-")
 plot <- VlnPlot(pbmc, pt.size = 0.10,
 features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 plot
-SaveFigure(plot, "vln_QC", width = 12, height = 6)
+# SaveFigure(plot, "vln_QC", width = 12, height = 6)
 
 plot1 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "percent.mt")
 plot1
@@ -128,7 +129,7 @@ plot2 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "nFeature_RNA"
 plot2
 
 # plot_grid(plot1, plot2)
-SaveFigure((plot1 + plot2),"scatter_QC", width = 12, height = 6, res = 200)
+# SaveFigure((plot1 + plot2),"scatter_QC", width = 12, height = 6, res = 200)
 ```
 
 Let's break down the conditions in the subset argument below:
@@ -161,7 +162,7 @@ plot1
 plot2 <- LabelPoints(plot = plot1, points = top10, repel = TRUE)
 plot2
 # plot_grid(plot1, plot2)
-SaveFigure((plot1 + plot2), "var_features", width = 12, height = 6)
+# SaveFigure((plot1 + plot2), "var_features", width = 12, height = 6)
 ```
 # Scaling the data
 Next, we apply a linear transformation ('scaling') that is a standard pre-processing step prior to dimensional reduction techniques like PCA. The ScaleData function:
@@ -196,7 +197,7 @@ print(pbmc[["pca"]], dims = 1:5, nfeatures = 5)
 ```{r, echo=TRUE}
 plot <- VizDimLoadings(pbmc, dims = 1:2, reduction = "pca")
 plot
-SaveFigure(plot, "viz_PCA_loadings", width = 10, height = 8)
+# SaveFigure(plot, "viz_PCA_loadings", width = 10, height = 8)
 ```
 
 
@@ -204,7 +205,7 @@ SaveFigure(plot, "viz_PCA_loadings", width = 10, height = 8)
 plot <- DimPlot(pbmc, reduction = "pca", group.by = "orig.ident")
 # plot <- DimPlot(pbmc, reduction = "pca", group.by = "grouping_var1")
 plot
-SaveFigure(plot, "pc1_2_scatter", width = 8, height = 6) # **
+# SaveFigure(plot, "pc1_2_scatter", width = 8, height = 6) # **
 ```
 
 In particular DimHeatmap allows for easy exploration of the primary sources of heterogeneity in a dataset, and can be useful when trying to decide which PCs to include for further downstream analyses. Both cells and features are ordered according to their PCA scores. Setting cells to a number plots the 'extreme' cells on both ends of the spectrum, which dramatically speeds plotting for large datasets. Though clearly a supervised analysis, we find this to be a valuable tool for exploring correlated feature sets.
@@ -214,13 +215,13 @@ In particular DimHeatmap allows for easy exploration of the primary sources of h
 # Image doesn't save as png unless fast = FALSE
 plot <- DimHeatmap(pbmc, dims = 1, cells = 500, balanced = TRUE, fast = FALSE)
 plot
-SaveFigure(plot, "dim_heatmap1", width = 8, height = 6)
+# SaveFigure(plot, "dim_heatmap1", width = 8, height = 6)
 ```
 
 ```{r, echo=TRUE}
 plot <- DimHeatmap(pbmc, dims = 1:15, cells = 500, balanced = TRUE, fast = FALSE)
 plot
-SaveFigure(plot, "dim_heatmap1_15", width = 12, height = 18)
+# SaveFigure(plot, "dim_heatmap1_15", width = 12, height = 18)
 ```
 # Determine the 'dimensionality' of the dataset
 To overcome the extensive technical noise in any single feature for scRNA-seq data, Seurat clusters cells based on their PCA scores, with each PC essentially representing a 'metafeature' that combines information across a correlated feature set. The top principal components therefore represent a robust compression of the dataset. However, how many components should we choose to include? 10? 20? 100?
@@ -242,7 +243,7 @@ For this particular dataset, we chose not to use the jackstraw plot for PC selec
 ```{r, echo=TRUE}
 plot <- ElbowPlot(pbmc,ndims = 50)
 plot
-SaveFigure(plot, "PC_elbow_plot", width = 8, height = 10)
+# SaveFigure(plot, "PC_elbow_plot", width = 8, height = 10)
 ```
 Identifying the true dimensionality of a dataset -- can be challenging/uncertain for the user. We therefore suggest these three approaches to consider. The first is more supervised, exploring PCs to determine relevant sources of heterogeneity, and could be used in conjunction with GSEA for example. The second implements a statistical test based on a random null model, but is time-consuming for large datasets, and may not return a clear PC cutoff. The third is a heuristic that is commonly used, and can be calculated instantly. In this example, all three approaches yielded similar results, but we might have been justified in choosing anything between PC 7-12 as a cutoff.
 
@@ -285,7 +286,7 @@ Seurat offers several non-linear dimensional reduction techniques, such as tSNE 
 pbmc <- RunUMAP(pbmc, dims = 1:30)
 plot <- DimPlot(pbmc, reduction = "umap", label = TRUE, repel = TRUE)
 plot
-SaveFigure(plot, "umap_louvain_res_p3", width = 9, height = 8)
+# SaveFigure(plot, "umap_louvain_res_p3", width = 9, height = 8)
 ```
 
 
@@ -322,8 +323,9 @@ We can then run FindMarkers between the groups (i.e., treatment Vs controls)
 
 ```{r, echo=TRUE}
 pbmc_markers <- FindAllMarkers(pbmc, min.pct = 0.25, logfc.threshold = 0.25)
-cc <- pbmc_markers %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC)
+cc <- pbmc_markers %>% group_by(cluster) %>% top_n(n = 3, wt = avg_log2FC)
 cc
+write_rds(pbmc_markers, "pbmc_markers.rds")
 ```
 
 
@@ -333,26 +335,26 @@ We include several tools for visualizing marker expression. VlnPlot (shows expre
 markers <- c("LINGO2", "GRIK1", "EFNA5", "COL15A1", "PDZRN4", "PDE1A", "SPP1",  "H19", "MIR924HG", "ANKRD1", "ADCY5", "HSPA5", "FREM1", "ENSG00000289950", "MIR924HG", "CENPF")
 plot <- VlnPlot(pbmc, features = markers, group.by = "tree.ident")
 plot
-SaveFigure(plot, "vln_exp1", width = 16, height = 8)
+# SaveFigure(plot, "vln_exp1", width = 16, height = 8)
 ```
 
 
 We can plot raw counts as well
 ```{r, echo=TRUE}
 plot <- VlnPlot(pbmc, features = markers, slot = "counts", log = TRUE)
-SaveFigure(plot, "vln_exp2", width = 16, height = 8)
+# SaveFigure(plot, "vln_exp2", width = 16, height = 8)
 ```
 
 
 # Visualizing the top n genes per cluster
-The Seurat PBMC tutorial makes use of the function DoHeatmapfor visualizing the top n genes per cluster in a single figure. This method works well for a  few thousand cells, but loses resolution as the number of cells increase because individual columns have to be interpolated. The DotPlot function addresses this by displaying the average expression for all cells in a cluster.
+The Seurat PBMC tutorial makes use of the function DotPlot for visualizing the top n genes per cluster in a single figure. This method works well for a  few thousand cells, but loses resolution as the number of cells increase because individual columns have to be interpolated. The DotPlot function addresses this by displaying the average expression for all cells in a cluster.
 
 ```{r, echo=TRUE}
 top5 <- pbmc_markers %>% group_by(cluster) %>% top_n(n = 5, wt = avg_log2FC)
 to_plot <- unique(top5$gene)
 plot <- DotPlot(pbmc, features = to_plot, group.by = "tree.ident") + coord_flip()
 plot
-SaveFigure(plot, "dplot_top5", width = 9, height = 20)
+# SaveFigure(plot, "dplot_top5", width = 9, height = 20)
 ```
 
 # Merging clusters and labeling cell types
@@ -372,7 +374,7 @@ markers <- c("LINGO2", "GRIK1", "EFNA5", "COL15A1", "PDZRN4", "PDE1A", "SPP1",  
 
 pbmc_markers_featurePLT <- FeaturePlot(pbmc, features = markers)
 pbmc_markers_featurePLT
-SaveFigure(pbmc_markers_featurePLT, "pbmc_markers", width = 30, height = 30)
+# SaveFigure(pbmc_markers_featurePLT, "pbmc_markers_featurePLT", width = 30, height = 30)
 ```
 
 Next, lets generate a UMAP plot with the clusters explicitly labeled so it's a easier to see which cluster corresponds with our PBMC markers. We'll notice that the cluster numbers tend to follow an ordered pattern (e.g. the green clusters on the bottom left contain 5, 6, and 7). This is a consequence of running the BuildClusterTree function and should make it easier to assign them to a single group (in the next step).
@@ -380,41 +382,41 @@ Next, lets generate a UMAP plot with the clusters explicitly labeled so it's a e
 ```{r, echo=TRUE}
 plot <- DimPlot(pbmc, reduction = "umap", label = TRUE) + NoAxes() + NoLegend()
 plot
-SaveFigure(plot, "umap_louvain_nolegend", width = 8, height = 7)
+# SaveFigure(plot, "umap_louvain_nolegend", width = 8, height = 7)
 ```
 
 The last step involves generating a list where each cell type is assigned multiple clusters so they can be merged. We may wonder why the cell names in the list look different the label names. It's because R list names don't accept spaces or special characters like "+".The last step involves generating a list where each cell type is assigned multiple clusters so they can be merged. We may wonder why the cell names in the list look different the label names. It's because R list names don't accept spaces or special characters like "+".
 
 
 ```{r, echo=TRUE}
-# New IDs from official tutorial
-new_ids <- c("Naive CD4 T", "Memory CD4 T", "CD14+ Mono", "B", "CD8 T",
-  "FCGR3A+ Mono", "NK", "DC", "IGHA", "ZNF385D")
-
-
-new_id_list <- list(Naive.CD4.T = c(17,19,20), Memory.CD4.T = c(15,16,18),
-  CD14.Mono = c(2), B = c(5:7), CD8.T = 13, FCGR3A.Mono = 1, NK = c(10:12,14),
-  DC = c(3,8), IGHA = 4, ZNF385D = 9)
-
-
-pbmc@meta.data$collapsed <- ""
-for (i in 1:length(new_id_list)) {
-  ind <- which(pbmc@meta.data$tree.ident %in% new_id_list[[i]])
-  pbmc@meta.data$collapsed[ind] <- names(new_id_list)[i]
-}
-
-pbmc@meta.data$collapsed <- factor(
-  pbmc@meta.data$collapsed, levels = names(new_id_list), ordered = TRUE)
-Idents(pbmc) <- pbmc@meta.data$collapsed
-
-names(new_ids) <- levels(pbmc)
-pbmc <- RenameIdents(pbmc, new_ids)
-
-plot <- DimPlot(pbmc, reduction = "umap", label = TRUE) + NoAxes() + NoLegend()
-plot
-SaveFigure(plot, "umap_louvain_nolegend_names", width = 8, height = 7)
-
-save.image("Final_analysis.RData")
+# # New IDs from official tutorial
+# new_ids <- c("Naive CD4 T", "Memory CD4 T", "CD14+ Mono", "B", "CD8 T",
+#   "FCGR3A+ Mono", "NK", "DC", "IGHA", "ZNF385D")
+# 
+# 
+# new_id_list <- list(Naive.CD4.T = c(17,19,20), Memory.CD4.T = c(15,16,18),
+#   CD14.Mono = c(2), B = c(5:7), CD8.T = 13, FCGR3A.Mono = 1, NK = c(10:12,14),
+#   DC = c(3,8), IGHA = 4, ZNF385D = 9)
+# 
+# 
+# pbmc@meta.data$collapsed <- ""
+# for (i in 1:length(new_id_list)) {
+#   ind <- which(pbmc@meta.data$tree.ident %in% new_id_list[[i]])
+#   pbmc@meta.data$collapsed[ind] <- names(new_id_list)[i]
+# }
+# 
+# pbmc@meta.data$collapsed <- factor(
+#   pbmc@meta.data$collapsed, levels = names(new_id_list), ordered = TRUE)
+# Idents(pbmc) <- pbmc@meta.data$collapsed
+# 
+# names(new_ids) <- levels(pbmc)
+# pbmc <- RenameIdents(pbmc, new_ids)
+# 
+# plot <- DimPlot(pbmc, reduction = "umap", label = TRUE) + NoAxes() + NoLegend()
+# plot
+# # SaveFigure(plot, "umap_louvain_nolegend_names", width = 8, height = 7)
+# 
+# save.image("Final_analysis.RData")
 ```
 
 
@@ -425,52 +427,69 @@ save.image("Final_analysis.RData")
 So let's create the grouping variables as required for our analysis
 ```{r, echo=TRUE}
 pbmc$grouping_var1 <- ifelse(grepl("S_25", pbmc$sample), "control", "cardiomyopathy")
-pbmc$grouping_var2 <- NA
+pbmc$grouping_var2 <- "control"
 pbmc$grouping_var2[grepl("GW64",pbmc$sample)] <- "LVNC"
-pbmc$grouping_var2[!grepl("GW64|S_25",pbmc$sample)] <- "other_cardiomypathy"
+pbmc$grouping_var2[!grepl("GW64|S_25",pbmc$sample)] <- "other_cardiomyopathy"
 ```
 
 # Create dimplot grouped by treatment conditions
 ```{r, echo=TRUE}
 plot1 <- DimPlot(pbmc, reduction = "umap", group.by = "grouping_var1") # can use tsne instead of umap
 plot1
-SaveFigure(plot1, "umap_louvain_res_p3_treatment_vs_control", width = 9, height = 8)
+# SaveFigure(plot1, "umap_louvain_res_p3_treatment_vs_control", width = 9, height = 8)
 ```
 
 To visualize the two conditions side-by-side, we can use the split.by argument to show each condition colored by cluster.
 
 ```{r, echo=TRUE}
-DimPlot(pbmc, reduction = "umap", split.by = "grouping_var1")
+plot1 <- DimPlot(pbmc, reduction = "umap", split.by = "grouping_var1")
+plot1
+# SaveFigure(plot1, "umap_louvain_res_p3_treatment_vs_control_split", width = 9, height = 8)
 ```
 
 
-We can explore these marker genes between subgroups.
+We can explore differentially expressed genes between groups (treatment Vs controls).
+Let's work on 
+1. The first question is to see differences between control and cardiomyopathy group
+
 ```{r, echo=TRUE}
 # loop over clusters
 # Look up identities or clusters with Idents() ; set identity with SetIdent()
 pbmc.tmp <- pbmc
 Idents(pbmc.tmp) <- "grouping_var1"
 # DefaultAssay(pbmc.tmp) <- "RNA"
-pbmc_markers_trt_control <- FindMarkers(pbmc.tmp, ident.1 = "control", ident.2 = "cardiomyopathy", min.pct = 0.25, logfc.threshold = 0.25)
-pbmc_markers_trt_control %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC)
+pbmc_markers_trt_control <- FindMarkers(pbmc.tmp, ident.1 = "cardiomyopathy", ident.2 = "control", min.pct = 0.25, logfc.threshold = 0.25)
 pbmc_markers_trt_control_sorted <- pbmc_markers_trt_control[order(-pbmc_markers_trt_control$avg_log2FC), ]
+# write.table(pbmc_markers_trt_control_sorted, "pbmc_markers_other.cardiomyopathy_vs_control_sorted.txt", sep = "\t", col.names = TRUE, row.names = FALSE, quote = FALSE)
 ```
 
 Another useful way to visualize these changes in gene expression is with the split.by option to the FeaturePlot() or VlnPlot() function. This will display FeaturePlots of the list of given genes, split by a grouping variable (stimulation condition here)
 
 ```{r, echo=TRUE}
-FeaturePlot(pbmc, features = c("CD3D", "GNLY", "IFI6"), split.by = "stim", max.cutoff = 3,
-    cols = c("grey", "red"))
+# FeaturePlot(pbmc, features = c("CD3D", "GNLY", "IFI6"), split.by = "grouping_var1", max.cutoff = 3,
+#     cols = c("grey", "red"))
 ```
 
 Violin plot 
 ```{r, echo=TRUE}
-plot <- VlnPlot(pbmc, features = c("LINGO2", "GRIK1", "EFNA5", "COL15A1", "PDZRN4", "PDE1A", "SPP1",  "H19", "MIR924HG", "ANKRD1", "ADCY5", "HSPA5", "FREM1", "ENSG00000289950", "MIR924HG", "CENPF"), group.by = "grouping_var1")
-plot
-SaveFigure(plot, "vln_exp1", width = 16, height = 8)
-plot <- VlnPlot(pbmc, features = c("CFH", "MYH7"), slot = "counts", group.by = "grouping_var1", log = TRUE)
-plot
+# plot <- VlnPlot(pbmc, features = c("LINGO2", "GRIK1", "EFNA5", "COL15A1", "PDZRN4", "PDE1A", "SPP1",  "H19", "MIR924HG", "ANKRD1", "ADCY5", "HSPA5", "FREM1", "ENSG00000289950", "MIR924HG", "CENPF"), group.by = "grouping_var1")
+# plot
+# # SaveFigure(plot, "vln_exp1", width = 16, height = 8)
+# plot <- VlnPlot(pbmc, features = c("CFH", "MYH7"), slot = "counts", group.by = "grouping_var1", log = TRUE)
+# plot
+# # SaveFigure(plot, "vln_exp2", width = 16, height = 8)
 ```
 
+2. The second and more important question is that what is the differences between LVNC and other cardiomyopathy groups. Specifically, we are interested in the trabecular/compaction process and how the trabeculations is different between LVNC and two other cardiomyopathy group. 
 
-SaveFigure(plot, "vln_exp2", width = 16, height = 8)
+```{r, echo=TRUE}
+# loop over clusters
+# Look up identities or clusters with Idents() ; set identity with SetIdent()
+pbmc.tmp <- pbmc
+Idents(pbmc.tmp) <- "grouping_var2"
+# DefaultAssay(pbmc.tmp) <- "RNA"
+pbmc_markers_other.cardiomyopathy_LVNC <- FindMarkers(pbmc.tmp, ident.1 = "other_cardiomyopathy", ident.2 = "LVNC", min.pct = 0.25, logfc.threshold = 0.25)
+pbmc_markers_other.cardiomyopathy_LVNC_sorted <- pbmc_markers_other.cardiomyopathy_LVNC[order(-pbmc_markers_other.cardiomyopathy_LVNC$avg_log2FC), ]
+# write.table(pbmc_markers_other.cardiomyopathy_LVNC_sorted, "pbmc_markers_other.cardiomyopathy_LVNC_sorted.txt", sep = "\t", col.names = TRUE, row.names = FALSE, quote = FALSE)
+```
+

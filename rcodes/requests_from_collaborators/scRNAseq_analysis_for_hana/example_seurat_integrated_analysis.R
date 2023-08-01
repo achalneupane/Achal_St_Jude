@@ -45,6 +45,18 @@ immune.combined <- IntegrateData(anchorset = immune.anchors)
 # original unmodified data still resides in the 'RNA' assay
 DefaultAssay(immune.combined) <- "integrated"
 
+# immune.combined <- ReadObject("seurat_obj_post_integration")
+immune.combined[["percent.mt"]] <- PercentageFeatureSet(immune.combined, pattern = "^MT-")
+plot6 <- VlnPlot(immune.combined, pt.size = 0.10,
+                 features = c("nFeature_RNA", "nCount_RNA"), ncol = 3)
+plot6
+plot7 <- FeatureScatter(immune.combined, feature1 = "nCount_RNA", feature2 = "percent.mt")
+plot7
+plot8 <- FeatureScatter(immune.combined, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot8
+
+
+
 # Run the standard workflow for visualization and clustering
 immune.combined <- ScaleData(immune.combined, verbose = FALSE)
 immune.combined <- RunPCA(immune.combined, npcs = 30, verbose = FALSE)

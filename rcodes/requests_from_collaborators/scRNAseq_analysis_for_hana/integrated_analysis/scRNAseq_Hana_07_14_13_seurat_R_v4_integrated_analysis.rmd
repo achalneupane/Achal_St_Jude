@@ -1,0 +1,398 @@
+---
+title: "scRNAseq_Hana_07_14_2023_seurat"
+output: word_document
+date: "2023-07-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+# Project description
+The cells here are from cardiac organoids made by mixing 15% endocardial cells and 85% cardiomyocytes. These organoids are then treated with factors to induce trabeculation. In our analysis so far, we have noticed that all group except for LVNC respond to this stimulation. 
+
+The samples are as below:
+S25: Control 
+GW64: Cardiomyopathy (LVNC: Left Ventricular Non-compaction Cardiomyopathy)
+GW129: Cardiomyopathy (HCM: Hypertrophic Cardiomyopathy)
+GW168: Cardiomyopathy (DCM: Dilated Cardiomyopathy)
+
+The first question is to see differences between control and cardiomyopathy group. The second and more important question is that what is the differences between LVNC and other cardiomyopathy groups. Specifically, we are interested in the trabecular/compaction process and how the trabeculations is different between LVNC and two other cardiomyopathy group. 
+
+
+The raw reads from two sub-libraries were processed with Parse Biosciences spilt-pipe v1.0.6p using GRCh38 reference genome and with default parameters.
+
+
+# Loading libraries and setting location paths
+```{r}
+# remove.packages('Matrix')
+# install.packages("Matrix", repos="http://R-Forge.R-project.org")
+library("Matrix")
+library(Seurat)
+# packageVersion("Seurat")
+library(dplyr)
+library(ggplot2)
+library(cowplot)
+library(readr)
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures/integrated_analysis/")
+
+# rm(list = ls())
+
+fig_path <- 'Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures/integrated_analysis/'
+# fig_path <- "/research_jude/rgs01_jude/groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures/integrated_analysis/"
+
+data_path <- 'Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures//integrated_analysis/'
+# data_path <- "/research_jude/rgs01_jude/groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/combined_figures/integrated_analysis/"
+
+
+```
+
+
+Below we've included a few convenience functions for saving images and reading/writing Seurat object to disk. When we're working with larger datasets, it's usually a good idea to save progress after computationally intensive steps so we can back track if we wish to do so.
+
+```{r, echo=FALSE}
+# Convenience functions
+SaveFigure <- function(plots, name, type = "png", width, height, res){
+  if(type == "png") {
+    png(paste0(fig_path, name, ".", type),
+      width = width, height = height, units = "in", res = 200)
+  } else {
+    pdf(paste0(fig_path, name, ".", type),
+      width = width, height = height)
+}
+print(plots)
+dev.off()
+}
+
+SaveObject <- function(object, name){
+  saveRDS(object, paste0(data_path, name, ".RDS"))
+}
+
+ReadObject <- function(name){
+  readRDS(paste0(data_path, name, ".RDS"))
+}
+```
+
+# Reading in data
+After reading in the data we'll perform basic filtering on our expression matrix to remove low quality cells and uninformative genes. The parameter "min_genes" will keep cells that have at least 300 genes, and similarly, "min_cells" will keep genes that are expressed in at least 5 cells. Note: Seurat version 4.1 includes a convenience function to read Parse data from the DGE folder. If we would like to use this function, please skip the code block below and see the section "Reading in data with Seurat >= 4.1"
+
+```{r, echo= TRUE}
+DGE_folder <- "Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/S_combined/all-well/DGE_filtered/"
+
+# split-pipe versions older than 1.1.0 used "DGE.mtx"
+mat <- readMM(paste0(DGE_folder, "DGE.mtx"))
+
+cell_meta <- read.delim(paste0(DGE_folder, "cell_metadata.csv"),
+                  stringsAsFactor = FALSE, sep = ",")
+genes <- read.delim(paste0(DGE_folder, "all_genes.csv"),
+                    stringsAsFactor = FALSE, sep = ",")
+
+cell_meta$bc_wells <- make.unique(cell_meta$bc_wells, sep = "_dup")
+rownames(cell_meta) <- cell_meta$bc_wells
+genes$gene_name <- make.unique(genes$gene_name, sep = "_dup")
+
+# Setting column and rownames to expression matrix
+colnames(mat) <- genes$gene_name
+rownames(mat) <- rownames(cell_meta)
+mat_t <- t(mat)
+
+# Remove empty rownames, if they exist
+mat_t <- mat_t[(rownames(mat_t) != ""),]
+
+# Seurat version 5 or greater uses "min.features" instead of "min.genes"
+pbmc <- CreateSeuratObject(mat_t, min.features = 100, min.cells = 2, meta.data = cell_meta)
+```
+
+When we create our Seurat object with the plate well numbers (column names in the expression matrix) from the experiment will automatically be assigned to the cell identity slot. In other words, the program assumes this how we want to initially classify our cells. In general, we would like to avoid this behavior so there isn't a bias towards a particular cell class when removing outliers.
+
+```{r, echo=TRUE}
+# Setting our initial cell class to a single type, this will changer after clustering. 
+pbmc@meta.data$orig.ident <- factor(rep("pbmc", nrow(pbmc@meta.data)))
+Idents(pbmc) <- pbmc@meta.data$orig.ident
+
+# SaveObject(pbmc, "seurat_obj_before_QC")
+# pbmc <- ReadObject("seurat_obj_before_QC")
+```
+
+
+# Cell quality control
+In this step we'll perform cell quality control to prevent outlier cells from influencing downstream analyses. Cells that have unusually high transcript or gene counts are very likely to be multiplets, which is a term for two or more cells that have identical barcodes. Conversely, cells that have very low transcript or genes counts are a consequence of barcoding cells with damage membranes, or barcoding ambient RNA.
+
+Filtering outliers can be accomplished by generating a violin plot for each cell feature and manually selecting the threshold we wish to remove cells. We'll also add another important cell feature that shows the percentage of mitochondrial genes expressed in each cell. Cells with high mitochondrial gene percentages should be removed, as they are likely to have lost cytoplasmic RNA from lysis or may have increased apoptosis (Luecken and Theis 2019)
+
+```{r, echo=TRUE}
+pbmc[["percent.mt"]] <- PercentageFeatureSet(pbmc, pattern = "^MT-")
+plot <- VlnPlot(pbmc, pt.size = 0.10,
+features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+plot
+# SaveFigure(plot, "vln_QC", width = 12, height = 6)
+
+plot1 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "percent.mt")
+plot1
+plot2 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot2
+
+# plot_grid(plot1, plot2)
+# SaveFigure((plot1 + plot2),"scatter_QC", width = 12, height = 6, res = 200)
+```
+
+Let's break down the conditions in the subset argument below:
+
+nFeature_RNA is the number of genes detected in each cell. nCount_RNA is the total number of molecules detected within a cell. Low nFeature_RNA for a cell indicates that it may be dead/dying or an empty droplet. High nCount_RNA and/or nFeature_RNA indicates that the "cell" may in fact be a doublet (or multiplet). In combination with % of mitochondrial reads, removing outliers from these groups removes most doublets/dead cells/empty droplets, hence why filtering is a common pre-processing step.
+
+```{r, echo=TRUE}
+# Perform the filtering
+# pbmc <- subset(pbmc, subset = nFeature_RNA < 5000 & nCount_RNA < 20000 & percent.mt < 15)
+```
+
+
+# QC 1. Normalizing the data
+After removing unwanted cells from the dataset, the next step is to normalize the data. By default, we employ a global-scaling normalization method     LogNormalize that normalizes the feature expression measurements for each cell by the total expression, multiplies this by a scale factor (10,000 by     default), and log-transforms the result. Normalized values are stored in pbmc[["RNA"]]@data.
+
+# QC 2. Identification of highly variable features
+We next calculate a subset of features that exhibit high cell-to-cell variation in the dataset (i.e, they are highly expressed in some cells, and lowly expressed in others). We and others have found that focusing on these genes in downstream analysis helps to highlight biological signal in single-cell datasets. Our procedure in Seurat3 is described in detail here, and improves on previous versions by directly modeling the mean-variance relationship inherent in single-cell data, and is implemented in the FindVariableFeatures function. By default, we return 2,000 features per dataset. These will be used in downstream analysis, like PCA.
+
+```{r, echo=TRUE}
+# split the dataset into a list of seurat objects by samples
+ifnb.list <- SplitObject(pbmc, split.by = "sample")
+
+sample_name <- names(ifnb.list)
+## For question 1
+for (sample_name in names(ifnb.list)) {
+  seurat_obj <- ifnb.list[[sample_name]]
+  
+  # Assuming you have a condition column in the Seurat object that indicates "Case" or "Control"
+  # Replace "condition_column_name" with the actual name of your condition column
+  # Assuming the condition is defined as "control" if the sample name contains "S_25"
+  seurat_obj$grouping_var1 <- ifelse(grepl("S_25", sample_name), "control", "cardiomyopathy")
+  Idents(seurat_obj) <-  ifelse(grepl("S_25", sample_name), "control", "cardiomyopathy")
+  ifnb.list[[sample_name]] <- seurat_obj
+}
+
+
+
+# normalize and identify variable features for each dataset independently
+ifnb.list <- lapply(X = ifnb.list, FUN = function(x) {
+    x <- subset(x, subset = nFeature_RNA < 5000 & nCount_RNA < 20000 & percent.mt < 15)
+    x <- NormalizeData(x, normalization.method = "LogNormalize", scale.factor = 10000)
+    x <- FindVariableFeatures(x, selection.method = "vst", nfeatures = 2000)
+})
+
+
+# select features that are repeatedly variable across datasets for integration
+features <- SelectIntegrationFeatures(object.list = ifnb.list)
+
+```
+
+
+```{r, echo=TRUE}
+immune.anchors <- FindIntegrationAnchors(object.list = ifnb.list, anchor.features = features)
+# this command creates an 'integrated' data assay
+immune.combined <- IntegrateData(anchorset = immune.anchors)
+
+# SaveObject(immune.combined, "seurat_obj_post_integration")
+# immune.combined <- ReadObject("seurat_obj_post_integration")
+```
+
+
+# Perform an integrated analysis
+Now we can run a single integrated analysis on all cells!
+  
+specify that we will perform downstream analysis on the corrected data note that the
+original unmodified data still resides in the 'RNA' assay
+```{r, echo = TRUE}
+DefaultAssay(immune.combined) <- "integrated"
+
+# Run the standard workflow for visualization and clustering
+immune.combined <- ScaleData(immune.combined, verbose = FALSE)
+immune.combined <- RunPCA(immune.combined, npcs = 30, verbose = FALSE)
+immune.combined <- RunUMAP(immune.combined, reduction = "pca", dims = 1:30)
+immune.combined <- FindNeighbors(immune.combined, reduction = "pca", dims = 1:30)
+immune.combined <- FindClusters(immune.combined, resolution = 0.5)
+
+# SaveObject(immune.combined, "seurat_obj_post_integration_postCluster")
+# immune.combined <- ReadObject("seurat_obj_post_integration_postCluster")
+
+# Visualization
+p1 <- DimPlot(immune.combined, reduction = "umap", group.by = "grouping_var1")
+p2 <- DimPlot(immune.combined, reduction = "umap", label = TRUE, repel = TRUE)
+p1 + p2
+```
+
+To visualize the two conditions side-by-side, we can use the split.by argument to show each condition colored by cluster.
+```{r, echo=TRUE}
+DimPlot(immune.combined, reduction = "umap", split.by = "grouping_var1")
+```
+# Identify conserved cell type markers
+To identify canonical cell type marker genes that are conserved across conditions, we provide the FindConservedMarkers() function. This function performs differential gene expression testing for each dataset/group and combines the p-values using meta-analysis methods from the MetaDE R package
+
+
+We can explore these marker genes for each cluster and use them to annotate our clusters as specific cell types.
+```{r, echo=TRUE}
+# For performing differential expression after integration, we switch back to the original data
+DefaultAssay(immune.combined) <- "RNA"
+# loop over clusters
+top.markers <- {}
+top.markers.df <- list()
+identities <- sort(unique(Idents(immune.combined)))
+for(i in 1:length(identities)){
+ident <- identities[i]  
+print(paste0("Doing identity: ", ident))
+immune.combined_markers <- FindConservedMarkers(immune.combined, ident.1 = ident, grouping.var = "grouping_var1", verbose = FALSE)
+top.markers.tmp <- rownames(head(immune.combined_markers,1))
+top.markers <- c(top.markers, top.markers.tmp)
+top.markers.df.tmp <- immune.combined_markers
+top.markers.df.tmp$cluster <- ident
+top.markers.df[[i]] <- top.markers.df.tmp
+}
+
+lapply(top.markers.df, head, 4)
+
+# [1] "Doing identity: 0"
+# [1] "Doing identity: 1"
+# [1] "Doing identity: 2"
+# [1] "Doing identity: 3"
+# [1] "Doing identity: 4"
+# [1] "Doing identity: 5"
+# [1] "Doing identity: 6"
+# [1] "Doing identity: 7"
+# [1] "Doing identity: 8"
+# [1] "Doing identity: 9"
+# [1] "Doing identity: 10"
+# [1] "Doing identity: 11"
+# [1] "Doing identity: 12"
+# Warning: Identity: 12 not present in group control. Skipping controlWarning: Only a single group was tested[1] "Doing identity: 13"
+# Warning: control has fewer than 3 cells in Identity: 13. Skipping controlWarning: Only a single group was tested[1] "Doing identity: 14"
+# [1] "Doing identity: 15"
+# Warning: Identity: 15 not present in group control. Skipping controlWarning: Only a single group was tested
+
+# SaveObject(top.markers, "seurat_obj_top_markers")
+# SaveObject(top.markers.df, "seurat_obj_top_markers_dataframe_list")
+
+
+# > top.markers
+top.markers <- c("FBN2", "TTN", "ADGRL3", "PCDH9", "CLSPN", "NR2F1-AS1", "ANLN", "CDH19", "CENPF", "CNTNAP2", "SLC7A11", "CDH19", "LUM", "SHOX2", "FGR", "NOS2")
+# FBN2= "ICCs"
+# TTN = "Cardiomyocyte"
+# ADGRL3 = "Pericyte"
+# PCDH9 = "Neuro_endocrine"
+# CLSPN = ""
+# NR2F1-AS1 = ""
+# ANLN = "Epithelial"
+# CDH19 = "Enterocytes_Schwann_cell"
+# CENPF = "Gamma_delta_T_cells"
+# CNTNAP2 = "Neuronal"
+# SLC7A11 = ""
+# CDH19 = "Enterocytes_Schwann_cell"
+# LUM = "Fibroblast"
+# SHOX2 = "Interneurons"
+# FGR = "Fibroblast"
+# NOS2 = "Enteric_glia_cells"
+
+#0 FBN2= "ICCs"
+#1 TTN = "Cardiomyocyte"
+#2 ADGRL3 = "Pericyte"
+#3 PCDH9 = "Neuro_endocrine"
+#4 CLSPN = ""
+#5 NR2F1-AS1 = ""
+#6 ANLN = "Epithelial"
+#7 CDH19 = "Enterocytes_Schwann_cell"
+#8 CENPF = "Gamma_delta_T_cells"
+#9 CNTNAP2 = "Neuronal"
+#10 SLC7A11 = ""
+#11 CDH19 = "Enterocytes_Schwann_cell"
+#12 LUM = "Fibroblast"
+#13 SHOX2 = "Interneurons"
+#14 FGR = "Fibroblast"
+#15 NOS2 = "Enteric_glia_cells"
+```
+
+
+We can explore these marker genes for each cluster and use them to annotate our clusters as specific cell types.
+
+```{r, echo = TRUE}
+DefaultAssay(immune.combined) <- "RNA"
+FeaturePlot(immune.combined, features = top.markers, min.cutoff = "q9")
+```
+
+
+
+
+```{r, echo = TRUE}
+immune.combined <- RenameIdents(immune.combined, `0` = "ICCs", `1` = "Cardiomyocyte", `2` = "Pericyte",
+    `3` = "Neuro_endocrine", `4` = "Unknown_1", `5` = "Unknown_2", `6` = "Epithelial", `7` = "Enterocytes_Schwann_cell", `8` = "Gamma_delta_T_cells",
+    `9` = "Neuronal", `10` = "Unknown_3", `11` = "Enterocytes_Schwann_cell", `12` = "Fibroblast", `13` = "Interneurons", `14` = "Fibroblast", 
+    `15` = "Enteric_glia_cells")
+DimPlot(immune.combined, label = TRUE, repel = TRUE)
+```
+
+
+The DotPlot() function with the split.by parameter can be useful for viewing conserved cell type markers across conditions, showing both the expression level and the percentage of cells in a cluster expressing any given gene. Here we plot 2-3 strong marker genes for each of our 14 clusters.
+
+```{r, echo = TRUE}
+markers.to.plot <- unique(c(top.markers, "ADCY5", "TECRL", "CACNA1C", "SORBS2"))
+DotPlot(immune.combined, features = markers.to.plot, cols = c("blue", "red"), dot.scale = 8, split.by = "grouping_var1") +
+    RotatedAxis()
+    
+```
+    
+    
+    
+Identify differential expressed genes across conditions
+Now that we’ve aligned the stimulated and control cells, we can start to do comparative analyses and look at the differences induced by stimulation. One way to look broadly at these changes is to plot the average expression of both the stimulated and control cells and look for genes that are visual outliers on a scatter plot. Here, we take the average expression of both the stimulated and control Cardiomyocytes and ICCs populations and generate the scatter plots, highlighting genes that exhibit dramatic responses.
+
+```{r, echo = TRUE}
+library(ggplot2)
+library(cowplot)
+theme_set(theme_cowplot())
+Cardiomyocytes <- subset(immune.combined, idents = "Cardiomyocyte")
+Idents(Cardiomyocytes) <- "grouping_var1"
+avg.Cardiomyocytes <- as.data.frame(log1p(AverageExpression(Cardiomyocytes, verbose = FALSE)$RNA))
+avg.Cardiomyocytes$gene <- rownames(avg.Cardiomyocytes)
+
+ICCs <- subset(immune.combined, idents = "ICCs")
+Idents(ICCs) <- "grouping_var1"
+avg.ICCs <- as.data.frame(log1p(AverageExpression(ICCs, verbose = FALSE)$RNA))
+avg.ICCs$gene <- rownames(avg.ICCs)
+
+# genes.to.label = c("ISG15", "LY6E", "IFI6", "ISG20", "MX1", "IFIT2", "IFIT1", "CXCL10", "CCL8")
+genes.to.label = c("TTN", "BAG3", "MYH7", "MYBPC3", "TNNT2", "TNNI3")
+p1 <- ggplot(avg.Cardiomyocytes, aes(control, cardiomyopathy)) + geom_point() + ggtitle("cardiomyocytes")
+p1 <- LabelPoints(plot = p1, points = genes.to.label, repel = TRUE)
+p2 <- ggplot(avg.ICCs, aes(control, cardiomyopathy)) + geom_point() + ggtitle("ICCs")
+p2 <- LabelPoints(plot = p2, points = genes.to.label, repel = TRUE)
+p1 + p2
+```
+
+
+
+As you can see, many of the same genes are upregulated in both of these cell types and likely represent a conserved pathway.
+
+Because we are confident in having identified common cell types across condition, we can ask what genes change in different conditions for cells of the same type. First, we create a column in the meta.data slot to hold both the cell type and stimulation information and switch the current ident to that column. Then we use FindMarkers() to find the genes that are different between cardiomyopathy and control cardiomyocyte cells. 
+
+```{r, echo = TRUE}
+immune.combined$celltype.cardiomyopathy <- paste(Idents(immune.combined), immune.combined$grouping_var1, sep = "_")
+immune.combined$celltype <- Idents(immune.combined)
+Idents(immune.combined) <- "celltype.cardiomyopathy"
+trt_control.markers <- FindMarkers(immune.combined, ident.1 = "Cardiomyocyte_cardiomyopathy", ident.2 = "Cardiomyocyte_control", verbose = FALSE)
+head(trt_control.markers, n = 15)
+
+SaveObject(trt_control.markers, "trt_control.DGE")
+
+```
+
+
+Another useful way to visualize these changes in gene expression is with the split.by option to the FeaturePlot() or VlnPlot() function. This will display FeaturePlots of the list of given genes, split by a grouping variable (stimulation condition here). 
+
+```{r, echo = TRUE}
+FeaturePlot(immune.combined, features = genes.to.label, split.by = "grouping_var1", max.cutoff = 3,
+    cols = c("grey", "red"))
+    
+```
+
+
+
+

@@ -4,7 +4,7 @@ library(scales)
 library(ggstance)
 library(dplyr)
 
-fig_path <- ("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots")
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots")
 
 # Your data
 df <- read.table(text = "Cohort	SN_types	Variables	Overall	Female	Male	Age<35	Age≥35
@@ -115,7 +115,7 @@ color_palette <- brewer.pal(num_colors, "Set1")
 
 ###########################################################
 # Create the plot with facets on the left and right and with %
-ggplot(df_melted, aes(x = Variables, y = value, fill = factor(variable))) +
+P <- ggplot(df_melted, aes(x = Variables, y = value, fill = factor(variable))) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.2) +
   labs(x = "Variables", y = "Attributable Fraction (%)", fill = "Variables") +
   scale_fill_manual(values = color_palette) +
@@ -138,55 +138,11 @@ ggplot(df_melted, aes(x = Variables, y = value, fill = factor(variable))) +
             size = 3,
             angle = 90) 
 
-##########################################################
-# # Create the plot with facets on the left and right
-# ggplot(df_melted, aes(x = Variables, y = value, fill = factor(variable))) +
-#   geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
-#   labs(x = "Variables", y = "Attributable Fraction", fill = "Variables") +
-#   scale_fill_manual(values = color_palette) +
-#   theme_minimal() +
-#   theme(axis.text.x = element_text(angle = 45, hjust = 1),
-#         legend.position = "top",
-#         strip.text = element_text(size = 10),  # Adjust the size of facet text
-#         strip.background = element_blank(),    # Remove facet background color
-#         strip.placement = "outside",           # Place facet labels outside the plot
-#         panel.border = element_rect(color = "black", fill = NA, size = 1)  # Add border between facets
-#   ) +
-#   facet_grid(SN_types ~ Cohort, scales = "free_x", space = "free_x", switch = "x", ) +
-#   # facet_grid(.~ Cohort, scales = "free_x", space = "free_x", switch = "x", ) +
-#   scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, 20)) +
-#   guides(fill = guide_legend(nrow = 1)) +  # Limits the legend to one row
-#   geom_text(aes(label = round(value, 2)), 
-#             position = position_dodge(width = 0.8), 
-#             hjust = -0.1, 
-#             size = 3,
-#             angle = 90)  # Add numeric labels above each bar and rotate them vertically
+plotname <- gsub(" ","_", paste0("V17_plots_without_lifestyle", ".tiff"))
+ggsave(filename = plotname, plot = P, width = 10, height = 10, dpi = 600)
 
-
-# ##########################################################
-# # Create the plot with facets
-# ggplot(df_melted, aes(x = Variables, y = value, fill = factor(variable))) +
-#   geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
-#   labs(x = "Variables", y = "Attributable Fraction", fill = "Variables") +
-#   scale_fill_manual(values = color_palette) +
-#   theme_minimal() +
-#   theme(axis.text.x = element_text(angle = 45, hjust = 1),
-#         legend.position = "top",
-#         strip.text = element_text(size = 10),  # Adjust the size of facet text
-#         strip.background = element_blank(),    # Remove facet background color
-#         strip.placement = "outside",           # Place facet labels outside the plot
-#         panel.border = element_rect(color = "black", fill = NA, size = 1)  # Add border between facets
-#   ) +
-#   facet_grid(Cohort ~ SN_types, scales = "free_y", space = "free_y", switch = "y") +
-#   scale_y_continuous(limits = c(-0.2, 1), breaks = seq(-0.2, 1, 0.2)) +
-#   guides(fill = guide_legend(nrow = 1)) +  # Limits the legend to one row
-#   geom_text(aes(label = round(value, 2)),
-#             position = position_dodge(width = 0.8),
-#             hjust = -0.1,
-#             size = 3,
-#             angle = 90)
-
-
+##########################################################################
+## V17 without diet
 mydf <- read.table(text = "Lifestyles	Cohort	SN_types	Variables	Overall	Female	Male	Age<35	Age≥35
 All_4_lifestyles	SJLIFE	Any SN (303)	Radiation	0.436	0.427	0.448	0.346	0.456
 All_4_lifestyles	SJLIFE	Any SN (303)	Chemo	0.034	0.034	0.034	0.061	0.028

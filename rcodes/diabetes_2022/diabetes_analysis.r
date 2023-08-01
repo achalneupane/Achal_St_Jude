@@ -21,7 +21,6 @@ LOF.keep <- rbind.data.frame(non.splice.region, NO.splice.region)
 dim(LOF.keep)
 # 78266    25
 
-# remove any missense that is not coming from clinvar
 Predicted.vars.inVCF.Unique <-  rbind.data.frame(CLINVAR.unique, LOF.keep)
 
 FINAL <- {}
