@@ -79,7 +79,7 @@ ReadObject <- function(name){
 # Reading in data
 After reading in the data we'll perform basic filtering on our expression matrix to remove low quality cells and uninformative genes. The parameter "min_genes" will keep cells that have at least 300 genes, and similarly, "min_cells" will keep genes that are expressed in at least 5 cells. Note: Seurat version 4.1 includes a convenience function to read Parse data from the DGE folder. If we would like to use this function, please skip the code block below and see the section "Reading in data with Seurat >= 4.1"
 
-```{r, echo= TRUE}
+```{r, eval=FALSE, echo= TRUE}
 DGE_folder <- "Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/S_combined/all-well/DGE_filtered/"
 
 # split-pipe versions older than 1.1.0 used "DGE.mtx"
@@ -108,7 +108,7 @@ pbmc <- CreateSeuratObject(mat_t, min.features = 100, min.cells = 2, meta.data =
 
 When we create our Seurat object with the plate well numbers (column names in the expression matrix) from the experiment will automatically be assigned to the cell identity slot. In other words, the program assumes this how we want to initially classify our cells. In general, we would like to avoid this behavior so there isn't a bias towards a particular cell class when removing outliers.
 
-```{r, echo=TRUE}
+```{r, eval=FALSE, echo= TRUE}
 # Setting our initial cell class to a single type, this will changer after clustering. 
 pbmc@meta.data$orig.ident <- factor(rep("pbmc", nrow(pbmc@meta.data)))
 Idents(pbmc) <- pbmc@meta.data$orig.ident
@@ -123,7 +123,7 @@ In this step we'll perform cell quality control to prevent outlier cells from in
 
 Filtering outliers can be accomplished by generating a violin plot for each cell feature and manually selecting the threshold we wish to remove cells. We'll also add another important cell feature that shows the percentage of mitochondrial genes expressed in each cell. Cells with high mitochondrial gene percentages should be removed, as they are likely to have lost cytoplasmic RNA from lysis or may have increased apoptosis (Luecken and Theis 2019)
 
-```{r, echo=TRUE}
+```{r, eval=FALSE, echo= TRUE}
 pbmc[["percent.mt"]] <- PercentageFeatureSet(pbmc, pattern = "^MT-")
 plot <- VlnPlot(pbmc, pt.size = 0.10,
 features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
@@ -155,7 +155,7 @@ After removing unwanted cells from the dataset, the next step is to normalize th
 # QC 2. Identification of highly variable features
 We next calculate a subset of features that exhibit high cell-to-cell variation in the dataset (i.e, they are highly expressed in some cells, and lowly expressed in others). We and others have found that focusing on these genes in downstream analysis helps to highlight biological signal in single-cell datasets. Our procedure in Seurat3 is described in detail here, and improves on previous versions by directly modeling the mean-variance relationship inherent in single-cell data, and is implemented in the FindVariableFeatures function. By default, we return 2,000 features per dataset. These will be used in downstream analysis, like PCA.
 
-```{r, echo=TRUE}
+```{r, eval=FALSE, echo= TRUE}
 # split the dataset into a list of seurat objects by samples
 ifnb.list <- SplitObject(pbmc, split.by = "sample")
 
@@ -188,7 +188,7 @@ features <- SelectIntegrationFeatures(object.list = ifnb.list)
 ```
 
 
-```{r, echo=TRUE}
+```{r, eval=FALSE, echo= TRUE}
 immune.anchors <- FindIntegrationAnchors(object.list = ifnb.list, anchor.features = features)
 # this command creates an 'integrated' data assay
 immune.combined <- IntegrateData(anchorset = immune.anchors)
@@ -203,7 +203,7 @@ Now we can run a single integrated analysis on all cells!
   
 specify that we will perform downstream analysis on the corrected data note that the
 original unmodified data still resides in the 'RNA' assay
-```{r, echo = TRUE}
+```{r, eval=FALSE, echo= TRUE}
 DefaultAssay(immune.combined) <- "integrated"
 
 # Run the standard workflow for visualization and clustering
@@ -224,7 +224,7 @@ SaveFigure(p1,"dimplot_cluster", width = 12, height = 6, res = 300)
 ```
 
 To visualize the two conditions side-by-side, we can use the split.by argument to show each condition colored by cluster.
-```{r, echo=TRUE}
+```{r, eval=FALSE, echo= TRUE}
 p1 <- DimPlot(immune.combined, reduction = "umap", split.by = "grouping_var1")
 SaveFigure((p1),"dimplot_cluster_conditions_side_by_side", width = 12, height = 6, res = 300)
 ```
@@ -233,7 +233,7 @@ To identify canonical cell type marker genes that are conserved across condition
 
 
 We can explore these marker genes for each cluster and use them to annotate our clusters as specific cell types.
-```{r, echo=TRUE}
+```{r, eval=FALSE, echo= TRUE}
 # For performing differential expression after integration, we switch back to the original data
 DefaultAssay(immune.combined) <- "RNA"
 # loop over clusters
@@ -318,7 +318,7 @@ top.markers <- c("FBN2", "TTN", "ADGRL3", "PCDH9", "CLSPN", "NR2F1-AS1", "ANLN",
 
 We can explore these marker genes for each cluster and use them to annotate our clusters as specific cell types.
 
-```{r, echo = TRUE}
+```{r, eval=FALSE, echo= TRUE}
 DefaultAssay(immune.combined) <- "RNA"
 p1 <- FeaturePlot(immune.combined, features = top.markers, min.cutoff = "q9")
 
@@ -328,7 +328,7 @@ SaveFigure(p1,"dimplot_individual_markers", width = 12, height = 12, res = 300)
 
 
 
-```{r, echo = TRUE}
+```{r, eval=FALSE, echo= TRUE}
 immune.combined <- RenameIdents(immune.combined, `0` = "ICCs", `1` = "Cardiomyocyte", `2` = "Pericyte",
     `3` = "Neuro_endocrine", `4` = "Unknown_1", `5` = "Unknown_2", `6` = "Epithelial", `7` = "Enterocytes_Schwann_cell", `8` = "Gamma_delta_T_cells",
     `9` = "Neuronal", `10` = "Unknown_3", `11` = "Enterocytes_Schwann_cell", `12` = "Fibroblast", `13` = "Interneurons", `14` = "Fibroblast", 
@@ -340,7 +340,7 @@ SaveFigure(p1,"dimplot_annotated", width = 12, height = 12, res = 300)
 
 The DotPlot() function with the split.by parameter can be useful for viewing conserved cell type markers across conditions, showing both the expression level and the percentage of cells in a cluster expressing any given gene. Here we plot 2-3 strong marker genes for each of our 14 clusters.
 
-```{r, echo = TRUE}
+```{r, eval=FALSE, echo= TRUE}
 markers.to.plot <- unique(c(top.markers, "ADCY5", "TECRL", "CACNA1C", "SORBS2"))
 p1 <- DotPlot(immune.combined, features = markers.to.plot, cols = c("blue", "red"), dot.scale = 8, split.by = "grouping_var1") +
     RotatedAxis()
@@ -354,7 +354,7 @@ SaveFigure(p1,"dotplot_top_markers", width = 12, height = 12, res = 300)
 Identify differential expressed genes across conditions
 Now that we’ve aligned the stimulated and control cells, we can start to do comparative analyses and look at the differences induced by stimulation. One way to look broadly at these changes is to plot the average expression of both the stimulated and control cells and look for genes that are visual outliers on a scatter plot. Here, we take the average expression of both the stimulated and control Cardiomyocytes and ICCs populations and generate the scatter plots, highlighting genes that exhibit dramatic responses.
 
-```{r, echo = TRUE}
+```{r, eval=FALSE, echo= TRUE}
 library(ggplot2)
 library(cowplot)
 theme_set(theme_cowplot())
@@ -383,7 +383,7 @@ As you can see, many of the same genes are upregulated in both of these cell typ
 
 Because we are confident in having identified common cell types across condition, we can ask what genes change in different conditions for cells of the same type. First, we create a column in the meta.data slot to hold both the cell type and stimulation information and switch the current ident to that column. Then we use FindMarkers() to find the genes that are different between cardiomyopathy and control cardiomyocyte cells. 
 
-```{r, echo = TRUE}
+```{r, eval=FALSE, echo= TRUE}
 immune.combined$celltype.cardiomyopathy <- paste(Idents(immune.combined), immune.combined$grouping_var1, sep = "_")
 immune.combined$celltype <- Idents(immune.combined)
 Idents(immune.combined) <- "celltype.cardiomyopathy"
@@ -397,7 +397,7 @@ SaveObject(trt_control.markers, "trt_control.DGE")
 
 Another useful way to visualize these changes in gene expression is with the split.by option to the FeaturePlot() or VlnPlot() function. This will display FeaturePlots of the list of given genes, split by a grouping variable (stimulation condition here). 
 
-```{r, echo = TRUE}
+```{r, eval=FALSE, echo= TRUE}
 p1 <- FeaturePlot(immune.combined, features = genes.to.label, split.by = "grouping_var1", max.cutoff = 3,
     cols = c("grey", "red"))
 

@@ -1,5 +1,5 @@
 ---
-title: "scRNAseq_Hana_07_14_2023_seurat"
+title: "scRNAseq analysis with Seurat (Cardiomyopathy vs LVNC)"
 output: word_document
 date: "2023-07-14"
 ---
@@ -15,8 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 The cells here are from cardiac organoids made by mixing 15% endocardial cells and 85% cardiomyocytes. These organoids are then treated with factors to induce trabeculation. In our analysis so far, we have noticed that all group except for LVNC respond to this stimulation. 
 
 The samples are as below:
-S25: Control 
-GW64: Cardiomyopathy (LVNC: Left Ventricular Non-compaction Cardiomyopathy)
+GW64: LVNC (LVNC: Left Ventricular Non-compaction Cardiomyopathy)
 GW129: Cardiomyopathy (HCM: Hypertrophic Cardiomyopathy)
 GW168: Cardiomyopathy (DCM: Dilated Cardiomyopathy)
 
@@ -77,7 +76,7 @@ ReadObject <- function(name){
 ```
 
 # Reading in data
-After reading in the data we'll perform basic filtering on our expression matrix to remove low quality cells and uninformative genes. The parameter "min_genes" will keep cells that have at least 300 genes, and similarly, "min_cells" will keep genes that are expressed in at least 5 cells. Note: Seurat version 4.1 includes a convenience function to read Parse data from the DGE folder. If we would like to use this function, please skip the code block below and see the section "Reading in data with Seurat >= 4.1"
+After reading in the data we'll perform basic filtering on our expression matrix to remove low quality cells and uninformative genes. The parameter "min_genes" will keep cells that have at least 100 genes, and similarly, "min_cells" will keep genes that are expressed in at least 1 cells. Note: Seurat version 4.1 includes a convenience function to read Parse data from the DGE folder. If we would like to use this function, please skip the code block below and see the section "Reading in data with Seurat >= 4.1"
 
 ```{r, echo= TRUE}
 DGE_folder <- "Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/newvolume/analysis/S_combined/all-well/DGE_filtered/"
@@ -127,16 +126,16 @@ Filtering outliers can be accomplished by generating a violin plot for each cell
 pbmc[["percent.mt"]] <- PercentageFeatureSet(pbmc, pattern = "^MT-")
 plot <- VlnPlot(pbmc, pt.size = 0.10,
 features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-plot
-# SaveFigure(plot, "vln_QC", width = 12, height = 6)
+# plot
+SaveFigure(plot, "vln_QC", width = 12, height = 6)
 
 plot1 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "percent.mt")
-plot1
+# plot1
 plot2 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
-plot2
+# plot2
 
 # plot_grid(plot1, plot2)
-# SaveFigure((plot1 + plot2),"scatter_QC", width = 12, height = 6, res = 200)
+SaveFigure((plot1 + plot2),"scatter_QC", width = 12, height = 6, res = 200)
 ```
 
 Let's break down the conditions in the subset argument below:
@@ -215,18 +214,21 @@ immune.combined <- RunUMAP(immune.combined, reduction = "pca", dims = 1:30)
 immune.combined <- FindNeighbors(immune.combined, reduction = "pca", dims = 1:30)
 immune.combined <- FindClusters(immune.combined, resolution = 0.5)
 
-# SaveObject(immune.combined, "seurat_obj_post_integration_postCluster")
-# immune.combined <- ReadObject("seurat_obj_post_integration_postCluster")
+# SaveObject(immune.combined, "seurat_obj_post_integration_postCluster_LVNC")
+# immune.combined <- ReadObject("seurat_obj_post_integration_postCluster_LVNC")
 
 # Visualization
 p1 <- DimPlot(immune.combined, reduction = "umap", group.by = "grouping_var1")
 p2 <- DimPlot(immune.combined, reduction = "umap", label = TRUE, repel = TRUE)
-p1 + p2
+# p1 + p2
+SaveFigure((p1 + p2),"dimplot_cluster", width = 12, height = 6, res = 300)
 ```
 
 To visualize the two conditions side-by-side, we can use the split.by argument to show each condition colored by cluster.
 ```{r, echo=TRUE}
 DimPlot(immune.combined, reduction = "umap", split.by = "grouping_var1")
+p1 <- DimPlot(immune.combined, reduction = "umap", split.by = "grouping_var1")
+SaveFigure(p1,"dimplot_cluster_conditions_side_by_side", width = 12, height = 6, res = 300)
 ```
 # Identify conserved cell type markers
 To identify canonical cell type marker genes that are conserved across conditions, we provide the FindConservedMarkers() function. This function performs differential gene expression testing for each dataset/group and combines the p-values using meta-analysis methods from the MetaDE R package
@@ -270,7 +272,6 @@ lapply(top.markers.df, head, 4)
 # Warning: control has fewer than 3 cells in Identity: 13. Skipping controlWarning: Only a single group was tested[1] "Doing identity: 14"
 # [1] "Doing identity: 15"
 # Warning: Identity: 15 not present in group control. Skipping controlWarning: Only a single group was tested
-
 # SaveObject(top.markers, "seurat_obj_top_markers")
 # SaveObject(top.markers.df, "seurat_obj_top_markers_dataframe_list")
 
