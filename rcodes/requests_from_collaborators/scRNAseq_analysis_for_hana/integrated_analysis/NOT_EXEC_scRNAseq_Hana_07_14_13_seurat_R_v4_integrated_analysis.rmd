@@ -404,8 +404,9 @@ Idents(immune.combined) <- "celltype.cardiomyopathy"
 trt_control.markers <- FindMarkers(immune.combined, ident.1 = "Cardiomyocyte_cardiomyopathy", ident.2 = "Cardiomyocyte_control", verbose = FALSE)
 head(trt_control.markers, n = 15)
 
-SaveObject(trt_control.markers, "trt_control.DGE")
-
+# SaveObject(trt_control.markers, "trt_control.DGE")
+# ReadObject("trt_control.DGE")
+write.table(trt_control.markers, "cardiomyopathy_Vs_control_DGE_in_cardiomyocyte_cluster.txt", col.names = T, row.names = T, quote = F)
 ```
 
 
