@@ -196,10 +196,10 @@ dat_lifestyle = dat_all
 dat_lifestyle$any_lifestyle_missing <- "No"
 
 dat_lifestyle$Current_smoker_yn = "No"
-dat_lifestyle$PhysicalActivity_yn = "Yes"
-dat_lifestyle$RiskyHeavyDrink_yn = "No"
-dat_lifestyle$HEALTHY_Diet_yn = "Yes"
-dat_lifestyle$Obese_yn = "No"
+# dat_lifestyle$PhysicalActivity_yn = "Yes"
+# dat_lifestyle$RiskyHeavyDrink_yn = "No"
+# dat_lifestyle$HEALTHY_Diet_yn = "Yes"
+# dat_lifestyle$Obese_yn = "No"
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
@@ -250,10 +250,10 @@ dat_tx.prs.lifestyle$Sarcoma_Machiela_PRS.tertile.category = "1st" ## **
 
 ## Nullify Lifestyle
 dat_tx.prs.lifestyle$Current_smoker_yn = "No"
-dat_tx.prs.lifestyle$PhysicalActivity_yn = "Yes"
-dat_tx.prs.lifestyle$RiskyHeavyDrink_yn = "No"
-dat_tx.prs.lifestyle$HEALTHY_Diet_yn = "Yes"
-dat_tx.prs.lifestyle$Obese_yn = "No"
+# dat_tx.prs.lifestyle$PhysicalActivity_yn = "Yes"
+# dat_tx.prs.lifestyle$RiskyHeavyDrink_yn = "No"
+# dat_tx.prs.lifestyle$HEALTHY_Diet_yn = "Yes"
+# dat_tx.prs.lifestyle$Obese_yn = "No"
 
 
 dat_all$pred_no_combined = predict(fit_all, newdata = dat_tx.prs.lifestyle, type = "response")

@@ -29,9 +29,9 @@ fit_all = glm(formula = event ~ Meningioma_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + 
                 maxsegrtdose.category + epitxn_dose_5.category + 
-                Obese_yn +
+                Current_smoker_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + Obese_yn + HEALTHY_Diet_yn +
                 EAS + AFR +
-                any_chemo_missing + any_rt_missing,
+                any_lifestyle_missing + any_chemo_missing + any_rt_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
 summary(fit_all)
@@ -230,10 +230,10 @@ dat_lifestyle = dat_all
 
 dat_lifestyle$any_lifestyle_missing <- "No"
 
-dat_lifestyle$Current_smoker_yn = "No"
-dat_lifestyle$PhysicalActivity_yn = "Yes"
-dat_lifestyle$RiskyHeavyDrink_yn = "No"
-dat_lifestyle$HEALTHY_Diet_yn = "Yes"
+# dat_lifestyle$Current_smoker_yn = "No"
+# dat_lifestyle$PhysicalActivity_yn = "Yes"
+# dat_lifestyle$RiskyHeavyDrink_yn = "No"
+# dat_lifestyle$HEALTHY_Diet_yn = "Yes"
 dat_lifestyle$Obese_yn = "No"
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
@@ -286,10 +286,10 @@ dat_tx.prs.lifestyle$epitxn_dose_5.category = "None" ## **
 dat_tx.prs.lifestyle$Meningioma_PRS.tertile.category = "1st" ## **
 
 ## Nullify Lifestyle
-dat_tx.prs.lifestyle$Current_smoker_yn = "No"
-dat_tx.prs.lifestyle$PhysicalActivity_yn = "Yes"
-dat_tx.prs.lifestyle$RiskyHeavyDrink_yn = "No"
-dat_tx.prs.lifestyle$HEALTHY_Diet_yn = "Yes"
+# dat_tx.prs.lifestyle$Current_smoker_yn = "No"
+# dat_tx.prs.lifestyle$PhysicalActivity_yn = "Yes"
+# dat_tx.prs.lifestyle$RiskyHeavyDrink_yn = "No"
+# dat_tx.prs.lifestyle$HEALTHY_Diet_yn = "Yes"
 dat_tx.prs.lifestyle$Obese_yn = "No"
 
 
