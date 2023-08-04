@@ -23,7 +23,7 @@ fit_all = glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
                 maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category +
                 Current_smoker_yn +
                 EAS + AFR + 
-                any_chemo_missing + any_rt_missing,
+                any_lifestyle_missing + any_chemo_missing + any_rt_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
 
