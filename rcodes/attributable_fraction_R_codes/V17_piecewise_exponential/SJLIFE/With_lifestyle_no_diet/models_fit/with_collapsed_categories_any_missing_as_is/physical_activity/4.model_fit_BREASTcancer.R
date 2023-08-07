@@ -226,7 +226,7 @@ af_by_prs.gteq.35
 ###############
 dat_lifestyle = dat_all
 
-dat_lifestyle$any_lifestyle_missing <- "No"
+# dat_lifestyle$any_lifestyle_missing <- "No"
 
 # dat_lifestyle$Current_smoker_yn = "No"
 dat_lifestyle$PhysicalActivity_yn = "Yes"
@@ -272,7 +272,7 @@ dat_tx.prs.lifestyle = dat_all
 dat_tx.prs.lifestyle$any_chemo_missing <- "No" ## **
 dat_tx.prs.lifestyle$any_rt_missing <- "No" ## **
 
-dat_tx.prs.lifestyle$any_lifestyle_missing <- "No"
+# dat_tx.prs.lifestyle$any_lifestyle_missing <- "No"
 
 ## Nullify Treatment
 dat_tx.prs.lifestyle$maxchestrtdose.category =
