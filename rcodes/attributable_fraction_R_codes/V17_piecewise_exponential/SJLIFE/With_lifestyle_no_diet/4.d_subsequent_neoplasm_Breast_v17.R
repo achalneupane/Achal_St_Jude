@@ -1,5 +1,7 @@
 # Following Qi's email on 05/03/2023 (subject: [Encrypt] CCSS help). Running Piecewise-exponential regression. **
-rm(list=ls())
+obj_keep <- c("miss_Any_SN", "miss_SMN", "miss_NMSC", "miss_BREAST", "miss_THYROID", "miss_MENINGIOMA", "miss_SARCOMA")
+rm(list = setdiff(ls(), obj_keep))
+# rm(list=ls())
 #########################
 ## Load Phenotype data ##
 #########################
@@ -195,6 +197,14 @@ PHENO.ANY_SN$any_rt_missing  <- factor(ifelse(PHENO.ANY_SN$any_rt_missing == FAL
 ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
 
+##############################
+## Get missing combinations ##
+##############################
+source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/get_missing_combination_V17.R")
+# Columns to check
+columns_to_check <- c("PhysicalActivity_yn", "Current_smoker_yn", "RiskyHeavyDrink_yn", "Obese_yn")
+# columns_to_check <- c("maxsegrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category", "epitxn_dose_5.category")
+miss_BREAST <- get_missing_combinations(PHENO.ANY_SN, columns_to_check)
 
 ############################################################
 ## Drop Unknown level from the lifestyle factor variables ##

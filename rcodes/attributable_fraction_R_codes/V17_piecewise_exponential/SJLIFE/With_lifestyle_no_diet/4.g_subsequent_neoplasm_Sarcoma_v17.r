@@ -1,5 +1,7 @@
 # Following Qi's email on 05/03/2023 (subject: [Encrypt] CCSS help). Running Piecewise-exponential regression. **
-rm(list=ls())
+obj_keep <- c("miss_Any_SN", "miss_SMN", "miss_NMSC", "miss_BREAST", "miss_THYROID", "miss_MENINGIOMA", "miss_SARCOMA")
+rm(list = setdiff(ls(), obj_keep))
+# rm(list=ls())
 #########################
 ## Load Phenotype data ##
 #########################
@@ -192,6 +194,26 @@ PHENO.ANY_SN$any_chemo_missing  <- factor(ifelse(PHENO.ANY_SN$any_chemo_missing 
 ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
 
+##############################
+## Get missing combinations ##
+##############################
+source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/get_missing_combination_V17.R")
+# Columns to check
+columns_to_check <- c("PhysicalActivity_yn", "Current_smoker_yn", "RiskyHeavyDrink_yn", "Obese_yn")
+# columns_to_check <- c("maxsegrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category", "epitxn_dose_5.category")
+miss_SARCOMA <- get_missing_combinations(PHENO.ANY_SN, columns_to_check)
+
+missing_combination <- cbind.data.frame(ANY_SN=miss_Any_SN, SMN = miss_SMN, NMSC = miss_NMSC, Breast_cancer = miss_BREAST, Thyroid_cancer = miss_THYROID, Meningioma = miss_MENINGIOMA, Sarcoma = miss_SARCOMA)
+# Separate by CA and CO groups
+ca_group <- missing_combination[c("atleast_1_missing_CA", "atleast_2_missing_CA", "atleast_3_missing_CA", "all_missing_CA"), ]
+co_group <- missing_combination[c("atleast_1_missing_CO", "atleast_2_missing_CO", "atleast_3_missing_CO", "all_missing_CO"), ]
+
+# Remove "_CA" and "_CO" extensions from row names
+row.names(ca_group) <- sub("_CA$", "", row.names(ca_group))
+row.names(co_group) <- sub("_CO$", "", row.names(co_group))
+
+View(t(ca_group))
+View(t(co_group))
 
 ############################################################
 ## Drop Unknown level from the lifestyle factor variables ##
