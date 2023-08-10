@@ -36,3 +36,64 @@ get_missing_combinations <- function(df, cols){
 # get_missing_combinations(df)
 
 
+## Yutaka on 08/10/2023: Could you breakdown the "any 1 missing" to each item missing so that I can see what variables are missing more
+library(dplyr)
+
+calculate_missing_counts <- function(data) {
+  colnames(data)[grepl("ANY_SNs|SMNs|NMSCs|BREASTcancer|THYROIDcancer|MENINGIOMA|SARCOMA", colnames(data))] <- "CACO"
+  result <- data %>%
+    group_by(CACO) %>%
+    summarize(
+      Total_CA = sum(CACO == "1"),
+      Total_CO = sum(CACO == "0"),
+      
+      Current_smoker_missing_CA = sum(Current_smoker_yn == "Unknown" & CACO == "1"),
+      RiskyHeavyDrink_missing_CA = sum(RiskyHeavyDrink_yn == "Unknown" & CACO == "1"),
+      PhysicalActivity_missing_CA = sum(PhysicalActivity_yn == "Unknown" & CACO == "1"),
+      Obese_missing_CA = sum(Obese_yn == "Unknown" & CACO == "1"),
+      
+      Current_smoker_missing_CO = sum(Current_smoker_yn == "Unknown" & CACO == "0"),
+      RiskyHeavyDrink_missing_CO = sum(RiskyHeavyDrink_yn == "Unknown" & CACO == "0"),
+      PhysicalActivity_missing_CO = sum(PhysicalActivity_yn == "Unknown" & CACO == "0"),
+      Obese_missing_CO = sum(Obese_yn == "Unknown" & CACO == "0")
+    )
+  
+  return(result)
+}
+
+# # Call the function with your dataframe
+# missing_counts <- calculate_missing_counts(df)
+# 
+# # Print the result
+# print(missing_counts)
+
+
+
+library(dplyr)
+
+calculate_missing_percentages <- function(data) {
+  colnames(data)[grepl("ANY_SNs|SMNs|NMSCs|BREASTcancer|THYROIDcancer|MENINGIOMA|SARCOMA", colnames(data))] <- "CACO"
+  result <- data %>%
+    group_by(CACO) %>%
+    summarize(
+      Total_CA = sum(CACO == "1"),
+      Total_CO = sum(CACO == "0"),
+      PhysicalActivity_missing_CA = (sum(PhysicalActivity_yn == "Unknown" & CACO == "1") / Total_CA) * 100,
+      PhysicalActivity_missing_CO = (sum(PhysicalActivity_yn == "Unknown" & CACO == "0") / Total_CO) * 100,
+      Current_smoker_missing_CA = (sum(Current_smoker_yn == "Unknown" & CACO == "1") / Total_CA) * 100,
+      Current_smoker_missing_CO = (sum(Current_smoker_yn == "Unknown" & CACO == "0") / Total_CO) * 100,
+      RiskyHeavyDrink_missing_CA = (sum(RiskyHeavyDrink_yn == "Unknown" & CACO == "1") / Total_CA) * 100,
+      RiskyHeavyDrink_missing_CO = (sum(RiskyHeavyDrink_yn == "Unknown" & CACO == "0") / Total_CO) * 100,
+      Obese_missing_CA = (sum(Obese_yn == "Unknown" & CACO == "1") / Total_CA) * 100,
+      Obese_missing_CO = (sum(Obese_yn == "Unknown" & CACO == "0") / Total_CO) * 100
+    )
+  
+  return(result)
+}
+
+# # Call the function with your dataframe
+# missing_percentages <- calculate_missing_percentages(df)
+# 
+# # Print the result
+# print(missing_percentages)
+

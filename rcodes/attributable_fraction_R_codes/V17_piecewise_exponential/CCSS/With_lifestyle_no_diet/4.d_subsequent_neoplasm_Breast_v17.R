@@ -200,6 +200,10 @@ columns_to_check <- c("PhysicalActivity_yn", "Current_smoker_yn", "RiskyHeavyDri
 # columns_to_check <- c("maxsegrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category", "epitxn_dose_5.category")
 miss_BREAST <- get_missing_combinations(PHENO.ANY_SN, columns_to_check)
 
+
+miss_BREAST <- calculate_missing_counts(PHENO.ANY_SN)
+## Yutaka on 08/10/2023: Could you breakdown the "any 1 missing" to each item missing so that I can see what variables are missing more
+miss_BREAST <- calculate_missing_percentages(PHENO.ANY_SN)
 ############################################################
 ## Drop Unknown level from the lifestyle factor variables ##
 ############################################################

@@ -218,8 +218,17 @@ co_group <- missing_combination[c("atleast_1_missing_CO", "atleast_2_missing_CO"
 row.names(ca_group) <- sub("_CA$", "", row.names(ca_group))
 row.names(co_group) <- sub("_CO$", "", row.names(co_group))
 
-View(t(ca_group))
-View(t(co_group))
+# View(t(ca_group))
+# View(t(co_group))
+
+
+
+miss_SARCOMA <- calculate_missing_counts(PHENO.ANY_SN)
+## Yutaka on 08/10/2023: Could you breakdown the "any 1 missing" to each item missing so that I can see what variables are missing more
+miss_SARCOMA <- calculate_missing_percentages(PHENO.ANY_SN)
+missing_combination <- rbind.data.frame(ANY_SN=miss_Any_SN, SMN = miss_SMN, NMSC = miss_NMSC, Breast_cancer = miss_BREAST, Thyroid_cancer = miss_THYROID, Meningioma = miss_MENINGIOMA, Sarcoma = miss_SARCOMA)
+
+
 ############################################################
 ## Drop Unknown level from the lifestyle factor variables ##
 ############################################################
