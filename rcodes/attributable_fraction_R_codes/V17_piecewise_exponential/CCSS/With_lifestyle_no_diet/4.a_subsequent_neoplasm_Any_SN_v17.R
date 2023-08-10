@@ -184,6 +184,14 @@ ethnicity.admixture$INDIVIDUAL <- sapply(strsplit(ethnicity.admixture$INDIVIDUAL
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$ccssid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
 
 
+## Get missing combinations
+source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/get_missing_combination.R")
+get_missing_combinations(PHENO.ANY_SN)
+
+table(PHENO.ANY_SN$RiskyHeavyDrink_yn)
+
+
+
 ############################################################
 ## Drop Unknown level from the lifestyle factor variables ##
 ############################################################
@@ -262,6 +270,8 @@ cases_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[P
 # Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for controls
 control_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$ANY_SNs == 0],
                        Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$ANY_SNs == 0])
+
+
 
 
 ## **
