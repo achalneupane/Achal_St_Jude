@@ -120,6 +120,34 @@ ALL.LIFESTYLE <- ALL.LIFESTYLE[!(ALL.LIFESTYLE$Current_smoker_yn == "Unknown" &
 dim(ALL.LIFESTYLE)
 # [1] 21115    12
 
+
+
+# Add lifestyle to cases
+CA <- PHENO.ANY_SN[PHENO.ANY_SN$ANY_SNs == 1,]
+
+
+
+test.CA <- CA[grepl("1000091|1000111|1000163", CA$ccssid),]
+test.LIFESTYLE <- ALL.LIFESTYLE[grepl("1000091|1000111|1000163", ALL.LIFESTYLE$ccssid),]
+
+
+library(dplyr)
+
+# Merge dataframes based on ccssid
+merged_df <- merge(CA, ALL.LIFESTYLE, by = "ccssid")
+
+# Filter rows where ALL.LIFESTYLE age is smaller or equal to AGE.ANY_SN in CA
+filtered_lifestyle <- merged_df %>%
+  filter(age <= AGE.ANY_SN) %>%
+  group_by(ccssid) %>%
+  slice_min(order_by = age) %>%
+  ungroup()
+
+# Print the first few rows of the filtered lifestyle dataframe
+head(filtered_lifestyle)
+
+
+
 PHENO.ANY_SN <- PHENO.ANY_SN[PHENO.ANY_SN$ccssid %in% ALL.LIFESTYLE$ccssid,]
 # Survey age is smaller than age at diagnosis
 ALL.LIFESTYLE <- ALL.LIFESTYLE[!ALL.LIFESTYLE$age > PHENO.ANY_SN$AGE.ANY_SN,]
