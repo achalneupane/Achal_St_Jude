@@ -155,3 +155,20 @@ cd  /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/gwa
 cut -d' ' -f1,2 pheno/sjlife_afr_dox_only_pcs.pheno > haplotype/AFRsamples
 plink --vcf ../../../../Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr16.PASS.decomposed.vcf.gz --make-bed --keep EURsamples --extract significant --out haplotype_input_eur
 plink --vcf ../../../../Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr16.PASS.decomposed.vcf.gz --make-bed --keep AFRsamples --extract significant --out haplotype_input_afr
+
+
+
+
+
+
+
+
+
+
+
+# Haplotype
+plink --bfile haplotype_input_afr --keep-allele-order --recodeA --out haplotype_input_afr_phase_raw
+plink --bfile haplotype_input_eur --keep-allele-order --recodeA --out haplotype_input_afr_phase_eur
+
+
+PHASE haplotype_input_edited_0.2.txt haplotype_phase_0.2.out

@@ -1,5 +1,6 @@
 # setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3") # (old analysis)
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/haplotype_analysis_v2/") # Version 2
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/haplotype") # kateryna
 ## ped <- read.table("haplotype_input.ped")
 ## map <- read.table("haplotype_input.map")
 # raw <- read.table("haplotype_input.raw", header = T) # r2 0.8
