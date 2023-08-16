@@ -16,7 +16,7 @@ plink --bfile ttn_significant_ld --extract plink.prune.in --keep-allele-order --
 ## Run convert_raw_to_phasing_v2.R script; then run PHASE; 
 # PHASE haplotype_input_edited.txt haplotype_phase.out
 # PHASE haplotype_input_edited_0.2.txt haplotype_phase_0.2.out
-PHASE haplotype_input_edited_0.2.txt haplotype_phase_0.2.out
+PHASE haplotype_input_edited_eur.txt haplotype_input_edited_eur.txt.out
 
 # then run extract_haplotypes.py; Then run association_analysis_with_haplotypes_v2.R
 

@@ -40,7 +40,7 @@ awk '/^chr2/ && $2 >= 178525989 && $2 <= 178807423' >> ${GENE}
 ##############################################
 ## Extract these nine genes from plink data ##
 ##############################################
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_exp_combined
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined
 module load plink/1.90b
 ## BAG3
 CHR=10
