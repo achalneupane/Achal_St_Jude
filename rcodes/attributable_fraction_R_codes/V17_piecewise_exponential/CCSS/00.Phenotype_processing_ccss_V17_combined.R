@@ -84,10 +84,16 @@ names(BMI.PA.SMK.DRK) <- strsplit(names(BMI.PA.SMK.DRK), '\\.') |> lapply(rev) |
 
 cc <- reshape(BMI.PA.SMK.DRK, direction='l', idvar='ccssid', varying=sort(names(BMI.PA.SMK.DRK)[-1]))
 
-
-
-
 cc$age <- as.numeric(cc$age)
+cc <- subset(cc, age >= 18)
+
+table(is.na(cc$MET))
+table(is.na(cc$smk))
+table(is.na(cc$riskydrk))
+table(is.na(cc$bmi))
+
+## Keep only those present in ccss WGS
+cc <- cc[cc$ccssid %in% ccss_samples,]
 
 ######################
 ## recode lifestyle ##
@@ -97,28 +103,82 @@ bmi_iid_dob_18 = subset(cc, age >= 18)
 bmi_iid_dob_18 <- bmi_iid_dob_18[!is.na(bmi_iid_dob_18$bmi), ]
 bmi_iid_dob_18_sorted = bmi_iid_dob_18[order(bmi_iid_dob_18$ccssid, bmi_iid_dob_18$age, decreasing = FALSE),]
 bmi_iid_dob_18_uniq = bmi_iid_dob_18_sorted[!duplicated(bmi_iid_dob_18_sorted$ccssid),]
+bmi_iid_dob_18_uniq = bmi_iid_dob_18_uniq[,c("ccssid", "time", "age", "bmi")]
 
 ## MET
 MET_iid_dob_18 = subset(cc, age >= 18)
 MET_iid_dob_18 <- MET_iid_dob_18[!is.na(MET_iid_dob_18$MET), ]
 MET_iid_dob_18_sorted = MET_iid_dob_18[order(MET_iid_dob_18$ccssid, MET_iid_dob_18$age, decreasing = FALSE),]
 MET_iid_dob_18_uniq = MET_iid_dob_18_sorted[!duplicated(MET_iid_dob_18_sorted$ccssid),]
+MET_iid_dob_18_uniq = MET_iid_dob_18_uniq[,c("ccssid", "time", "age", "CDC")]
 
 ## smk
 smk_iid_dob_18 = subset(cc, age >= 18)
 smk_iid_dob_18 <- smk_iid_dob_18[!is.na(smk_iid_dob_18$smk), ]
 smk_iid_dob_18_sorted = smk_iid_dob_18[order(smk_iid_dob_18$ccssid, smk_iid_dob_18$age, decreasing = FALSE),]
 smk_iid_dob_18_uniq = smk_iid_dob_18_sorted[!duplicated(smk_iid_dob_18_sorted$ccssid),]
+smk_iid_dob_18_uniq = smk_iid_dob_18_uniq[,c("ccssid", "time", "age", "smk")]
 
 ## drinking
 drk_iid_dob_18 = subset(cc, age >= 18)
 drk_iid_dob_18 <- drk_iid_dob_18[!is.na(drk_iid_dob_18$riskydrk), ]
 drk_iid_dob_18_sorted = drk_iid_dob_18[order(drk_iid_dob_18$ccssid, drk_iid_dob_18$age, decreasing = FALSE),]
 drk_iid_dob_18_uniq = drk_iid_dob_18_sorted[!duplicated(drk_iid_dob_18_sorted$ccssid),]
+drk_iid_dob_18_uniq = drk_iid_dob_18_uniq[,c("ccssid", "time", "age", "riskydrk")]
 
-###########################
-## relabel age variables ##
-###########################
+merged_df <- Reduce(function(x, y) left_join(x, y, by = 'ccssid'), list(bmi_iid_dob_18_uniq, smk_iid_dob_18_uniq, drk_iid_dob_18_uniq, MET_iid_dob_18_uniq))
+
+test <- merged_df[grepl("age", colnames(merged_df))]
+colnames(test) <- c("age_bmi", "age_smk", "age_drk", "age_PA")
+
+count_same <- function(row) {
+  sum(row == row[1], na.rm = TRUE)
+}
+
+# Apply the function row-wise to the dataframe
+test$same_count <- apply(test, 1, count_same)
+table(test$same_count)
+
+table(merged_df$ccssid %in% ccss_samples)
+
+
+#############################
+## Add lifestyle variables ##
+#############################
+
+# Obesity
+CCSS_data$BMI <- as.numeric(bmi_iid_dob_18_uniq$bmi[match(CCSS_data$ccssid, bmi_iid_dob_18_uniq$ccssid)])
+CCSS_data$Obese_yn_agesurvey <- as.numeric(bmi_iid_dob_18_uniq$age[match(CCSS_data$ccssid, bmi_iid_dob_18_uniq$ccssid)])
+CCSS_data$Obese_yn <- factor(ifelse(CCSS_data$BMI < 30, "No", "Yes"))
+CCSS_data$Obese_yn <- factor(CCSS_data$Obese_yn, level = c("No", "Yes", "Unknown")) 
+CCSS_data$Obese_yn[is.na(CCSS_data$Obese_yn)] <- "Unknown";
+
+# Physical activity
+CCSS_data$CDC <- MET_iid_dob_18_uniq$CDC[match(CCSS_data$ccssid, MET_iid_dob_18_uniq$ccssid)]
+CCSS_data$PhysicalActivity_yn_agesurvey <- as.numeric(MET_iid_dob_18_uniq$age[match(CCSS_data$ccssid, MET_iid_dob_18_uniq$ccssid)])
+CCSS_data$PhysicalActivity_yn <- factor(CCSS_data$CDC)
+CCSS_data$PhysicalActivity_yn <- ifelse (CCSS_data$PhysicalActivity_yn == "Yes", "Yes", "No")
+CCSS_data$PhysicalActivity_yn[is.na(CCSS_data$PhysicalActivity_yn)] <- "Unknown"
+CCSS_data$PhysicalActivity_yn <- factor(CCSS_data$PhysicalActivity_yn, level = c("Yes", "No", "Unknown")) 
+
+# Smoker
+CCSS_data$SMK <- smk_iid_dob_18_uniq$smk[match(CCSS_data$ccssid, smk_iid_dob_18_uniq$ccssid)]
+CCSS_data$Current_smoker_yn_agesurvey <- as.numeric(smk_iid_dob_18_uniq$age[match(CCSS_data$ccssid, smk_iid_dob_18_uniq$ccssid)])
+CCSS_data$Current_smoker_yn <- factor(CCSS_data$SMK)
+CCSS_data$Current_smoker_yn <- factor(ifelse(CCSS_data$Current_smoker_yn != 3, "No", "Yes"))
+CCSS_data$Current_smoker_yn <- factor(CCSS_data$Current_smoker_yn, level = c("No", "Yes", "Unknown")) 
+CCSS_data$Current_smoker_yn[is.na(CCSS_data$Current_smoker_yn)] <- "Unknown"
+
+# drinker
+CCSS_data$DRK <- drk_iid_dob_18_uniq$riskydrk[match(CCSS_data$ccssid, smk_iid_dob_18_uniq$ccssid)]
+CCSS_data$RiskyHeavyDrink_yn_agesurvey <- as.numeric(drk_iid_dob_18_uniq$age[match(CCSS_data$ccssid, smk_iid_dob_18_uniq$ccssid)])
+CCSS_data$RiskyHeavyDrink_yn <- factor(ifelse(factor(CCSS_data$DRK) == "No", "No", "Yes"))
+CCSS_data$RiskyHeavyDrink_yn <- factor(CCSS_data$RiskyHeavyDrink_yn, level = c("No", "Yes", "Unknown")) 
+CCSS_data$RiskyHeavyDrink_yn[is.na(CCSS_data$RiskyHeavyDrink_yn)] <- "Unknown"
+
+#############################
+## Harmonize age variables ##
+#############################
 ## Use this variable CCSS_data_ANY_SN for ANY_SN
 CCSS_data$AGE.ANY_SN <- as.numeric(CCSS_data$a_candx)
 CCSS_data$agedx <- as.numeric(CCSS_data$a_dx)
@@ -147,7 +207,8 @@ CCSS_data$gradedt <- as.numeric(CCSS_data$a_candx)
 subneo <- CCSS_data
 PHENO.ANY_SN <- CCSS_data[c('ccssid', 'SEX', 'agedx', 'AGE_AT_DIAGNOSIS', 'agelstcontact', 
                            'chestrtgrp', 'neckrtgrp', 'abdomenrtgrp', 'abdomenrtgrp', 'brainrtgrp', 'pelvisrtgrp', 
-                           'chestmaxrtdose', 'neckmaxrtdose', 'pelvismaxrtdose', 'abdmaxrtdose', 'maxsegrtdose', 'anth_DED5', 'alk_CED5', 'epipdose5', 'pt_cisED5')]
+                           'chestmaxrtdose', 'neckmaxrtdose', 'pelvismaxrtdose', 'abdmaxrtdose', 'maxsegrtdose', 'anth_DED5', 'alk_CED5', 'epipdose5', 'pt_cisED5', 
+                           "Obese_yn_agesurvey", "Obese_yn", "PhysicalActivity_yn_agesurvey", "PhysicalActivity_yn", "Current_smoker_yn_agesurvey", "Current_smoker_yn", "RiskyHeavyDrink_yn_agesurvey", "RiskyHeavyDrink_yn")]
 PHENO.ANY_SN <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$ccssid),]
 
 
@@ -254,7 +315,8 @@ PHENO.ANY_SN <- PHENO.ANY_SN[c('ccssid', 'gender', 'agelstcontact', 'AGE_AT_DIAG
                                  "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", 
                                  'maxchestrtdose.category', 'maxneckrtdose.category', 'maxabdrtdose.category', 'maxsegrtdose.category', 'maxpelvisrtdose.category',
                                  'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category',
-                               'chestmaxrtdose', 'neckmaxrtdose', 'pelvismaxrtdose', 'abdmaxrtdose', 'maxsegrtdose', 'anth_DED5', 'alk_CED5', 'epipdose5', 'pt_cisED5')]
+                               'chestmaxrtdose', 'neckmaxrtdose', 'pelvismaxrtdose', 'abdmaxrtdose', 'maxsegrtdose', 'anth_DED5', 'alk_CED5', 'epipdose5', 'pt_cisED5',
+                               "Obese_yn_agesurvey", "Obese_yn", "PhysicalActivity_yn_agesurvey", "PhysicalActivity_yn", "Current_smoker_yn_agesurvey", "Current_smoker_yn", "RiskyHeavyDrink_yn_agesurvey", "RiskyHeavyDrink_yn")]
 ## Meningioma_from_variants_also_in_CCSS_org_prs.profile-----------------------------------------------
 Meningioma.exp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Meningioma_from_variants_also_in_CCSS_org_prs.profile", header = T)
 Meningioma.org <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/prs_out/Meningioma_prs.profile", header = T)
@@ -359,6 +421,40 @@ PHENO.ANY_SN <- add_therapy_tertiles(PHENO.ANY_SN)
 PHENO.ANY_SN <- add_PRS_to_PHENO(PHENO.ANY_SN)
 
 rm(list=ls()[!grepl(c("PHENO.ANY_SN|subneo"), ls())])
+
+
+PHENO.ANY_SN$maxsegrtdose.category <- as.character(PHENO.ANY_SN$maxsegrtdose.category)
+# None 0-18 18-30 >=30 Unknown -->>> None >0-<18 >=18-<30 >=30 Unknown
+PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "0-18"] <- ">0-<18"
+PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "18-30"] <- ">=18-<30"
+PHENO.ANY_SN$maxsegrtdose.category <- factor(PHENO.ANY_SN$maxsegrtdose.category, levels = c("None", ">0-<18", ">=18-<30", ">=30", "Unknown"))
+table(PHENO.ANY_SN$maxsegrtdose.category)
+
+PHENO.ANY_SN$maxneckrtdose.category <- as.character(PHENO.ANY_SN$maxneckrtdose.category)
+# None 0-11 11-20 20-30 >=30 Unknown -->>> None >0-<11 >=11-<20 >=20-<30 >=30 Unknown
+PHENO.ANY_SN$maxneckrtdose.category[PHENO.ANY_SN$maxneckrtdose.category == "0-11"] <- ">0-<11"
+PHENO.ANY_SN$maxneckrtdose.category[PHENO.ANY_SN$maxneckrtdose.category == "11-20"] <- ">=11-<20"
+PHENO.ANY_SN$maxneckrtdose.category[PHENO.ANY_SN$maxneckrtdose.category == "20-30"] <- ">=20-<30"
+PHENO.ANY_SN$maxneckrtdose.category <- factor(PHENO.ANY_SN$maxneckrtdose.category, levels = c("None", ">0-<11", ">=11-<20", ">=20-<30", ">=30", "Unknown"))
+table(PHENO.ANY_SN$maxneckrtdose.category)
+
+PHENO.ANY_SN$maxabdrtdose.category <- as.character(PHENO.ANY_SN$maxabdrtdose.category)
+#  None 0-30 >=30 Unknown -->>> None >0-<30 >=30 Unknown
+PHENO.ANY_SN$maxabdrtdose.category[PHENO.ANY_SN$maxabdrtdose.category == "0-30"] <- ">0-<30"
+PHENO.ANY_SN$maxabdrtdose.category <- factor(PHENO.ANY_SN$maxabdrtdose.category, levels = c("None", ">0-<30", ">=30", "Unknown"))
+table(PHENO.ANY_SN$maxabdrtdose.category)
+
+PHENO.ANY_SN$maxchestrtdose.category <- as.character(PHENO.ANY_SN$maxchestrtdose.category)
+#  None 0-20 >=20 Unknown -->>> None >0-<20 >=20 Unknown
+PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$maxchestrtdose.category == "0-20"] <- ">0-<20"
+PHENO.ANY_SN$maxchestrtdose.category <- factor(PHENO.ANY_SN$maxchestrtdose.category, levels = c("None", ">0-<20", ">=20", "Unknown"))
+table(PHENO.ANY_SN$maxchestrtdose.category)
+
+PHENO.ANY_SN$maxpelvisrtdose.category <- as.character(PHENO.ANY_SN$maxpelvisrtdose.category)
+#  None 0-20 >=20 Unknown -->>> None >0-<20 >=20 Unknown
+PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$maxpelvisrtdose.category == "0-20"] <- ">0-<20"
+PHENO.ANY_SN$maxpelvisrtdose.category <- factor(PHENO.ANY_SN$maxpelvisrtdose.category, levels = c("None", ">0-<20", ">=20", "Unknown"))
+table(PHENO.ANY_SN$maxpelvisrtdose.category)
 
 
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_Genetic_data_P_LP_v17.Rdata")
