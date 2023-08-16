@@ -74,7 +74,7 @@ if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 }
 
 dim(PHENO.ANY_SN)
-## 7876 51 ** END
+## 7894 51 ** END
 
 # Removing samples with SN within the 5 years of childhood cancer **
 sum(PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid)

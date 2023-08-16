@@ -97,6 +97,12 @@ ALL.LIFESTYLE <- subset(ALL.LIFESTYLE, age >= 18)
 # Keep only those that have CCSS WGS
 ALL.LIFESTYLE <- ALL.LIFESTYLE[ALL.LIFESTYLE$ccssid %in% ccss_samples,]
 
+dim(ALL.LIFESTYLE)
+# 21115     8
+count_same <- function(row) {
+  sum(row == row[1], na.rm = TRUE)
+}
+
 ######################
 ## recode lifestyle ##
 ######################

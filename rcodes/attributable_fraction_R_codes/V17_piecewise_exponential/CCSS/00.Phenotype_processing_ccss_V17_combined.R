@@ -36,6 +36,8 @@ colnames(BMI.PA.SMK.DRK) <- c("ccssid", "base.age", "fu1.age", "fu2.age", "fu3.a
                           "base.smk", "fu2.smk", "fu7.smk", "fu5.smk",
                           "base.riskydrk", "fu7.riskydrk", "fu5.riskydrk")
 
+## Keep only those present in ccss WGS
+BMI.PA.SMK.DRK <- BMI.PA.SMK.DRK[BMI.PA.SMK.DRK$ccssid %in% ccss_samples,]
 
 # Make columns uniform for all follow-ups by adding missing columns
 BMI.PA.SMK.DRK$base.MET <- NA
@@ -86,14 +88,13 @@ cc <- reshape(BMI.PA.SMK.DRK, direction='l', idvar='ccssid', varying=sort(names(
 
 cc$age <- as.numeric(cc$age)
 cc <- subset(cc, age >= 18)
+dim(cc)
 
 table(is.na(cc$MET))
 table(is.na(cc$smk))
 table(is.na(cc$riskydrk))
 table(is.na(cc$bmi))
 
-## Keep only those present in ccss WGS
-cc <- cc[cc$ccssid %in% ccss_samples,]
 
 ######################
 ## recode lifestyle ##
@@ -141,10 +142,15 @@ table(test$same_count)
 
 table(merged_df$ccssid %in% ccss_samples)
 
+test <- test[c("age_bmi", "age_smk", "age_drk")]
+test$same_count <- apply(test, 1, count_same)
+table(test$same_count)
 
 #############################
 ## Add lifestyle variables ##
 #############################
+
+
 
 # Obesity
 CCSS_data$BMI <- as.numeric(bmi_iid_dob_18_uniq$bmi[match(CCSS_data$ccssid, bmi_iid_dob_18_uniq$ccssid)])
@@ -170,11 +176,32 @@ CCSS_data$Current_smoker_yn <- factor(CCSS_data$Current_smoker_yn, level = c("No
 CCSS_data$Current_smoker_yn[is.na(CCSS_data$Current_smoker_yn)] <- "Unknown"
 
 # drinker
-CCSS_data$DRK <- drk_iid_dob_18_uniq$riskydrk[match(CCSS_data$ccssid, smk_iid_dob_18_uniq$ccssid)]
-CCSS_data$RiskyHeavyDrink_yn_agesurvey <- as.numeric(drk_iid_dob_18_uniq$age[match(CCSS_data$ccssid, smk_iid_dob_18_uniq$ccssid)])
+CCSS_data$DRK <- drk_iid_dob_18_uniq$riskydrk[match(CCSS_data$ccssid, drk_iid_dob_18_uniq$ccssid)]
+CCSS_data$RiskyHeavyDrink_yn_agesurvey <- as.numeric(drk_iid_dob_18_uniq$age[match(CCSS_data$ccssid, drk_iid_dob_18_uniq$ccssid)])
 CCSS_data$RiskyHeavyDrink_yn <- factor(ifelse(factor(CCSS_data$DRK) == "No", "No", "Yes"))
 CCSS_data$RiskyHeavyDrink_yn <- factor(CCSS_data$RiskyHeavyDrink_yn, level = c("No", "Yes", "Unknown")) 
 CCSS_data$RiskyHeavyDrink_yn[is.na(CCSS_data$RiskyHeavyDrink_yn)] <- "Unknown"
+
+
+
+test <- CCSS_data[grepl("agesurvey", colnames(CCSS_data))]
+# > colnames(test)
+# [1] "Obese_yn_agesurvey"            "PhysicalActivity_yn_agesurvey" "Current_smoker_yn_agesurvey"   "RiskyHeavyDrink_yn_agesurvey" 
+
+count_same <- function(row) {
+  sum(row == row[1], na.rm = TRUE)
+}
+
+# Apply the function row-wise to the dataframe
+test$same_count <- apply(test, 1, count_same)
+table(test$same_count)
+
+test <- CCSS_data[!duplicated(CCSS_data$ccssid),]
+test <- test[c("Obese_yn_agesurvey", "Current_smoker_yn_agesurvey", "RiskyHeavyDrink_yn_agesurvey")]
+
+test$same_count <- apply(test, 1, count_same)
+table(test$same_count)
+
 
 #############################
 ## Harmonize age variables ##
