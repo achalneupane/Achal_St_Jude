@@ -342,7 +342,7 @@ return(CCSS_data)
 ## PRS scores ##
 ################
 add_PRS_to_PHENO <-function(PHENO.ANY_SN){
-PHENO.ANY_SN <- PHENO.ANY_SN[c('ccssid', 'gender', 'agelstcontact', 'AGE_AT_DIAGNOSIS', 
+PHENO.ANY_SN <- PHENO.ANY_SN[c('ccssid', 'gender', "agedx", 'agelstcontact', 'AGE_AT_DIAGNOSIS', 
                                  "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", 
                                  'maxchestrtdose.category', 'maxneckrtdose.category', 'maxabdrtdose.category', 'maxsegrtdose.category', 'maxpelvisrtdose.category',
                                  'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category',
