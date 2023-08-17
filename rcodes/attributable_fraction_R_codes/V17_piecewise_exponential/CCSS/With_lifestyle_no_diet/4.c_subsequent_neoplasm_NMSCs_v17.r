@@ -17,9 +17,9 @@ library(stringr)
 library(lubridate)
 # benchmarkme::get_ram()
 
-## Edit lifestyle variables
-source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
-PHENO.ANY_SN <- edit_lifestyle.ccss(PHENO.ANY_SN)
+# ## Edit lifestyle variables
+# source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
+# PHENO.ANY_SN <- edit_lifestyle.ccss(PHENO.ANY_SN)
 
 
 ## Read NMSC data from Qi

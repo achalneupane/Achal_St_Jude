@@ -18,9 +18,9 @@ library(lubridate)
 # benchmarkme::get_ram()
 library(survival)
 
-## Edit lifestyle variables
-source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
-PHENO.ANY_SN <- edit_lifestyle.ccss(PHENO.ANY_SN)
+# ## Edit lifestyle variables
+# source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
+# PHENO.ANY_SN <- edit_lifestyle.ccss(PHENO.ANY_SN)
 
 #########################
 ## Keep malignant only ##
@@ -133,7 +133,7 @@ sum((PHENO.ANY_SN$Current_smoker_yn_agesurvey >= 18|
        PHENO.ANY_SN$PhysicalActivity_yn_agesurvey >= 18|
        PHENO.ANY_SN$RiskyHeavyDrink_yn_agesurvey >= 18|
        PHENO.ANY_SN$Obese_yn_agesurvey >= 18), na.rm = T)
-# 7780
+# 7803
 
 
 PHENO.ANY_SN <- PHENO.ANY_SN[which(PHENO.ANY_SN$Current_smoker_yn_agesurvey >= 18 |
@@ -154,7 +154,26 @@ cols <- c(
 library(matrixStats)
 PHENO.ANY_SN$survey_min <- rowMins(as.matrix(PHENO.ANY_SN[, cols]), na.rm = TRUE)
 
-test.1 <- PHENO.ANY_SN[c("ccssid", "survey_min", "Current_smoker_yn_agesurvey", "RiskyHeavyDrink_yn_agesurvey", "Obese_yn_agesurvey", "PhysicalActivity_yn_agesurvey","Current_smoker_yn", "RiskyHeavyDrink_yn", "Obese_yn", "PhysicalActivity_yn")]
+count_same <- function(row) {
+  sum(row == row[1], na.rm = TRUE)
+}
+
+
+test.1 <- PHENO.ANY_SN[, c("Current_smoker_yn_agesurvey", "RiskyHeavyDrink_yn_agesurvey", "Obese_yn_agesurvey", "PhysicalActivity_yn_agesurvey")]
+# Apply the function row-wise to the dataframe
+test.1$same_count <- apply(test.1, 1, count_same)
+table(test.1$same_count)
+# 0    1    2    3    4 
+# 12   16  429 7155  191 
+
+# test.1 <- PHENO.ANY_SN[c("ccssid", "survey_min", "Current_smoker_yn_agesurvey", "RiskyHeavyDrink_yn_agesurvey", "Obese_yn_agesurvey", "PhysicalActivity_yn_agesurvey","Current_smoker_yn", "RiskyHeavyDrink_yn", "Obese_yn", "PhysicalActivity_yn")]
+test.1 <- PHENO.ANY_SN[, c("Current_smoker_yn_agesurvey", "RiskyHeavyDrink_yn_agesurvey", "Obese_yn_agesurvey")]
+# Apply the function row-wise to the dataframe
+test.1$same_count <- apply(test.1, 1, count_same)
+table(test.1$same_count)
+# 0    1    2    3 
+# 12   72 1389 6330 ## most of the missingness comes from Physical activity
+
 
 # cc <- PHENO.ANY_SN[, c("SJLIFEID", cols, "survey_min")]
 PHENO.ANY_SN$Current_smoker_yn [which(PHENO.ANY_SN$Current_smoker_yn_agesurvey != PHENO.ANY_SN$survey_min)] <- "Unknown"
@@ -166,7 +185,7 @@ PHENO.ANY_SN$Obese_yn [which(PHENO.ANY_SN$Obese_yn_agesurvey != PHENO.ANY_SN$sur
 ## Remove SN cases if the diagnosis date is prior to the youngest adult survey date
 PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$survey_min > PHENO.ANY_SN$AGE.ANY_SN),]
 dim(PHENO.ANY_SN)
-# 7741   65
+# 7698   65
 ######################### ** END
 
 
@@ -177,7 +196,7 @@ PHENO.ANY_SN$any_lifestyle_missing  <- factor(ifelse(PHENO.ANY_SN$any_lifestyle_
 
 table(PHENO.ANY_SN$any_lifestyle_missing)
 # No  Yes 
-# 68 7620 
+# 191 7507
 ########################################
 ## Do the same for missing treatments ##
 ########################################
@@ -186,7 +205,7 @@ PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FAL
 
 table(PHENO.ANY_SN$any_tx_missing)
 # No  Yes 
-# 7054  634 
+# 7062  636
 
 PHENO.ANY_SN$any_chemo_missing <- apply(PHENO.ANY_SN[c("epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
 PHENO.ANY_SN$any_chemo_missing  <- factor(ifelse(PHENO.ANY_SN$any_chemo_missing == FALSE, "No", "Yes"))

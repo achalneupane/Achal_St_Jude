@@ -183,6 +183,10 @@ CCSS_data$RiskyHeavyDrink_yn <- factor(CCSS_data$RiskyHeavyDrink_yn, level = c("
 CCSS_data$RiskyHeavyDrink_yn[is.na(CCSS_data$RiskyHeavyDrink_yn)] <- "Unknown"
 
 
+# # remove those with all 4 lifestyle missing
+# CCSS_data <- CCSS_data[!(is.na(CCSS_data$Obese_yn_agesurvey) & is.na(CCSS_data$Current_smoker_yn_agesurvey) &
+#                            is.na(CCSS_data$RiskyHeavyDrink_yn_agesurvey) & is.na(CCSS_data$PhysicalActivity_yn_agesurvey)), ] ##$$
+
 
 test <- CCSS_data[grepl("agesurvey", colnames(CCSS_data))]
 # > colnames(test)

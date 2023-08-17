@@ -2,7 +2,8 @@
 obj_keep <- c("miss_Any_SN", "miss_SMN", "miss_NMSC", "miss_BREAST", "miss_THYROID", "miss_MENINGIOMA", "miss_SARCOMA")
 rm(list = setdiff(ls(), obj_keep))
 # rm(list=ls())
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_Genetic_data_P_LP_v17.Rdata")
+# load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_combined_Genetic_data_P_LP_v14.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_Genetic_data_P_LP_v17.Rdata") # V17b
 
 library(haven)
 library(benchmarkme)
@@ -16,9 +17,9 @@ library(stringr)
 library(lubridate)
 # benchmarkme::get_ram()
 
-## Edit lifestyle variables
-source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
-PHENO.ANY_SN <- edit_lifestyle.ccss(PHENO.ANY_SN)
+# ## Edit lifestyle variables
+# source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
+# PHENO.ANY_SN <- edit_lifestyle.ccss(PHENO.ANY_SN)
 
 #########################
 ## Subsequent neoplasm ##
