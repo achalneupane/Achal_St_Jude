@@ -43,39 +43,39 @@ plink --bfile sjlife_ccss_org_ccss_exp_samples --freq --keep-allele-order --out 
 
 ## 0 is male; 1 is female
 
-awk '$6 == 1 || NR == 1' pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno > pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_female.pheno
-awk '$6 == 0 || NR == 1' pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno > pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_male.pheno
+# awk '$6 == 1 || NR == 1' pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno > pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_female.pheno
+# awk '$6 == 0 || NR == 1' pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno > pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_male.pheno
 
 
 
-## Male
- plink \
- --allow-no-sex \
- --bfile sjlife_ccss_org_ccss_exp_samples \
- --maf 0.01 \
- --hwe 1e-06 \
- --logistic hide-covar \
- --ci 0.95 \
- --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_male.pheno \
- --pheno-name CMP \
- --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_male.pheno \
- --covar-name agedx,agelstcontact,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
- --out sjlife_ccss_org_ccss_exp_samples_results_male
+# ## Male
+#  plink \
+#  --allow-no-sex \
+#  --bfile sjlife_ccss_org_ccss_exp_samples \
+#  --maf 0.01 \
+#  --hwe 1e-06 \
+#  --logistic hide-covar \
+#  --ci 0.95 \
+#  --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_male.pheno \
+#  --pheno-name CMP \
+#  --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_male.pheno \
+#  --covar-name agedx,agelstcontact,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+#  --out sjlife_ccss_org_ccss_exp_samples_results_male
 
 
-## Female
- plink \
- --allow-no-sex \
- --bfile sjlife_ccss_org_ccss_exp_samples \
- --maf 0.01 \
- --hwe 1e-06 \
- --logistic hide-covar \
- --ci 0.95 \
- --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_female.pheno \
- --pheno-name CMP \
- --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_female.pheno \
- --covar-name agedx,agelstcontact,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
- --out sjlife_ccss_org_ccss_exp_samples_results_female
+# ## Female
+#  plink \
+#  --allow-no-sex \
+#  --bfile sjlife_ccss_org_ccss_exp_samples \
+#  --maf 0.01 \
+#  --hwe 1e-06 \
+#  --logistic hide-covar \
+#  --ci 0.95 \
+#  --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_female.pheno \
+#  --pheno-name CMP \
+#  --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_female.pheno \
+#  --covar-name agedx,agelstcontact,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+#  --out sjlife_ccss_org_ccss_exp_samples_results_female
 
 ## Run association analysis with ccss_org and ccss_exp
 plink --bfile ccss_org_to_concat --bmerge ccss_exp_to_concat --make-bed --out merged_ccss
@@ -94,3 +94,11 @@ plink --bfile ccss_org_to_concat --bmerge ccss_exp_to_concat --make-bed --out me
  --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
  --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
  --out sccss_org_ccss_exp_vars
+
+
+
+
+ ## Analysis of chr2_178562809_T_C and chr10:119670121:T:C carriers:
+ # Z:\ResearchHome\ClusterHome\aneupane\St_Jude\Achal_St_Jude\rcodes\TITN_BAG3\combined_cohorts\cardiomyopathy_gwas_echo\echo_dosage_and_gender_analysis\TTN_BAG3_carrier_heartRT_anthra\top_TTN_BAG3_SNPs_wrt_carrier_status_in_sjlife_ccss_exp_ccss_org.R
+plink --bfile sjlife_ccss_org_ccss_exp_samples --out sjlife_ccss_org_ccss_exp_chr2_178562809_T_C --recode A --snp chr2:178562809:T:C
+plink --bfile sjlife_ccss_org_ccss_exp_samples --out sjlife_ccss_org_ccss_exp_chr10_119670121_T_C --recode A --snp chr10:119670121:T:C
