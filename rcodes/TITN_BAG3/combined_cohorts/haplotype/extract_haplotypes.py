@@ -6,9 +6,8 @@ os.getcwd()
 ids_to_haplotypes = {}
 
 
-# with open("haplotype_phase.out", "r") as f: 
-# r2 < 0.2
-with open("haplotype_phase_0.2.out", "r") as f:
+# r2 > 0.8
+with open("haplotype_phase.out", "r") as f:
     extract = False
     current_id = ""
 
@@ -27,7 +26,7 @@ with open("haplotype_phase_0.2.out", "r") as f:
                 haplotype = haplotype_line.strip().split()[0:]
                 ids_to_haplotypes[current_id] = " ".join(haplotype)
 
-with open("haplotypes_ttn_r2_0.2.txt", "w") as f:
+with open("haplotypes_ttn_r2_0.8.txt", "w") as f:
     for id, haplotype in ids_to_haplotypes.items():
         f.write(f"{id}\t{haplotype}\n")
 

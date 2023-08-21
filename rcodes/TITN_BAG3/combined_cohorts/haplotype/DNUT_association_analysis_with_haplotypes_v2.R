@@ -1,80 +1,55 @@
-setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/") 
+# setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3") # (old)
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/haplotype_analysis_v2/") # (version_2)
 
 ###############################
 ## Association of haplotypes ##
 ###############################
 ## After extracting haplotypes with extract_haplotypes.py, now check the association of the haplotypes
-pheno <- read.table("pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno", header = T)
-haplotypes <- read.table("haplotypes_ttn_r2_0.8.txt", header = F) # r2 < 0.8
+pheno <- read.table("../pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno", header = T)
+# haplotypes <- read.table("haplotypes_ttn.txt", header = F) # r2 < 0.8
+haplotypes <- read.table("haplotypes_ttn_r2_0.2.txt", header = F) # r2 < 0.2
 # haplotypes$haplo <- gsub('\\(|\\)|\\[|\\]',"", apply(haplotypes[2:11], 1, function(x) paste(x, collapse = "")))
-haplotypes$haplo <- gsub('\\(|\\)|\\[|\\]',"", apply(haplotypes[2:10], 1, function(x) paste(x, collapse = "")))
+haplotypes$haplo <- gsub('\\(|\\)|\\[|\\]',"", apply(haplotypes[2:7], 1, function(x) paste(x, collapse = "")))
 # haplotypes$haplo <- apply(haplotypes[2:11], 1, function(x) paste(x, collapse = ""))
 length(table(haplotypes$haplo))
-# 28 
+# 34 # 0010000101 and 0000001101 haplotypes were not found
+
+pheno$haplotypes <- haplotypes$haplo[match(pheno$IID, haplotypes$V1)]
 
 
 freq <- read.table(text="index  haplotype     freq         SE
-         1   000000000    0.654829    0.000274
-         2   000000001    0.009935    0.000147
-         3   000000010    0.110620    0.000227
-         4   000000011    0.000003    0.000017
-         5   000000100    0.000107    0.000044
-         6   000000101    0.000696    0.000174
-         7   000000111    0.000173    0.000123
-         8   000001100    0.000006    0.000030
-         9   000001101    0.000075    0.000019
-        10   000001110    0.000154    0.000030
-        11   000010101    0.000148    0.000083
-        12   000011101    0.000447    0.000054
-        13   000100000    0.000022    0.000036
-        14   000100010    0.000002    0.000014
-        15   000111101    0.000689    0.000039
-        16   010000000    0.000159    0.000042
-        17   010000001    0.000012    0.000029
-        18   010000100    0.001993    0.000123
-        19   010000101    0.000112    0.000109
-        20   010010100    0.000972    0.000075
-        21   010010101    0.044120    0.000098
-        22   010011101    0.000068    0.000029
-        23   010100100    0.000075    0.000055
-        24   010110100    0.000078    0.000016
-        25   010110101    0.006944    0.000081
-        26   010110111    0.000011    0.000066
-        27   011110100    0.002223    0.000085
-        28   011110101    0.018898    0.000088
-        29   011110111    0.000002    0.000019
-        30   011111100    0.000003    0.000016
-        31   011111101    0.000157    0.000016
-        32   100000000    0.000119    0.000040
-        33   100000001    0.000018    0.000033
-        34   110000000    0.000004    0.000017
-        35   110000100    0.000013    0.000029
-        36   110000101    0.000006    0.000022
-        37   111000100    0.000038    0.000040
-        38   111010101    0.000042    0.000040
-        39   111011101    0.000081    0.000008
-        40   111100000    0.000238    0.000011
-        41   111100001    0.000002    0.000011
-        42   111101101    0.000005    0.000019
-        43   111111000    0.000002    0.000014
-        44   111111001    0.000157    0.000016
-        45   111111100    0.002293    0.000129
-        46   111111101    0.142923    0.000117
-        47   111111110    0.000284    0.000092
-        48   111111111    0.000038    0.000076", header = T, colClasses = c("numeric", "character", "numeric", "numeric"))
+         1      000000    0.654865    0.000270
+         2      000001    0.010008    0.000117
+         3      000010    0.110590    0.000239
+         4      000011    0.000001    0.000008
+         5      000100    0.000168    0.000075
+         6      000101    0.000485    0.000161
+         7      000110    0.000069    0.000073
+         8      000111    0.000279    0.000115
+         9      001101    0.001490    0.000084
+        10      010000    0.000158    0.000025
+        11      010001    0.000005    0.000019
+        12      010100    0.002179    0.000035
+        13      010101    0.000001    0.000008
+        14      011100    0.003316    0.000111
+        15      011101    0.070140    0.000122
+        16      011110    0.000001    0.000008
+        17      011111    0.000011    0.000054
+        18      100000    0.000090    0.000031
+        19      110000    0.000250    0.000030
+        20      110001    0.000001    0.000008
+        21      110101    0.000071    0.000027
+        22      111001    0.000159    0.000008
+        23      111100    0.002257    0.000145
+        24      111101    0.143082    0.000120
+        25      111110    0.000309    0.000093
+        26      111111    0.000014    0.000059", header = T, colClasses = c("numeric", "character", "numeric", "numeric"))
 
 dim(freq)
 
 freq$haplotype
 
-
-pheno$haplotypes <- haplotypes$haplo[match(pheno$IID, haplotypes$V1)]
-
-sum(unique(pheno$haplotypes) %in% freq$haplotype)
-## 28 
-
-freq <- freq[freq$haplotype %in% unique(haplotypes$haplo),]
-
+# sum(unique(pheno$haplotypes) %in% freq$haplotype)
 
 haplotypes <- unique(pheno$haplotypes)
 for (i in 1:length(haplotypes)){
@@ -124,7 +99,7 @@ for (i in 1:length(haplos)){
   
   wanted.vars.tmp <- c(wanted.haplo, wanted.freq, OR, P)
   wanted.vars <- rbind(wanted.vars, wanted.vars.tmp)
-  Sys.sleep(10)
+  # Sys.sleep(10)
 }
 
 # ## Only these two haplotypes were found significant:
