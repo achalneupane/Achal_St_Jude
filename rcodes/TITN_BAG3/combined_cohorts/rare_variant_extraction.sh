@@ -263,3 +263,7 @@ plink --bfile merged_plink_PLP --keep sjlife_ccss_exp_samples.txt --max-maf 0.01
 plink --bfile sjlife_ccss_exp_merged_maxmaf_0.01 --extract sjlife_ccss_exp_overlapping_SNPS_maf_lt_0.01_gnomad.txt --geno 0.01 --recodeA --out sjlife_ccss_exp_SNPS_maf_lt_0.01_gnomad_recodeA
 
 
+In ours 
+BAG3 (1), DSP (0), LMNA (1), MYH7 (0), SCN5A (0), TCAP (0), TNNC1 (0), TNNT2 (3), and TTN (15)
+In garcia
+BAG3 (0), DSP (2), LMNA (0), MYH7 (0), SCN5A (1), TCAP (1), TNNC1 (0), TNNT2 (0), and TTN (16)
