@@ -5,7 +5,7 @@
 # 4. Within each sample, if the minimum age event has has zero grade, then look for 0 or higher grades (grade 0, 2,3,4,5, etc). Once that done, among the extracted rows (within each sample), make sure all grade 0 has different ageevent; also make sure any grade 2, has ageevent greater than any grade 0 ageevent; any grade 3 has ageevent greater than any ageevent of grade 2 or lower grade; any grade 4 has ageevent greater than any ageevent of grade 3 or lower grades; any grade 5 has ageevent greater than any ageevent of grade 4 or lower grades; and so forth; Thus, make sure all grades have different ageevent. 
 # 5. Then output the dataframe with the extracted rows
 
-setwd("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/requests_from_collaborators/Yadav/Serum")
+setwd("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/")
 library(dplyr)
 
 
