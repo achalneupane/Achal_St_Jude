@@ -1,16 +1,11 @@
 ## Conditions::
 # 1. within each sample if all rows have grade 2 or higher, or if minimum ageevent has grade 2 or higher, skip this sample. Do not extract any rows from that sample.
+# 2. Withing each sample, remove rows where grades are smaller than the grades previously seen in the ordered rows.
 # 2. Then, within each tb_number, keep rows with max num_vials; then keep ALIVE over DEAD (something like this: filter(Survival_Status == "ALIVE" | all(Survival_Status == "DEAD")))
-# 3. Then, within each sample, if all grades are zero for all tb_number, keep rows with unique ageevent per sample and also with unique ageevent (making sure all controls are included). If, there are grades 2 or higher (including grade 0) in any tb_number, then continue with step number 4.
-# 4. Within each sample, if the minimum age event has has zero grade, then look for 0 or higher grades (grade 0, 2,3,4,5, etc). Once that done, among the extracted rows (within each sample), make sure all grade 0 has different ageevent; also make sure any grade 2, has ageevent greater than any grade 0 ageevent; any grade 3 has ageevent greater than any ageevent of grade 2 or lower grade; any grade 4 has ageevent greater than any ageevent of grade 3 or lower grades; any grade 5 has ageevent greater than any ageevent of grade 4 or lower grades; and so forth; Thus, make sure all grades have different ageevent. 
-# 5. Then output the dataframe with the extracted rows
 
 setwd("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/")
 library(dplyr)
-
-
-
-
+library(haven)
 
 ##############################
 # ## Count by SJLID samples
@@ -27,15 +22,12 @@ head(all.df)
 sum(is.na(all.df$tb_number))
 
 
-all.df$original_Sample_age <- all.df$Sample_age
-all.df$original_ageevent <- all.df$ageevent
-
 all.df$Sample_age <- as.numeric(all.df$Sample_age)
+all.df$ageevent <- as.numeric(as.character(all.df$ageevent))
 
-# Round age down to one decimal place, so easier to compare
-all.df$Sample_age <- floor(all.df$Sample_age * 10) / 10
-all.df$ageevent <- floor(all.df$ageevent * 10) / 10
 
+## read echo data
+echo <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/echo_machine.sas7bdat')
 
 ##################################################
 ## 1. First process df without ageevent missing ##
@@ -75,9 +67,10 @@ check_grades_transition.agevent.grade.0(df, 0, 5)
 check_grades_transition.agevent.grade.0(df, 0, 6)
 
 
-## Next, filter rows where ageevent is greater than sample age
-df <- df[!is.na(df$Sample_age) & df$ageevent >= df$Sample_age, ]
-df.3724 <- df
+## Next, filter rows where ageevent is greater than (or within 1 week of) sample age
+# df <- df[!is.na(df$Sample_age) & df$ageevent >= df$Sample_age, ]
+df <- df[!is.na(df$Sample_age) & df$ageevent+7/365.25 >= df$Sample_age, ]
+df.3782 <- df
 
 ## Get counts in non-missing events
 check_grades_eq_or_higher_than(df, 2)
@@ -107,84 +100,43 @@ check_grades_transition.agevent.grade.0(df, 0, 5)
 check_grades_transition.agevent.grade.0(df, 0, 6)
 
 ## Processing...
-
-# Condition 1: Skip samples with grade 2 or higher or minimum ageevent with grade 2 or higher
+# Condition 1: Skip samples with grade 2 or higher or minimum ageevent with grade 2 or higher. If there are two ageevent that are miniumum value, we still apply this filter (but this did not make any difference)
 step1 <- df %>%
   group_by(sjlid) %>%
   filter(
-    !(grade[which.min(ageevent)] != 0)
+    !(grade[which(ageevent == min(ageevent))[1]] != 0)
   ) %>%
   ungroup()
 
 dim(step1)
 
-# Condition 2: Keep rows with max num_vials and Survival_Status
-step2 <- step1 %>%
+
+# Condition 2: Proceed to remove rows where grades are smaller than the grades previously seen in the ordered rows:
+step2 <- step1 %>% 
+  arrange(sjlid, ageevent) %>% 
+  group_by(sjlid) %>% 
+  filter(cummax(grade) == grade) %>% 
+  ungroup()
+
+dim(step2)
+
+# Condition 3: Keep rows with max num_vials and Survival_Status
+step3 <- step2 %>%
   group_by(tb_number) %>%
   filter(num_vials == max(num_vials)) %>%
   filter(Survival_Status == "ALIVE" | all(Survival_Status == "DEAD"))
 
-dim(step2)
-
-# Step 3: Keep rows with unique ageevent if all grades are zero
-# If there are grades 2 or higher (including grade 0), continue to Step 4
-step3 <- step2 %>%
-  group_by(sjlid, ageevent) %>%
-  mutate(
-    all_zero = all(grade == 0),
-    any_non_zero = any(grade != 0)
-  ) %>%
-  filter(!all_zero | (all_zero & !any_non_zero & row_number() == 1)) %>%
-  ungroup() %>%
-  select(-all_zero, -any_non_zero)
-
 dim(step3)
+# removed_rows <- anti_join(step2, step3)
 
-## remove duplicate events if all grades are zero
-step3 <- step3 %>%
-  group_by(sjlid) %>%
-  mutate(
-    has_non_zero = any(grade != 0)
-  ) %>%
-  filter(!has_non_zero | grade == 0 | !duplicated(ageevent)) %>%
-  ungroup() %>%
-  select(-has_non_zero) %>%
-  group_by(sjlid, ageevent) %>%
-  distinct(.keep_all = TRUE) %>%
-  ungroup()
-
-dim(step3)
-
-# Step 4: Continue with further processing
-transformed_df <- step3 %>%
-  group_by(sjlid) %>%
-  mutate(
-    has_grade_2_or_higher = any(grade >= 2),
-    min_ageevent_zero = min(ageevent[grade == 0])
-  ) %>%
-  filter(
-    !has_grade_2_or_higher |
-      (grade > 0 & ageevent > min_ageevent_zero) |
-      (grade == 0 & ageevent == min_ageevent_zero)
-  ) %>%
-  ungroup() %>%
-  select(-has_grade_2_or_higher, -min_ageevent_zero) %>%
-  arrange(sjlid, tb_number, grade, ageevent) %>%
-  group_by(sjlid, tb_number, grade) %>%
-  mutate(
-    rank_age = dense_rank(ageevent)
-  ) %>%
-  ungroup()
+# # # Remove rows with duplicate grade, ageevent, sample_age combinations (it only removes 23 rows; need to discuss with Yadav!)
+# step3 <- step3 %>%
+#   distinct(sjlid, grade, ageevent, Sample_age, .keep_all = TRUE)
 
 dim(transformed_df)
+# removed_rows <- anti_join(step2, step3)
 
-
-# Remove rows with duplicate grade and ageevent combinations
-transformed_df <- transformed_df %>%
-  distinct(sjlid, grade, ageevent, .keep_all = TRUE)
-
-dim(transformed_df)
-FINAL.1 <- transformed_df
+FINAL.1 <- step3
 
 
 # ## Get counts in non-missing events
@@ -224,92 +176,20 @@ df <- all.df[all.df$sjlid %in% missing.age.samples,]
 sum(is.na(df$ageevent)) # 323
 sum(is.na(df$ageevent) & df$grade == 0) # 323  ## all are grade 0 and with missing ageevent, so we can run the same code
 
-## Processing...
+## No need to process anything further
+# ## Remove rows with duplicate grade, ageevent, sample_age combinations (it only removes 23 rows; need to discuss with Yadav!)
+# df <- df %>%
+#   distinct(sjlid, grade, ageevent, Sample_age, .keep_all = TRUE)
 
-# Condition 1: Skip samples with grade 2 or higher or minimum sample age with grade 2 or higher
-step1 <- df %>%
-  group_by(sjlid) %>%
-  filter(
-    !(grade[which.min(Sample_age)] != 0)
-  ) %>%
-  ungroup()
-
-dim(step1)
-
-# Condition 2: Keep rows with max num_vials and Survival_Status
-step2 <- step1 %>%
-  group_by(tb_number) %>%
-  filter(num_vials == max(num_vials)) %>%
-  filter(Survival_Status == "ALIVE" | all(Survival_Status == "DEAD"))
-
-dim(step2)
-
-# Step 3: Keep rows with unique ageevent if all grades are zero
-# If there are grades 2 or higher (including grade 0), continue to Step 4
-step3 <- step2 %>%
-  group_by(sjlid, ageevent) %>%
-  mutate(
-    all_zero = all(grade == 0),
-    any_non_zero = any(grade != 0)
-  ) %>%
-  filter(!all_zero | (all_zero & !any_non_zero & row_number() == 1)) %>%
-  ungroup() %>%
-  select(-all_zero, -any_non_zero)
-
-dim(step3)
-
-## remove duplicate events if all grades are zero
-step3 <- step3 %>%
-  group_by(sjlid) %>%
-  mutate(
-    has_non_zero = any(grade != 0)
-  ) %>%
-  filter(!has_non_zero | grade == 0 | !duplicated(ageevent)) %>%
-  ungroup() %>%
-  select(-has_non_zero) %>%
-  group_by(sjlid, ageevent) %>%
-  distinct(.keep_all = TRUE) %>%
-  ungroup()
-
-dim(step3)
-
-# Step 4: Continue with further processing
-transformed_df <- step3 %>%
-  group_by(sjlid) %>%
-  mutate(
-    has_grade_2_or_higher = any(grade >= 2),
-    min_ageevent_zero = min(ageevent[grade == 0])
-  ) %>%
-  filter(
-    !has_grade_2_or_higher |
-      (grade > 0 & ageevent > min_ageevent_zero) |
-      (grade == 0 & ageevent == min_ageevent_zero)
-  ) %>%
-  ungroup() %>%
-  select(-has_grade_2_or_higher, -min_ageevent_zero) %>%
-  arrange(sjlid, tb_number, grade, ageevent) %>%
-  group_by(sjlid, tb_number, grade) %>%
-  mutate(
-    rank_age = dense_rank(ageevent)
-  ) %>%
-  ungroup()
-
-dim(transformed_df)
-
-
-# Remove rows with duplicate grade and ageevent combinations
-transformed_df <- transformed_df %>%
-  distinct(sjlid, grade, ageevent, .keep_all = TRUE)
-
-dim(transformed_df)
-FINAL.2 <- transformed_df
+dim(df)
+FINAL.2 <- df
 
 
 ## Merge 1 and 2.
 FINAL <- rbind.data.frame(FINAL.1, FINAL.2) 
+dim(FINAL)
 
-
-write.table(FINAL, file = "serum_data_processed_final.txt", sep = "\t",  row.names = FALSE, col.names = TRUE, quote = F)
+write.table(FINAL, file = "serum_data_processed_final_v3_cleaned.txt", sep = "\t",  row.names = FALSE, col.names = TRUE, quote = F)
 df.3447 <- FINAL
 
 
@@ -331,8 +211,8 @@ cat("Number of samples with grade 2:", samples_with_grade_2, "\n")
 ##################################
 ## Yadav: do you know how many of the 3853 had data at multiple timepoints and what is the breakdown by 2 times, 3 times, etc
 df.3853$Sample_age
-cc <- df.3853[grepl("SJL0253301|SJL1063201|SJL1063401|SJL1063501|SJL1063101|TB-12-5258|TB-14-3725", df.3853$sjlid), c("sjlid", "tb_number", "num_vials", "aliquot_type", "volume", "Sample_age", "Survival_Status", "grade", "ageevent")]
-dput(cc)
+# cc <- df.3853[grepl("SJL0253301|SJL1063201|SJL1063401|SJL1063501|SJL1063101|TB-12-5258|TB-14-3725", df.3853$sjlid), c("sjlid", "tb_number", "num_vials", "aliquot_type", "volume", "Sample_age", "Survival_Status", "grade", "ageevent")]
+# dput(cc)
 
 
 ## Sample age
