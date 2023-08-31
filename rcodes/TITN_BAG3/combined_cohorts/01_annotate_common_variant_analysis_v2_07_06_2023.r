@@ -36,6 +36,7 @@ TTN_BAG3 <- TTN_BAG3[!duplicated(TTN_BAG3$SNP),]
 dim(TTN_BAG3)
 # 3007    25
 
+
 # # TTN_BAG3$SNP <- sub(";.*", "", TTN_BAG3$ID)
 # sum(df.asso$KEY %in% TTN_BAG3$KEY)
 ## 111
