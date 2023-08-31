@@ -194,19 +194,20 @@ ASSOC.results <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxi
 SJLIFE <- read.table("sjlife_results_AN.assoc.logistic", header = T)
 SJLIFE$new_OR <- paste0(SJLIFE$OR, " (", SJLIFE$L95, "-", SJLIFE$U95, ")")
 SJLIFE$KEY <- paste0("chr", SJLIFE$CHR, ":", SJLIFE$BP)
-SJLIFE$dups <- duplicated(SJLIFE$KEY)
+# SJLIFE$dups <- duplicated(SJLIFE$KEY)
+colnames(SJLIFE)[-2] <- paste0("SJLIFE_", colnames(SJLIFE)[-2])
 
 CCSS_ORG <- read.table("ccss_org_results_AN.assoc.logistic", header = T)
 CCSS_ORG$KEY <- paste0("chr", CCSS_ORG$CHR, ":", CCSS_ORG$BP)
 CCSS_ORG$new_OR <- paste0(CCSS_ORG$OR, " (", CCSS_ORG$L95, "-", CCSS_ORG$U95, ")")
+colnames(CCSS_ORG)[-2] <- paste0("CCSS_ORG_", colnames(CCSS_ORG)[-2])
 
 CCSS_EXP <- read.table("ccss_exp_results_AN.assoc.logistic", header = T)
 CCSS_EXP$KEY <- paste0("chr", CCSS_EXP$CHR, ":", CCSS_EXP$BP)
 CCSS_EXP$new_OR <- paste0(CCSS_EXP$OR, " (", CCSS_EXP$L95, "-", CCSS_EXP$U95, ")")
+colnames(CCSS_EXP)[-2] <- paste0("CCSS_EXP_", colnames(CCSS_EXP)[-2])
 
-sum(!SJLIFE$KEY %in% ASSOC.results$KEY)
-
-# These variants : rs3829746 and rs2234962 are not significant in CCSS, but only in SJLIFE, so decided to only include combined data
+## These variants : rs3829746 and rs2234962 are not significant in CCSS, but only in SJLIFE, so decided to only include combined data
 ####
 
 
