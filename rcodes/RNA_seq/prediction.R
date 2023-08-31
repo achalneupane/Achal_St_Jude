@@ -1,3 +1,30 @@
+# glmnet provides various arguments for users to customize the fit: we introduce some commonly used arguments here. (For more information, type ?glmnet.)
+# 
+# alpha is for the elastic net mixing parameter α
+# , with range α∈[0,1]
+# . α=1
+# is lasso regression (default) and α=0
+# is ridge regression.
+# 
+# weights is for the observation weights, default is 1 for each observation. (Note: glmnet rescales the weights internally to sum to N, the sample size.)
+# 
+# nlambda is the number of λ
+# values in the sequence (default is 100).
+# 
+# lambda can be provided if the user wants to specify the lambda sequence, but typical usage is for the program to construct the lambda sequence on its own. When automatically generated, the λ
+# sequence is determined by lambda.max and lambda.min.ratio. The latter is the ratio of smallest value of the generated λ
+# sequence (say lambda.min) to lambda.max. The program generates nlambda values linear on the log scale from lambda.max down to lambda.min. lambda.max is not user-specified but is computed from the input x
+# and y
+# : it is the smallest value for lambda such that all the coefficients are zero. For alpha = 0 (ridge) lambda.max would be ∞
+# : in this case we pick a value corresponding to a small value for alpha close to zero.)
+# 
+# standardize is a logical flag for x variable standardization prior to fitting the model sequence. The coefficients are always returned on the original scale. Default is standardize = TRUE.
+# 
+# As an example, we set α=0.2
+# (more like a ridge regression), and give double weight to the latter half of the observations. We set nlambda to 20 so that the model fit is only compute for 20 values of λ
+# . In practice, we recommend nlambda to be 100 (default) or more. In most cases, it does not come with extra cost because of the warm-starts used in the algorithm, and for nonlinear models leads to better convergence properties.
+
+
 # Load necessary libraries
 library(glmnet)
 library(dplyr)
