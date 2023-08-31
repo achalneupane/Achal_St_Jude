@@ -190,6 +190,12 @@ ASSOC.results$new_OR <- paste0(ASSOC.results$OR, " (", ASSOC.results$L95, "-", A
 
 ASSOC.results <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/sjlife_ccss_org_ccss_exp__ttn_bag3.assoc.final_v2_07_06_2023.txt", header = T, sep = "\t")
 
+# Create combinations to match in big ASSOC.results
+ASSOC.results$match_combinations <- paste(paste(ASSOC.results$KEY, ASSOC.results$REF, ASSOC.results$ALT, sep = ":"),
+                                          paste(ASSOC.results$KEY, ASSOC.results$ALT, ASSOC.results$REF, sep = ":"),
+                                          paste(ASSOC.results$KEY, ASSOC.results$REF_flipped, ASSOC.results$ALT_flipped, sep = ":"),
+                                          paste(ASSOC.results$KEY, ASSOC.results$ALT_flipped, ASSOC.results$REF_flipped, sep = ":"), sep = "|")
+
 ## ADD individual cohorts
 SJLIFE <- read.table("sjlife_results_AN.assoc.logistic", header = T)
 SJLIFE$new_OR <- paste0(SJLIFE$OR, " (", SJLIFE$L95, "-", SJLIFE$U95, ")")
@@ -206,6 +212,77 @@ CCSS_EXP <- read.table("ccss_exp_results_AN.assoc.logistic", header = T)
 CCSS_EXP$KEY <- paste0("chr", CCSS_EXP$CHR, ":", CCSS_EXP$BP)
 CCSS_EXP$new_OR <- paste0(CCSS_EXP$OR, " (", CCSS_EXP$L95, "-", CCSS_EXP$U95, ")")
 colnames(CCSS_EXP)[-2] <- paste0("CCSS_EXP_", colnames(CCSS_EXP)[-2])
+
+###################
+## Append SJLIFE ##
+###################
+ASSOC.results$SJLIFE_SNP <- NA
+ASSOC.results$SJLIFE_new_OR <- NA
+ASSOC.results$SJLIFE_P <- NA
+
+# Loop over the rows of ASSOC.results
+for (i in 1:nrow(ASSOC.results)) {
+  print(paste0("Doing i ", i))
+  # Find the index of the matching row in SJLIFE
+  index <- which(grepl(ASSOC.results$match_combinations[i], SJLIFE$SNP))
+  
+  # Merge the matching row from SJLIFE with the current row of ASSOC.results
+  if (length(index) > 0) {
+    ASSOC.results[i, c("SJLIFE_SNP", "SJLIFE_new_OR", "SJLIFE_P")] <- SJLIFE[index, c("SNP", "SJLIFE_new_OR", "SJLIFE_P")]
+  }
+}
+
+
+#####################
+## Append CCSS_org ##
+#####################
+ASSOC.results$CCSS_ORG_SNP <- NA
+ASSOC.results$CCSS_ORG_new_OR <- NA
+ASSOC.results$CCSS_ORG_P <- NA
+# Loop over the rows of ASSOC.results
+for (i in 1:nrow(ASSOC.results)) {
+  print(paste0("Doing i ", i))
+  # Find the index of the matching row in SJLIFE
+  index <- which(grepl(ASSOC.results$match_combinations[i], CCSS_ORG$SNP))
+  
+  # Merge the matching row from SJLIFE with the current row of ASSOC.results
+  if (length(index) > 0) {
+    ASSOC.results[i, c("CCSS_ORG_SNP", "CCSS_ORG_new_OR", "CCSS_ORG_P")] <- CCSS_ORG[index, c("SNP", "CCSS_ORG_new_OR", "CCSS_ORG_P")]
+  }
+}
+
+
+#####################
+## Append CCSS_exp ##
+#####################
+ASSOC.results$CCSS_EXP_SNP <- NA
+ASSOC.results$CCSS_EXP_new_OR <- NA
+ASSOC.results$CCSS_EXP_P <- NA
+# Loop over the rows of ASSOC.results
+for (i in 1:nrow(ASSOC.results)) {
+  print(paste0("Doing i ", i))
+  # Find the index of the matching row in SJLIFE
+  index <- which(grepl(ASSOC.results$match_combinations[i], CCSS_EXP$SNP))
+  
+  # Merge the matching row from SJLIFE with the current row of ASSOC.results
+  if (length(index) > 0) {
+    ASSOC.results[i, c("CCSS_EXP_SNP", "CCSS_EXP_new_OR", "CCSS_EXP_P")] <- CCSS_EXP[index, c("SNP", "CCSS_EXP_new_OR", "CCSS_EXP_P")]
+  }
+}
+
+
+FINAL <- ASSOC.results[c("CHR", "SNP", "BP", "A1", "TEST", "NMISS", "gnomAD_equivalent", "Substitution", "Impact", "Gene", "MAF_SJLIFE", "new_OR", "P",
+  "SJLIFE_SNP", "SJLIFE_new_OR", "SJLIFE_P", 
+  "CCSS_ORG_SNP", "CCSS_ORG_new_OR", "CCSS_ORG_P", 
+  "CCSS_EXP_SNP", "CCSS_EXP_new_OR", "CCSS_EXP_P")]
+
+# ASSOC.results now contains the merged data with matching rows from ASSOC.results and SJLIFE
+complete_data <- FINAL[complete.cases(FINAL), ]
+
+# merged_data now contains the merged data with matching rows from ASSOC.results and SJLIFE
+write.table(complete_data, "sjlife_ccss_org_ccss_exp__ttn_bag3.assoc.final_combined_with_individual_cohorts.txt", col.names = T, row.names = F, quote = F, sep = "\t")
+
+
 
 ## These variants : rs3829746 and rs2234962 are not significant in CCSS, but only in SJLIFE, so decided to only include combined data
 ####
