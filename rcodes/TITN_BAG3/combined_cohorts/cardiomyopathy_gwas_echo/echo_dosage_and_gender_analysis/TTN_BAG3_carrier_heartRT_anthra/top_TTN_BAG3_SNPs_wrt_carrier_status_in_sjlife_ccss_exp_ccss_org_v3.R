@@ -165,8 +165,6 @@ ttn.gender <- table_data
 # Moderate Risk: Patients who have received a cumulative anthracycline dose between 100 and <250 mg/m² and/or chest-directed radiotherapy between 15 and <30 Gy. The table has "NA" (Not Applicable) for the combination of anthracycline and radiotherapy in this risk group.
 # Low Risk: Patients who have received a cumulative anthracycline dose >0 and <100 mg/m² and/or chest-directed radiotherapy >0 and <15 Gy.
 
-
-
 #------------------2. High risk treatment
 all_data <- dat_final[(dat_final$anthra_jco_dose_any >=250 & dat_final$hrtavg ==0)| 
                   (dat_final$hrtavg >=30 & dat_final$anthra_jco_dose_any ==0)| 
@@ -331,10 +329,7 @@ table_data$CI_Upper <- odds_ratio_info$ci_upper
 
 # Print the table
 print(table_data)
-# Gender   Estimate  Std_Error    Z_Value    P_Value          n Odds_Ratio  CI_Lower  CI_Upper
-# 1   Both -0.2063604 0.09151526 -2.2549289 0.02413779 6249 (461)  0.8135398 0.6799539 0.9733705
-# 2   Male -0.3226134 0.13380675 -2.4110400 0.01590710 3109 (222)  0.7242538 0.5571757 0.9414329
-# 3 Female -0.1125266 0.12714609 -0.8850181 0.37614687 3140 (239)  0.8935736 0.6964683 1.1464609
+
 
 # Apply the function to your data frame
 table_data$OR_CI <- combine_or_ci(table_data$Odds_Ratio, table_data$CI_Lower, table_data$CI_Upper)
