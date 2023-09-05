@@ -7,15 +7,16 @@ df <- read.table("Trans-omics CMP profiling Inventory 20230901.txt", header = T)
 PLASMA <- df[grepl("Plasma", df$aliquot_type, ignore.case = T),]
 PLASMA <- PLASMA %>%
   group_by(sjlid) %>%
-  filter(ageatsample == max(ageatsample)) %>%
+  arrange(desc(ageatsample), desc(vitalstatus), desc(num_vials)) %>%
+  slice(1) %>%
   ungroup()
 
 SERUM <- df[grepl("Serum", df$aliquot_type, ignore.case = T),]
 SERUM <- SERUM %>%
   group_by(sjlid) %>%
-  filter(ageatsample == max(ageatsample)) %>%
+  arrange(desc(ageatsample), desc(vitalstatus), desc(num_vials)) %>%
+  slice(1) %>%
   ungroup()
-
 ## Conditions::
 # 1. Remove rows where ageevent is not greater than (or within 1 week of) sample age
 # 2. within each sample if all rows have grade 2 or higher, or if minimum ageevent has grade 2 or higher, skip this sample. Do not extract any rows from that sample.
