@@ -296,7 +296,7 @@ res_ttn$p_BH = p.adjust(res_ttn$pval, method = "BH")
 print(res_bag3); print(res_ttn)
 
 
-## b. -----------------moderate to low-risk
+## b. -----------------low-moderate to low-risk
 all_data.moderate.risk <- pheno_final.all[
   ((pheno_final.all$anthra_jco_dose_any >= 100 & pheno_final.all$anthra_jco_dose_any < 250 & pheno_final.all$hrtavg == 0)| 
      (pheno_final.all$hrtavg >= 15 & pheno_final.all$hrtavg < 30 & pheno_final.all$anthra_jco_dose_any == 0)),
