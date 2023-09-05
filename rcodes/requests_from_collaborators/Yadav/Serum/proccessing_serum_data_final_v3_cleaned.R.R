@@ -1,12 +1,26 @@
+library(dplyr)
+library(haven)
+setwd("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/")
+
+# Could you please work on it by merging with the CTCAE grades for cardiomyopathy from the most recent data freeze? Please look at serum and plasma separately.
+df <- read.table("Trans-omics CMP profiling Inventory 20230901.txt", header = T)
+PLASMA <- df[grepl("Plasma", df$aliquot_type, ignore.case = T),]
+PLASMA <- PLASMA %>%
+  group_by(sjlid) %>%
+  filter(ageatsample == max(ageatsample)) %>%
+  ungroup()
+
+SERUM <- df[grepl("Serum", df$aliquot_type, ignore.case = T),]
+SERUM <- SERUM %>%
+  group_by(sjlid) %>%
+  filter(ageatsample == max(ageatsample)) %>%
+  ungroup()
+
 ## Conditions::
 # 1. Remove rows where ageevent is not greater than (or within 1 week of) sample age
 # 2. within each sample if all rows have grade 2 or higher, or if minimum ageevent has grade 2 or higher, skip this sample. Do not extract any rows from that sample.
 # 3. Withing each sample, remove rows where grades are smaller than the grades previously seen in the ordered rows.
 # 4. Then, within each tb_number, keep rows with max num_vials; then keep ALIVE over DEAD (something like this: filter(Survival_Status == "ALIVE" | all(Survival_Status == "DEAD")))
-
-setwd("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/")
-library(dplyr)
-library(haven)
 
 ## SJL5192513, SJL1599510, SJL1659216, SJL1675616
 
