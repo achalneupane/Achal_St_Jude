@@ -238,7 +238,53 @@ all_data.low.risk <- dat_final[
 all_data <- rbind.data.frame(all_data.moderate.risk, all_data.low.risk)
 
 
+# Overall Analysis
+overall_model <- glm(CMP ~ chr2.178562809.T.C_C + gender + agedx + agelstcontact + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
+                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial, data = all_data)
+overall_summary <- summary(overall_model)
+overall_summary
 
+# Male-specific Analysis
+male_pheno <- all_data[all_data$gender == 0, ]
+male_model <- glm(CMP ~ chr2.178562809.T.C_C + agedx + agelstcontact + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
+                    PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial, data = male_pheno)
+male_summary <- summary(male_model)
+
+# Female-specific Analysis
+female_pheno <- all_data[all_data$gender == 1, ]
+female_model <- glm(CMP ~ chr2.178562809.T.C_C + agedx + agelstcontact + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
+                      PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial, data = female_pheno)
+female_summary <- summary(female_model)
+
+
+# Create the table
+table_data <- data.frame(
+  Gender = c("Both", "Male", "Female"),
+  Estimate = c(overall_summary$coefficients[2, 1], male_summary$coefficients[2, 1], female_summary$coefficients[2, 1]),
+  Std_Error = c(overall_summary$coefficients[2, 2], male_summary$coefficients[2, 2], female_summary$coefficients[2, 2]),
+  Z_Value = c(overall_summary$coefficients[2, 3], male_summary$coefficients[2, 3], female_summary$coefficients[2, 3]),
+  P_Value = c(overall_summary$coefficients[2, 4], male_summary$coefficients[2, 4], female_summary$coefficients[2, 4]),
+  n = c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")"), paste0(nrow(male_pheno), " (", sum(male_pheno$CMP==1), ")"), paste0(nrow(female_pheno), " (", sum(female_pheno$CMP==1), ")")),
+  stringsAsFactors = FALSE
+)
+
+# Calculate odds ratio and confidence interval
+odds_ratio_info <- calculate_odds_ratio(table_data$Estimate, table_data$Std_Error)
+table_data$Odds_Ratio <- odds_ratio_info$odds_ratio
+table_data$CI_Lower <- odds_ratio_info$ci_lower
+table_data$CI_Upper <- odds_ratio_info$ci_upper
+
+# Print the table
+print(table_data)
+
+
+# Apply the function to your data frame
+table_data$OR_CI <- combine_or_ci(table_data$Odds_Ratio, table_data$CI_Lower, table_data$CI_Upper)
+
+# Print the updated data frame
+print(table_data)
+
+ttn.low.risk.trt <- table_data
 
 
 
@@ -285,10 +331,10 @@ table_data$CI_Upper <- odds_ratio_info$ci_upper
 
 # Print the table
 print(table_data)
-# Gender    Estimate Std_Error    Z_Value    P_Value          n Odds_Ratio  CI_Lower  CI_Upper
-# 1   Both -0.22010842 0.1021540 -2.1546733 0.03118741 6249 (461)  0.8024318 0.6568299 0.9803098
-# 2   Male -0.36574462 0.1462691 -2.5004919 0.01240210 3109 (222)  0.6936799 0.5207777 0.9239870
-# 3 Female -0.08349255 0.1439014 -0.5802067 0.56177525 3140 (239)  0.9198979 0.6938224 1.2196381
+# Gender   Estimate  Std_Error    Z_Value    P_Value          n Odds_Ratio  CI_Lower  CI_Upper
+# 1   Both -0.2063604 0.09151526 -2.2549289 0.02413779 6249 (461)  0.8135398 0.6799539 0.9733705
+# 2   Male -0.3226134 0.13380675 -2.4110400 0.01590710 3109 (222)  0.7242538 0.5571757 0.9414329
+# 3 Female -0.1125266 0.12714609 -0.8850181 0.37614687 3140 (239)  0.8935736 0.6964683 1.1464609
 
 # Apply the function to your data frame
 table_data$OR_CI <- combine_or_ci(table_data$Odds_Ratio, table_data$CI_Lower, table_data$CI_Upper)
@@ -298,26 +344,28 @@ print(table_data)
 
 bag3.gender <- table_data
 
-#------------------2. Anthracycline only, no heart radiation
-all_data <- dat_final[dat_final$anthra_jco_dose_any > 0 & dat_final$hrtavg == 0,]
-all_data$anthra_dose <- factor(ifelse(all_data$anthra_jco_dose_any < 250, "low", "high"), levels = c("low", "high"))
+
+#------------------2. High risk treatment
+all_data <- dat_final[(dat_final$anthra_jco_dose_any >=250 & dat_final$hrtavg ==0)| 
+                        (dat_final$hrtavg >=30 & dat_final$anthra_jco_dose_any ==0)| 
+                        (dat_final$anthra_jco_dose_any >=100 &  dat_final$hrtavg >= 15),]
 
 
 # Overall Analysis
-overall_model <- glm(CMP ~ anthra_dose + chr10.119670121.T.C_C + gender + agedx + agelstcontact + hrtavg + PC1 + PC2 + PC3 +
+overall_model <- glm(CMP ~ chr10.119670121.T.C_C + gender + agedx + agelstcontact + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
                        PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial, data = all_data)
 overall_summary <- summary(overall_model)
 overall_summary
 
 # Male-specific Analysis
 male_pheno <- all_data[all_data$gender == 0, ]
-male_model <- glm(CMP ~ anthra_dose + chr10.119670121.T.C_C + agedx + agelstcontact + hrtavg + PC1 + PC2 + PC3 +
+male_model <- glm(CMP ~ chr10.119670121.T.C_C + agedx + agelstcontact + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
                     PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial, data = male_pheno)
 male_summary <- summary(male_model)
 
 # Female-specific Analysis
 female_pheno <- all_data[all_data$gender == 1, ]
-female_model <- glm(CMP ~ anthra_dose + chr10.119670121.T.C_C + agedx + agelstcontact + hrtavg + PC1 + PC2 + PC3 +
+female_model <- glm(CMP ~ chr10.119670121.T.C_C + agedx + agelstcontact + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial, data = female_pheno)
 female_summary <- summary(female_model)
 
@@ -341,10 +389,6 @@ table_data$CI_Upper <- odds_ratio_info$ci_upper
 
 # Print the table
 print(table_data)
-# Gender Estimate Std_Error  Z_Value      P_Value          n Odds_Ratio CI_Lower CI_Upper
-# 1   Both 1.325270 0.2187225 6.059141 1.368503e-09 1804 (131)   3.763203 2.451192 5.777473
-# 2   Male 1.393756 0.3044173 4.578438 4.684603e-06   906 (69)   4.029958 2.219092 7.318563
-# 3 Female 1.346099 0.3238450 4.156615 3.229971e-05   898 (62)   3.842407 2.036765 7.248795
 
 
 # Apply the function to your data frame
@@ -353,27 +397,40 @@ table_data$OR_CI <- combine_or_ci(table_data$Odds_Ratio, table_data$CI_Lower, ta
 # Print the updated data frame
 print(table_data)
 
-bag3.anthra <- table_data
+bag3.high.risk.trt <- table_data
 
-#------------------3. Heart radiation; no anthracycline
-all_data <- dat_final[dat_final$anthra_jco_dose_any == 0 & dat_final$hrtavg > 0,]
-all_data$heart_RT <- factor(ifelse(all_data$hrtavg < 15, "low", "high"), levels = c("low", "high"))
+
+#------------------2. Low-moderate treatment risk
+all_data.moderate.risk <- dat_final[
+  ((dat_final$anthra_jco_dose_any >= 100 & dat_final$anthra_jco_dose_any < 250 & dat_final$hrtavg == 0)| 
+     (dat_final$hrtavg >= 15 & dat_final$hrtavg < 30 & dat_final$anthra_jco_dose_any == 0)),
+]
+
+
+all_data.low.risk <- dat_final[
+  (dat_final$anthra_jco_dose_any > 0 & dat_final$anthra_jco_dose_any < 100 & 
+     dat_final$hrtavg ==0)|
+    (dat_final$hrtavg > 0 & dat_final$hrtavg < 15 & dat_final$anthra_jco_dose_any == 0),
+]
+
+all_data <- rbind.data.frame(all_data.moderate.risk, all_data.low.risk)
+
 
 # Overall Analysis
-overall_model <- glm(CMP ~ heart_RT + chr10.119670121.T.C_C + gender + agedx + agelstcontact + anthra_jco_dose_any + PC1 + PC2 + PC3 +
+overall_model <- glm(CMP ~ chr10.119670121.T.C_C + gender + agedx + agelstcontact + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
                        PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial, data = all_data)
 overall_summary <- summary(overall_model)
 overall_summary
 
 # Male-specific Analysis
 male_pheno <- all_data[all_data$gender == 0, ]
-male_model <- glm(CMP ~ heart_RT + chr10.119670121.T.C_C + agedx + agelstcontact + anthra_jco_dose_any + PC1 + PC2 + PC3 +
+male_model <- glm(CMP ~ chr10.119670121.T.C_C + agedx + agelstcontact + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
                     PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial, data = male_pheno)
 male_summary <- summary(male_model)
 
 # Female-specific Analysis
 female_pheno <- all_data[all_data$gender == 1, ]
-female_model <- glm(CMP ~ heart_RT + chr10.119670121.T.C_C + agedx + agelstcontact + anthra_jco_dose_any + PC1 + PC2 + PC3 +
+female_model <- glm(CMP ~ chr10.119670121.T.C_C + agedx + agelstcontact + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial, data = female_pheno)
 female_summary <- summary(female_model)
 
@@ -397,10 +454,7 @@ table_data$CI_Upper <- odds_ratio_info$ci_upper
 
 # Print the table
 print(table_data)
-# Gender Estimate Std_Error  Z_Value      P_Value          n Odds_Ratio CI_Lower CI_Upper
-# 1   Both 2.207731 0.2924933 7.547973 4.420848e-14 2477 (118)   9.095061 5.126610 16.13544
-# 2   Male 2.256660 0.4259181 5.298342 1.168589e-07  1205 (53)   9.551133 4.144824 22.00917
-# 3 Female 2.177241 0.4064555 5.356654 8.477736e-08  1272 (65)   8.821935 3.977241 19.56797
+
 
 # Apply the function to your data frame
 table_data$OR_CI <- combine_or_ci(table_data$Odds_Ratio, table_data$CI_Lower, table_data$CI_Upper)
@@ -408,11 +462,13 @@ table_data$OR_CI <- combine_or_ci(table_data$Odds_Ratio, table_data$CI_Lower, ta
 # Print the updated data frame
 print(table_data)
 
-bag3.heart <- table_data
+bag3.low.risk.trt <- table_data
+
+
 
 
 # Create a list of your objects
-objects_list <- list(ttn.gender, ttn.anthra, ttn.heart, bag3.gender, bag3.anthra, bag3.heart)
+objects_list <- list(ttn.gender, ttn.high.risk.trt, ttn.low.risk.trt, bag3.gender, bag3.high.risk.trt, bag3.low.risk.trt)
 
 # Extract information and combine into a data frame
 combined_info <- do.call(rbind, lapply(objects_list, extract_info))
