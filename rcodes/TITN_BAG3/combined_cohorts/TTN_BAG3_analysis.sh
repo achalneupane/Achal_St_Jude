@@ -149,3 +149,27 @@ plink --bfile ccss_org_to_concat --bmerge ccss_exp_to_concat --make-bed --out me
  # Z:\ResearchHome\ClusterHome\aneupane\St_Jude\Achal_St_Jude\rcodes\TITN_BAG3\combined_cohorts\cardiomyopathy_gwas_echo\echo_dosage_and_gender_analysis\TTN_BAG3_carrier_heartRT_anthra\top_TTN_BAG3_SNPs_wrt_carrier_status_in_sjlife_ccss_exp_ccss_org.R
 plink --bfile sjlife_ccss_org_ccss_exp_samples --out sjlife_ccss_org_ccss_exp_chr2_178562809_T_C --recode A --snp chr2:178562809:T:C
 plink --bfile sjlife_ccss_org_ccss_exp_samples --out sjlife_ccss_org_ccss_exp_chr10_119670121_T_C --recode A --snp chr10:119670121:T:C
+
+
+
+## Contingency table before and after removing early-onset sample in CCSS_exp
+plink --bfile ccss_exp --keep pheno/ccss_exp_eur_cardiotoxic_exposed.pheno --out ccss_exp_before_chr2_178562809_T_C --recode A --snp chr2:178562809:T:C
+plink --bfile ccss_exp_to_concat --out ccss_exp_after_chr2_178562809_T_C --recode A --snp chr2:178562809:T:C
+
+plink --bfile ccss_exp --keep pheno/ccss_exp_eur_cardiotoxic_exposed.pheno --out ccss_exp_before_chr10_119670121_T_C --recode A --snp chr10:119670121:T:C
+plink --bfile ccss_exp_to_concat --out ccss_exp_after_chr10_119670121_T_C --recode A --snp chr10:119670121:T:C
+
+
+
+
+  --allow-no-sex
+  --bfile ccss_exp
+  --ci 0.95
+  --covar pheno/ccss_exp_eur_cardiotoxic_exposed.pheno
+  --covar-name a_dx,a_end,SEX,anth_DED,HeartAvg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10
+  --hwe 1e-06
+  --logistic hide-covar
+  --maf 0.01
+  --out ccss_exp_results
+  --pheno pheno/ccss_exp_eur_cardiotoxic_exposed.pheno
+  --pheno-name CMP2plus

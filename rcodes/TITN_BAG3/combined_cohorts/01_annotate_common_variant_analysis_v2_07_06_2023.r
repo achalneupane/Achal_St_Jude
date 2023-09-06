@@ -280,8 +280,8 @@ FINAL <- ASSOC.results[c("CHR", "SNP", "BP", "A1", "TEST", "NMISS", "gnomAD_equi
 # ASSOC.results now contains the merged data with matching rows from ASSOC.results and SJLIFE
 complete_data <- FINAL[complete.cases(FINAL), ]
 
-# merged_data now contains the merged data with matching rows from ASSOC.results and SJLIFE
-write.table(complete_data, "sjlife_ccss_org_ccss_exp__ttn_bag3.assoc.final_combined_with_individual_cohorts.txt", col.names = T, row.names = F, quote = F, sep = "\t")
+## merged_data now contains the merged data with matching rows from ASSOC.results and SJLIFE
+# write.table(complete_data, "sjlife_ccss_org_ccss_exp__ttn_bag3.assoc.final_combined_with_individual_cohorts.txt", col.names = T, row.names = F, quote = F, sep = "\t")
 
 
 
