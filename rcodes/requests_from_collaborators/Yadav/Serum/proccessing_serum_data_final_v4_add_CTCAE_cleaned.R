@@ -65,31 +65,7 @@ source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/reques
 ## Count by serum samples
 # source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/requests_from_collaborators/Yadav/Serum/Count_functions_by_tb_number.R")
 
-# all.df <- read.delim("All_serum_samples_for_R01_22Aug2023_for_Achal_edited.txt", sep = "\t", header = T, check.names = F)
-# dim(all.df)
-# 
-# head(all.df)
-# 
-# sum(is.na(all.df$tb_number))
-# 
-# all.df$original_Sample_age <- all.df$Sample_age
-# all.df$original_ageevent <- all.df$ageevent
-# 
-# all.df$Sample_age <- as.numeric(all.df$Sample_age)
-# 
-# # # Round age down to one decimal place, so easier to compare
-# # all.df$Sample_age <- floor(all.df$Sample_age * 10) / 10
-# # all.df$ageevent <- floor(all.df$ageevent * 10) / 10
-# 
-# 
-# ##################################################
-# ## 1. First process df without ageevent missing ##
-# ##################################################
-# # Remove rows with missing ageevent and process them separately
-# missing.age.samples <- all.df$sjlid[is.na(all.df$ageevent)]
-# ## Process them separately
-# df <- all.df[!all.df$sjlid %in% missing.age.samples,]
-# df.3853 <- df
+
 # ## Get counts in non-missing events
 # # counts for any grade at min ageevent
 # check_grades_eq_or_higher_than(df, 2)
@@ -176,7 +152,7 @@ step3$tb_number[duplicated(step3$tb_number)] # check duplicates
 step3 <- step3 %>%
   distinct(sjlid, grade, ageevent, Sample_age, .keep_all = TRUE)
 
-dim(step3)
+dim(step3) # 5992   10
 # removed_rows <- anti_join(step2, step3)
 
 FINAL.1 <- step3
@@ -204,32 +180,6 @@ check_grades_transition.agevent.grade.0(FINAL.1, 0, 2)
 check_grades_transition.agevent.grade.0(FINAL.1, 0, 3)
 check_grades_transition.agevent.grade.0(FINAL.1, 0, 4)
 check_grades_transition.agevent.grade.0(FINAL.1, 0, 5)
-
-
-##################################################
-## 2. Now, work on those with missing age event ##
-##################################################
-# if ageevent is missing and grade is zero, keep (eg. SJL5237316, SJL5257302)
-df <- all.df[all.df$sjlid %in% missing.age.samples,]
-sum(is.na(df$ageevent)) # 323
-sum(is.na(df$ageevent) & df$grade == 0) # 323  ## all are grade 0 and with missing ageevent, so we can run the same code
-
-## No need to process anything further
-# ## Remove rows with duplicate grade, ageevent, sample_age combinations (it only removes 23 rows; need to discuss with Yadav!)
-# df <- df %>%
-#   distinct(sjlid, grade, ageevent, Sample_age, .keep_all = TRUE)
-
-dim(df)
-FINAL.2 <- df
-
-
-## Merge 1 and 2.
-FINAL <- rbind.data.frame(FINAL.1, FINAL.2) 
-dim(FINAL)
-
-write.table(FINAL, file = "serum_data_processed_final_v3_cleaned.txt", sep = "\t",  row.names = FALSE, col.names = TRUE, quote = F)
-df.3498 <- FINAL.1
-
 
 
 

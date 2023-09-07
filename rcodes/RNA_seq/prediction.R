@@ -104,3 +104,48 @@ cat("Lasso selected genes:\n")
 print(names(lasso_genes)[which(lasso_genes != 0)])
 cat("\nElastic Net selected genes:\n")
 print(names(elastic_net_genes)[which(elastic_net_genes != 0)])
+
+
+
+
+
+#########
+# Load required libraries
+library(pROC)
+library(DescTools)
+
+# Generate example data
+set.seed(123)
+n <- 500  # Number of samples
+X_percent <- 10  # Percentage of top genes to add
+mydata <- data.frame(
+  Age = runif(n, min = 20, max = 80),
+  Sex = sample(c("Male", "Female"), n, replace = TRUE),
+  Anthracycline = runif(n, min = 0, max = 100),
+  Radiation = sample(0:1, n, replace = TRUE),
+  Cardiomyopathy = sample(0:1, n, replace = TRUE)
+)
+
+# Generate random gene expression data (replace with your actual gene data)
+top_genes <- as.data.frame(matrix(runif(n * X_percent), ncol = X_percent))
+
+# Step 1: Fit Clinical Model
+clinical_model <- glm(Cardiomyopathy ~ Age + Sex + Anthracycline + Radiation, data = mydata, family = "binomial")
+
+# Step 2: Add top X% genes to the Clinical Model
+mydata_with_genes <- cbind(mydata, top_genes)
+clinical_model_with_genes <- glm(Cardiomyopathy ~ Age + Sex + Anthracycline + Radiation + ., data = mydata_with_genes, family = "binomial")
+
+# Step 3: Calculate AUC for Clinical Model
+roc_clinical <- roc(mydata$Cardiomyopathy, fitted(clinical_model), levels = c(0, 1))
+
+# Calculate AUC for Clinical Model + top X% genes
+roc_clinical_with_genes <- roc(mydata$Cardiomyopathy, fitted(clinical_model_with_genes), levels = c(0, 1))
+
+# Step 4: Compare AUCs using DeLong's test
+delong_test <- roc.test(roc_clinical, roc_clinical_with_genes, method = "delong")
+
+# Print the results
+print(paste("AUC Clinical Model:", round(auc(roc_clinical), 2)))
+print(paste("AUC Clinical Model + top X% genes:", round(auc(roc_clinical_with_genes), 2)))
+print(paste("p-value (DeLong's Test):", round(delong_test$p.value, 4)))
