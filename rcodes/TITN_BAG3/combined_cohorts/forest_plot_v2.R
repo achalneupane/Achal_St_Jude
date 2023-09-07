@@ -57,35 +57,60 @@ LV_global_longitudinal_peak_strain_(GLPS)	-0.165	0.059	0.005	750	0.025	Male", he
 
 echo.sig$Phenotype <- gsub("_|-", " ", echo.sig$Phenotype)
 
-# echo.sig$Significant = ifelse(echo.sig$P_BH < 0.05, "*", "")
-echo.sig$OR <- exp(echo.sig$β)
-echo.sig$CI_low <- exp(echo.sig$β - 1.96 * echo.sig$SE)
-echo.sig$CI_high <- exp(echo.sig$β + 1.96 * echo.sig$SE)
-
-
 # Create the forest plot
 library(ggplot2)
 
-p <- ggplot(echo.sig, aes(x = Phenotype, y = OR, color = Gender)) +
-  geom_linerange(aes(ymin = CI_low, ymax = CI_high), position = position_dodge(width = 0.8), size = 1) +
-  geom_point(aes(x = as.numeric(factor(Phenotype)), y = OR), position = position_dodge(width = 0.8), size = 2) +
-  geom_hline(yintercept = 1, linetype = "dashed", color = "gray") +
-  labs(x = NULL, y = "OR (95% CI") +
+## With beta
+p <- ggplot(echo.sig, aes(x = Phenotype, y = β, color = Gender)) +
+  geom_linerange(aes(ymin = β - 1.96 * SE, ymax = β + 1.96 * SE), position = position_dodge(width = 0.8), size = 1) +
+  geom_point(aes(x = as.numeric(factor(Phenotype)), y = β), position = position_dodge(width = 0.8), size = 2) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray") +
+  labs(x = NULL, y = "Effect Size (β)") +
   geom_text(
     aes(x = as.numeric(factor(Phenotype)), 
-        label = sprintf("P = %.3f\nOR = %.2f", P_BH, OR), 
+        label = sprintf("P = %.3f\nβ = %.2f", P_BH, β), 
         hjust = ifelse(Gender == "Male", 1.2, -0.2),
-        y = (CI_low + CI_high) / 2), # Center text vertically
+        y = (β - 1.96 * SE + β + 1.96 * SE) / 2), # Center text vertically
     color = "black", # Set text color to black
-    size = 3, show.legend = FALSE) +
+    size = 4, show.legend = FALSE) + # Increase text size to 5
   theme_classic() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1, size = 12, color = "black"), # Increase x-axis text size to 14
+        axis.text.y = element_text(size = 12, color = "black"), # Increase y-axis text size to 14
+        axis.title.y = element_text(size = 12, color = "black"), # Increase Y-axis title size to 16
+        legend.text = element_text(size = 12, color = "black"), # Increase legend text size to 14
+        legend.title = element_text(size = 12, color = "black"), # Increase legend title size to 14
+        plot.title = element_text(size = 12, color = "black")) + # Increase plot title size to 16
   theme(legend.position = "right") +
   scale_x_discrete(labels = echo.sig$Phenotype)
-  # scale_color_manual(values = c("Male" = "blue", "Both" = "black"))
+
+
+# ## With OR
+# # echo.sig$Significant = ifelse(echo.sig$P_BH < 0.05, "*", "")
+# echo.sig$OR <- exp(echo.sig$β)
+# echo.sig$CI_low <- exp(echo.sig$β - 1.96 * echo.sig$SE)
+# echo.sig$CI_high <- exp(echo.sig$β + 1.96 * echo.sig$SE)
+# 
+# 
+# p <- ggplot(echo.sig, aes(x = Phenotype, y = OR, color = Gender)) +
+#   geom_linerange(aes(ymin = CI_low, ymax = CI_high), position = position_dodge(width = 0.8), size = 1) +
+#   geom_point(aes(x = as.numeric(factor(Phenotype)), y = OR), position = position_dodge(width = 0.8), size = 2) +
+#   geom_hline(yintercept = 1, linetype = "dashed", color = "gray") +
+#   labs(x = NULL, y = "OR (95% CI") +
+#   geom_text(
+#     aes(x = as.numeric(factor(Phenotype)), 
+#         label = sprintf("P = %.3f\nOR = %.2f", P_BH, OR), 
+#         hjust = ifelse(Gender == "Male", 1.2, -0.2),
+#         y = (CI_low + CI_high) / 2), # Center text vertically
+#     color = "black", # Set text color to black
+#     size = 3, show.legend = FALSE) +
+#   theme_classic() +
+#   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+#   theme(legend.position = "right") +
+#   scale_x_discrete(labels = echo.sig$Phenotype)
+#   # scale_color_manual(values = c("Male" = "blue", "Both" = "black"))
 
 p
-ggsave("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Papers/TTN_BAG3/Final_v8/echo_measure_sig.tiff", p, dpi = 600, width = 8, height = 7, units = "in")
+ggsave("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Papers/TTN_BAG3/Final_v8/echo_measure_sig.tiff", p, dpi = 600, width = 9, height = 7, units = "in")
 
 ##############
 
