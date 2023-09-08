@@ -110,6 +110,17 @@ print(names(elastic_net_genes)[which(elastic_net_genes != 0)])
 
 
 #########
+# # Yadav wanted to:
+# 1. Fit a clinical model including the variables you adjusted in DE analysis. This will include age at diagnosis, sex, etc. Let’s call it Clinical model.
+# 2. Add top X% genes to the clinical model in 1). Let’s call it Clinical model + top X% genes.
+# 3. Calculate area under the ROC curve (AUC) for Clinical model with and without top X% genes.
+# 4. Compare AUC of the Clinical model with top X% genes with the AUC of the Clinical model, using DeLong’s test.
+# 5. Validate Clinical model with and without the top X% genes in (a) AA survivors and (b) additional White survivors (n=116). Please note we should validate the exact same model from 1) and 2) in the validation datasets, without re-fitting the models.
+# 6. Repeat (3) and (4) for both validation datasets as well.
+
+
+# interesting read: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6989986/
+
 # Load required libraries
 library(pROC)
 library(DescTools)

@@ -165,6 +165,58 @@ table(FINAL.SERUM$event_number, FINAL.SERUM$grade)
 # 3  384   26    8
 # 4   73    9    4
 # 5    3    0    1
+
+
+
+## So now, we want to work with this dataset: CTCAE.in.serum.with.1st.event.0
+table(CTCAE.in.serum.with.1st.event.0$grade)
+CTCAE.in.serum.with.1st.event.0 <- CTCAE.in.serum.with.1st.event.0[CTCAE.in.serum.with.1st.event.0$grade != -9,] # remove grade -9
+# grade grade 0 and the first cardiomypathy
+
+
+
+
+first_CMP_event <- CTCAE.in.serum.with.1st.event.0 %>%
+  group_by(sjlid) %>%
+  arrange(sjlid, event_number) %>%
+  filter(!cumany(grade >= 2) | row_number() <= min(which(grade >= 2))) %>%
+  ungroup()
+## Note: the warnings basically means there are o grade 2 or greater for those sjlids
+
+
+CTCAE.saved <- CTCAE
+
+## Add Sample_age
+first_CMP_event$sjlid
+
+
+##########################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ############ 
 ## Plasma ##
 ############

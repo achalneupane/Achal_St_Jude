@@ -22,3 +22,29 @@ return(PLASMA)
 }
 
 # cc <- get_matching_rows(PLASMA.cc, CTCAE.cc, 7/365.25)
+
+
+CTCAE <- first_CMP_event
+PLASMA <- SERUM.original
+get_rows_with_smaller_sample_age <- function(CTCAE, PLASMA, days){
+  CTCAE$Sample_age <- NA  # Initialize ageevent with NA values
+  
+  for (i in 1:nrow(CTCAE)) {
+    # Subset PLASMA and CTCAE data for the current SJLID
+    CTCAE_subset <- CTCAE[i, ]
+    # Find matching rows in CTCAE based on sjlid and age difference
+    matching_rows <- which(
+      (PLASMA$sjlid == CTCAE_subset$sjlid) &
+        (abs(CTCAE_subset$ageevent - PLASMA$ageatsample) <= days/365.25)
+    )
+    # Check if there are matching rows
+    if (length(matching_rows) > 0) {
+      # If matching rows exist, update the ageevent and grade using the first matching row
+      CTCAE$Sample_age[i] <- PLASMA$ageatsample[matching_rows[1]]
+    }
+  }
+  return(CTCAE)
+}
+
+
+test <- get_rows_with_smaller_sample_age(first_CMP_event, SERUM.original, 0)
