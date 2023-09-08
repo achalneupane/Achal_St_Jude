@@ -6,7 +6,7 @@ setwd("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/")
 # read CTCAE
 # CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
 CTCAE <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
-CTCAE.original <- CTCAE
+# CTCAE.original <- CTCAE
 CTCAE <- CTCAE.original[c("sjlid", "studypop", "sjlife_cohort", "gender", "organsys", "condition", "gradedt", "grade", "ageevent")]
 ## Since Trans-omics CMP ageatsample is in one decimal, I am coverting CTCAE age also to one decimal place.
 CTCAE$ageevent <- round(CTCAE$ageevent,1)
@@ -35,7 +35,7 @@ PLASMA <- PLASMA[!is.na(PLASMA$grade) & PLASMA$grade != -9,]
 
 ## Note: Since we are rounding age down to one decimal place, a 7-days window did not make any difference in terms of the number of rows or samples
 SERUM <- df[grepl("Serum", df$aliquot_type, ignore.case = T),]
-
+SERUM.original <- SERUM
 SERUM <- get_matching_rows(SERUM, CTCAE, 0/365.25) # on same day
 SERUM <- SERUM[!is.na(SERUM$grade) & SERUM$grade != -9,]
 
@@ -54,60 +54,12 @@ source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/reques
 ## Count by serum samples
 # source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/requests_from_collaborators/Yadav/Serum/Count_functions_by_tb_number.R")
 
-
-# ## Get counts in non-missing events
-# # counts for any grade at min ageevent
-# check_grades_eq_or_higher_than(df, 2)
-# check_grades_eq_or_higher_than(df, 3)
-# check_grades_eq_or_higher_than(df, 4)
-# check_grades_eq_or_higher_than(df, 5)
-# 
-# # counts for 0 to X transitions with any grade at min ageevent
-# check_grades_transition(df, 0, 2)
-# check_grades_transition(df, 0, 3)
-# check_grades_transition(df, 0, 4)
-# check_grades_transition(df, 0, 5)
-# 
-# # counts for 0 grade at min ageevent
-# check_grades_eq_or_higher_than.min.agevent.grade.0(df, 2)
-# check_grades_eq_or_higher_than.min.agevent.grade.0(df, 3)
-# check_grades_eq_or_higher_than.min.agevent.grade.0(df, 4)
-# check_grades_eq_or_higher_than.min.agevent.grade.0(df, 5)
-# 
-# # counts for 0 to X transitions with min ageevent 0
-# check_grades_transition.agevent.grade.0(df, 0, 2)
-# check_grades_transition.agevent.grade.0(df, 0, 3)
-# check_grades_transition.agevent.grade.0(df, 0, 4)
-# check_grades_transition.agevent.grade.0(df, 0, 5)
-
 ########### 
 ## Serum ##
 ###########
 df <- SERUM
 df$Sample_age <- df$ageatsample
 
-## Get counts in non-missing events
-check_grades_eq_or_higher_than(df, 2)
-check_grades_eq_or_higher_than(df, 3)
-check_grades_eq_or_higher_than(df, 4)
-check_grades_eq_or_higher_than(df, 5)
-
-# counts for 0 to X transitions with any grade at min ageevent
-check_grades_transition(df, 0, 2)
-check_grades_transition(df, 0, 3)
-check_grades_transition(df, 0, 4)
-check_grades_transition(df, 0, 5)
-
-check_grades_eq_or_higher_than.min.agevent.grade.0(df, 2)
-check_grades_eq_or_higher_than.min.agevent.grade.0(df, 3)
-check_grades_eq_or_higher_than.min.agevent.grade.0(df, 4)
-check_grades_eq_or_higher_than.min.agevent.grade.0(df, 5)
-
-# counts for 0 to X transitions with min ageevent 0
-check_grades_transition.agevent.grade.0(df, 0, 2)
-check_grades_transition.agevent.grade.0(df, 0, 3)
-check_grades_transition.agevent.grade.0(df, 0, 4)
-check_grades_transition.agevent.grade.0(df, 0, 5)
 
 ## Processing...
 # Condition 1: Skip samples with grade 2 or higher or minimum ageevent with grade 2 or higher. If there are two ageevent that are miniumum value, we still apply this filter (but this did not make any difference)
@@ -150,29 +102,70 @@ dim(step3) # 5992   10
 FINAL.1 <- step3
 FINAL.SERUM <- step3
 
-# ## Get counts in non-missing events
-check_grades_eq_or_higher_than(FINAL.1, 2)
-check_grades_eq_or_higher_than(FINAL.1, 3)
-check_grades_eq_or_higher_than(FINAL.1, 4)
-check_grades_eq_or_higher_than(FINAL.1, 5)
 
-check_grades_eq_or_higher_than.min.agevent.grade.0(FINAL.1, 2)
-check_grades_eq_or_higher_than.min.agevent.grade.0(FINAL.1, 3)
-check_grades_eq_or_higher_than.min.agevent.grade.0(FINAL.1, 4)
-check_grades_eq_or_higher_than.min.agevent.grade.0(FINAL.1, 5)
 
-# counts for 0 to X transitions with any grade at min ageevent
-check_grades_transition(FINAL.1, 0, 2)
-check_grades_transition(FINAL.1, 0, 3)
-check_grades_transition(FINAL.1, 0, 4)
-check_grades_transition(FINAL.1, 0, 5)
 
-# counts for 0 to X transitions with min ageevent 0
-check_grades_transition.agevent.grade.0(FINAL.1, 0, 2)
-check_grades_transition.agevent.grade.0(FINAL.1, 0, 3)
-check_grades_transition.agevent.grade.0(FINAL.1, 0, 4)
-check_grades_transition.agevent.grade.0(FINAL.1, 0, 5)
+sum(CTCAE$sjlid %in% unique(FINAL.SERUM$sjlid ))
+CTCAE.in.serum.with.1st.event.0 <-  CTCAE[CTCAE$sjlid %in% unique(FINAL.SERUM$sjlid ),]
+table(CTCAE.in.serum.with.1st.event.0$grade)
+# -9    0    2    3    4    5 
+# 1 7518  180   97    1    3 
 
+## Add event number
+CTCAE.in.serum.with.1st.event.0 <- CTCAE.in.serum.with.1st.event.0 %>%
+  group_by(sjlid) %>%
+  arrange(ageevent) %>%
+  mutate(event_number = row_number()) %>%
+  ungroup() %>%
+  arrange(sjlid)  # Restore the original order
+
+table(CTCAE.in.serum.with.1st.event.0$event_number, CTCAE.in.serum.with.1st.event.0$grade)
+# Ev# -9    0    2    3    4    5
+# 1    0 4105    0    0    0    0
+# 2    1 2075   82   27    0    0
+# 3    0  880   58   22    0    0
+# 4    0  321   26   16    1    2
+# 5    0   83    8   15    0    0
+# 6    0   32    2    6    0    1
+# 7    0   15    2    5    0    0
+# 8    0    6    1    3    0    0
+# 9    0    1    1    3    0    0
+
+## Check how many overlap from previous round of 165 cases in Kylas data
+previous.164 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/serum_data_processed_final_v3_cleaned.txt", header = T)
+## How many in total overlap
+length(unique(SERUM.original$sjlid)) # The one Kyla gave
+# 5479
+length(unique(previous.164$sjlid))
+# 3747
+
+sum(unique(SERUM.original$sjlid) %in% unique(previous.164$sjlid))
+# 3747
+
+result.164 <- previous.164 %>%
+  group_by(sjlid) %>%
+  filter(any(grade == 0) & any(grade >= 2))
+
+length(unique(FINAL.SERUM$sjlid))
+## 4105
+sum(unique(FINAL.SERUM$sjlid) %in% unique(result.164$sjlid))
+# 146
+
+## Add event number:
+FINAL.SERUM <- FINAL.SERUM %>%
+  group_by(sjlid) %>%
+  arrange(ageevent) %>%
+  mutate(event_number = row_number()) %>%
+  ungroup() %>%
+  arrange(sjlid)  # Restore the original order
+
+table(FINAL.SERUM$event_number, FINAL.SERUM$grade)
+#     0    2    3
+# 1 4105    0    0
+# 2 1301   59   19
+# 3  384   26    8
+# 4   73    9    4
+# 5    3    0    1
 ############ 
 ## Plasma ##
 ############
