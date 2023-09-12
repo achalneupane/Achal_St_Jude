@@ -71,7 +71,6 @@ BMI.PA.SMK.DRK$fu1.riskydrk <- NA
 BMI.PA.SMK.DRK$fu2.riskydrk <- NA
 
 BMI.PA.SMK.DRK$fu3.bmi <- NA
-BMI.PA.SMK.DRK$fu3.bmi <- NA
 BMI.PA.SMK.DRK$fu3.MET <- NA
 BMI.PA.SMK.DRK$fu3.CDC <- NA
 BMI.PA.SMK.DRK$fu3.met_vig <- NA
@@ -88,7 +87,7 @@ BMI.PA.SMK.DRK$fu7.met_vig <- NA
 
 
 BMI.PA.SMK.DRK[BMI.PA.SMK.DRK == "."] <- NA
-
+# test <- BMI.PA.SMK.DRK[grepl("ccssid|met_vig", colnames(BMI.PA.SMK.DRK))]
 ## Reshape BMI.PA.SMK.DRK to long format
 # dw <- BMI.PA.SMK.DRK[1:2,]
 
@@ -106,8 +105,11 @@ BMI.PA.SMK.DRK[BMI.PA.SMK.DRK == "."] <- NA
 ## make prefixes to suffixes
 names(BMI.PA.SMK.DRK) <- strsplit(names(BMI.PA.SMK.DRK), '\\.') |> lapply(rev) |> sapply(paste, collapse='.')
 
-cc <- reshape(BMI.PA.SMK.DRK, direction='l', idvar='ccssid', varying=sort(names(BMI.PA.SMK.DRK)[-1]))
+## reorder columns
+column_order <- c("ccssid", sort(setdiff(names(BMI.PA.SMK.DRK), "ccssid")))
+BMI.PA.SMK.DRK <- BMI.PA.SMK.DRK[column_order]
 
+cc <- reshape(BMI.PA.SMK.DRK, direction='l', idvar='ccssid', varying=sort(names(BMI.PA.SMK.DRK)[-1]))
 cc$age <- as.numeric(cc$age)
 cc <- subset(cc, age >= 18)
 dim(cc)
@@ -130,11 +132,18 @@ bmi_iid_dob_18_uniq = bmi_iid_dob_18_sorted[!duplicated(bmi_iid_dob_18_sorted$cc
 bmi_iid_dob_18_uniq = bmi_iid_dob_18_uniq[,c("ccssid", "time", "age", "bmi")]
 
 ## MET
+# MET_iid_dob_18 = subset(cc, age >= 18)
+# MET_iid_dob_18 <- MET_iid_dob_18[!is.na(MET_iid_dob_18$MET), ]
+# MET_iid_dob_18_sorted = MET_iid_dob_18[order(MET_iid_dob_18$ccssid, MET_iid_dob_18$age, decreasing = FALSE),]
+# MET_iid_dob_18_uniq = MET_iid_dob_18_sorted[!duplicated(MET_iid_dob_18_sorted$ccssid),]
+# MET_iid_dob_18_uniq = MET_iid_dob_18_uniq[,c("ccssid", "time", "age", "CDC")]
+
 MET_iid_dob_18 = subset(cc, age >= 18)
-MET_iid_dob_18 <- MET_iid_dob_18[!is.na(MET_iid_dob_18$MET), ]
+MET_iid_dob_18 <- MET_iid_dob_18[!is.na(MET_iid_dob_18$met_vig), ]
 MET_iid_dob_18_sorted = MET_iid_dob_18[order(MET_iid_dob_18$ccssid, MET_iid_dob_18$age, decreasing = FALSE),]
 MET_iid_dob_18_uniq = MET_iid_dob_18_sorted[!duplicated(MET_iid_dob_18_sorted$ccssid),]
-MET_iid_dob_18_uniq = MET_iid_dob_18_uniq[,c("ccssid", "time", "age", "CDC")]
+MET_iid_dob_18_uniq = MET_iid_dob_18_uniq[,c("ccssid", "time", "age", "met_vig")]
+colnames(MET_iid_dob_18_uniq)[colnames(MET_iid_dob_18_uniq) == "met_vig"] <- "CDC"
 
 ## smk
 smk_iid_dob_18 = subset(cc, age >= 18)
