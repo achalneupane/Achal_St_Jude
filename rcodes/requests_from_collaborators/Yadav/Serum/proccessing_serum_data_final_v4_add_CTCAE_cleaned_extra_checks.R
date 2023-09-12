@@ -20,6 +20,8 @@ CTCAE <- CTCAE %>%
   ) %>%
   ungroup()
 
+## Remove rows once grades 2 or higher are seen in ordered df by sjlid and event_number
+CTCAE <- filter_rows_by_condition(CTCAE, "sjlid", "grade")
 
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/requests_from_collaborators/Yadav/Serum/get_matching_rows_from_CTCAE.R")
 df <- read.table("Trans-omics CMP profiling Inventory 20230901.txt", header = T)
@@ -30,13 +32,13 @@ df.original <- df
 PLASMA <- df[grepl("Plasma", df$aliquot_type, ignore.case = T),]
 # PLASMA.within.7.days.age.eevnt <- get_matching_rows(PLASMA, CTCAE, 7/365.25) # within 7 days
 # PLASMA.within.7.days.age.eevnt <- PLASMA.within.7.days.age.eevnt[!is.na(PLASMA.within.7.days.age.eevnt$grade),]
-PLASMA <- get_matching_rows(PLASMA, CTCAE, 0/365.25) # on same day; use 7/365.25 for a 7 days window
+PLASMA <- get_matching_rows(PLASMA, CTCAE, 0) # on same day; use 7/365.25 for a 7 days window
 PLASMA <- PLASMA[!is.na(PLASMA$grade) & PLASMA$grade != -9,]
 
 ## Note: Since we are rounding age down to one decimal place, a 7-days window did not make any difference in terms of the number of rows or samples
 SERUM <- df[grepl("Serum", df$aliquot_type, ignore.case = T),]
 SERUM.original <- SERUM
-SERUM <- get_matching_rows(SERUM, CTCAE, 0/365.25) # on same day
+SERUM <- get_matching_rows(SERUM, CTCAE, 0) # on same day
 SERUM <- SERUM[!is.na(SERUM$grade) & SERUM$grade != -9,]
 
 ## Conditions::
@@ -57,13 +59,13 @@ source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/reques
 ########### 
 ## Serum ##
 ###########
-df <- SERUM
-df$Sample_age <- df$ageatsample
+df.serum <- SERUM
+df.serum$Sample_age <- df.serum$ageatsample
 
 
 ## Processing...
 # Condition 1: Skip samples with grade 2 or higher or minimum ageevent with grade 2 or higher. If there are two ageevent that are miniumum value, we still apply this filter (but this did not make any difference)
-step1 <- df %>%
+step1 <- df.serum %>%
   group_by(sjlid) %>%
   filter(
     !(grade[which(ageevent == min(ageevent))[1]] != 0)
@@ -71,7 +73,7 @@ step1 <- df %>%
   ungroup()
 
 dim(step1)
-# anti_join(df, step1)
+# anti_join(df.serum, step1)
 
 # Condition 2: Proceed to remove rows where grades are smaller than the grades previously seen in the ordered rows. In simpler terms, we keeps the rows where the grade value is the highest seen so far within each group. This effectively retains only the rows with the highest grade value within each sjlid group.
 step2 <- step1 %>% 
@@ -151,6 +153,9 @@ length(unique(FINAL.SERUM$sjlid))
 sum(unique(FINAL.SERUM$sjlid) %in% unique(result.164$sjlid))
 # 146
 
+
+
+
 ## Add event number:
 FINAL.SERUM <- FINAL.SERUM %>%
   group_by(sjlid) %>%
@@ -158,6 +163,11 @@ FINAL.SERUM <- FINAL.SERUM %>%
   mutate(event_number = row_number()) %>%
   ungroup() %>%
   arrange(sjlid)  # Restore the original order
+
+
+table(FINAL.SERUM$grade == 0 & FINAL.SERUM$event_number == 1)
+cc <- FINAL.SERUM[!(FINAL.SERUM$grade == 0 & FINAL.SERUM$event_number == 1),]
+
 
 table(FINAL.SERUM$event_number, FINAL.SERUM$grade)
 #     0    2    3

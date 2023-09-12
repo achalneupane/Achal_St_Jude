@@ -21,6 +21,7 @@ for (i in 1:nrow(PLASMA)) {
 return(PLASMA)
 }
 
+
 # cc <- get_matching_rows(PLASMA.cc, CTCAE.cc, 7/365.25)
 
 
@@ -49,7 +50,7 @@ get_rows_with_smaller_sample_age <- function(CTCAE, SERUM, days){
 
 
 
-## Remove rows one grades 2 or higher are seen in ordered df by sjlid and event_number
+## Remove rows once grades 2 or higher are seen in ordered df ordered by event_number
 filter_rows_by_condition <- function(data, group_column, condition_column) {
   # Split the dataframe by the group_column
   split_data <- split(data, data[[group_column]])
