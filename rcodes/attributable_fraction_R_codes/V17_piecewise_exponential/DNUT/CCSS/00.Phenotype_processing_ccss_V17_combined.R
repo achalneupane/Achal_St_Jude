@@ -358,7 +358,7 @@ PHENO.ANY_SN$Meningioma_PRS <-  Meningioma$SCORE [match(PHENO.ANY_SN$ccssid, Men
 
 ## Pleiotropy_PRSWEB_from_variants_also_in_CCSS_org_prs.profile--------- 
 Pleiotropy_PRSWEB.exp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Pleiotropy_PRSWEB_from_variants_also_in_CCSS_org_prs.profile", header = T)
-Pleiotropy_PRSWEB.org <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/prs_out/Meningioma_prs.profile", header = T)
+Pleiotropy_PRSWEB.org <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/prs_out/Pleiotropy_PRSWEB_prs.profile", header = T)
 Pleiotropy_PRSWEB.org$IID <- sub("^(\\d+)_.*", "\\1", Pleiotropy_PRSWEB.org$IID)
 Pleiotropy_PRSWEB <- rbind.data.frame(Pleiotropy_PRSWEB.exp, Pleiotropy_PRSWEB.org)
 PHENO.ANY_SN$Pleiotropy_PRSWEB_PRS <-  Pleiotropy_PRSWEB$SCORE [match(PHENO.ANY_SN$ccssid, Pleiotropy_PRSWEB$IID)]
