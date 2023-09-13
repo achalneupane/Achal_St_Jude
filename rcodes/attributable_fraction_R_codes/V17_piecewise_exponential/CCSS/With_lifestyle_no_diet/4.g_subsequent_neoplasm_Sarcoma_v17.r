@@ -16,6 +16,7 @@ library(stringr)
 # library(tidyverse)
 library(lubridate)
 # benchmarkme::get_ram()
+library(survival)
 
 # ## Edit lifestyle variables
 # source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")

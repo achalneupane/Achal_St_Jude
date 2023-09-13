@@ -138,6 +138,7 @@ bmi_iid_dob_18_uniq = bmi_iid_dob_18_uniq[,c("ccssid", "time", "age", "bmi")]
 # MET_iid_dob_18_uniq = MET_iid_dob_18_sorted[!duplicated(MET_iid_dob_18_sorted$ccssid),]
 # MET_iid_dob_18_uniq = MET_iid_dob_18_uniq[,c("ccssid", "time", "age", "CDC")]
 
+# New met after Huiqi added Physical activity for baseline
 MET_iid_dob_18 = subset(cc, age >= 18)
 MET_iid_dob_18 <- MET_iid_dob_18[!is.na(MET_iid_dob_18$met_vig), ]
 MET_iid_dob_18_sorted = MET_iid_dob_18[order(MET_iid_dob_18$ccssid, MET_iid_dob_18$age, decreasing = FALSE),]
