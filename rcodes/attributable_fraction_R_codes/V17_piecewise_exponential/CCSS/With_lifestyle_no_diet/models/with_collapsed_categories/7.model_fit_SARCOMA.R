@@ -307,4 +307,3 @@ Sarcoma.res
 
 all.res <- rbind.data.frame(SN=SN.res, SMN=SMN.res, NMSC=NMSC.res, BREAST=Breast.res, THYROID=Thyroid.res, MENINGIOMA=Meningioma.res, SARCOMA=Sarcoma.res)
 # View(all.res)
-# View(all.res)
