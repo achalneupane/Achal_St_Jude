@@ -1,4 +1,5 @@
 library(dplyr)
+library(tidyr)
 library(haven)
 setwd("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/")
 
@@ -29,7 +30,7 @@ SERUM <- SERUM %>%
 
 ## Could you please work on it by merging with the CTCAE grades for cardiomyopathy from the most recent data freeze? Please look at serum and plasma separately.
 # read CTCAE
-# CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
+CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
 CTCAE <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
 # CTCAE.original <- CTCAE
 CTCAE <- CTCAE.original[c("sjlid", "studypop", "sjlife_cohort", "gender", "organsys", "condition", "gradedt", "grade", "ageevent")]
@@ -52,11 +53,11 @@ CTCAE <- get_rows_with_smaller_sample_age(CTCAE, SERUM, 0)
 
 ## Add event number
 CTCAE <- CTCAE %>%
-  group_by(sjlid) %>%
-  arrange(ageevent) %>%
-  mutate(event_number = row_number()) %>%
-  ungroup() %>%
-  arrange(sjlid)  # Restore the original order
+  dplyr::group_by(sjlid) %>%
+  dplyr::arrange(ageevent) %>%
+  dplyr::mutate(event_number = row_number()) %>%
+  dplyr::ungroup() %>%
+  dplyr::arrange(sjlid)  # Restore the original order
 
 ## first event should have sample
 CTCAE <- CTCAE[!(CTCAE$grade == 0 & is.na(CTCAE$Sample_age)),]
@@ -74,26 +75,30 @@ CTCAE.2 <- CTCAE
 # SJL5553107
 # Skip samples with grade 2 or higher or minimum ageevent with grade 2 or higher
 CTCAE.2 <- CTCAE.2 %>%
-  group_by(sjlid) %>%
-  filter(
+  dplyr::group_by(sjlid) %>%
+  dplyr::filter(
     !(grade[which(ageevent == min(ageevent))[1]] != 0)
   ) %>%
-  ungroup()
+  dplyr::ungroup()
 
 
 ## Add event number
 CTCAE.2 <- CTCAE.2 %>%
-  group_by(sjlid) %>%
-  arrange(ageevent) %>%
-  mutate(new_event_number = row_number()) %>%
-  ungroup() %>%
-  arrange(sjlid)  # Restore the original order
+  dplyr::group_by(sjlid) %>%
+  dplyr::arrange(ageevent) %>%
+  dplyr::mutate(new_event_number = row_number()) %>%
+  dplyr::ungroup() %>%
+  dplyr::arrange(sjlid)  # Restore the original order
 
 
 CTCAE.2$grade_2_or_higher <- ifelse(CTCAE.2$grade >= 2, "grade_2_or_higher", "grade_0")
 table(CTCAE.2$event_number,CTCAE.2$grade)
 table(CTCAE.2$event_number,CTCAE.2$grade_2_or_higher)
 # table(CTCAE.2$new_event_number,CTCAE.2$grade_2_or_higher)
+
+CTCAE.3 <- CTCAE.2[!is.na(CTCAE.2$Sample_age),]
+table(CTCAE.3$event_number,CTCAE.3$grade_2_or_higher)
+
 
 table(is.na(CTCAE.2$Sample_age) & CTCAE.2$grade >=2)
 table(CTCAE.2$grade >=2)
