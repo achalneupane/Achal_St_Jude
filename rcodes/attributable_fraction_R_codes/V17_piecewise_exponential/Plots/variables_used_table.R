@@ -1,21 +1,21 @@
 ######################################
 ## Attributable fraction of Any SNs ##
 ######################################
-
+library(relrisk)
 # load ANY SN data
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.Any_SNs.V17.Rdata")
 
 # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
-cc
-filtered_cc <- cc[cc[, 2] < 10 | cc[, 3] < 10, 1]
-filtered_cc
-
-PHENO.ANY_SN$maxsegrtdose.category <- as.character(PHENO.ANY_SN$maxsegrtdose.category)
-PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">0-<18"] <- ">0-<30"
-PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">=18-<30"] <- ">0-<30"
-PHENO.ANY_SN$maxsegrtdose.category <- factor(PHENO.ANY_SN$maxsegrtdose.category, levels = c("None", ">0-<30", ">=30"))
-
-table(PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$event == 1]) ## **
+# cc
+# filtered_cc <- cc[cc[, 2] < 10 | cc[, 3] < 10, 1]
+# filtered_cc
+# 
+# PHENO.ANY_SN$maxsegrtdose.category <- as.character(PHENO.ANY_SN$maxsegrtdose.category)
+# PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">0-<18"] <- ">0-<30"
+# PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">=18-<30"] <- ">0-<30"
+# PHENO.ANY_SN$maxsegrtdose.category <- factor(PHENO.ANY_SN$maxsegrtdose.category, levels = c("None", ">0-<30", ">=30"))
+# 
+# table(PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$event == 1]) ## **
 
 
 dat_all = PHENO.ANY_SN
@@ -35,7 +35,7 @@ summary_fit_all <- summary(fit_all)
 
 results <- data.frame(
   Predictor = rownames(coef(summary_fit_all)),
-  "OR (95% CI)" = sprintf("%.2f (%.2f-%.2f)",
+  "RR (95% CI)" = sprintf("%.2f (%.2f-%.2f)",
                           exp(coef(summary_fit_all)[, "Estimate"]),
                           exp(coef(summary_fit_all)[, "Estimate"] - 1.96 * coef(summary_fit_all)[, "Std. Error"]),
                           exp(coef(summary_fit_all)[, "Estimate"] + 1.96 * coef(summary_fit_all)[, "Std. Error"])
@@ -46,6 +46,36 @@ results <- data.frame(
 
 
 ANY_SN.vars <- results[grepl("diagnosis|gender|maxsegrt|abdomen|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
+
+
+
+
+## RR
+
+# Extract coefficients, standard errors, and p-values from the model summary
+coefficients <- coef(summary_fit_all)
+std_errors <- coefficients[, "Std. Error"]
+p_values <- coefficients[, "Pr(>|z|)"]
+
+# Calculate relative risks (exponentiated coefficients)
+relative_risks <- exp(coefficients[, "Estimate"])
+
+# Calculate 95% confidence intervals for relative risks
+conf_int_low <- exp(coefficients[, "Estimate"] - 1.96 * std_errors)
+conf_int_high <- exp(coefficients[, "Estimate"] + 1.96 * std_errors)
+
+# Create a data frame to display the results
+results <- data.frame(
+  Coefficient = rownames(coefficients),
+  Relative_Risk = relative_risks,
+  CI_Lower = conf_int_low,
+  CI_Upper = conf_int_high,
+  P_Value = p_values
+)
+
+# Print the results
+print(results)
+
 
 ###################################
 ## Attributable fraction of SMNs ##
@@ -81,7 +111,7 @@ summary_fit_all <- summary(fit_all)
 
 results <- data.frame(
   Predictor = rownames(coef(summary_fit_all)),
-  "OR (95% CI)" = sprintf("%.2f (%.2f-%.2f)",
+  "RR (95% CI)" = sprintf("%.2f (%.2f-%.2f)",
                           exp(coef(summary_fit_all)[, "Estimate"]),
                           exp(coef(summary_fit_all)[, "Estimate"] - 1.96 * coef(summary_fit_all)[, "Std. Error"]),
                           exp(coef(summary_fit_all)[, "Estimate"] + 1.96 * coef(summary_fit_all)[, "Std. Error"])
@@ -135,7 +165,7 @@ summary_fit_all <- summary(fit_all)
 
 results <- data.frame(
   Predictor = rownames(coef(summary_fit_all)),
-  "OR (95% CI)" = sprintf("%.2f (%.2f-%.2f)",
+  "RR (95% CI)" = sprintf("%.2f (%.2f-%.2f)",
                           exp(coef(summary_fit_all)[, "Estimate"]),
                           exp(coef(summary_fit_all)[, "Estimate"] - 1.96 * coef(summary_fit_all)[, "Std. Error"]),
                           exp(coef(summary_fit_all)[, "Estimate"] + 1.96 * coef(summary_fit_all)[, "Std. Error"])
@@ -191,7 +221,7 @@ summary_fit_all <- summary(fit_all)
 
 results <- data.frame(
   Predictor = rownames(coef(summary_fit_all)),
-  "OR (95% CI)" = sprintf("%.2f (%.2f-%.2f)",
+  "RR (95% CI)" = sprintf("%.2f (%.2f-%.2f)",
                           exp(coef(summary_fit_all)[, "Estimate"]),
                           exp(coef(summary_fit_all)[, "Estimate"] - 1.96 * coef(summary_fit_all)[, "Std. Error"]),
                           exp(coef(summary_fit_all)[, "Estimate"] + 1.96 * coef(summary_fit_all)[, "Std. Error"])
@@ -243,7 +273,7 @@ summary_fit_all <- summary(fit_all)
 
 results <- data.frame(
   Predictor = rownames(coef(summary_fit_all)),
-  "OR (95% CI)" = sprintf("%.2f (%.2f-%.2f)",
+  "RR (95% CI)" = sprintf("%.2f (%.2f-%.2f)",
                           exp(coef(summary_fit_all)[, "Estimate"]),
                           exp(coef(summary_fit_all)[, "Estimate"] - 1.96 * coef(summary_fit_all)[, "Std. Error"]),
                           exp(coef(summary_fit_all)[, "Estimate"] + 1.96 * coef(summary_fit_all)[, "Std. Error"])
@@ -299,7 +329,7 @@ summary_fit_all <- summary(fit_all)
 
 results <- data.frame(
   Predictor = rownames(coef(summary_fit_all)),
-  "OR (95% CI)" = sprintf("%.2f (%.2f-%.2f)",
+  "RR (95% CI)" = sprintf("%.2f (%.2f-%.2f)",
                           exp(coef(summary_fit_all)[, "Estimate"]),
                           exp(coef(summary_fit_all)[, "Estimate"] - 1.96 * coef(summary_fit_all)[, "Std. Error"]),
                           exp(coef(summary_fit_all)[, "Estimate"] + 1.96 * coef(summary_fit_all)[, "Std. Error"])
@@ -346,9 +376,11 @@ fit_all = glm(formula = event ~ Sarcoma_Machiela_PRS.tertile.category +
 
 summary(fit_all)
 
+summary_fit_all <- summary(fit_all)
+
 results <- data.frame(
   Predictor = rownames(coef(summary_fit_all)),
-  "OR (95% CI)" = sprintf("%.2f (%.2f-%.2f)",
+  "RR (95% CI)" = sprintf("%.2f (%.2f-%.2f)",
                           exp(coef(summary_fit_all)[, "Estimate"]),
                           exp(coef(summary_fit_all)[, "Estimate"] - 1.96 * coef(summary_fit_all)[, "Std. Error"]),
                           exp(coef(summary_fit_all)[, "Estimate"] + 1.96 * coef(summary_fit_all)[, "Std. Error"])
@@ -358,7 +390,7 @@ results <- data.frame(
 
 
 
-SARCOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|abdomen|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
+SARCOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|abdomen|pelvis|chest|neck|aa_class_dose|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
 
 
 ## Combine all
@@ -371,7 +403,7 @@ for (i in 1:length(dataframes)) {
   rownames(df) <- NULL
   # Extract the part of the column names after "PRS.tertile.category"
   df$Predictor <- sub(".*PRS.tertile.category", "PRS_tertile_", df$Predictor, ignore.case = T)
-  colnames(df)[-1] <- paste0(c("OR (95% CI)", "P"), "_", names(dataframes)[i])
+  colnames(df)[-1] <- paste0(c("RR (95% CI)", "P"), "_", names(dataframes)[i])
   dataframes[[i]] <- df
 }
 dataframes[[2]]
