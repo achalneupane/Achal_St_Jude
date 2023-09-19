@@ -174,6 +174,7 @@ load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHE
 # 
 # # table(PHENO.ANY_SN$anthra_jco_dose_5.category[PHENO.ANY_SN$BREASTcancer == 1])
 
+# PHENO.ANY_SN <- PHENO.ANY_SN[PHENO.ANY_SN$gender == "Female",]
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 
