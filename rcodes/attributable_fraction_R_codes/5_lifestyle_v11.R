@@ -13,6 +13,7 @@ library(lubridate)
 #########################
 ## Load Phenotype data ##
 #########################
+rm(list=ls())
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores_categories_v11.RDATA")
 
 ##########################################################################################################
@@ -437,6 +438,86 @@ table(ALL.LIFESTYLE$HEALTHY_Diet_yn)
 
 ALL.LIFESTYLE$HEI2015_TOTAL_SCORE <- HEI2015_iid_dob_18_uniq$HEI2015_TOTAL_SCORE[match(ALL.LIFESTYLE$SJLIFEID, HEI2015_iid_dob_18_uniq$sjlid)]
 ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey <- HEI2015_iid_dob_18_uniq$agesurvey[match(ALL.LIFESTYLE$SJLIFEID, HEI2015_iid_dob_18_uniq$sjlid)]
+
+
+# # Yadav's emial on 7/19/2022: In RT dose variables, you may see values of 20 cGy
+# # (centigray) and 200 cGy which are scatter doses than actual doses to that body
+# # region. For example, if someone was treated with 2000 cGy (or 20 Gray) of
+# # radiation to pelvis, it is possible some radiation will get scattered to
+# # nearby body regions such as leg or abdomen or even chest. These doses are
+# # indicated as scatter doses and a value of 20 cGy indicates scatter low (or SL
+# # in some cases) and 200 cGy indicates scatter high (or SH in some cases). For
+# # the above example, doses to abdomen would probably be scatter high because it
+# # is close to pelvis (actual region of irradiation) but doses to chest would
+# # probably be scatter low. Both scatter low and high doses should not be
+# # considered as RT-exposed. When you categorize RT dose variables, values <=200
+# # cGy (that is, scatter doses and 0 dose) should be categorized as no exposure
+# # (or 0 dose).
+# 
+# # ## Do not: Re-classify categorical variables based on Yadav's email above!!
+# # ## maxsegrtdose
+# # epsilon <- 1e-10
+# # PHENO.ANY_SN$maxsegrtdose.gray <- PHENO.ANY_SN$maxsegrtdose/100
+# # # Define the breaks for the categories
+# # breaks <- c(-epsilon, 0, 18-epsilon, 30-epsilon, Inf)
+# # # Define the labels for the categories
+# # labels <- c("None", ">0-<18", ">=18-<30", ">=30")
+# # # Cut the variable into categories
+# # PHENO.ANY_SN$maxsegrtdose.category <- cut(PHENO.ANY_SN$maxsegrtdose.gray, breaks = breaks, labels = labels, include.lowest = TRUE)
+# # levels(PHENO.ANY_SN$maxsegrtdose.category) <- c(levels(PHENO.ANY_SN$maxsegrtdose.category), "Unknown")
+# # PHENO.ANY_SN$maxsegrtdose.category [is.na(PHENO.ANY_SN$maxsegrtdose)] <- "Unknown"
+# # # gg <- cbind.data.frame(PHENO.ANY_SN$maxsegrtdose, PHENO.ANY_SN$maxsegrtdose.category, PHENO.ANY_SN$maxsegrtdose.gray.category)
+# # 
+# # 
+# # ## maxabdrtdose
+# # epsilon <- 1e-10
+# # PHENO.ANY_SN$maxabdrtdose.gray <- PHENO.ANY_SN$maxabdrtdose/100
+# # # Define the breaks for the categories
+# # breaks <- c(-epsilon, 0, 30-epsilon, Inf)
+# # # Define the labels for the categories
+# # labels <- c("None", ">0-<30", ">=30")
+# # # Cut the variable into categories
+# # PHENO.ANY_SN$maxabdrtdose.category <- cut(PHENO.ANY_SN$maxabdrtdose.gray, breaks = breaks, labels = labels, include.lowest = TRUE)
+# # levels(PHENO.ANY_SN$maxabdrtdose.category) <- c(levels(PHENO.ANY_SN$maxabdrtdose.category), "Unknown")
+# # PHENO.ANY_SN$maxabdrtdose.category [is.na(PHENO.ANY_SN$maxabdrtdose)] <- "Unknown"
+# # gg <- cbind.data.frame(PHENO.ANY_SN$maxabdrtdose, PHENO.ANY_SN$maxabdrtdose.category)
+# # 
+# # ## maxpelvisrtdose
+# # epsilon <- 1e-10
+# # PHENO.ANY_SN$maxpelvisrtdose.gray <- PHENO.ANY_SN$maxpelvisrtdose/100
+# # # Define the breaks for the categories
+# # breaks <- c(-epsilon, 0, 20-epsilon, Inf)
+# # # Define the labels for the categories
+# # labels <- c("None", ">0-<20", ">=20")
+# # # Cut the variable into categories
+# # PHENO.ANY_SN$maxpelvisrtdose.category <- cut(PHENO.ANY_SN$maxpelvisrtdose.gray, breaks = breaks, labels = labels, include.lowest = TRUE)
+# # levels(PHENO.ANY_SN$maxpelvisrtdose.category) <- c(levels(PHENO.ANY_SN$maxpelvisrtdose.category), "Unknown")
+# # PHENO.ANY_SN$maxpelvisrtdose.category [is.na(PHENO.ANY_SN$maxpelvisrtdose)] <- "Unknown"
+# # 
+# # ## maxchestrtdose
+# # epsilon <- 1e-10
+# # PHENO.ANY_SN$maxchestrtdose.gray <- PHENO.ANY_SN$maxchestrtdose/100
+# # # Define the breaks for the categories
+# # breaks <- c(-epsilon, 0, 20-epsilon, Inf)
+# # # Define the labels for the categories
+# # labels <- c("None", ">0-<20", ">=20")
+# # # Cut the variable into categories
+# # PHENO.ANY_SN$maxchestrtdose.category <- cut(PHENO.ANY_SN$maxchestrtdose.gray, breaks = breaks, labels = labels, include.lowest = TRUE)
+# # levels(PHENO.ANY_SN$maxchestrtdose.category) <- c(levels(PHENO.ANY_SN$maxchestrtdose.category), "Unknown")
+# # PHENO.ANY_SN$maxchestrtdose.category [is.na(PHENO.ANY_SN$maxchestrtdose)] <- "Unknown"
+# # 
+# # 
+# # ## maxneckrtdose
+# # epsilon <- 1e-10
+# # PHENO.ANY_SN$maxneckrtdose.gray <- PHENO.ANY_SN$maxneckrtdose/100
+# # # Define the breaks for the categories
+# # breaks <- c(-epsilon, 0, 11-epsilon, 20-epsilon, 30-epsilon, Inf)
+# # # Define the labels for the categories
+# # labels <- c("None", ">0-<11", ">=11-<20", ">=20-<30", ">=30")
+# # # Cut the variable into categories
+# # PHENO.ANY_SN$maxneckrtdose.category <- cut(PHENO.ANY_SN$maxneckrtdose.gray, breaks = breaks, labels = labels, include.lowest = TRUE)
+# # levels(PHENO.ANY_SN$maxneckrtdose.category) <- c(levels(PHENO.ANY_SN$maxneckrtdose.category), "Unknown")
+# # PHENO.ANY_SN$maxneckrtdose.category [is.na(PHENO.ANY_SN$maxneckrtdose)] <- "Unknown"
 
 
 # save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
