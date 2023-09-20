@@ -11,72 +11,33 @@ library(lubridate)
 # benchmarkme::get_ram()
 library(survival)
 
-QIsubneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_from_Qi_Liu/toyadav.sas7bdat")
-QIsubneo.original <- QIsubneo  
+data <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_from_Qi_Liu/toyadav.sas7bdat")
 
-QIsubneo <- QIsubneo[c("sjlid", "primdx", "diagdt", "Newstatus", "dob", "survival", "deathdt",
-"maxsegrtdose", "neckmaxrtdose", "chestmaxrtdose", "abdmaxrtdose", "pelvismaxrtdose", "braindose", "neckdose",
-"chestdose", "abddose","pelvisdose", "sex", "race", "diaggrp", "diag", "agedx",
-"braincat", "neckcat", "chestcat", "abdcat", "pelviscat", 
-"lstcondt", "agelstcontact", "ageend", "d_lastc", "agedxcat", "agelast", "sex1", 
-"aa_class_dose", "anthra_jco_dose", 
-"epitxn_dose", "aaclassic_5", "anthracyclines_5", "epipodophyllotoxins_5",
-"cat_aa_class_dose", "cat_anthra_jco_dose", "cat_epitxn_dose", "d_entry", "icdo3morph", "icdo3mcode",
-"sngroup", "snsubgrp", "sndx", "evaldt", "sn")]
+# data$agelstcontact.origina <- data$agelstcontact
 
-contains_breast <- function(column) {
-  any(grepl("Breast", column, ignore.case = TRUE))
-}
-# Apply the function to each column
-columns_with_breast <- sapply(QIsubneo, contains_breast)
-# Get the column names with "Breast" mentioned
-breast_column_names <- names(columns_with_breast[columns_with_breast])
-# Print the column names with "Breast" mentioned
-print(breast_column_names)
-breast.cancer <- QIsubneo[grepl("Breast", QIsubneo$sngroup),]
+data$gradedt <- data$evaldt ## SN grade date
 
-# 2= Meningioma, 4= Sarcoma, 5, Breast cancer, 6 = Thyroid, 7 = NMSC
+## Age at SN diagnosis
+data$AGE.ANY_SN <- time_length(interval(as.Date(data$dob), as.Date(data$gradedt)), "years")
 
-QIsubneo$gradedt <- QIsubneo$evaldt
-
-QIsubneo$AGE.ANY_SN <- time_length(interval(as.Date(QIsubneo$dob), as.Date(QIsubneo$gradedt)), "years")
-QIsubneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- QIsubneo$AGE.ANY_SN - QIsubneo$agedx
-min(QIsubneo$AGE.ANY_SN.after.childhood.cancer.from.agedx, na.rm = T) ## 5.2
-################################## Check in our data
-table(QIsubneo$sndx)
-
-QIsubneo.first <- QIsubneo
-QIsubneo.first$first <- ave(QIsubneo.first$agelstcontact, QIsubneo.first$sjlid, FUN = seq_along)
-QIsubneo.first <- QIsubneo.first[!QIsubneo.first$first >= 2,]
-## Check with my data
-table(PHENO.ANY_SN$anthra_jco_dose_5.category)
-table(PHENO.ANY_SN$aa_class_dose_5.category)
-table(PHENO.ANY_SN$AGE_AT_DIAGNOSIS)
-table(PHENO.ANY_SN$maxsegrtdose.category)
-table(PHENO.ANY_SN$maxneckrtdose.category)
-table(PHENO.ANY_SN$maxabdrtdose.category)
+## Attained age: age at last contact for cases is SN diagnosis date
+data$agelstcontact[!is.na(data$evaldt)] <- data$AGE.ANY_SN[!is.na(data$AGE.ANY_SN)]
 
 
-table(QIsubneo.first$cat_anthra_jco_dose)
-table(QIsubneo.first$cat_aa_class_dose)
-table(QIsubneo.first$agedxcat)
-table(QIsubneo.first$braincat)
-table(QIsubneo.first$neckcat)
-table(QIsubneo.first$abdcat)
+## Add cubic spline of age attained 
+source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/cubic_spline.r")
+breaks = seq(5, 95, 22.5)
+cp = quantile(data$agelstcontact, breaks/100, na.rm = T)
+cs = cubic_spline(data$agelstcontact, knots = cp)
 
-## Any SN
-# data <- QIsubneo[QIsubneo$sndx == 0 | QIsubneo$sndx == 2,] # 2= Meningioma, 4= Sarcoma, 5, Breast cancer, 6 = Thyroid, 7 = NMSC
-data <- QIsubneo
-########################################
-## Prepare data accoding to Qi's code ## 
-########################################
+colnames(cs) <- c("AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4")
+data <- cbind.data.frame(data, cs)
+# cs.data1 <- data[c("sjlid", "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4")]
 
-## Age at last contact for cases is SN diagnosis data
-data$agelstcontact[!is.na(data$AGE.ANY_SN)] <- data$AGE.ANY_SN[!is.na(data$AGE.ANY_SN)]
 
+## define event (Any SN)
 # 2= Meningioma, 4= Sarcoma, 5, Breast cancer, 6 = Thyroid, 7 = NMSC
 data$event <- ifelse(data$sndx != 0, 1, 0) ## Any SN
-# data$event <- ifelse(data$sndx == 2, 1, 0) ## Meningioma
 
 ### How many people had events?
 length(unique(data$sjlid[data$event==1]))
@@ -95,28 +56,31 @@ alldata <- merge(data,event.number,by.x="sjlid",by.y="sjlid")
 alldata$start <- NULL
 alldata$end <- NULL
 ### For those without event, start is agedx and end is Fu date === for SN, analysis starts from 5 years post DX (SNs within 5 years have been removed from the analysis)
+### Achal: Since the analysis start from 5 years post DX, this line, alldata$start[alldata$event==0] <- alldata$agedx[alldata$event==0], has been revised, as below:
 alldata$start[alldata$event==0] <- alldata$agedx[alldata$event==0] + 5
-### Achal: Since the analysis start from 5 years post DX, the above line has been revised to: alldata$start[alldata$event==0] <- alldata$agedx[alldata$event==0]+5
 alldata$end[alldata$event==0] <- alldata$agelstcontact[alldata$event==0] 
 
-### For the first event, start is agedx and end is first event time
+### For the first event, start is agedx and end is first event time; Achal: also added +5 in the line below
 alldata$start[alldata$event==1 & alldata$first==1] <- alldata$agedx[alldata$event==1 & alldata$first==1] + 5
-### Achal: also added +5 in the above line
 alldata$end[alldata$event==1 & alldata$first==1] <- as.numeric(difftime(alldata$gradedt[alldata$event==1 & alldata$first==1],alldata$dob[alldata$event==1 & alldata$first==1], units = 'days')/365.25)
 
 #### For events that are not the first, segments are from the previous event date to this event date
 alldata$previous <- as.Date(c(NA,alldata$gradedt[1:length(alldata$gradedt)-1]),origin = "1970-01-01")
+gg1 <-cbind.data.frame(alldata$sjlid, alldata$event, alldata$first, alldata$previous, alldata$gradedt, alldata$start, alldata$end)
 alldata[1:10,]
 ### if first>1 (i.e, 2 or more events, previous event time remained, others are missing)
 alldata$previous[alldata$first==1] <- NA
+gg2 <-cbind.data.frame(alldata$sjlid, alldata$event, alldata$first, alldata$previous, alldata$gradedt, alldata$start, alldata$end)
+
 alldata$start[alldata$first>1] <- as.numeric(difftime(alldata$previous[alldata$first>1],alldata$dob[alldata$first>1], units = 'days')/365.25)
 alldata$end[alldata$first>1] <- as.numeric(difftime(alldata$gradedt[alldata$first>1],alldata$dob[alldata$first>1], units = 'days')/365.25)
-
+cc1 <- alldata[c(1,50:ncol(alldata))]
 
 ### If one person has only 1 event, we need to have segment from agedx to event date (handled above), and then from event date to end of FU
 row_add <- alldata[alldata$event==1 & alldata$first==alldata$maxE,] ## this includes (1) people with only 1 event (2) The last row for people with multiple events
 row_add$start <- as.numeric(difftime(row_add$gradedt, row_add$dob, units = 'days')/365.25)
 row_add$end <- row_add$agelstcontact;
+
 #### remember to make these rows event as 0, as we are adding the time after the last event date.
 row_add$event <- 0
 ### If we do first event analysis, we would not need these. I need to add an indicator here, in case I only need to get the first event analysis segments.
@@ -128,8 +92,11 @@ adata <- rbind(alldata,row_add)
 #### order by person and start date
 adata <- adata[order(adata$sjlid, adata$start, decreasing = FALSE),]
 table(adata$event)## Double check event numebr is correct
+cc2 <- adata[c(1,50:ncol(alldata))]
 
 ###any stop time <=start time
+# valid_indices <- !is.na(adata$end) & adata$end <= adata$start
+# adata$end[valid_indices] <- adata$end[valid_indices] + 1/365
 adata$end[adata$end<=adata$start] <- adata$end[adata$end<=adata$start] + 1/365
 any <- adata[adata$end<=adata$start,] # 
 diff=any$start-any$end 
@@ -151,8 +118,8 @@ length(unique(SNs_py$sjlid[SNs_py$event==1 & SNs_py$evt1==1 ]))
 
 SNs_py$PY <- SNs_py$end-SNs_py$start
 
-# SNs_py2=SNs_py
-SNs_py2=SNs_py[SNs_py$evt1==1,]
+SNs_py2=SNs_py
+# SNs_py2=SNs_py[SNs_py$evt1==1,]
 
 
 SNs_py2$agedxcat <- factor(SNs_py2$agedxcat)
@@ -172,20 +139,6 @@ SNs_py2$cat_aa_class_dose <- factor(SNs_py2$cat_aa_class_dose)
 
 ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
 SNs_py2 <- cbind.data.frame(SNs_py2, ethnicity.admixture[match(SNs_py2$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
-
-
-
-
-
-########################################
-source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/cubic_spline.r")
-
-breaks = seq(5, 95, 22.5)
-cp = quantile(SNs_py2$agelstcontact, breaks/100, na.rm = T)
-cs = cubic_spline(QIsubneo$agelstcontact, knots = cp)
-
-colnames(cs) <- c("AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4")
-QIsubneo <- cbind.data.frame(QIsubneo, cs)
 
 
 ###############
