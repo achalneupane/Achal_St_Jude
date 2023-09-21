@@ -36,7 +36,7 @@ ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Geno
 data <- cbind.data.frame(data, ethnicity.admixture[match(data$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
 
 
-# data$agelstcontact.origina <- data$agelstcontact
+# data$agelstcontact.original <- data$agelstcontact
 data$gradedt <- data$evaldt ## SN grade date
 
 ## Age at SN diagnosis
@@ -45,19 +45,23 @@ data$AGE.ANY_SN <- time_length(interval(as.Date(data$dob), as.Date(data$gradedt)
 ## Attained age: age at last contact for cases is SN diagnosis date
 data$agelstcontact[!is.na(data$evaldt)] <- data$AGE.ANY_SN[!is.na(data$AGE.ANY_SN)]
 
-
-## Add cubic spline of age attained 
-breaks = seq(5, 95, 22.5)
-cp = quantile(data$agelstcontact, breaks/100, na.rm = T)
-cs = cubic_spline(data$agelstcontact, knots = cp)
-
-colnames(cs) <- c("AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4")
-data <- cbind.data.frame(data, cs)
-
-
 ## define event (Any SN)
 # 2= Meningioma, 4= Sarcoma, 5, Breast cancer, 6 = Thyroid, 7 = NMSC
 data$event <- ifelse(data$sndx != 0, 1, 0) ## Any SN
+
+
+## Check how many within 5 years of primary cancer
+data$AGE.ANY_SN.after.childhood.cancer.from.agedx <- data$AGE.ANY_SN - data$agedx
+sum(data$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5, na.rm = T)
+# 0
+## Get first event after 5 years of primary diagnosis
+table(data$event == 1)
+CA <- data[data$event == 1,]
+CO <- data[data$event == 0,]
+CA <- setDT(CA)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+
+data <- rbind.data.frame(CA, CO)
+
 
 ### How many people had events?
 length(unique(data$sjlid[data$event==1]))
@@ -145,6 +149,15 @@ SNs_py2$cat_anthra_jco_dose <- factor(SNs_py2$cat_anthra_jco_dose)
 SNs_py2$cat_epitxn_dose <- factor(SNs_py2$cat_epitxn_dose)
 SNs_py2$cat_aa_class_dose <- factor(SNs_py2$cat_aa_class_dose)
 
+
+
+## Add cubic spline of age attained
+breaks = seq(5, 95, 22.5)
+cp = quantile(SNs_py2$agelstcontact, breaks/100, na.rm = T)
+cs = cubic_spline(SNs_py2$agelstcontact, knots = cp)
+
+colnames(cs) <- c("AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4")
+data <- cbind.data.frame(SNs_py2, cs)
 
 
 ###############
