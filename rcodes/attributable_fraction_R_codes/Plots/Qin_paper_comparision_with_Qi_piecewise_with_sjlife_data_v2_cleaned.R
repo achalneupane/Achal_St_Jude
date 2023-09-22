@@ -15,6 +15,7 @@ library(stringr)
 library(lubridate)
 # benchmarkme::get_ram()
 library(survival)
+library(geepack)
 
 ## function to add cubic spline
 cubic_spline <- function(tp, knots)
@@ -708,8 +709,8 @@ length(unique(SNs_py$sjlid[SNs_py$event==1 & SNs_py$evt1==1 ]))
 SNs_py$PY <- SNs_py$end-SNs_py$start
 
 
-# SNs_py2=SNs_py
-SNs_py2=SNs_py[SNs_py$evt1==1,]
+SNs_py2=SNs_py
+# SNs_py2=SNs_py[SNs_py$evt1==1,]
 
 
 SNs_py2$agedxcat <- factor(SNs_py2$agedxcat)
@@ -735,31 +736,47 @@ colnames(cs) <- c("AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_
 SNs_py2 <- cbind.data.frame(SNs_py2, cs)
 
 
-# library(splines)
-# # Define evenly spaced knots
-num_knots <- 5
-knots <- seq(min(SNs_py2$end), max(SNs_py2$end), length.out = num_knots + 2)[2:(num_knots + 1)]
-
-# Create a cubic spline with 5 evenly spaced knots
-cubic_spline <- ns(SNs_py2$end, knots = knots)
-
-# colnames(cubic_spline) <- c("AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", "AGE_AT_LAST_CONTACT.cs5")
-colnames(cubic_spline) <- c("AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", "AGE_AT_LAST_CONTACT.cs5", "AGE_AT_LAST_CONTACT.cs6")
-cs <- cubic_spline
-SNs_py2 <- cbind.data.frame(SNs_py2, cs)
+# # library(splines)
+# # # Define evenly spaced knots
+# num_knots <- 5
+# knots <- seq(min(SNs_py2$end), max(SNs_py2$end), length.out = num_knots + 2)[2:(num_knots + 1)]
+# 
+# # Create a cubic spline with 5 evenly spaced knots
+# cubic_spline <- ns(SNs_py2$end, knots = knots)
+# 
+# # colnames(cubic_spline) <- c("AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", "AGE_AT_LAST_CONTACT.cs5")
+# colnames(cubic_spline) <- c("AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4", "AGE_AT_LAST_CONTACT.cs5", "AGE_AT_LAST_CONTACT.cs6")
+# cs <- cubic_spline
+# SNs_py2 <- cbind.data.frame(SNs_py2, cs)
 
 ###############
 ## Model fit ##
 ###############
 
 # subset fameles only
-SNs_py2 <- SNs_py2[SNs_py2$sex == "Female",]
+# SNs_py2 <- SNs_py2[SNs_py2$sex == "Female",]
+
+
+
 ## 1. Any SN
-fit_all <- glm(formula = event ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +AGE_AT_LAST_CONTACT.cs5 +
+fit_all <- glm(formula = event ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                  agedxcat +
                  chestcat + cat_anthra_jco_dose + 
                  EAS + AFR,
                family = "poisson", offset = log(SNs_py2$PY), data = SNs_py2)
+
+
+# SNs_py2 <- SNs_py2 %>%
+#   mutate(id = as.numeric(factor(sjlid)))
+# # 
+# SNs_py2 <- SNs_py2[c("AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4",
+# "agedxcat", "chestcat", "cat_anthra_jco_dose", "event", "sjlid", "PY", "id")]
+# # 
+# SNs_py2 <- SNs_py2[complete.cases(SNs_py2), ]
+# 
+# fit_all <- geeglm(event ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+#                     agedxcat + chestcat + cat_anthra_jco_dose, 
+#                   family = "poisson", offset = log(SNs_py2$PY), id = id, corstr = "independence",  std.err = "san.se", data = SNs_py2)
 
 summary_fit_all <- summary(fit_all)
 
@@ -771,6 +788,8 @@ p_values <- coefficients[, "Pr(>|z|)"]
 
 # Calculate relative risks (exponentiated coefficients)
 relative_risks <- exp(coefficients[, "Estimate"])
+
+# cbind.data.frame(rownames(coefficients), exp(coefficients[, "Estimate"]))
 
 # Calculate 95% confidence intervals for relative risks
 conf_int_low <- exp(coefficients[, "Estimate"] - 1.96 * std_errors)

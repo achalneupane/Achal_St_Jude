@@ -90,9 +90,9 @@ PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid,]
 BREASTcancer$gender <-  PHENO.ANY_SN$gender[match(BREASTcancer$sjlid , PHENO.ANY_SN$sjlid)]
 BREASTcancer <- BREASTcancer[BREASTcancer$gender == "Female",]
 
-## Remove those that are not breast cancer
-subneo.not.breast.cancer <- unique(subneo$sjlid[!subneo$sjlid %in% unique(BREASTcancer$sjlid)])
-PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.not.breast.cancer$sjlid,]
+# ## Remove those that are not breast cancer
+# subneo.not.breast.cancer <- unique(subneo$sjlid[!subneo$sjlid %in% unique(BREASTcancer$sjlid)])
+# PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.not.breast.cancer,]
 
 
 PHENO.ANY_SN$BREASTcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% BREASTcancer$sjlid, 0, 1))
