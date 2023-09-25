@@ -34,7 +34,7 @@ results <- data.frame(
 
 
 ANY_SN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
-
+ANY_SN.vars
 ###################################
 ## Attributable fraction of SMNs ##
 ###################################
@@ -176,7 +176,7 @@ results <- data.frame(
 
 
 THYROID.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
-
+THYROID.vars
 
 #############################################
 ## Attributable fraction of Any Meningioma ##
@@ -210,7 +210,7 @@ results <- data.frame(
 
 
 MENINGIOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
-
+MENINGIOMA.vars
 
 ##########################################
 ## Attributable fraction of Any SARCOMA ##
@@ -236,12 +236,10 @@ load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHE
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 
-fit_all = glm(formula = event ~ Sarcoma_Machiela_PRS.tertile.category +
-                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+fit_all = glm(formula = event ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 gender + 
                 aa_class_dose_5.category +
-                EAS + AFR + 
-                any_chemo_missing,
+                EAS + AFR,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
 summary(fit_all)
@@ -261,7 +259,7 @@ results <- data.frame(
 
 
 SARCOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
-
+SARCOMA.vars
 
 ## Combine all
 

@@ -524,26 +524,95 @@ ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey <- HEI2015_iid_dob_18_uniq$agesurvey
 ## read from datafreeze
 chemo.2020 <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/chemosum_dose.sas7bdat')
 # chemo.2020$match(PHENO.ANY_SN$sjlid, chemo.2020$sjlid)
+# chemo.2018 <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20181231/Clinical Data/chemosum_dose.sas7bdat')
 
 radiation.2020 <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/radiation_dosimetry.sas7bdat')
+# radiation.2018 <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20181231/Clinical Data/radiation_dosimetry.sas7bdat')
+
+
+## Remove unnecessary columns
+PHENO.ANY_SN <- PHENO.ANY_SN[!colnames(PHENO.ANY_SN) %in% c("aa_class_dose_any_yn", "aa_class_dose_any.category", "aa_class_dose_5_yn", "cisplat_dose_any_yn", "cisplat_dose_any.category", "cisplateq_dose_5_yn", "cisplateq_dose_5.category",
+  "aa_hvymtl_dose_any_yn", "aa_hvymtl_dose_any.category", "aa_hvymtl_dose_5_yn", "aa_hvymtl_dose_5.category", "anthra_jco_dose_any_yn", "anthra_jco_dose_any.category",
+  "anthra_jco_dose_5_yn", "epitxn_dose_any_yn", "epitxn_dose_any.category", "epitxn_dose_5_yn",
+  "aa_class_dose_any", "aa_hvymtl_dose_5", "aa_hvymtl_dose_any", "cisplat_dose_5", "cisplat_dose_any", "cisplateq_dose_5", "cisplateq_dose_any", 
+  "epitxn_dose_any", "anthra_cog_dose_5", "anthra_cog_dose_any", "anthra_jco_dose_any", "carbo_dose_any", "carbo_dose_5" )]
+
 
 ## MaxsegRT
-PHENO.ANY_SN$maxsegrtdose.2020 <- radiation.2020$maxsegrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
-table(PHENO.ANY_SN$maxsegrtdose.2020 == PHENO.ANY_SN$maxsegrtdose) ## 2020
+PHENO.ANY_SN$maxsegrtdose <- radiation.2020$maxsegrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
+PHENO.ANY_SN$maxsegrtdose.category <- cut(PHENO.ANY_SN$maxsegrtdose, breaks = c(0, 200, 1799, 2999, max(PHENO.ANY_SN$maxsegrtdose, na.rm = T)),
+                                          labels = c("None", ">0-<18", ">=18-<30", ">=30"),
+                                          include.lowest = TRUE)
+levels(PHENO.ANY_SN$maxsegrtdose.category) <- c(levels(PHENO.ANY_SN$maxsegrtdose.category), "Unknown")
+PHENO.ANY_SN$maxsegrtdose.category [is.na(PHENO.ANY_SN$maxsegrtdose)] <- "Unknown"
+
+
 
 ## Maxchest
-PHENO.ANY_SN$maxchestrtdose.2020 <- radiation.2020$maxchestrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
-table(PHENO.ANY_SN$maxchestrtdose.2020 == PHENO.ANY_SN$maxchestrtdose) ## 2020
+PHENO.ANY_SN$maxchestrtdose <- radiation.2020$maxchestrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
+PHENO.ANY_SN$maxchestrtdose.category <- cut(PHENO.ANY_SN$maxchestrtdose, breaks = c(0, 200, 1999, max(PHENO.ANY_SN$maxchestrtdose, na.rm = T)),
+                                            labels = c("None", ">0-<20", ">=20"),
+                                            include.lowest = TRUE)
+levels(PHENO.ANY_SN$maxchestrtdose.category) <- c(levels(PHENO.ANY_SN$maxchestrtdose.category), "Unknown")
+PHENO.ANY_SN$maxchestrtdose.category [is.na(PHENO.ANY_SN$maxchestrtdose)] <- "Unknown"
+
 
 ## Maxneck
-PHENO.ANY_SN$maxneckrtdose.2020 <- radiation.2020$maxneckrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
-table(PHENO.ANY_SN$maxneckrtdose.2020 == PHENO.ANY_SN$maxneckrtdose) ## 2020
+PHENO.ANY_SN$maxneckrtdose <- radiation.2020$maxneckrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
+PHENO.ANY_SN$maxneckrtdose.category <- cut(PHENO.ANY_SN$maxneckrtdose, breaks = c(0, 200, 1099, 1999, 2999, max(PHENO.ANY_SN$maxneckrtdose, na.rm = T)),
+                                           labels = c("None", ">0-<11", ">=11-<20", ">=20-<30", ">=30"),
+                                           include.lowest = TRUE)
+levels(PHENO.ANY_SN$maxneckrtdose.category) <- c(levels(PHENO.ANY_SN$maxneckrtdose.category), "Unknown")
+PHENO.ANY_SN$maxneckrtdose.category [is.na(PHENO.ANY_SN$maxneckrtdose)] <- "Unknown"
+
 
 ## Maxabdomen
-PHENO.ANY_SN$maxabdrtdose.2020 <- radiation.2020$maxabdrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
-table(PHENO.ANY_SN$maxabdrtdose.2020 == PHENO.ANY_SN$maxabdrtdose) ## 2020
-table(PHENO.ANY_SN$maxabdrtdose.2018 == PHENO.ANY_SN$maxabdrtdose) 
-PHENO.ANY_SN$MRN[which(PHENO.ANY_SN$maxabdrtdose.2020 != PHENO.ANY_SN$maxabdrtdose)]
+PHENO.ANY_SN$maxabdrtdose <- radiation.2020$maxabdrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
+PHENO.ANY_SN$maxabdrtdose.category <- cut(PHENO.ANY_SN$maxabdrtdose, breaks = c(0, 200, 2999, max(PHENO.ANY_SN$maxabdrtdose, na.rm = T)),
+                                          labels = c("None", ">0-<30", ">=30"),
+                                          include.lowest = TRUE)
+levels(PHENO.ANY_SN$maxabdrtdose.category) <- c(levels(PHENO.ANY_SN$maxabdrtdose.category), "Unknown")
+PHENO.ANY_SN$maxabdrtdose.category [is.na(PHENO.ANY_SN$maxabdrtdose)] <- "Unknown"
+
+
+## Maxpelvis
+PHENO.ANY_SN$maxpelvisrtdose <- radiation.2020$maxpelvisrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
+PHENO.ANY_SN$maxpelvisrtdose.category <- cut(PHENO.ANY_SN$maxpelvisrtdose, breaks = c(0, 200, 1999, max(PHENO.ANY_SN$maxpelvisrtdose, na.rm = T)),
+                                             labels = c("None", ">0-<20", ">=20"),
+                                             include.lowest = TRUE)
+levels(PHENO.ANY_SN$maxpelvisrtdose.category) <- c(levels(PHENO.ANY_SN$maxpelvisrtdose.category), "Unknown")
+PHENO.ANY_SN$maxpelvisrtdose.category [is.na(PHENO.ANY_SN$maxpelvisrtdose)] <- "Unknown"
+
+
+## aa_class_dose_5 **
+PHENO.ANY_SN$aa_class_dose_5 <- chemo.2020$alkylating_dose_5[match(PHENO.ANY_SN$sjlid, chemo.2020$sjlid)]
+TERT = unname(quantile(PHENO.ANY_SN$aa_class_dose_5[PHENO.ANY_SN$aa_class_dose_5 !=0], c(1/3, 2/3, 1), na.rm = T))
+PHENO.ANY_SN$aa_class_dose_5.category <- cut(PHENO.ANY_SN$aa_class_dose_5, breaks = c(-Inf, 0, TERT),
+                                             labels = c("None", "1st", "2nd", "3rd"),
+                                             include.lowest = TRUE)
+# levels(PHENO.ANY_SN$aa_class_dose_5.category) <- c(levels(PHENO.ANY_SN$aa_class_dose_5.category), "Unknown")
+# PHENO.ANY_SN$aa_class_dose_5.category [is.na(PHENO.ANY_SN$aa_class_dose_5.category)] <- "Unknown"
+
+
+## anthra_jco_dose_5 **
+PHENO.ANY_SN$anthra_jco_dose_5 <- chemo.2020$anthracyclines_dose_5[match(PHENO.ANY_SN$sjlid, chemo.2020$sjlid)]
+TERT = unname(quantile(PHENO.ANY_SN$anthra_jco_dose_5[PHENO.ANY_SN$anthra_jco_dose_5 !=0], c(1/3, 2/3, 1), na.rm = T))
+PHENO.ANY_SN$anthra_jco_dose_5.category <- cut(PHENO.ANY_SN$anthra_jco_dose_5, breaks = c(-Inf, 0, TERT),
+                                               labels = c("None", "1st", "2nd", "3rd"),
+                                               include.lowest = TRUE)
+# levels(PHENO.ANY_SN$anthra_jco_dose_5.category) <- c(levels(PHENO.ANY_SN$anthra_jco_dose_5.category), "Unknown")
+# PHENO.ANY_SN$anthra_jco_dose_5.category [is.na(PHENO.ANY_SN$anthra_jco_dose_5.category)] <- "Unknown"
+
+
+## epitxn_dose_5 **
+PHENO.ANY_SN$epitxn_dose_5 <- chemo.2020$epipodophyllotoxins_dose_5[match(PHENO.ANY_SN$sjlid, chemo.2020$sjlid)]
+TERT = unname(quantile(PHENO.ANY_SN$epitxn_dose_5[PHENO.ANY_SN$epitxn_dose_5 !=0], c(1/3, 2/3, 1), na.rm = T))
+PHENO.ANY_SN$epitxn_dose_5.category <- cut(PHENO.ANY_SN$epitxn_dose_5, breaks = c(-Inf, 0, TERT),
+                                           labels = c("None", "1st", "2nd", "3rd"),
+                                           include.lowest = TRUE)
+# levels(PHENO.ANY_SN$epitxn_dose_5.category) <- c(levels(PHENO.ANY_SN$epitxn_dose_5.category), "Unknown")
+# PHENO.ANY_SN$epitxn_dose_5.category [is.na(PHENO.ANY_SN$epitxn_dose_5.category)] <- "Unknown"
+
 
 
 # save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
