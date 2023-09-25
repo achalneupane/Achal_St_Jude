@@ -40,6 +40,40 @@ ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Geno
 data.all <- cbind.data.frame(data, ethnicity.admixture[match(data$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
 
+## read from datafreeze
+chemo.2020 <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/chemosum_dose.sas7bdat')
+# chemo.2020$match(PHENO.ANY_SN$sjlid, chemo.2020$sjlid)
+
+radiation.2020 <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/radiation_dosimetry.sas7bdat')
+radiation.2018 <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20181231/Clinical Data/radiation_dosimetry.sas7bdat')
+
+## MaxsegRT
+PHENO.ANY_SN$maxsegrtdose.2020 <- radiation.2020$maxsegrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
+PHENO.ANY_SN$maxsegrtdose.2018 <- radiation.2018$maxsegrtdose[match(PHENO.ANY_SN$sjlid, radiation.2018$sjlid)]
+table(PHENO.ANY_SN$maxsegrtdose.2020 == PHENO.ANY_SN$maxsegrtdose) ## 2020
+table(PHENO.ANY_SN$maxsegrtdose.2018 == PHENO.ANY_SN$maxsegrtdose) 
+
+## Maxchest
+PHENO.ANY_SN$maxchestrtdose.2020 <- radiation.2020$maxchestrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
+PHENO.ANY_SN$maxchestrtdose.2018 <- radiation.2018$maxchestrtdose[match(PHENO.ANY_SN$sjlid, radiation.2018$sjlid)]
+table(PHENO.ANY_SN$maxchestrtdose.2020 == PHENO.ANY_SN$maxchestrtdose) ## 2020
+table(PHENO.ANY_SN$maxchestrtdose.2018 == PHENO.ANY_SN$maxchestrtdose) 
+
+## Maxneck
+PHENO.ANY_SN$maxneckrtdose.2020 <- radiation.2020$maxneckrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
+PHENO.ANY_SN$maxneckrtdose.2018 <- radiation.2018$maxneckrtdose[match(PHENO.ANY_SN$sjlid, radiation.2018$sjlid)]
+table(PHENO.ANY_SN$maxneckrtdose.2020 == PHENO.ANY_SN$maxneckrtdose) ## 2020
+table(PHENO.ANY_SN$maxneckrtdose.2018 == PHENO.ANY_SN$maxneckrtdose) 
+
+## Maxabdomen
+PHENO.ANY_SN$maxabdrtdose.2020 <- radiation.2020$maxabdrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
+PHENO.ANY_SN$maxabdrtdose.2018 <- radiation.2018$maxabdrtdose[match(PHENO.ANY_SN$sjlid, radiation.2018$sjlid)]
+table(PHENO.ANY_SN$maxabdrtdose.2020 == PHENO.ANY_SN$maxabdrtdose) ## 2020
+table(PHENO.ANY_SN$maxabdrtdose.2018 == PHENO.ANY_SN$maxabdrtdose) 
+PHENO.ANY_SN$MRN[which(PHENO.ANY_SN$maxabdrtdose.2020 != PHENO.ANY_SN$maxabdrtdose)]
+
+
+
 ## 1.-----------------------------------maxsegRT
 table(data.all$braincat)
 # 0    1    2    3    4 
@@ -74,7 +108,15 @@ data.all$neckcat.AN <- cut(data.all$neckmaxrtdose, breaks = c(0, 200, 1099, 1999
 levels(data.all$neckcat.AN) <- c(levels(data.all$neckcat.AN), 5)
 data.all$neckcat.AN[is.na(data.all$neckcat.AN)] <- 5
 table(data.all$neckcat.AN)
+# 0    1    2    3    4    5 
+# 3652    5   77  504  354  582 
+
 cc <- data.all[c("sjlid", "neckcat", "neckcat.AN", "neckmaxrtdose")]
+
+## Our data
+table(PHENO.ANY_SN$maxneckrtdose.category)
+# None   >0-<11 >=11-<20 >=20-<30     >=30  Unknown 
+# 3561        6       90      426      270       48 
 
 ## 3.-----------------------------------abdomenRT
 table(data.all$abdcat)
@@ -84,10 +126,16 @@ table(data.all$abdcat)
 data.all$abdcat.AN <- cut(data.all$abdmaxrtdose, breaks = c(0, 200, 2999, max(data.all$abdmaxrtdose, na.rm = T)),
     labels = c(0:2),
     include.lowest = TRUE)
-levels(data.all$abdcat.AN) <- c(levels(PHENO.ANY_SN$maxabdrtdose.category), 3)
+levels(data.all$abdcat.AN) <- c(levels(data.all$abdcat.AN), 3)
 data.all$abdcat.AN [is.na(data.all$abdcat.AN)] <- 3
 table(data.all$abdcat.AN)
+# 0    1    2    3 
+# 3718  563  310  583
 
+## Our data
+table(PHENO.ANY_SN$maxabdrtdose.category)
+# None  >0-<30    >=30 Unknown 
+# 3568     522     263      48
 
 
 ## 4.-----------------------------------chestRT
@@ -100,6 +148,13 @@ data.all$chestcat.AN <- cut(data.all$chestmaxrtdose, breaks = c(0, 200, 1999, ma
 levels(data.all$chestcat.AN) <- c(levels(data.all$chestcat.AN), 3)
 data.all$chestcat.AN [is.na(data.all$chestcat.AN)] <- 3
 table(data.all$chestcat.AN)
+# 0    1    2    3 
+# 3621  119  851  583
+
+## Our data
+table(PHENO.ANY_SN$maxchestrtdose.category)
+# None  >0-<20    >=20 Unknown 
+# 3498     149     705      49 
 
 
 ## 5.-----------------------------------pelvisRT
@@ -115,19 +170,61 @@ data.all$pelviscat.AN [is.na(data.all$pelviscat.AN)] <- 3
 table(data.all$pelviscat.AN)
 # 0    1    2    3 
 # 3853  141  597  583 
+## Our data
+table(PHENO.ANY_SN$maxpelvisrtdose.category)
+# None  >0-<20    >=20 Unknown 
+# 3669     169     518      45
 
+## 6.-----------------------------------aa_class_dose
 table(data.all$cat_aa_class_dose)
 # 0    1    2    3 
 # 2114  924  936 1159 
 
+TERT = unname(quantile(data.all$aa_class_dose[data.all$aa_class_dose !=0], c(1/3, 2/3, 1), na.rm = T))
+data.all$cat_aa_class_dose.AN <- cut(data.all$aa_class_dose, breaks = c(-Inf, 0, TERT),
+                                               labels = c("None", "1st", "2nd", "3rd"),
+                                               include.lowest = TRUE)
+table(data.all$cat_aa_class_dose.AN)
+# None  1st  2nd  3rd 
+# 2114 1014  999 1006
+
+
+TERT = unname(quantile(data.all$aa_class_dose[data.all$aa_class_dose !=0], c(1/3, 2/3, 1), na.rm = T))
+data.all$cat_aa_class_dose.AN <- cut(data.all$aa_class_dose, breaks = c(-Inf, 0, TERT),
+                                     labels = c("None", "1st", "2nd", "3rd"),
+                                     include.lowest = TRUE)
+table(data.all$cat_aa_class_dose.AN)
+
+cc <- data.all[c("sjlid", "cat_aa_class_dose", "cat_aa_class_dose.AN", "aa_class_dose")]
+
+table(PHENO.ANY_SN$aa_class_dose_5.category)
+
+
+
+## 7.-----------------------------------anthra_jco_dose
 table(data.all$cat_anthra_jco_dose)
 # 0    1    2    3 
 # 2379  965  911  894 
 
+TERT = unname(quantile(data.all$anthra_jco_dose[data.all$anthra_jco_dose !=0], c(1/3, 2/3, 1), na.rm = T))
+data.all$cat_anthra_jco_dose.AN <- cut(data.all$anthra_jco_dose, breaks = c(-Inf, 0, TERT),
+                                     labels = c("None", "1st", "2nd", "3rd"),
+                                     include.lowest = TRUE)
+table(data.all$cat_anthra_jco_dose.AN )
+# None  1st  2nd  3rd 
+# 2379  924  932  914 
+
+## 7.-----------------------------------epitxn_dose
 table(data.all$cat_epitxn_dose)
 # 0    1    2    3 
 # 3521  574  529  528 
-
+TERT = unname(quantile(data.all$epitxn_dose[data.all$epitxn_dose !=0], c(1/3, 2/3, 1), na.rm = T))
+data.all$cat_epitxn_dose.AN <- cut(data.all$epitxn_dose, breaks = c(-Inf, 0, TERT),
+                                       labels = c("None", "1st", "2nd", "3rd"),
+                                       include.lowest = TRUE)
+table(data.all$cat_epitxn_dose.AN)
+# None  1st  2nd  3rd 
+# 3521  544  543  544
 
 
 data.all$agedx
@@ -145,6 +242,7 @@ table(data.all$agedxcat)
 ## Any SN ##
 ############
 
+data <- data.all
 # data$agelstcontact.original <- data$agelstcontact
 data$gradedt <- data$evaldt ## SN grade date
 
@@ -162,14 +260,14 @@ data$event <- ifelse(data$sndx != 0, 1, 0) ## Any SN
 ## Check how many within 5 years of primary cancer
 data$AGE.ANY_SN.after.childhood.cancer.from.agedx <- data$AGE.ANY_SN - data$agedx
 sum(data$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5, na.rm = T)
-0 # Since it's 0, they all are after 5 years of primary diagnosis
+# 0 # Since it's 0, they all are after 5 years of primary diagnosis
 # Get first event after 5 years of primary diagnosis
 table(data$event == 1)
 CA <- data[data$sndx != 0,]
 CO <- data[data$sndx == 0,]
 CA <- setDT(CA)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 
-# data <- rbind.data.frame(CA, CO)
+data <- rbind.data.frame(CA, CO)
 
 
 ### How many people had events?
@@ -332,10 +430,7 @@ library(lubridate)
 # benchmarkme::get_ram()
 library(survival)
 
-data <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_from_Qi_Liu/toyadav.sas7bdat")
-ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
-data <- cbind.data.frame(data, ethnicity.admixture[match(data$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
-
+data <- data.all
 
 # data$agelstcontact.original <- data$agelstcontact
 data$gradedt <- data$evaldt ## SN grade date
@@ -360,7 +455,7 @@ sum(data$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5, na.rm = T)
 table(data$event == 1)
 CA <- data[data$sndx == 2,]
 CO <- data[data$sndx == 0,]
-CA <- setDT(CA)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+# CA <- setDT(CA)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 
 data <- rbind.data.frame(CA, CO)
 dim(data)
@@ -435,8 +530,8 @@ length(unique(SNs_py$sjlid[SNs_py$event==1 & SNs_py$evt1==1 ]))
 SNs_py$PY <- SNs_py$end-SNs_py$start
 
 
-# SNs_py2=SNs_py
-SNs_py2=SNs_py[SNs_py$evt1==1,]
+SNs_py2=SNs_py
+# SNs_py2=SNs_py[SNs_py$evt1==1,]
 
 
 SNs_py2$agedxcat <- factor(SNs_py2$agedxcat)
@@ -478,7 +573,7 @@ SNs_py2 <- cbind.data.frame(SNs_py2, cs)
 ###############
 ## Model fit ##
 ###############
-## 1. Any SN
+## 2. Meningioma
 fit_all <- glm(formula = event ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                  agedxcat + sex +
                  braincat + cat_epitxn_dose,
@@ -658,7 +753,7 @@ SNs_py2 <- cbind.data.frame(SNs_py2, cs)
 ###############
 ## Model fit ##
 ###############
-## 1. Any SN
+## 3. Sarcoma
 fit_all <- glm(formula = event ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                  sex +
                  cat_aa_class_dose +
@@ -854,11 +949,9 @@ SNs_py2 <- cbind.data.frame(SNs_py2, cs)
 ###############
 
 # subset fameles only
-# SNs_py2 <- SNs_py2[SNs_py2$sex == "Female",]
+SNs_py2 <- SNs_py2[SNs_py2$sex == "Female",]
 
-
-
-## 1. Any SN
+## 4. Breast cancer
 fit_all <- glm(formula = event ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                  agedxcat +
                  chestcat + cat_anthra_jco_dose + 
@@ -1052,7 +1145,7 @@ SNs_py2 <- cbind.data.frame(SNs_py2, cs)
 ###############
 ## Model fit ##
 ###############
-## 1. Any SN
+## 5. Thyroid
 fit_all <- glm(formula = event ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                  agedxcat + sex +
                  neckcat + cat_epitxn_dose,
@@ -1074,7 +1167,7 @@ conf_int_low <- exp(coefficients[, "Estimate"] - 1.96 * std_errors)
 conf_int_high <- exp(coefficients[, "Estimate"] + 1.96 * std_errors)
 
 # Create a data frame to display the results
-results.Sarcoma <- data.frame(
+results.Thyroid <- data.frame(
   Coefficient = rownames(coefficients),
   Relative_Risk = round(relative_risks,1),
   CI_Lower = round(conf_int_low,1),
@@ -1083,5 +1176,5 @@ results.Sarcoma <- data.frame(
 )
 
 # Print the results
-print(results.Sarcoma)
+print(results.Thyroid)
 

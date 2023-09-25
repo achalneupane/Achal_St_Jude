@@ -108,13 +108,13 @@ NMSC.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.BREASTcancer.V18.Rdata")
 
 
-# PHENO.ANY_SN <- PHENO.ANY_SN[PHENO.ANY_SN$gender == "Female",]
+PHENO.ANY_SN <- PHENO.ANY_SN[PHENO.ANY_SN$gender == "Female",]
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 
 
-dat_all <- dat_all %>%
-  mutate(id = as.numeric(factor(sjlid)))
+# dat_all <- dat_all %>%
+#   mutate(id = as.numeric(factor(sjlid)))
 
 
 fit_all = glm(formula = event ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + 
@@ -141,7 +141,7 @@ results <- data.frame(
 
 
 BREASTCANCER.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
-
+BREASTCANCER.vars
 ##########################################
 ## Attributable fraction of Any THYROID ##
 ##########################################

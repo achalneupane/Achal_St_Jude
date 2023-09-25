@@ -520,6 +520,32 @@ ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey <- HEI2015_iid_dob_18_uniq$agesurvey
 # # PHENO.ANY_SN$maxneckrtdose.category [is.na(PHENO.ANY_SN$maxneckrtdose)] <- "Unknown"
 
 
+## Recheck chemo and radiation variables
+## read from datafreeze
+chemo.2020 <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/chemosum_dose.sas7bdat')
+# chemo.2020$match(PHENO.ANY_SN$sjlid, chemo.2020$sjlid)
+
+radiation.2020 <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/radiation_dosimetry.sas7bdat')
+
+## MaxsegRT
+PHENO.ANY_SN$maxsegrtdose.2020 <- radiation.2020$maxsegrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
+table(PHENO.ANY_SN$maxsegrtdose.2020 == PHENO.ANY_SN$maxsegrtdose) ## 2020
+
+## Maxchest
+PHENO.ANY_SN$maxchestrtdose.2020 <- radiation.2020$maxchestrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
+table(PHENO.ANY_SN$maxchestrtdose.2020 == PHENO.ANY_SN$maxchestrtdose) ## 2020
+
+## Maxneck
+PHENO.ANY_SN$maxneckrtdose.2020 <- radiation.2020$maxneckrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
+table(PHENO.ANY_SN$maxneckrtdose.2020 == PHENO.ANY_SN$maxneckrtdose) ## 2020
+
+## Maxabdomen
+PHENO.ANY_SN$maxabdrtdose.2020 <- radiation.2020$maxabdrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
+table(PHENO.ANY_SN$maxabdrtdose.2020 == PHENO.ANY_SN$maxabdrtdose) ## 2020
+table(PHENO.ANY_SN$maxabdrtdose.2018 == PHENO.ANY_SN$maxabdrtdose) 
+PHENO.ANY_SN$MRN[which(PHENO.ANY_SN$maxabdrtdose.2020 != PHENO.ANY_SN$maxabdrtdose)]
+
+
 # save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
 
 # load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
