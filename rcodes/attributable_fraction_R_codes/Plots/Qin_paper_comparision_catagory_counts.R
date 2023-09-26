@@ -317,10 +317,10 @@ table(data.rtchemocheck$chestcat.AN)
 # 3221  105  518  558 
 table(data.rtchemocheck$chestcat.AN.2018)
 # 0    1    2    3 
-# 3502  564  290   46 
+# 3502  149  705   46 
 table(data.rtchemocheck$chestcat.AN.2020)
 # 0    1    2    3 
-# 3501  149  703   49
+# 3501  149  703   49 
 ## Our data
 table(PHENO.ANY_SN$maxchestrtdose.category)
 # None  >0-<20    >=20 Unknown 
@@ -408,6 +408,9 @@ data.rtchemocheck$cat_aa_class_dose.AN.2020 <- cut(data.rtchemocheck$aa_class_do
 table(data.rtchemocheck$cat_aa_class_dose)
 # 0    1    2    3 
 # 1911  820  824  820
+table(data.rtchemocheck$cat_aa_class_dose.AN)
+# None  1st  2nd  3rd 
+# 1911  822  821  821 
 table(data.rtchemocheck$cat_aa_class_dose.AN.2018)
 # None  1st  2nd  3rd 
 # 1920  823  823  823
@@ -456,6 +459,10 @@ data.rtchemocheck$cat_anthra_jco_dose.AN.2020 <- cut(data.rtchemocheck$anthra_jc
 table(data.rtchemocheck$cat_anthra_jco_dose)
 # 0    1    2    3 
 # 1938  815  815  815
+table(data.rtchemocheck$cat_anthra_jco_dose.AN)
+# None  1st  2nd  3rd 
+# 1938  815  815  815
+
 table(data.rtchemocheck$cat_anthra_jco_dose.AN.2018)
 # None  1st  2nd  3rd 
 # 1947  817  816  817
@@ -500,6 +507,9 @@ data.rtchemocheck$cat_epitxn_dose.AN.2020 <- cut(data.rtchemocheck$epitxn_dose.2
 table(data.rtchemocheck$cat_epitxn_dose)
 # 0    1    2    3 
 # 2896  494  496  494 
+table(data.rtchemocheck$cat_epitxn_dose.AN)
+# 0    1    2    3 
+# 2896  495  494  495
 table(data.rtchemocheck$cat_epitxn_dose.AN.2018)
 # None  1st  2nd  3rd 
 # 2906  496  496  496 

@@ -66,6 +66,10 @@ sum(!duplicated(subneo.within5$sjlid))
 # Get BREASTcancer for the first time and Age at First BREASTcancer.
 # For this, I will first sort the table by date
 library(data.table)
+
+## Remove SNs as cases that are within 5 years of primary diagnosis
+subneo <- subneo[!subneo$sjlid %in% subneo.within5$sjlid,]
+
 BREASTcancer <- subneo[grepl("breast", subneo$diag, ignore.case = T),]
 BREASTcancer <- setDT(BREASTcancer)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 
@@ -98,6 +102,7 @@ BREASTcancer <- BREASTcancer[BREASTcancer$gender == "Female",]
 
 
 PHENO.ANY_SN$BREASTcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% BREASTcancer$sjlid, 0, 1))
+# PHENO.ANY_SN <- PHENO.ANY_SN[PHENO.ANY_SN$gender == "Female",]
 
 table(PHENO.ANY_SN$BREASTcancer)
 # 0    1 

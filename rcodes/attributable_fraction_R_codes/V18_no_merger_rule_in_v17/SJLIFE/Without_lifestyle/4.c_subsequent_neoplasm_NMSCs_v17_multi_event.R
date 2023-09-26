@@ -58,27 +58,41 @@ length(unique(subneo.after5$sjlid))
 subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
 sum(!duplicated(subneo.within5$sjlid))
 # 22
-################
-## Meningioma ##
-################
-# Get MENINGIOMA for the first time and Age at First MENINGIOMA.
+#############
+## Any SNs ##
+#############
+# Get NMSCs for the first time and Age at First NMSCs.
 # For this, I will first sort the table by date
 library(data.table)
+NMSCs <- subneo[grepl("basal cell|squamous cell", subneo$diag, ignore.case = T),]
+
+colnames(PHENO.ANY_SN)
+
+# NMSCs <- setDT(NMSCs)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+
+NMSCs$gender <- PHENO.ANY_SN$gender[match(NMSCs$sjlid, PHENO.ANY_SN$sjlid)]
+NMSCs$maxsegrtdose.category <- PHENO.ANY_SN$maxsegrtdose.category[match(NMSCs$sjlid, PHENO.ANY_SN$sjlid)]
+NMSCs$maxabdrtdose.category <- PHENO.ANY_SN$maxabdrtdose.category[match(NMSCs$sjlid, PHENO.ANY_SN$sjlid)]
+NMSCs$maxpelvisrtdose.category <- PHENO.ANY_SN$maxpelvisrtdose.category[match(NMSCs$sjlid, PHENO.ANY_SN$sjlid)]
+
+NMSCs$agedx <- PHENO.ANY_SN$agedx[match(NMSCs$sjlid, PHENO.ANY_SN$sjlid)]
+NMSCs$diagdt <- PHENO.ANY_SN$diagdt[match(NMSCs$sjlid, PHENO.ANY_SN$sjlid)]
+NMSCs$agelstcontact <- PHENO.ANY_SN$agelstcontact[match(NMSCs$sjlid, PHENO.ANY_SN$sjlid)]
+NMSCs$dob <- PHENO.ANY_SN$dob[match(NMSCs$sjlid, PHENO.ANY_SN$sjlid)]
+# NMSCs$EAS <- PHENO.ANY_SN$EAS[match(NMSCs$sjlid, PHENO.ANY_SN$sjlid)]
+# NMSCs$AFR <- PHENO.ANY_SN$AFR[match(NMSCs$sjlid, PHENO.ANY_SN$sjlid)]
+
+
+
 ## Remove SNs as cases that are within 5 years of primary diagnosis
-subneo <- subneo[!subneo$sjlid %in% subneo.within5$sjlid,]
+NMSCs <- NMSCs[!NMSCs$sjlid %in% subneo.within5$sjlid,]
+nrow(NMSCs)
+# 249
 
-MENINGIOMA <- subneo[grepl("meningioma", subneo$diag, ignore.case = T),]
-MENINGIOMA <- setDT(MENINGIOMA)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+## Remove NMSCs if younger than 18
+PHENO.ANY_SN$AGE.ANY_SN <- NMSCs$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, NMSCs$sjlid)]
+PHENO.ANY_SN$gradedt <- NMSCs$gradedt[match(PHENO.ANY_SN$sjlid, NMSCs$sjlid)]
 
-## Remove SNs as cases that are within 5 years of primary diagnosis
-MENINGIOMA <- MENINGIOMA[!MENINGIOMA$sjlid %in% subneo.within5$sjlid,]
-nrow(MENINGIOMA)
-nrow(MENINGIOMA)
-# 149
-
-## Remove MENINGIOMA if younger than 18
-PHENO.ANY_SN$gradedt <- MENINGIOMA$gradedt[match(PHENO.ANY_SN$sjlid, MENINGIOMA$sjlid)]
-PHENO.ANY_SN$AGE.ANY_SN <- MENINGIOMA$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, MENINGIOMA$sjlid)]
 # if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 # PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 # }
@@ -88,22 +102,27 @@ sum(PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid)
 # 22
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid,]
 
-PHENO.ANY_SN$MENINGIOMA <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% MENINGIOMA$sjlid, 0, 1))
+PHENO.ANY_SN$NMSCs <- 0
 
-table(PHENO.ANY_SN$MENINGIOMA)
+PHENO.ANY_SN <- PHENO.ANY_SN[c("sjlid", "NMSCs", "gender", "maxsegrtdose.category", "maxabdrtdose.category", "maxpelvisrtdose.category", "AGE.ANY_SN", "diagdt", "gradedt", "agelstcontact", "dob", "agedx")]
+
+table(PHENO.ANY_SN$NMSCs)
 # 0    1 
-# 4230 149
+# 4130  249
+
+PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% NMSCs$sjlid,]
+NMSCs$NMSCs <- 1
+NMSCs <- NMSCs[c("sjlid", "NMSCs", "gender", "maxsegrtdose.category", "maxabdrtdose.category", "maxpelvisrtdose.category", "AGE.ANY_SN", "diagdt", "gradedt", "agelstcontact", "dob", "agedx")]
+
+PHENO.ANY_SN <- rbind.data.frame(PHENO.ANY_SN, NMSCs)
 
 # #################
 # ## missingness ##
 # #################
-# PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
+# PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "maxabdrtdose.category", "maxpelvisrtdose.category")], 1, function(x) any("Unknown" %in% x))
 # PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
 # 
-# PHENO.ANY_SN$any_chemo_missing <- apply(PHENO.ANY_SN[c("epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
-# PHENO.ANY_SN$any_chemo_missing  <- factor(ifelse(PHENO.ANY_SN$any_chemo_missing == FALSE, "No", "Yes"))
-# 
-# PHENO.ANY_SN$any_rt_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category")], 1, function(x) any("Unknown" %in% x))
+# PHENO.ANY_SN$any_rt_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "maxabdrtdose.category", "maxpelvisrtdose.category")], 1, function(x) any("Unknown" %in% x))
 # PHENO.ANY_SN$any_rt_missing  <- factor(ifelse(PHENO.ANY_SN$any_rt_missing == FALSE, "No", "Yes"))
 
 #########################
@@ -143,30 +162,8 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.A
 # PHENO.ANY_SN$aa_class_dose_5.category <- droplevels(PHENO.ANY_SN$aa_class_dose_5.category)
 
 
-################
-## Cross tabs ##
-################
-library(expss)
-
-# Getting counts for non-missing data only; 6 samples do not have admixture ancestry
-CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
-
-CROSS_CASES.df <- PHENO.ANY_SN
-
-CROSS_CASES.df <- CROSS_CASES.df[,c("MENINGIOMA", "maxsegrtdose.category", "epitxn_dose_5.category")]
-
-CROSS_CASES.df <- apply_labels(CROSS_CASES.df, MENINGIOMA = "MENINGIOMA", 
-                               maxsegrtdose.category = "maxsegrtdose.category", epitxn_dose_5.category = "epitxn_dose_5.category")
-
-as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(MENINGIOMA, list(maxsegrtdose.category, epitxn_dose_5.category))))
 
 
-cc <- as.data.frame(t(CROSS_CASES.df %>%
-                        cross_cases(MENINGIOMA, list(maxsegrtdose.category, epitxn_dose_5.category))))
-
-rownames(cc) <- NULL 
-cc
 
 ########################################
 ## Prepare data accoding to Qi's code ## 
@@ -228,10 +225,9 @@ adata <- adata[order(adata$sjlid, adata$start, decreasing = FALSE),]
 table(adata$event)## Double check event numebr is correct
 
 ###any stop time <=start time
-adata$end[adata$end<=adata$start] <- adata$end[adata$end<=adata$start] + 1/365
+# adata$end[adata$end<=adata$start] <- adata$end[adata$end<=adata$start] + 1/365
 any <- adata[adata$end<=adata$start,] # 
-### 2 people had the stroke date on the Fu date. In this case, either get rid of the 2 lines [i.e, no time is follow-up after the last event date], or add 1 day on end date of these 2 segments, assuming there were followed up 1 more day. Will not make much difference. 1 day out of 365 days is 0.0027.
-diff=any$start-any$end ###Qi: These are people who had SN after the last contact date. Just wonder why this could happen. While it may not make the results differ, I wonder is there any reason to keep the events but change last contact date to be SN+1day? Depends on why there are SN after last contact date.
+diff=any$start-any$end 
 dim(adata)
 final <- adata[adata$end>adata$start,]
 
@@ -249,15 +245,16 @@ SNs_py$PY <- SNs_py$end-SNs_py$start
 ###############
 ## Model fit ##
 ###############
-PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.category", "BASALcell_PRS.tertile.category", 
-                         "Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category", "Thyroid_PRS.tertile.category",
-                         "Meningioma_PRS.tertile.category", "Sarcoma_Machiela_PRS.tertile.category",
-                         "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4",
-                         "AGE_AT_DIAGNOSIS", "gender", 
-                         "maxsegrtdose.category", "maxneckrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category",
-                         "maxpelvisrtdose.category", "epitxn_dose_5.category", "anthra_jco_dose_5.category", "aa_class_dose_5.category",
-                         "EAS", "AFR", 
-                         "PY","evt1", "end")]
+PHENO.ANY_SN <- SNs_py
+# PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.category", "BASALcell_PRS.tertile.category", 
+#                          "Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category", "Thyroid_PRS.tertile.category",
+#                          "Meningioma_PRS.tertile.category", "Sarcoma_Machiela_PRS.tertile.category",
+#                          "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4",
+#                          "AGE_AT_DIAGNOSIS", "gender", 
+#                          "maxsegrtdose.category", "maxneckrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category",
+#                          "maxpelvisrtdose.category", "epitxn_dose_5.category", "anthra_jco_dose_5.category", "aa_class_dose_5.category",
+#                          "EAS", "AFR", 
+#                          "PY","evt1", "end")]
 
 ## Age attained age (cubic spline)
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/cubic_spline.r")
@@ -270,4 +267,4 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, cs)
 
 
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.MENINGIOMA.V18.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.NMSCs.V18_multi_event.Rdata")

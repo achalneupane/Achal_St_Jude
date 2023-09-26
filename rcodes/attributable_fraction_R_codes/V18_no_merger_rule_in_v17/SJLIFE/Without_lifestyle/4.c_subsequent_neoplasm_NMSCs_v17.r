@@ -64,14 +64,15 @@ sum(!duplicated(subneo.within5$sjlid))
 # Get NMSCs for the first time and Age at First NMSCs.
 # For this, I will first sort the table by date
 library(data.table)
+## Remove SNs as cases that are within 5 years of primary diagnosis
+subneo <- subneo[!subneo$sjlid %in% subneo.within5$sjlid,]
+
 NMSCs <- subneo[grepl("basal cell|squamous cell", subneo$diag, ignore.case = T),]
 NMSCs <- setDT(NMSCs)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 
-## Remove SNs as cases that are within 5 years of primary diagnosis
-NMSCs <- NMSCs[!NMSCs$sjlid %in% subneo.within5$sjlid,]
+
 nrow(NMSCs)
 # 249
-
 
 ## Remove NMSCs if younger than 18
 PHENO.ANY_SN$AGE.ANY_SN <- NMSCs$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, NMSCs$sjlid)]

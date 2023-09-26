@@ -64,6 +64,8 @@ sum(!duplicated(subneo.within5$sjlid))
 # Get SARCOMA for the first time and Age at First SARCOMA.
 # For this, I will first sort the table by date
 library(data.table)
+## Remove SNs as cases that are within 5 years of primary diagnosis
+subneo <- subneo[!subneo$sjlid %in% subneo.within5$sjlid,]
 SARCOMA <- subneo[grepl("sarcoma", subneo$diag, ignore.case = T),]
 SARCOMA <- setDT(SARCOMA)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 

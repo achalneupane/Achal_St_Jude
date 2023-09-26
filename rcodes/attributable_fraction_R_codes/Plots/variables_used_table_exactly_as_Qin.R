@@ -38,7 +38,7 @@ ANY_SN.vars
 ###################################
 ## Attributable fraction of SMNs ##
 ###################################
-# load ANY SN data
+# load SMN data
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.SMNs.V18.Rdata")
 
 dat_all = PHENO.ANY_SN
@@ -108,7 +108,7 @@ NMSC.vars
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.BREASTcancer.V18.Rdata")
 
 
-# PHENO.ANY_SN <- PHENO.ANY_SN[PHENO.ANY_SN$gender == "Female",]
+PHENO.ANY_SN <- PHENO.ANY_SN[PHENO.ANY_SN$gender == "Female",]
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 

@@ -64,6 +64,10 @@ sum(!duplicated(subneo.within5$sjlid))
 # Get THYROIDcancer for the first time and Age at First THYROIDcancer.
 # For this, I will first sort the table by date
 library(data.table)
+
+## Remove SNs as cases that are within 5 years of primary diagnosis
+subneo <- subneo[!subneo$sjlid %in% subneo.within5$sjlid,]
+
 THYROIDcancer <- subneo[grepl("thyroid", subneo$diag, ignore.case = T),]
 THYROIDcancer <- setDT(THYROIDcancer)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 

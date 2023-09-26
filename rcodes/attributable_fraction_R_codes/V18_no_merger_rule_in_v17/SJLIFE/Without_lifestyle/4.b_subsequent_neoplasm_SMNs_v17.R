@@ -67,6 +67,9 @@ library(data.table)
 ## Keeping only malignant based on ICDO3 behaviour
 subneo <- subneo[grepl("^Malignant", subneo$icdo3behavior, ignore.case = T),]
 
+## Remove SNs as cases that are within 5 years of primary diagnosis
+subneo <- subneo[!subneo$sjlid %in% subneo.within5$sjlid,]
+
 SMNs <- subneo
 # SMNs <- subneo[!grepl("basal cell|squamous cell|meningioma", subneo$diag, ignore.case = T),]
 SMNs <- setDT(SMNs)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
