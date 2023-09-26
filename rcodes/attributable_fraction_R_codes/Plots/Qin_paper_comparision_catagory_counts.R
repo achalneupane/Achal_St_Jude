@@ -82,10 +82,6 @@ PHENO.ANY_SN$maxsegrtdose.2018 <- radiation.2018$maxsegrtdose[match(PHENO.ANY_SN
 table(PHENO.ANY_SN$maxsegrtdose.2020 == PHENO.ANY_SN$maxsegrtdose) ## 2020
 table(PHENO.ANY_SN$maxsegrtdose.2018 == PHENO.ANY_SN$maxsegrtdose) 
 
-# In Qis data
-PHENO.ANY_SN$maxsegrtdose.QI <- data.rtchemocheck$maxsegrtdose [match(PHENO.ANY_SN$sjlid, data.rtchemocheck$sjlid)]
-table(PHENO.ANY_SN$maxsegrtdose.QI == PHENO.ANY_SN$maxsegrtdose.2018)
-
 
 ## Maxchest
 PHENO.ANY_SN$maxchestrtdose.2020 <- radiation.2020$maxchestrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
@@ -93,21 +89,12 @@ PHENO.ANY_SN$maxchestrtdose.2018 <- radiation.2018$maxchestrtdose[match(PHENO.AN
 table(PHENO.ANY_SN$maxchestrtdose.2020 == PHENO.ANY_SN$maxchestrtdose) ## 2020
 table(PHENO.ANY_SN$maxchestrtdose.2018 == PHENO.ANY_SN$maxchestrtdose) 
 
-# In Qis data
-PHENO.ANY_SN$maxchestrtdose.QI <- data.rtchemocheck$chestmaxrtdose[match(PHENO.ANY_SN$sjlid, data.rtchemocheck$sjlid)]
-table(PHENO.ANY_SN$maxchestrtdose.QI == PHENO.ANY_SN$maxchestrtdose.2018)
-
 
 ## Maxneck
 PHENO.ANY_SN$maxneckrtdose.2020 <- radiation.2020$maxneckrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
 PHENO.ANY_SN$maxneckrtdose.2018 <- radiation.2018$maxneckrtdose[match(PHENO.ANY_SN$sjlid, radiation.2018$sjlid)]
 table(PHENO.ANY_SN$maxneckrtdose.2020 == PHENO.ANY_SN$maxneckrtdose) ## 2020
 table(PHENO.ANY_SN$maxneckrtdose.2018 == PHENO.ANY_SN$maxneckrtdose) 
-
-# In Qis data
-PHENO.ANY_SN$maxneckrtdose.QI <- data.rtchemocheck$neckmaxrtdose[match(PHENO.ANY_SN$sjlid, data.rtchemocheck$sjlid)]
-table(PHENO.ANY_SN$maxneckrtdose.QI == PHENO.ANY_SN$maxneckrtdose.2018)
-
 
 ## Maxabdomen
 PHENO.ANY_SN$maxabdrtdose.2020 <- radiation.2020$maxabdrtdose[match(PHENO.ANY_SN$sjlid, radiation.2020$sjlid)]
@@ -195,7 +182,7 @@ table(PHENO.ANY_SN$maxsegrtdose.category)
 # 3255       18      568      508       52 
 
 # table(data.rtchemocheck$maxsegrtdose.2018 == data.rtchemocheck$maxsegrtdose)
-cc <- data.all[c("sjlid", "braincat", "braincat.AN", "maxsegrtdose", "maxabdrtdose.2018", "maxabdrtdose.2020", "braindose")]
+cc <- data.all[c("sjlid", "braincat", "maxsegrtdose", "maxabdrtdose.2018", "maxabdrtdose.2020", "braindose")]
 ## There are NAs but not labelled 4 in Qi's data
 # 0    1    2    3    4 
 # 3222   19  978  368  587
@@ -247,7 +234,7 @@ table(PHENO.ANY_SN$maxneckrtdose.category)
 # None   >0-<11 >=11-<20 >=20-<30     >=30  Unknown 
 # 3562        6       87      421      277       48 
 
-cc <- data.all[c("sjlid", "neckcat", "neckcat.AN", "neckmaxrtdose", "maxneckrtdose.2018", "maxneckrtdose.2020")]
+cc <- data.all[c("sjlid", "neckcat", "neckmaxrtdose", "maxneckrtdose.2018", "maxneckrtdose.2020")]
 
 ## Our data
 table(PHENO.ANY_SN$maxneckrtdose.category)
@@ -302,20 +289,20 @@ table(PHENO.ANY_SN$maxabdrtdose.category)
 data.rtchemocheck <- data.all[!duplicated(data.all$sjlid),]
 
 
-data.rtchemocheck$chestcat.AN <- cut(data.rtchemocheck$chestmaxrtdose, breaks = c(0, 200, 2999, max(data.rtchemocheck$chestmaxrtdose, na.rm = T)),
+data.rtchemocheck$chestcat.AN <- cut(data.rtchemocheck$chestmaxrtdose, breaks = c(0, 200, 1999, max(data.rtchemocheck$chestmaxrtdose, na.rm = T)),
                                    labels = c(0:2),
                                    include.lowest = TRUE)
 levels(data.rtchemocheck$chestcat.AN) <- c(levels(data.rtchemocheck$chestcat.AN), 3)
 data.rtchemocheck$chestcat.AN [is.na(data.rtchemocheck$chestcat.AN)] <- 3
 
 
-data.rtchemocheck$chestcat.AN.2018 <- cut(data.rtchemocheck$maxchestrtdose.2018, breaks = c(0, 200, 2999, max(data.rtchemocheck$maxchestrtdose.2018, na.rm = T)),
+data.rtchemocheck$chestcat.AN.2018 <- cut(data.rtchemocheck$maxchestrtdose.2018, breaks = c(0, 200, 1999, max(data.rtchemocheck$maxchestrtdose.2018, na.rm = T)),
                                         labels = c(0:2),
                                         include.lowest = TRUE)
 levels(data.rtchemocheck$chestcat.AN.2018) <- c(levels(data.rtchemocheck$chestcat.AN.2018), 3)
 data.rtchemocheck$chestcat.AN.2018 [is.na(data.rtchemocheck$chestcat.AN.2018)] <- 3
 
-data.rtchemocheck$chestcat.AN.2020 <- cut(data.rtchemocheck$maxchestrtdose.2020, breaks = c(0, 200, 2999, max(data.rtchemocheck$maxchestrtdose.2020, na.rm = T)),
+data.rtchemocheck$chestcat.AN.2020 <- cut(data.rtchemocheck$maxchestrtdose.2020, breaks = c(0, 200, 1999, max(data.rtchemocheck$maxchestrtdose.2020, na.rm = T)),
                                         labels = c(0:2),
                                         include.lowest = TRUE)
 levels(data.rtchemocheck$chestcat.AN.2020) <- c(levels(data.rtchemocheck$chestcat.AN.2020), 3)
@@ -327,141 +314,223 @@ table(data.rtchemocheck$chestcat)
 
 table(data.rtchemocheck$chestcat.AN)
 # 0    1    2    3 
-# 3221  397  226  558 
+# 3221  105  518  558 
 table(data.rtchemocheck$chestcat.AN.2018)
 # 0    1    2    3 
 # 3502  564  290   46 
 table(data.rtchemocheck$chestcat.AN.2020)
 # 0    1    2    3 
-# 3501  559  293   49 
+# 3501  149  703   49
 ## Our data
 table(PHENO.ANY_SN$maxchestrtdose.category)
-# None  >0-<30    >=30 Unknown 
-# 3568     522     263      48
+# None  >0-<20    >=20 Unknown 
+# 3500     149     703      49 
 
 table(PHENO.ANY_SN$maxchestrtdose == PHENO.ANY_SN$maxchestrtdose.2020)
+# table(data.rtchemocheck$chestmaxrtdose == data.rtchemocheck$maxchestrtdose.2020)
+table(!is.na(data.rtchemocheck$chestmaxrtdose) & data.rtchemocheck$chestmaxrtdose == data.rtchemocheck$maxchestrtdose.2020)
 
-
+cc <- data.rtchemocheck[c("sjlid", "chestmaxrtdose", "maxchestrtdose.2018", "maxchestrtdose.2020", "chestcat", "chestcat.AN", "chestcat.AN.2018", "chestcat.AN.2020")]
+## Take screenshot of cc
 
 ##########################################################################################################
 ## 5.-----------------------------------pelvisRT
-table(data.all$pelviscat)
-# 0    1    2    3 
-# 4206  145  597  226 
+data.rtchemocheck <- data.all[!duplicated(data.all$sjlid),]
 
-data.all$pelviscat.AN <- cut(data.all$pelvismaxrtdose, breaks = c(0, 200, 1999, max(data.all$pelvismaxrtdose, na.rm = T)),
-                                             labels = c(0:2),
-                                             include.lowest = TRUE)
-levels(data.all$pelviscat.AN) <- c(levels(data.all$pelviscat.AN), 3)
-data.all$pelviscat.AN [is.na(data.all$pelviscat.AN)] <- 3
-table(data.all$pelviscat.AN)
+
+data.rtchemocheck$pelviscat.AN <- cut(data.rtchemocheck$pelvismaxrtdose, breaks = c(0, 200, 1999, max(data.rtchemocheck$pelvismaxrtdose, na.rm = T)),
+                                     labels = c(0:2),
+                                     include.lowest = TRUE)
+levels(data.rtchemocheck$pelviscat.AN) <- c(levels(data.rtchemocheck$pelviscat.AN), 3)
+data.rtchemocheck$pelviscat.AN [is.na(data.rtchemocheck$pelviscat.AN)] <- 3
+
+
+data.rtchemocheck$pelviscat.AN.2018 <- cut(data.rtchemocheck$maxpelvisrtdose.2018, breaks = c(0, 200, 1999, max(data.rtchemocheck$maxpelvisrtdose.2018, na.rm = T)),
+                                          labels = c(0:2),
+                                          include.lowest = TRUE)
+levels(data.rtchemocheck$pelviscat.AN.2018) <- c(levels(data.rtchemocheck$pelviscat.AN.2018), 3)
+data.rtchemocheck$pelviscat.AN.2018 [is.na(data.rtchemocheck$pelviscat.AN.2018)] <- 3
+
+data.rtchemocheck$pelviscat.AN.2020 <- cut(data.rtchemocheck$maxpelvisrtdose.2020, breaks = c(0, 200, 1999, max(data.rtchemocheck$maxpelvisrtdose.2020, na.rm = T)),
+                                          labels = c(0:2),
+                                          include.lowest = TRUE)
+levels(data.rtchemocheck$pelviscat.AN.2020) <- c(levels(data.rtchemocheck$pelviscat.AN.2020), 3)
+data.rtchemocheck$pelviscat.AN.2020 [is.na(data.rtchemocheck$pelviscat.AN.2020)] <- 3
+
+table(data.rtchemocheck$pelviscat)
 # 0    1    2    3 
-# 3853  141  597  583 
+# 3685  129  377  211 
+
+table(data.rtchemocheck$pelviscat.AN)
+# 0    1    2    3 
+# 3341  126  377  558 
+table(data.rtchemocheck$pelviscat.AN.2018)
+# 0    1    2    3 
+# 3673  169  518   42 
+table(data.rtchemocheck$pelviscat.AN.2020)
+# 0    1    2    3 
+# 3669  169  519   45 
 ## Our data
 table(PHENO.ANY_SN$maxpelvisrtdose.category)
 # None  >0-<20    >=20 Unknown 
-# 3669     169     518      45
+# 3668     169     519      45 
 
+table(PHENO.ANY_SN$maxpelvisrtdose == PHENO.ANY_SN$maxpelvisrtdose.2020)
+# table(data.rtchemocheck$pelvismaxrtdose == data.rtchemocheck$maxpelvisrtdose.2020)
+table(!is.na(data.rtchemocheck$pelvismaxrtdose) & data.rtchemocheck$pelvismaxrtdose == data.rtchemocheck$maxpelvisrtdose.2020)
 
+cc <- data.rtchemocheck[c("sjlid", "pelvismaxrtdose", "maxpelvisrtdose.2018", "maxpelvisrtdose.2020", "pelviscat", "pelviscat.AN", "pelviscat.AN.2018", "pelviscat.AN.2020")]
+## Take screenshot of cc
 
 ##########################################################################################################
 ## 6.-----------------------------------aa_class_dose
-table(data.all$cat_aa_class_dose)
-# 0    1    2    3 
-# 2114  924  936 1159 
+data.rtchemocheck <- data.all[!duplicated(data.all$sjlid),]
+
 
 TERT = unname(quantile(data.rtchemocheck$aa_class_dose[data.rtchemocheck$aa_class_dose !=0], c(1/3, 2/3, 1), na.rm = T))
-data.all$cat_aa_class_dose.AN <- cut(data.all$aa_class_dose, breaks = c(-Inf, 0, TERT),
+data.rtchemocheck$cat_aa_class_dose.AN <- cut(data.rtchemocheck$aa_class_dose, breaks = c(-Inf, 0, TERT),
                                                labels = c("None", "1st", "2nd", "3rd"),
                                                include.lowest = TRUE)
 
-data.all$cat_aa_class_dose.AN <- cut(data.all$aa_class_dose., breaks = c(-Inf, 0, TERT),
-                                     labels = c("None", "1st", "2nd", "3rd"),
-                                     include.lowest = TRUE)
 
-table(data.all$cat_aa_class_dose.AN)
+
+TERT = unname(quantile(data.rtchemocheck$aa_class_dose.2018[data.rtchemocheck$aa_class_dose.2018 !=0], c(1/3, 2/3, 1), na.rm = T))
+data.rtchemocheck$cat_aa_class_dose.AN.2018 <- cut(data.rtchemocheck$aa_class_dose.2018, breaks = c(-Inf, 0, TERT),
+                                                   labels = c("None", "1st", "2nd", "3rd"),
+                                                   include.lowest = TRUE)
+
+TERT = unname(quantile(data.rtchemocheck$aa_class_dose.2020[data.rtchemocheck$aa_class_dose.2020 !=0], c(1/3, 2/3, 1), na.rm = T))
+data.rtchemocheck$cat_aa_class_dose.AN.2020 <- cut(data.rtchemocheck$aa_class_dose.2020, breaks = c(-Inf, 0, TERT),
+                                                   labels = c("None", "1st", "2nd", "3rd"),
+                                                   include.lowest = TRUE)
+
+
+table(data.rtchemocheck$cat_aa_class_dose)
+# 0    1    2    3 
+# 1911  820  824  820
+table(data.rtchemocheck$cat_aa_class_dose.AN.2018)
 # None  1st  2nd  3rd 
-# 2114  926  933 1160 
-
+# 1920  823  823  823
+table(data.rtchemocheck$cat_aa_class_dose.AN.2020)
+# None  1st  2nd  3rd 
+# 1943  819  812  816 
 table(PHENO.ANY_SN$aa_class_dose_5.category)
 # None  1st  2nd  3rd 
 # 1943  819  812  815
-table(data.rtchemocheck$cat_aa_class_dose)
-# 0    1    2    3 
-# 1911  820  824  820 
 
 
+data.rtchemocheck$aa_class_dose.AN.2020 <- PHENO.ANY_SN$aa_class_dose_5.2020[match(data.rtchemocheck$sjlid, PHENO.ANY_SN$sjlid)]
+data.rtchemocheck$aa_class_dose.AN.2018 <- PHENO.ANY_SN$aa_class_dose_5.2018[match(data.rtchemocheck$sjlid, PHENO.ANY_SN$sjlid)]
+table(data.rtchemocheck$aa_class_dose.AN.2018 == data.rtchemocheck$aa_class_dose)
+table(data.rtchemocheck$aa_class_dose.AN.2020 == data.rtchemocheck$aa_class_dose)
 
-
-data.all$aa_class_dose.AN <- PHENO.ANY_SN$aa_class_dose_5.2020[match(data.all$sjlid, PHENO.ANY_SN$sjlid)]
-data.all$aa_class_dose_5.category <- PHENO.ANY_SN$aa_class_dose_5.category[match(data.all$sjlid, PHENO.ANY_SN$sjlid)]
-table(data.all$aa_class_dose.AN == data.all$aa_class_dose)
-
-table(PHENO.ANY_SN$aa_class_dose_5.category)
+table(data.rtchemocheck$aa_class_dose_5.category)
 # None  1st  2nd  3rd 
-# 2146  923  923 1155
+# 1943  819  812  815
 
-table(data.rtchemocheck$cat_aa_class_dose)
-table(PHENO.ANY_SN$aa_class_dose_5.category)
-
-cc <- data.all[c("sjlid", "aa_class_dose", "aa_class_dose.AN", "cat_aa_class_dose", "cat_aa_class_dose.AN", "aa_class_dose_5.category")]
+cc <- data.rtchemocheck[c("sjlid", "aa_class_dose", "aa_class_dose.AN.2018", "aa_class_dose.AN.2020", "cat_aa_class_dose", "cat_aa_class_dose.AN", "cat_aa_class_dose.AN.2018", "cat_aa_class_dose.AN.2020")]
 
 
 ##########################################################################################################
 ## 7.-----------------------------------anthra_jco_dose
-table(data.all$cat_anthra_jco_dose)
-# 0    1    2    3 
-# 2379  965  911  894 
+data.rtchemocheck <- data.all[!duplicated(data.all$sjlid),]
+
 
 TERT = unname(quantile(data.rtchemocheck$anthra_jco_dose[data.rtchemocheck$anthra_jco_dose !=0], c(1/3, 2/3, 1), na.rm = T))
-data.all$cat_anthra_jco_dose.AN <- cut(data.all$anthra_jco_dose, breaks = c(-Inf, 0, TERT),
-                                     labels = c("None", "1st", "2nd", "3rd"),
-                                     include.lowest = TRUE)
-table(data.all$cat_anthra_jco_dose.AN )
-# None  1st  2nd  3rd 
-# 2379  924  932  914 
+data.rtchemocheck$cat_anthra_jco_dose.AN <- cut(data.rtchemocheck$anthra_jco_dose, breaks = c(-Inf, 0, TERT),
+                                              labels = c("None", "1st", "2nd", "3rd"),
+                                              include.lowest = TRUE)
 
-data.all$anthra_jco_dose.AN <- PHENO.ANY_SN$anthra_jco_dose_5[match(data.all$sjlid, PHENO.ANY_SN$sjlid)]
-table(data.all$anthra_jco_dose.AN == data.all$anthra_jco_dose)
-TERT = unname(quantile(data.rtchemocheck$anthra_jco_dose.AN[data.rtchemocheck$anthra_jco_dose.AN !=0], c(1/3, 2/3, 1), na.rm = T))
-data.all$cat_anthra_jco_dose.AN <- cut(data.all$anthra_jco_dose., breaks = c(-Inf, 0, TERT),
-                                       labels = c("None", "1st", "2nd", "3rd"),
-                                       include.lowest = TRUE)
 
-table(data.all$cat_anthra_jco_dose.AN.2020)
-# None  1st  2nd  3rd 
-# 2413  917  916  917
+TERT = unname(quantile(data.rtchemocheck$anthra_jco_dose.2018[data.rtchemocheck$anthra_jco_dose.2018 !=0], c(1/3, 2/3, 1), na.rm = T))
+data.rtchemocheck$cat_anthra_jco_dose.AN.2018 <- cut(data.rtchemocheck$anthra_jco_dose.2018, breaks = c(-Inf, 0, TERT),
+                                                   labels = c("None", "1st", "2nd", "3rd"),
+                                                   include.lowest = TRUE)
 
-cc <- data.all[c("sjlid", "anthra_jco_dose", "anthra_jco_dose.AN", "cat_anthra_jco_dose", "cat_anthra_jco_dose.AN", "cat_anthra_jco_dose.AN.2020")]
+TERT = unname(quantile(data.rtchemocheck$anthra_jco_dose.2020[data.rtchemocheck$anthra_jco_dose.2020 !=0], c(1/3, 2/3, 1), na.rm = T))
+data.rtchemocheck$cat_anthra_jco_dose.AN.2020 <- cut(data.rtchemocheck$anthra_jco_dose.2020, breaks = c(-Inf, 0, TERT),
+                                                   labels = c("None", "1st", "2nd", "3rd"),
+                                                   include.lowest = TRUE)
+
 
 table(data.rtchemocheck$cat_anthra_jco_dose)
+# 0    1    2    3 
+# 1938  815  815  815
+table(data.rtchemocheck$cat_anthra_jco_dose.AN.2018)
+# None  1st  2nd  3rd 
+# 1947  817  816  817
+table(data.rtchemocheck$cat_anthra_jco_dose.AN.2020)
+# None  1st  2nd  3rd 
+# 1973  809  808  808
 table(PHENO.ANY_SN$anthra_jco_dose_5.category)
+# None  1st  2nd  3rd 
+# 1972  809  808  808 
+
+
+data.rtchemocheck$anthra_jco_dose.AN.2020 <- PHENO.ANY_SN$anthra_jco_dose_5.2020[match(data.rtchemocheck$sjlid, PHENO.ANY_SN$sjlid)]
+data.rtchemocheck$anthra_jco_dose.AN.2018 <- PHENO.ANY_SN$anthra_jco_dose_5.2018[match(data.rtchemocheck$sjlid, PHENO.ANY_SN$sjlid)]
+table(data.rtchemocheck$anthra_jco_dose.AN.2018 == data.rtchemocheck$anthra_jco_dose)
+table(data.rtchemocheck$anthra_jco_dose.AN.2020 == data.rtchemocheck$anthra_jco_dose)
+
+cc <- data.rtchemocheck[c("sjlid", "anthra_jco_dose", "anthra_jco_dose.AN.2018", "anthra_jco_dose.AN.2020", "cat_anthra_jco_dose", "cat_anthra_jco_dose.AN", "cat_anthra_jco_dose.AN.2018", "cat_anthra_jco_dose.AN.2020")]
 
 
 ##########################################################################################################
 ## 8.-----------------------------------epitxn_dose
-table(data.all$cat_epitxn_dose)
-# 0    1    2    3 
-# 3521  574  529  528 
+data.rtchemocheck <- data.all[!duplicated(data.all$sjlid),]
+
+
 TERT = unname(quantile(data.rtchemocheck$epitxn_dose[data.rtchemocheck$epitxn_dose !=0], c(1/3, 2/3, 1), na.rm = T))
-data.all$cat_epitxn_dose.AN <- cut(data.all$epitxn_dose, breaks = c(-Inf, 0, TERT),
-                                       labels = c("None", "1st", "2nd", "3rd"),
-                                       include.lowest = TRUE)
-table(data.all$cat_epitxn_dose.AN)
+data.rtchemocheck$cat_epitxn_dose.AN <- cut(data.rtchemocheck$epitxn_dose, breaks = c(-Inf, 0, TERT),
+                                                labels = c("None", "1st", "2nd", "3rd"),
+                                                include.lowest = TRUE)
+
+
+TERT = unname(quantile(data.rtchemocheck$epitxn_dose.2018[data.rtchemocheck$epitxn_dose.2018 !=0], c(1/3, 2/3, 1), na.rm = T))
+data.rtchemocheck$cat_epitxn_dose.AN.2018 <- cut(data.rtchemocheck$epitxn_dose.2018, breaks = c(-Inf, 0, TERT),
+                                                     labels = c("None", "1st", "2nd", "3rd"),
+                                                     include.lowest = TRUE)
+
+TERT = unname(quantile(data.rtchemocheck$epitxn_dose.2020[data.rtchemocheck$epitxn_dose.2020 !=0], c(1/3, 2/3, 1), na.rm = T))
+data.rtchemocheck$cat_epitxn_dose.AN.2020 <- cut(data.rtchemocheck$epitxn_dose.2020, breaks = c(-Inf, 0, TERT),
+                                                     labels = c("None", "1st", "2nd", "3rd"),
+                                                     include.lowest = TRUE)
+
+
+table(data.rtchemocheck$cat_epitxn_dose)
+# 0    1    2    3 
+# 2896  494  496  494 
+table(data.rtchemocheck$cat_epitxn_dose.AN.2018)
 # None  1st  2nd  3rd 
-# 3521  544  543  544
+# 2906  496  496  496 
+table(data.rtchemocheck$cat_epitxn_dose.AN.2020)
+# None  1st  2nd  3rd 
+# 2906  496  495  496 
+table(PHENO.ANY_SN$epitxn_dose_5.category)
+# None  1st  2nd  3rd 
+# 2906  496  495  495 
 
-data.all$epitxn_dose.AN <- PHENO.ANY_SN$epitxn_dose_5.2020[match(data.all$sjlid, PHENO.ANY_SN$sjlid)]
-table(data.all$aa_class_dose.AN == data.all$aa_class_dose)
+
+data.rtchemocheck$epitxn_dose.AN.2020 <- PHENO.ANY_SN$epitxn_dose_5.2020[match(data.rtchemocheck$sjlid, PHENO.ANY_SN$sjlid)]
+data.rtchemocheck$epitxn_dose.AN.2018 <- PHENO.ANY_SN$epitxn_dose_5.2018[match(data.rtchemocheck$sjlid, PHENO.ANY_SN$sjlid)]
+table(data.rtchemocheck$epitxn_dose.AN.2018 == data.rtchemocheck$epitxn_dose)
+table(data.rtchemocheck$epitxn_dose.AN.2020 == data.rtchemocheck$epitxn_dose)
+
+cc <- data.rtchemocheck[c("sjlid", "epitxn_dose", "epitxn_dose.AN.2018", "epitxn_dose.AN.2020", "cat_epitxn_dose", "cat_epitxn_dose.AN", "cat_epitxn_dose.AN.2018", "cat_epitxn_dose.AN.2020")]
 
 
-data.all$agedx
-data.all$agedxcat.AN <- data.all$agedx
-data.all$agedxcat.AN[data.all$agedx >= 0 & data.all$agedx < 5 ] <- "0-4"
-data.all$agedxcat.AN[data.all$agedx >= 5 & data.all$agedx < 10 ] <- "5-9"
-data.all$agedxcat.AN[data.all$agedx >= 10 & data.all$agedx < 15 ] <- "10-14"
-data.all$agedxcat.AN[data.all$agedx >= 15 ] <- ">=15"
-data.all$agedxcat.AN <- factor(data.all$agedxcat.AN, levels = c("0-4", "5-9", "10-14", ">=15")) # first level will be treated as reference
-table(data.all$agedxcat.AN)
-table(data.all$agedxcat)
 
+
+data.rtchemocheck$agedx
+data.rtchemocheck$agedxcat.AN <- data.rtchemocheck$agedx
+data.rtchemocheck$agedxcat.AN[data.rtchemocheck$agedx >= 0 & data.rtchemocheck$agedx < 5 ] <- "0-4"
+data.rtchemocheck$agedxcat.AN[data.rtchemocheck$agedx >= 5 & data.rtchemocheck$agedx < 10 ] <- "5-9"
+data.rtchemocheck$agedxcat.AN[data.rtchemocheck$agedx >= 10 & data.rtchemocheck$agedx < 15 ] <- "10-14"
+data.rtchemocheck$agedxcat.AN[data.rtchemocheck$agedx >= 15 ] <- ">=15"
+data.rtchemocheck$agedxcat.AN <- factor(data.rtchemocheck$agedxcat.AN, levels = c("0-4", "5-9", "10-14", ">=15")) # first level will be treated as reference
+table(data.rtchemocheck$agedxcat.AN)
+table(data.rtchemocheck$agedxcat)
+table(PHENO.ANY_SN$AGE_AT_DIAGNOSIS)
+
+table(data.rtchemocheck$sex)
+table(PHENO.ANY_SN$gender)

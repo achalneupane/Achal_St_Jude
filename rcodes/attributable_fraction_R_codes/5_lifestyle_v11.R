@@ -529,6 +529,46 @@ chemo.2020 <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Fina
 radiation.2020 <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/radiation_dosimetry.sas7bdat')
 # radiation.2018 <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20181231/Clinical Data/radiation_dosimetry.sas7bdat')
 
+# ## Also check sex and dob 2020 data
+demographics <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/demographics.sas7bdat')
+PHENO.ANY_SN$gender <- demographics$gender[match(PHENO.ANY_SN$sjlid, demographics$sjlid)]
+# table(PHENO.ANY_SN$gender == PHENO.ANY_SN$gender.2) ## this looks correct
+PHENO.ANY_SN$dob <- demographics$dob[match(PHENO.ANY_SN$sjlid, demographics$sjlid)]
+# table(PHENO.ANY_SN$dob == PHENO.ANY_SN$dob.2) ## this looks correct
+
+# # ## Also check sex and dob 2018 data
+# demographics <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20181231/Clinical Data/demographics.sas7bdat')
+# PHENO.ANY_SN$gender.2 <- demographics$gender[match(PHENO.ANY_SN$sjlid, demographics$sjlid)]
+# table(PHENO.ANY_SN$gender == PHENO.ANY_SN$gender.2) ## this looks correct
+# # ## Also check dob
+# PHENO.ANY_SN$dob.2 <- demographics$dob[match(PHENO.ANY_SN$sjlid, demographics$sjlid)]
+# table(PHENO.ANY_SN$dob == PHENO.ANY_SN$dob.2) ## this looks correct
+
+
+# ## Also check sex and dob 2020 data
+diagnosis <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/diagnosis.sas7bdat')
+PHENO.ANY_SN$agedx <- diagnosis$agedx[match(PHENO.ANY_SN$sjlid, diagnosis$sjlid)]
+# table(PHENO.ANY_SN$agedx == PHENO.ANY_SN$agedx.2) ## six were incorrect
+# ## Also check diagdt
+PHENO.ANY_SN$diagdt <- diagnosis$diagdt[match(PHENO.ANY_SN$sjlid, diagnosis$sjlid)]
+# table(PHENO.ANY_SN$diagdt == PHENO.ANY_SN$diagdt.2) ## six were incorrect
+
+# # ## Also check sex and dob 2018 data
+# PHENO.ANY_SN$diagdt.3 <- diagnosis$diagdt[match(PHENO.ANY_SN$sjlid, diagnosis$sjlid)]
+# table(PHENO.ANY_SN$diagdt.2 == PHENO.ANY_SN$diagdt.3) ## this looks correct
+
+
+PHENO.ANY_SN$AGE_AT_DIAGNOSIS[PHENO.ANY_SN$agedx >= 0 & PHENO.ANY_SN$agedx < 5 ] <- "0-4"
+PHENO.ANY_SN$AGE_AT_DIAGNOSIS[PHENO.ANY_SN$agedx >= 5 & PHENO.ANY_SN$agedx < 10 ] <- "5-9"
+PHENO.ANY_SN$AGE_AT_DIAGNOSIS[PHENO.ANY_SN$agedx >= 10 & PHENO.ANY_SN$agedx < 15 ] <- "10-14"
+PHENO.ANY_SN$AGE_AT_DIAGNOSIS[PHENO.ANY_SN$agedx >= 15 ] <- ">=15"
+PHENO.ANY_SN$AGE_AT_DIAGNOSIS <- factor(PHENO.ANY_SN$AGE_AT_DIAGNOSIS, levels = c("0-4", "5-9", "10-14", ">=15")) # first level will be treated as reference
+
+
+## Age at last contact
+demographics <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/demographics.sas7bdat')
+PHENO.ANY_SN$gender <- demographics$gender[match(PHENO.ANY_SN$sjlid, demographics$sjlid)]
+
 
 ## Remove unnecessary columns
 PHENO.ANY_SN <- PHENO.ANY_SN[!colnames(PHENO.ANY_SN) %in% c("aa_class_dose_any_yn", "aa_class_dose_any.category", "aa_class_dose_5_yn", "cisplat_dose_any_yn", "cisplat_dose_any.category", "cisplateq_dose_5_yn", "cisplateq_dose_5.category",
