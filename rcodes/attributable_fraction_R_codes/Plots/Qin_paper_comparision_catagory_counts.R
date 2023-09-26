@@ -167,7 +167,7 @@ table(data.rtchemocheck$braincat)
 
 table(data.rtchemocheck$braincat.AN)
 # 0    1    2    3    4 
-# 3222   19  978  368  587 
+# 2992   13  556  279  562
 
 table(data.rtchemocheck$braincat.AN.2018)
 # 0    1    2    3    4 
@@ -282,7 +282,7 @@ table(data.rtchemocheck$abdcat.AN.2020)
 ## Our data
 table(PHENO.ANY_SN$maxabdrtdose.category)
 # None  >0-<30    >=30 Unknown 
-# 3568     522     263      48
+# 3566     524     263      48 
 
 ##########################################################################################################
 ## 4.-----------------------------------chestRT

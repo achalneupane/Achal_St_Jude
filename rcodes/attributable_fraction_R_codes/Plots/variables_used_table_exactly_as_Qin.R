@@ -100,7 +100,7 @@ results <- data.frame(
 
 
 NMSC.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
-
+NMSC.vars
 ################################################
 ## Attributable fraction of Any Breast cancer ##
 ################################################
@@ -108,7 +108,7 @@ NMSC.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.BREASTcancer.V18.Rdata")
 
 
-PHENO.ANY_SN <- PHENO.ANY_SN[PHENO.ANY_SN$gender == "Female",]
+# PHENO.ANY_SN <- PHENO.ANY_SN[PHENO.ANY_SN$gender == "Female",]
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 
