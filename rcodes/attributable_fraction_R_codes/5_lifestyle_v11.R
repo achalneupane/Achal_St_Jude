@@ -532,6 +532,8 @@ radiation.2020 <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 
 # ## Also check sex and dob 2020 data
 demographics <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/demographics.sas7bdat')
 PHENO.ANY_SN$gender <- demographics$gender[match(PHENO.ANY_SN$sjlid, demographics$sjlid)]
+PHENO.ANY_SN$gender <- factor(PHENO.ANY_SN$gender, levels = c("Male", "Female"))
+
 # table(PHENO.ANY_SN$gender == PHENO.ANY_SN$gender.2) ## this looks correct
 PHENO.ANY_SN$dob <- demographics$dob[match(PHENO.ANY_SN$sjlid, demographics$sjlid)]
 # table(PHENO.ANY_SN$dob == PHENO.ANY_SN$dob.2) ## this looks correct
@@ -566,9 +568,9 @@ PHENO.ANY_SN$AGE_AT_DIAGNOSIS <- factor(PHENO.ANY_SN$AGE_AT_DIAGNOSIS, levels = 
 
 
 ## Age at last contact
-demographics <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/demographics.sas7bdat')
-PHENO.ANY_SN$gender <- demographics$gender[match(PHENO.ANY_SN$sjlid, demographics$sjlid)]
-
+lstcondt <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Tracking Data/lstcondt.sas7bdat')
+PHENO.ANY_SN$agelstcontact <- lstcondt$agelstcontact[match(PHENO.ANY_SN$sjlid, lstcondt$sjlid)]
+# table(PHENO.ANY_SN$agelstcontact.2 == PHENO.ANY_SN$agelstcontact) # This looks correct
 
 ## Remove unnecessary columns
 PHENO.ANY_SN <- PHENO.ANY_SN[!colnames(PHENO.ANY_SN) %in% c("aa_class_dose_any_yn", "aa_class_dose_any.category", "aa_class_dose_5_yn", "cisplat_dose_any_yn", "cisplat_dose_any.category", "cisplateq_dose_5_yn", "cisplateq_dose_5.category",

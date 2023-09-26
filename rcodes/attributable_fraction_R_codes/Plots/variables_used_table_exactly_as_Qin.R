@@ -66,7 +66,7 @@ results <- data.frame(
 
 
 SMN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
-
+SMN.vars
 ########################################
 ## Attributable fraction of Any NMSCs ##
 ########################################
