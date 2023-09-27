@@ -183,6 +183,9 @@ table(PHENO.ANY_SN$maxsegrtdose.category)
 
 # table(data.rtchemocheck$maxsegrtdose.2018 == data.rtchemocheck$maxsegrtdose)
 cc <- data.rtchemocheck[c("sjlid", "braincat", "braincat.AN", "braincat.AN.2020", "maxsegrtdose", "maxsegrtdose.2018", "maxsegrtdose.2020", "braindose")]
+
+cc <- data[c("sjlid", "maxsegrtdose", "braindose", "braincat")]
+
 ## There are NAs but not labelled 4 in Qi's data
 # 0    1    2    3    4 
 # 3222   19  978  368  587
@@ -330,8 +333,10 @@ table(PHENO.ANY_SN$maxchestrtdose == PHENO.ANY_SN$maxchestrtdose.2020)
 # table(data.rtchemocheck$chestmaxrtdose == data.rtchemocheck$maxchestrtdose.2020)
 table(!is.na(data.rtchemocheck$chestmaxrtdose) & data.rtchemocheck$chestmaxrtdose == data.rtchemocheck$maxchestrtdose.2020)
 
-cc <- data.rtchemocheck[c("sjlid", "chestmaxrtdose", "maxchestrtdose.2018", "maxchestrtdose.2020", "chestcat", "chestcat.AN", "chestcat.AN.2018", "chestcat.AN.2020")]
+cc <- data.rtchemocheck[c("sjlid", "chestmaxrtdose", "chestdose", "maxchestrtdose.2018", "maxchestrtdose.2020", "chestcat", "chestcat.AN", "chestcat.AN.2018", "chestcat.AN.2020")]
 ## Take screenshot of cc
+
+cc <- data[c("sjlid", "chestmaxrtdose", "chestdose", "chestcat")]
 
 ##########################################################################################################
 ## 5.-----------------------------------pelvisRT
