@@ -258,4 +258,4 @@ PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.catego
 
 
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.SARCOMA.V17.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.SARCOMA.V18.Rdata")

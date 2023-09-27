@@ -217,7 +217,7 @@ MENINGIOMA.vars
 ##########################################
 
 # load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.SARCOMA.V17.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.SARCOMA.V18.Rdata")
 
 # # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 # cc
@@ -295,11 +295,11 @@ for (col in colnames(p_columns)) {
 
 ## Sort
 empty_dataframe.ordered <- empty_dataframe[match(c(NA, "AGE_AT_DIAGNOSIS5-9", "AGE_AT_DIAGNOSIS10-14", "AGE_AT_DIAGNOSIS>=15", "genderFemale", 
-                            NA, "maxsegrtdose.category>0-<18", "maxsegrtdose.category>=18-<30", "maxsegrtdose.category>=30", NA,
-                            NA, "maxabdrtdose.category>0-<30", "maxabdrtdose.category>=30", NA,
-                            NA, "maxpelvisrtdose.category>0-<20", "maxpelvisrtdose.category>=20", NA,
-                            NA, "maxchestrtdose.category>0-<20", "maxchestrtdose.category>=20", NA, 
-                            NA, "maxneckrtdose.category>0-<11", "maxneckrtdose.category>=11-<20", "maxneckrtdose.category>=20-<30", "maxneckrtdose.category>=30", NA,
+                            NA, "maxsegrtdose.category>0-<18", "maxsegrtdose.category>=18-<30", "maxsegrtdose.category>=30", "maxsegrtdose.categoryUnknown",
+                            NA, "maxabdrtdose.category>0-<30", "maxabdrtdose.category>=30", "maxabdrtdose.categoryUnknown",
+                            NA, "maxpelvisrtdose.category>0-<20", "maxpelvisrtdose.category>=20", "maxpelvisrtdose.categoryUnknown",
+                            NA, "maxchestrtdose.category>0-<20", "maxchestrtdose.category>=20", "maxchestrtdose.categoryUnknown", 
+                            NA, "maxneckrtdose.category>0-<11", "maxneckrtdose.category>=11-<20", "maxneckrtdose.category>=20-<30", "maxneckrtdose.category>=30", "maxneckrtdose.categoryUnknown",
                             NA, "aa_class_dose_5.category1st", "aa_class_dose_5.category2nd", "aa_class_dose_5.category3rd",
                             NA, "anthra_jco_dose_5.category1st",  "anthra_jco_dose_5.category2nd", "anthra_jco_dose_5.category3rd",
                             NA, "epitxn_dose_5.category1st", "epitxn_dose_5.category2nd", "epitxn_dose_5.category3rd",

@@ -405,6 +405,16 @@ data.all$agedxcat.AN <- factor(data.all$agedxcat.AN, levels = c("0-4", "5-9", "1
 table(data.all$agedxcat.AN)
 table(data.all$agedxcat)
 
+# 2= Meningioma, 4= Sarcoma, 5, Breast cancer, 6 = Thyroid, 7 = NMSC
+meningioma <- data.all[data.all$sndx == 2,]
+table(meningioma$icdo3morph)
+
+sarcoma <- data.all[data.all$sndx == 4,]
+table(sarcoma$icdo3morph)
+
+nmsc <- data.all[data.all$sndx == 7,]
+table(nmsc$icdo3morph)
+
 
 ############
 ## Any SN ##

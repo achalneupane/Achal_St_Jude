@@ -182,7 +182,7 @@ table(PHENO.ANY_SN$maxsegrtdose.category)
 # 3255       18      568      508       52 
 
 # table(data.rtchemocheck$maxsegrtdose.2018 == data.rtchemocheck$maxsegrtdose)
-cc <- data.all[c("sjlid", "braincat", "maxsegrtdose", "maxabdrtdose.2018", "maxabdrtdose.2020", "braindose")]
+cc <- data.rtchemocheck[c("sjlid", "braincat", "braincat.AN", "braincat.AN.2020", "maxsegrtdose", "maxsegrtdose.2018", "maxsegrtdose.2020", "braindose")]
 ## There are NAs but not labelled 4 in Qi's data
 # 0    1    2    3    4 
 # 3222   19  978  368  587
