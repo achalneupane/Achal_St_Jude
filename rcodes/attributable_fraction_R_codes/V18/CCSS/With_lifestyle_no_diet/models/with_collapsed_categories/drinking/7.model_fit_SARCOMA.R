@@ -1,5 +1,5 @@
 # load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA.V17b_without_diet.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA.V18b_without_diet.Rdata")
 
 # PHENO.ANY_SN$any_lifestyle_missing <- relevel(PHENO.ANY_SN$any_lifestyle_missing, ref = "Yes")
 # PHENO.ANY_SN$any_tx_missing <- relevel(PHENO.ANY_SN$any_tx_missing, ref = "Yes")
