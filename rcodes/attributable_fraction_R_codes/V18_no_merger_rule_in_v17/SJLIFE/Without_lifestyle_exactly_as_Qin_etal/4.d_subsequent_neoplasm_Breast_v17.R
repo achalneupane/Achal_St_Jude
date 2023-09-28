@@ -1,4 +1,3 @@
-## **
 # Following Qi's email on 05/03/2023 (subject: [Encrypt] CCSS help). Running Piecewise-exponential regression.
 rm(list=ls())
 #########################
@@ -36,6 +35,7 @@ dim(subneo)
 subneo <- subneo[subneo$sjlid %in% PHENO.ANY_SN$sjlid ,]
 dim(subneo)
 # 1717
+
 # add diagnosis date 
 subneo$diagdt <-  PHENO.ANY_SN$diagdt [match(subneo$sjlid , PHENO.ANY_SN$sjlid)]
 subneo$agedx <-  PHENO.ANY_SN$agedx [match(subneo$sjlid , PHENO.ANY_SN$sjlid)]
@@ -43,8 +43,10 @@ subneo$agedx <-  PHENO.ANY_SN$agedx [match(subneo$sjlid , PHENO.ANY_SN$sjlid)]
 subneo$DOB <- PHENO.ANY_SN$dob[match(subneo$sjlid, PHENO.ANY_SN$sjlid)]
 
 subneo$gradedt <- as.Date(subneo$gradedt, "%m/%d/%Y") ## **
+
 subneo$AGE.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
 
+## These two dates should be the (almost) same
 subneo$AGE.ANY_SN.after.childhood.cancer <- time_length(interval(as.Date(subneo$diagdt), as.Date(subneo$gradedt)), "years")
 subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subneo$agedx
 
@@ -61,25 +63,25 @@ sum(!duplicated(subneo.within5$sjlid))
 #############
 ## Any SNs ##
 #############
-# Get THYROIDcancer for the first time and Age at First THYROIDcancer.
+# Get BREASTcancer for the first time and Age at First BREASTcancer.
 # For this, I will first sort the table by date
 library(data.table)
 
 ## Remove SNs as cases that are within 5 years of primary diagnosis
 subneo <- subneo[!subneo$sjlid %in% subneo.within5$sjlid,]
 
-THYROIDcancer <- subneo[grepl("thyroid", subneo$diag, ignore.case = T),]
-THYROIDcancer <- setDT(THYROIDcancer)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
+BREASTcancer <- subneo[grepl("breast", subneo$diag, ignore.case = T),]
+BREASTcancer <- setDT(BREASTcancer)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 
 ## Remove SNs as cases that are within 5 years of primary diagnosis
-THYROIDcancer <- THYROIDcancer[!THYROIDcancer$sjlid %in% subneo.within5$sjlid,]
-nrow(THYROIDcancer)
-# 86
+BREASTcancer <- BREASTcancer[!BREASTcancer$sjlid %in% subneo.within5$sjlid,]
+nrow(BREASTcancer)
+# 76
 
 
-PHENO.ANY_SN$gradedt <- THYROIDcancer$gradedt[match(PHENO.ANY_SN$sjlid, THYROIDcancer$sjlid)]
-PHENO.ANY_SN$AGE.ANY_SN <- THYROIDcancer$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, THYROIDcancer$sjlid)]
-## Remove THYROIDcancer if younger than 18
+## Remove BREASTcancer if younger than 18
+PHENO.ANY_SN$gradedt <- BREASTcancer$gradedt[match(PHENO.ANY_SN$sjlid, BREASTcancer$sjlid)]
+PHENO.ANY_SN$AGE.ANY_SN <- BREASTcancer$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, BREASTcancer$sjlid)]
 # if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 # PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 # }
@@ -89,27 +91,35 @@ sum(PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid)
 # 22
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid,]
 
-PHENO.ANY_SN$THYROIDcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% THYROIDcancer$sjlid, 0, 1))
 
-table(PHENO.ANY_SN$THYROIDcancer)
+## Keep females only
+BREASTcancer$gender <-  PHENO.ANY_SN$gender[match(BREASTcancer$sjlid , PHENO.ANY_SN$sjlid)]
+BREASTcancer <- BREASTcancer[BREASTcancer$gender == "Female",]
+
+# ## Remove those that are not breast cancer
+# subneo.not.breast.cancer <- unique(subneo$sjlid[!subneo$sjlid %in% unique(BREASTcancer$sjlid)])
+# PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.not.breast.cancer,]
+
+
+PHENO.ANY_SN$BREASTcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% BREASTcancer$sjlid, 0, 1))
+# PHENO.ANY_SN <- PHENO.ANY_SN[PHENO.ANY_SN$gender == "Female",]
+
+table(PHENO.ANY_SN$BREASTcancer)
 # 0    1 
-# 4293 86
+# 4303  76
 
-#################
-## missingness ##
-#################
-PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxneckrtdose.category", "epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
-PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
+# #################
+# ## missingness ##
+# #################
+# PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxchestrtdose.category", "anthra_jco_dose_5.category")], 1, function(x) any("Unknown" %in% x))
+# PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
+# 
+# PHENO.ANY_SN$any_chemo_missing <- apply(PHENO.ANY_SN[c("anthra_jco_dose_5.category")], 1, function(x) any("Unknown" %in% x))
+# PHENO.ANY_SN$any_chemo_missing  <- factor(ifelse(PHENO.ANY_SN$any_chemo_missing == FALSE, "No", "Yes"))
+# 
+# PHENO.ANY_SN$any_rt_missing <- apply(PHENO.ANY_SN[c("maxchestrtdose.category")], 1, function(x) any("Unknown" %in% x))
+# PHENO.ANY_SN$any_rt_missing  <- factor(ifelse(PHENO.ANY_SN$any_rt_missing == FALSE, "No", "Yes"))
 
-PHENO.ANY_SN$any_chemo_missing <- apply(PHENO.ANY_SN[c("epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
-PHENO.ANY_SN$any_chemo_missing  <- factor(ifelse(PHENO.ANY_SN$any_chemo_missing == FALSE, "No", "Yes"))
-
-PHENO.ANY_SN$any_rt_missing <- apply(PHENO.ANY_SN[c("maxneckrtdose.category")], 1, function(x) any("Unknown" %in% x))
-PHENO.ANY_SN$any_rt_missing  <- factor(ifelse(PHENO.ANY_SN$any_rt_missing == FALSE, "No", "Yes"))
-
-PHENO.ANY_SN$any_tx_missing <- factor(PHENO.ANY_SN$any_tx_missing, levels = c("No", "Yes"))
-PHENO.ANY_SN$any_chemo_missing <- factor(PHENO.ANY_SN$any_chemo_missing, levels = c("No", "Yes"))
-PHENO.ANY_SN$any_rt_missing <- factor(PHENO.ANY_SN$any_rt_missing, levels = c("No", "Yes"))
 #########################
 ## Extract Ethnicities ##
 #########################
@@ -118,33 +128,33 @@ ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Geno
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
 
 
-############################################################
-## Drop Unknown level from the lifestyle factor variables ##
-############################################################
-## Missing tx
-PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "Unknown"] <- "None"
-PHENO.ANY_SN$maxsegrtdose.category <- droplevels(PHENO.ANY_SN$maxsegrtdose.category)
-
-PHENO.ANY_SN$maxneckrtdose.category[PHENO.ANY_SN$maxneckrtdose.category == "Unknown"] <- "None"
-PHENO.ANY_SN$maxneckrtdose.category <- droplevels(PHENO.ANY_SN$maxneckrtdose.category)
-
-PHENO.ANY_SN$maxabdrtdose.category[PHENO.ANY_SN$maxabdrtdose.category == "Unknown"] <- "None"
-PHENO.ANY_SN$maxabdrtdose.category <- droplevels(PHENO.ANY_SN$maxabdrtdose.category)
-
-PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$maxchestrtdose.category == "Unknown"] <- "None"
-PHENO.ANY_SN$maxchestrtdose.category <- droplevels(PHENO.ANY_SN$maxchestrtdose.category)
-
-PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$maxpelvisrtdose.category == "Unknown"] <- "None"
-PHENO.ANY_SN$maxpelvisrtdose.category <- droplevels(PHENO.ANY_SN$maxpelvisrtdose.category)
-
-PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "Unknown"] <- "None"
-PHENO.ANY_SN$epitxn_dose_5.category <- droplevels(PHENO.ANY_SN$epitxn_dose_5.category)
-
-PHENO.ANY_SN$anthra_jco_dose_5.category[PHENO.ANY_SN$anthra_jco_dose_5.category == "Unknown"] <- "None"
-PHENO.ANY_SN$anthra_jco_dose_5.category <- droplevels(PHENO.ANY_SN$anthra_jco_dose_5.category)
-
-PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "Unknown"] <- "None"
-PHENO.ANY_SN$aa_class_dose_5.category <- droplevels(PHENO.ANY_SN$aa_class_dose_5.category)
+# ############################################################
+# ## Drop Unknown level from the lifestyle factor variables ##
+# ############################################################
+# ## Missing tx
+# PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "Unknown"] <- "None"
+# PHENO.ANY_SN$maxsegrtdose.category <- droplevels(PHENO.ANY_SN$maxsegrtdose.category)
+# 
+# PHENO.ANY_SN$maxneckrtdose.category[PHENO.ANY_SN$maxneckrtdose.category == "Unknown"] <- "None"
+# PHENO.ANY_SN$maxneckrtdose.category <- droplevels(PHENO.ANY_SN$maxneckrtdose.category)
+# 
+# PHENO.ANY_SN$maxabdrtdose.category[PHENO.ANY_SN$maxabdrtdose.category == "Unknown"] <- "None"
+# PHENO.ANY_SN$maxabdrtdose.category <- droplevels(PHENO.ANY_SN$maxabdrtdose.category)
+# 
+# PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$maxchestrtdose.category == "Unknown"] <- "None"
+# PHENO.ANY_SN$maxchestrtdose.category <- droplevels(PHENO.ANY_SN$maxchestrtdose.category)
+# 
+# PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$maxpelvisrtdose.category == "Unknown"] <- "None"
+# PHENO.ANY_SN$maxpelvisrtdose.category <- droplevels(PHENO.ANY_SN$maxpelvisrtdose.category)
+# 
+# PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "Unknown"] <- "None"
+# PHENO.ANY_SN$epitxn_dose_5.category <- droplevels(PHENO.ANY_SN$epitxn_dose_5.category)
+# 
+# PHENO.ANY_SN$anthra_jco_dose_5.category[PHENO.ANY_SN$anthra_jco_dose_5.category == "Unknown"] <- "None"
+# PHENO.ANY_SN$anthra_jco_dose_5.category <- droplevels(PHENO.ANY_SN$anthra_jco_dose_5.category)
+# 
+# PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "Unknown"] <- "None"
+# PHENO.ANY_SN$aa_class_dose_5.category <- droplevels(PHENO.ANY_SN$aa_class_dose_5.category)
 
 
 ################
@@ -157,31 +167,20 @@ CROSS_CASES.df <- PHENO.ANY_SN[!is.na(PHENO.ANY_SN$EUR),]
 
 CROSS_CASES.df <- PHENO.ANY_SN
 
-CROSS_CASES.df <- CROSS_CASES.df[,c("THYROIDcancer", "maxneckrtdose.category", "epitxn_dose_5.category")]
+CROSS_CASES.df <- CROSS_CASES.df[,c("BREASTcancer", "maxchestrtdose.category", "anthra_jco_dose_5.category")]
 
-CROSS_CASES.df <- apply_labels(CROSS_CASES.df, THYROIDcancer = "THYROIDcancer", 
-                               maxneckrtdose.category = "maxneckrtdose.category", epitxn_dose_5.category = "epitxn_dose_5.category")
+CROSS_CASES.df <- apply_labels(CROSS_CASES.df, BREASTcancer = "BREASTcancer", 
+                               maxchestrtdose.category = "maxchestrtdose.category", anthra_jco_dose_5.category = "anthra_jco_dose_5.category")
 
 as.data.frame(t(CROSS_CASES.df %>%
-                  cross_cases(THYROIDcancer, list(maxneckrtdose.category, epitxn_dose_5.category))))
+                  cross_cases(BREASTcancer, list(maxchestrtdose.category, anthra_jco_dose_5.category))))
 
 
 cc <- as.data.frame(t(CROSS_CASES.df %>%
-                        cross_cases(THYROIDcancer, list(maxneckrtdose.category, epitxn_dose_5.category))))
+                        cross_cases(BREASTcancer, list(maxchestrtdose.category, anthra_jco_dose_5.category))))
 
 rownames(cc) <- NULL 
 cc
-
-
-# Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for cases
-cases_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$THYROIDcancer == 1],
-                     Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$THYROIDcancer == 1])
-
-# Create a cross-tabulation table between maxsegrtdose and maxchedtrtdose for controls
-control_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$THYROIDcancer == 0],
-                     Max_ChestRT_Dose = PHENO.ANY_SN$maxchestrtdose.category[PHENO.ANY_SN$THYROIDcancer == 0])
-
-
 
 ########################################
 ## Prepare data accoding to Qi's code ## 
@@ -245,7 +244,8 @@ table(adata$event)## Double check event numebr is correct
 ###any stop time <=start time
 adata$end[adata$end<=adata$start] <- adata$end[adata$end<=adata$start] + 1/365
 any <- adata[adata$end<=adata$start,] # 
-diff=any$start-any$end
+### 2 people had the stroke date on the Fu date. In this case, either get rid of the 2 lines [i.e, no time is follow-up after the last event date], or add 1 day on end date of these 2 segments, assuming there were followed up 1 more day. Will not make much difference. 1 day out of 365 days is 0.0027.
+diff=any$start-any$end ###Qi: These are people who had SN after the last contact date. Just wonder why this could happen. While it may not make the results differ, I wonder is there any reason to keep the events but change last contact date to be SN+1day? Depends on why there are SN after last contact date.
 dim(adata)
 final <- adata[adata$end>adata$start,]
 
@@ -271,10 +271,7 @@ PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.catego
                          "maxsegrtdose.category", "maxneckrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category",
                          "maxpelvisrtdose.category", "epitxn_dose_5.category", "anthra_jco_dose_5.category", "aa_class_dose_5.category",
                          "EAS", "AFR", 
-                         "any_tx_missing", "any_rt_missing", "any_chemo_missing",
                          "PY","evt1", "end")]
-
-
 
 ## Age attained age (cubic spline)
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/cubic_spline.r")
@@ -286,5 +283,6 @@ colnames(cs) <- c("AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, cs)
 
 
+
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.THYROIDcancer.V18b.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.BREASTcancer.V18.Rdata")

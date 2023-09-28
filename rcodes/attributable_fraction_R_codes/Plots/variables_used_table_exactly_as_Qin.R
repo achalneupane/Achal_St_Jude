@@ -1,5 +1,7 @@
 
-## 1.------------------------------------- SJLIFE
+## 1.------------------------------------- SJLIFE (Exactly as Qin et al)
+# This is based on Z:\ResearchHome\ClusterHome\aneupane\St_Jude\Achal_St_Jude\rcodes\attributable_fraction_R_codes\V18_no_merger_rule_in_v17\SJLIFE\Without_lifestyle_exactly_as_Qin_etal
+
 rm(list=ls())
 ######################################
 ## Attributable fraction of Any SNs ##
@@ -311,19 +313,19 @@ empty_dataframe.ordered[is.na(empty_dataframe.ordered)] <- ""
 
 
 
+## 2.------------------------------------- SJLIFE
 
 
 
 
 
-
-## 2.------------------------------------- CCSS
+## 3.------------------------------------- CCSS
 rm(list=ls())
 ######################################
 ## Attributable fraction of Any SNs ##
 ######################################
 # load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.Any_SNs_without_lifestyle.V17b.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.Any_SNs_without_lifestyle.V18.Rdata")
 
 # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 # cc
@@ -342,13 +344,11 @@ dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 
 # Fit the Poisson regression model
-fit_all <- glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
-                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+fit_all <- glm(formula = event ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                  AGE_AT_DIAGNOSIS + gender + 
                  maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category +
-                 EAS + AFR + 
-                 any_chemo_missing + any_rt_missing,
-               family = "poisson", offset = log(dat_all$PY), data = dat_all)
+                 EAS + AFR,
+                 family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
 # Get the summary of the Poisson regression model
 summary_fit_all <- summary(fit_all)
@@ -370,8 +370,8 @@ ANY_SN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|ches
 ###################################
 ## Attributable fraction of SMNs ##
 ###################################
-# load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SMNs_without_lifestyle.V17b.Rdata")
+# load ANY SMN data
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SMNs_without_lifestyle.V18.Rdata")
 
 
 # # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
@@ -387,12 +387,10 @@ load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHE
 
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
-fit_all = glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
-                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+fit_all = glm(formula = event ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender +
                 maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category +
-                EAS + AFR + 
-                any_chemo_missing + any_rt_missing,
+                EAS + AFR,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
 
@@ -418,7 +416,7 @@ SMN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|n
 ########################################
 
 # load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.NMSCs_without_lifestyle.V17b.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.NMSCs_without_lifestyle.V18.Rdata")
 
 # # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 # cc
@@ -441,11 +439,9 @@ load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHE
 dat_all = PHENO.ANY_SN
 
 dat_all=dat_all[dat_all$evt1==1,]
-fit_all = glm(formula = event ~ BASALcell_PRS.tertile.category + 
-                AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
+fit_all = glm(formula = event ~ AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 gender + maxsegrtdose.category + maxabdrtdose.category + maxpelvisrtdose.category +
-                EAS + AFR +
-                any_rt_missing,
+                EAS + AFR,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
 summary(fit_all)
@@ -466,12 +462,12 @@ results <- data.frame(
 
 
 NMSC.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
-
+NMSC.vars
 ################################################
 ## Attributable fraction of Any Breast cancer ##
 ################################################
 # load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.BREASTcancer_without_lifestyle.V17b.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.BREASTcancer_without_lifestyle.V18.Rdata")
 
 # # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 # cc
@@ -527,7 +523,7 @@ BREASTCANCER.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvi
 ## Attributable fraction of Any THYROID ##
 ##########################################
 # load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.THYROIDcancer_without_lifestyle.V17b.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.THYROIDcancer_without_lifestyle.V18.Rdata")
 
 # # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 # cc
@@ -579,7 +575,7 @@ THYROID.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|che
 ## Attributable fraction of Any Meningioma ##
 #############################################
 # load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.MENINGIOMA_without_lifestyle.V17b.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.MENINGIOMA_without_lifestyle.V18.Rdata")
 
 # # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 # cc
@@ -636,7 +632,7 @@ MENINGIOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|
 ##########################################
 
 # load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA_without_lifestyle.V17b.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA_without_lifestyle.V18.Rdata")
 
 # # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 # cc
