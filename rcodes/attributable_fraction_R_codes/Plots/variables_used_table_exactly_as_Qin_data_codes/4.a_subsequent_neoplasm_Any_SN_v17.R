@@ -4,7 +4,7 @@ rm(list=ls())
 #########################
 ## Load Phenotype data ##
 #########################
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11_exactly_as_Qin.RDATA")
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
 ALL.LIFESTYLE <- edit_lifestyle(ALL.LIFESTYLE)
 #########################
