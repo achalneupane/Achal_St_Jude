@@ -6,19 +6,19 @@ cc
 filtered_cc <- cc[cc[, 2] < 10 | cc[, 3] < 10, 1]
 filtered_cc
 
-PHENO.ANY_SN$maxsegrtdose.category <- as.character(PHENO.ANY_SN$maxsegrtdose.category)
-PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "None"] <- "<30"
-PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">0-<18"] <- "<30"
-PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">=18-<30"] <- "<30"
-PHENO.ANY_SN$maxsegrtdose.category <- factor(PHENO.ANY_SN$maxsegrtdose.category, levels = c("<30", ">=30"))
-
-table(PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$MENINGIOMA == 1])
-
-PHENO.ANY_SN$epitxn_dose_5.category <- as.character(PHENO.ANY_SN$epitxn_dose_5.category)
-PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "1st"] <- "Any"
-PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "2nd"] <- "Any"
-PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "3rd"] <- "Any"
-PHENO.ANY_SN$epitxn_dose_5.category <- factor(PHENO.ANY_SN$epitxn_dose_5.category, levels = c("None", "Any"))
+# PHENO.ANY_SN$maxsegrtdose.category <- as.character(PHENO.ANY_SN$maxsegrtdose.category)
+# PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "None"] <- "<30"
+# PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">0-<18"] <- "<30"
+# PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">=18-<30"] <- "<30"
+# PHENO.ANY_SN$maxsegrtdose.category <- factor(PHENO.ANY_SN$maxsegrtdose.category, levels = c("<30", ">=30"))
+# 
+# table(PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$MENINGIOMA == 1])
+# 
+# PHENO.ANY_SN$epitxn_dose_5.category <- as.character(PHENO.ANY_SN$epitxn_dose_5.category)
+# PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "1st"] <- "Any"
+# PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "2nd"] <- "Any"
+# PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "3rd"] <- "Any"
+# PHENO.ANY_SN$epitxn_dose_5.category <- factor(PHENO.ANY_SN$epitxn_dose_5.category, levels = c("None", "Any"))
 ######################################
 ## Attributable fraction of Any SNs ##
 ######################################
@@ -106,7 +106,7 @@ dat_rt = dat_all
 
 dat_rt$any_rt_missing <- "No" # **
 
-dat_rt$maxsegrtdose.category = "<30" ## **
+dat_rt$maxsegrtdose.category = "None" ## **
 
 dat_all$pred_no_rt = predict(fit_all, newdata = dat_rt, type = "response")
 
@@ -151,7 +151,7 @@ dat_tx.rt = dat_all
 dat_tx.rt$any_chemo_missing <- "No" ## **
 dat_tx.rt$any_rt_missing <- "No" ## **
 
-dat_tx.rt$maxsegrtdose.category = "<30"
+dat_tx.rt$maxsegrtdose.category = "None"
 dat_tx.rt$epitxn_dose_5.category = "None" ## **
 
 dat_all$pred_no_tx.rt = predict(fit_all, newdata = dat_tx.rt, type = "response")
@@ -278,7 +278,7 @@ dat_tx.prs.lifestyle$any_rt_missing <- "No" ## **
 dat_tx.prs.lifestyle$any_lifestyle_missing <- "No"
 
 ## Nullify Treatment
-dat_tx.prs.lifestyle$maxsegrtdose.category = "<30"
+dat_tx.prs.lifestyle$maxsegrtdose.category = "None"
 dat_tx.prs.lifestyle$epitxn_dose_5.category = "None" ## **
 
 ## Nullify Genetics
