@@ -7,11 +7,11 @@ cc
 filtered_cc <- cc[cc[, 2] < 10 | cc[, 3] < 10, 1]
 filtered_cc
 
-PHENO.ANY_SN$aa_class_dose_5.category <- as.character(PHENO.ANY_SN$aa_class_dose_5.category)
-PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "None"] <- "1st"
-PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "2nd"] <- "2nd-3rd"
-PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "3rd"] <- "2nd-3rd"
-PHENO.ANY_SN$aa_class_dose_5.category <- factor(PHENO.ANY_SN$aa_class_dose_5.category, levels = c("1st", "2nd-3rd"))
+# PHENO.ANY_SN$aa_class_dose_5.category <- as.character(PHENO.ANY_SN$aa_class_dose_5.category)
+# PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "None"] <- "1st"
+# PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "2nd"] <- "2nd-3rd"
+# PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "3rd"] <- "2nd-3rd"
+# PHENO.ANY_SN$aa_class_dose_5.category <- factor(PHENO.ANY_SN$aa_class_dose_5.category, levels = c("1st", "2nd-3rd"))
 
 ######################################
 ## Attributable fraction of Any SNs ##
@@ -54,7 +54,7 @@ N_all.gteq.35 = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.
 dat_tx = dat_all
 
 dat_tx$any_chemo_missing <- "No" # **
-dat_tx$aa_class_dose_5.category = "1st" ## **
+dat_tx$aa_class_dose_5.category = "None" ## **
 
 dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
 
@@ -117,7 +117,7 @@ dat_tx.rt = dat_all
 
 dat_tx.rt$any_chemo_missing <- "No" ## **
 
-dat_tx.rt$aa_class_dose_5.category = "1st" ## **
+dat_tx.rt$aa_class_dose_5.category = "None" ## **
 
 dat_all$pred_no_tx.rt = predict(fit_all, newdata = dat_tx.rt, type = "response")
 
@@ -215,7 +215,7 @@ dat_tx.prs.lifestyle$any_chemo_missing <- "No" ## **
 
 
 ## Nullify Treatment
-dat_tx.prs.lifestyle$aa_class_dose_5.category = "1st" ## **
+dat_tx.prs.lifestyle$aa_class_dose_5.category = "None" ## **
 
 ## Nullify Genetics
 # dat_tx.plp.prs.lifestyle$Zhaoming_carriers = dat_tx.plp.prs.lifestyle$Qin_without_Zhaoming_vars_carriers = "N";
