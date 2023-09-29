@@ -632,8 +632,8 @@ TERT = unname(quantile(PHENO.ANY_SN$aa_class_dose_5[PHENO.ANY_SN$aa_class_dose_5
 PHENO.ANY_SN$aa_class_dose_5.category <- cut(PHENO.ANY_SN$aa_class_dose_5, breaks = c(-Inf, 0, TERT),
                                              labels = c("None", "1st", "2nd", "3rd"),
                                              include.lowest = TRUE)
-# levels(PHENO.ANY_SN$aa_class_dose_5.category) <- c(levels(PHENO.ANY_SN$aa_class_dose_5.category), "Unknown")
-# PHENO.ANY_SN$aa_class_dose_5.category [is.na(PHENO.ANY_SN$aa_class_dose_5.category)] <- "Unknown"
+levels(PHENO.ANY_SN$aa_class_dose_5.category) <- c(levels(PHENO.ANY_SN$aa_class_dose_5.category), "Unknown")
+PHENO.ANY_SN$aa_class_dose_5.category [is.na(PHENO.ANY_SN$aa_class_dose_5.category)] <- "Unknown"
 
 
 ## anthra_jco_dose_5 **
@@ -642,8 +642,8 @@ TERT = unname(quantile(PHENO.ANY_SN$anthra_jco_dose_5[PHENO.ANY_SN$anthra_jco_do
 PHENO.ANY_SN$anthra_jco_dose_5.category <- cut(PHENO.ANY_SN$anthra_jco_dose_5, breaks = c(-Inf, 0, TERT),
                                                labels = c("None", "1st", "2nd", "3rd"),
                                                include.lowest = TRUE)
-# levels(PHENO.ANY_SN$anthra_jco_dose_5.category) <- c(levels(PHENO.ANY_SN$anthra_jco_dose_5.category), "Unknown")
-# PHENO.ANY_SN$anthra_jco_dose_5.category [is.na(PHENO.ANY_SN$anthra_jco_dose_5.category)] <- "Unknown"
+levels(PHENO.ANY_SN$anthra_jco_dose_5.category) <- c(levels(PHENO.ANY_SN$anthra_jco_dose_5.category), "Unknown")
+PHENO.ANY_SN$anthra_jco_dose_5.category [is.na(PHENO.ANY_SN$anthra_jco_dose_5.category)] <- "Unknown"
 
 
 ## epitxn_dose_5 **
@@ -652,8 +652,8 @@ TERT = unname(quantile(PHENO.ANY_SN$epitxn_dose_5[PHENO.ANY_SN$epitxn_dose_5 !=0
 PHENO.ANY_SN$epitxn_dose_5.category <- cut(PHENO.ANY_SN$epitxn_dose_5, breaks = c(-Inf, 0, TERT),
                                            labels = c("None", "1st", "2nd", "3rd"),
                                            include.lowest = TRUE)
-# levels(PHENO.ANY_SN$epitxn_dose_5.category) <- c(levels(PHENO.ANY_SN$epitxn_dose_5.category), "Unknown")
-# PHENO.ANY_SN$epitxn_dose_5.category [is.na(PHENO.ANY_SN$epitxn_dose_5.category)] <- "Unknown"
+levels(PHENO.ANY_SN$epitxn_dose_5.category) <- c(levels(PHENO.ANY_SN$epitxn_dose_5.category), "Unknown")
+PHENO.ANY_SN$epitxn_dose_5.category [is.na(PHENO.ANY_SN$epitxn_dose_5.category)] <- "Unknown"
 
 
 
