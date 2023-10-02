@@ -1,5 +1,5 @@
 # load ANY SN data
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.BREASTcancer.V18b.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.BREASTcancer.V18d.Rdata")
 
 # cc
 # filtered_cc <- cc[cc[, 2] < 10 | cc[, 3] < 10, 1]

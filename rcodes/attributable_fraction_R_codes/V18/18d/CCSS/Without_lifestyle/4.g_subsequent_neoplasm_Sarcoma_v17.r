@@ -310,5 +310,5 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, cs)
 
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
 # save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA_without_lifestyle.V17.Rdata")
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA_without_lifestyle.V18b.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA_without_lifestyle.V18d.Rdata")
 

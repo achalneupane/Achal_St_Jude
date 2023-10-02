@@ -19,3 +19,6 @@ find . -type f -name '4*' -exec sed -i '/"any_lifestyle_missing",/s/^/# /' {} \;
 find . -type f -name '4*' -exec sed -i '/^# # #.*,$/d' {} \;
 
 find . -type f -name '*model_fit_*' -exec sed -i 's/EAS + AFR +/EAS + AFR,/' {} \;
+
+
+find . -type f -exec sed -i 's/18b/18d/' {} \;
