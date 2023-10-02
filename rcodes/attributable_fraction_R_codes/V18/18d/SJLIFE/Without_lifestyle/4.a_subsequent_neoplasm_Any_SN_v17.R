@@ -1,14 +1,11 @@
-## **
 # Following Qi's email on 05/03/2023 (subject: [Encrypt] CCSS help). Running Piecewise-exponential regression.
 rm(list=ls())
 #########################
-## Load Phenotype data ##
 #########################
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
 ALL.LIFESTYLE <- edit_lifestyle(ALL.LIFESTYLE)
 #########################
-## Subsequent Neoplasm ##
 #########################
 
 library(haven)
@@ -61,13 +58,11 @@ subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 
 sum(!duplicated(subneo.within5$sjlid))
 # 22
 #############
-## Any SNs ##
 #############
 # Get SNs for the first time and Age at First SN. Note: I am only keeping first event SN 5 years post diagnosis
 # For this, I will first sort the table by date
 library(data.table)
 
-## Remove SNs as cases that are within 5 years of primary diagnosis
 subneo <- subneo[!subneo$sjlid %in% subneo.within5$sjlid,]
 ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 
@@ -80,7 +75,6 @@ PHENO.ANY_SN$AGE.ANY_SN <- ANY_SNs$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, ANY_SNs
 # PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 # }
 
-## remove within 5 years of diagnosis
 sum(PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid)
 # 22
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid,]
@@ -94,7 +88,6 @@ table(PHENO.ANY_SN$ANY_SNs)
 
 
 #################
-## missingness ##
 #################
 # PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category", "epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
 # PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
@@ -110,17 +103,13 @@ table(PHENO.ANY_SN$ANY_SNs)
 # PHENO.ANY_SN$any_rt_missing <- factor(PHENO.ANY_SN$any_rt_missing, levels = c("No", "Yes"))
 
 #########################
-## Extract Ethnicities ##
 #########################
-## Add admixture ethnicity 
 ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
 
 
 ############################################################
-## Drop Unknown level from the lifestyle factor variables ##
 ############################################################
-## Missing tx
 # PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "Unknown"] <- "None"
 # PHENO.ANY_SN$maxsegrtdose.category <- droplevels(PHENO.ANY_SN$maxsegrtdose.category)
 
@@ -147,7 +136,6 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.A
 
 
 ################
-## Cross tabs ##
 ################
 library(expss)
 
@@ -184,11 +172,9 @@ control_table <- table(Max_SegmentedRT_Dose = PHENO.ANY_SN$maxsegrtdose.category
 
 # **
 ########################################
-## Prepare data accoding to Qi's code ## 
 ########################################
 data <- PHENO.ANY_SN[!grepl("MRN", colnames(PHENO.ANY_SN))]
 
-## Age at last contact for cases is SN diagnosis data
 data$agelstcontact[!is.na(data$AGE.ANY_SN)] <- data$AGE.ANY_SN[!is.na(data$AGE.ANY_SN)]
 
 data$event <- ifelse(!is.na(data$gradedt), 1, 0)
@@ -265,7 +251,6 @@ length(unique(SNs_py$sjlid[SNs_py$event==1 & SNs_py$evt1==1 ]))
 SNs_py$PY <- SNs_py$end-SNs_py$start
 
 ###############
-## Model fit ##
 ###############
 
 PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.category", "BASALcell_PRS.tertile.category", 
@@ -276,12 +261,10 @@ PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.catego
                          "maxsegrtdose.category", "maxneckrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category",
                          "maxpelvisrtdose.category", "epitxn_dose_5.category", "anthra_jco_dose_5.category", "aa_class_dose_5.category",
                          "EAS", "AFR", 
-                         "any_tx_missing", "any_rt_missing", "any_chemo_missing",
                          "PY","evt1", "end")]
 
 
 
-## Age attained age (cubic spline)
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/cubic_spline.r")
 breaks = seq(5, 95, 22.5)
 cp = quantile(PHENO.ANY_SN$end, breaks/100, na.rm = T)
@@ -292,5 +275,4 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, cs)
 
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
 
-## **
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.Any_SNs.V18d.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.Any_SNs.V18b.Rdata")

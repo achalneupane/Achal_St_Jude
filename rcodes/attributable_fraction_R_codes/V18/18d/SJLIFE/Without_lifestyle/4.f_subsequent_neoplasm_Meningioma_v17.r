@@ -1,13 +1,11 @@
 # Following Qi's email on 05/03/2023 (subject: [Encrypt] CCSS help). Running Piecewise-exponential regression.
 rm(list=ls())
 #########################
-## Load Phenotype data ##
 #########################
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
 ALL.LIFESTYLE <- edit_lifestyle(ALL.LIFESTYLE)
 #########################
-## Subsequent Neoplasm ##
 #########################
 
 library(haven)
@@ -44,7 +42,6 @@ subneo$DOB <- PHENO.ANY_SN$dob[match(subneo$sjlid, PHENO.ANY_SN$sjlid)]
 subneo$gradedt <- as.Date(subneo$gradedt, "%m/%d/%Y") ## **
 subneo$AGE.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
 
-## These two dates should be the (almost) same
 subneo$AGE.ANY_SN.after.childhood.cancer <- time_length(interval(as.Date(subneo$diagdt), as.Date(subneo$gradedt)), "years")
 subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subneo$agedx
 
@@ -59,31 +56,26 @@ subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 
 sum(!duplicated(subneo.within5$sjlid))
 # 22
 ################
-## Meningioma ##
 ################
 # Get MENINGIOMA for the first time and Age at First MENINGIOMA.
 # For this, I will first sort the table by date
 library(data.table)
-## Remove SNs as cases that are within 5 years of primary diagnosis
 subneo <- subneo[!subneo$sjlid %in% subneo.within5$sjlid,]
 
 MENINGIOMA <- subneo[grepl("meningioma", subneo$diag, ignore.case = T),]
 MENINGIOMA <- setDT(MENINGIOMA)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 
-## Remove SNs as cases that are within 5 years of primary diagnosis
 MENINGIOMA <- MENINGIOMA[!MENINGIOMA$sjlid %in% subneo.within5$sjlid,]
 nrow(MENINGIOMA)
 nrow(MENINGIOMA)
 # 149
 
-## Remove MENINGIOMA if younger than 18
 PHENO.ANY_SN$gradedt <- MENINGIOMA$gradedt[match(PHENO.ANY_SN$sjlid, MENINGIOMA$sjlid)]
 PHENO.ANY_SN$AGE.ANY_SN <- MENINGIOMA$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, MENINGIOMA$sjlid)]
 # if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 # PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 # }
 
-## remove within 5 years of diagnosis
 sum(PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid)
 # 22
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid,]
@@ -95,7 +87,6 @@ table(PHENO.ANY_SN$MENINGIOMA)
 # 4230 149
 
 #################
-## missingness ##
 #################
 # PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
 # PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
@@ -110,17 +101,13 @@ table(PHENO.ANY_SN$MENINGIOMA)
 # PHENO.ANY_SN$any_chemo_missing <- factor(PHENO.ANY_SN$any_chemo_missing, levels = c("No", "Yes"))
 # PHENO.ANY_SN$any_rt_missing <- factor(PHENO.ANY_SN$any_rt_missing, levels = c("No", "Yes"))
 #########################
-## Extract Ethnicities ##
 #########################
-## Add admixture ethnicity 
 ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
 
 
 ############################################################
-## Drop Unknown level from the lifestyle factor variables ##
 ############################################################
-## Missing tx
 # PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "Unknown"] <- "None"
 # PHENO.ANY_SN$maxsegrtdose.category <- droplevels(PHENO.ANY_SN$maxsegrtdose.category)
 
@@ -147,7 +134,6 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.A
 
 
 ################
-## Cross tabs ##
 ################
 library(expss)
 
@@ -172,11 +158,9 @@ rownames(cc) <- NULL
 cc
 
 ########################################
-## Prepare data accoding to Qi's code ## 
 ########################################
 data <- PHENO.ANY_SN[!grepl("MRN", colnames(PHENO.ANY_SN))]
 
-## Age at last contact for cases is SN diagnosis data
 data$agelstcontact[!is.na(data$AGE.ANY_SN)] <- data$AGE.ANY_SN[!is.na(data$AGE.ANY_SN)]
 
 data$event <- ifelse(!is.na(data$gradedt), 1, 0)
@@ -250,7 +234,6 @@ length(unique(SNs_py$sjlid[SNs_py$event==1 & SNs_py$evt1==1 ]))
 SNs_py$PY <- SNs_py$end-SNs_py$start
 
 ###############
-## Model fit ##
 ###############
 PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.category", "BASALcell_PRS.tertile.category", 
                          "Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category", "Thyroid_PRS.tertile.category",
@@ -260,12 +243,10 @@ PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.catego
                          "maxsegrtdose.category", "maxneckrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category",
                          "maxpelvisrtdose.category", "epitxn_dose_5.category", "anthra_jco_dose_5.category", "aa_class_dose_5.category",
                          "EAS", "AFR", 
-                         "any_tx_missing", "any_rt_missing", "any_chemo_missing",
                          "PY","evt1", "end")]
 
 
 
-## Age attained age (cubic spline)
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/cubic_spline.r")
 breaks = seq(5, 95, 22.5)
 cp = quantile(PHENO.ANY_SN$end, breaks/100, na.rm = T)
@@ -277,4 +258,4 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, cs)
 
 
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.MENINGIOMA.V18d.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_lifestyle.MENINGIOMA.V18b.Rdata")

@@ -1,6 +1,6 @@
 # load ANY SN data
-# load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA_without_lifestyle.V18d.Rdata")
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA_without_lifestyle.V18d.Rdata")
+# load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA_without_lifestyle.V18b.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA_without_lifestyle.V18b.Rdata")
 
 # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
 cc
@@ -24,7 +24,6 @@ fit_all = glm(formula = event ~ Sarcoma_Machiela_PRS.tertile.category +
                 gender + 
                 aa_class_dose_5.category +
                 EAS + AFR, 
-                any_chemo_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
 summary(fit_all)
@@ -283,7 +282,6 @@ all.res <- rbind.data.frame(SN=SN.res, SMN=SMN.res, NMSC=NMSC.res, BREAST=Breast
 #                 gender + 
 #                 aa_class_dose_5.category +
 #                 EAS + AFR, 
-#                 any_chemo_missing +
 #                 aa_class_dose_5.category * Sarcoma_Machiela_PRS.tertile.category,
 #               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 # 

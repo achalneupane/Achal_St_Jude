@@ -3,13 +3,11 @@ obj_keep <- c("miss_Any_SN", "miss_SMN", "miss_NMSC", "miss_BREAST", "miss_THYRO
 rm(list = setdiff(ls(), obj_keep))
 # rm(list=ls())
 #########################
-## Load Phenotype data ##
 #########################
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
 ALL.LIFESTYLE <- edit_lifestyle(ALL.LIFESTYLE)
 #########################
-## Subsequent Neoplasm ##
 #########################
 
 library(haven)
@@ -46,7 +44,6 @@ subneo$DOB <- PHENO.ANY_SN$dob[match(subneo$sjlid, PHENO.ANY_SN$sjlid)]
 subneo$gradedt <- as.Date(subneo$gradedt, "%m/%d/%Y") ## **
 subneo$AGE.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
 
-## These two dates should be the (almost) same
 subneo$AGE.ANY_SN.after.childhood.cancer <- time_length(interval(as.Date(subneo$diagdt), as.Date(subneo$gradedt)), "years")
 subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subneo$agedx
 
@@ -61,7 +58,6 @@ subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 
 sum(!duplicated(subneo.within5$sjlid))
 # 22
 #############
-## Any SNs ##
 #############
 # Get NMSCs for the first time and Age at First NMSCs.
 # For this, I will first sort the table by date
@@ -69,20 +65,17 @@ library(data.table)
 NMSCs <- subneo[grepl("basal cell|squamous cell", subneo$diag, ignore.case = T),]
 NMSCs <- setDT(NMSCs)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
 
-## Remove SNs as cases that are within 5 years of primary diagnosis
 NMSCs <- NMSCs[!NMSCs$sjlid %in% subneo.within5$sjlid,]
 nrow(NMSCs)
 # 249
 
 
-## Remove NMSCs if younger than 18
 PHENO.ANY_SN$AGE.ANY_SN <- NMSCs$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, NMSCs$sjlid)]
 
 if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 }
 
-## remove within 5 years of diagnosis
 sum(PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid)
 # 22
 
@@ -96,14 +89,12 @@ table(PHENO.ANY_SN$NMSCs)
 # 4130  240
 
 #############################
-## Add Lifestyle variables ##
 #############################
 # Define CA/CO status in lifestyle
 ALL.LIFESTYLE$CACO <- factor(ifelse(!ALL.LIFESTYLE$SJLIFEID %in% NMSCs$sjlid, 0, 1))
 
 
 
-## Get date (gradedt) and age at diagnosis of SN
 ALL.LIFESTYLE$ANY.SN_gradedate <- NMSCs$gradedt[match(ALL.LIFESTYLE$SJLIFEID, NMSCs$sjlid)]
 ALL.LIFESTYLE$AGE.ANY_SN <- NMSCs$AGE.ANY_SN[match(ALL.LIFESTYLE$SJLIFEID, NMSCs$sjlid)]
 
@@ -149,7 +140,6 @@ cols <- c(
   "Not_obese_yn_agesurvey"
 )
 
-## round to nearest integer
 # saved.cc <- ALL.LIFESTYLE[, c("SJLIFEID", cols)]
 ALL.LIFESTYLE[, cols] <- apply(ALL.LIFESTYLE[, cols], 2, round)
 library(matrixStats)
@@ -167,22 +157,18 @@ PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% to.remove,]
 sum(PHENO.ANY_SN$sjlid %in% ALL.LIFESTYLE$SJLIFEID)
 # 3562
 
-## Remove any samples that do not have lifestyle
 PHENO.ANY_SN  <- PHENO.ANY_SN[PHENO.ANY_SN$sjlid %in% ALL.LIFESTYLE$SJLIFEID,]
 
 #############################
-## Addd lifestyle to Pheno ##
 #############################
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("survey_min", "HEI2015_TOTAL_SCORE", "Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "HEALTHY_Diet_yn", "Obese_yn")])
 
 
-## Add any missing to each lifestyle variable
 # PHENO.ANY_SN[c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn")]
 # PHENO.ANY_SN$any_lifestyle_missing <- apply(PHENO.ANY_SN[c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn")], 1, function(x) any("Unknown" %in% x))
 # PHENO.ANY_SN$any_lifestyle_missing  <- factor(ifelse(PHENO.ANY_SN$any_lifestyle_missing == FALSE, "No", "Yes"))
 
 ########################################
-## Do the same for missing treatments ##
 ########################################
 # PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "maxabdrtdose.category", "maxpelvisrtdose.category")], 1, function(x) any("Unknown" %in% x))
 # PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
@@ -193,14 +179,11 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$
 # PHENO.ANY_SN$any_tx_missing <- factor(PHENO.ANY_SN$any_tx_missing, levels = c("No", "Yes"))
 # PHENO.ANY_SN$any_rt_missing <- factor(PHENO.ANY_SN$any_rt_missing, levels = c("No", "Yes"))
 #########################
-## Extract Ethnicities ##
 #########################
-## Add admixture ethnicity 
 ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
 
 ##############################
-## Get missing combinations ##
 ##############################
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/get_missing_combination_V17.R")
 # Columns to check
@@ -209,10 +192,7 @@ columns_to_check <- c("PhysicalActivity_yn", "Current_smoker_yn", "RiskyHeavyDri
 miss_NMSC <- get_missing_combinations(PHENO.ANY_SN, columns_to_check)
 
 ############################################################
-## Drop Unknown level from the lifestyle factor variables ##
 ############################################################
-## Recode lifestyle variables to fit the model for missingness
-## Missing lifestyle
 # PHENO.ANY_SN$Current_smoker_yn[PHENO.ANY_SN$Current_smoker_yn == "Unknown"] <- "No"
 # PHENO.ANY_SN$Current_smoker_yn <- droplevels(PHENO.ANY_SN$Current_smoker_yn)
 
@@ -226,7 +206,6 @@ miss_NMSC <- get_missing_combinations(PHENO.ANY_SN, columns_to_check)
 # PHENO.ANY_SN$Obese_yn <- droplevels(PHENO.ANY_SN$Obese_yn)
 
 
-## Missing tx
 # PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "Unknown"] <- "None"
 # PHENO.ANY_SN$maxsegrtdose.category <- droplevels(PHENO.ANY_SN$maxsegrtdose.category)
 
@@ -255,7 +234,6 @@ miss_NMSC <- get_missing_combinations(PHENO.ANY_SN, columns_to_check)
 
 
 ################
-## Cross tabs ##
 ################
 library(expss)
 
@@ -281,11 +259,9 @@ cc
 
 
 ########################################
-## Prepare data accoding to Qi's code ## 
 ########################################  ## change agedx to survey_min which is the age at first adult survey
 data <- PHENO.ANY_SN[!grepl("MRN", colnames(PHENO.ANY_SN))]
 
-## Age at last contact for cases is SN diagnosis data
 data$agelstcontact[!is.na(data$AGE.ANY_SN)] <- data$AGE.ANY_SN[!is.na(data$AGE.ANY_SN)]
 # If age at adult survey is greater than age at last contact for Controls, Use age at survey as age at last contact **
 BOOL <- is.na(data$AGE.ANY_SN) & data$agelstcontact < data$survey_min
@@ -368,7 +344,6 @@ length(unique(SNs_py$sjlid[SNs_py$event==1 & SNs_py$evt1==1 ]))
 SNs_py$PY <- SNs_py$end-SNs_py$start
 
 ###############
-## Model fit ##
 ###############
 PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.category", "BASALcell_PRS.tertile.category", 
                          "Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category", "Thyroid_PRS.tertile.category",
@@ -379,12 +354,10 @@ PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.catego
                          "maxpelvisrtdose.category", "epitxn_dose_5.category", "anthra_jco_dose_5.category", "aa_class_dose_5.category",
                          "EAS", "AFR", 
                          "Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn", 
-                         "any_lifestyle_missing", "any_tx_missing", "any_rt_missing",
                          "PY","evt1", "end")]
 
 
 
-## Age attained age (cubic spline)
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/cubic_spline.r")
 breaks = seq(5, 95, 22.5)
 cp = quantile(PHENO.ANY_SN$end, breaks/100, na.rm = T)
@@ -395,4 +368,4 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, cs)
 
 
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.NMSCs.V18d.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_without_diet.NMSCs.V18b.Rdata")
