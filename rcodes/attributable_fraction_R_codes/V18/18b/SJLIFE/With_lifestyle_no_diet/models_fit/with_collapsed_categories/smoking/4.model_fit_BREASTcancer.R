@@ -23,6 +23,7 @@ PHENO.ANY_SN$anthra_jco_dose_5.category <- factor(PHENO.ANY_SN$anthra_jco_dose_5
 ## Attributable fraction of Any SNs ##
 ######################################
 dat_all = PHENO.ANY_SN
+dat_all = dat_all[dat_all$gender == "Female",]
 dat_all=dat_all[dat_all$evt1==1,]
 
 fit_all = glm(formula = event ~ 
@@ -341,6 +342,7 @@ Breast.res <- data.frame(
 # ## Check PRS and treatment interaction ##
 # #########################################
 # dat_all = PHENO.ANY_SN
+dat_all = dat_all[dat_all$gender == "Female",]
 # dat_all=dat_all[dat_all$evt1==1,]
 # 
 # fit_all = glm(formula = event ~ 
