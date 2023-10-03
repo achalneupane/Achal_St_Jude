@@ -22,3 +22,12 @@ find . -type f -name '*model_fit_*' -exec sed -i 's/EAS + AFR +/EAS + AFR,/' {} 
 
 
 find . -type f -exec sed -i 's/18b/18d/' {} \;
+
+
+add a new line after line dat_all = PHENO.ANY_SN. The line I want to insert is PHENO.ANY_SN[PHENO.ANY_SN$gender == "Female",]
+find . -type f -name '*model_fit_BREASTcancer*' -exec sed -i '/dat_all = PHENO.ANY_SN/a dat_all = dat_all[dat_all$gender == "Female",]' {} \;
+
+
+
+comment out line with $any_chemo_missing or $any_rt_missing or $any_lifestyle_missing
+find . -type f -name '*model_fit*' -exec sed -i '/\$any_chemo_missing\|\$any_rt_missing\|\$any_lifestyle_missing/s/^/# /' {} \;
