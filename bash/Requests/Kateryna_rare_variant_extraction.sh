@@ -36,10 +36,10 @@ print(as.data.frame(table(VCF$CLNSIG)))
 # 8  Conflicting_interpretations_of_pathogenicity|_association        6
 # 9  Conflicting_interpretations_of_pathogenicity|_risk_factor        6
 # 10                                             Likely_benign    62840
-# 11                                         Likely_pathogenic      593
-# 12                                                Pathogenic     2028
-# 13                              Pathogenic/Likely_pathogenic      875
-# 14                                   Pathogenic|_risk_factor        9
+# 11                                         Likely_pathogenic      593**
+# 12                                                Pathogenic     2028 **
+# 13                              Pathogenic/Likely_pathogenic      875**
+# 14                                   Pathogenic|_risk_factor        9**
 # 15                                    Uncertain_significance    47896
 # 16                                               association        7
 # 17                                              not_provided      535
