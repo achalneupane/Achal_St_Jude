@@ -79,9 +79,9 @@ dat_rt = dat_all
 # dat_rt$any_rt_missing <- "No" # **
 
 
-dat_rt$maxsegrtdose.category =
-  dat_rt$maxabdrtdose.category =
-  dat_rt$maxpelvisrtdose.category = "None" ## **
+dat_rt$maxsegrtdose.category [!grepl("Unknown", dat_rt$maxsegrtdose.category)] =
+  dat_rt$maxabdrtdose.category [!grepl("Unknown", dat_rt$maxabdrtdose.category)] =
+  dat_rt$maxpelvisrtdose.category [!grepl("Unknown", dat_rt$maxpelvisrtdose.category)] = "None" ## **
 
 dat_all$pred_no_rt = predict(fit_all, newdata = dat_rt, type = "response")
 
@@ -125,9 +125,9 @@ dat_tx.rt = dat_all
 
 # dat_tx.rt$any_rt_missing <- "No" ## **
 
-dat_tx.rt$maxsegrtdose.category =
-  dat_tx.rt$maxabdrtdose.category =
-  dat_tx.rt$maxpelvisrtdose.category = "None" ## **
+dat_tx.rt$maxsegrtdose.category [!grepl("Unknown", dat_tx.rt$maxsegrtdose.category)] =
+  dat_tx.rt$maxabdrtdose.category [!grepl("Unknown", dat_tx.rt$maxabdrtdose.category)] =
+  dat_tx.rt$maxpelvisrtdose.category [!grepl("Unknown", dat_tx.rt$maxpelvisrtdose.category)] = "None" ## **
 
 dat_all$pred_no_tx.rt = predict(fit_all, newdata = dat_tx.rt, type = "response")
 
@@ -204,11 +204,11 @@ dat_lifestyle = dat_all
 
 # dat_lifestyle$any_lifestyle_missing <- "No"
 
-# dat_lifestyle$Current_smoker_yn = "No"
-# dat_lifestyle$PhysicalActivity_yn = "Yes"
-dat_lifestyle$RiskyHeavyDrink_yn = "No"
-# # dat_lifestyle$HEALTHY_Diet_yn = "Yes"
-# dat_lifestyle$Obese_yn = "No"
+# dat_lifestyle$Current_smoker_yn [!grepl("Unknown", dat_lifestyle$Current_smoker_yn)] = "No"
+# dat_lifestyle$PhysicalActivity_yn [!grepl("Unknown", dat_lifestyle$PhysicalActivity_yn)] = "Yes"
+dat_lifestyle$RiskyHeavyDrink_yn [!grepl("Unknown", dat_lifestyle$RiskyHeavyDrink_yn)] = "No"
+# # dat_lifestyle$HEALTHY_Diet_yn [!grepl("Unknown", dat_lifestyle$HEALTHY_Diet_yn)] = "Yes"
+# dat_lifestyle$Obese_yn [!grepl("Unknown", dat_lifestyle$Obese_yn)] = "No"
 
 dat_all$pred_no_favorable_lifestyle.category = predict(fit_all, newdata = dat_lifestyle, type = "response")
 N_no_favorable_lifestyle.category = sum(dat_all$pred_no_favorable_lifestyle.category, na.rm = TRUE)
@@ -251,20 +251,20 @@ dat_tx.prs.lifestyle = dat_all
 # dat_tx.prs.lifestyle$any_lifestyle_missing <- "No"
 
 ## Nullify Treatment
-dat_tx.prs.lifestyle$maxsegrtdose.category =
-  dat_tx.prs.lifestyle$maxabdrtdose.category =
-  dat_tx.prs.lifestyle$maxpelvisrtdose.category = "None" ## **
+dat_tx.prs.lifestyle$maxsegrtdose.category [!grepl("Unknown", dat_tx.prs.lifestyle$maxsegrtdose.category)] =
+  dat_tx.prs.lifestyle$maxabdrtdose.category [!grepl("Unknown", dat_tx.prs.lifestyle$maxabdrtdose.category)] =
+  dat_tx.prs.lifestyle$maxpelvisrtdose.category [!grepl("Unknown", dat_tx.prs.lifestyle$maxpelvisrtdose.category)] = "None" ## **
 
 ## Nullify Genetics
 # dat_tx.plp.prs.lifestyle$Zhaoming_carriers = dat_tx.plp.prs.lifestyle$Qin_without_Zhaoming_vars_carriers = "N";
 dat_tx.prs.lifestyle$BASALcell_PRS.tertile.category = "1st" ## **
 
 ## Nullify Lifestyle
-# dat_tx.prs.lifestyle$Current_smoker_yn = "No"
-# dat_tx.prs.lifestyle$PhysicalActivity_yn = "Yes"
-dat_tx.prs.lifestyle$RiskyHeavyDrink_yn = "No"
-# # dat_tx.prs.lifestyle$HEALTHY_Diet_yn = "Yes"
-# dat_tx.prs.lifestyle$Obese_yn = "No"
+# dat_tx.prs.lifestyle$Current_smoker_yn [!grepl("Unknown", dat_tx.prs.lifestyle$Current_smoker_yn)] = "No"
+# dat_tx.prs.lifestyle$PhysicalActivity_yn [!grepl("Unknown", dat_tx.prs.lifestyle$PhysicalActivity_yn)] = "Yes"
+dat_tx.prs.lifestyle$RiskyHeavyDrink_yn [!grepl("Unknown", dat_tx.prs.lifestyle$RiskyHeavyDrink_yn)] = "No"
+# # dat_tx.prs.lifestyle$HEALTHY_Diet_yn [!grepl("Unknown", dat_tx.prs.lifestyle$HEALTHY_Diet_yn)] = "Yes"
+# dat_tx.prs.lifestyle$Obese_yn [!grepl("Unknown", dat_tx.prs.lifestyle$Obese_yn)] = "No"
 
 
 dat_all$pred_no_combined = predict(fit_all, newdata = dat_tx.prs.lifestyle, type = "response")
