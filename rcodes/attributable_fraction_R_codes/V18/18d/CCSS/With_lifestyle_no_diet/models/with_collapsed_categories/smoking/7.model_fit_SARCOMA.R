@@ -1,7 +1,7 @@
 # load ANY SN data
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.SARCOMA.V18d_without_diet.Rdata")
 
-# PHENO.ANY_SN$any_lifestyle_missing <- relevel(PHENO.ANY_SN$any_lifestyle_missing, ref = "Yes")
+# # PHENO.ANY_SN$any_lifestyle_missing <- relevel(PHENO.ANY_SN$any_lifestyle_missing, ref = "Yes")
 # PHENO.ANY_SN$any_tx_missing <- relevel(PHENO.ANY_SN$any_tx_missing, ref = "Yes")
 
 # Yutaka's email on 03/16/2023:  It seems maxsegrtdose 0-18 Gy is a very small group and perhaps needs to be combined with 18-30 Gy
@@ -55,7 +55,7 @@ N_all.gteq.35 = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx = dat_all
 
-dat_tx$any_chemo_missing <- "No" # **
+# dat_tx$any_chemo_missing <- "No" # **
 dat_tx$aa_class_dose_5.category = "None" ## **
 
 dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
@@ -117,7 +117,7 @@ af_by_rt.gteq.35 <- "-"
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx.rt = dat_all
 
-dat_tx.rt$any_chemo_missing <- "No" ## **
+# dat_tx.rt$any_chemo_missing <- "No" ## **
 
 dat_tx.rt$aa_class_dose_5.category = "None" ## **
 
@@ -195,7 +195,7 @@ af_by_prs.gteq.35
 ###############
 dat_lifestyle = dat_all
 
-dat_lifestyle$any_lifestyle_missing <- "No"
+# dat_lifestyle$any_lifestyle_missing <- "No"
 
 dat_lifestyle$Current_smoker_yn = "No"
 # dat_lifestyle$PhysicalActivity_yn = "Yes"
@@ -239,9 +239,9 @@ af_by_no_favorable_lifestyle.category.gteq.35
 
 dat_tx.prs.lifestyle = dat_all
 
-dat_tx.prs.lifestyle$any_chemo_missing <- "No" ## **
+# dat_tx.prs.lifestyle$any_chemo_missing <- "No" ## **
 
-dat_tx.prs.lifestyle$any_lifestyle_missing <- "No"
+# dat_tx.prs.lifestyle$any_lifestyle_missing <- "No"
 
 ## Nullify Treatment
 dat_tx.prs.lifestyle$aa_class_dose_5.category = "None" ## **

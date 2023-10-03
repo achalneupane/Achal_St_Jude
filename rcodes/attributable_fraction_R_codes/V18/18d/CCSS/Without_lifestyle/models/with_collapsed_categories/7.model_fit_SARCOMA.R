@@ -52,7 +52,7 @@ N_all.gteq.35 = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx = dat_all
 
-dat_tx$any_chemo_missing <- "No" # **
+# dat_tx$any_chemo_missing <- "No" # **
 dat_tx$aa_class_dose_5.category = "None" ## **
 
 dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
@@ -114,7 +114,7 @@ af_by_rt.gteq.35 <- "-"
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx.rt = dat_all
 
-dat_tx.rt$any_chemo_missing <- "No" ## **
+# dat_tx.rt$any_chemo_missing <- "No" ## **
 
 dat_tx.rt$aa_class_dose_5.category = "None" ## **
 
@@ -210,7 +210,7 @@ af_by_no_favorable_lifestyle.category.gteq.35 <- "-"
 
 dat_tx.prs.lifestyle = dat_all
 
-dat_tx.prs.lifestyle$any_chemo_missing <- "No" ## **
+# dat_tx.prs.lifestyle$any_chemo_missing <- "No" ## **
 
 
 ## Nullify Treatment

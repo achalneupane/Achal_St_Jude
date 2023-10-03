@@ -76,7 +76,7 @@ af_by_tx.gteq.35 <- "-"
 ## Move relevant treatment exposures for everyone to no exposure
 dat_rt = dat_all
 
-dat_rt$any_rt_missing <- "No" # **
+# dat_rt$any_rt_missing <- "No" # **
 
 
 dat_rt$maxsegrtdose.category =
@@ -123,7 +123,7 @@ af_by_rt.gteq.35
 ## Move relevant treatment exposures for everyone to no exposure
 dat_tx.rt = dat_all
 
-dat_tx.rt$any_rt_missing <- "No" ## **
+# dat_tx.rt$any_rt_missing <- "No" ## **
 
 dat_tx.rt$maxsegrtdose.category =
   dat_tx.rt$maxabdrtdose.category =
@@ -202,7 +202,7 @@ af_by_prs.gteq.35
 ###############
 dat_lifestyle = dat_all
 
-dat_lifestyle$any_lifestyle_missing <- "No"
+# dat_lifestyle$any_lifestyle_missing <- "No"
 
 # dat_lifestyle$Current_smoker_yn = "No"
 dat_lifestyle$PhysicalActivity_yn = "Yes"
@@ -246,9 +246,9 @@ af_by_no_favorable_lifestyle.category.gteq.35
 
 dat_tx.prs.lifestyle = dat_all
 
-dat_tx.prs.lifestyle$any_rt_missing <- "No" ## **
+# dat_tx.prs.lifestyle$any_rt_missing <- "No" ## **
 
-dat_tx.prs.lifestyle$any_lifestyle_missing <- "No"
+# dat_tx.prs.lifestyle$any_lifestyle_missing <- "No"
 
 ## Nullify Treatment
 dat_tx.prs.lifestyle$maxsegrtdose.category =

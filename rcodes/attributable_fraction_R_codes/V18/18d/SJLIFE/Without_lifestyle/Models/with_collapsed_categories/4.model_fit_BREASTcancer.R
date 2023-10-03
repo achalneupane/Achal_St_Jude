@@ -20,6 +20,7 @@ filtered_cc
 ######################################
 ######################################
 dat_all = PHENO.ANY_SN
+dat_all = dat_all[dat_all$gender == "Female",]
 dat_all=dat_all[dat_all$evt1==1,]
 
 fit_all = glm(formula = event ~ 
@@ -49,7 +50,7 @@ N_all.gteq.35 = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.
 #############
 dat_tx = dat_all
 
-dat_tx$any_chemo_missing <- "No" # **
+# dat_tx$any_chemo_missing <- "No" # **
 dat_tx$anthra_jco_dose_5.category = "None" ## **
 
 dat_all$pred_no_tx = predict(fit_all, newdata = dat_tx, type = "response")
@@ -85,7 +86,7 @@ af_by_tx.gteq.35
 
 dat_rt = dat_all
 
-dat_rt$any_rt_missing <- "No" # **
+# dat_rt$any_rt_missing <- "No" # **
 
 dat_rt$maxchestrtdose.category = "None" ## **
 
@@ -122,8 +123,8 @@ af_by_rt.gteq.35
 
 dat_tx.rt = dat_all
 
-dat_tx.rt$any_chemo_missing <- "No" ## **
-dat_tx.rt$any_rt_missing <- "No" ## **
+# dat_tx.rt$any_chemo_missing <- "No" ## **
+# dat_tx.rt$any_rt_missing <- "No" ## **
 
 dat_tx.rt$maxchestrtdose.category =
   dat_tx.rt$anthra_jco_dose_5.category = "None" ## **
@@ -202,8 +203,8 @@ af_by_no_favorable_lifestyle.category.gteq.35 <- "-"
 #################################################
 dat_tx.prs.lifestyle = dat_all
 
-dat_tx.prs.lifestyle$any_chemo_missing <- "No" ## **
-dat_tx.prs.lifestyle$any_rt_missing <- "No" ## **
+# dat_tx.prs.lifestyle$any_chemo_missing <- "No" ## **
+# dat_tx.prs.lifestyle$any_rt_missing <- "No" ## **
 
 
 dat_tx.prs.lifestyle$maxchestrtdose.category =
@@ -260,7 +261,9 @@ Breast.res <- data.frame(
 # ## Check PRS and treatment interaction ##
 # #########################################
 # dat_all = PHENO.ANY_SN
+dat_all = dat_all[dat_all$gender == "Female",]
 # dat_all=dat_all[dat_all$evt1==1,]
+dat_all[dat_all$gender == "Female",]
 # 
 # fit_all = glm(formula = event ~ 
 #                 Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category +
