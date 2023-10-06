@@ -218,22 +218,22 @@ done;
 #####################################
 # First check avblist hg38_avdblist.txt for the latest releases
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/annovar
-perl annotate_variation.pl -webfrom annovar -downdb avdblist -buildver hg38 /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/annovar/annovar/humandb/
+# perl annotate_variation.pl -webfrom annovar -downdb avdblist -buildver hg38 /research_jude/rgs01_jude/groups/sapkogrp/projects/SJLIFE_WGS/common/sjlife/MERGED_SJLIFE_1_2/annotation/annovar/annovar/humandb/
 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar 1000g2015aug humandb/
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar refGene humandb/
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar exac03 humandb/
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar exac03nontcga humandb/
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar esp6500siv2_all humandb/ 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar gnomad_exome humandb/ 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar gnomad_genome humandb/ 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar dbnsfp42c humandb/ 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar revel humandb/ 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar intervar_20180118 humandb/ 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar dbscsnv11 humandb/ 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar cosmic70 humandb/ 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar nci60 humandb/ 
-annotate_variation.pl -buildver hg38 -downdb -webfrom annovar clinvar_20220320 humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar 1000g2015aug humandb/
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar refGene humandb/
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar exac03 humandb/
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar exac03nontcga humandb/
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar esp6500siv2_all humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar gnomad_exome humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar gnomad_genome humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar dbnsfp42c humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar revel humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar intervar_20180118 humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar dbscsnv11 humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar cosmic70 humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar nci60 humandb/ 
+# annotate_variation.pl -buildver hg38 -downdb -webfrom annovar clinvar_20220320 humandb/ 
 
 
 ## Annovar annotation ##

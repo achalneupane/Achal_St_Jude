@@ -30,10 +30,11 @@ SERUM <- SERUM %>%
 
 ## Could you please work on it by merging with the CTCAE grades for cardiomyopathy from the most recent data freeze? Please look at serum and plasma separately.
 # read CTCAE
-CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
+# CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
 CTCAE <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
 # CTCAE.original <- CTCAE
 CTCAE <- CTCAE.original[c("sjlid", "studypop", "sjlife_cohort", "gender", "organsys", "condition", "gradedt", "grade", "ageevent")]
+# CTCAE.original.2 <- CTCAE.original[c("sjlid", "studypop", "sjlife_cohort", "gender", "organsys", "condition", "gradedt", "grade", "ageevent")]
 ## Since Trans-omics CMP ageatsample is in one decimal, I am coverting CTCAE age also to one decimal place.
 CTCAE$ageevent <- round(CTCAE$ageevent,1)
 
@@ -46,10 +47,17 @@ CTCAE <- CTCAE %>%
   ) %>%
   ungroup() %>%
 arrange(sjlid)
+dim(CTCAE)
+# 9218    9
 
 CTCAE <- CTCAE[CTCAE$sjlid %in% unique(SERUM$sjlid),]
+dim(CTCAE)
+# 8332
 
-CTCAE <- get_rows_with_smaller_sample_age(CTCAE, SERUM, 0)
+# CTCAE <- get_rows_with_smaller_sample_age(CTCAE, SERUM, 0)
+CTCAE <- get_rows_with_smaller_sample_age.all(CTCAE, SERUM, 7)
+dim(CTCAE)
+# 8332
 
 ## Add event number
 CTCAE <- CTCAE %>%
@@ -94,7 +102,9 @@ CTCAE.2 <- CTCAE.2 %>%
 CTCAE.2$grade_2_or_higher <- ifelse(CTCAE.2$grade >= 2, "grade_2_or_higher", "grade_0")
 table(CTCAE.2$event_number,CTCAE.2$grade)
 table(CTCAE.2$event_number,CTCAE.2$grade_2_or_higher)
-# table(CTCAE.2$new_event_number,CTCAE.2$grade_2_or_higher)
+
+table(CTCAE.2$new_event_number,CTCAE.2$grade)
+table(CTCAE.2$new_event_number,CTCAE.2$grade_2_or_higher)
 
 CTCAE.3 <- CTCAE.2[!is.na(CTCAE.2$Sample_age),]
 table(CTCAE.3$event_number,CTCAE.3$grade_2_or_higher)
@@ -105,6 +115,5 @@ table(CTCAE.2$grade >=2)
 
 write.table(CTCAE.2, "Serum_data_processed_v6.txt", col.names = T, row.names = F, sep = "\t")
 
-# dat.v4 <- read.table("Serum_data_processed_v4.txt", header = T)
-# head(dat.v4)
-# unique(dat.v4$sjlid)[!unique(dat.v4$sjlid) %in% unique(CTCAE.2$sjlid)]
+
+

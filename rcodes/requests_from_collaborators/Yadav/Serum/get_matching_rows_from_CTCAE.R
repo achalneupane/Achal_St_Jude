@@ -48,6 +48,33 @@ get_rows_with_smaller_sample_age <- function(CTCAE, SERUM, days){
   return(CTCAE)
 }
 
+## also include vials
+get_rows_with_smaller_sample_age.all <- function(CTCAE, SERUM, days){
+  CTCAE$Sample_age <- NA  # Initialize ageevent with NA values
+  CTCAE$num_vials <- NA
+  CTCAE$vitalstatus <- NA
+  
+  for (i in 1:nrow(CTCAE)) {
+    # Subset SERUM and CTCAE data for the current SJLID
+    CTCAE_subset <- CTCAE[i, ]
+    # Find matching rows in CTCAE based on sjlid and age difference
+    matching_rows <- which(
+      (SERUM$sjlid == CTCAE_subset$sjlid) &
+        # (abs(CTCAE_subset$ageevent - SERUM$ageatsample) <= days/365.25)
+        (abs(CTCAE_subset$ageevent - SERUM$ageatsample) <= days/365.25)
+    )
+    # Check if there are matching rows
+    if (length(matching_rows) > 0) {
+      # If matching rows exist, update the ageevent and grade using the first matching row
+      CTCAE$Sample_age[i] <- SERUM$ageatsample[matching_rows[1]]
+      CTCAE$num_vials[i] <- SERUM$num_vials[matching_rows[1]]
+      CTCAE$vitalstatus[i] <- SERUM$vitalstatus[matching_rows[1]]
+    }
+  }
+  return(CTCAE)
+}
+
+
 
 
 ## Remove rows once grades 2 or higher are seen in ordered df ordered by event_number
