@@ -30,7 +30,7 @@ demographic$WGS <- ifelse(demographic$sjlid %in% have.WGS$V2, "Yes", 'No')
 
 
 # CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
-CTCAE.original.2 <- CTCAE
+CTCAE.original.2 <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
 CTCAE.original.2 <- CTCAE.original.2[c("sjlid", "studypop", "sjlife_cohort", "gender", "organsys", "condition", "gradedt", "grade", "ageevent")]
 # Also, we previously performed proteomics/metabolomics experiments on 200
 # survivors (100 with cardiomyopathy); they are attached here (see Sheet3 for
@@ -71,5 +71,7 @@ sum(proteomics.co$sjlid %in% CTCAE.serum$sjlid) ## 95
 SERUM.kyla <- read.table("Trans-omics CMP profiling Inventory 20230901.txt", header = T)
 sum(proteomics.ca$sjlid %in% SERUM.kyla$sjlid) ## 100
 sum(proteomics.co$sjlid %in% SERUM.kyla$sjlid) ## 95
+
+
 
 
