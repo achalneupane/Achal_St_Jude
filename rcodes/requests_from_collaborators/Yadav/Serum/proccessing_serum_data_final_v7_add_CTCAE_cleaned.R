@@ -22,7 +22,7 @@ SERUM <- SERUM %>%
   filter(num_vials == max(num_vials)) %>%
   filter(vitalstatus == "Alive" | all(vitalstatus == "Deceased"))
 
-## Could you please work on it by merging with the CTCAE grades for cardiomyopathy from the most recent data freeze? Please look at serum and plasma separately.
+## work on it by merging with the CTCAE grades for cardiomyopathy from the most recent data freeze.
 # read CTCAE
 # CTCAE.original <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
 CTCAE <- CTCAE.original[grepl("Cardiomyopathy", CTCAE.original$condition),]
@@ -98,11 +98,12 @@ CTCAE.2 <- CTCAE.2 %>%
   dplyr::arrange(sjlid)  # Restore the original order
 
 
-
-
 table(CTCAE.2$new_event_number,CTCAE.2$grade)
 table(CTCAE.2$new_event_number,CTCAE.2$grade >= 2)
 
+# Calculate age different from first visit to first CMP
+result <- calculate_ageevent_difference(CTCAE.2)
+print(result)
 
 
 write.table(CTCAE.2, "Serum_data_processed_v7.txt", col.names = T, row.names = F, sep = "\t")
