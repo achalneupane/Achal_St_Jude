@@ -10,7 +10,7 @@ library(dplyr)
 library(tidyr)
 library(haven)
 setwd("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/")
-CTCAE.serum <- read.table("Serum_data_processed_v6.txt", header = T, sep = "\t")
+CTCAE.serum <- read.table("Serum_data_processed_v7.txt", header = T, sep = "\t")
 
 demographic <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/demographics.sas7bdat")
 chemo <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/chemosum_dose.sas7bdat")
@@ -29,8 +29,8 @@ demographic <- cbind.data.frame(demographic, radiation.2[match(demographic$sjlid
 demographic$WGS <- ifelse(demographic$sjlid %in% have.WGS$V2, "Yes", 'No')
 
 
-# CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
-CTCAE.original.2 <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
+# CTCAE.original <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
+CTCAE.original.2 <- CTCAE.original[grepl("Cardiomyopathy", CTCAE.original$condition),]
 CTCAE.original.2 <- CTCAE.original.2[c("sjlid", "studypop", "sjlife_cohort", "gender", "organsys", "condition", "gradedt", "grade", "ageevent")]
 # Also, we previously performed proteomics/metabolomics experiments on 200
 # survivors (100 with cardiomyopathy); they are attached here (see Sheet3 for
@@ -42,8 +42,8 @@ library(readxl)
 # Read data from Sheet3
 proteomics <- read_excel("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/pilot_study_200_samples.xlsx", sheet = "Sheet3")
 colnames(proteomics) <- c("sjlid", "grade", "ageevent", "TBID", "Sample_age", "status")
-sum( proteomics$sjlid %in% CTCAE.serum$sjlid)
-# 153
+sum(proteomics$sjlid %in% CTCAE.serum$sjlid)
+# 157
 
 
 # Define a function to check if two values are within X-days window
@@ -65,12 +65,13 @@ dim(overlap_data)
 proteomics.ca <- proteomics[proteomics$status == 1,]
 proteomics.co <- proteomics[proteomics$status == 0,]
 
-sum(proteomics.ca$sjlid %in% CTCAE.serum$sjlid) ## 58
-sum(proteomics.co$sjlid %in% CTCAE.serum$sjlid) ## 95
+sum(proteomics.ca$sjlid %in% CTCAE.serum$sjlid) ## 59
+sum(proteomics.co$sjlid %in% CTCAE.serum$sjlid) ## 98
 
 SERUM.kyla <- read.table("Trans-omics CMP profiling Inventory 20230901.txt", header = T)
+SERUM.kyla <- SERUM.kyla[SERUM.kyla$aliquot_type == "Serum",]
 sum(proteomics.ca$sjlid %in% SERUM.kyla$sjlid) ## 100
-sum(proteomics.co$sjlid %in% SERUM.kyla$sjlid) ## 95
+sum(proteomics.co$sjlid %in% SERUM.kyla$sjlid) ## 99
 
 
 
