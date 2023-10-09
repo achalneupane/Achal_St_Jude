@@ -28,6 +28,12 @@ demographic <- cbind.data.frame(demographic, radiation[match(demographic$sjlid, 
 demographic <- cbind.data.frame(demographic, radiation.2[match(demographic$sjlid, radiation.2$sjlid),])
 demographic$WGS <- ifelse(demographic$sjlid %in% have.WGS$V2, "Yes", 'No')
 
+CTCAE.serum <- cbind.data.frame(CTCAE.serum,demographic[match(CTCAE.serum$sjlid, demographic$sjlid),])
+# Exposed to either anthracyclines or chest radiation
+# With WGS (no restriction on treatment exposures)
+# Exposed to either anthracyclines or chest radiation with WGS
+
+
 
 # CTCAE.original <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
 CTCAE.original.2 <- CTCAE.original[grepl("Cardiomyopathy", CTCAE.original$condition),]
@@ -74,5 +80,11 @@ sum(proteomics.ca$sjlid %in% SERUM.kyla$sjlid) ## 100
 sum(proteomics.co$sjlid %in% SERUM.kyla$sjlid) ## 99
 
 
+table(CTCAE.serum$new_event_number,CTCAE.serum$grade)
+table(CTCAE.serum$new_event_number,CTCAE.serum$grade >= 2)
+
+# Calculate age different from first visit to first CMP
+result <- calculate_ageevent_difference(CTCAE.serum)
+print(result)
 
 
