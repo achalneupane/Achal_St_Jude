@@ -30,9 +30,18 @@ demographic$WGS <- ifelse(demographic$sjlid %in% have.WGS$V2, "Yes", 'No')
 
 CTCAE.serum <- cbind.data.frame(CTCAE.serum,demographic[match(CTCAE.serum$sjlid, demographic$sjlid),])
 # Exposed to either anthracyclines or chest radiation
-# With WGS (no restriction on treatment exposures)
-# Exposed to either anthracyclines or chest radiation with WGS
+CTCAE.serum.1 <- CTCAE.serum[CTCAE.serum$anthracyclines_dose_any > 0 | CTCAE.serum$maxchestrtdose > 200,]
+table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade)
+table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade >= 2)
 
+# With WGS (no restriction on treatment exposures)
+CTCAE.serum.2 <- CTCAE.serum[CTCAE.serum$WGS == "Yes",]
+table(CTCAE.serum.2$new_event_number,CTCAE.serum.2$grade)
+table(CTCAE.serum.2$new_event_number,CTCAE.serum.2$grade >= 2)
+# Exposed to either anthracyclines or chest radiation with WGS
+CTCAE.serum.3 <- CTCAE.serum.2[CTCAE.serum.2$anthracyclines_dose_any > 0 | CTCAE.serum.2$maxchestrtdose > 200,]
+table(CTCAE.serum.3$new_event_number,CTCAE.serum.3$grade)
+table(CTCAE.serum.3$new_event_number,CTCAE.serum.3$grade >= 2)
 
 
 # CTCAE.original <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
