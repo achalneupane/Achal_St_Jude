@@ -69,10 +69,12 @@ done;
 wget https://storage.googleapis.com/gcp-public-data--gnomad/release/2.1.1/liftover_grch38/vcf/exomes/gnomad.exomes.r2.1.1.sites.liftover_grch38.vcf.bgz
 wget https://storage.googleapis.com/gcp-public-data--gnomad/release/2.1.1/liftover_grch38/vcf/exomes/gnomad.exomes.r2.1.1.sites.liftover_grch38.vcf.bgz.tbi
 
-${JAVA} ${JAVAOPTS} -jar ${SNPSIFT} annotate /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/gnomAD/gnomad.exomes.r2.1.1.sites.liftover_grch38.vcf.bgz chr16.Survivor_WES.GATK4180.hg38_biallelic.vcf.gz > annotated_my.vcf
-
-${JAVA} ${JAVAOPTS} -jar ${SNPSIFT} annotate /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/gnomAD/gnomad.exomes.r2.1.1.sites.liftover_grch38.vcf.bgz chr16.Survivor_WES.GATK4180.hg38_biallelic.vcf.gz > annotated_my.vcf
-
+## Download GRCh38 genomes
+for chr in {1..22}; do
+echo "Downloading chr ${chr}"
+wget https://storage.googleapis.com/gcp-public-data--gnomad/release/3.1.2/vcf/genomes/gnomad.genomes.v3.1.2.sites.chr${chr}.vcf.bgz
+wget https://storage.googleapis.com/gcp-public-data--gnomad/release/3.1.2/vcf/genomes/gnomad.genomes.v3.1.2.sites.chr${chr}.vcf.bgz.tbi
+done
 ##################################################################
 ## Helper script to Annotate VCF using snpeff and snpsift tools ##
 ##################################################################

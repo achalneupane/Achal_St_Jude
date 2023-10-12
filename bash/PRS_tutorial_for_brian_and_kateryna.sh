@@ -41,13 +41,22 @@ module load bcftools/1.9
 module load plink/1.90b
 
 
-THREADS=4
-for CHR in {1..22}; do
-grep -w chr${CHR} PRS_vars.bed | sort -V > PRS_vars_chr${CHR}.bed
-sed -i "s/\r//g" PRS_vars_chr${CHR}.bed
-bcftools view -Oz MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.preQC_biallelic_renamed_ID_edited.vcf.gz --threads ${THREADS} -R PRS_vars_chr${CHR}.bed > PRS_chr${CHR}.vcf.gz
-plink --vcf PRS_chr${CHR}.vcf.gz --double-id --vcf-half-call m --keep-allele-order --threads ${THREADS} --make-bed --out PRS_chr${CHR}
-done
+# THREADS=4
+# for CHR in {1..22}; do
+# grep -w chr${CHR} PRS_vars.bed | sort -V > PRS_vars_chr${CHR}.bed
+# sed -i "s/\r//g" PRS_vars_chr${CHR}.bed
+# bcftools view -Oz MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.preQC_biallelic_renamed_ID_edited.vcf.gz --threads ${THREADS} -R PRS_vars_chr${CHR}.bed > PRS_chr${CHR}.vcf.gz
+# plink --vcf PRS_chr${CHR}.vcf.gz --double-id --vcf-half-call m --keep-allele-order --threads ${THREADS} --make-bed --out PRS_chr${CHR}
+# done
+
+removed:
+14:83000001
+
+/home/aneupane/liftover/liftOver GRCh37_PRS_score_dyslipidemia.txt /home/aneupane/liftover/hg19ToHg38.over.chain GRCh38_PRS_score_dyslipidemia.bed GRCh38_PRS_score_dyslipidemia_unmapped.bed
+cat /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf.gz.bim > /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/all.bim
+
+awk 'FNR == NR { seen[$1,$2]; next } ($1,$4) in seen' GRCh38_PRS_score_dyslipidemia.txt /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/all.bim > dyslipidemia_found_in_all.bim
+
 
 
 ## step 6
