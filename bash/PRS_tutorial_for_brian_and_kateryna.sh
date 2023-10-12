@@ -49,9 +49,6 @@ module load plink/1.90b
 # plink --vcf PRS_chr${CHR}.vcf.gz --double-id --vcf-half-call m --keep-allele-order --threads ${THREADS} --make-bed --out PRS_chr${CHR}
 # done
 
-removed:
-14:83000001
-
 /home/aneupane/liftover/liftOver GRCh37_PRS_score_dyslipidemia.txt /home/aneupane/liftover/hg19ToHg38.over.chain GRCh38_PRS_score_dyslipidemia.bed GRCh38_PRS_score_dyslipidemia_unmapped.bed
 cat /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf.gz.bim > /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/all.bim
 
