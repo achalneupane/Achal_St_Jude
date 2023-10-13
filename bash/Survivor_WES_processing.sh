@@ -6,20 +6,16 @@ cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_W
 # bcftools annotate --set-id '%CHROM\:%POS\:%REF\:%FIRST_ALT' MERGED_biallelic_sorted_sjlife_1_2_zhaoming_v2.vcf.gz -Oz -o MERGED_biallelic_sorted_sjlife_1_2_zhaoming_ID_edited.vcf.gz
 # bcftools index -f -t --threads 4 MERGED_biallelic_sorted_sjlife_1_2_zhaoming_ID_edited.vcf.gz
 
-## <biallelic.sh>
-#!/usr/bin/bash
-module load bcftools
-bcftools norm -m-any --check-ref -w -f /research/rgs01/reference/public/genomes/Homo_sapiens/GRCh38/GRCh38_no_alt/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa "${WORKDIR}/${VCF}" -Oz -o "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_tmp.vcf.gz"
-bcftools annotate --set-id '%CHROM\:%POS\:%REF\:%FIRST_ALT' "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_tmp.vcf.gz" -Oz -o "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
-bcftools index -f -t --threads 4 "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
+awk '{cmd="echo "$0" | sed -e '\''s/.*CCSS-//g; s/^0\\+\\([^0]\\)/\\1/g'\''"; cmd | getline result; close(cmd); print $0"\t"result}' Survivor_WES.samplelist.ccss  > ./biallelic/rename_ccss.txt
+cat rename_ccss.txt rename_sjlife.txt > sample_mapping.txt
 
+## <biallelic_renaming_split.sh>
 for i in {1..22}; do \
 export CHR="chr${i}"; \
-echo "Annotating $CHR"; \
+echo "splitting $CHR"; \
 unset VCF; \
 export THREADS=4; \
 export VCF="${CHR}.Survivor_WES.GATK4180.hg38.vcf.gz"; \
-export JAVA="java"; \
 export JAVAOPTS="-Xms4g -Xmx30g"; \
 export WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/"; \
 bsub \
@@ -28,15 +24,27 @@ bsub \
         -o "${WORKDIR}/biallelic/logs/${VCF%.vcf*}_biallelic.%J" \
         -n ${THREADS} \
         -R "rusage[mem=8192]" \
-        "./biallelic.sh"; \
+        "./biallelic_renaming_split.sh"; \
 done;
+
+
+# <biallelic_renaming_split.sh>
+#!/usr/bin/bash
+module load bcftools
+# bcftools norm -m-any --check-ref -w -f /research/rgs01/reference/public/genomes/Homo_sapiens/GRCh38/GRCh38_no_alt/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa "${WORKDIR}/${VCF}" -Oz -o "${WORKDIR}/biallelic/$(basename ${VCF} .vc
+# bcftools annotate --set-id '%CHROM\:%POS\:%REF\:%FIRST_ALT' "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_tmp.vcf.gz" -Oz -o "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
+# bcftools index -f -t --threads 4 "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
+## Rename samples
+bcftools reheader -s sample_mapping.txt "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz" -o "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic_renamed.vcf.gz"
+## Extract three cohorts
+
 
 ###############
 ## 1. SnpEFF ##
 ###############
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff
-ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/*_biallelic.vcf.gz .
-ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/*_biallelic.vcf.gz.tbi .
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/*_renamed.vcf.gz .
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/*_renamed.vcf.gz.tbi .
 
 
 for i in {1..22}; do \
@@ -75,6 +83,10 @@ echo "Downloading chr ${chr}"
 wget https://storage.googleapis.com/gcp-public-data--gnomad/release/3.1.2/vcf/genomes/gnomad.genomes.v3.1.2.sites.chr${chr}.vcf.bgz
 wget https://storage.googleapis.com/gcp-public-data--gnomad/release/3.1.2/vcf/genomes/gnomad.genomes.v3.1.2.sites.chr${chr}.vcf.bgz.tbi
 done
+
+
+
+
 ##################################################################
 ## Helper script to Annotate VCF using snpeff and snpsift tools ##
 ##################################################################
@@ -152,31 +164,4 @@ echo "DONE for ${CHR}" >> annotation_step.txt
 
 
 
-## Annovar
-# <entrypoint>
-VERSION="1.0"
 
-module load gatk/3.7
-module load vt
-module load vcftools
-module load bcftools
-module load tabix
-module load vep/v88
-module load zlib/1.2.5
-module load java/13.0.1
-
-cd ${WORKDIR}
-
-
-ANNOTATED="${ANNOT_PROJECT}-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf"
-/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/annovar/table_annovar.pl ${ANNOTATED} \
-/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/annovar/humandb \
--buildver hg38 \
--out ANNOVAR_${ANNOTATED} -remove \
--protocol refGene,1000g2015aug_all,exac03,exac03nontcga,esp6500siv2_all,gnomad_exome,gnomad_genome,dbnsfp42c,intervar_20180118,dbscsnv11,cosmic70,nci60,clinvar_20220320,MetaSVM,revel \
--operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f \
--protocol refGene,1000g2015aug_all,exac03,exac03nontcga,esp6500siv2_all,gnomad_exome,gnomad_genome,dbnsfp42c,intervar_20180118,dbscsnv11,cosmic70,nci60,clinvar_20220320,MetaSVM,revel,polyphen2 \
--operation g,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f \
---nastring . \
--vcfinput
-echo "DONE ANNOVAR Annotation for ${CHR}" >> annotation_step.txt
