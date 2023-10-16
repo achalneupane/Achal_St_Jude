@@ -161,6 +161,7 @@ p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = variable)) +
   ## Adjust the x-axis limits to ensure that the secondary y-axis label is fully visible.
   coord_cartesian(clip = "off")
 
+p <- p + scale_y_continuous(limits = c(0, 1))
 # Save the plot as a high-resolution image
 plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/", group, "_", AF.type, "_", lifestyle, ".tiff")
 
