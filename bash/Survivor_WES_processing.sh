@@ -6,6 +6,8 @@ cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_W
 # bcftools annotate --set-id '%CHROM\:%POS\:%REF\:%FIRST_ALT' MERGED_biallelic_sorted_sjlife_1_2_zhaoming_v2.vcf.gz -Oz -o MERGED_biallelic_sorted_sjlife_1_2_zhaoming_ID_edited.vcf.gz
 # bcftools index -f -t --threads 4 MERGED_biallelic_sorted_sjlife_1_2_zhaoming_ID_edited.vcf.gz
 
+
+## Incase we need to rename
 awk '{cmd="echo "$0" | sed -e '\''s/.*CCSS-//g; s/^0\\+\\([^0]\\)/\\1/g'\''"; cmd | getline result; close(cmd); print $0"\t"result}' Survivor_WES.samplelist.ccss  > ./biallelic/rename_ccss.txt
 cat rename_ccss.txt rename_sjlife.txt > sample_mapping.txt
 
@@ -31,20 +33,39 @@ done;
 # <biallelic_renaming_split.sh>
 #!/usr/bin/bash
 module load bcftools
-# bcftools norm -m-any --check-ref -w -f /research/rgs01/reference/public/genomes/Homo_sapiens/GRCh38/GRCh38_no_alt/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa "${WORKDIR}/${VCF}" -Oz -o "${WORKDIR}/biallelic/$(basename ${VCF} .vc
-# bcftools annotate --set-id '%CHROM\:%POS\:%REF\:%FIRST_ALT' "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_tmp.vcf.gz" -Oz -o "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
-# bcftools index -f -t --threads 4 "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
-## Rename samples
-bcftools reheader -s sample_mapping.txt "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz" -o "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic_renamed.vcf.gz"
-## Extract three cohorts
+# ## Normalize and make biallelic
+bcftools norm -m-any --check-ref -w -f /research/rgs01/reference/public/genomes/Homo_sapiens/GRCh38/GRCh38_no_alt/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa "${WORKDIR}/${VCF}" -Oz -o "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_tmp.vcf.gz"
+bcftools annotate --set-id '%CHROM\:%POS\:%REF\:%FIRST_ALT' "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_tmp.vcf.gz" -Oz -o "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
+bcftools index -f -t --threads 4 "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
+# ## Extract three cohorts
+bcftools view -O z -o \
+"${WORKDIR}/biallelic/ccss/$(basename ${VCF} .vcf.gz)_biallelic_ccss.vcf.gz" \
+-S ${WORKDIR}/biallelic/extract_CCSS.samples.txt \
+"${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
+bcftools index -f -t --threads 4 "${WORKDIR}/biallelic/ccss/$(basename ${VCF} .vcf.gz)_biallelic_ccss.vcf.gz"
 
+bcftools view -O z -o \
+"${WORKDIR}/biallelic/sjlife/$(basename ${VCF} .vcf.gz)_biallelic_sjlife.vcf.gz" \
+-S ${WORKDIR}/biallelic/extract_SJLIFE_survivor.txt \
+"${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
+bcftools index -f -t --threads 4 "${WORKDIR}/biallelic/sjlife/$(basename ${VCF} .vcf.gz)_biallelic_sjlife.vcf.gz"
+
+bcftools view -O z -o \
+"${WORKDIR}/biallelic/sjlife_control/$(basename ${VCF} .vcf.gz)_biallelic_sjlife_control.vcf.gz" \
+-S ${WORKDIR}/biallelic/extract_SJLIFE_survivor_control.txt \
+"${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
+bcftools index -f -t --threads 4 "${WORKDIR}/biallelic/sjlife_control/$(basename ${VCF} .vcf.gz)_biallelic_sjlife_control.vcf.gz"
+
+
+## # Rename samples (if we need to rename)
+## bcftools reheader -s sample_mapping.txt "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz" -o "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic_renamed.vcf.gz"
 
 ###############
 ## 1. SnpEFF ##
 ###############
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff
-ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/*_renamed.vcf.gz .
-ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/*_renamed.vcf.gz.tbi .
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/*_biallelic.vcf.gz.vcf.gz .
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/*_biallelic.vcf.gz.tbi .
 
 
 for i in {1..22}; do \
@@ -94,10 +115,10 @@ done
 ## Achal Neupane    ##
 ## Date: 10/10/2023 ##
 ######################
-# entrypoint_snpEff_annotation.sh
 VERSION="1.0"
 
-module load gatk/3.7
+# module load gatk/3.7
+module load gatk/4.1.8.0
 module load vt
 module load vcftools
 module load bcftools
@@ -109,8 +130,19 @@ module load java/13.0.1
 cd ${WORKDIR}
 
 VCF="${INPUT_VCF}"
+
 MAX_HEADER_LINES=5000
-ANNOT_SOURCE="${VCF}"; ANNOT_PROJECT="${VCF%.*}-annot"
+ANNOT_SOURCE="new_${VCF}"; ANNOT_PROJECT="new_${VCF%.*}-annot"
+
+## Adding dbSNP
+gatk VariantAnnotator \
+   -R ${REF} \
+   -V ${VCF} \
+   -L ${VCF} \
+   -D /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/dbSNP/dbSNP_155.GCF_000001405.39.gz \
+   -O new_${VCF}
+
+echo "DONE GATK Annotation with dbSNP for ${CHR}" >> annotation_step.txt
 
 ## Start annotating
 # zcat ${ANNOT_SOURCE} | head -${MAX_HEADER_LINES} | grep "^##" > ${ANNOT_PROJECT}.vcf
@@ -139,22 +171,17 @@ ${JAVA} ${JAVAOPTS} -jar ${SNPSIFT} annotate -v -info CLNSIG ${CLINVAR} ${ANNOT_
 # rm ${ANNOT_PROJECT}-snpeff-dbnsfp-ExAC.0.3.GRCh38.vcf
 echo "DONE SNPSIFT Annotation with clinvar for ${CHR}" >> annotation_step.txt
 
-## Adding dbSNP; note that GATK will load different version of java so will have to load the module again
-module load gatk/3.7
-${JAVA} ${JAVAOPTS} -jar ${GATK} \
-   -R ${REF} \
-   -T VariantAnnotator \
-   -V ${ANNOT_PROJECT}-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf \
-   -L ${ANNOT_PROJECT}-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf \
-   -o ${ANNOT_PROJECT}-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf \
-   --dbsnp /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/dbSNP/dbSNP_155.GCF_000001405.39.gz
-echo "DONE GATK Annotation with dbSNP for ${CHR}" >> annotation_step.txt
+
 # rm ${ANNOT_PROJECT}-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf
-ANNOTATED="${ANNOT_PROJECT}-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf"
+ANNOTATED="${ANNOT_PROJECT}-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf"
+
+## Add gnomad
+${JAVA} ${JAVAOPTS} -jar ${SNPSIFT} annotate /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/gnomAD/gnomad.exomes.r2.1.1.sites.liftover_grch38.vcf.bgz "${ANNOT_PROJECT}-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf" > "${ANNOT_PROJECT}-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.with.gnomAD.vcf"
+ANNOTATED="${ANNOT_PROJECT}-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.with.gnomAD.vcf"
 
 # echo "Creating simplified table"
 module load java/13.0.1
-cat ${ANNOTATED} |${ONELINEPL}| ${JAVA} ${JAVAOPTS} -jar ${SNPSIFT} extractFields -e "."  - CHROM POS ID REF ALT "ANN[*].ALLELE" "ANN[*].EFFECT" "ANN[*].IMPACT" "ANN[*].GENE" "ANN[*].GENEID" "ANN[*].FEATURE" "ANN[*].FEATUREID" "ANN[*].HGVS_C" "ANN[*].HGVS_P" "dbNSFP_CADD_phred" "dbNSFP_1000Gp3_AF"  "dbNSFP_ExAC_AF" "dbNSFP_ExAC_Adj_AF" "dbNSFP_MetaSVM_score" "dbNSFP_MetaSVM_rankscore" "dbNSFP_MetaSVM_pred" "dbNSFP_clinvar_clnsig" "dbNSFP_MutationAssessor_pred"	"dbNSFP_MutationTaster_pred"	"dbNSFP_Polyphen2_HDIV_pred"	"dbNSFP_Polyphen2_HVAR_pred"	"dbNSFP_SIFT_pred"	"dbNSFP_LRT_pred"	"CLNSIG"> ${ANNOTATED%.*}-FIELDS-simple.txt
+cat ${ANNOTATED} |${ONELINEPL}| ${JAVA} ${JAVAOPTS} -jar ${SNPSIFT} extractFields -e "."  - CHROM POS ID REF ALT "ANN[*].ALLELE" "ANN[*].EFFECT" "ANN[*].IMPACT" "ANN[*].GENE" "ANN[*].GENEID" "ANN[*].FEATURE" "ANN[*].FEATUREID" "ANN[*].HGVS_C" "ANN[*].HGVS_P" "dbNSFP_CADD_phred" "dbNSFP_1000Gp3_AF"  "dbNSFP_ExAC_AF" "dbNSFP_ExAC_Adj_AF" "dbNSFP_MetaSVM_score" "dbNSFP_MetaSVM_rankscore" "dbNSFP_MetaSVM_pred" "dbNSFP_clinvar_clnsig" "dbNSFP_MutationAssessor_pred"	"dbNSFP_MutationTaster_pred"	"dbNSFP_Polyphen2_HDIV_pred"	"dbNSFP_Polyphen2_HVAR_pred"	"dbNSFP_SIFT_pred"	"dbNSFP_LRT_pred"	"CLNSIG" "AF_nfe" "AF_afr" "AF_eas" "AF_sas" "AF_raw" "AF_popmax"> ${ANNOTATED%.*}-FIELDS-simple.txt
 
 echo "DONE for ${CHR}" >> annotation_step.txt
 
