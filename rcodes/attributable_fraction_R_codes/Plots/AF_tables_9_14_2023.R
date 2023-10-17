@@ -96,7 +96,7 @@ data[data == "-"] <- NA
 
 lifestyle <- "without_lifestyle"
 all.group <- c("Overall", "Female", "Male", "Age.lt.35", "Age.ge.35")
-variables <-  c("Combined", "Radiation", "Chemo", "All treatments", "PRS", "Lifestyle")
+variables <-  c("Combined", "Radiation", "Chemo", "treatments", "PRS", "Lifestyle")
 
 
 # Define the text file path
@@ -235,7 +235,7 @@ data[data == "-"] <- NA
 
 lifestyle <- "without_diet"
 all.group <- c("Overall", "Female", "Male", "Age.lt.35", "Age.ge.35")
-variables <-  c("Combined", "Radiation", "Chemo", "All treatments", "PRS", "Lifestyle")
+variables <-  c("Combined", "Radiation", "Chemo", "treatments", "PRS", "Lifestyle")
 
 
 # Define the text file path
@@ -324,7 +324,7 @@ data[data == "-"] <- NA
 
 lifestyle <- "lifestyle_with_diet"
 all.group <- c("Overall", "Female", "Male", "Age.lt.35", "Age.ge.35")
-variables <-  c("Combined", "Radiation", "Chemo", "All treatments", "PRS", "Lifestyle")
+variables <-  c("Combined", "Radiation", "Chemo", "treatments", "PRS", "Lifestyle")
 
 
 # Define the text file path
