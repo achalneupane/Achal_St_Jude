@@ -211,6 +211,200 @@ bsub \
 	"./entrypoint_VCFannotation.sh"; \
 done; 
 
+## Annotate with the latest version of dbnsfp
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff_v2
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf.gz .
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf.gz.tbi .
+
+for i in {1..22}; do \
+export CHR="chr${i}"; \
+echo "Annotating $CHR"; \
+unset INPUT_VCF; \
+export THREADS=20; \
+export INPUT_VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.${CHR}.preQC_biallelic_renamed_ID_edited.vcf.gz"; \
+export JAVA="java"; \
+export JAVAOPTS="-Xms4g -Xmx30g"; \
+export WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff_v2"; \
+export REF="/research/rgs01/reference/public/genomes/Homo_sapiens/GRCh38/GRCh38_no_alt/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa"; \
+export SNPEFF="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/snpEff.jar"; \
+export SNPSIFT="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/SnpSift.jar"; \
+export CLINVAR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/clinvar/clinvar.vcf.gz"
+# export GATK="/hpcf/apps/gatk/install/3.7/GenomeAnalysisTK.jar"; \
+# export DBNSFPfile="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/dbNSFP/GRCh38/dbNSFP4.1a.txt.gz"; \
+export DBNSFPfile="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/dbnsfp/new_dbNSFP4.4a_variant.${CHR}.gz"; \
+export EXACDB="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/exac0.3/ExAC.0.3.GRCh38.vcf.gz"; \
+export ONELINEPL="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/scripts/vcfEffOnePerLine.pl"; \
+bsub \
+        -P "${CHR}_annotate" \
+        -J "${CHR}_ann" \
+        -o "${WORKDIR}/logs/${INPUT_VCF%.vcf*}_dbSNP_annotated.%J" \
+        -n ${THREADS} \
+        -R "rusage[mem=8192]" \
+        "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff_v2/entrypoint_snpEff_annotation_round2.sh"; \
+done;
+
+
+##################################################################
+## Helper script to Annotate VCF using snpeff and snpsift tools ##
+##################################################################
+######################
+## Achal Neupane    ##
+## Date: 10/10/2023 ##
+######################
+VERSION="2.0"
+#!/usr/bin/bash
+# module load gatk/3.7
+module load gatk/4.1.8.0
+module load vt
+module load vcftools
+module load bcftools
+module load tabix
+module load zlib/1.2.5
+module load java/13.0.1
+module load vep/v108
+module load samtools
+
+cd ${WORKDIR}
+
+VCF="${INPUT_VCF}"
+
+MAX_HEADER_LINES=5000
+ANNOT_SOURCE="new_${VCF}"; ANNOT_PROJECT="new_${VCF%.*}-annot"
+
+## Adding dbSNP
+gatk --java-options "-Xmx16g -XX:ParallelGCThreads=20" VariantAnnotator \
+   -R ${REF} \
+   -V ${VCF} \
+   -L ${VCF} \
+   -D /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/dbSNP/dbSNP_155.GCF_000001405.39.gz \
+   -O new_${VCF}
+
+echo "DONE GATK Annotation with dbSNP for ${CHR}" >> annotation_step.txt
+
+## Start annotating
+# zcat ${ANNOT_SOURCE} | head -${MAX_HEADER_LINES} | grep "^##" > ${ANNOT_PROJECT}.vcf
+zcat ${ANNOT_SOURCE}| grep -v "^##" | cut -f1-8 | awk -F'\t' '!_[$3]++' >> ${ANNOT_PROJECT}.vcf
+sed -i 's/\t\*\t/\t<*:DEL>\t/g' ${ANNOT_PROJECT}.vcf
+echo "DONE trimming the VCF for ${CHR}" >> annotation_step.txt
+## Adding snpEff annotation; these are genome annotations from ENSEMBL, created from GRCh38/hg38 reference genome sequence
+${JAVA} ${JAVAOPTS} -jar ${SNPEFF} -v GRCh38.105  ${ANNOT_PROJECT}.vcf > ${ANNOT_PROJECT}-snpeff.vcf
+mv snpEff_genes.txt ${CHR}_snpEff_genes.txt; mv snpEff_summary.html ${CHR}_snpEff_summary.html
+# rm ${ANNOT_PROJECT}.vcf
+echo "DONE SNPeff for ${CHR}" >> annotation_step.txt
+
+# Adding EXaC db
+${JAVA} ${JAVAOPTS} -jar ${SNPSIFT} annotate -v ${EXACDB} ${ANNOT_PROJECT}-snpeff.vcf > ${ANNOT_PROJECT}-snpeff-ExAC.0.3.GRCh38.vcf
+echo "DONE SNPSIFT Annotation with EXAC for ${CHR}" >> annotation_step.txt
+# rm ${ANNOT_PROJECT}-snpeff-dbnsfp.vcf
+
+## Adding clinvar CLNSIG
+module load java/13.0.1
+${JAVA} ${JAVAOPTS} -jar ${SNPSIFT} annotate -v -info CLNSIG ${CLINVAR} ${ANNOT_PROJECT}-snpeff-ExAC.0.3.GRCh38.vcf > ${ANNOT_PROJECT}-snpeff-ExAC.0.3-clinvar.GRCh38.vcf
+# rm ${ANNOT_PROJECT}-snpeff-dbnsfp-ExAC.0.3.GRCh38.vcf
+echo "DONE SNPSIFT Annotation with clinvar for ${CHR}" >> annotation_step.txt
+
+
+## Adding dbNSFP
+${JAVA} ${JAVAOPTS} -jar ${SNPSIFT} dbnsfp -db ${DBNSFPfile} -n -v ${ANNOT_PROJECT}-snpeff-ExAC.0.3-clinvar.GRCh38.vcf > ${ANNOT_PROJECT}-snpeff-dbnsfp.vcf
+
+# cat ${ANNOTATED} |${ONELINEPL}| ${JAVA} ${JAVAOPTS} -jar ${SNPSIFT} extractFields -e "."  - CHROM POS ID REF ALT "ANN[*].ALLELE" "ANN[*].EFFECT" "ANN[*].IMPACT" "ANN[*].GENE" "ANN[*].GENEID" "ANN[*].FEATURE" "ANN[*].FEATUREID" "ANN[*].HGVS_C" "ANN[*].HGVS_P" "dbNSFP_CADD_phred" "dbNSFP_1000Gp3_AF"  "dbNSFP_ExAC_AF" "dbNSFP_ExAC_Adj_AF" "dbNSFP_MetaSVM_score" "dbNSFP_MetaSVM_rankscore" "dbNSFP_MetaSVM_pred" "dbNSFP_clinvar_clnsig" "dbNSFP_MutationAssessor_pred"      "dbNSFP_MutationTaster_pred"    "dbNSFP_Polyphen2_HDIV_pred"    "dbNSFP_Polyphen2_HVAR_pred"    "dbNSFP_SIFT_pred"      "dbNSFP_LRT_pred"       "CLNSIG" "AF_nfe" "AF_afr" "AF_eas" "AF_sas" "AF_raw" "AF_popmax"> ${ANNOTATED%.*}-FIELDS-simple.txt
+
+
+
+
+
+
+## Adding latest dbNSFP and gnomad
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff
+
+# gnomAD data
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/gnomAD
+for i in {1..22}; do 
+wget https://storage.googleapis.com/gcp-public-data--gnomad/release/4.0/vcf/genomes/gnomad.genomes.v4.0.sites.chr${i}.vcf.bgz
+wget https://storage.googleapis.com/gcp-public-data--gnomad/release/4.0/vcf/genomes/gnomad.genomes.v4.0.sites.chr${i}.vcf.bgz.tbi 
+done
+
+
+for i in {1..22}; do \
+export CHR="chr${i}"; \
+echo "Annotating $CHR"; \
+unset INPUT_VCF; \
+export THREADS=4; \
+export INPUT_VCF="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.${CHR}.preQC_biallelic_renamed_ID_edited.vcf.gz"; \
+export JAVA="java"; \
+export JAVAOPTS="-Xms4g -Xmx30g"; \
+export WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff"; \
+export REF="/research/rgs01/reference/public/genomes/Homo_sapiens/GRCh38/GRCh38_no_alt/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa"; \
+export SNPEFF="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/snpEff.jar"; \
+export SNPSIFT="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/SnpSift.jar"; \
+export CLINVAR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/clinvar/clinvar.vcf.gz"
+# export GATK="/hpcf/apps/gatk/install/3.7/GenomeAnalysisTK.jar"; \
+# export DBNSFPfile="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/dbNSFP/GRCh38/dbNSFP4.1a.txt.gz"; \
+export DBNSFPfile="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/dbnsfp/new_dbNSFP4.4a_variant.${CHR}.gz"; \
+export EXACDB="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/exac0.3/ExAC.0.3.GRCh38.vcf.gz"; \
+export ONELINEPL="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/scripts/vcfEffOnePerLine.pl"; \
+bsub \
+        -P "${CHR}_annotate" \
+        -J "${CHR}_ann" \
+        -o "${WORKDIR}/logs/${INPUT_VCF%.vcf*}_dbSNP_annotated.%J" \
+        -n ${THREADS} \
+        -R "rusage[mem=8192]" \
+        "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/latest_dbnsfp.sh"; \
+done;
+
+
+latest_dbnsfp.sh
+#!/usr/bin/bash
+
+module load gatk/4.1.8.0
+module load vt
+module load vcftools
+module load bcftools
+module load tabix
+module load zlib/1.2.5
+module load java/13.0.1
+module load vep/v108
+module load samtools
+## Adding latest dbNSFP
+cd ${WORKDIR}
+
+# ${JAVA} ${JAVAOPTS} -jar ${SNPSIFT} dbnsfp -db ${DBNSFPfile} -n -v ${WORKDIR}/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.${CHR}.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf > ${WORKDIR}/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.${CHR}.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-latest-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf
+
+ANNOTATED="MERGED.SJLIFE.1.2.GATKv3.4.VQSR.${CHR}.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-latest-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf"
+
+## Add gnomad
+${JAVA} ${JAVAOPTS} -jar ${SNPSIFT} annotate /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/gnomAD/gnomad.genomes.v4.0.sites.${CHR}.vcf.bgz \
+${ANNOTATED} > "${WORKDIR}/$(basename ${ANNOTATED} .vcf).gnomAD.vcf"
+
+
+ANNOTATED="$(basename ${ANNOTATED} .vcf).gnomAD.vcf"
+cat ${ANNOTATED} |${ONELINEPL}| ${JAVA} ${JAVAOPTS} -jar ${SNPSIFT} extractFields -e "."  - CHROM POS ID REF ALT "ANN[*].ALLELE" "ANN[*].EFFECT" "ANN[*].IMPACT" "ANN[*].GENE" "ANN[*].GENEID" "ANN[*].FEATURE" "ANN[*].FEATUREID" "ANN[*].HGVS_C" "ANN[*].HGVS_P" "dbNSFP_CADD_phred" "dbNSFP_1000Gp3_AF"  "dbNSFP_ExAC_AF" "dbNSFP_ExAC_Adj_AF" "dbNSFP_MetaSVM_score" "dbNSFP_MetaSVM_rankscore" "dbNSFP_MetaSVM_pred" "dbNSFP_clinvar_clnsig" "dbNSFP_MutationAssessor_pred" "dbNSFP_MutationTaster_pred" "dbNSFP_Polyphen2_HDIV_pred" "dbNSFP_Polyphen2_HVAR_pred" "dbNSFP_SIFT_pred" "dbNSFP_LRT_pred" "CLNSIG" "dbNSFP_gnomAD_genomes_AF" "dbNSFP_gnomAD_genomes_NFE_AF" "dbNSFP_gnomAD_genomes_AMI_AF" "dbNSFP_gnomAD_genomes_ASJ_AF" "dbNSFP_gnomAD_genomes_MID_AF" "dbNSFP_gnomAD_genomes_FIN_AF" "dbNSFP_gnomAD_genomes_SAS_AF" "dbNSFP_gnomAD_genomes_EAS_AF" "dbNSFP_gnomAD_genomes_AFR_AF" "dbNSFP_gnomAD_genomes_POPMAX_AF" "dbNSFP_gnomAD_exomes_AF" "dbNSFP_gnomAD_exomes_NFE_AF" "dbNSFP_gnomAD_exomes_ASJ_AF" "dbNSFP_gnomAD_exomes_FIN_AF" "dbNSFP_gnomAD_exomes_SAS_AF" "dbNSFP_gnomAD_exomes_EAS_AF" "dbNSFP_gnomAD_exomes_AFR_AF" "dbNSFP_gnomAD_exomes_POPMAX_AF" "AF_nfe" "AF_afr" "AF_eas" "AF_sas" "AF_fin" "AF_raw" "AF" "AF_grpmax"> ${WORKDIR}/${ANNOTATED%.*}-FIELDS-simple.txt
+
+
+
+
+awk -F'\t' '$48 < 0.01 && $54 < 0.01 && $48 != "." && $54 != "."' test.field.txt | less -S
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #####################################

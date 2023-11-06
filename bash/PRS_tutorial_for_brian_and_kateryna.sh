@@ -149,3 +149,73 @@ awk '{print $1":"$2, $4, $5}' prs_out/ALL_Cancers_PRS_data.txt_$study > prs_out/
 plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweight --out prs_out/${study}_prs
 
 # Done!
+
+
+
+
+
+
+
+
+
+
+#####################################################################
+mkdir -p prs_out
+study="PGS000888"
+# Subset PRS data for each study
+grep ${study} GRCh38_PRS_score_dyslipidemia.txt > prs_out/GRCh38_PRS_score_dyslipidemia.txt_${study}
+awk 'a[$1":"$2]++' prs_out/GRCh38_PRS_score_dyslipidemia.txt_$study | wc -l
+
+## Look for directly matching variants in the WGS data
+awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/GRCh38_PRS_score_dyslipidemia.txt_$study plink_data/myresult_dys_PRS.bim \
+| awk '($4==$6 || $4==$7) && ($5==$6 || $5==$7)' > prs_out/GRCh38_PRS_score_dyslipidemia.txt_${study}_direct_match
+
+
+
+# No direct match
+awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out/GRCh38_PRS_score_dyslipidemia.txt_$study plink_data/myresult_dys_PRS.bim \
+| awk '!(($4==$6 || $4==$7) && ($5==$6 || $5==$7))' | grep -v DEL > prs_out/GRCh38_PRS_score_dyslipidemia.txt_${study}_no_direct_match
+# Exclude those that are already a direct match
+awk 'NR==FNR{a[$1":"$3];next}!($1":"$3 in a){print}' prs_out/GRCh38_PRS_score_dyslipidemia.txt_${study}_direct_match prs_out/GRCh38_PRS_score_dyslipidemia.txt_${study}_no_direct_match \
+> prs_out/GRCh38_PRS_score_dyslipidemia.txt_${study}_no_direct_match_final
+
+wc -l prs_out/GRCh38_PRS_score_dyslipidemia.txt_${study}_no_direct_match_final
+
+## Harmonize alleles
+module load R
+Rscript /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/harmonize_alleles.R prs_out/GRCh38_PRS_score_dyslipidemia.txt_${study}_no_direct_match_final
+
+## Update the alleles; It checks if the last field ($NF) in each line is equal to 1; if true, then { print $3, $6, $7, $8, $9 } so we can update the plink file for variants with no direct match
+awk '($NF==1){ print $3, $6, $7, $8, $9}' prs_out/GRCh38_PRS_score_dyslipidemia.txt_${study}_no_direct_match_final_alleles_harmonized > prs_out/GRCh38_PRS_score_dyslipidemia.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt
+# (base) [aneupane@splprhpc08 prs_out]$ cat ALL_Cancers_PRS_data.txt_Pleiotropy_One_directional_Significant_no_direct_match_final_alleles_harmonized
+# chr pos variant khera_a1 khera_a2 wgs_a1 wgs_a2 wgs_a1_new wgs_a2_new match
+# 10 46037697 chr10:46037697:A:G T C G A C T 1
+
+# (base) [aneupane@splprhpc08 prs_out]$ cat ALL_Cancers_PRS_data.txt_Pleiotropy_One_directional_no_direct_match_alleles_harmonized_update_alleles.txt
+# chr10:46037697:A:G G A C T
+
+
+# Extract study-specific variants
+awk '{print $2}' prs_out/GRCh38_PRS_score_dyslipidemia.txt_${study}_direct_match > prs_out/GRCh38_PRS_score_dyslipidemia.txt_${study}_direct_match_to_extract.txt
+module load plink/1.90b
+plink --bfile plink_data/myresult_dys_PRS --extract prs_out/GRCh38_PRS_score_dyslipidemia.txt_${study}_direct_match_to_extract.txt --make-bed --out prs_out/${study}_direct_match
+plink --bfile plink_data/myresult_dys_PRS --extract prs_out/GRCh38_PRS_score_dyslipidemia.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --update-alleles prs_out/GRCh38_PRS_score_dyslipidemia.txt_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --make-bed --out prs_out/${study}_harmonized
+
+## Merge
+plink --bfile prs_out/${study}_direct_match --bmerge prs_out/${study}_harmonized --make-bed --out prs_out/$study
+# Update variant names
+awk '{print $2, $1":"$4}' prs_out/${study}.bim > prs_out/${study}_update_variantnames
+## Check duplicates, see if rare, remove those
+plink --bfile prs_out/$study --update-name prs_out/${study}_update_variantnames --make-bed --out prs_out/${study}_varname_updated ## 53 duplicates
+# Create a score file
+awk '{print $1":"$2, $4, $5}' prs_out/GRCh38_PRS_score_dyslipidemia.txt_$study > prs_out/${study}.prsweight
+# (base) [aneupane@splprhpc08 prs_out]$ head Pleiotropy_One_directional.prsweight
+# 8:127401060 G 0.214304603
+# 17:37743574 A 0.196014884
+# 19:50862184 C 0.337899789
+# 6:32623790 T 0.392717535
+# 11:69213892 G 0.223143551
+
+
+# Calculate PRS
+plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweight --out prs_out/${study}_prs
