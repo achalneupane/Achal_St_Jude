@@ -6,14 +6,6 @@ library(dplyr)
 
 
 
-## Create a data frame with your data
-# data <- data.frame(
-# SN_types = c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma"),
-# SJLIFE = c(0.518, 0.455, 0.652, 0.672, 0.862, 0.438, 0.371),
-# CCSS = c(0.419, 0.326, 0.555, 0.709, 0.659, 0.432, 0.368)
-# )
-
-
 ## V18 b
 data <- read.table(text="Cohort	SN_types	Variables	Overall	Female	Male	Age.lt.35	Age.ge.35
 SJLIFE	Any SN (605)	Radiation	0.425	0.417	0.435	0.400	0.447
@@ -101,7 +93,7 @@ CCSS	Sarcoma (60)	PRS	0.024	0.026	0.022	0.023	0.025
 CCSS	Sarcoma (60)	Lifestyle	-	-	-	-	-
 CCSS	Sarcoma (60)	Combined	0.358	0.345	0.372	0.353	0.364", header = T, sep = "\t")
 
-data$SN_types <- gsub("\\([0-9]+\\)", "", data$SN_types)
+data$SN_types <- trimws(gsub("\\([0-9]+\\)", "", data$SN_types))
 data[data == "-"] <- NA
 saved.data <- data
 
@@ -116,24 +108,18 @@ saved.data <- data
 group <- "Overall"
 variables <- unique(data$Variables)
 
+custom_colors <- c("SJLIFE" = "#1E90FF", "CCSS" = "#FF6347")
+legend_order <- c("SJLIFE", "CCSS")
+
+
 for(i in 1:length(variables)){
-new_data <- data[grepl(variables[i], data$Variables), c("Cohort", "SN_types", "Variables", group)]
-colnames(new_data) <- c("variable", "SN_types", "AF_by", "value")
-new_data$value <- as.numeric(new_data$value)
+data_melted <- data[grepl(variables[i], data$Variables), c("Cohort", "SN_types", "Variables", group)]
+colnames(data_melted) <- c("variable", "SN_types", "AF_by", "value")
+data_melted$value <- as.numeric(data_melted$value); data_melted <- data_melted[complete.cases(data_melted),]
+data_melted$new_value <- round(data_melted$value,2)*100
 
 # Reshape the data for ggplot2
 library(reshape2)
-# data_melted <- melt(data, id.vars = "SN_types")
-# data_melted
-# SN_types variable value
-# 1Any SN SJLIFE 0.518
-# 2 Any SMN SJLIFE 0.455
-# 3NMSC SJLIFE 0.652
-data_melted <-new_data
-## Exclude rows with NAs
-data_melted <- data_melted[complete.cases(data_melted),]
-
-# order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
 order <- unique(data_melted$SN_types)
 AF.type <- data_melted$AF_by[i] 
 lifestyle <- "without_lifestyle"
@@ -143,46 +129,50 @@ next
 
 data_melted$legend_group <- factor(data_melted$variable, levels = c("SJLIFE", "CCSS"))
 
-order <- unique(data_melted$SN_types)
-AF.type <- data_melted$AF_by[i] 
-lifestyle <- "without_lifestyle"
 
 
 
-# Create the grouped bar chart
-p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
-geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
-# Customize the theme and appearance
-theme_minimal() +
-theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),# Adjust font size and angle
-axis.text.y = element_text(size = 16, color = "black"),
-axis.title.y = element_text(size = 20, color = "black"),# Customize Y-axis title
-legend.title = element_blank(),# Remove legend title
-legend.text = element_text(size = 16, color = "black"),# Adjust legend font size
-plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),# Title formatting
-panel.grid.major = element_blank(),# Remove major gridlines
-panel.grid.minor = element_blank() # Remove minor gridlines
+p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.4), width = 0.4) +
+  # Customize the theme and appearance
+  # # geom_hline(yintercept = seq(-0.1, 0.1, by = 0.1), color = "black", linetype = "solid", size = 0.7) +
+  # # geom_hline(yintercept = 0, color = "black", linetype = "solid", size = 0.7) +
+  # Add Y lines
+  # # geom_vline(xintercept = seq(0.5, length(unique(data_melted$SN_types)) + 0.5), color = "black", linetype = "solid", size = 0.7) +
+  # # geom_vline(xintercept = 0.5, color = "black", linetype = "solid", size = 0.7) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 16, color = "black"),
+        axis.text.y = element_text(size = 16, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"),
+        axis.line.x = element_line(color="black"),
+        axis.line.y = element_line(color="black"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 16, color = "black"),
+        plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  
+  # Customize colors
+  scale_fill_manual(values = custom_colors, breaks = legend_order) +
+  
+  # Add labels with geom_text
+  geom_text(
+    data = data_melted %>% filter(!is.na(new_value)),
+    aes(label = new_value, y = new_value),  # Adjust y position
+    position = position_dodge(width = 0.3),
+    vjust = -0.20,  # Adjust vertical justification
+    hjust = 0.5,  # Center text horizontally
+    size = 5.5,
+    color = "black"
+  ) +
+  # Adjust legend position
+  theme(legend.position = "top", legend.box = "horizontal") +
+  # Additional adjustments
+  scale_x_discrete(limits = order) +
+  coord_cartesian(clip = "off")
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
 
-) +
-
-# Customize colors
-scale_fill_manual(values = c("SJLIFE" = "#1E90FF", "CCSS" = "#FF6347")) +# Use color codes
-# Add labels
-labs(title = "", y = "Attributable fraction", x = NULL) +
-# Remove extra space at the bottom of the Y-axis
-scale_y_continuous(expand = c(0, 0)) +
-# Add data labels
-geom_text(aes(label = sprintf("%.3f", value)), position = position_dodge(width = 0.8), vjust = -0.25, size = 5.5, color = "black") +
-# Adjust legend position
-theme(legend.position="top", legend.box = "horizontal") +
-## Add caption
-# labs(caption = "Data")
-# scale_x_discrete(limits = c("Any SN ", "Any SMN ", "NMSC ", "Breast cancer ", "Thyroid cancer ", "Meningioma ", "Sarcoma ")) +
-scale_x_discrete(limits = order) +
-## Adjust the x-axis limits to ensure that the secondary y-axis label is fully visible.
-coord_cartesian(clip = "off")
-
-p <- p + scale_y_continuous(limits = c(0, 1))
+p
 # Save the plot as a high-resolution image
 plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/overall/", group, "_", AF.type, "_", lifestyle, ".tiff")
 
@@ -202,17 +192,8 @@ new_data$value <- as.numeric(new_data$value)
 
 # Reshape the data for ggplot2
 library(reshape2)
-# data_melted <- melt(data, id.vars = "SN_types")
-# data_melted
-# SN_types variable value
-# 1Any SN SJLIFE 0.518
-# 2 Any SMN SJLIFE 0.455
-# 3NMSC SJLIFE 0.652
-data_melted <-new_data
-## Exclude rows with NAs
-data_melted <- data_melted[complete.cases(data_melted),]
 
-# order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
+data_melted <-new_data
 order <- unique(data_melted$SN_types)
 AF.type <- "treatment_PRS"
 lifestyle <- "without_lifestyle"
@@ -220,13 +201,7 @@ lifestyle <- "without_lifestyle"
 data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
 
 
-data_melted$new_value <- data_melted$value
-# data_melted <- data_melted %>%
-# group_by(SN_types, value) %>%
-# mutate(new_value = ifelse(row_number() == which.min(new_value), new_value, NA)) %>%
-# ungroup()
-
-
+data_melted$new_value <- round(data_melted$value,2)*100
 
 
 # Define custom colors and legend order
@@ -235,56 +210,50 @@ legend_order <- c("SJLIFE_PRS", "CCSS_PRS", "SJLIFE_All_treatments", "CCSS_All_t
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
-# Define the order of x-axis categories
-x_order <- c("Any SN ", "Any SMN ", "NMSC ", "Breast cancer ", "Thyroid cancer ", "Meningioma ", "Sarcoma ")
-
 # Create a factor with the desired order
-data_melted$SN_types <- factor(data_melted$SN_types, levels = x_order)
+data_melted$SN_types <- factor(order, levels = order)
 
-# Create the grouped bar chart
-# Create the plot
-p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
-geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
-# Customize the theme and appearance
-theme_minimal() +
-theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
-axis.text.y = element_text(size = 16, color = "black"),
-axis.title.y = element_text(size = 20, color = "black"),
-legend.title = element_blank(),
-legend.text = element_text(size = 16, color = "black"),
-plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
-panel.grid.major = element_blank(),
-panel.grid.minor = element_blank()) +
-
-# Customize colors
-scale_fill_manual(values = custom_colors, breaks = legend_order) +
-
-# Add labels with repelling
-geom_text_repel(
-data = data_melted %>% filter(!is.na(new_value)),
-aes(label = sprintf("%.3f", new_value)),
-position = position_dodge(width = 0.8),
-vjust = 1.35,
-hjust = 0.15,
-size = 5.5,
-color = "black",
-box.padding = 0.15,
-force = 1,
-segment.color = "transparent",
-segment.size = 0,
-fill = "white"
-) +
-
-# Adjust legend position
-theme(legend.position = "top", legend.box = "horizontal") +
-
-# Additional adjustments
-scale_x_discrete(limits = x_order) +
-coord_cartesian(clip = "off")
-
-p <- p + scale_y_continuous(limits = c(0, 1)) + labs(title = "", y = "Attributable fraction", x = NULL) 
+p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.8) +
+  # Customize the theme and appearance
+  # geom_hline(yintercept = 0, color = "black", linetype = "solid", size = 0.7) +
+  # Add Y lines
+  # geom_vline(xintercept = 0.5, color = "black", linetype = "solid", size = 0.7) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 16, color = "black"),
+        axis.text.y = element_text(size = 16, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"), 
+        axis.line.x = element_line(color="black"), 
+        axis.line.y = element_line(color="black"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 16, color = "black"),
+        plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
   
+  # Customize colors
+  scale_fill_manual(values = custom_colors, breaks = legend_order) +
+  
+  # Add labels with geom_text
+  geom_text(
+    data = data_melted %>% filter(!is.na(new_value)),
+    aes(label = new_value, y = new_value),  # Adjust y position
+    position = position_dodge(width = 0.8),
+    vjust = -0.20,  # Adjust vertical justification
+    hjust = 0.5,  # Center text horizontally
+    size = 5.5,
+    color = "black"
+  ) +
+  # Adjust legend position
+  theme(legend.position = "top", legend.box = "horizontal") +
+  # Additional adjustments
+  scale_x_discrete(limits = order) +
+  coord_cartesian(clip = "off")
 p
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
+
+p
+
 # Save the plot as a high-resolution image
 plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/overall/", group, "_", AF.type,"_", lifestyle, ".tiff")
 
@@ -303,31 +272,14 @@ new_data$value <- as.numeric(new_data$value)
 
 # Reshape the data for ggplot2
 library(reshape2)
-# data_melted <- melt(data, id.vars = "SN_types")
-# data_melted
-# SN_types variable value
-# 1Any SN SJLIFE 0.518
-# 2 Any SMN SJLIFE 0.455
-# 3NMSC SJLIFE 0.652
 data_melted <-new_data
-## Exclude rows with NAs
-data_melted <- data_melted[complete.cases(data_melted),]
+data_melted$new_value <- round(data_melted$value,2)*100
 
-# order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
 order <- unique(data_melted$SN_types)
 AF.type <- "Chemo_Radiation"
 lifestyle <- "without_lifestyle"
 
 data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
-
-
-data_melted$new_value <- data_melted$value
-# data_melted <- data_melted %>%
-# group_by(SN_types, value) %>%
-# mutate(new_value = ifelse(row_number() == which.min(new_value), new_value, NA)) %>%
-# ungroup()
-
-
 
 
 # Define custom colors and legend order
@@ -337,54 +289,54 @@ legend_order <- c("SJLIFE_Chemo", "CCSS_Chemo", "SJLIFE_Radiation", "CCSS_Radiat
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
 # Define the order of x-axis categories
-x_order <- c("Any SN ", "Any SMN ", "NMSC ", "Breast cancer ", "Thyroid cancer ", "Meningioma ", "Sarcoma ")
+order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
 
 # Create a factor with the desired order
-data_melted$SN_types <- factor(data_melted$SN_types, levels = x_order)
+data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
 
 # Create the grouped bar chart
 # Create the plot
-p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
-geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
-# Customize the theme and appearance
-theme_minimal() +
-theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
-axis.text.y = element_text(size = 16, color = "black"),
-axis.title.y = element_text(size = 20, color = "black"),
-legend.title = element_blank(),
-legend.text = element_text(size = 16, color = "black"),
-plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
-panel.grid.major = element_blank(),
-panel.grid.minor = element_blank()) +
-
-# Customize colors
-scale_fill_manual(values = custom_colors, breaks = legend_order) +
-
-# Add labels with repelling
-geom_text_repel(
-data = data_melted %>% filter(!is.na(new_value)),
-aes(label = sprintf("%.3f", new_value)),
-position = position_dodge(width = 0.8),
-vjust = 1.35,
-hjust = 0.15,
-size = 5.5,
-color = "black",
-box.padding = 0.15,
-force = 1,
-segment.color = "transparent",
-segment.size = 0,
-fill = "white"
-) +
-
-# Adjust legend position
-theme(legend.position = "top", legend.box = "horizontal") +
-
-# Additional adjustments
-scale_x_discrete(limits = x_order) +
-coord_cartesian(clip = "off")
-
-p <- p + scale_y_continuous(limits = c(0, 1)) + labs(title = "", y = "Attributable fraction", x = NULL) 
+p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.8) +
+  # Customize the theme and appearance
+  # geom_hline(yintercept = 0, color = "black", linetype = "solid", size = 0.7) +
+  # Add Y lines
+  # geom_vline(xintercept = 0.5, color = "black", linetype = "solid", size = 0.7) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 16, color = "black"),
+        axis.text.y = element_text(size = 16, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"), 
+        axis.line.x = element_line(color="black"), 
+        axis.line.y = element_line(color="black"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 16, color = "black"),
+        plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  
+  # Customize colors
+  scale_fill_manual(values = custom_colors, breaks = legend_order) +
+  
+  # Add labels with geom_text
+  geom_text(
+    data = data_melted,
+    aes(label = new_value, y = new_value),  # Adjust y position
+    position = position_dodge(width = 0.8),
+    vjust = -0.20,  # Adjust vertical justification
+    hjust = 0.5,  # Center text horizontally
+    size = 5.5,
+    color = "black"
+  ) +
+  # Adjust legend position
+  theme(legend.position = "top", legend.box = "horizontal") +
+  # Additional adjustments
+  scale_x_discrete(limits = order) +
+  coord_cartesian(clip = "off")
 p
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
+
+p
+
 # Save the plot as a high-resolution image
 plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/overall/", group, "_", AF.type,"_", lifestyle, ".tiff")
 
@@ -404,23 +356,13 @@ group <- "Female"
 variables <- unique(data$Variables)
 
 for(i in 1:length(variables)){
-  new_data <- data[grepl(variables[i], data$Variables), c("Cohort", "SN_types", "Variables", group)]
-  colnames(new_data) <- c("variable", "SN_types", "AF_by", "value")
-  new_data$value <- as.numeric(new_data$value)
+  data_melted <- data[grepl(variables[i], data$Variables), c("Cohort", "SN_types", "Variables", group)]
+  colnames(data_melted) <- c("variable", "SN_types", "AF_by", "value")
+  data_melted$value <- as.numeric(data_melted$value); data_melted <- data_melted[complete.cases(data_melted),]
+  data_melted$new_value <- round(data_melted$value,2)*100
   
   # Reshape the data for ggplot2
   library(reshape2)
-  # data_melted <- melt(data, id.vars = "SN_types")
-  # data_melted
-  # SN_types variable value
-  # 1Any SN SJLIFE 0.518
-  # 2 Any SMN SJLIFE 0.455
-  # 3NMSC SJLIFE 0.652
-  data_melted <-new_data
-  ## Exclude rows with NAs
-  data_melted <- data_melted[complete.cases(data_melted),]
-  
-  # order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
   order <- unique(data_melted$SN_types)
   AF.type <- data_melted$AF_by[i] 
   lifestyle <- "without_lifestyle"
@@ -430,46 +372,47 @@ for(i in 1:length(variables)){
   
   data_melted$legend_group <- factor(data_melted$variable, levels = c("SJLIFE", "CCSS"))
   
-  order <- unique(data_melted$SN_types)
-  AF.type <- data_melted$AF_by[i] 
-  lifestyle <- "without_lifestyle"
-  
-  
-  
-  # Create the grouped bar chart
-  p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
-    geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
+  p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
+    geom_bar(stat = "identity", position = position_dodge(width = 0.4), width = 0.4) +
     # Customize the theme and appearance
+    # # geom_hline(yintercept = seq(-0.1, 0.1, by = 0.1), color = "black", linetype = "solid", size = 0.7) +
+    # geom_hline(yintercept = 0, color = "black", linetype = "solid", size = 0.7) +
+    # Add Y lines
+    # # geom_vline(xintercept = seq(0.5, length(unique(data_melted$SN_types)) + 0.5), color = "black", linetype = "solid", size = 0.7) +
+    # geom_vline(xintercept = 0.5, color = "black", linetype = "solid", size = 0.7) +
     theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),# Adjust font size and angle
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 16, color = "black"),
           axis.text.y = element_text(size = 16, color = "black"),
-          axis.title.y = element_text(size = 20, color = "black"),# Customize Y-axis title
-          legend.title = element_blank(),# Remove legend title
-          legend.text = element_text(size = 16, color = "black"),# Adjust legend font size
-          plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),# Title formatting
-          panel.grid.major = element_blank(),# Remove major gridlines
-          panel.grid.minor = element_blank() # Remove minor gridlines
-          
-    ) +
+          axis.title.y = element_text(size = 20, color = "black"), 
+          axis.line.x = element_line(color="black"), 
+          axis.line.y = element_line(color="black"),
+          legend.title = element_blank(),
+          legend.text = element_text(size = 16, color = "black"),
+          plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
     
     # Customize colors
-    scale_fill_manual(values = c("SJLIFE" = "#1E90FF", "CCSS" = "#FF6347")) +# Use color codes
-    # Add labels
-    labs(title = "", y = "Attributable fraction", x = NULL) +
-    # Remove extra space at the bottom of the Y-axis
-    scale_y_continuous(expand = c(0, 0)) +
-    # Add data labels
-    geom_text(aes(label = sprintf("%.3f", value)), position = position_dodge(width = 0.8), vjust = -0.25, size = 5.5, color = "black") +
+    scale_fill_manual(values = custom_colors, breaks = legend_order) +
+    
+    # Add labels with geom_text
+    geom_text(
+      data = data_melted,
+      aes(label = new_value, y = new_value),  # Adjust y position
+      position = position_dodge(width = 0.3),
+      vjust = -0.20,  # Adjust vertical justification
+      hjust = 0.5,  # Center text horizontally
+      size = 5.5,
+      color = "black"
+    ) +
     # Adjust legend position
-    theme(legend.position="top", legend.box = "horizontal") +
-    ## Add caption
-    # labs(caption = "Data")
-    # scale_x_discrete(limits = c("Any SN ", "Any SMN ", "NMSC ", "Breast cancer ", "Thyroid cancer ", "Meningioma ", "Sarcoma ")) +
+    theme(legend.position = "top", legend.box = "horizontal") +
+    # Additional adjustments
     scale_x_discrete(limits = order) +
-    ## Adjust the x-axis limits to ensure that the secondary y-axis label is fully visible.
     coord_cartesian(clip = "off")
+  p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
   
-  p <- p + scale_y_continuous(limits = c(0, 1))
+  p
   # Save the plot as a high-resolution image
   plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/female/", group, "_", AF.type, "_", lifestyle, ".tiff")
   
@@ -489,17 +432,9 @@ new_data$value <- as.numeric(new_data$value)
 
 # Reshape the data for ggplot2
 library(reshape2)
-# data_melted <- melt(data, id.vars = "SN_types")
-# data_melted
-# SN_types variable value
-# 1Any SN SJLIFE 0.518
-# 2 Any SMN SJLIFE 0.455
-# 3NMSC SJLIFE 0.652
 data_melted <-new_data
-## Exclude rows with NAs
-data_melted <- data_melted[complete.cases(data_melted),]
 
-# order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
+
 order <- unique(data_melted$SN_types)
 AF.type <- "treatment_PRS"
 lifestyle <- "without_lifestyle"
@@ -507,14 +442,7 @@ lifestyle <- "without_lifestyle"
 data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
 
 
-data_melted$new_value <- data_melted$value
-# data_melted <- data_melted %>%
-# group_by(SN_types, value) %>%
-# mutate(new_value = ifelse(row_number() == which.min(new_value), new_value, NA)) %>%
-# ungroup()
-
-
-
+data_melted$new_value <- round(data_melted$value,2)*100
 
 # Define custom colors and legend order
 custom_colors <- c("SJLIFE_PRS" = "#87CEFA", "CCSS_PRS" = "#FFA07A", "SJLIFE_All_treatments" = "#1E90FF", "CCSS_All_treatments" = "#FF6347")
@@ -523,20 +451,25 @@ legend_order <- c("SJLIFE_PRS", "CCSS_PRS", "SJLIFE_All_treatments", "CCSS_All_t
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
 # Define the order of x-axis categories
-x_order <- c("Any SN ", "Any SMN ", "NMSC ", "Breast cancer ", "Thyroid cancer ", "Meningioma ", "Sarcoma ")
+order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
 
 # Create a factor with the desired order
-data_melted$SN_types <- factor(data_melted$SN_types, levels = x_order)
+data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
 
 # Create the grouped bar chart
 # Create the plot
-p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
-  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
+p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.8) +
   # Customize the theme and appearance
+  # geom_hline(yintercept = 0, color = "black", linetype = "solid", size = 0.7) +
+  # Add Y lines
+  # geom_vline(xintercept = 0.5, color = "black", linetype = "solid", size = 0.7) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 16, color = "black"),
         axis.text.y = element_text(size = 16, color = "black"),
-        axis.title.y = element_text(size = 20, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"), 
+        axis.line.x = element_line(color="black"), 
+        axis.line.y = element_line(color="black"),
         legend.title = element_blank(),
         legend.text = element_text(size = 16, color = "black"),
         plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
@@ -546,31 +479,25 @@ p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
   # Customize colors
   scale_fill_manual(values = custom_colors, breaks = legend_order) +
   
-  # Add labels with repelling
-  geom_text_repel(
-    data = data_melted %>% filter(!is.na(new_value)),
-    aes(label = sprintf("%.3f", new_value)),
+  # Add labels with geom_text
+  geom_text(
+    data = data_melted,
+    aes(label = new_value, y = new_value),  # Adjust y position
     position = position_dodge(width = 0.8),
-    vjust = 1.35,
-    hjust = 0.15,
+    vjust = -0.20,  # Adjust vertical justification
+    hjust = 0.5,  # Center text horizontally
     size = 5.5,
-    color = "black",
-    box.padding = 0.15,
-    force = 1,
-    segment.color = "transparent",
-    segment.size = 0,
-    fill = "white"
+    color = "black"
   ) +
-  
   # Adjust legend position
   theme(legend.position = "top", legend.box = "horizontal") +
-  
   # Additional adjustments
-  scale_x_discrete(limits = x_order) +
+  scale_x_discrete(limits = order) +
   coord_cartesian(clip = "off")
-
-p <- p + scale_y_continuous(limits = c(0, 1)) + labs(title = "", y = "Attributable fraction", x = NULL) 
 p
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
+p
+
 # Save the plot as a high-resolution image
 plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/female/", group, "_", AF.type,"_", lifestyle, ".tiff")
 
@@ -589,31 +516,14 @@ new_data$value <- as.numeric(new_data$value)
 
 # Reshape the data for ggplot2
 library(reshape2)
-# data_melted <- melt(data, id.vars = "SN_types")
-# data_melted
-# SN_types variable value
-# 1Any SN SJLIFE 0.518
-# 2 Any SMN SJLIFE 0.455
-# 3NMSC SJLIFE 0.652
 data_melted <-new_data
-## Exclude rows with NAs
-data_melted <- data_melted[complete.cases(data_melted),]
+data_melted$new_value <- round(data_melted$value,2)*100
 
-# order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
 order <- unique(data_melted$SN_types)
 AF.type <- "Chemo_Radiation"
 lifestyle <- "without_lifestyle"
 
 data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
-
-
-data_melted$new_value <- data_melted$value
-# data_melted <- data_melted %>%
-# group_by(SN_types, value) %>%
-# mutate(new_value = ifelse(row_number() == which.min(new_value), new_value, NA)) %>%
-# ungroup()
-
-
 
 
 # Define custom colors and legend order
@@ -623,20 +533,25 @@ legend_order <- c("SJLIFE_Chemo", "CCSS_Chemo", "SJLIFE_Radiation", "CCSS_Radiat
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
 # Define the order of x-axis categories
-x_order <- c("Any SN ", "Any SMN ", "NMSC ", "Breast cancer ", "Thyroid cancer ", "Meningioma ", "Sarcoma ")
+order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
 
 # Create a factor with the desired order
-data_melted$SN_types <- factor(data_melted$SN_types, levels = x_order)
+data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
 
 # Create the grouped bar chart
 # Create the plot
-p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
-  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
+p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.8) +
   # Customize the theme and appearance
+  # geom_hline(yintercept = 0, color = "black", linetype = "solid", size = 0.7) +
+  # Add Y lines
+  # geom_vline(xintercept = 0.5, color = "black", linetype = "solid", size = 0.7) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 16, color = "black"),
         axis.text.y = element_text(size = 16, color = "black"),
-        axis.title.y = element_text(size = 20, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"), 
+        axis.line.x = element_line(color="black"), 
+        axis.line.y = element_line(color="black"),
         legend.title = element_blank(),
         legend.text = element_text(size = 16, color = "black"),
         plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
@@ -646,30 +561,24 @@ p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
   # Customize colors
   scale_fill_manual(values = custom_colors, breaks = legend_order) +
   
-  # Add labels with repelling
-  geom_text_repel(
-    data = data_melted %>% filter(!is.na(new_value)),
-    aes(label = sprintf("%.3f", new_value)),
+  # Add labels with geom_text
+  geom_text(
+    data = data_melted,
+    aes(label = new_value, y = new_value),  # Adjust y position
     position = position_dodge(width = 0.8),
-    vjust = 1.35,
-    hjust = 0.15,
+    vjust = -0.20,  # Adjust vertical justification
+    hjust = 0.5,  # Center text horizontally
     size = 5.5,
-    color = "black",
-    box.padding = 0.15,
-    force = 1,
-    segment.color = "transparent",
-    segment.size = 0,
-    fill = "white"
+    color = "black"
   ) +
-  
   # Adjust legend position
   theme(legend.position = "top", legend.box = "horizontal") +
-  
   # Additional adjustments
-  scale_x_discrete(limits = x_order) +
+  scale_x_discrete(limits = order) +
   coord_cartesian(clip = "off")
+p
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
 
-p <- p + scale_y_continuous(limits = c(0, 1)) + labs(title = "", y = "Attributable fraction", x = NULL) 
 p
 # Save the plot as a high-resolution image
 plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/female/", group, "_", AF.type,"_", lifestyle, ".tiff")
@@ -689,23 +598,16 @@ group <- "Male"
 variables <- unique(data$Variables)
 
 for(i in 1:length(variables)){
-  new_data <- data[grepl(variables[i], data$Variables), c("Cohort", "SN_types", "Variables", group)]
-  colnames(new_data) <- c("variable", "SN_types", "AF_by", "value")
-  new_data$value <- as.numeric(new_data$value)
+  data_melted <- data[grepl(variables[i], data$Variables), c("Cohort", "SN_types", "Variables", group)]
+  colnames(data_melted) <- c("variable", "SN_types", "AF_by", "value")
+  data_melted$value <- as.numeric(data_melted$value); data_melted <- data_melted[complete.cases(data_melted),]
+  data_melted$new_value <- round(data_melted$value,2)*100
   
   # Reshape the data for ggplot2
   library(reshape2)
-  # data_melted <- melt(data, id.vars = "SN_types")
-  # data_melted
-  # SN_types variable value
-  # 1Any SN SJLIFE 0.518
-  # 2 Any SMN SJLIFE 0.455
-  # 3NMSC SJLIFE 0.652
-  data_melted <-new_data
-  ## Exclude rows with NAs
+  
   data_melted <- data_melted[complete.cases(data_melted),]
   
-  # order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
   order <- unique(data_melted$SN_types)
   AF.type <- data_melted$AF_by[i] 
   lifestyle <- "without_lifestyle"
@@ -715,46 +617,50 @@ for(i in 1:length(variables)){
   
   data_melted$legend_group <- factor(data_melted$variable, levels = c("SJLIFE", "CCSS"))
   
-  order <- unique(data_melted$SN_types)
-  AF.type <- data_melted$AF_by[i] 
-  lifestyle <- "without_lifestyle"
   
   
   
-  # Create the grouped bar chart
-  p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
-    geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
+  p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
+    geom_bar(stat = "identity", position = position_dodge(width = 0.4), width = 0.4) +
     # Customize the theme and appearance
+    # # geom_hline(yintercept = seq(-0.1, 0.1, by = 0.1), color = "black", linetype = "solid", size = 0.7) +
+    # geom_hline(yintercept = 0, color = "black", linetype = "solid", size = 0.7) +
+    # Add Y lines
+    # # geom_vline(xintercept = seq(0.5, length(unique(data_melted$SN_types)) + 0.5), color = "black", linetype = "solid", size = 0.7) +
+    # geom_vline(xintercept = 0.5, color = "black", linetype = "solid", size = 0.7) +
     theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),# Adjust font size and angle
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 16, color = "black"),
           axis.text.y = element_text(size = 16, color = "black"),
-          axis.title.y = element_text(size = 20, color = "black"),# Customize Y-axis title
-          legend.title = element_blank(),# Remove legend title
-          legend.text = element_text(size = 16, color = "black"),# Adjust legend font size
-          plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),# Title formatting
-          panel.grid.major = element_blank(),# Remove major gridlines
-          panel.grid.minor = element_blank() # Remove minor gridlines
-          
-    ) +
+          axis.title.y = element_text(size = 20, color = "black"), 
+          axis.line.x = element_line(color="black"), 
+          axis.line.y = element_line(color="black"),
+          legend.title = element_blank(),
+          legend.text = element_text(size = 16, color = "black"),
+          plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
     
     # Customize colors
-    scale_fill_manual(values = c("SJLIFE" = "#1E90FF", "CCSS" = "#FF6347")) +# Use color codes
-    # Add labels
-    labs(title = "", y = "Attributable fraction", x = NULL) +
-    # Remove extra space at the bottom of the Y-axis
-    scale_y_continuous(expand = c(0, 0)) +
-    # Add data labels
-    geom_text(aes(label = sprintf("%.3f", value)), position = position_dodge(width = 0.8), vjust = -0.25, size = 5.5, color = "black") +
+    scale_fill_manual(values = custom_colors, breaks = legend_order) +
+    
+    # Add labels with geom_text
+    geom_text(
+      data = data_melted,
+      aes(label = new_value, y = new_value),  # Adjust y position
+      position = position_dodge(width = 0.3),
+      vjust = -0.20,  # Adjust vertical justification
+      hjust = 0.5,  # Center text horizontally
+      size = 5.5,
+      color = "black"
+    ) +
     # Adjust legend position
-    theme(legend.position="top", legend.box = "horizontal") +
-    ## Add caption
-    # labs(caption = "Data")
-    # scale_x_discrete(limits = c("Any SN ", "Any SMN ", "NMSC ", "Breast cancer ", "Thyroid cancer ", "Meningioma ", "Sarcoma ")) +
+    theme(legend.position = "top", legend.box = "horizontal") +
+    # Additional adjustments
     scale_x_discrete(limits = order) +
-    ## Adjust the x-axis limits to ensure that the secondary y-axis label is fully visible.
     coord_cartesian(clip = "off")
+  p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
   
-  p <- p + scale_y_continuous(limits = c(0, 1))
+  p
   # Save the plot as a high-resolution image
   plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/male/", group, "_", AF.type, "_", lifestyle, ".tiff")
   
@@ -774,17 +680,7 @@ new_data$value <- as.numeric(new_data$value)
 
 # Reshape the data for ggplot2
 library(reshape2)
-# data_melted <- melt(data, id.vars = "SN_types")
-# data_melted
-# SN_types variable value
-# 1Any SN SJLIFE 0.518
-# 2 Any SMN SJLIFE 0.455
-# 3NMSC SJLIFE 0.652
 data_melted <-new_data
-## Exclude rows with NAs
-data_melted <- data_melted[complete.cases(data_melted),]
-
-# order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
 order <- unique(data_melted$SN_types)
 AF.type <- "treatment_PRS"
 lifestyle <- "without_lifestyle"
@@ -792,14 +688,7 @@ lifestyle <- "without_lifestyle"
 data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
 
 
-data_melted$new_value <- data_melted$value
-# data_melted <- data_melted %>%
-# group_by(SN_types, value) %>%
-# mutate(new_value = ifelse(row_number() == which.min(new_value), new_value, NA)) %>%
-# ungroup()
-
-
-
+data_melted$new_value <- round(data_melted$value,2)*100
 
 # Define custom colors and legend order
 custom_colors <- c("SJLIFE_PRS" = "#87CEFA", "CCSS_PRS" = "#FFA07A", "SJLIFE_All_treatments" = "#1E90FF", "CCSS_All_treatments" = "#FF6347")
@@ -807,21 +696,23 @@ legend_order <- c("SJLIFE_PRS", "CCSS_PRS", "SJLIFE_All_treatments", "CCSS_All_t
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
-# Define the order of x-axis categories
-x_order <- c("Any SN ", "Any SMN ", "NMSC ", "Thyroid cancer ", "Meningioma ", "Sarcoma ")
-
 # Create a factor with the desired order
-data_melted$SN_types <- factor(data_melted$SN_types, levels = x_order)
+data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
 
 # Create the grouped bar chart
 # Create the plot
-p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
-  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
+p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.8) +
   # Customize the theme and appearance
+  # geom_hline(yintercept = 0, color = "black", linetype = "solid", size = 0.7) +
+  # Add Y lines
+  # geom_vline(xintercept = 0.5, color = "black", linetype = "solid", size = 0.7) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 16, color = "black"),
         axis.text.y = element_text(size = 16, color = "black"),
-        axis.title.y = element_text(size = 20, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"), 
+        axis.line.x = element_line(color="black"), 
+        axis.line.y = element_line(color="black"),
         legend.title = element_blank(),
         legend.text = element_text(size = 16, color = "black"),
         plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
@@ -831,30 +722,23 @@ p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
   # Customize colors
   scale_fill_manual(values = custom_colors, breaks = legend_order) +
   
-  # Add labels with repelling
-  geom_text_repel(
-    data = data_melted %>% filter(!is.na(new_value)),
-    aes(label = sprintf("%.3f", new_value)),
+  # Add labels with geom_text
+  geom_text(
+    data = data_melted,
+    aes(label = new_value, y = new_value),  # Adjust y position
     position = position_dodge(width = 0.8),
-    vjust = 1.35,
-    hjust = 0.15,
+    vjust = -0.20,  # Adjust vertical justification
+    hjust = 0.5,  # Center text horizontally
     size = 5.5,
-    color = "black",
-    box.padding = 0.15,
-    force = 1,
-    segment.color = "transparent",
-    segment.size = 0,
-    fill = "white"
+    color = "black"
   ) +
-  
   # Adjust legend position
   theme(legend.position = "top", legend.box = "horizontal") +
-  
   # Additional adjustments
-  scale_x_discrete(limits = x_order) +
+  scale_x_discrete(limits = order) +
   coord_cartesian(clip = "off")
-
-p <- p + scale_y_continuous(limits = c(0, 1)) + labs(title = "", y = "Attributable fraction", x = NULL) 
+p
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
 p
 # Save the plot as a high-resolution image
 plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/male/", group, "_", AF.type,"_", lifestyle, ".tiff")
@@ -874,31 +758,13 @@ new_data$value <- as.numeric(new_data$value)
 
 # Reshape the data for ggplot2
 library(reshape2)
-# data_melted <- melt(data, id.vars = "SN_types")
-# data_melted
-# SN_types variable value
-# 1Any SN SJLIFE 0.518
-# 2 Any SMN SJLIFE 0.455
-# 3NMSC SJLIFE 0.652
 data_melted <-new_data
-## Exclude rows with NAs
-data_melted <- data_melted[complete.cases(data_melted),]
-
-# order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
+data_melted$new_value <- round(data_melted$value,2)*100
 order <- unique(data_melted$SN_types)
 AF.type <- "Chemo_Radiation"
 lifestyle <- "without_lifestyle"
 
 data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
-
-
-data_melted$new_value <- data_melted$value
-# data_melted <- data_melted %>%
-# group_by(SN_types, value) %>%
-# mutate(new_value = ifelse(row_number() == which.min(new_value), new_value, NA)) %>%
-# ungroup()
-
-
 
 
 # Define custom colors and legend order
@@ -908,20 +774,25 @@ legend_order <- c("SJLIFE_Chemo", "CCSS_Chemo", "SJLIFE_Radiation", "CCSS_Radiat
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
 # Define the order of x-axis categories
-x_order <- c("Any SN ", "Any SMN ", "NMSC ", "Thyroid cancer ", "Meningioma ", "Sarcoma ")
+order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
 
 # Create a factor with the desired order
-data_melted$SN_types <- factor(data_melted$SN_types, levels = x_order)
+data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
 
 # Create the grouped bar chart
 # Create the plot
-p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
-  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
+p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.8) +
   # Customize the theme and appearance
+  # geom_hline(yintercept = 0, color = "black", linetype = "solid", size = 0.7) +
+  # Add Y lines
+  # geom_vline(xintercept = 0.5, color = "black", linetype = "solid", size = 0.7) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 16, color = "black"),
         axis.text.y = element_text(size = 16, color = "black"),
-        axis.title.y = element_text(size = 20, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"), 
+        axis.line.x = element_line(color="black"), 
+        axis.line.y = element_line(color="black"),
         legend.title = element_blank(),
         legend.text = element_text(size = 16, color = "black"),
         plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
@@ -931,30 +802,24 @@ p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
   # Customize colors
   scale_fill_manual(values = custom_colors, breaks = legend_order) +
   
-  # Add labels with repelling
-  geom_text_repel(
-    data = data_melted %>% filter(!is.na(new_value)),
-    aes(label = sprintf("%.3f", new_value)),
+  # Add labels with geom_text
+  geom_text(
+    data = data_melted,
+    aes(label = new_value, y = new_value),  # Adjust y position
     position = position_dodge(width = 0.8),
-    vjust = 1.35,
-    hjust = 0.15,
+    vjust = -0.20,  # Adjust vertical justification
+    hjust = 0.5,  # Center text horizontally
     size = 5.5,
-    color = "black",
-    box.padding = 0.15,
-    force = 1,
-    segment.color = "transparent",
-    segment.size = 0,
-    fill = "white"
+    color = "black"
   ) +
-  
   # Adjust legend position
   theme(legend.position = "top", legend.box = "horizontal") +
-  
   # Additional adjustments
-  scale_x_discrete(limits = x_order) +
+  scale_x_discrete(limits = order) +
   coord_cartesian(clip = "off")
+p
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
 
-p <- p + scale_y_continuous(limits = c(0, 1)) + labs(title = "", y = "Attributable fraction", x = NULL) 
 p
 # Save the plot as a high-resolution image
 plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/male/", group, "_", AF.type,"_", lifestyle, ".tiff")
@@ -974,23 +839,13 @@ group <- "Age.lt.35"
 variables <- unique(data$Variables)
 
 for(i in 1:length(variables)){
-  new_data <- data[grepl(variables[i], data$Variables), c("Cohort", "SN_types", "Variables", group)]
-  colnames(new_data) <- c("variable", "SN_types", "AF_by", "value")
-  new_data$value <- as.numeric(new_data$value)
+  data_melted <- data[grepl(variables[i], data$Variables), c("Cohort", "SN_types", "Variables", group)]
+  colnames(data_melted) <- c("variable", "SN_types", "AF_by", "value")
+  data_melted$value <- as.numeric(data_melted$value); data_melted <- data_melted[complete.cases(data_melted),]
+  data_melted$new_value <- round(data_melted$value,2)*100
   
   # Reshape the data for ggplot2
   library(reshape2)
-  # data_melted <- melt(data, id.vars = "SN_types")
-  # data_melted
-  # SN_types variable value
-  # 1Any SN SJLIFE 0.518
-  # 2 Any SMN SJLIFE 0.455
-  # 3NMSC SJLIFE 0.652
-  data_melted <-new_data
-  ## Exclude rows with NAs
-  data_melted <- data_melted[complete.cases(data_melted),]
-  
-  # order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
   order <- unique(data_melted$SN_types)
   AF.type <- data_melted$AF_by[i] 
   lifestyle <- "without_lifestyle"
@@ -1000,46 +855,47 @@ for(i in 1:length(variables)){
   
   data_melted$legend_group <- factor(data_melted$variable, levels = c("SJLIFE", "CCSS"))
   
-  order <- unique(data_melted$SN_types)
-  AF.type <- data_melted$AF_by[i] 
-  lifestyle <- "without_lifestyle"
-  
-  
-  
-  # Create the grouped bar chart
-  p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
-    geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
+  p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
+    geom_bar(stat = "identity", position = position_dodge(width = 0.4), width = 0.4) +
     # Customize the theme and appearance
+    # # geom_hline(yintercept = seq(-0.1, 0.1, by = 0.1), color = "black", linetype = "solid", size = 0.7) +
+    # geom_hline(yintercept = 0, color = "black", linetype = "solid", size = 0.7) +
+    # Add Y lines
+    # # geom_vline(xintercept = seq(0.5, length(unique(data_melted$SN_types)) + 0.5), color = "black", linetype = "solid", size = 0.7) +
+    # geom_vline(xintercept = 0.5, color = "black", linetype = "solid", size = 0.7) +
     theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),# Adjust font size and angle
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 16, color = "black"),
           axis.text.y = element_text(size = 16, color = "black"),
-          axis.title.y = element_text(size = 20, color = "black"),# Customize Y-axis title
-          legend.title = element_blank(),# Remove legend title
-          legend.text = element_text(size = 16, color = "black"),# Adjust legend font size
-          plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),# Title formatting
-          panel.grid.major = element_blank(),# Remove major gridlines
-          panel.grid.minor = element_blank() # Remove minor gridlines
-          
-    ) +
+          axis.title.y = element_text(size = 20, color = "black"), 
+          axis.line.x = element_line(color="black"), 
+          axis.line.y = element_line(color="black"),
+          legend.title = element_blank(),
+          legend.text = element_text(size = 16, color = "black"),
+          plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
     
     # Customize colors
-    scale_fill_manual(values = c("SJLIFE" = "#1E90FF", "CCSS" = "#FF6347")) +# Use color codes
-    # Add labels
-    labs(title = "", y = "Attributable fraction", x = NULL) +
-    # Remove extra space at the bottom of the Y-axis
-    scale_y_continuous(expand = c(0, 0)) +
-    # Add data labels
-    geom_text(aes(label = sprintf("%.3f", value)), position = position_dodge(width = 0.8), vjust = -0.25, size = 5.5, color = "black") +
+    scale_fill_manual(values = custom_colors, breaks = legend_order) +
+    
+    # Add labels with geom_text
+    geom_text(
+      data = data_melted,
+      aes(label = new_value, y = new_value),  # Adjust y position
+      position = position_dodge(width = 0.3),
+      vjust = -0.20,  # Adjust vertical justification
+      hjust = 0.5,  # Center text horizontally
+      size = 5.5,
+      color = "black"
+    ) +
     # Adjust legend position
-    theme(legend.position="top", legend.box = "horizontal") +
-    ## Add caption
-    # labs(caption = "Data")
-    # scale_x_discrete(limits = c("Any SN ", "Any SMN ", "NMSC ", "Breast cancer ", "Thyroid cancer ", "Meningioma ", "Sarcoma ")) +
+    theme(legend.position = "top", legend.box = "horizontal") +
+    # Additional adjustments
     scale_x_discrete(limits = order) +
-    ## Adjust the x-axis limits to ensure that the secondary y-axis label is fully visible.
     coord_cartesian(clip = "off")
+  p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
   
-  p <- p + scale_y_continuous(limits = c(0, 1))
+  p
   # Save the plot as a high-resolution image
   plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/lt35/", group, "_", AF.type, "_", lifestyle, ".tiff")
   
@@ -1059,16 +915,7 @@ new_data$value <- as.numeric(new_data$value)
 
 # Reshape the data for ggplot2
 library(reshape2)
-# data_melted <- melt(data, id.vars = "SN_types")
-# data_melted
-# SN_types variable value
-# 1Any SN SJLIFE 0.518
-# 2 Any SMN SJLIFE 0.455
-# 3NMSC SJLIFE 0.652
 data_melted <-new_data
-## Exclude rows with NAs
-data_melted <- data_melted[complete.cases(data_melted),]
-
 # order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
 order <- unique(data_melted$SN_types)
 AF.type <- "treatment_PRS"
@@ -1077,14 +924,7 @@ lifestyle <- "without_lifestyle"
 data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
 
 
-data_melted$new_value <- data_melted$value
-# data_melted <- data_melted %>%
-# group_by(SN_types, value) %>%
-# mutate(new_value = ifelse(row_number() == which.min(new_value), new_value, NA)) %>%
-# ungroup()
-
-
-
+data_melted$new_value <- round(data_melted$value,2)*100
 
 # Define custom colors and legend order
 custom_colors <- c("SJLIFE_PRS" = "#87CEFA", "CCSS_PRS" = "#FFA07A", "SJLIFE_All_treatments" = "#1E90FF", "CCSS_All_treatments" = "#FF6347")
@@ -1093,20 +933,25 @@ legend_order <- c("SJLIFE_PRS", "CCSS_PRS", "SJLIFE_All_treatments", "CCSS_All_t
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
 # Define the order of x-axis categories
-x_order <- c("Any SN ", "Any SMN ", "NMSC ", "Breast cancer ", "Thyroid cancer ", "Meningioma ", "Sarcoma ")
+order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
 
 # Create a factor with the desired order
-data_melted$SN_types <- factor(data_melted$SN_types, levels = x_order)
+data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
 
 # Create the grouped bar chart
 # Create the plot
-p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
-  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
+p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.8) +
   # Customize the theme and appearance
+  # geom_hline(yintercept = 0, color = "black", linetype = "solid", size = 0.7) +
+  # Add Y lines
+  # geom_vline(xintercept = 0.5, color = "black", linetype = "solid", size = 0.7) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 16, color = "black"),
         axis.text.y = element_text(size = 16, color = "black"),
-        axis.title.y = element_text(size = 20, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"), 
+        axis.line.x = element_line(color="black"), 
+        axis.line.y = element_line(color="black"),
         legend.title = element_blank(),
         legend.text = element_text(size = 16, color = "black"),
         plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
@@ -1116,30 +961,23 @@ p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
   # Customize colors
   scale_fill_manual(values = custom_colors, breaks = legend_order) +
   
-  # Add labels with repelling
-  geom_text_repel(
-    data = data_melted %>% filter(!is.na(new_value)),
-    aes(label = sprintf("%.3f", new_value)),
+  # Add labels with geom_text
+  geom_text(
+    data = data_melted,
+    aes(label = new_value, y = new_value),  # Adjust y position
     position = position_dodge(width = 0.8),
-    vjust = 1.35,
-    hjust = 0.15,
+    vjust = -0.20,  # Adjust vertical justification
+    hjust = 0.5,  # Center text horizontally
     size = 5.5,
-    color = "black",
-    box.padding = 0.15,
-    force = 1,
-    segment.color = "transparent",
-    segment.size = 0,
-    fill = "white"
+    color = "black"
   ) +
-  
   # Adjust legend position
   theme(legend.position = "top", legend.box = "horizontal") +
-  
   # Additional adjustments
-  scale_x_discrete(limits = x_order) +
+  scale_x_discrete(limits = order) +
   coord_cartesian(clip = "off")
-
-p <- p + scale_y_continuous(limits = c(0, 1)) + labs(title = "", y = "Attributable fraction", x = NULL) 
+p
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
 p
 # Save the plot as a high-resolution image
 plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/lt35/", group, "_", AF.type,"_", lifestyle, ".tiff")
@@ -1159,31 +997,14 @@ new_data$value <- as.numeric(new_data$value)
 
 # Reshape the data for ggplot2
 library(reshape2)
-# data_melted <- melt(data, id.vars = "SN_types")
-# data_melted
-# SN_types variable value
-# 1Any SN SJLIFE 0.518
-# 2 Any SMN SJLIFE 0.455
-# 3NMSC SJLIFE 0.652
 data_melted <-new_data
-## Exclude rows with NAs
-data_melted <- data_melted[complete.cases(data_melted),]
 
-# order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
+data_melted$new_value <- round(data_melted$value,2)*100
 order <- unique(data_melted$SN_types)
 AF.type <- "Chemo_Radiation"
 lifestyle <- "without_lifestyle"
 
 data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
-
-
-data_melted$new_value <- data_melted$value
-# data_melted <- data_melted %>%
-# group_by(SN_types, value) %>%
-# mutate(new_value = ifelse(row_number() == which.min(new_value), new_value, NA)) %>%
-# ungroup()
-
-
 
 
 # Define custom colors and legend order
@@ -1193,20 +1014,25 @@ legend_order <- c("SJLIFE_Chemo", "CCSS_Chemo", "SJLIFE_Radiation", "CCSS_Radiat
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
 # Define the order of x-axis categories
-x_order <- c("Any SN ", "Any SMN ", "NMSC ", "Breast cancer ", "Thyroid cancer ", "Meningioma ", "Sarcoma ")
+order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
 
 # Create a factor with the desired order
-data_melted$SN_types <- factor(data_melted$SN_types, levels = x_order)
+data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
 
 # Create the grouped bar chart
 # Create the plot
-p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
-  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
+p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.8) +
   # Customize the theme and appearance
+  # geom_hline(yintercept = 0, color = "black", linetype = "solid", size = 0.7) +
+  # Add Y lines
+  # geom_vline(xintercept = 0.5, color = "black", linetype = "solid", size = 0.7) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 16, color = "black"),
         axis.text.y = element_text(size = 16, color = "black"),
-        axis.title.y = element_text(size = 20, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"), 
+        axis.line.x = element_line(color="black"), 
+        axis.line.y = element_line(color="black"),
         legend.title = element_blank(),
         legend.text = element_text(size = 16, color = "black"),
         plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
@@ -1216,30 +1042,24 @@ p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
   # Customize colors
   scale_fill_manual(values = custom_colors, breaks = legend_order) +
   
-  # Add labels with repelling
-  geom_text_repel(
-    data = data_melted %>% filter(!is.na(new_value)),
-    aes(label = sprintf("%.3f", new_value)),
+  # Add labels with geom_text
+  geom_text(
+    data = data_melted,
+    aes(label = new_value, y = new_value),  # Adjust y position
     position = position_dodge(width = 0.8),
-    vjust = 1.35,
-    hjust = 0.15,
+    vjust = -0.20,  # Adjust vertical justification
+    hjust = 0.5,  # Center text horizontally
     size = 5.5,
-    color = "black",
-    box.padding = 0.15,
-    force = 1,
-    segment.color = "transparent",
-    segment.size = 0,
-    fill = "white"
+    color = "black"
   ) +
-  
   # Adjust legend position
   theme(legend.position = "top", legend.box = "horizontal") +
-  
   # Additional adjustments
-  scale_x_discrete(limits = x_order) +
+  scale_x_discrete(limits = order) +
   coord_cartesian(clip = "off")
+p
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
 
-p <- p + scale_y_continuous(limits = c(0, 1)) + labs(title = "", y = "Attributable fraction", x = NULL) 
 p
 # Save the plot as a high-resolution image
 plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/lt35/", group, "_", AF.type,"_", lifestyle, ".tiff")
@@ -1258,23 +1078,14 @@ group <- "Age.ge.35"
 variables <- unique(data$Variables)
 
 for(i in 1:length(variables)){
-  new_data <- data[grepl(variables[i], data$Variables), c("Cohort", "SN_types", "Variables", group)]
-  colnames(new_data) <- c("variable", "SN_types", "AF_by", "value")
-  new_data$value <- as.numeric(new_data$value)
+  data_melted <- data[grepl(variables[i], data$Variables), c("Cohort", "SN_types", "Variables", group)]
+  colnames(data_melted) <- c("variable", "SN_types", "AF_by", "value")
+  data_melted$value <- as.numeric(data_melted$value); data_melted <- data_melted[complete.cases(data_melted),]
+  data_melted$new_value <- round(data_melted$value,2)*100
   
   # Reshape the data for ggplot2
   library(reshape2)
-  # data_melted <- melt(data, id.vars = "SN_types")
-  # data_melted
-  # SN_types variable value
-  # 1Any SN SJLIFE 0.518
-  # 2 Any SMN SJLIFE 0.455
-  # 3NMSC SJLIFE 0.652
-  data_melted <-new_data
-  ## Exclude rows with NAs
-  data_melted <- data_melted[complete.cases(data_melted),]
-  
-  # order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
+
   order <- unique(data_melted$SN_types)
   AF.type <- data_melted$AF_by[i] 
   lifestyle <- "without_lifestyle"
@@ -1284,46 +1095,47 @@ for(i in 1:length(variables)){
   
   data_melted$legend_group <- factor(data_melted$variable, levels = c("SJLIFE", "CCSS"))
   
-  order <- unique(data_melted$SN_types)
-  AF.type <- data_melted$AF_by[i] 
-  lifestyle <- "without_lifestyle"
-  
-  
-  
-  # Create the grouped bar chart
-  p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
-    geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
+  p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
+    geom_bar(stat = "identity", position = position_dodge(width = 0.4), width = 0.4) +
     # Customize the theme and appearance
+    # # geom_hline(yintercept = seq(-0.1, 0.1, by = 0.1), color = "black", linetype = "solid", size = 0.7) +
+    # geom_hline(yintercept = 0, color = "black", linetype = "solid", size = 0.7) +
+    # Add Y lines
+    # # geom_vline(xintercept = seq(0.5, length(unique(data_melted$SN_types)) + 0.5), color = "black", linetype = "solid", size = 0.7) +
+    # geom_vline(xintercept = 0.5, color = "black", linetype = "solid", size = 0.7) +
     theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),# Adjust font size and angle
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 16, color = "black"),
           axis.text.y = element_text(size = 16, color = "black"),
-          axis.title.y = element_text(size = 20, color = "black"),# Customize Y-axis title
-          legend.title = element_blank(),# Remove legend title
-          legend.text = element_text(size = 16, color = "black"),# Adjust legend font size
-          plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),# Title formatting
-          panel.grid.major = element_blank(),# Remove major gridlines
-          panel.grid.minor = element_blank() # Remove minor gridlines
-          
-    ) +
+          axis.title.y = element_text(size = 20, color = "black"), 
+          axis.line.x = element_line(color="black"), 
+          axis.line.y = element_line(color="black"),
+          legend.title = element_blank(),
+          legend.text = element_text(size = 16, color = "black"),
+          plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
     
     # Customize colors
-    scale_fill_manual(values = c("SJLIFE" = "#1E90FF", "CCSS" = "#FF6347")) +# Use color codes
-    # Add labels
-    labs(title = "", y = "Attributable fraction", x = NULL) +
-    # Remove extra space at the bottom of the Y-axis
-    scale_y_continuous(expand = c(0, 0)) +
-    # Add data labels
-    geom_text(aes(label = sprintf("%.3f", value)), position = position_dodge(width = 0.8), vjust = -0.25, size = 5.5, color = "black") +
+    scale_fill_manual(values = custom_colors, breaks = legend_order) +
+    
+    # Add labels with geom_text
+    geom_text(
+      data = data_melted,
+      aes(label = new_value, y = new_value),  # Adjust y position
+      position = position_dodge(width = 0.3),
+      vjust = -0.20,  # Adjust vertical justification
+      hjust = 0.5,  # Center text horizontally
+      size = 5.5,
+      color = "black"
+    ) +
     # Adjust legend position
-    theme(legend.position="top", legend.box = "horizontal") +
-    ## Add caption
-    # labs(caption = "Data")
-    # scale_x_discrete(limits = c("Any SN ", "Any SMN ", "NMSC ", "Breast cancer ", "Thyroid cancer ", "Meningioma ", "Sarcoma ")) +
+    theme(legend.position = "top", legend.box = "horizontal") +
+    # Additional adjustments
     scale_x_discrete(limits = order) +
-    ## Adjust the x-axis limits to ensure that the secondary y-axis label is fully visible.
     coord_cartesian(clip = "off")
+  p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
   
-  p <- p + scale_y_continuous(limits = c(0, 1))
+  p
   # Save the plot as a high-resolution image
   plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/ge35/", group, "_", AF.type, "_", lifestyle, ".tiff")
   
@@ -1343,17 +1155,8 @@ new_data$value <- as.numeric(new_data$value)
 
 # Reshape the data for ggplot2
 library(reshape2)
-# data_melted <- melt(data, id.vars = "SN_types")
-# data_melted
-# SN_types variable value
-# 1Any SN SJLIFE 0.518
-# 2 Any SMN SJLIFE 0.455
-# 3NMSC SJLIFE 0.652
-data_melted <-new_data
-## Exclude rows with NAs
-data_melted <- data_melted[complete.cases(data_melted),]
 
-# order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
+data_melted <-new_data
 order <- unique(data_melted$SN_types)
 AF.type <- "treatment_PRS"
 lifestyle <- "without_lifestyle"
@@ -1361,14 +1164,7 @@ lifestyle <- "without_lifestyle"
 data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
 
 
-data_melted$new_value <- data_melted$value
-# data_melted <- data_melted %>%
-# group_by(SN_types, value) %>%
-# mutate(new_value = ifelse(row_number() == which.min(new_value), new_value, NA)) %>%
-# ungroup()
-
-
-
+data_melted$new_value <- round(data_melted$value,2)*100
 
 # Define custom colors and legend order
 custom_colors <- c("SJLIFE_PRS" = "#87CEFA", "CCSS_PRS" = "#FFA07A", "SJLIFE_All_treatments" = "#1E90FF", "CCSS_All_treatments" = "#FF6347")
@@ -1377,20 +1173,25 @@ legend_order <- c("SJLIFE_PRS", "CCSS_PRS", "SJLIFE_All_treatments", "CCSS_All_t
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
 # Define the order of x-axis categories
-x_order <- c("Any SN ", "Any SMN ", "NMSC ", "Breast cancer ", "Thyroid cancer ", "Meningioma ", "Sarcoma ")
+order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
 
 # Create a factor with the desired order
-data_melted$SN_types <- factor(data_melted$SN_types, levels = x_order)
+data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
 
 # Create the grouped bar chart
 # Create the plot
-p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
-  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
+p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.8) +
   # Customize the theme and appearance
+  # geom_hline(yintercept = 0, color = "black", linetype = "solid", size = 0.7) +
+  # Add Y lines
+  # geom_vline(xintercept = 0.5, color = "black", linetype = "solid", size = 0.7) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 16, color = "black"),
         axis.text.y = element_text(size = 16, color = "black"),
-        axis.title.y = element_text(size = 20, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"), 
+        axis.line.x = element_line(color="black"), 
+        axis.line.y = element_line(color="black"),
         legend.title = element_blank(),
         legend.text = element_text(size = 16, color = "black"),
         plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
@@ -1400,30 +1201,23 @@ p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
   # Customize colors
   scale_fill_manual(values = custom_colors, breaks = legend_order) +
   
-  # Add labels with repelling
-  geom_text_repel(
-    data = data_melted %>% filter(!is.na(new_value)),
-    aes(label = sprintf("%.3f", new_value)),
+  # Add labels with geom_text
+  geom_text(
+    data = data_melted,
+    aes(label = new_value, y = new_value),  # Adjust y position
     position = position_dodge(width = 0.8),
-    vjust = 1.35,
-    hjust = 0.15,
+    vjust = -0.20,  # Adjust vertical justification
+    hjust = 0.5,  # Center text horizontally
     size = 5.5,
-    color = "black",
-    box.padding = 0.15,
-    force = 1,
-    segment.color = "transparent",
-    segment.size = 0,
-    fill = "white"
+    color = "black"
   ) +
-  
   # Adjust legend position
   theme(legend.position = "top", legend.box = "horizontal") +
-  
   # Additional adjustments
-  scale_x_discrete(limits = x_order) +
+  scale_x_discrete(limits = order) +
   coord_cartesian(clip = "off")
-
-p <- p + scale_y_continuous(limits = c(0, 1)) + labs(title = "", y = "Attributable fraction", x = NULL) 
+p
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
 p
 # Save the plot as a high-resolution image
 plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/ge35/", group, "_", AF.type,"_", lifestyle, ".tiff")
@@ -1443,31 +1237,14 @@ new_data$value <- as.numeric(new_data$value)
 
 # Reshape the data for ggplot2
 library(reshape2)
-# data_melted <- melt(data, id.vars = "SN_types")
-# data_melted
-# SN_types variable value
-# 1Any SN SJLIFE 0.518
-# 2 Any SMN SJLIFE 0.455
-# 3NMSC SJLIFE 0.652
 data_melted <-new_data
-## Exclude rows with NAs
-data_melted <- data_melted[complete.cases(data_melted),]
+data_melted$new_value <- round(data_melted$value,2)*100
 
-# order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
 order <- unique(data_melted$SN_types)
 AF.type <- "Chemo_Radiation"
 lifestyle <- "without_lifestyle"
 
 data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
-
-
-data_melted$new_value <- data_melted$value
-# data_melted <- data_melted %>%
-# group_by(SN_types, value) %>%
-# mutate(new_value = ifelse(row_number() == which.min(new_value), new_value, NA)) %>%
-# ungroup()
-
-
 
 
 # Define custom colors and legend order
@@ -1477,20 +1254,25 @@ legend_order <- c("SJLIFE_Chemo", "CCSS_Chemo", "SJLIFE_Radiation", "CCSS_Radiat
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
 # Define the order of x-axis categories
-x_order <- c("Any SN ", "Any SMN ", "NMSC ", "Breast cancer ", "Thyroid cancer ", "Meningioma ", "Sarcoma ")
+order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
 
 # Create a factor with the desired order
-data_melted$SN_types <- factor(data_melted$SN_types, levels = x_order)
+data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
 
 # Create the grouped bar chart
 # Create the plot
-p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
-  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.6) +
+p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.8) +
   # Customize the theme and appearance
+  # geom_hline(yintercept = 0, color = "black", linetype = "solid", size = 0.7) +
+  # Add Y lines
+  # geom_vline(xintercept = 0.5, color = "black", linetype = "solid", size = 0.7) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 16, color = "black"),
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 16, color = "black"),
         axis.text.y = element_text(size = 16, color = "black"),
-        axis.title.y = element_text(size = 20, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"), 
+        axis.line.x = element_line(color="black"), 
+        axis.line.y = element_line(color="black"),
         legend.title = element_blank(),
         legend.text = element_text(size = 16, color = "black"),
         plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
@@ -1500,30 +1282,24 @@ p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
   # Customize colors
   scale_fill_manual(values = custom_colors, breaks = legend_order) +
   
-  # Add labels with repelling
-  geom_text_repel(
-    data = data_melted %>% filter(!is.na(new_value)),
-    aes(label = sprintf("%.3f", new_value)),
+  # Add labels with geom_text
+  geom_text(
+    data = data_melted,
+    aes(label = new_value, y = new_value),  # Adjust y position
     position = position_dodge(width = 0.8),
-    vjust = 1.35,
-    hjust = 0.15,
+    vjust = -0.20,  # Adjust vertical justification
+    hjust = 0.5,  # Center text horizontally
     size = 5.5,
-    color = "black",
-    box.padding = 0.15,
-    force = 1,
-    segment.color = "transparent",
-    segment.size = 0,
-    fill = "white"
+    color = "black"
   ) +
-  
   # Adjust legend position
   theme(legend.position = "top", legend.box = "horizontal") +
-  
   # Additional adjustments
-  scale_x_discrete(limits = x_order) +
+  scale_x_discrete(limits = order) +
   coord_cartesian(clip = "off")
+p
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
 
-p <- p + scale_y_continuous(limits = c(0, 1)) + labs(title = "", y = "Attributable fraction", x = NULL) 
 p
 # Save the plot as a high-resolution image
 plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/ge35/", group, "_", AF.type,"_", lifestyle, ".tiff")
