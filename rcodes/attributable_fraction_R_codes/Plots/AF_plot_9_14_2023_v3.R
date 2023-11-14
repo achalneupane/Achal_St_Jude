@@ -129,6 +129,8 @@ next
 
 data_melted$legend_group <- factor(data_melted$variable, levels = c("SJLIFE", "CCSS"))
 
+# Create a factor with the desired order
+data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
 
 
 
@@ -200,7 +202,6 @@ lifestyle <- "without_lifestyle"
 
 data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
 
-
 data_melted$new_value <- round(data_melted$value,2)*100
 
 
@@ -209,9 +210,9 @@ custom_colors <- c("SJLIFE_PRS" = "#87CEFA", "CCSS_PRS" = "#FFA07A", "SJLIFE_All
 legend_order <- c("SJLIFE_PRS", "CCSS_PRS", "SJLIFE_All_treatments", "CCSS_All_treatments")
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
-
 # Create a factor with the desired order
-data_melted$SN_types <- factor(order, levels = order)
+data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
+
 
 p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.8) +
@@ -288,9 +289,6 @@ legend_order <- c("SJLIFE_Chemo", "CCSS_Chemo", "SJLIFE_Radiation", "CCSS_Radiat
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
-# Define the order of x-axis categories
-order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
-
 # Create a factor with the desired order
 data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
 
@@ -355,6 +353,9 @@ data <- saved.data
 group <- "Female"
 variables <- unique(data$Variables)
 
+custom_colors <- c("SJLIFE" = "#1E90FF", "CCSS" = "#FF6347")
+legend_order <- c("SJLIFE", "CCSS")
+
 for(i in 1:length(variables)){
   data_melted <- data[grepl(variables[i], data$Variables), c("Cohort", "SN_types", "Variables", group)]
   colnames(data_melted) <- c("variable", "SN_types", "AF_by", "value")
@@ -371,6 +372,9 @@ for(i in 1:length(variables)){
   }
   
   data_melted$legend_group <- factor(data_melted$variable, levels = c("SJLIFE", "CCSS"))
+  # Create a factor with the desired order
+  data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
+  
   
   p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
     geom_bar(stat = "identity", position = position_dodge(width = 0.4), width = 0.4) +
@@ -450,9 +454,6 @@ legend_order <- c("SJLIFE_PRS", "CCSS_PRS", "SJLIFE_All_treatments", "CCSS_All_t
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
-# Define the order of x-axis categories
-order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
-
 # Create a factor with the desired order
 data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
 
@@ -532,9 +533,6 @@ legend_order <- c("SJLIFE_Chemo", "CCSS_Chemo", "SJLIFE_Radiation", "CCSS_Radiat
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
-# Define the order of x-axis categories
-order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
-
 # Create a factor with the desired order
 data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
 
@@ -597,6 +595,9 @@ data <- saved.data
 group <- "Male"
 variables <- unique(data$Variables)
 
+custom_colors <- c("SJLIFE" = "#1E90FF", "CCSS" = "#FF6347")
+legend_order <- c("SJLIFE", "CCSS")
+
 for(i in 1:length(variables)){
   data_melted <- data[grepl(variables[i], data$Variables), c("Cohort", "SN_types", "Variables", group)]
   colnames(data_melted) <- c("variable", "SN_types", "AF_by", "value")
@@ -617,6 +618,8 @@ for(i in 1:length(variables)){
   
   data_melted$legend_group <- factor(data_melted$variable, levels = c("SJLIFE", "CCSS"))
   
+  # Create a factor with the desired order
+  data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
   
   
   
@@ -681,6 +684,8 @@ new_data$value <- as.numeric(new_data$value)
 # Reshape the data for ggplot2
 library(reshape2)
 data_melted <-new_data
+data_melted <- data_melted[!grepl("Breast", data_melted$SN_types),]
+
 order <- unique(data_melted$SN_types)
 AF.type <- "treatment_PRS"
 lifestyle <- "without_lifestyle"
@@ -698,6 +703,7 @@ data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_ord
 
 # Create a factor with the desired order
 data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
+
 
 # Create the grouped bar chart
 # Create the plot
@@ -759,6 +765,7 @@ new_data$value <- as.numeric(new_data$value)
 # Reshape the data for ggplot2
 library(reshape2)
 data_melted <-new_data
+data_melted <- data_melted[!grepl("Breast", data_melted$SN_types),]
 data_melted$new_value <- round(data_melted$value,2)*100
 order <- unique(data_melted$SN_types)
 AF.type <- "Chemo_Radiation"
@@ -772,9 +779,6 @@ custom_colors <- c("SJLIFE_Chemo" = "#87CEFA", "CCSS_Chemo" = "#FFA07A", "SJLIFE
 legend_order <- c("SJLIFE_Chemo", "CCSS_Chemo", "SJLIFE_Radiation", "CCSS_Radiation")
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
-
-# Define the order of x-axis categories
-order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
 
 # Create a factor with the desired order
 data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
@@ -838,6 +842,9 @@ data <- saved.data
 group <- "Age.lt.35"
 variables <- unique(data$Variables)
 
+custom_colors <- c("SJLIFE" = "#1E90FF", "CCSS" = "#FF6347")
+legend_order <- c("SJLIFE", "CCSS")
+
 for(i in 1:length(variables)){
   data_melted <- data[grepl(variables[i], data$Variables), c("Cohort", "SN_types", "Variables", group)]
   colnames(data_melted) <- c("variable", "SN_types", "AF_by", "value")
@@ -854,6 +861,9 @@ for(i in 1:length(variables)){
   }
   
   data_melted$legend_group <- factor(data_melted$variable, levels = c("SJLIFE", "CCSS"))
+  # Create a factor with the desired order
+  data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
+  
   
   p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
     geom_bar(stat = "identity", position = position_dodge(width = 0.4), width = 0.4) +
@@ -932,9 +942,6 @@ legend_order <- c("SJLIFE_PRS", "CCSS_PRS", "SJLIFE_All_treatments", "CCSS_All_t
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
-# Define the order of x-axis categories
-order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
-
 # Create a factor with the desired order
 data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
 
@@ -1013,9 +1020,6 @@ legend_order <- c("SJLIFE_Chemo", "CCSS_Chemo", "SJLIFE_Radiation", "CCSS_Radiat
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
-# Define the order of x-axis categories
-order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
-
 # Create a factor with the desired order
 data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
 
@@ -1077,6 +1081,9 @@ data <- saved.data
 group <- "Age.ge.35"
 variables <- unique(data$Variables)
 
+custom_colors <- c("SJLIFE" = "#1E90FF", "CCSS" = "#FF6347")
+legend_order <- c("SJLIFE", "CCSS")
+
 for(i in 1:length(variables)){
   data_melted <- data[grepl(variables[i], data$Variables), c("Cohort", "SN_types", "Variables", group)]
   colnames(data_melted) <- c("variable", "SN_types", "AF_by", "value")
@@ -1094,6 +1101,9 @@ for(i in 1:length(variables)){
   }
   
   data_melted$legend_group <- factor(data_melted$variable, levels = c("SJLIFE", "CCSS"))
+  # Create a factor with the desired order
+  data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
+  
   
   p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
     geom_bar(stat = "identity", position = position_dodge(width = 0.4), width = 0.4) +
@@ -1172,9 +1182,6 @@ legend_order <- c("SJLIFE_PRS", "CCSS_PRS", "SJLIFE_All_treatments", "CCSS_All_t
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
-# Define the order of x-axis categories
-order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
-
 # Create a factor with the desired order
 data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
 
@@ -1252,9 +1259,6 @@ custom_colors <- c("SJLIFE_Chemo" = "#87CEFA", "CCSS_Chemo" = "#FFA07A", "SJLIFE
 legend_order <- c("SJLIFE_Chemo", "CCSS_Chemo", "SJLIFE_Radiation", "CCSS_Radiation")
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
-
-# Define the order of x-axis categories
-order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
 
 # Create a factor with the desired order
 data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
