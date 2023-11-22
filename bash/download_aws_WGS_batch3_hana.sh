@@ -1,7 +1,9 @@
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/CAB/common/WGS_Northwestern/WGS_batch_3/F23A480000289_HOMvrpzR
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/CAB/common/WGS_Northwestern/WGS_batch_3
 ## download files
+module load aws-cli
+aws configure
 aws s3 cp s3://homvrpzr-030971057479 . --recursive
-
+aws s3 cp s3://hombzsyr-598731762349 . --recursive
 ## Check md5
 find . -type f -exec md5sum {} \; | awk '{print $2, $1}' >>../../../F23A480000289_HOMvrpzR/achal_md5_sum.txt
 
@@ -69,16 +71,16 @@ KG34_C1_P20
 
 
 
-for line in $(cat eqtl_hiPSC.list); do
+for line in $(cat eqtl_hiPSC.txt); do
 find . -type d | grep $line
 done
 
 while read -r line; do
   find . -type d | grep  "$line" 
-done < eqtl_hiPSC.list
+done < eqtl_hiPSC.txt
 
 
-while read -r line; do   find . -type d | grep -v eQTL_hiPSC| grep  "$line" ; done < eqtl_hiPSC.list >> all.files.found.txt
+while read -r line; do   find . -type d | grep -v eQTL_hiPSC| grep  "$line" ; done < eqtl_hiPSC.txt >> all.files.found.txt
 
 
 "KG09/KG18" "SC06"      "SC28"      "SC30"      "SC35"      "JR01/JR04" "JR06/JR61" "JR54"      "JR63"      "SC38" 
@@ -88,3 +90,63 @@ Response from Hana:
 SC06 is SC6
 JR54 missing in BGI
 SC28 missing in BGI
+
+
+################################
+# <R>
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/CAB/common/WGS_Northwestern/")
+
+df <- read.delim("WGS_Northwestern_eQTL.txt", header = T, sep = "\t", check.names = F)
+head(df)
+df$ShortName <- sapply(strsplit(df$FULLPATH, "/"), function(x) tail(x, 1))
+table(df$ShortName == df$`Sample name`) ## all should be true
+
+for(i in 1:nrow(df)){
+directory_path <- gsub("/research_jude/rgs01_jude/groups", "/z/ResearchHome/Groups", df$FULLPATH[i])
+files <- system(paste("ls", shQuote(directory_path)), intern = TRUE)
+print(paste0("********DOing i : ", i, " has total files: " , length(files)))
+Sys.sleep(1)
+}
+
+
+## Check if all samples are available for eQTL
+df2 <- read.table("eqtl_hiPSC.txt")
+dim(df2)
+# 100
+
+# Remove everything after the first occurrence of "_" or "-"
+df$ShortName <- sub("[-_].*", "", df$ShortName)
+
+sum(df2$V1 %in% df$ShortName)
+
+df2$V1[!df2$V1 %in% df$ShortName]
+
+df2$V1[df2$V1 == "KG09/KG18"] <- "KG09"
+df2$V1[df2$V1 == "SC06" ] <- "SC6"
+df2$V1[df2$V1 == "JR01/JR04" ] <- "JR01"
+df2$V1[df2$V1 == "JR06/JR61" ] <- "JR06"
+
+df2$V1[!df2$V1 %in% df$ShortName]
+
+sum(df2$V1 %in% df$ShortName)
+## 100
+df2$match <- df$`Sample name`[match(df2$V1, df$ShortName)]
+
+length(df$`Sample name`)
+length(unique((df$`Sample name`)))
+####################################
+
+# for file in $(ls *L01_104_1.fq.gz*); do
+# echo "Doing ${file}"
+# file1=${file}
+# file2=$(echo ${file1} | sed 's/_1\.fq\.gz/_2.fq.gz/')
+# zcat ${file1}| wc -l; zcat ${file2}| wc -l
+# done
+
+for file in $(ls *L01_124_1.fq.gz); do
+echo "Doing ${file}"
+file1=${file}
+file2=$(echo ${file1} | sed 's/_1\.fq\.gz/_2.fq.gz/')
+md5sum ${file1}
+md5sum ${file2}
+done
