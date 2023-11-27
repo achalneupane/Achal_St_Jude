@@ -29,7 +29,7 @@ fit_all = glm(formula = event ~ Meningioma_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + 
                 maxsegrtdose.category + epitxn_dose_5.category + 
-                EAS + AFR +
+                # EAS + AFR +
                 any_chemo_missing + any_rt_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 

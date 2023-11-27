@@ -25,7 +25,7 @@ fit_all = glm(formula = event ~ Sarcoma_Machiela_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 gender + 
                 aa_class_dose_5.category +
-                EAS + AFR + 
+                # EAS + AFR + 
                 any_chemo_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
