@@ -32,7 +32,7 @@ SERUM <- SERUM %>%
 # read CTCAE
 # CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
 CTCAE <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
-# CTCAE.original <- CTCAE
+CTCAE.original <- CTCAE
 CTCAE <- CTCAE.original[c("sjlid", "studypop", "sjlife_cohort", "gender", "organsys", "condition", "gradedt", "grade", "ageevent")]
 # CTCAE.original.2 <- CTCAE.original[c("sjlid", "studypop", "sjlife_cohort", "gender", "organsys", "condition", "gradedt", "grade", "ageevent")]
 ## Since Trans-omics CMP ageatsample is in one decimal, I am coverting CTCAE age also to one decimal place.
