@@ -42,6 +42,28 @@ CTCAE.serum.1 <- CTCAE.serum[CTCAE.serum$anthracyclines_dose_any > 0 | CTCAE.ser
 table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade)
 table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade >= 2)
 
+## break down exposed to either anthracyclines or chest radiation by race
+CTCAE.serum.1$race_group [CTCAE.serum.1$race =="White"] <- "White"
+CTCAE.serum.1$race_group [CTCAE.serum.1$race =="Black"] <- "Black"
+CTCAE.serum.1$race_group[is.na(CTCAE.serum.1$race_group)] <- "Other"
+table(CTCAE.serum.1$race_group)
+
+## Only in White
+CTCAE.serum.1.w <- CTCAE.serum.1[CTCAE.serum.1$race_group =="White",]
+table(CTCAE.serum.1.w$new_event_number,CTCAE.serum.1.w$grade)
+table(CTCAE.serum.1.w$new_event_number,CTCAE.serum.1.w$grade >= 2)
+
+## Only in Black
+CTCAE.serum.1.w <- CTCAE.serum.1[CTCAE.serum.1$race_group =="Black",]
+table(CTCAE.serum.1.w$new_event_number,CTCAE.serum.1.w$grade)
+table(CTCAE.serum.1.w$new_event_number,CTCAE.serum.1.w$grade >= 2)
+
+## Only in other races
+CTCAE.serum.1.w <- CTCAE.serum.1[CTCAE.serum.1$race_group =="Other",]
+table(CTCAE.serum.1.w$new_event_number,CTCAE.serum.1.w$grade)
+table(CTCAE.serum.1.w$new_event_number,CTCAE.serum.1.w$grade >= 2)
+
+
 ## exposed to anthracyclines with chest RT
 CTCAE.serum.4 <- CTCAE.serum[CTCAE.serum$anthracyclines_dose_any > 0 & CTCAE.serum$maxchestrtdose > 200,]
 table(CTCAE.serum.4$new_event_number,CTCAE.serum.4$grade)
@@ -63,7 +85,7 @@ table(CTCAE.serum.6$new_event_number,CTCAE.serum.6$grade)
 table(CTCAE.serum.6$new_event_number,CTCAE.serum.6$grade >= 2)
 
 
-## break down exposed to anthracyclines regardless of chest RT
+## break down exposed to anthracyclines regardless of chest RT by race
 CTCAE.serum.6$race_group [CTCAE.serum.6$race =="White"] <- "White"
 CTCAE.serum.6$race_group [CTCAE.serum.6$race =="Black"] <- "Black"
 CTCAE.serum.6$race_group[is.na(CTCAE.serum.6$race_group)] <- "Other"
@@ -170,6 +192,29 @@ table(CTCAE.serum$new_event_number, CTCAE.serum$grade)
 CTCAE.serum.1 <- CTCAE.serum[CTCAE.serum$anthracyclines_dose_any > 0 | CTCAE.serum$maxchestrtdose > 200,]
 table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade)
 table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade >= 2)
+
+
+## break down exposed to either anthracyclines or chest radiation by race
+CTCAE.serum.1$race_group [CTCAE.serum.1$race =="White"] <- "White"
+CTCAE.serum.1$race_group [CTCAE.serum.1$race =="Black"] <- "Black"
+CTCAE.serum.1$race_group[is.na(CTCAE.serum.1$race_group)] <- "Other"
+table(CTCAE.serum.1$race_group)
+
+## Only in White
+CTCAE.serum.1.w <- CTCAE.serum.1[CTCAE.serum.1$race_group =="White",]
+table(CTCAE.serum.1.w$new_event_number,CTCAE.serum.1.w$grade)
+table(CTCAE.serum.1.w$new_event_number,CTCAE.serum.1.w$grade >= 2)
+
+## Only in Black
+CTCAE.serum.1.w <- CTCAE.serum.1[CTCAE.serum.1$race_group =="Black",]
+table(CTCAE.serum.1.w$new_event_number,CTCAE.serum.1.w$grade)
+table(CTCAE.serum.1.w$new_event_number,CTCAE.serum.1.w$grade >= 2)
+
+## Only in other races
+CTCAE.serum.1.w <- CTCAE.serum.1[CTCAE.serum.1$race_group =="Other",]
+table(CTCAE.serum.1.w$new_event_number,CTCAE.serum.1.w$grade)
+table(CTCAE.serum.1.w$new_event_number,CTCAE.serum.1.w$grade >= 2)
+
 
 ## exposed to anthracyclines with chest RT
 CTCAE.serum.4 <- CTCAE.serum[CTCAE.serum$anthracyclines_dose_any > 0 & CTCAE.serum$maxchestrtdose > 200,]
