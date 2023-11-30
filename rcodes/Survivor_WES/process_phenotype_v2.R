@@ -15,7 +15,7 @@ CTCAE.data <- CTCAE.data[-which(CTCAE.data$grade==-9),]
 cc <- CTCAE.data[1:30, 1:11]
 
 
-# Filter rows where all grades are zero: if all grades are zero, get the row with the max gradedt
+# Filter rows where all grades are zero: if all grades are zero, get the row with the max gradedt (i.e., latest grade date)
 result_zero <- CTCAE.data %>%
   group_by(sjlid, condition) %>%
   filter(all(grade == 0)) %>%
@@ -55,3 +55,24 @@ CTCAE.data.3 <- CTCAE.data.2 %>%
 
 ## Display the wide format result
 # CTCAE.data.3
+
+CTCAE.data.4 <- CTCAE.data.3 %>%
+  mutate(across(contains("_grade"), 
+                ~case_when(
+                  . == 0 ~ "0",
+                  . >= 2 ~ "1",
+                  TRUE ~ NA_character_
+                ),
+                .names = "{str_remove(.col, '_grade')}_status_0_vs_2")) %>%
+  select(c(all_of(first_columns), sort(names(.))))
+
+
+CTCAE.data.4 <- CTCAE.data.4 %>%
+  mutate(across(contains("_grade"), 
+                ~case_when(
+                  . == 0 ~ "0",
+                  . >= 3 ~ "1",
+                  TRUE ~ NA_character_
+                ),
+                .names = "{str_remove(.col, '_grade')}_status_0_vs_3")) %>%
+  select(c(all_of(first_columns), sort(names(.))))
