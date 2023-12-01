@@ -98,6 +98,9 @@ demographics <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Fi
 # CTCAE.data.4$gender1 <- demographics$gender[match(CTCAE.data.4$sjlid, demographics$sjlid)]
 CTCAE.data.4$race <- demographics$race[match(CTCAE.data.4$sjlid, demographics$sjlid)]
 
+diagnosis <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/diagnosis.sas7bdat')
+CTCAE.data.4$agedx <- diagnosis$agedx[match(CTCAE.data.4$sjlid, diagnosis$sjlid)]
+
 chemo <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/chemosum_dose.sas7bdat')
 radiation <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/radiation_dosimetry.sas7bdat')
 
@@ -119,12 +122,21 @@ CTCAE.data.4$maxpelvisrtdose <- radiation$maxpelvisrtdose[match(CTCAE.data.4$sjl
 
 ## aa_class_dose_5 **
 CTCAE.data.4$aa_class_dose_5 <- chemo$alkylating_dose_5[match(CTCAE.data.4$sjlid, chemo$sjlid)]
+CTCAE.data.4$alkylating_dose_any <- chemo$alkylating_dose_any[match(CTCAE.data.4$sjlid, chemo$sjlid)]
 
 ## anthra_jco_dose_5 **
 CTCAE.data.4$anthra_jco_dose_5 <- chemo$anthracyclines_dose_5[match(CTCAE.data.4$sjlid, chemo$sjlid)]
+CTCAE.data.4$anthracyclines_dose_any <- chemo$anthracyclines_dose_any[match(CTCAE.data.4$sjlid, chemo$sjlid)]
 
 ## epitxn_dose_5 **
 CTCAE.data.4$epitxn_dose_5 <- chemo$epipodophyllotoxins_dose_5[match(CTCAE.data.4$sjlid, chemo$sjlid)]
+CTCAE.data.4$epipodophyllotoxins_dose_any <- chemo$epipodophyllotoxins_dose_any[match(CTCAE.data.4$sjlid, chemo$sjlid)]
+
+
+
+
+# check
+cc <- CTCAE.data.4[c(1:6,1256:1269, grep("Cardiomyopathy", colnames(CTCAE.data.4)))]
 
 #############################################################################################
 ## Now check how many of the status columns have cases vs controls to association analysis ##
@@ -136,18 +148,53 @@ grade_columns <- CTCAE.data.4 %>%
   select(contains("status_")) %>%
   names()
 
-# Assuming your data is named CTCAE.data.4 and grade_columns contains the relevant columns
-table_list <- lapply(grade_columns, function(col) {
-  table(CTCAE.data.4[[col]])
-})
+# Initialize an empty list to store tables
+table_list <- list()
 
-# Convert the list of tables to a data frame
-table_df <- do.call(rbind, lapply(seq_along(table_list), function(i) {
-  data.frame(variable = grade_columns[i], table_list[[i]])
-}))
+# Loop through each column in grade_columns
+for (col in grade_columns) {
+  # Create a table for the current column
+  tab <- table(CTCAE.data.4[[col]])
+  
+  # Ensure both 0 and 1 are present in the table
+  if (!("0" %in% names(tab))) {
+    tab[["0"]] <- 0
+  }
+  
+  if (!("1" %in% names(tab))) {
+    tab[["1"]] <- 0
+  }
+  
+  # Rename the columns to 0 and 1
+  names(tab) <- c("0", "1")
+  
+  # Convert the table to a data frame and add variable column
+  tab_df <- data.frame(value = as.numeric(names(tab)), count = as.numeric(tab))
+  tab_df$variable <- col
+  
+  # Append the data frame to the list
+  table_list <- append(table_list, list(tab_df))
+}
+
+# Combine the list of tables into a single data frame
+table_df <- do.call(rbind, table_list)
 
 # Rename the columns
-colnames(table_df) <- c("variable", "value", "count")
+colnames(table_df) <- c("Status", "count", "variable")
 
 # Display the result
 print(table_df)
+
+
+table_df <- table_df %>%
+  pivot_wider(
+    id_cols = variable,
+    names_from = Status,
+    values_from = count,
+    names_prefix = "status_"
+  )
+
+# Keep status with at least 25 cases and controls
+filtered_table_df <- table_df %>%
+  filter(status_0 >= 25, status_1 >= 25)
+
