@@ -3,7 +3,8 @@ setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/ann
 file_path <- "chr22.Survivor_WES.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.with.gnomAD.revel.loftee.tsv"
 
 rl <- readLines(file_path, n=1000)
-header = read.table(rl[grep('^#Uploaded_variation.*', rl)], header = T, sep = "\t")
+matching_line <- grep('^#Uploaded_variation.*', rl)
+header = gsub("X.", "", names(read.table(text = rl[matching_line], header = TRUE, sep = "\t")))
 
 Final.DF <- {}
 for(i in 1:22){
