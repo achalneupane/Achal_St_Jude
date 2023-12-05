@@ -4,7 +4,7 @@ file_path <- "chr22.Survivor_WES.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp
 
 rl <- readLines(file_path, n=1000)
 matching_line <- grep('^#Uploaded_variation.*', rl)
-header = gsub("X.", "", names(read.table(text = rl[matching_line], header = TRUE, sep = "\t")))
+header = gsub("X.", "", names(read.table(text = rl[matching_line], header = TRUE, sep = "\t", comment.char = "")))
 
 Final.DF <- {}
 for(i in 1:22){
