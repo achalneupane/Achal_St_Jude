@@ -1,31 +1,25 @@
 # Specify the file path
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round2/loftee")
-file_path <- "chr20.Survivor_WES.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.with.gnomAD.revel.loftee.tsv"
+file_path <- "chr22.Survivor_WES.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.with.gnomAD.revel.loftee.tsv"
 
-# Specify the chunk size
-chunk_size <- 1000
+rl <- readLines(file_path, n=1000)
+header = read.table(rl[grep('^#Uploaded_variation.*', rl)], header = T, sep = "\t")
+df <- read.table(file_path, skip = 108, header = FALSE, sep ='\t')
+colnames(df) <- header
 
-# Read the first 1000 lines from the file
-lines <- readLines(file_path, n = 1000)
-# Filter lines starting with a single "#"
-header_lines <- grep("^#[^#]", lines)
-# Print or use the extracted header lines
-header_vector <- gsub("#", "", lines[header_lines])
-header <- read.delim(text = header_vector, header = T, sep = "\t")
-header <- colnames(header)
+##################
+## Extract P/LP ##
+##################
+table(df$CLIN_SIG)
+clinvar <- (grepl("pathogenic|likely_pathogenic", df$CLIN_SIG)
 
-# Open the file connection
-con <- file(file_path, open = "r")
+#########
+## NHW ##
+#########
 
-# Read and process the file in chunks
-while (length(lines <- readLines(con, n = chunk_size)) > 0) {
-  # Skip lines starting with #
-  lines <- lines[!grepl("^#", lines)]
-  df <- read.table(text = lines, header = F, sep = "\t")
-  # Perform an operation on each chunk
-  # For example, print the first few lines of each chunk
-  print(head(lines))
-}
 
-# Close the file connection
-close(con)
+
+
+#############
+## African ##
+#############

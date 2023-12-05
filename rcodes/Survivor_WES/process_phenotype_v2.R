@@ -53,6 +53,12 @@ CTCAE.data.3 <- CTCAE.data.2 %>%
   ) %>%
   select(c(all_of(first_columns), sort(names(.))))
 
+
+# Assuming CTCAE.data.3 is your data frame
+columns_to_replace <- grepl("grade", colnames(CTCAE.data.3))
+# Replace NAs with 0 in the specified columns
+CTCAE.data.3[columns_to_replace] <- lapply(CTCAE.data.3[columns_to_replace], function(x) replace(x, is.na(x), 0))
+
 ## Display the wide format result
 # CTCAE.data.3
 
@@ -194,7 +200,17 @@ table_df <- table_df %>%
     names_prefix = "status_"
   )
 
-# Keep status with at least 25 cases and controls
-filtered_table_df <- table_df %>%
-  filter(status_0 >= 25, status_1 >= 25)
 
+
+table_df.status_gt_0 <- table_df[grepl("status_gt_0", table_df$variable),]
+
+
+# Keep status with at least 25 cases
+filtered_table_df <- table_df %>%
+  filter(status_1 >= 25)
+# filtered_table_df <- table_df %>%
+#   filter(status_0 >= 25, status_1 >= 25)
+
+
+
+Afferent_pupillary_defect <- CTCAE.data[grepl("Afferent pupillary defect", CTCAE.data$condition),]
