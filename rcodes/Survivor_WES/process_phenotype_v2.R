@@ -205,6 +205,13 @@ table_df <- table_df %>%
 
 table_df.status_gt_0 <- table_df[grepl("status_gt_0", table_df$variable),]
 
+table_df.status_gt_2 <- table_df[grepl("status_gt_2", table_df$variable),]
+
+table_df.status_gt_3 <- table_df[grepl("status_gt_3", table_df$variable),]
+
+
+
+
 
 # Keep status with at least 25 cases
 filtered_table_df <- table_df %>%
