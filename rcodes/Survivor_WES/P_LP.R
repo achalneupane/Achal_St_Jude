@@ -26,13 +26,20 @@ clinvar$Prediction <- "Clinvar"
 ## Loss of Function ##
 ######################
 # LoF <- df[grepl("frameshift|start_lost|stop_gained|donor|acceptor", df$Consequence, ignore.case = T),]
-LoF <- df[grepl("frameshift|start_lost|stop_gained|gain|donor|acceptor", df$Consequence, ignore.case = T),]
+LoF <- df[grepl("frameshift|start_lost|stop_gained|gain|donor|acceptor", df$Consequence, ignore.case = T),] ## Use ANN[*].IMPACT column instead of Consequence; df$`ANN[*].IMPACT`
 # dim(LoF)
 LoF$Prediction <- "LoF"
 tmp.df <- rbind.data.frame(clinvar, LoF)
 Final.DF <- rbind.data.frame(Final.DF, tmp.df)
 print(paste0("final df rows:: ", nrow(Final.DF)))
 }
+
+# save.image("All_p_lP_vars_before_maf_filter.Rdata")
+load("All_p_lP_vars_before_maf_filter.Rdata")
+####################
+## All population ##
+####################
+Final.DF.rare.PLP <- Final.DF[Final.DF$AF < 0.01,]
 
 #########
 ## NHW ##

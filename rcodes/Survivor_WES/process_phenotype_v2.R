@@ -1,6 +1,7 @@
 library(dplyr)
 library(tidyr)
 library(haven)
+library(stringr)
 
 ## Phenotype for all samples sequenced
 all.samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/sample_mapping.txt", header = F)
