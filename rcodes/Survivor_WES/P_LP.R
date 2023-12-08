@@ -36,11 +36,18 @@ print(paste0("final df rows:: ", nrow(Final.DF)))
 
 # save.image("All_p_lP_vars_before_maf_filter.Rdata")
 load("All_p_lP_vars_before_maf_filter.Rdata")
+
+# clinvar <- Final.DF[Final.DF$Prediction == "Clinvar",]
+# LoF <- Final.DF[Final.DF$Prediction == "LoF",]
+# # Filter more for LoF
+# cc <- LoF[grepl("^non_coding_transcript_exon_variant$|^splice_region_variant,non_coding_transcript_exon_variant$", LoF$Consequence, ignore.case = T),]
+
 ####################
 ## All population ##
 ####################
 Final.DF.rare.PLP <- Final.DF[Final.DF$AF < 0.01,]
 
+saveRDS(Final.DF.rare.PLP, file = "Final.DF.rare.PLP.rds")
 #########
 ## NHW ##
 #########
