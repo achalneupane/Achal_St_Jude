@@ -37,11 +37,14 @@ print(paste0("final df rows:: ", nrow(Final.DF)))
 # save.image("All_p_lP_vars_before_maf_filter.Rdata")
 load("All_p_lP_vars_before_maf_filter.Rdata")
 
-# clinvar <- Final.DF[Final.DF$Prediction == "Clinvar",]
-# LoF <- Final.DF[Final.DF$Prediction == "LoF",]
-# # Filter more for LoF
+clinvar <- Final.DF[Final.DF$Prediction == "Clinvar",]
+# filter more clinvar
+clinvar <- clinvar[!grepl("^affects$|^affects,other$|^confers_sensitivity$|^other$|^protective$|^likely_risk_allele$|^association$|association,affects", clinvar$CLIN_SIG),] 
+LoF <- Final.DF[Final.DF$Prediction == "LoF",]
+# Filter more for LoF
 # cc <- LoF[grepl("^non_coding_transcript_exon_variant$|^splice_region_variant,non_coding_transcript_exon_variant$", LoF$Consequence, ignore.case = T),]
 
+Final.DF <- rbind.data.frame(clinvar, LoF)
 ####################
 ## All population ##
 ####################
