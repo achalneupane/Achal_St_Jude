@@ -6,38 +6,44 @@ setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/ann
 # b.	Predicted loss-of-function (LOF) variants: We will use Loss-of-Function Transcript Effect Estimator (LOFTEE; plug-in implemented in the Variant Effect Predictor or VEP29 (version 108), see https://github.com/konradjk/loftee). This tool uses VEP to annotate the most severe consequence of a given variant for each gene transcript, while LOFTEE annotates high-confidence loss-of-function (LOF) variants, which include frameshift indels, stop-gain variants and splice site disrupting variants. LOF variants flagged by LOFTEE as dubious (e.g., affecting poorly conserved exons and splice variants affecting NAGNAG sites or non-canonical splice regions) will be excluded.
 # c.	Pathogenic or likely pathogenic (P/LP) variants: NCBI ClinVar30 will be accessed and search. The most recent ClinVar adjudications from clinical testing laboratories (2015 onwards) for variants without “conflicting interpretations” will be used, regardless of phenotype reported in ClinVar (given that these are sometimes vague or broad).
 
+# version dbNSFP4.4a; downloaded on 10/25/2023
+library(data.table)
+
 Final.DF <- {}
 for(i in 1:22){
   CHR=paste0("chr", i)
   print(CHR)
-  file_path <- paste0(CHR, ".Survivor_WES.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.with.gnomAD.revel.loftee.tsv")
-  df <- read.table(file_path, header = FALSE, sep ='\t')
+  file_path <- paste0("new_", CHR, ".Survivor_WES.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp.vcf-FIELDS-simple.txt")
+  df <- fread(file_path, header = TRUE, sep ='\t')
+  
+  colnames(df)
+  
+  ## Keep unique
+  df <- df[!duplicated(df$ID),]
+  ################################################
+  ## a.	Predicted deleterious missense variants ##
+  ################################################
+  missense <- df[grepl("missense", df$`ANN[*].EFFECT`),]
+
+  # Aloft prediction
+  table(missense$dbNSFP_Aloft_pred)
+  table(missense$dbNSFP_Aloft_pred)
+  table(missense$dbNSFP_Aloft_pred)
+  table(missense$dbNSFP_Aloft_pred)
+  table(missense$dbNSFP_Aloft_pred)
+  table(missense$dbNSFP_Aloft_pred)
+  
+  
+  
+  ################
+  ## c. Clinvar ##
+  ################
+  clinvar <- df[!grepl("uncertain|benign|conflicting|not_provided|drug_response|risk_factor|^\\-$|^\\.$", df$CLNSIG, ignore.case = T),]
+  cc <- cbind.data.frame(clinvar$ID, clinvar$CLNSIG, clinvar$dbNSFP_clinvar_clnsig)
+  clinvar <- clinvar[!duplicated(clinvar$ID),]
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  
 
 ############
 ## Loftee ##
