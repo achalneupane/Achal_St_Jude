@@ -44,7 +44,17 @@ LoF <- Final.DF[Final.DF$Prediction == "LoF",]
 # Filter more for LoF
 # cc <- LoF[grepl("^non_coding_transcript_exon_variant$|^splice_region_variant,non_coding_transcript_exon_variant$", LoF$Consequence, ignore.case = T),]
 
+############
+## Loftee ##
+############
+
+
+###############
+## Merge all ##
+###############
+
 Final.DF <- rbind.data.frame(clinvar, LoF)
+
 ####################
 ## All population ##
 ####################

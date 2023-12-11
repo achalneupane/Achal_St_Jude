@@ -62,6 +62,7 @@ if(length(covariates_file_name)>0) {
 cvrt$LoadFile(covariates_file_name)
 }
 
+# outcome specific difference??
 me = Matrix_eQTL_engine(
     snps = snps,
     gene = gene,
