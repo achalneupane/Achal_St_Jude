@@ -44,26 +44,6 @@ LoF <- Final.DF[Final.DF$Prediction == "LoF",]
 # Filter more for LoF
 # cc <- LoF[grepl("^non_coding_transcript_exon_variant$|^splice_region_variant,non_coding_transcript_exon_variant$", LoF$Consequence, ignore.case = T),]
 
-############
-## Loftee ##
-############
-LoF <- df[grepl("frameshift|start_lost|stop_gained|gain|donor|acceptor", df$Consequence, ignore.case = T),] ## Use ANN[*].IMPACT column instead of Consequence; df$`ANN[*].IMPACT`
-# dim(LoF)
-LoF$Prediction <- "LoF"
-tmp.df <- rbind.data.frame(clinvar, LoF)
-Final.DF <- rbind.data.frame(Final.DF, tmp.df)
-print(paste0("final df rows:: ", nrow(Final.DF)))
-}
-
-# save.image("All_p_lP_vars_before_maf_filter.Rdata")
-load("All_p_lP_vars_before_maf_filter.Rdata")
-
-clinvar <- Final.DF[Final.DF$Prediction == "Clinvar",]
-# filter more clinvar
-clinvar <- clinvar[!grepl("^affects$|^affects,other$|^confers_sensitivity$|^other$|^protective$|^likely_risk_allele$|^association$|association,affects", clinvar$CLIN_SIG),] 
-LoF <- Final.DF[Final.DF$Prediction == "LoF",]
-
-
 ###############
 ## Merge all ##
 ###############
