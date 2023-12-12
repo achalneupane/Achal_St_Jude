@@ -15,23 +15,49 @@ for(i in 1:22){
   print(CHR)
   file_path <- paste0("new_", CHR, ".Survivor_WES.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp.vcf-FIELDS-simple.txt")
   df <- fread(file_path, header = TRUE, sep ='\t')
-  
+  df[df == "."] <- NA
   colnames(df)
   
   ## Keep unique
-  df <- df[!duplicated(df$ID),]
+  # df <- df[!duplicated(df$ID),]
   ################################################
   ## a.	Predicted deleterious missense variants ##
   ################################################
   missense <- df[grepl("missense", df$`ANN[*].EFFECT`),]
-
-  # Aloft prediction
-  table(missense$dbNSFP_Aloft_pred)
-  table(missense$dbNSFP_Aloft_pred)
-  table(missense$dbNSFP_Aloft_pred)
-  table(missense$dbNSFP_Aloft_pred)
-  table(missense$dbNSFP_Aloft_pred)
-  table(missense$dbNSFP_Aloft_pred)
+  missense <- missense[!duplicated(missense$ID),]
+  
+  Aloft <- missense[is.na(missense$dbNSFP_Aloft_pred),]
+  
+  BayesDel <- missense[grepl("D", missense$dbNSFP_BayesDel_noAF_pred),] # this field may indicate the prediction of BayesDel without considering allele frequency as opposed to dbNSFP_BayesDel_addAF_pred. 
+  
+  missense$dbNSFP_CADD_phred <- as.numeric(missense$dbNSFP_CADD_phred)
+  CADD <- missense[missense$dbNSFP_CADD_phred > 20,]
+  
+  ClinPred <- missense$dbNSFP_ClinPred_pred
+  DANN
+  DEOGEN2
+  Eigen/Eigen-PC
+  fathmm-MKL
+  fathmm-XF
+  FATHMM
+  GenoCanyon
+  LIST-S2
+  LRT
+  M-CAP
+  MetaRNN
+  MetaSVM/MetaLR
+  Missense
+  MPC
+  MVP
+  MutPred
+  MutationAssessor
+  MutationTaster
+  Polyphen2
+  PrimateAI
+  PROVEAN
+  REVEL
+  SIFT
+  VEST4
   
   
   

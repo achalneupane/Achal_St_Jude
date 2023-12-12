@@ -172,3 +172,23 @@ plink --bfile haplotype_input_eur --keep-allele-order --recodeA --out haplotype_
 
 
 PHASE haplotype_input_edited_0.2.txt haplotype_phase_0.2.out
+
+
+
+## Extract clinvar
+awk -F'\t' 'NR==1 || ($29 ~ /Pathogenic|Likely_pathogenic/) && $29 !~ /Conflicting|Benign/' MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-latest-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.gnomAD-FIELDS-simple.txt > all_plp_kateryna_dyslipidemia.txt
+
+# extract MAF < 1%; 54th column is AF
+awk 'NR == 1 || $54 < 0.01' all_plp_kateryna_dyslipidemia.txt > all_plp_kateryna_dyslipidemia_0.01_AF.txt
+
+## Now extract genes
+<file_start_end.txt>
+chr9	10105	14105	ABC
+chr9	18105	24105	DEF
+
+while read -r CHR START END GENE; do
+  # Extract the header from the input file
+  awk 'NR==1 {print}' all_plp_kateryna_dyslipidemia_0.01_AF.txt > "result_${GENE}.txt"
+  # Filter rows based on conditions and append to the result file
+  awk -v chr="$CHR" -v start="$START" -v end="$END" '$1 == chr && $2 >= start && $2 <= end' all_plp_kateryna_dyslipidemia_0.01_AF.txt >> "result_${GENE}.txt"
+done < file_start_end.txt
