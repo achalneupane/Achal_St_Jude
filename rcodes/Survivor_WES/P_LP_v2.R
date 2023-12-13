@@ -26,28 +26,76 @@ for(i in 1:22){
   missense <- df[grepl("missense", df$`ANN[*].EFFECT`),]
   missense <- missense[!duplicated(missense$ID),]
   
+  #
   Aloft <- missense[is.na(missense$dbNSFP_Aloft_pred),]
   
+  #
   BayesDel <- missense[grepl("D", missense$dbNSFP_BayesDel_noAF_pred),] # this field may indicate the prediction of BayesDel without considering allele frequency as opposed to dbNSFP_BayesDel_addAF_pred. 
   
+  #
   missense$dbNSFP_CADD_phred <- as.numeric(missense$dbNSFP_CADD_phred)
   CADD <- missense[missense$dbNSFP_CADD_phred > 20,]
   
-  ClinPred <- missense$dbNSFP_ClinPred_pred
-  DANN
-  DEOGEN2
-  Eigen/Eigen-PC
-  fathmm-MKL
-  fathmm-XF
-  FATHMM
-  GenoCanyon
-  LIST-S2
-  LRT
-  M-CAP
-  MetaRNN
-  MetaSVM/MetaLR
-  Missense
-  MPC
+  #
+  ClinPred <- missense[grepl("D", missense$dbNSFP_ClinPred_pred),] 
+  
+  #
+  DANN <- missense[grepl("D", missense$dbNSFP_ClinPred_pred),]
+  
+  #
+  DEOGEN2 <- missense[grepl("D", missense$dbNSFP_DEOGEN2_pred),] # DEOGEN2 uses the MCC-optimal deleteriousness threshold >0.45 (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5570203/)
+  
+  # Eigen/Eigen-PC #The Eigen scores themselves, including Eigen Phred Score (Coding) and Eigen PC Phred Score (Coding), are generally not direct indicators of deleteriousness of a genetic variant. 
+  
+  #Original version of the tool. Predicts whether missense variants are deleterious or tolerated based on their functional impact.
+  FATHMM <- missense[grepl("D", missense$dbNSFP_FATHMM_pred),]
+  # FATHMM <- FATHMM[!grepl("T", FATHMM$dbNSFP_FATHMM_pred),]# Remove any with tolerable
+  
+  # An extension of FATHMM that incorporates multiple information sources (kernels) for improved prediction accuracy. It uses a combination of different types of genomic and functional data to make predictions.
+  fathmm_MKL <- missense[grepl("D", missense$dbNSFP_fathmm_MKL_coding_pred),]
+  # fathmm_MKL <- fathmm_MKL[!grepl("T", fathmm_MKL$dbNSFP_FATHMM_pred),]# Remove any with tolerable
+  
+  # A specialized version of FATHMM designed specifically for X-linked genes. It takes into account the unique characteristics of X-chromosomal inheritance.
+  fathmm_XF <- missense[grepl("D", missense$dbNSFP_fathmm_XF_coding_pred),]
+  
+  # used threshold of 0.5 "All of this evidence suggests that important functional segments could still be detected locally even in a generally lower-scored region". https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4444969/
+  missense$dbNSFP_GenoCanyon_score <- as.numeric(missense$dbNSFP_GenoCanyon_score)
+  GenoCanyon <- missense[missense$dbNSFP_GenoCanyon_score> 0.8,] 
+  
+  
+  #
+  LIST_S2 <- missense[grepl("D", missense$dbNSFP_LIST_S2_pred),]
+  # LIST_S2 <- LIST_S2[!grepl("T", LIST_S2$dbNSFP_LIST_S2_pred),] # Remove any with tolerable
+  
+  #
+  LRT <- missense[grepl("D", missense$dbNSFP_LRT_pred),]
+  
+  
+  #
+  MCAP <- missense[grepl("D", missense$dbNSFP_M_CAP_pred),]
+  
+  
+  #
+  MetaRNN <- missense[grepl("D", missense$dbNSFP_MetaRNN_pred),]
+  
+  
+  #
+  MetaSVM <- missense[grepl("D", missense$dbNSFP_MetaSVM_pred),]
+  
+  
+  #
+  MetaLR <- missense[grepl("D", missense$dbNSFP_MetaLR_pred),]
+  
+  
+  #
+  missense$dbNSFP_MPC_score <- as.numeric(missense$dbNSFP_MPC_score)
+  
+  
+  #
+  MPC <- missense[missense$dbNSFP_MPC_score>0.5,]
+  
+  
+  #
   MVP
   MutPred
   MutationAssessor
@@ -59,7 +107,7 @@ for(i in 1:22){
   SIFT
   VEST4
   
-  
+  cc <- cbind.data.frame(missense[, 1:12], missense$dbNSFP_MetaLR_pred, missense$dbNSFP_MetaLR_score)
   
   ################
   ## c. Clinvar ##
