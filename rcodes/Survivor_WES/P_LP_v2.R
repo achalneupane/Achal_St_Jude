@@ -13,7 +13,7 @@ Final.DF <- {}
 for(i in 1:22){
   CHR=paste0("chr", i)
   print(CHR)
-  file_path <- paste0("new_", CHR, ".Survivor_WES.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp.vcf-FIELDS-simple.txt")
+  file_path <- paste0("new_", CHR, ".Survivor_WES.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp_clinvar_12_10_2023_clinvar_12_10_2023.vcf-FIELDS-simple.txt")
   df <- fread(file_path, header = TRUE, sep ='\t')
   df[df == "."] <- NA
   colnames(df)
@@ -92,11 +92,23 @@ for(i in 1:22){
   
   
   #
-  MPC <- missense[missense$dbNSFP_MPC_score>0.5,]
+  MPC <- missense[missense$dbNSFP_MPC_score>0.5,] ## source
   
   
-  #
-  MVP
+  # Missense Variant Pathogenicity prediction: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7820281/
+  # a rank score of 0.75 indicates the missense variant is more likely to be pathogenic than 75% of all possible missense variants.
+  # select the max rankscore
+  # Function to extract maximum number from a string
+  extract_max <- function(x) {
+    numbers <- as.numeric(unlist(strsplit(x, ",")))
+    max_number <- max(numbers, na.rm = TRUE)
+    return(max_number)
+  }
+  # Apply the function to each element in the vector
+  missense$dbNSFP_MVP_rankscore <- sapply(missense$dbNSFP_MVP_rankscore, extract_max)
+  MVP <- missense[missense$dbNSFP_MVP_rankscore>= 0.5 ,]
+  
+  
   MutPred
   MutationAssessor
   MutationTaster
