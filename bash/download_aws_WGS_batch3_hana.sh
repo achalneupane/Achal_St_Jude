@@ -143,7 +143,7 @@ length(unique((df$`Sample name`)))
 # zcat ${file1}| wc -l; zcat ${file2}| wc -l
 # done
 
-for file in $(ls *L01_124_1.fq.gz); do
+for file in $(ls *L01_123_1.fq.gz); do
 echo "Doing ${file}"
 file1=${file}
 file2=$(echo ${file1} | sed 's/_1\.fq\.gz/_2.fq.gz/')

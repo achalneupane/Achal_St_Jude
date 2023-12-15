@@ -280,7 +280,8 @@ for(i in 1:22){
   
 }
   
-  
+# save.image("all_missense_deleterious.RData")  
+load.image("all_missense_deleterious.RData")
   
 cc <- cbind.data.frame(missense[, 1:12], missense$dbNSFP_MetaLR_pred, missense$dbNSFP_MetaLR_score)
   
