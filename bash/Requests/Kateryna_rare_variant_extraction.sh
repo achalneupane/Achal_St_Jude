@@ -176,14 +176,11 @@ PHASE haplotype_input_edited_0.2.txt haplotype_phase_0.2.out
 
 
 ## Extract clinvar
-cut -d$'\t' -f22 MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-latest-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.gnomAD-FIELDS-simple.txt| sort -V | uniq
-awk -F'\t' 'NR==1 || ($29 ~ /Pathogenic|Likely_pathogenic/) && $29 !~ /Conflicting|Benign/' MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-latest-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.gnomAD-FIELDS-simple.txt > all_plp_kateryna_dyslipidemia.txt
-
-awk -F'\t' 'NR==1 || ($22 ~ /Pathogenic|Likely_pathogenic/) && $22 !~ /Conflicting|Benign/' MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr2.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-latest-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.gnomAD-FIELDS-simple.txt > APOB_test
-
+cut -d$'\t' -f22 MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-latest-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.gnomAD.gnomAD_clinvar_12_10_2023-clinvar_12_10_2023_FIELDS-simple.txt| sort -V | uniq
+awk -F'\t' 'NR==1 || ($29 ~ /Pathogenic|Likely_pathogenic/) && $29 !~ /Conflicting|Benign/' MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-latest-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.gnomAD.gnomAD_clinvar_12_10_2023-clinvar_12_10_2023_FIELDS-simple.txt > all_plp_kateryna_dyslipidemia_new_clinvar.txt
 
 # extract MAF < 1%; 54th column is AF
-awk 'NR == 1 || $54 < 0.01' all_plp_kateryna_dyslipidemia.txt > all_plp_kateryna_dyslipidemia_0.01_AF.txt
+awk 'NR == 1 || $54 < 0.01' all_plp_kateryna_dyslipidemia_new_clinvar.txt > all_plp_kateryna_dyslipidemia_new_clinvar_0.01_AF.txt
 
 ## Now extract genes
 <file_start_end.txt>
@@ -192,20 +189,88 @@ chr9	18105	24105	DEF
 
 while read -r CHR START END GENE; do
   # Extract the header from the input file
-  awk 'NR==1 {print}' all_plp_kateryna_dyslipidemia_0.01_AF.txt > "result_${GENE}.txt"
+  awk 'NR==1 {print}' all_plp_kateryna_dyslipidemia_new_clinvar_0.01_AF.txt > "result_${GENE}_new_clinvar.txt"
   # Filter rows based on conditions and append to the result file
-  awk -v chr="$CHR" -v start="$START" -v end="$END" '$1 == chr && $2 >= start && $2 <= end' all_plp_kateryna_dyslipidemia_0.01_AF.txt >> "result_${GENE}.txt"
+  awk -v chr="$CHR" -v start="$START" -v end="$END" '$1 == chr && $2 >= start && $2 <= end' all_plp_kateryna_dyslipidemia_new_clinvar_0.01_AF.txt  >> "result_${GENE}_new_clinvar.txt"
 done < file_start_end.txt
 
 
-dbNSFP_clinvar_clnsig
-
-
-
-
-while read -r CHR START END GENE; do
-  # Extract the header from the input file
-  awk 'NR==1 {print}' MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr12.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-latest-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.gnomAD-FIELDS > "result_${GENE}.txt"
-  # Filter rows based on conditions and append to the result file
-  awk -v chr="$CHR" -v start="$START" -v end="$END" '$1 == chr && $2 >= start && $2 <= end' MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-latest-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.gnomAD-FIELDS >> "result_${GENE}_in_VCF.txt"
-done < file_start_end.txt
+cut -d$'\t' -f22 MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-latest-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.gnomAD.gnomAD_clinvar_12_10_2023-clinvar_12_10_2023_FIELDS-simple.txt| sort -V | uniq -c
+# 585615527 .
+#     237 Affects
+#       5 Affects_association
+#       1 Affects_risk_factor
+#  198697 Benign
+#    2265 Benign,Benign
+#      34 Benign,Benign,Benign
+#   90505 Benign/Likely_benign
+#    1208 Benign/Likely_benign,Benign/Likely_benign
+#       7 Benign/Likely_benign_association
+#       9 Benign/Likely_benign_drug_response
+#       3 Benign/Likely_benign_drug_response_other
+#      65 Benign/Likely_benign_other
+#      13 Benign/Likely_benign_other_risk_factor
+#      43 Benign/Likely_benign_risk_factor
+#       3 Benign_confers_sensitivity
+#      14 Benign_drug_response
+#     161 Benign_other
+#       8 Benign_protective
+#      11 Benign_risk_factor
+#  250614 Conflicting_interpretations_of_pathogenicity
+#    2571 Conflicting_interpretations_of_pathogenicity,Conflicting_interpretations_of_pathogenicity
+#      41 Conflicting_interpretations_of_pathogenicity_Affects
+#      68 Conflicting_interpretations_of_pathogenicity_association
+#      13 Conflicting_interpretations_of_pathogenicity_association_risk_factor
+#      17 Conflicting_interpretations_of_pathogenicity_drug_response
+#     335 Conflicting_interpretations_of_pathogenicity_other
+#      24 Conflicting_interpretations_of_pathogenicity_other_risk_factor
+#      99 Conflicting_interpretations_of_pathogenicity_risk_factor
+#  153356 Likely_benign
+#    2775 Likely_benign,Likely_benign
+#      18 Likely_benign,Likely_benign,Likely_benign
+#       3 Likely_benign_association
+#      54 Likely_benign_drug_response_other
+#     107 Likely_benign_other
+#    8627 Likely_pathogenic
+#     138 Likely_pathogenic,Likely_pathogenic
+#      10 Likely_pathogenic_risk_factor
+#      32 Likely_risk_allele
+#   20805 Pathogenic
+#     275 Pathogenic,Pathogenic
+#   14533 Pathogenic/Likely_pathogenic
+#     203 Pathogenic/Likely_pathogenic,Pathogenic/Likely_pathogenic
+#      15 Pathogenic/Likely_pathogenic/Pathogenic,_low_penetrance
+#      30 Pathogenic/Likely_pathogenic_other
+#      33 Pathogenic/Likely_pathogenic_risk_factor
+#       2 Pathogenic/Pathogenic,_low_penetrance_risk_factor
+#      13 Pathogenic_Affects
+#      17 Pathogenic_association
+#      29 Pathogenic_drug_response
+#      18 Pathogenic_other
+#      16 Pathogenic_protective
+#      40 Pathogenic_risk_factor
+#      26 Uncertain_risk_allele
+#      10 Uncertain_risk_allele_protective
+#       2 Uncertain_risk_allele_risk_factor
+# 1043649 Uncertain_significance
+#   14156 Uncertain_significance,Uncertain_significance
+#     176 Uncertain_significance,Uncertain_significance,Uncertain_significance
+#      82 Uncertain_significance/Uncertain_risk_allele
+#       8 Uncertain_significance_association
+#      18 Uncertain_significance_drug_response
+#      12 Uncertain_significance_other
+#       8 Uncertain_significance_risk_factor
+#     240 association
+#       1 association_drug_response
+#      12 confers_sensitivity
+#      22 dbNSFP_clinvar_clnsig
+#     716 drug_response
+#       3 drug_response_other
+#      22 drug_response_risk_factor
+#    2539 not_provided
+#      19 not_provided,not_provided
+#      72 other
+#       6 other,other
+#      55 protective
+#      12 protective_risk_factor
+#     624 risk_factor
