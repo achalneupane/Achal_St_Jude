@@ -221,7 +221,7 @@ for(i in 1:22){
   # To meet the challenges of handling high-throughput sequencing data, we developed MutationTaster, a free, web-based application for rapid evaluation of the disease-causing potential of DNA sequence alterations. MutationTaster integrates information from different biomedical databases and uses established analysis tools
   MutationTaster <- missense[grepl("D", missense$dbNSFP_MutationTaster_pred),]
   MutationTaster <- MutationTaster[!duplicated(MutationTaster$ID),]
-  MutationTaster.final <- rbind.data.frame(MutationTaster.final, MutationTaster)
+  MutationTaster.final <- rbind.data.frame(MutationTasdata:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAWElEQVR42mNgGPTAxsZmJsVqQApgmGw1yApwKcQiT7phRBuCzzCSDSHGMKINIeDNmWQlA2IigKJwIssQkHdINgxfmBBtGDEBS3KCxBc7pMQgMYE5c/AXPwAwSX4lV3pTWwAAAABJRU5ErkJggg==ter.final, MutationTaster)
   
   # Polyphen2: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2855889/
   # benign, possibly damaging, or probably damaging: http://genetics.bwh.harvard.edu/pph2/dokuwiki/overview
