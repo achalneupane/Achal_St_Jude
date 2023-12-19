@@ -1,3 +1,12 @@
+plink --double-id --keep-allele-order --make-bed --out /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR//MERGED.SJLIFE.1.2.GATKv3.4.VQSR.sjlid_chr16.PASS.decomposed --threads 4 --vcf MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr16.PASS.decomposed.vcf.gz --vcf-half-call m
+
+# calculate frequency
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/gwas
+# plink --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.sjlid_chr16.PASS.decomposed --keep-allele-order --keep pheno/sjlife_eur_dox_only_pcs.pheno --freq --out MERGED.SJLIFE.1.2.GATKv3.4.VQSR.sjlid_chr16.PASS.decomposed_freq_993samples
+# awk '{ for(i=1;i<=NF;i++){if(i==NF){printf("%s\n",$NF);}else {printf("%s\t",$i)}}}' MERGED.SJLIFE.1.2.GATKv3.4.VQSR.sjlid_chr16.PASS.decomposed_freq_993samples.frq > MERGED.SJLIFE.1.2.GATKv3.4.VQSR.sjlid_chr16.PASS.decomposed_freq_993samples.frq_edited1
+plink --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.sjlid_chr16.PASS.decomposed --keep-allele-order --freq --out MERGED.SJLIFE.1.2.GATKv3.4.VQSR.sjlid_chr16.PASS.decomposed_freq
+awk '{ for(i=1;i<=NF;i++){if(i==NF){printf("%s\n",$NF);}else {printf("%s\t",$i)}}}' MERGED.SJLIFE.1.2.GATKv3.4.VQSR.sjlid_chr16.PASS.decomposed_freq.frq > MERGED.SJLIFE.1.2.GATKv3.4.VQSR.sjlid_chr16.PASS.decomposed_freq.frq_edited1
+
 # # Additionally, .z file shoul have maf in specific form. I was getting this error: "Error : Expected a floating point value greater than 0.0 and smaller or equal than 0.5 in line 3 column 6 of file 'samplesnp.z'!"
 
 ## Extract TITN and BAG3 variants with MAF > 1%; separately.
@@ -28,26 +37,6 @@ module load gcta
 
 
 <R>
-## First only keep those with maf >1 %; then separate the summary statistics for TITN and BAG3 and 
-gwas.dat.maf.gt.1perc <- gwas.dat[!gwas.dat$maf < 0.01,]
-gwas.dat.maf.gt.1perc.TITN <- gwas.dat.maf.gt.1perc[grepl("2", gwas.dat.maf.gt.1perc$chromosome),]
-write.table(as.data.frame(gwas.dat.maf.gt.1perc.TITN$rsid), "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp_TITN_gt_MAF_1_perc_vars_meta.list", quote = F, row.names = F, col.names = F, sep = " ")
-# After extracting these variants from plink, I am re-ordering the summary stat
-# to match the order of varinats in plink. This is to ensure LD and summary stat
-# have same variant order
-samplesnp_TITN_gt_MAF_1_perc_vars.dat.bim <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp_TITN_gt_MAF_1_perc_vars.dat.bim")
-gwas.dat.maf.gt.1perc.TITN <- gwas.dat.maf.gt.1perc.TITN[match(samplesnp_TITN_gt_MAF_1_perc_vars.dat.bim$V2, gwas.dat.maf.gt.1perc.TITN$rsid),]
-table(gwas.dat.maf.gt.1perc.TITN$rsid == samplesnp_TITN_gt_MAF_1_perc_vars.dat.bim$V2)
-# TRUE 
-# 947 
-write.table(gwas.dat.maf.gt.1perc.TITN, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp_TITN_gt_MAF_1_perc_meta.z", quote = F, row.names = F, col.names = T, sep = " ")
-## Input summary stat file for COJO analysis 
-TITN.COJO <- cbind.data.frame(SNP=gwas.dat.maf.gt.1perc.TITN$rsid, A1=gwas.dat.maf.gt.1perc.TITN$allele1, A2=gwas.dat.maf.gt.1perc.TITN$allele2, 
-                              freq=gwas.dat.maf.gt.1perc.TITN$maf, b=gwas.dat.maf.gt.1perc.TITN$beta, se=gwas.dat.maf.gt.1perc.TITN$se, p=gwas.dat.maf.gt.1perc.TITN$P)
-TITN.COJO$N <- 1645
-## COJO files
-write.table(TITN.COJO, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/cojo_test/samplesnp_TITN_gt_MAF_1_perc_vars_meta.ma", quote = F, row.names = F, col.names = F, sep = " ")
-
 
 less -S samplesnp_TITN_gt_MAF_1_perc_vars.ma
 chr2:178313079:G:A A G 0.0845 0.231111720963387 0.190410329535685 0.213 1645
