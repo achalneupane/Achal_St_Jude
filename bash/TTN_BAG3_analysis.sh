@@ -157,61 +157,10 @@ cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_
 # - Post-Pr(# of causal SNPs is k)   :
 #   (0 -> 0)
 #    1 -> 1
-mv *.cred1 *.bf1 *.config *.snp *.log_sss /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/assuming_1_causal_SNP/
-
-## >>>>>>>>>>> Without any asumptions for the number of causal SNP
-./finemap_v1.4.1_x86_64 --sss --log --in-files samplesnp_TITN_gt_MAF_1_perc --dataset 1
-# - Number of GWAS samples           : 1645
-# - Number of SNPs                   : 947
-# - Prior-Pr(# of causal SNPs is k)  :
-#   (0 -> 0)
-#    1 -> 0.583
-#    2 -> 0.291
-#    3 -> 0.097
-#    4 -> 0.0242
-#    5 -> 0.00482
-# - 947 configurations evaluated (0.100/100%) : converged after 100 iterations
-# - Computing causal SNP statistics  : done!
-# - Regional SNP heritability        : 0.00173 (SD: 0.00161 ; 95% CI: [2.26e-05,0.00593])
-# - Log10-BF of >= one causal SNP    : -0.199
-# - Post-expected # of causal SNPs   : 1
-# - Post-Pr(# of causal SNPs is k)   :
-#   (0 -> 0)
-#    1 -> 1
-#    2 -> 0
-#    3 -> 0
-#    4 -> 0
-#    5 -> 0
-
-./finemap_v1.4.1_x86_64 --sss --log --in-files samplesnp_BAG3_gt_MAF_1_perc --dataset 1
-# - Number of GWAS samples           : 1645
-# - Number of SNPs                   : 1594
-# - Prior-Pr(# of causal SNPs is k)  :
-#   (0 -> 0)
-#    1 -> 0.583
-#    2 -> 0.291
-#    3 -> 0.097
-#    4 -> 0.0242
-#    5 -> 0.00484
-# - 1604 configurations evaluated (0.133/100%) : converged after 133 iterations
-# - Computing causal SNP statistics  : done!
-# - Regional SNP heritability        : 0.00212 (SD: 0.00172 ; 95% CI: [0.00013,0.00654])
-# - Log10-BF of >= one causal SNP    : -0.24
-# - Post-expected # of causal SNPs   : 1
-# - Post-Pr(# of causal SNPs is k)   :
-#   (0 -> 0)
-#    1 -> 0.995
-#    2 -> 0.00489
-#    3 -> 0
-#    4 -> 0
-#    5 -> 0
-
-mv *.cred1 *.bf1 *.config *.snp *.log_sss /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/without_assumption_4_causal_SNP
-
 
 ## >>>>>>>>>>> Configuring each SNP of interest
 # Note: log10bf column contains the log10 Bayes factors. The Bayes factor quantifies the evidence that the i-{th} SNP is causal with log10 Bayes factors greater than 2 reporting considerable evidence
-./finemap_v1.4.1_x86_64 --config --in-files samplesnp_TITN_gt_MAF_1_perc --dataset 1 --rsids chr2:178562809:T:C
+./finemap_v1.4.1_x86_64 --config --in-files samplesnp_TITN_gt_MAF_1_perc --dataset 1 --rsids chr2:178562809:T:C,chr10:119670121:T:C
 # - SNPs in causal configuration     : chr2:178562809:T:C
 # ------------------------------------
 # - Log-Likelihood of configuration  : -2330.787730
@@ -226,32 +175,6 @@ mv *.cred1 *.bf1 *.config *.snp *.log_sss /research_jude/rgs01_jude/groups/sapko
 # - Regional SNP heritability        : 0.00274 (SD: 0.00217 ; 95% CI: [8.41e-05,0.00823])
 
 
-./finemap_v1.4.1_x86_64 --config --in-files samplesnp_BAG3_gt_MAF_1_perc --dataset 1 --rsids chr10:119670121:T:C
-# - SNPs in causal configuration     : chr10:119670121:T:C
-# ------------------------------------
-# - Log-Likelihood of configuration  : -2331.429058
-# - ML causal effect estimates       : -0.0896417
-# - SE of ML causal effect estimates : 0.0424663
-# - P-values for causal effects      : 0.0347816
-# ------------------------------------
-# - Log10-BF of configuration        : 0.421902
-# - Posterior mean of causal effects : -0.0721079
-# - Posterior SD of causal effects   : 0.0381389
-# ------------------------------------
-# - Regional SNP heritability        : 0.00224 (SD: 0.00197 ; 95% CI: [1.42e-05,0.0072])
-
-# - Run time                         : 0 hours, 0 minutes, 0 seconds
-
-
-
-## Email: 08/11/2022  "can you please also run GCTA analysis but conditioning on the SNPs in bold for both TTN and BAG3 separately?"
-# gcta64  --bfile test  --chr 1 --maf 0.01 --cojo-file test.ma --cojo-cond cond.bag3.snplist --out test_chr1
-
-# <cond.TTN.snplist>
-# chr2:178562809:T:C
-
-# <cond.BAG3.snplist>
-# chr10:119670121:T:C
 
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/cojo_test
 gcta64  --bfile samplesnp_TITN_gt_MAF_1_perc_vars.dat  --chr 2 --maf 0.01 --cojo-file samplesnp_TITN_gt_MAF_1_perc_vars.ma --cojo-slct --cojo-p 0.00017925 --cojo-wind 100000 --out TITN_cojo

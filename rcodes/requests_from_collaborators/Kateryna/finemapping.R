@@ -23,7 +23,7 @@ gwas.dat$SNP[(!gwas.dat$SNP %in% sjlife.bim$V2)]
 sjlife.bim <- sjlife.bim[sjlife.bim$V2 %in% gwas.dat$SNP,]
 sjlife.bim$V2[duplicated(sjlife.bim$KEY)]
 
-# dim(sjlife.bim)
+dim(sjlife.bim)
 # [1] 859    6
 
 # wanted.snp.list <- paste0("chr", sjlife.bim$V2)
@@ -46,6 +46,9 @@ sum(gwas.dat$V2 %in% freq.dat$SNP)
 # 859 
 
 gwas.dat$maf <- freq.dat$MAF[match(gwas.dat$V2, freq.dat$SNP)]
+gwas.dat$maf.allele <- freq.dat$A1[match(gwas.dat$V2, freq.dat$SNP)]
+gwas.dat$maf[gwas.dat$A1 != gwas.dat$maf.allele] <- 1-gwas.dat$maf[gwas.dat$A1 != gwas.dat$maf.allele]
+
 
 gwas.dat$lowerCI <-  as.numeric(gwas.dat$L95)
 gwas.dat$upperCI <-  as.numeric(gwas.dat$U95)
@@ -65,7 +68,7 @@ gwas.dat$allele2 <- gwas.dat$A1
 gwas.dat$allele2[gwas.dat$A1!=gwas.dat$V6] <- gwas.dat$V6[gwas.dat$A1!=gwas.dat$V6]
 gwas.dat$allele2[gwas.dat$A1!=gwas.dat$V5] <- gwas.dat$V5[gwas.dat$A1!=gwas.dat$V5]
 
-# Now, finally flip the allele and change the sign of beta where maf > 0.5
+# Now, finally flip the allele and change the sign of beta where maf > 0.5 (50%)
 gwas.dat[gwas.dat$maf > 0.5 , c("allele1", "allele2")] <- gwas.dat[gwas.dat$maf > 0.5, c("allele2", "allele1")] # swap alleles
 gwas.dat$beta[gwas.dat$maf > 0.5] <- (-1 * gwas.dat$beta[gwas.dat$maf > 0.5]) # Change the sign of beta
 gwas.dat$maf[gwas.dat$maf > 0.5] <- 1-gwas.dat$maf[gwas.dat$maf > 0.5] # Finally, change the maf values
@@ -80,34 +83,29 @@ gwas.dat <- cbind.data.frame(rsid=gwas.dat$SNP, chromosome=gwas.dat$V1, position
 sum(gwas.dat$maf < 0.01)
 # 0
 
-## First only keep those with maf >1 %; then separate the summary statistics for TITN and BAG3 and 
+## First only keep those with maf >1 %; then separate the summary statistics for chr16 
 gwas.dat.maf.gt.1perc <- gwas.dat[!gwas.dat$maf < 0.01,]
 
-gwas.dat.maf.gt.1perc <- gwas.dat.maf.gt.1perc[grepl("2", gwas.dat.maf.gt.1perc$chromosome),]
+gwas.dat.maf.gt.1perc <- gwas.dat.maf.gt.1perc[grepl("16", gwas.dat.maf.gt.1perc$chromosome),]
 write.table(as.data.frame(gwas.dat.maf.gt.1perc$rsid), "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/finemap_kateryna/samplesnp_gt_MAF_1_perc_vars_meta.list", quote = F, row.names = F, col.names = F, sep = " ")
 # After extracting these variants from plink, I am re-ordering the summary stat
 # to match the order of varinats in plink. This is to ensure LD and summary stat
 # have same variant order
-samplesnp_gt_MAF_1_perc_vars.dat.bim <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/finemap_kateryna/samplesnp_gt_MAF_1_perc_vars.dat.bim")
+
+
+samplesnp_gt_MAF_1_perc_vars.dat.bim <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/finemap_kateryna/chr16_finemap_plink.bim")
 gwas.dat.maf.gt.1perc <- gwas.dat.maf.gt.1perc[match(samplesnp_gt_MAF_1_perc_vars.dat.bim$V2, gwas.dat.maf.gt.1perc$rsid),]
 table(gwas.dat.maf.gt.1perc$rsid == samplesnp_gt_MAF_1_perc_vars.dat.bim$V2)
 # TRUE 
-# 947 
+# 859 
 
-write.table(gwas.dat.maf.gt.1perc, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/samplesnp_gt_MAF_1_perc_meta.z", quote = F, row.names = F, col.names = T, sep = " ")
-
-
-
-
-
-
-
+write.table(gwas.dat.maf.gt.1perc, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/finemap_kateryna/samplesnp_gt_MAF_1_perc.z", quote = F, row.names = F, col.names = T, sep = " ")
 
 
 ## Input summary stat file for COJO analysis 
-TITN.COJO <- cbind.data.frame(SNP=gwas.dat.maf.gt.1perc$rsid, A1=gwas.dat.maf.gt.1perc$allele1, A2=gwas.dat.maf.gt.1perc$allele2, 
+chr16.COJO <- cbind.data.frame(SNP=gwas.dat.maf.gt.1perc$rsid, A1=gwas.dat.maf.gt.1perc$allele1, A2=gwas.dat.maf.gt.1perc$allele2, 
                               freq=gwas.dat.maf.gt.1perc$maf, b=gwas.dat.maf.gt.1perc$beta, se=gwas.dat.maf.gt.1perc$se, p=gwas.dat.maf.gt.1perc$P)
-TITN.COJO$N <- 943
+chr16.COJO$N <- 993
 
 ## COJO files
-write.table(TITN.COJO, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/cojo_test/samplesnp_gt_MAF_1_perc_vars_meta.ma", quote = F, row.names = F, col.names = F, sep = " ")
+write.table(chr16.COJO, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/finemap_kateryna/samplesnp_gt_MAF_1_perc_vars.ma", quote = F, row.names = F, col.names = F, sep = " ")
