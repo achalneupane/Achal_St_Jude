@@ -1,16 +1,22 @@
 ########################
 ## Finemap with CARMA ##
 ########################
-
+# export LD_PRELOAD=/research_jude/rgs01_jude/groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/codes/yes/pkgs/mkl-2023.1.0-h213fc3f_46344/lib/libmkl_rt.so R
 # devtools::install_github("ZikunY/CARMA")
+lib_paths <- c(
+  "/research/rgs01/home/clusterHome/aneupane/R/x86_64-pc-linux-gnu-library/4.3",
+  "/research/rgs01/applications/hpcf/authorized_apps/rhel8_apps/R/4.3.1/install_with_lapack/lib64/R/library"
+)
+# Set the library paths
+.libPaths(lib_paths)
+
 library(CARMA)
 library(data.table)
 library(magrittr)
 library(dplyr)
-library(devtools)
 library(R.utils)
 ##### setting up the working directory or the wd where the data are stored
-setwd('CARMA')
+setwd('/research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/gwas/CARMA/')
 ###### load the GWAS summary statistics
 sumstat<- fread(file = "Sample_data/sumstats_chr1_200937832_201937832.txt.gz",
                 sep = "\t", header = T, check.names = F, data.table = F,
