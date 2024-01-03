@@ -3,7 +3,7 @@ library(ggplot2)
 library(ggthemes)  # For additional themes
 library(tidyverse)
 
-## V18 b
+## V18 b (without lifestyle)
 data <- read.table(text="Cohort	SN_types	Variables	Overall	Female	Male	Age.lt.35	Age.ge.35
 SJLIFE	Any SN (605)	Radiation	0.425	0.417	0.435	0.400	0.447
 SJLIFE	Any SN (605)	Chemo	0.080	0.079	0.080	0.109	0.054
@@ -396,8 +396,8 @@ SJLIFE	Thyroid_cancer	Radiation	0.613	0.625	0.599	0.550	0.643	0.613	0.625	0.599	
 SJLIFE	Thyroid_cancer	Chemo	0.247	0.251	0.242	0.344	0.200	0.247	0.251	0.242	0.344	0.200	0.247	0.251	0.242	0.344	0.200	0.247	0.251	0.242	0.344	0.200	0.247	0.251	0.242	0.344	0.200
 SJLIFE	Thyroid_cancer	All_treatments	0.732	0.741	0.721	0.712	0.741	0.732	0.741	0.721	0.712	0.741	0.732	0.741	0.721	0.712	0.741	0.732	0.741	0.721	0.712	0.741	0.732	0.741	0.721	0.712	0.741
 SJLIFE	Thyroid_cancer	PRS	0.601	0.597	0.607	0.613	0.596	0.601	0.597	0.607	0.613	0.596	0.601	0.597	0.607	0.613	0.596	0.601	0.597	0.607	0.613	0.596	0.601	0.597	0.607	0.613	0.596
-SJLIFE	Thyroid_cancer	Lifestyle	-0.173	-0.198	-0.145	-0.147	-0.186	0.090	0.094	0.086	0.079	0.096	0.090	0.094	0.086	0.079	0.096	-0.231	-0.264	-0.192	-0.206	-0.243	-0.125	-0.127	-0.121	-0.118	-0.128
-SJLIFE	Thyroid_cancer	Combined	0.878	0.879	0.878	0.870	0.883	0.906	0.908	0.903	0.896	0.910	0.906	0.908	0.903	0.896	0.910	0.870	0.870	0.870	0.861	0.875	0.881	0.884	0.878	0.872	0.886
+SJLIFE	Thyroid_cancer	Lifestyle	-0.173	-0.198	-0.145	-0.147	-0.186	0.090	0.094	0.086	0.079	0.096	-0.135	-0.126	-0.146	-0.138	-0.134	-0.231	-0.264	-0.192	-0.206	-0.243	-0.125	-0.127	-0.121	-0.118	-0.128
+SJLIFE	Thyroid_cancer	Combined	0.878	0.879	0.878	0.870	0.883	0.906	0.908	0.903	0.896	0.910	0.879	0.883	0.875	0.869	0.884	0.870	0.870	0.870	0.861	0.875	0.881	0.884	0.878	0.872	0.886
 SJLIFE	Meningioma	Radiation	0.185	0.150	0.226	0.246	0.165	0.185	0.150	0.226	0.246	0.165	0.185	0.150	0.226	0.246	0.165	0.185	0.150	0.226	0.246	0.165	0.185	0.150	0.226	0.246	0.165
 SJLIFE	Meningioma	Chemo	0.324	0.329	0.319	0.470	0.276	0.324	0.329	0.319	0.470	0.276	0.324	0.329	0.319	0.470	0.276	0.324	0.329	0.319	0.470	0.276	0.324	0.329	0.319	0.470	0.276
 SJLIFE	Meningioma	All_treatments	0.459	0.440	0.482	0.629	0.403	0.459	0.440	0.482	0.629	0.403	0.459	0.440	0.482	0.629	0.403	0.459	0.440	0.482	0.629	0.403	0.459	0.440	0.482	0.629	0.403
@@ -457,7 +457,7 @@ data.ccss.wanted <- data.ccss[grepl("Lifestyle", data.ccss$Variables),]
 variables <- c("drk", "smk", "PA", "obese")
 
 
-i=4
+i=2
 sjlife <- data.sjlife.wanted[grepl(paste0("SNtypes|",variables[i]), colnames(data.sjlife.wanted))]
 sjlife <- rbind.data.frame(sjlife, c("Sarcoma",NA,NA,NA,NA,NA))
 colnames(sjlife)<- paste0(colnames(sjlife), "_sjlife")
