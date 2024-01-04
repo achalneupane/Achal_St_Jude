@@ -74,6 +74,15 @@ gwas.dat$beta[gwas.dat$maf > 0.5] <- (-1 * gwas.dat$beta[gwas.dat$maf > 0.5]) # 
 gwas.dat$maf[gwas.dat$maf > 0.5] <- 1-gwas.dat$maf[gwas.dat$maf > 0.5] # Finally, change the maf values
 
 
+## Now Keep only the the required columns for CARMA
+gwas.dat.CARMA <- cbind.data.frame(ID=gwas.dat$SNP, CHR=gwas.dat$V1, POS=gwas.dat$V4, 
+                             Ref = gwas.dat$allele2, Alt = gwas.dat$allele1, SNP = gwas.dat$SNP, N = gwas.dat$NMISS, MAF = gwas.dat$maf, Z = gwas.dat$STAT, Pval=gwas.dat$P)
+
+write.table(gwas.dat.CARMA, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common//gwas/CARMA/analysis/summary_stat_carma_chr16.txt", quote = F, row.names = F, col.names = T, sep = "\t")
+
+# Write SNP file for LD calculation
+write.table(cbind.data.frame(gwas.dat$SNP,gwas.dat$allele1), "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common//gwas/finemap_kateryna/SNP_A1_chr16.txt", quote = F, row.names = F, col.names = F, sep = "\t")
+
 ## Now Keep only the the required columns
 gwas.dat <- cbind.data.frame(rsid=gwas.dat$SNP, chromosome=gwas.dat$V1, position=gwas.dat$V4, 
                              allele1 = gwas.dat$allele1, allele2 = gwas.dat$allele2, maf = gwas.dat$maf, beta = gwas.dat$beta, se = gwas.dat$beta.SE, P=gwas.dat$P)

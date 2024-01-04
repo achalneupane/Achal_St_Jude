@@ -16,16 +16,20 @@ library(magrittr)
 library(dplyr)
 library(R.utils)
 ##### setting up the working directory or the wd where the data are stored
-setwd('/research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/gwas/CARMA/')
+setwd('/research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/gwas/CARMA/analysis/')
 ###### load the GWAS summary statistics
-sumstat<- fread(file = "Sample_data/sumstats_chr1_200937832_201937832.txt.gz",
+sumstat<- fread(file = "/research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/gwas/CARMA/analysis/summary_stat_carma_chr16.txt",
                 sep = "\t", header = T, check.names = F, data.table = F,
                 stringsAsFactors = F)
+dim(sumstat)
+# 859
 ###### load the pair-wise LD matrix (assuming the variants are sorted in the same order
 ###### as the variants in sumstat file)
-ld = fread(file = "Sample_data/sumstats_chr1_200937832_201937832_ld.txt.gz",
-           sep = "\t", header = F, check.names = F, data.table = F,
+ld = fread(file = "/research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/gwas/finemap_kateryna/samplesnp_gt_MAF_1_perc.ld",
+           sep = " ", header = F, check.names = F, data.table = F,
            stringsAsFactors = F)
+length(ld)
+# 859
 print(head(sumstat))
 # > print(head(sumstat))
 # ID CHR       POS Ref Alt        SNP     N       MAF           Z      Pval
@@ -43,6 +47,7 @@ ld.list[[1]]<-as.matrix(ld)
 lambda.list[[1]]<-1
 CARMA.results<-CARMA(z.list,ld.list,lambda.list=lambda.list,
                      outlier.switch=F)
+
 ###### Posterior inclusion probability (PIP) and credible set (CS)
 sumstat.result = sumstat %>% mutate(PIP = CARMA.results[[1]]$PIPs, CS = 0)
 if(length(CARMA.results[[1]]$`Credible set`[[2]])!=0){
@@ -50,11 +55,13 @@ if(length(CARMA.results[[1]]$`Credible set`[[2]])!=0){
     sumstat.result$CS[CARMA.results[[1]]$`Credible set`[[2]][[l]]]=l
   }
 }
+
+head(sumstat.result)
+
 ###### write the GWAS summary statistics with PIP and CS
 fwrite(x = sumstat.result,
-       file = "Sample_data/sumstats_chr1_200937832_201937832_carma.txt.gz",
-       sep = "\t", quote = F, na = "NA", row.names = F, col.names = T,
-       compress = "gzip")
+       file = "sumstats_chr16_carma_results.txt",
+       sep = "\t", quote = F, na = "NA", row.names = F, col.names = T)
 
 
 CARMA.results[[1]]$`Credible set`[[2]]

@@ -55,7 +55,9 @@ chr2:178313779:A:G A G 0.01459 -1.10866262452161 0.733656312073577 0.13 1645
 gcta64  --bfile chr16_finemap_plink  --chr 16 --maf 0.01 --cojo-file samplesnp_gt_MAF_1_perc_vars.ma --cojo-slct --cojo-p 0.00028999 --cojo-wind 100000 --out cojo
 
 # Create LD file
-plink --r2 --bfile chr16_finemap_plink --matrix --out samplesnp_gt_MAF_1_perc
+# plink --r2 --bfile chr16_finemap_plink --matrix --out samplesnp_gt_MAF_1_perc
+plink --r2 --bfile chr16_finemap_plink --a1-allele SNP_A1_chr16.txt --matrix --out samplesnp_gt_MAF_1_perc
+
 ## test
 plink --r2 --bfile chr16_finemap_plink --out samplesnp_gt_MAF_1_perc_test_ld
 
