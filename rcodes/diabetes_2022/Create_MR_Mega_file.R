@@ -1,5 +1,6 @@
 # setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/meta_analysis_with_mr_Mega")
-setwd("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/diabetes/meta_analysis_with_mr_Mega/v2_with_preQC_VCF")
+# setwd("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/diabetes/meta_analysis_with_mr_Mega/v2_with_preQC_VCF")
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/diabetes/meta_analysis_with_mr_Mega/v2_with_preQC_VCF")
 
 library(data.table)
 
