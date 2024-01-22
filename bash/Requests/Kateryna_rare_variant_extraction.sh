@@ -274,3 +274,10 @@ cut -d$'\t' -f22 MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID
 #      55 protective
 #      12 protective_risk_factor
 #     624 risk_factor
+
+
+
+## Dox GWAS
+/research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/gwas/haplotype
+plink --bfile haplotype_input_afr --keep-allele-order --recodeA --out ../chr16_genotypes_afr
+plink --bfile haplotype_input_eur --keep-allele-order --recodeA --out ../chr16_genotypes_eur

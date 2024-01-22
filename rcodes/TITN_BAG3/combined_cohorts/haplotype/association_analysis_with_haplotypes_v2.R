@@ -5,7 +5,7 @@ setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/"
 ###############################
 ## After extracting haplotypes with extract_haplotypes.py, now check the association of the haplotypes
 pheno <- read.table("pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno", header = T)
-haplotypes <- read.table("haplotypes_ttn_r2_0.8.txt", header = F) # r2 < 0.8
+haplotypes <- read.table("haplotypes_ttn_r2_0.8.txt", header = F) # r2 > 0.8
 # haplotypes$haplo <- gsub('\\(|\\)|\\[|\\]',"", apply(haplotypes[2:11], 1, function(x) paste(x, collapse = "")))
 haplotypes$haplo <- gsub('\\(|\\)|\\[|\\]',"", apply(haplotypes[2:10], 1, function(x) paste(x, collapse = "")))
 # haplotypes$haplo <- apply(haplotypes[2:11], 1, function(x) paste(x, collapse = ""))
