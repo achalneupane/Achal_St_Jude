@@ -242,3 +242,10 @@ awk 'NR == 1 || $5 >= 0.01' AFR_frq_chr_ALL.frq > AFR_maf_ge_0.01_frq_chr_ALL.fr
 # filter_variants_with_maf_ge_0.01.R
 gzip chr1_22_PCA_eur.assoc.logistic.clean.Psorted.withBETA_deposition.maf.ge.0.01.tsv
 gzip chr1_22_PCA_afr.assoc.logistic.clean.Psorted.withBETA_deposition.maf.ge.0.01.tsv
+
+
+
+
+## duplicate
+chr6:88113:A:AAT
+chr6:132430:CTT:C

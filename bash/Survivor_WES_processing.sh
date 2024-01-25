@@ -37,24 +37,24 @@ module load bcftools
 bcftools norm -m-any --check-ref -w -f /research/rgs01/reference/public/genomes/Homo_sapiens/GRCh38/GRCh38_no_alt/GCA_000001405.15_GRCh38_no_alt_analysis_set.fa "${WORKDIR}/${VCF}" -Oz -o "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_tmp.vcf.gz"
 bcftools annotate --set-id '%CHROM\:%POS\:%REF\:%FIRST_ALT' "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_tmp.vcf.gz" -Oz -o "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
 bcftools index -f -t --threads 4 "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
-# ## Extract three cohorts
-bcftools view -O z -o \
-"${WORKDIR}/biallelic/ccss/$(basename ${VCF} .vcf.gz)_biallelic_ccss.vcf.gz" \
--S ${WORKDIR}/biallelic/extract_CCSS.samples.txt \
-"${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
-bcftools index -f -t --threads 4 "${WORKDIR}/biallelic/ccss/$(basename ${VCF} .vcf.gz)_biallelic_ccss.vcf.gz"
+# # ## Extract three cohorts
+# bcftools view -O z -o \
+# "${WORKDIR}/biallelic/ccss/$(basename ${VCF} .vcf.gz)_biallelic_ccss.vcf.gz" \
+# -S ${WORKDIR}/biallelic/extract_CCSS.samples.txt \
+# "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
+# bcftools index -f -t --threads 4 "${WORKDIR}/biallelic/ccss/$(basename ${VCF} .vcf.gz)_biallelic_ccss.vcf.gz"
 
-bcftools view -O z -o \
-"${WORKDIR}/biallelic/sjlife/$(basename ${VCF} .vcf.gz)_biallelic_sjlife.vcf.gz" \
--S ${WORKDIR}/biallelic/extract_SJLIFE_survivor.txt \
-"${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
-bcftools index -f -t --threads 4 "${WORKDIR}/biallelic/sjlife/$(basename ${VCF} .vcf.gz)_biallelic_sjlife.vcf.gz"
+# bcftools view -O z -o \
+# "${WORKDIR}/biallelic/sjlife/$(basename ${VCF} .vcf.gz)_biallelic_sjlife.vcf.gz" \
+# -S ${WORKDIR}/biallelic/extract_SJLIFE_survivor.txt \
+# "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
+# bcftools index -f -t --threads 4 "${WORKDIR}/biallelic/sjlife/$(basename ${VCF} .vcf.gz)_biallelic_sjlife.vcf.gz"
 
-bcftools view -O z -o \
-"${WORKDIR}/biallelic/sjlife_control/$(basename ${VCF} .vcf.gz)_biallelic_sjlife_control.vcf.gz" \
--S ${WORKDIR}/biallelic/extract_SJLIFE_survivor_control.txt \
-"${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
-bcftools index -f -t --threads 4 "${WORKDIR}/biallelic/sjlife_control/$(basename ${VCF} .vcf.gz)_biallelic_sjlife_control.vcf.gz"
+# bcftools view -O z -o \
+# "${WORKDIR}/biallelic/sjlife_control/$(basename ${VCF} .vcf.gz)_biallelic_sjlife_control.vcf.gz" \
+# -S ${WORKDIR}/biallelic/extract_SJLIFE_survivor_control.txt \
+# "${WORKDIR}/biallelic/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
+# bcftools index -f -t --threads 4 "${WORKDIR}/biallelic/sjlife_control/$(basename ${VCF} .vcf.gz)_biallelic_sjlife_control.vcf.gz"
 
 
 ## # Rename samples (if we need to rename)
@@ -73,7 +73,6 @@ export CHR="chr${i}"; \
 echo "splitting $CHR"; \
 unset VCF; \
 export THREADS=4; \
-export VCF="${CHR}.Survivor_WES.GATK4180.hg38.vcf.gz"; \
 export WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/"; \
 bsub \
         -P "${CHR}_plk" \
@@ -150,6 +149,21 @@ plink --bfile chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15 \
 plink --bfile chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15_maf0.05_indep_prune --het --out chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15_maf0.05_indep_prune_heterozygosity
 plink --bfile chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15 --missing --out chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15_missing
 
+
+
+#######################################################
+## Extract Survivorr, control and CCSS exp here from ##
+#######################################################
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/plink_all
+ls chr*.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1.bim | sed 's/.bim//'| sort -V  > merge_list2.txt
+plink --merge-list merge_list2.txt --keep-allele-order --make-bed --out chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1
+
+
+## Survivor; ../extract_SJLIFE_survivor.txt
+plink --bfile chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1 --keep-allele-order --keep ../extract_SJLIFE_survivor.txt --make-bed --out /Survivors/chr.ALL.SURVIVORS_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1
+## CCSS exp; ../extract_CCSS.samples.txt
+
+## Control; ../extract_SJLIFE_survivor_control.txt
 
 
 

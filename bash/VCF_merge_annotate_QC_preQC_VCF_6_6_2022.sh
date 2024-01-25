@@ -42,6 +42,30 @@ for CHR in {1..22}; do \
 done; 
 
 
+#####################################
+## Helper script to merge VCF file ##
+#####################################
+######################
+## Achal Neupane    ##
+## Date: 04/22/2022 ##
+######################
+# Load module
+module load bcftools/1.14
+
+if [ ! -f "${VCF1}.tbi" ]; then
+echo "Index file missing, Creating index file for ${VCF1}"
+bcftools index -t --threads ${THREADS} ${VCF1}
+fi
+
+if [ ! -f "${VCF2}.tbi" ]; then
+echo "Index file missing, Creating index file for ${VCF2}"
+bcftools index -t --threads ${THREADS} ${VCF2}
+fi
+
+echo "RUNNING bcftools merge for: ${VCF1} and ${VCF2}"
+bcftools merge --threads ${THREADS} ${VCF1} ${VCF2} -0 -Oz -o ${OUT_DIR}/${MERGED}.vcf.gz
+
+
 
 ## Convert to biallelic; reset IDs; reset sample names
 mkdir -p /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned
@@ -74,7 +98,7 @@ for i in {1..22}; do \
 	echo "Doing chr${CHR}"; \
 	export MEM=6; \
 	export THREADS=4; \
-	export OUT_DIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/"; \
+	export OUT_DIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned2/"; \
 	bsub \
 	-P "chr${CHR}_edit" \
 	-J "chr${CHR}_edit" \
@@ -107,7 +131,11 @@ done;
 
 
 
+## duplicate
+chr6:88113:A:AAT
+chr6:132430:CTT:C
 
+plink --vcf ./MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr6.preQC_biallelic_renamed_ID_edited.vcf.gz --double-id --vcf-half-call m --threads 1 --make-bed --out test
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ####################
