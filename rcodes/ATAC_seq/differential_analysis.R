@@ -92,6 +92,14 @@ day2 <- c("1537-0", "1537-1", "1537-3", "0242-0", "0242-1", "0242-3",
 pheno$batch [pheno$new_ID %in% day1] <- "day1"
 pheno$batch [pheno$new_ID %in% day2] <- "day2"
 
+pheno.saved <- pheno
+counts.saved <- counts
+## Dox 0
+pheno <- pheno.saved[grepl("-0", pheno.saved$new_ID),]
+counts <- counts.saved[colnames(counts.saved) %in% pheno$new_ID]
+sum(pheno$new_ID != colnames(counts))
+# 0
+
 # define group
 groupLabels <- pheno$Cardtox
 TS <- factor(groupLabels, levels = c("No", "Yes"))
@@ -104,7 +112,7 @@ colnames(design) <- levels(TS)
 dge <- DGEList(counts = counts, group = groupLabels)
 
 
-# filter out low expressed genes
+# filter out low expressed regions
 cpm_cutoff=10
 cutoff <- as.vector(cpm(cpm_cutoff,mean(dge$samples$lib.size) ) )
 keep <- (rowSums(cpm(dge) > cutoff) >= min(as.numeric(table(groupLabels))))
@@ -113,11 +121,31 @@ dge <- calcNormFactors(dge)
 
 v <- voom(dge, design, plot = F)
 fit <- lmFit(v, design)
-# cont.matrix <- makeContrasts(KOvsWT = (KO - WT), dKOvsWT = (dKO - WT), dKOvsKO = (dKO - KO), levels = design)
 cont.matrix <- makeContrasts(YesvsNo = (Yes - No), levels = design)
 fitcon <- contrasts.fit(fit, cont.matrix)
 fitcon <- eBayes(fitcon)
-
 results1 <- topTable(fitcon, n = Inf, sort.by="P", coef="YesvsNo")
-outFile1 <- paste0("Yes_VS_No", "_diff.txt")
+outFile1 <- paste0("Cardiotox_Yes_VS_No_afr", "_diff.txt")
+
+# Create a volcano plot
+library(ggplot2)
+
+## Adj P
+ggplot(results1, aes(x = logFC, y = -log10(P.Value))) +
+  geom_point(aes(color = ifelse(adj.P.Val < 0.05, "Yes", "No")), size = 3) +
+  scale_color_manual(values = c("Yes" = "red", "No" = "black")) +
+  theme_minimal() +
+  labs(title = "Volcano Plot", x = "logFC", y = "-log10(P.Value)", color = "Siginificant")
+
+## With P
+ggplot(results1, aes(x = logFC, y = -log10(P.Value))) +
+  geom_point(aes(color = ifelse(P.Value < 0.05, "Yes", "No")), size = 3) +
+  scale_color_manual(values = c("Yes" = "red", "No" = "black")) +
+  theme_minimal() +
+  labs(title = "Volcano Plot", x = "logFC", y = "-log10(P.Value)", color = "Siginificant")
+
+
+
+
+
 
