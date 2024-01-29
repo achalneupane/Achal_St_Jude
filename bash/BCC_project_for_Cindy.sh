@@ -30,7 +30,7 @@
 
 ## Extract variants for PRS
 # load modules
-module load bcftools/1.9
+module load bcftools
 module load plink/1.90b
 
 
@@ -38,8 +38,34 @@ cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/prs/sj
 ## SJLIFE
 THREADS=4
 for CHR in {1..22}; do
-grep -w chr${CHR} all_bed_BCC.bed | sort -V > PRS_vars_chr${CHR}.bed
+grep -w chr${CHR} ../all_bed_BCC.bed | sort -V > PRS_vars_chr${CHR}.bed
 sed -i "s/\r//g" PRS_vars_chr${CHR}.bed
 bcftools view -Oz /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2//MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${CHR}.PASS.decomposed.vcf.gz --threads ${THREADS} -R PRS_vars_chr${CHR}.bed > PRS_chr${CHR}.vcf.gz
 plink --vcf PRS_chr${CHR}.vcf.gz --double-id --vcf-half-call m --keep-allele-order --threads ${THREADS} --make-bed --out PRS_chr${CHR}
 done
+
+#####################################
+## create plink files for CCSS exp ##
+#####################################
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/preQC_VCF_per_chromosome
+for i in {1..22}; do \
+export CHR="chr${i}"; \
+echo "splitting $CHR"; \
+unset VCF; \
+export THREADS=4; \
+export WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/preQC_VCF_per_chromosome/"; \
+bsub \
+        -P "${CHR}_plk" \
+        -J "${CHR}_plk" \
+        -o "${WORKDIR}/logs/${VCF%.vcf*}_biallelic.%J" \
+        -n ${THREADS} \
+        -R "rusage[mem=8192]" \
+        "./plinkQC.sh"; \
+done;
+
+module load plink/1.90b
+plink --vcf "${WORKDIR}/CCSS_exp_biallelic_${CHR}_ID_edited.vcf.gz" --double-id --vcf-half-call m --keep-allele-order --threads ${THREADS} --make-bed --out "${WORKDIR}/CCSS_exp_biallelic_${CHR}_ID_edited"
+
+#####################################
+## create plink files for CCSS org ##
+#####################################

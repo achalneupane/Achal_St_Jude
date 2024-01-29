@@ -66,3 +66,16 @@ write.table(BCC, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/p
 BED <- cbind.data.frame(BCC$CHROM, BCC$POS_GRCh38-2, BCC$POS_GRCh38+2)
 write.table(BED, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/all_bed_BCC.bed", col.names = F, row.names = F, quote = F)
 
+BCC$KEY <- paste0(BCC$CHROM, ":", BCC$POS_GRCh38, ":")
+
+BIM.ALL <- {}
+for (CHR in 1:22){
+print(paste0("Doing CHR: ", CHR))
+BIM <- read.table(paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr",CHR, ".PASS.decomposed.bim"), header = F)
+BIM$KEY <- paste0("chr", BIM$V1, ":", BIM$V4, ":")
+BIM <- BIM[BIM$KEY %in% BCC$KEY,]
+BIM.ALL <- rbind.data.frame(BIM.ALL,BIM)
+}
+
+# cc <- BCC[BCC$CHROM == "chr1",]
+# cc <- cc [!duplicated(cc$KEY),]
