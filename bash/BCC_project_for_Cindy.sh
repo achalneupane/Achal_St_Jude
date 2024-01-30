@@ -63,9 +63,39 @@ bsub \
         "./plinkQC.sh"; \
 done;
 
+#!/usr/bin/bash
 module load plink/1.90b
 plink --vcf "${WORKDIR}/CCSS_exp_biallelic_${CHR}_ID_edited.vcf.gz" --double-id --vcf-half-call m --keep-allele-order --threads ${THREADS} --make-bed --out "${WORKDIR}/CCSS_exp_biallelic_${CHR}_ID_edited"
 
 #####################################
 ## create plink files for CCSS org ##
 #####################################
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/
+for i in {1..22}; do \
+export CHR="chr${i}"; \
+echo "splitting $CHR"; \
+export THREADS=4; \
+export WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/plink/"; \
+export VCFDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/"; \
+bsub \
+        -P "${CHR}_plk" \
+        -J "${CHR}_plk" \
+        -o "${WORKDIR}/logs/${CHR}_biallelic.%J" \
+        -n ${THREADS} \
+        -R "rusage[mem=8192]" \
+        "./plinkQC.sh"; \
+done;
+
+
+#!/usr/bin/bash
+module load plink/1.90b
+plink --vcf "${VCFDIR}/${CHR}.dose.vcf.gz" --double-id --vcf-half-call m --keep-allele-order --threads ${THREADS} --make-bed --out "${WORKDIR}/CCSS_org_GRCh37_${CHR}"
+
+
+
+# #!/usr/bin/bash
+# module load bcftools/1.9
+# module load tabix
+# cd ${WORKDIR}
+# /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/tools/liftover/liftOver "${VCFDIR}/${CHR}.dose.vcf.gz" /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/tools/liftover/hg19ToHg38.over.chain ${CHR}_GRCh38.dose.vcf.gz ${CHR}_unmapped.bed
+# tabix -p vcf "${WORKDIR}/${CHR}_GRCh38.dose.vcf.gz"
