@@ -99,3 +99,11 @@ plink --vcf "${VCFDIR}/${CHR}.dose.vcf.gz" --double-id --vcf-half-call m --keep-
 # cd ${WORKDIR}
 # /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/tools/liftover/liftOver "${VCFDIR}/${CHR}.dose.vcf.gz" /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/tools/liftover/hg19ToHg38.over.chain ${CHR}_GRCh38.dose.vcf.gz ${CHR}_unmapped.bed
 # tabix -p vcf "${WORKDIR}/${CHR}_GRCh38.dose.vcf.gz"
+
+
+## Rename all BIM files with CHR:POS:REF:ALT in shell script in ccss_org
+for i in {1..22}; do \
+CHR="chr${i}";
+awk '{print "chr"$1, "chr"$2":"$6":"$5, $3, $4, $5, $6}' CCSS_org_GRCh37_${CHR}.bim > tmp_bim
+mv tmp_bim CCSS_org_GRCh37_${CHR}.bim
+done

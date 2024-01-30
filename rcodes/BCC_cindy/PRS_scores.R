@@ -183,3 +183,61 @@ for (i in 1:nrow(BCC)){
     BCC$BIM_CCSS_exp[i] <- BIM.final$V2[matching_row]
   }
 }
+
+## extract ccss_org variants
+write.table(BCC$BIM_SJLIFE[!is.na(BCC$BIM_SJLIFE)], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/extract_sjlife_vars", col.names = F, row.names = F, quote = F)
+
+write.table(BCC$BIM_CCSS_exp[!is.na(BCC$BIM_CCSS_exp)], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/extract_CCSS_exp_vars", col.names = F, row.names = F, quote = F)
+
+
+####################################
+## extract variants from ccss_org ##
+####################################
+BCC.GRCh37$KEY <- paste0(BCC.GRCh37$CHROM, ":", BCC.GRCh37$POS_GRCh37)
+BCC.GRCh37$REF_flipped <- chartr("acgtACGT", "tgcaTGCA", BCC.GRCh37$REF)
+BCC.GRCh37$Effect_allele_flipped <- chartr("acgtACGT", "tgcaTGCA", BCC.GRCh37$Effect_allele)
+BCC.GRCh37$KEY2 <- paste0(BCC.GRCh37$KEY,":", BCC.GRCh37$REF,":",BCC.GRCh37$Effect_allele, ";", BCC.GRCh37$KEY,":", BCC.GRCh37$Effect_allele, ":", BCC.GRCh37$REF, ";", BCC.GRCh37$KEY,":", BCC.GRCh37$REF_flipped,":",BCC.GRCh37$Effect_allele_flipped, ";", BCC.GRCh37$KEY,":", BCC.GRCh37$Effect_allele_flipped, ":", BCC.GRCh37$REF_flipped,";")
+
+
+## First rename all BIM files with CHR:POS:REF:ALT in shell script in CCSS_org bim
+BIM.ALL <- {}
+for (CHR in 1:22){
+  print(paste0("Doing CHR: ", CHR))
+  BIM <- fread(paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/plink/CCSS_org_GRCh37_chr",CHR, ".bim"), header = F)
+  BIM$KEY <- paste0(BIM$V1, ":", BIM$V4)
+  BIM <- BIM[BIM$KEY %in% BCC.GRCh37$KEY,]
+  BIM.ALL <- rbind.data.frame(BIM.ALL,BIM)
+}
+
+# cc <- BCC[BCC$CHROM == "chr1",]
+# cc <- cc [!duplicated(cc$KEY),]
+
+BIM.final <- BIM.ALL[!duplicated(BIM.ALL$V2),]
+## 0
+
+BCC.GRCh37$BIM_CCSS_org <- NA
+for (i in 1:nrow(BCC.GRCh37)){
+  snp_id <- BCC.GRCh37$KEY2[i]
+  snps <- unlist(strsplit(snp_id, ";"))
+  for (k in 1:length(snps)){
+    matching_row <- which(BIM.final$V2 %in% snps)
+  }
+  # If a match is found, assign the value to BCC.GRCh37$BIM
+  if (length(matching_row) > 0) {
+    BCC.GRCh37$BIM_CCSS_org[i] <- BIM.final$V2[matching_row]
+  }
+}
+
+BCC.ccss.org <- BCC.GRCh37
+## remove missing ones
+BCC.ccss.org <- BCC.ccss.org[!is.na(BCC.ccss.org$BIM_CCSS_org),]
+## extract ccss_org variants
+write.table(BCC.ccss.org$BIM_CCSS_org, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/extract_ccss_org_vars", col.names = F, row.names = F, quote = F)
+
+BCC.ccss.org <- BCC.ccss.org[c("CHROM", "POS_GRCh37", "REF", "Effect_allele", "Effect_size", "TYPE", "TYPE2")]
+
+
+write.table(BCC.ccss.org, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/all_BCC_effect_ccss_org.dat", col.names = F, row.names = F, quote = F)
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/prs_prep_data.RData")
+
+
