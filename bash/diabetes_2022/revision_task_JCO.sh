@@ -246,6 +246,3 @@ gzip chr1_22_PCA_afr.assoc.logistic.clean.Psorted.withBETA_deposition.maf.ge.0.0
 
 
 
-## duplicate
-chr6:88113:A:AAT
-chr6:132430:CTT:C
