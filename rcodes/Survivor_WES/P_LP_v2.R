@@ -1,5 +1,6 @@
 # Specify the file path
-setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round2/")
+# setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round2/")
+setwd("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round2")
 ##-------------------------------------POI option 1
 # Option 1: Variants in selected genes with the following 3 rare variant masks will be included :
 # a.	Predicted deleterious missense variants: Annotation will be performed using SnpEff27. We will use dbNSFP28 (version 4.1a), which uses 30 in silico prediction tools for annotation . Missense variants will be classified as deleterious if >90% of collated annotations (across all tools) predict deleteriousness.
@@ -9,6 +10,7 @@ setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/ann
 # version dbNSFP4.4a; downloaded on 10/25/2023
 library(data.table)
 
+## 30 tools in total
 Aloft.final <- {}
 BayesDel.final <- {}
 CADD.final <- {}
@@ -50,9 +52,9 @@ for(i in 1:22){
   
   ## Keep unique
   # df <- df[!duplicated(df$ID),]
-  ################################################
-  ## a.	Predicted deleterious missense variants ##
-  ################################################
+################################################
+## a.	Predicted deleterious missense variants ##
+################################################
   missense <- df[grepl("missense", df$`ANN[*].EFFECT`),]
   # missense <- missense[!duplicated(missense$ID),]
   
@@ -281,16 +283,113 @@ for(i in 1:22){
 }
   
 # save.image("all_missense_deleterious.RData")  
-load.image("all_missense_deleterious.RData")
+load("all_missense_deleterious.RData")
+## Save final only
+rm(list=ls()[!grepl("final", ls())])
+ls()[grepl("final", ls())]
+
+Aloft.final$SNP <- sub(";.*", "", Aloft.final$ID)
+BayesDel.final$SNP <- sub(";.*", "", BayesDel.final$ID)
+CADD.final$SNP <- sub(";.*", "", CADD.final$ID)
+ClinPred.final$SNP <- sub(";.*", "", ClinPred.final$ID)
+DANN.final$SNP <- sub(";.*", "", DANN.final$ID)
+DEOGEN2.final$SNP <- sub(";.*", "", DEOGEN2.final$ID)
+FATHMM.final$SNP <- sub(";.*", "", FATHMM.final$ID)
+fathmm_MKL.final$SNP <- sub(";.*", "", fathmm_MKL.final$ID)
+fathmm_XF.final$SNP <- sub(";.*", "", fathmm_XF.final$ID)
+GenoCanyon.final$SNP <- sub(";.*", "", GenoCanyon.final$ID)
+GERP_RS.final$SNP <- sub(";.*", "", GERP_RS.final$ID)
+LIST_S2.final$SNP <- sub(";.*", "", LIST_S2.final$ID)
+LRT.final$SNP <- sub(";.*", "", LRT.final$ID)
+MCAP.final$SNP <- sub(";.*", "", MCAP.final$ID)
+MetaRNN.final$SNP <- sub(";.*", "", MetaRNN.final$ID)
+MetaSVM.final$SNP <- sub(";.*", "", MetaSVM.final$ID)
+MetaLR.final$SNP <- sub(";.*", "", MetaLR.final$ID)
+MPC.final$SNP <- sub(";.*", "", MPC.final$ID)
+MVP.final$SNP <- sub(";.*", "", MVP.final$ID)
+MutPred.final$SNP <- sub(";.*", "", MutPred.final$ID)
+MutationAssessor.final$SNP <- sub(";.*", "", MutationAssessor.final$ID)
+MutationTaster.final$SNP <- sub(";.*", "", MutationTaster.final$ID)
+Polyphen2HDIV.final$SNP <- sub(";.*", "", Polyphen2HDIV.final$ID)
+Polyphen2HVAR.final$SNP <- sub(";.*", "", Polyphen2HVAR.final$ID)
+PrimateAI.final$SNP <- sub(";.*", "", PrimateAI.final$ID)
+PROVEAN.final$SNP <- sub(";.*", "", PROVEAN.final$ID)
+REVEL.final$SNP <- sub(";.*", "", REVEL.final$ID)
+SIFT.final$SNP <- sub(";.*", "", SIFT.final$ID)
+SIFT4G.final$SNP <- sub(";.*", "", SIFT4G.final$ID)
+VEST4.final$SNP <- sub(";.*", "", VEST4.final$ID)
   
-cc <- cbind.data.frame(missense[, 1:12], missense$dbNSFP_MetaLR_pred, missense$dbNSFP_MetaLR_score)
+###############################################################################
+## Get the list of variants with overlap of at least 90 percent of the tools ##
+###############################################################################
+
+df_list <- list(
+  Aloft.final, BayesDel.final, CADD.final, ClinPred.final, DANN.final,
+  DEOGEN2.final, FATHMM.final, fathmm_MKL.final, fathmm_XF.final, 
+  GenoCanyon.final, GERP_RS.final, LIST_S2.final, LRT.final, MCAP.final, 
+  MetaRNN.final, MetaSVM.final, MetaLR.final, MPC.final, MVP.final, 
+  MutPred.final, MutationAssessor.final, MutationTaster.final, 
+  Polyphen2HDIV.final, Polyphen2HVAR.final, PrimateAI.final, PROVEAN.final, 
+  REVEL.final, SIFT.final, SIFT4G.final, VEST4.final
+)
+
+# Get unique SNPs from each dataframe
+unique_snps_list <- lapply(df_list, function(df) unique(df$SNP))
+
+# Concatenate unique SNPs from all dataframes
+all_unique_snps <- c(unlist(unique_snps_list))
+
+
+threshold <- length(df_list) * 0.9
+
+common_snps <- as.data.frame(table(all_unique_snps))
+common_snps <- common_snps[common_snps$Freq >= threshold,]
+common_snps.90percent.overlap <- unique(common_snps$all_unique_snps)
+
+length(common_snps.90percent.overlap)
+# [1] 19896
+
+common_snps <- common_snps[order(-common_snps$Freq), ]
+
+write.table(common_snps, "missense_variants_with_overlap_in_more_than_90_percent_of_prediction_tools.txt", col.names = T, row.names = F, quote = F)
+
+
+## Now extract these lines
+all.missense <- {}
+for(i in 1:22){
+  CHR=paste0("chr", i)
+  print(CHR)
+  file_path <- paste0("new_", CHR, ".Survivor_WES.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp_clinvar_12_10_2023_clinvar_12_10_2023.vcf-FIELDS-simple.txt")
+  df <- fread(file_path, header = TRUE, sep ='\t')
+  df[df == "."] <- NA
+  colnames(df)
   
-  ################
-  ## c. Clinvar ##
-  ################
-  clinvar <- df[!grepl("uncertain|benign|conflicting|not_provided|drug_response|risk_factor|^\\-$|^\\.$", df$CLNSIG, ignore.case = T),]
-  cc <- cbind.data.frame(clinvar$ID, clinvar$CLNSIG, clinvar$dbNSFP_clinvar_clnsig)
-  clinvar <- clinvar[!duplicated(clinvar$ID),]
+  ## Keep unique
+  # df <- df[!duplicated(df$ID),]
+  ################################################
+  ## a.	Predicted deleterious missense variants ##
+  ################################################
+  missense <- df[grepl("missense", df$`ANN[*].EFFECT`),]
+  missense$SNP <- sub(";.*", "", missense$ID)
+  missense <- missense[missense$SNP %in% common_snps$all_unique_snps,]
+  all.missense <- rbind.data.frame(all.missense, missense)
+  rm(df)
+}
+
+
+write.table(all.missense, "missense_variants_with_overlap_in_more_than_90_percent_of_prediction_tools_all_cols.txt", col.names = T, row.names = F, quote = F)
+
+
+#########################################
+## b. Predicted loss-of-function (LOF) ## Done!
+#########################################
+  
+################
+## c. Clinvar ## Done!
+################
+  # clinvar <- df[!grepl("uncertain|benign|conflicting|not_provided|drug_response|risk_factor|^\\-$|^\\.$", df$CLNSIG, ignore.case = T),]
+  # cc <- cbind.data.frame(clinvar$ID, clinvar$CLNSIG, clinvar$dbNSFP_clinvar_clnsig)
+  # clinvar <- clinvar[!duplicated(clinvar$ID),]
 
 
   
