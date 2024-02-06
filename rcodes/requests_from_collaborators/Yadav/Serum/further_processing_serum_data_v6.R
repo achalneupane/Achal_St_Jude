@@ -42,6 +42,10 @@ CTCAE.serum.1 <- CTCAE.serum[CTCAE.serum$anthracyclines_dose_any > 0 | CTCAE.ser
 table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade)
 table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade >= 2)
 
+## For Table 2 (in Table_counts sheet of Serum_data_processed_v6_corrected_11_18_2023.xlxs)
+table_2 <- CTCAE.serum.1[!is.na(CTCAE.serum.1$grade),]
+write.table(table_2, "table_2.txt", row.names = F, col.names = T, quote = F, sep = "\t")                    
+
 ## break down exposed to either anthracyclines or chest radiation by race
 CTCAE.serum.1$race_group [CTCAE.serum.1$race =="White"] <- "White"
 CTCAE.serum.1$race_group [CTCAE.serum.1$race =="Black"] <- "Black"

@@ -160,6 +160,26 @@ sum(WGS_SJLID$V2 %in% SJLID)
 # 106 ## Survivors from WGS in Community_control WES
 
 ## total 4474 in WGS if we include both Survivor and community control in SJLIFE
+
+## Rename sample ID
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/plink_all")
+all.samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/plink_all/chr19.Survivor_WES.GATK4180.hg38_biallelic.fam", header = F)
+
+all.samples <- all.samples[1:2]
+
+SJLIFE <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/SJLIFE_WESsamplelist_TBIDcheck_YSapkota_02Aug2022_FINAL.txt", header = T)
+sum(duplicated(SJLIFE$SJLID))
+
+all.samples$V3 <- all.samples$V1
+all.samples$V4 <- SJLIFE$SJLID[match(all.samples$V2, SJLIFE$CompBioID)]
+all.samples$V4[is.na(all.samples$V4)] <- all.samples$V2[is.na(all.samples$V4)]
+
+all.samples$V4 <- sub(".*CCSS-0", "", all.samples$V4)
+all.samples$V4 <- sub(".*CCSS-", "", all.samples$V4)
+
+write.table(all.samples, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/rename_samples.txt", col.names = F, row.names = F, quote = F)
+
+
 ################################################################################################################
 ################################################################################################################
 ################################################################################################################

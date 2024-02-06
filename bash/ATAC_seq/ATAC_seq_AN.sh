@@ -41,24 +41,24 @@ echo "Region $(ls *.bed.count | sort -V | cut -d'.' -f1 | tr '\n' ' ')" > All.co
 paste All.kept.Repro.bed.pre $(ls *.bed.count | sort -V)  >> All.counts.dat
 
 
-#######################
-## With wanted sites ##
-#######################
+# #######################
+# ## With wanted sites ##
+# #######################
 
-#ATACseq Paired-End, recommend only use nucleosome free fragments. See "ATACseq QC and peak calling" for details
-for sample in $(ls *FDR50_free_macs2_peaks.narrowPeak | cut -d'.' -f1); do
-echo "Doing ${sample}"
-# cat ${sample}.bedpe | awk '$6 - $2 < 109{OFS="\t"; print $1,$2,$6}' > ${sample}.bed
-bedtools intersect -a wanted.sites.bed -b ${sample}.bed -c | awk '{print $NF}' > ${sample}.wanted.sites.bed.count
-done
+# #ATACseq Paired-End, recommend only use nucleosome free fragments. See "ATACseq QC and peak calling" for details
+# for sample in $(ls *FDR50_free_macs2_peaks.narrowPeak | cut -d'.' -f1); do
+# echo "Doing ${sample}"
+# # cat ${sample}.bedpe | awk '$6 - $2 < 109{OFS="\t"; print $1,$2,$6}' > ${sample}.bed
+# bedtools intersect -a wanted.sites.bed -b ${sample}.bed -c | awk '{print $NF}' > ${sample}.wanted.sites.bed.count
+# done
 
 
-#Combine into count table
-awk '{print $1":"$2"-"$3}' wanted.sites.bed > wanted.sites.bed.pre
+# #Combine into count table
+# awk '{print $1":"$2"-"$3}' wanted.sites.bed > wanted.sites.bed.pre
 
-ls *.wanted.sites.bed.count| sort -V
+# ls *.wanted.sites.bed.count| sort -V
 
-echo "Region $(ls *.wanted.sites.bed.count | sort -V | cut -d'.' -f1 | tr '\n' ' ')" > All.wanted.sites.counts.dat
-paste wanted.sites.bed.pre $(ls *.wanted.sites.bed.count | sort -V)  >> All.wanted.sites.counts.dat
+# echo "Region $(ls *.wanted.sites.bed.count | sort -V | cut -d'.' -f1 | tr '\n' ' ')" > All.wanted.sites.counts.dat
+# paste wanted.sites.bed.pre $(ls *.wanted.sites.bed.count | sort -V)  >> All.wanted.sites.counts.dat
 
 

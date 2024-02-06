@@ -349,3 +349,93 @@ plink --bfile prs_out/${study}_varname_updated --score prs_out/${study}.prsweigh
 #######################################################################################################################################
 #######################################################################################################################################
 #######################################################################################################################################
+
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic_ID_updated* .
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_ID_updated* .
+
+module load plink/1.90b
+plink --bfile chr.ALL.Survivor_WES.GATK4180.hg38_biallelic_ID_updated --extract rare_variants_to_extract.txt --keep-allele-order --make-bed -out all_BCC_rare_variants
+
+plink --bfile all_BCC_rare_variants --recodeA --out all_BCC_rare_variants_recodeA
+
+
+
+
+IN SJLIFE, 
+6.15% for CSG60
+29.62% in CSG172
+3.12 % BCC panel
+3.34% clinvar.BCC.result
+0.96% in NCI_Table3
+
+
+
+1. For the CSG60 dataset, we found 43/60 genes, with a total of 285 variants in WES data, utilizing ClinVar annotations. Out of the 31 reported genes (Clinvar set), 29 were found. Among these, 67 variants from these genes matched with 148 variants reported by Kim et al in the ClinVar set (21 of which were not considered pathogenic/likely pathogenic (P/LP) in the latest ClinVar update).
+2. For the CSG172 dataset, we found 84/172 genes, with a total of 473 variants in WES data. Out of the 46 reported genes (Clinvar set), 41 were found. Among these, 64 variants matched with 188 variants reported by Kim et al in the ClinVar set.
+
+
+grep 'NA' csg.60.vars.unique.txt | cut -f8 | while read -r line; do
+  # echo "Doing ${line}"
+  grep "${line}" /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic_ID_updated.bim
+done
+
+
+
+CSG60 variants present in WES but not P/LP (all uncertain significance)
+# 1       chr1:241512001:G:C      0       241512001       C       G
+# 2       chr2:47800130:C:*       0       47800130        *       C
+# 2       chr2:47800130:C:T       0       47800130        T       C
+# 17      chr17:31169999:T:G      0       31169999        G       T
+# 17      chr17:31259060:T:C      0       31259060        C       T
+# 17      chr17:31227289:G:T      0       31227289        T       G
+# 9       chr9:37002705:C:T       0       37002705        T       C
+# 9       chr9:95485875:C:T       0       95485875        T       C
+# 13      chr13:48360062:T:A      0       48360062        A       T
+# 13      chr13:48303931:C:T      0       48303931        T       C
+# 13      chr13:48465238:C:T      0       48465238        T       C
+# 13      chr13:48303991:C:CGGAACCCCCGGCA 0       48303991        CGGAACCCCCGGCA  C
+# 13      chr13:48456349:G:T      0       48456349        T       G
+# 13      chr13:48349000:G:A      0       48349000        A       G
+# 10      chr10:43119576:G:A      0       43119576        A       G
+# 1       chr1:17028712:T:C       0       17028712        C       T
+# 1       chr1:17033077:C:T       0       17033077        T       C
+# 10      chr10:102509250:G:A     0       102509250       A       G
+# 17      chr17:7675058:C:T       0       7675058 T       C
+# 17      chr17:7675070:C:T       0       7675070 T       C
+# 11      chr11:32428554:G:A      0       32428554        A       G
+
+
+grep 'NA' csg.60.vars.unique.txt | cut -f8 | while read -r line; do
+  # echo "Doing ${line}"
+  grep "${line}" /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/all.bim
+done
+
+CSG60 variants present in WGS (all uncertain significance)
+# 5       chr5:112834948:T:G      0       112834948       G       T **
+# 1       chr1:241512001:G:C      0       241512001       C       G
+# 2       chr2:47800130:C:T       0       47800130        T       C
+# 17      chr17:31169999:T:G      0       31169999        G       T
+# 17      chr17:31259060:T:C      0       31259060        C       T
+# 17      chr17:31227289:G:T      0       31227289        T       G
+# 9       chr9:37002705:C:T       0       37002705        T       C
+# 9       chr9:95485875:C:T       0       95485875        T       C
+# 10      chr10:87863635:C:T      0       87863635        T       C **
+# 13      chr13:48360062:T:A      0       48360062        A       T
+# 13      chr13:48303931:C:T      0       48303931        T       C
+# 13      chr13:48465238:C:T      0       48465238        T       C
+# 13      chr13:48456349:G:T      0       48456349        T       G
+# 13      chr13:48349000:G:A      0       48349000        A       G
+# 13      chr13:48303716:G:T      0       48303716        T       G **
+# 10      chr10:43119576:G:A      0       43119576        A       G
+# 1       chr1:17028712:T:C       0       17028712        C       T
+# 1       chr1:17033077:C:T       0       17033077        T       C
+# 1       chr1:170330771:T:C      0       170330771       C       T **
+# 11      chr11:112093129:C:T     0       112093129       T       C **
+# 11      chr11:112093129:C:<*:DEL>       0       112093129       <*:DEL> C **
+# 10      chr10:102509250:G:A     0       102509250       A       G
+# 17      chr17:76761531:G:A      0       76761531        A       G **
+# 17      chr17:7675058:C:T       0       7675058 T       C
+# 17      chr17:76750589:C:T      0       76750589        T       C
+# 17      chr17:7675070:C:T       0       7675070 T       C
+# 11      chr11:32428554:G:A      0       32428554        A       G
