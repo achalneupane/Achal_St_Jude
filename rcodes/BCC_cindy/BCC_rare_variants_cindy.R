@@ -1,4 +1,5 @@
 ## read WES annotation files for POI option 1
+rm(list=ls())
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/")
 
 gene_regions <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/all_genes_gene_regions.txt", header = T, sep = "\t")
@@ -60,6 +61,7 @@ snpeff.afr <- snpeff[which(snpeff$AF <0.01 & snpeff$AF_afr < 0.01),]
 
 
 length(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
+# 46076
 cc <- as.data.frame(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
 dim(cc)
 write.table(cc, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/rare_variants_to_extract.txt", row.names = F, col.names = F, quote = F)
@@ -412,7 +414,13 @@ load("Achal_carrier.status.RData")
 raw.2 <- raw[raw$IID %in% subdf$studyid,]
 raw.2 <- raw.2[raw.2$FID %in% carrier.status$FID,]
 
-raw.2[, -c(1, 2)][raw.2[, -c(1, 2)] == 2] <- 1
+library(dplyr)
+## Make genotype 2 to 1, so we can get the frequency
+raw.2 <- raw.2 %>%
+  mutate_at(vars(-c(1, 2)), ~ ifelse(. == 2, 1, .))
+
+row.names(raw.2) <- raw.2$IID
+
 kim_ST1.csg172.clinvar.all.raw.2 <- raw.2[kim_ST1.csg172.clinvar.all$SNP]
 
 

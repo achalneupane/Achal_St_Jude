@@ -61,8 +61,10 @@ snpeff.afr <- snpeff[which(snpeff$AF <0.01 & snpeff$AF_afr < 0.01),]
 
 
 length(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
+# 46076
 cc <- as.data.frame(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
 dim(cc)
+# 46076
 write.table(cc, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/rare_variants_to_extract.txt", row.names = F, col.names = F, quote = F)
 # Dear Achal,
 #
@@ -156,7 +158,7 @@ table(is.na(csg.60.vars.unique$matched))
 # 67    81 
 
 ## 43 0f 60 genes and total of 285 variants found in WES based on clinvar. 29/31 genes match based on clinvar annotation Of these, 67 variants match out of 148 variants in Kim (clinvar set) 
-write.table(csg.60.vars.unique, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/csg.60.vars.unique.txt", row.names = F, col.names = T, quote = F, sep ="\t")
+# write.table(csg.60.vars.unique, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/csg.60.vars.unique.txt", row.names = F, col.names = T, quote = F, sep ="\t")
 
 kim_ST1.csg60.loftee.all <- loftee.all[loftee.all$SYMBOL %in% kim_ST1.csg60$Gene.Name,]
 
@@ -215,7 +217,7 @@ table(is.na(kim_ST1.csg172.vars.unique$matched))
 # 64   124 
 ## 84 0f 172 genes and total of 473 variants found in WES based on clinvar. 41/46 genes match based on clinvar annotation Of these, 64 variants match out of 188 variants in Kim (clinvar set) 
 
-write.table(kim_ST1.csg172.vars.unique, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/kim_ST1.csg172.vars.unique.txt", row.names = F, col.names = T, quote = F, sep ="\t")
+# write.table(kim_ST1.csg172.vars.unique, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/kim_ST1.csg172.vars.unique.txt", row.names = F, col.names = T, quote = F, sep ="\t")
 
 kim_ST1.csg172.loftee.all <- loftee.all[loftee.all$SYMBOL %in% kim_ST1.csg172$Gene.Name,]
 
@@ -297,7 +299,7 @@ raw <- raw[, !(colnames(raw) %in% c("PAT", "MAT", "SEX", "PHENOTYPE"))]
 
 # colnames(raw) # check this with the .bim REF and NON-REFERENCE alleles
 dim(raw)
-# 46078
+# [1]  8065 46078
 
 sjl <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//Survivor_WES/biallelic/extract_SJLIFE_survivor_iid_fid.txt", header = F)
 ccss_exp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//Survivor_WES/biallelic/extract_CCSS.samples_iid_fid.txt", header = F)
@@ -440,7 +442,48 @@ all.genes <- unique(c(kim_ST1.csg60$Gene.Name, kim_ST1.csg172$Gene.Name, NCI_tab
 
 write.table(all.genes, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/all_genes_to_extract.txt", row.names = F, col.names = F, quote = F)                    
 
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/BCC_rare_variants_cindy_v2.RData")
+###########################################################################################################################
 
+# Hi Achal,
+# 
+# Attached are the FIDs+IIDs I used for our analysis (recall I arbitrarily removed duplicates; see carrier.status) and the EUR studyids involved in the analysis (subdf).
+# 
+# Would you have time to help with the following by this Friday noon? 
+#   
+#   I was hoping I could get an overall frequency count of the genes with the most P/LP variants in our data, using Clinvar, LOFTEE, and Clinvar or LOFTEE as the masks of interest. Please see the figure below from my grant with Zhaoming using CSG60 as an example. We don't need this pretty plot, just tables with the total P/LP counts for maybe the top 20 genes in csg172 and all of the "panel" genes.
+# 
+# Please let me know if this might be possible. Totally okay if you cannot manage - sorry to ask you on such a tight turnaround.
+# 
+# Thank you,
+# Cindy
+
+# Thank you, Achal! Also, before I forget, please provide the total number of genes in csg172 and panel sets with P/LP variants in our data.
+# length(unique(kim_ST1.csg172.clinvar.all$ANN....GENE)) = 84 genes
+# length(unique(kim_ST1.csg172.loftee.all$SYMBOL)) = 74
+
+# length(unique(BCC.panel.clinvar.all$ANN....GENE)) = 16
+# length(unique(BCC.panel.loftee.all$SYMBOL)) = 12 
+###################################
+## 1. kim_ST1.csg172.clinvar.all ##
+###################################
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/")
+load("Achal_carrier.status.RData")
+
+raw.2 <- raw[raw$IID %in% subdf$studyid,]
+raw.2 <- raw.2[raw.2$FID %in% carrier.status$FID,]
+
+library(dplyr)
+## Make genotype 2 to 1, so we can get the frequency
+raw.2 <- raw.2 %>%
+  mutate_at(vars(-c(1, 2)), ~ ifelse(. == 2, 1, .))
+
+row.names(raw.2) <- raw.2$IID
+
+kim_ST1.csg172.clinvar.all.raw.2 <- raw.2[kim_ST1.csg172.clinvar.all$SNP]
+
+
+################################
 
 # # install.packages("biomaRt")
 # library(biomaRt)
