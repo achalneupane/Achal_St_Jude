@@ -397,7 +397,7 @@ dim(all.missense)
 ## c. Clinvar ## Done!
 ################
   # clinvar <- df[!grepl("uncertain|benign|conflicting|not_provided|drug_response|risk_factor|^\\-$|^\\.$", df$CLNSIG, ignore.case = T),]
-  # cc <- cbind.data.frame(clinvar$ID, clinvar$CLNSIG, clinvar$dbNSFP_clinvar_clnsig)
+  # cc <- cbind.data.frame(clinvar$ID, clinvar$CLNSIG, clinvar$dbNSFP_clinvar_clnsi
   # clinvar <- clinvar[!duplicated(clinvar$ID),]
 
 
