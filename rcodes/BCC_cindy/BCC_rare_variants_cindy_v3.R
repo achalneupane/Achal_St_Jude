@@ -168,6 +168,7 @@ kim_ST1.csg60.snpeff.all <- snpeff.all[snpeff.all$ANN....GENE %in% kim_ST1.csg60
 # (2) Expanded list of 172 cancer susceptibility genes. Kim_ST1.txt, use
 # "CSG_172" (genes marked with "x"; 172 genes evaluated in CCSS)
 
+
 ## get 172 gene list
 kim_ST1.csg172 <- kim_ST1[grepl("x", kim_ST1$CSG_172),]
 
@@ -181,9 +182,9 @@ length(unique(kim_ST1.csg172$Gene.Name[!kim_ST1.csg172$Gene.Name %in% kim_ST1.cs
 
 kim_ST1.csg172.clinvar.all$KEY <- paste0(kim_ST1.csg172.clinvar.all$CHROM, ":", kim_ST1.csg172.clinvar.all$POS)
 ## check if they are in CSG172 vars lists
-kim_ST1.csg172.vars <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/rare_variants/kim_et_al/CS20-0146R1 Kim Supp tables1-3_010721.txt", header = T, sep = "\t")
+kim_ST1.csg172.vars <- read.delim("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/rare_variants/kim_et_al/CS20-0146R1 Kim Supp tables1-3_010721.txt", header = T, sep = "\t")
 kim_ST1.csg172.vars <- kim_ST1.csg172.vars[grepl("Clinvar", kim_ST1.csg172.vars$Method.of.classification, ignore.case = T),]
-grch38 <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/rare_variants/kim_et_al/hglft_genome_d359_661a0.bed", header = F, sep = "\t")
+grch38 <- read.delim("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/rare_variants/kim_et_al/hglft_genome_d359_661a0.bed", header = F, sep = "\t")
 
 kim_ST1.csg172.vars$KEY <- paste0(kim_ST1.csg172.vars$Chr, ":", kim_ST1.csg172.vars$Position)
 grch38$POS37KEY <- sub("-.*", "", grch38$V4)
@@ -664,6 +665,131 @@ write.table(BCC.panel.loftee.clinvar.all.raw.2_summary, "/research_jude/rgs01_ju
 
 
 ################################
+
+## Updated 02/08/2024
+# Then, Achal, you need to count autosomal dominant and recessive genes
+# separately. For dominant genes, those who carry 1 or 2 copies of P/LP variant
+# would be carriers. For recessive genes, only those who carry both copies of
+# P/LP variants should be designated as carriers. Could you do this and see what
+# you get?
+
+## Editing this part based on email on 0.2/08/2024 from Yadav
+raw.3 <- raw[raw$IID %in% subdf$studyid,]
+raw.3 <- raw.3[raw.3$FID %in% carrier.status$FID,]
+raw.3 <- raw.3[grepl("FID|IID|chr", colnames(raw.3))]
+
+rownames(raw.3) <- raw.3$IID
+raw.3 <- raw.3[-c(1:2)]
+
+#############
+## Clinvar ##
+#############
+col.extract <- colnames(raw.3)[colnames(raw.3) %in% kim_ST1.csg172.clinvar.all$SNP]
+
+
+# 1. first check with unknown as AR
+kim_ST1.csg172.AR.unknown.clinvar <- kim_ST1.csg172[!grepl("^dominant$", kim_ST1.csg172$Mode.of.Inheritance),]
+kim_ST1.csg172.AR.unknown.clinvar.var <- kim_ST1.csg172.clinvar.all$SNP[kim_ST1.csg172.clinvar.all$ANN....GENE %in% kim_ST1.csg172.AR.unknown.clinvar$Gene.Name]
+
+
+# 2. then unknown as AD
+kim_ST1.csg172.AR.clinvar <- kim_ST1.csg172[!grepl("^dominant$|unknown", kim_ST1.csg172$Mode.of.Inheritance),]
+kim_ST1.csg172.AR.clinvar.var <- kim_ST1.csg172.clinvar.all$SNP[kim_ST1.csg172.clinvar.all$ANN....GENE %in% kim_ST1.csg172.AR$Gene.Name]
+
+
+# Unknown as AR
+raw.4.AR.unknown.as.recessive.clinvar <- raw.3[, c(col.extract)]
+## If recessive is 1, make it zero
+sum(raw.4.AR.unknown.as.recessive.clinvar[,kim_ST1.csg172.AR.unknown.clinvar.var] == 1, na.rm = T)
+# 183
+
+raw.4.AR.unknown.as.recessive.clinvar[,kim_ST1.csg172.AR.unknown.clinvar.var] <- replace(raw.4.AR.unknown.as.recessive.clinvar[, kim_ST1.csg172.AR.unknown.clinvar.var], raw.4.AR.unknown.as.recessive.clinvar[, kim_ST1.csg172.AR.unknown.clinvar.var] == 1, 0)
+raw.4.AR.unknown.as.recessive.clinvar$kim_ST1.csg172.clinvar.all.status <- ifelse(rowSums(raw.4.AR.unknown.as.recessive.clinvar[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+
+# Unknown as AD
+raw.4.AR.only.as.recessive.clinvar <- raw.3[, c(col.extract)]
+## If recessive is 1, make it zero
+sum(raw.4.AR.only.as.recessive.clinvar[,kim_ST1.csg172.AR.clinvar.var] == 1, na.rm = T)
+# 173
+
+raw.4.AR.only.as.recessive.clinvar[,kim_ST1.csg172.AR.clinvar.var] <- replace(raw.4.AR.only.as.recessive.clinvar[, kim_ST1.csg172.AR.clinvar.var], raw.4.AR.only.as.recessive.clinvar[, kim_ST1.csg172.AR.clinvar.var] == 1, 0)
+raw.4.AR.only.as.recessive.clinvar$kim_ST1.csg172.clinvar.all.status <- ifelse(rowSums(raw.4.AR.only.as.recessive.clinvar[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+
+############
+## Loftee ##
+############
+## Extract variant carrier status
+col.extract <- colnames(raw.3)[colnames(raw.3) %in% kim_ST1.csg172.loftee.all$SNP]
+
+
+# 1. first check with unknown as AR
+kim_ST1.csg172.AR.unknown.loftee <- kim_ST1.csg172[!grepl("^dominant$", kim_ST1.csg172$Mode.of.Inheritance),]
+kim_ST1.csg172.AR.unknown.loftee.var <- kim_ST1.csg172.loftee.all$SNP[kim_ST1.csg172.loftee.all$SYMBOL %in% kim_ST1.csg172.AR.unknown.loftee$Gene.Name]
+
+
+# 2. then unknown as AD
+kim_ST1.csg172.AR.loftee <- kim_ST1.csg172[!grepl("^dominant$|unknown", kim_ST1.csg172$Mode.of.Inheritance),]
+kim_ST1.csg172.AR.loftee.var <- kim_ST1.csg172.loftee.all$SNP[kim_ST1.csg172.loftee.all$SYMBOL %in% kim_ST1.csg172.AR.loftee$Gene.Name]
+
+# Unknown as AR
+raw.4.AR.unknown.as.recessive.loftee <- raw.3[, c(col.extract)]
+## If recessive is 1, make it zero
+sum(raw.4.AR.unknown.as.recessive.loftee[,kim_ST1.csg172.AR.unknown.loftee.var] == 1, na.rm = T)
+# 258
+
+raw.4.AR.unknown.as.recessive.loftee[,kim_ST1.csg172.AR.unknown.loftee.var] <- replace(raw.4.AR.unknown.as.recessive.loftee[, kim_ST1.csg172.AR.unknown.loftee.var], raw.4.AR.unknown.as.recessive.loftee[, kim_ST1.csg172.AR.unknown.loftee.var] == 1, 0)
+raw.4.AR.unknown.as.recessive.loftee$kim_ST1.csg172.loftee.all.status <- ifelse(rowSums(raw.4.AR.unknown.as.recessive.loftee[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+
+# Unknown as AD
+raw.4.AR.only.as.recessive.loftee <- raw.3[, c(col.extract)]
+## If recessive is 1, make it zero
+sum(raw.4.AR.only.as.recessive.loftee[,kim_ST1.csg172.AR.loftee.var] == 1, na.rm = T)
+# 242
+
+raw.4.AR.only.as.recessive.loftee[,kim_ST1.csg172.AR.loftee.var] <- replace(raw.4.AR.only.as.recessive.loftee[, kim_ST1.csg172.AR.loftee.var], raw.4.AR.only.as.recessive.loftee[, kim_ST1.csg172.AR.loftee.var] == 1, 0)
+raw.4.AR.only.as.recessive.loftee$kim_ST1.csg172.loftee.all.status <- ifelse(rowSums(raw.4.AR.only.as.recessive.loftee[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+
+############
+## snpeff ##
+############
+
+col.extract <- colnames(raw.3)[colnames(raw.3) %in% kim_ST1.csg172.snpeff.all$SNP]
+
+# 1. first check with unknown as AR
+kim_ST1.csg172.AR.unknown.snpeff <- kim_ST1.csg172[!grepl("^dominant$", kim_ST1.csg172$Mode.of.Inheritance),]
+kim_ST1.csg172.AR.unknown.snpeff.var <- kim_ST1.csg172.snpeff.all$SNP[kim_ST1.csg172.snpeff.all$ANN....GENE %in% kim_ST1.csg172.AR.unknown.snpeff$Gene.Name]
+
+
+# 2. then unknown as AD
+kim_ST1.csg172.AR.snpeff <- kim_ST1.csg172[!grepl("^dominant$|unknown", kim_ST1.csg172$Mode.of.Inheritance),]
+kim_ST1.csg172.AR.snpeff.var <- kim_ST1.csg172.snpeff.all$SNP[kim_ST1.csg172.snpeff.all$ANN....GENE %in% kim_ST1.csg172.AR.snpeff$Gene.Name]
+
+# Unknown as AR
+raw.4.AR.unknown.as.recessive.snpeff <- raw.3[, c(col.extract)]
+## If recessive is 1, make it zero
+sum(raw.4.AR.unknown.as.recessive.snpeff[,kim_ST1.csg172.AR.unknown.snpeff.var] == 1, na.rm = T)
+# 121
+
+raw.4.AR.unknown.as.recessive.snpeff[,kim_ST1.csg172.AR.unknown.snpeff.var] <- replace(raw.4.AR.unknown.as.recessive.snpeff[, kim_ST1.csg172.AR.unknown.snpeff.var], raw.4.AR.unknown.as.recessive.snpeff[, kim_ST1.csg172.AR.unknown.snpeff.var] == 1, 0)
+raw.4.AR.unknown.as.recessive.snpeff$kim_ST1.csg172.snpeff.all.status <- ifelse(rowSums(raw.4.AR.unknown.as.recessive.snpeff[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+
+# Unknown as AD
+raw.4.AR.only.as.recessive.snpeff <- raw.3[, c(col.extract)]
+## If recessive is 1, make it zero
+sum(raw.4.AR.only.as.recessive.snpeff[,kim_ST1.csg172.AR.snpeff.var] == 1, na.rm = T)
+# 109
+
+raw.4.AR.only.as.recessive.snpeff[,kim_ST1.csg172.AR.snpeff.var] <- replace(raw.4.AR.only.as.recessive.snpeff[, kim_ST1.csg172.AR.snpeff.var], raw.4.AR.only.as.recessive.snpeff[, kim_ST1.csg172.AR.snpeff.var] == 1, 0)
+raw.4.AR.only.as.recessive.snpeff$kim_ST1.csg172.snpeff.all.status <- ifelse(rowSums(raw.4.AR.only.as.recessive.snpeff[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+
+
+
+
+carrier_status_unknown.as.AR <- cbind.data.frame(IID = rownames(raw.4.AR.unknown.as.recessive.clinvar), kim_ST1.csg172.clinvar.all.status= raw.4.AR.unknown.as.recessive.clinvar$kim_ST1.csg172.clinvar.all.status, kim_ST1.csg172.loftee.all.status= raw.4.AR.unknown.as.recessive.loftee$kim_ST1.csg172.loftee.all.status, kim_ST1.csg172.snpeff.all.status = raw.4.AR.unknown.as.recessive.snpeff$kim_ST1.csg172.snpeff.all.status)
+carrier_status_unknown.as.AD <- cbind.data.frame(IID = rownames(raw.4.AR.only.as.recessive.clinvar), kim_ST1.csg172.clinvar.all.status= raw.4.AR.only.as.recessive.clinvar$kim_ST1.csg172.clinvar.all.status, kim_ST1.csg172.loftee.all.status= raw.4.AR.only.as.recessive.loftee$kim_ST1.csg172.loftee.all.status, kim_ST1.csg172.snpeff.all.status = raw.4.AR.only.as.recessive.snpeff$kim_ST1.csg172.snpeff.all.status)
+
+save(list = c("carrier_status_unknown.as.AR", "carrier_status_unknown.as.AD"), file = "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis//CSG172_carrier_updated_for_AR_genes.RData")
+
 
 # # install.packages("biomaRt")
 # library(biomaRt)

@@ -383,26 +383,23 @@ done
 
 
 CSG60 variants present in WES but not P/LP (all uncertain significance)
-# 1       chr1:241512001:G:C      0       241512001       C       G
-# 2       chr2:47800130:C:*       0       47800130        *       C
-# 2       chr2:47800130:C:T       0       47800130        T       C
+# 2       chr2:47800130:C:*;rs587782805       0       47800130        *       C
 # 17      chr17:31169999:T:G      0       31169999        G       T
-# 17      chr17:31259060:T:C      0       31259060        C       T
 # 17      chr17:31227289:G:T      0       31227289        T       G
-# 9       chr9:37002705:C:T       0       37002705        T       C
-# 9       chr9:95485875:C:T       0       95485875        T       C
+# 9       chr9:95485875:C:T;rs368869806       0       95485875        T       C
+# 9       chr9:37002705:C:T;rs398123063       0       37002705        T       C
 # 13      chr13:48360062:T:A      0       48360062        A       T
-# 13      chr13:48303931:C:T      0       48303931        T       C
-# 13      chr13:48465238:C:T      0       48465238        T       C
+# 13      chr13:48303931:C:T;rs1952051704      0       48303931        T       C
+# 13      chr13:48465238:C:T;rs137853293      0       48465238        T       C
 # 13      chr13:48303991:C:CGGAACCCCCGGCA 0       48303991        CGGAACCCCCGGCA  C
 # 13      chr13:48456349:G:T      0       48456349        T       G
-# 13      chr13:48349000:G:A      0       48349000        A       G
-# 10      chr10:43119576:G:A      0       43119576        A       G
-# 1       chr1:17028712:T:C       0       17028712        C       T
-# 1       chr1:17033077:C:T       0       17033077        T       C
-# 10      chr10:102509250:G:A     0       102509250       A       G
-# 17      chr17:7675058:C:T       0       7675058 T       C
-# 17      chr17:7675070:C:T       0       7675070 T       C
+# 13      chr13:48349000:G:A;rs2138093650      0       48349000        A       G
+# 10      chr10:43119576:G:A;rs1318733775      0       43119576        A       G
+# 1       chr1:17028712:T:C;rs1310341038       0       17028712        C       T
+# 1       chr1:17033077:C:T;rs570278423       0       17033077        T       C
+# 1       chr1:241512001:G:C;rs199822819      0       241512001       C       G
+# 10      chr10:102509250:G:A;rs2135620546     0       102509250       A       G
+# 17      chr17:7675058:C:T;rs150607408       0       7675058 T       C
 # 11      chr11:32428554:G:A      0       32428554        A       G
 
 
@@ -439,3 +436,32 @@ CSG60 variants present in WGS (all uncertain significance)
 # 17      chr17:76750589:C:T      0       76750589        T       C
 # 17      chr17:7675070:C:T       0       7675070 T       C
 # 11      chr11:32428554:G:A      0       32428554        A       G
+
+
+
+grep 'NA' kim_ST1.csg172.vars.unique.txt | cut -f10 | while read -r line; do
+  # echo "Doing ${line}"
+  grep -w "${line}" /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic_ID_updated.bim
+done
+
+
+CSG172 variants present in WES but not P/LP (all uncertain significance)
+1       chr1:241497927:A:ATTT;rs367543046   0       241497927       ATTT    A ## conflicting
+1       chr1:241512001:G:C;rs199822819       0       241512001       C       G ## conflicting
+2       chr2:136114925:C:T;rs147214773      0       136114925       T       C ## conflicting
+3       chr3:10149921:C:T;rs28940298       0       10149921        T       C ## conflicting
+3       chr3:48583584:G:A;rs79378857       0       48583584        A       G ## conflicting
+3       chr3:69959395:A:G;rs368915509       0       69959395        G       A
+5       chr5:1294282:C:T;rs121918661        0       1294282 T       C ## conflicting
+5       chr5:112780865:C:G;rs141576417     0       112780865       G       C ## conflicting
+14      chr14:81062179:C:T;rs142063461      0       81062179        T       C ## conflicting
+14      chr14:81143695:G:A;rs121908866      0       81143695        A       G ## conflicting
+17      chr17:58709883:A:G;rs199886026      0       58709883        G       A ## conflicting
+17      chr17:7675070:C:T;rs397514495       0       7675070 T       C ## conflicting
+17      chr17:61716051:G:A;59793412       0       61716051        A       G ## conflicting
+22      chr22:28695868:AG:A;rs555607708     0       28695868        A       AG ## conflicting
+22      chr22:28711986:C:T;rs121908702      0       28711986        T       C ## Uncertain significance
+22      chr22:28725242:C:*;      0       28725242        *       C ## conflicting
+22      chr22:28725242:C:T;rs121908698      0       28725242        T       C ## conflicting
+
+
