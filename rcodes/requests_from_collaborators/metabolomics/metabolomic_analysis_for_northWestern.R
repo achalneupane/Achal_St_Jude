@@ -71,16 +71,20 @@ intensities_t = as.data.frame(scale(intensities_t, center = TRUE, scale = TRUE))
 ## Add phenotype
 intensities_t$samples <- row.names(intensities_t)
 intensities_t$Cardtox <- pheno$Cardtox[match(sub("\\..*", "", intensities_t$samples), pheno$ID)]
+intensities_t$Genotypes <- pheno$Genotypes[match(sub("\\..*", "", intensities_t$samples), pheno$ID)]
+
+
+metabolites <- intensities_t
 ############
 ## t.test ##
 ############
-metabolites <- intensities_t
 # If there are NAs, we can remove them before running the t-test
 # Replace NaN with NA in the entire dataframe
 metabolites <- apply(metabolites, MARGIN = 2, FUN = function(x) ifelse(is.nan(x), NA, x))
-
-metabolites_list <- metabolites[, colSums(!is.na(metabolites)) > 0, drop = FALSE]
-dim(metabolites_list)
+metabolites <- as.data.frame(metabolites[, colSums(!is.na(metabolites)) > 0, drop = FALSE])
+dim(metabolites)
+metabolites_list <- colnames(metabolites)
+metabolites_list <- metabolites_list[!grepl("samples|Cardtox|Genotypes", metabolites_list)]
 
 # Empty vector to store t-test results
 p_values <- c()
@@ -88,8 +92,49 @@ p_values <- c()
 # Loop through each metabolite
 for (metabolite in metabolites_list) {
   # t_test_result <- t.test(metabolites[[metabolite]] ~ Cardtox, data = metabolites)
-  t_test_result <- t.test(metabolites[[metabolite]] ~ Cardtox, data = metabolites, na.rm = TRUE)
+  t_test_result <- t.test(as.numeric(metabolites[[metabolite]]) ~ Cardtox, data = metabolites, na.rm = TRUE)
   p_values <- c(p_values, t_test_result$p.value)
 }
 
+names(p_values) <- metabolites_list
+
 # Display results or further analysis with the p_values vector
+metabolite_df <- data.frame(Metabolite = names(p_values), p_value = unname(p_values))
+
+
+#################
+## Mixed model ##
+#################
+cc <- metabolites
+cc$dose <- sub(".*\\.", "", cc$samples)
+
+## Install and load the necessary package
+# install.packages("lme4")
+library(lme4)
+# ## check for collinearity. High correlation between predictors can lead to multicollinearity issues
+# cor(cc[, c("xylitol", "glutamylcysteine")])
+
+## fix colnames
+colnames(cc)[!grepl("samples|Cardtox|Genotypes|dose", colnames(cc))] <-  
+  paste0("M_",gsub("_*_", "_",gsub(" |-|/|\\+|\\(|\\)|,|\\'", "_", colnames(cc)[!grepl("samples|Cardtox|Genotypes|dose", colnames(cc))])))
+
+colnames(cc)[!grepl("samples|Cardtox|Genotypes|dose", colnames(cc))] <- gsub('\\"', "", colnames(cc)[!grepl("samples|Cardtox|Genotypes|dose", colnames(cc))])
+
+
+metabolite_columns <- colnames(cc) [!grepl("samples|Cardtox|Genotypes|dose", colnames(cc))]
+cc[metabolite_columns] <- sapply(cc[metabolite_columns], as.numeric)
+
+
+models_list <- list()
+# Loop through metabolite columns and fit mixed-effects model
+for (metabolite in metabolite_columns) {
+  # Construct the formula
+  formula <- as.formula(paste0(metabolite,"~ dose", "+ (1 | Cardtox)"))
+  # Fit the mixed-effects model
+  model <- lmer(formula, data = cc)
+  
+  # Store the model in the list
+  models_list[[metabolite]] <- model
+}
+
+# ggplot(cc,aes(x=Cardtox,y=valine_norvaline,col=dose)) + geom_jitter() + geom_boxplot(alpha=0.2) + facet_wrap(~dose)
