@@ -1,0 +1,19 @@
+SCHEME STDERR
+STDERR SE
+
+MARKER SNP
+ALLELE A1 A2
+EFFECT BETA
+PVALUE P
+PROCESS sjlife_results.assoc.logistic.clean.Psorted.formetal.common
+
+PROCESS ccss_org_results.assoc.logistic.clean.Psorted.formetal.common
+
+PROCESS ccss_exp_results.assoc.logistic.clean.Psorted.formetal.common
+
+OUTFILE	Meta_analysis_sjlife_ccss_org_ccss_exp_fixed_ .tbl
+
+ANALYZE HETEROGENEITY
+
+QUIT
+

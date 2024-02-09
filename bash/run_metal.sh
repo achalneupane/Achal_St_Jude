@@ -1,11 +1,41 @@
 #!/bin/bash
 
 ## Process PLINK result files for meta-analysis using METAL; add A2 and BETA
+# (base) [aneupane@splprhpc09 ttn_bag3]$ head sjlife_results.assoc.logistic.clean.Psorted
+# CHR SNP BP A1 TEST NMISS OR SE L95 U95 STAT P
+# 10 chr10:119570337:A:C 119570337 C ADD 1645 4.403 0.4072 1.982 9.782 3.64 0.0002725
+# 10 chr10:119640101:T:C 119640101 C ADD 1630 3.383 0.348 1.71 6.691 3.502 0.0004613
+# 10 chr10:119644280:G:A 119644280 A ADD 1645 3.318 0.3462 1.683 6.539 3.463 0.0005332
+# 10 chr10:119754685:C:G 119754685 G ADD 1645 3.166 0.3497 1.595 6.283 3.295 0.0009831
+# 10 chr10:119833210:A:G 119833210 G ADD 1645 2.973 0.3447 1.513 5.843 3.161 0.001571
+# 10 chr10:119691120:G:C 119691120 C ADD 1644 1.426 0.1185 1.13 1.798 2.992 0.002776
+# 2 chr2:178395655:A:G 178395655 A ADD 1643 0.7096 0.1157 0.5657 0.8902 -2.966 0.003017
+# 10 chr10:119610713:G:A 119610713 A ADD 1645 2.82 0.3518 1.415 5.619 2.947 0.003205
+# 10 chr10:119877390:G:A 119877390 A ADD 1645 2.966 0.3709 1.434 6.136 2.932 0.003371
+
+tr '\t' ' ' < sjlife_results.assoc.logistic | sed 's/  */ /g' > sjlife_results.assoc.logistic.clean
+{ head -n 1 sjlife_results.assoc.logistic.clean.Psorted && tail -n +2 sjlife_results.assoc.logistic.clean.Psorted | sort -k12,12n; } > sjlife_results.assoc.logistic.clean.Psorted.sorted
+
+
 # SJLIFE
 awk '{split($2, a, ":"); print $0, a[3], a[4]}' sjlife_results.assoc.logistic.clean.Psorted \
 | awk '{if($4==$13) A2=$14; else A2=$13; BETA=log($7); print $0, A2, BETA}' \
 | awk 'BEGIN{print "CHR SNP BP A1 TEST NMISS OR SE L95 U95 STAT P REF ALT A2 BETA"}FNR>1{print}' \
 > sjlife_results.assoc.logistic.clean.Psorted.formetal
+
+# (base) [aneupane@splprhpc09 ttn_bag3]$ head sjlife_results.assoc.logistic.clean.Psorted.formetal
+# CHR SNP BP A1 TEST NMISS OR SE L95 U95 STAT P REF ALT A2 BETA
+# 10 chr10:119570337:A:C 119570337 C ADD 1645 4.403 0.4072 1.982 9.782 3.64 0.0002725 A C A 1.48229
+# 10 chr10:119640101:T:C 119640101 C ADD 1630 3.383 0.348 1.71 6.691 3.502 0.0004613 T C T 1.21876
+# 10 chr10:119644280:G:A 119644280 A ADD 1645 3.318 0.3462 1.683 6.539 3.463 0.0005332 G A G 1.19936
+# 10 chr10:119754685:C:G 119754685 G ADD 1645 3.166 0.3497 1.595 6.283 3.295 0.0009831 C G C 1.15247
+# 10 chr10:119833210:A:G 119833210 G ADD 1645 2.973 0.3447 1.513 5.843 3.161 0.001571 A G A 1.08957
+# 10 chr10:119691120:G:C 119691120 C ADD 1644 1.426 0.1185 1.13 1.798 2.992 0.002776 G C G 0.354873
+# 2 chr2:178395655:A:G 178395655 A ADD 1643 0.7096 0.1157 0.5657 0.8902 -2.966 0.003017 A G G -0.343054
+# 10 chr10:119610713:G:A 119610713 A ADD 1645 2.82 0.3518 1.415 5.619 2.947 0.003205 G A G 1.03674
+# 10 chr10:119877390:G:A 119877390 A ADD 1645 2.966 0.3709 1.434 6.136 2.932 0.003371 G A G 1.08721
+
+
 # CCSS EXP
 awk '{split($2, a, ":"); print $0, a[3], a[4]}' ccss_exp_results.assoc.logistic.clean.Psorted \
 | awk '{if($4==$13) A2=$14; else A2=$13; BETA=log($7); print $0, A2, BETA}' \
