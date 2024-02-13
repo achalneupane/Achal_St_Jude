@@ -62,3 +62,16 @@ paste All.kept.Repro.bed.pre $(ls *.bed.count | sort -V)  >> All.counts.dat
 # paste wanted.sites.bed.pre $(ls *.wanted.sites.bed.count | sort -V)  >> All.wanted.sites.counts.dat
 
 
+
+
+
+#############################################
+# Can you examine the ATAC-seq peak data for the variants of interest, such as the TTN or BAG region and the new locus from Kateryna’s new GWAS, along with previously reported GWAS variants for cardiomyopathy in the Cancer Research (chr1 locus) and JNCI (chr6 locus) papers?
+# We need to see if the peaks differ by cardiomyopathy status, with and without the variants of interest.
+
+Sapkota et al 2022; JNCI
+rs2815063=chr6:39294759:C:A
+
+
+Sapkota et al 2020; Cancer Research
+rs6689879=chr1:113559097:T:C

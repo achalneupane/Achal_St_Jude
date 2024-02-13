@@ -14,7 +14,7 @@
 # 10 chr10:119877390:G:A 119877390 A ADD 1645 2.966 0.3709 1.434 6.136 2.932 0.003371
 
 tr '\t' ' ' < sjlife_results.assoc.logistic | sed 's/  */ /g' > sjlife_results.assoc.logistic.clean
-{ head -n 1 sjlife_results.assoc.logistic.clean.Psorted && tail -n +2 sjlife_results.assoc.logistic.clean.Psorted | sort -k12,12n; } > sjlife_results.assoc.logistic.clean.Psorted.sorted
+{ head -n 1 sjlife_results.assoc.logistic.clean && tail -n +2 sjlife_results.assoc.logistic.clean | sort -k12,12n; } > sjlife_results.assoc.logistic.clean.Psorted
 
 
 # SJLIFE
