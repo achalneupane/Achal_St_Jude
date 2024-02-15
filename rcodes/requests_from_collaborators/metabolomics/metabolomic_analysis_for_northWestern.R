@@ -83,23 +83,69 @@ metabolites <- intensities_t
 metabolites <- apply(metabolites, MARGIN = 2, FUN = function(x) ifelse(is.nan(x), NA, x))
 metabolites <- as.data.frame(metabolites[, colSums(!is.na(metabolites)) > 0, drop = FALSE])
 dim(metabolites)
+metabolites$dose <- sub("^[^.]+\\.", "", row.names(metabolites))
+
+## fix colnames
+colnames(metabolites)[!grepl("samples|Cardtox|Genotypes|dose", colnames(metabolites))] <-  
+  paste0("M_",gsub("_*_", "_",gsub(" |-|/|\\+|\\(|\\)|,|\\'", "_", colnames(metabolites)[!grepl("samples|Cardtox|Genotypes|dose", colnames(metabolites))])))
+
+colnames(metabolites)[!grepl("samples|Cardtox|Genotypes|dose", colnames(metabolites))] <- gsub('\\"', "", colnames(metabolites)[!grepl("samples|Cardtox|Genotypes|dose", colnames(metabolites))])
+colnames(metabolites) <- gsub("_$", "", colnames(metabolites))
+
 metabolites_list <- colnames(metabolites)
-metabolites_list <- metabolites_list[!grepl("samples|Cardtox|Genotypes", metabolites_list)]
+metabolites_list <- metabolites_list[!grepl("samples|Cardtox|Genotypes|dose", metabolites_list)]
 
-# Empty vector to store t-test results
-p_values <- c()
-
-# Loop through each metabolite
-for (metabolite in metabolites_list) {
-  # t_test_result <- t.test(metabolites[[metabolite]] ~ Cardtox, data = metabolites)
-  t_test_result <- t.test(as.numeric(metabolites[[metabolite]]) ~ Genotypes, data = metabolites, na.rm = TRUE)
-  p_values <- c(p_values, t_test_result$p.value)
+doses <- c(0, 1, 3)
+all_p_values <- c()
+for (dose in doses) {
+  # Empty vector to store t-test results for the current dose
+  p_values <- c()
+  # Loop through each metabolite
+  for (metabolite in metabolites_list) {
+    metabolites.dose <- metabolites[metabolites$dose == dose,]
+    
+    # Perform the t-test only if there are enough observations
+    t_test_result <- try(t.test(as.numeric(metabolites.dose[[metabolite]]) ~ Genotypes, data = metabolites.dose, na.rm = TRUE, paired = FALSE), silent = TRUE)
+      
+      # Check if t-test was successful
+      if (!inherits(t_test_result, "try-error")) {
+        p_values <- c(p_values, t_test_result$p.value)
+      } else {
+        # If an error occurs, set p-value to NA
+        p_values <- c(p_values, NA)
+      }
+  }
+  # Assign names to p_values for the current dose
+  names(p_values) <- metabolites_list
+  # Create a unique identifier for each dose
+  dose_identifier <- paste0(dose,"dose", "_")
+  # Append p_values to the all_p_values vector
+  all_p_values <- c(all_p_values, setNames(p_values, paste0(dose_identifier, metabolites_list)))
 }
 
-names(p_values) <- metabolites_list
-
 # Display results or further analysis with the p_values vector
-metabolite_df <- data.frame(Metabolite = names(p_values), p_value = unname(p_values))
+all_p_values <- data.frame( unname(all_p_values))
+colnames(all_p_values) <- c("P", "dose", "metabolites")
+
+
+library(ggplot2)
+
+# Convert 'dose' column to a factor with the desired order
+all_p_values$dose <- factor(all_p_values$dose, levels = c("0dose", "1dose", "3dose"))
+
+# Plot using ggplot2
+ggplot(all_p_values, aes(x = dose, y = P, color = dose)) +
+  geom_point(size = 3) +
+  geom_hline(yintercept = 0.05, linetype = "dashed", color = "red") +
+  labs(title = "P-values for Each Dose", x = "Dose", y = "P-values") +
+  scale_color_manual(values = c("0dose" = "green", "1dose" = "red", "3dose" = "darkred")) +
+  scale_shape_manual(values = c("0dose" = 16, "1dose" = 17, "3dose" = 18)) +
+  theme_minimal()+
+  scale_y_reverse()
+
+
+
+
 
 
 #################
@@ -119,7 +165,7 @@ colnames(cc)[!grepl("samples|Cardtox|Genotypes|dose", colnames(cc))] <-
   paste0("M_",gsub("_*_", "_",gsub(" |-|/|\\+|\\(|\\)|,|\\'", "_", colnames(cc)[!grepl("samples|Cardtox|Genotypes|dose", colnames(cc))])))
 
 colnames(cc)[!grepl("samples|Cardtox|Genotypes|dose", colnames(cc))] <- gsub('\\"', "", colnames(cc)[!grepl("samples|Cardtox|Genotypes|dose", colnames(cc))])
-
+colnames(cc) <- gsub("_$", "", colnames(cc))
 
 metabolite_columns <- colnames(cc) [!grepl("samples|Cardtox|Genotypes|dose", colnames(cc))]
 cc[metabolite_columns] <- sapply(cc[metabolite_columns], as.numeric)
@@ -129,7 +175,7 @@ models_list <- list()
 # Loop through metabolite columns and fit mixed-effects model
 for (metabolite in metabolite_columns) {
   # Construct the formula
-  formula <- as.formula(paste0(metabolite,"~ dose", "+ (1 | Cardtox)"))
+  formula <- as.formula(paste0(metabolite,"~ dose", "+ (1 | Genotypes)"))
   # Fit the mixed-effects model
   model <- lmer(formula, data = cc)
   
