@@ -69,9 +69,13 @@ paste All.kept.Repro.bed.pre $(ls *.bed.count | sort -V)  >> All.counts.dat
 # Can you examine the ATAC-seq peak data for the variants of interest, such as the TTN or BAG region and the new locus from Kateryna’s new GWAS, along with previously reported GWAS variants for cardiomyopathy in the Cancer Research (chr1 locus) and JNCI (chr6 locus) papers?
 # We need to see if the peaks differ by cardiomyopathy status, with and without the variants of interest.
 
-Sapkota et al 2022; JNCI
+Sapkota et al 2022; JNCI (EUR)
 rs2815063=chr6:39294759:C:A
 
 
-Sapkota et al 2020; Cancer Research
+Sapkota et al 2020; Cancer Research (AFR)
 rs6689879=chr1:113559097:T:C
+
+Among survivors of 
+African ancestry with rs6689879*C PHTF1 promoter region was hypomethylated (chr1:113696831-113759486)
+chr1:11375

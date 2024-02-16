@@ -89,13 +89,28 @@ day2 <- c("1537-0", "1537-1", "1537-3", "0242-0", "0242-1", "0242-3",
           "7597-0", "7597-1", "7597-3", "02775-0", "02775-1", "02775-3"
 )
 
+
+pheno$dose <- sub(".*-", "", pheno$new_ID)
+
 pheno$batch [pheno$new_ID %in% day1] <- "day1"
 pheno$batch [pheno$new_ID %in% day2] <- "day2"
 
 pheno.saved <- pheno
 counts.saved <- counts
+
+# pheno <- pheno.saved 
+# counts <- counts.saved
+
+
+
+# PHTF1 <- counts[grepl("chr1:11369|chr1:1137", rownames(counts)),]
+
+doses <- c(0, 1, 3)
+# dose = 1
+for (dose in doses){
+print (dose)
 ## Dox 0
-pheno <- pheno.saved[grepl("-0", pheno.saved$new_ID),]
+pheno <- pheno.saved[pheno.saved$dose == dose,]
 counts <- counts.saved[colnames(counts.saved) %in% pheno$new_ID]
 sum(pheno$new_ID != colnames(counts))
 # 0
@@ -109,8 +124,11 @@ TS <- factor(groupLabels, levels = c("No", "Yes"))
 design <- model.matrix(~ 0 + TS )
 colnames(design) <- levels(TS)
 
-dge <- DGEList(counts = counts, group = groupLabels)
+## adding covariates
+# design <- model.matrix(~ 0 + age +TS )
+# colnames(design) <- c("age",levels(TS))
 
+dge <- DGEList(counts = counts, group = groupLabels)
 
 # filter out low expressed regions
 cpm_cutoff=10
@@ -125,8 +143,16 @@ cont.matrix <- makeContrasts(YesvsNo = (Yes - No), levels = design)
 fitcon <- contrasts.fit(fit, cont.matrix)
 fitcon <- eBayes(fitcon)
 results1 <- topTable(fitcon, n = Inf, sort.by="P", coef="YesvsNo")
-outFile1 <- paste0("Cardiotox_Yes_VS_No_afr", "_diff.txt")
+results1$loci <- rownames(results1)
 
+outFile1 <- paste0("Cardiotox_Yes_VS_No_afr_dose_", dose, "_diff.txt")
+
+write.table(results1, outFile1, col.names = T, row.names = T, sep = "\t", quote = F)
+}
+
+
+PHTF1.vars <- results1[grepl("chr1:11369|chr1:1137", rownames(results1)),]
+PHTF1.vars
 # Create a volcano plot
 library(ggplot2)
 
