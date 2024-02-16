@@ -152,30 +152,92 @@ ggplot(all_p_values, aes(x = dose, y = P, color = dose)) +
 ## Mixed model ##
 #################
 cc <- metabolites
-cc$dose <- sub(".*\\.", "", cc$samples)
-
+cc$samples <- sub("\\..*", "", cc$samples)
 ## Install and load the necessary package
 # install.packages("lme4")
-library(lme4)
+# library(lme4)
+library(lmerTest)
+# lmerTest is an extension of lme4 and is used for hypothesis testing of fixed effects in linear mixed-effects models.
+# Specifically designed to provide p-values for fixed effects, which are not provided by default in lme4.
+
 # ## check for collinearity. High correlation between predictors can lead to multicollinearity issues
 # cor(cc[, c("xylitol", "glutamylcysteine")])
 
 ## fix colnames
-colnames(cc)[!grepl("samples|Cardtox|Genotypes|dose", colnames(cc))] <-  
-  paste0("M_",gsub("_*_", "_",gsub(" |-|/|\\+|\\(|\\)|,|\\'", "_", colnames(cc)[!grepl("samples|Cardtox|Genotypes|dose", colnames(cc))])))
-
-colnames(cc)[!grepl("samples|Cardtox|Genotypes|dose", colnames(cc))] <- gsub('\\"', "", colnames(cc)[!grepl("samples|Cardtox|Genotypes|dose", colnames(cc))])
-colnames(cc) <- gsub("_$", "", colnames(cc))
 
 metabolite_columns <- colnames(cc) [!grepl("samples|Cardtox|Genotypes|dose", colnames(cc))]
 cc[metabolite_columns] <- sapply(cc[metabolite_columns], as.numeric)
 
+# gg <- cc[c(248,250:253)]
+
+estimates <- c()
+p_values <- c()
+result_df <- data.frame()
 
 models_list <- list()
 # Loop through metabolite columns and fit mixed-effects model
 for (metabolite in metabolite_columns) {
   # Construct the formula
-  formula <- as.formula(paste0(metabolite,"~ dose", "+ (1 | Genotypes)"))
+  gg <- cc[c("samples", "Cardtox", "Genotypes", "dose", metabolite)]
+  gg$wanted_var <- gg[,c(metabolite)]
+  
+  gg <- gg %>%
+    arrange(samples, dose) %>%
+    group_by(samples) %>%
+    mutate(baseline_dose = replace(wanted_var, dose != "0", NA)) %>%
+    fill(baseline_dose, .direction = "downup")
+  
+  ## remove baseline samples
+  gg <- gg[gg$dose != 0,]
+  gg$dose <- factor(gg$dose, levels = c(1,3))
+  gg$Genotypes <- factor(gg$Genotypes, levels = c("TT","TC"))
+  formula <- as.formula(paste0(metabolite,"~ dose", " + baseline_dose + dose*Genotypes + (1 | Genotypes)"))
+  # Fit the mixed-effects model
+  model <- lmerTest::lmer(formula, data = gg, REML= T)
+  
+  # Store the model in the list
+  models_list[[metabolite]] <- model
+  summary_model <- summary(model)
+  
+  # Extract Estimate and Pr(>|t|) values
+  estimates <- summary_model$coefficients[, "Estimate"]
+  p_values <- summary_model$coefficients[, "Pr(>|t|)"]
+  
+  result_tmp <- cbind.data.frame(metabolite = metabolite, Estimate = estimates, P_Value = p_values)
+  result_tmp$variables <- rownames(result_tmp)
+  rownames(result_tmp) <- NULL
+  result_df <- rbind.data.frame(result_df, result_tmp)
+}
+
+
+# Given that the baseline_dose is significant, it suggests that there is a
+# significant difference in the response variable (M_1_methylnicotinamide)
+# between the baseline dose (0 um) and the other doses (1 um and 3 um) after
+# accounting for other variables in the model. Positive Coefficient: If the
+# coefficient for baseline_dose is positive, it indicates that, on average, the
+# response variable increases as the baseline dose (dose = 0 um) increases. In
+# other words, individuals with a higher baseline dose tend to have higher
+# values for the response variable.
+
+# Negative Coefficient: If the coefficient for baseline_dose is negative, it
+# suggests that, on average, the response variable decreases as the baseline
+# dose increases. Individuals with a higher baseline dose tend to have lower
+# values for the response variable.
+
+mm.dose3 <- result_df[result_df$variables == "dose3",]
+mm.baseline_dose <- result_df[result_df$variables == "baseline_dose",]
+mm.Genotypes <- result_df[result_df$variables == "GenotypesTC",]
+mm.dose3_Genotypes <- result_df[result_df$variables == "dose3:GenotypesTC",]
+
+
+
+
+## with dose and genotype interaction
+models_list <- list()
+# Loop through metabolite columns and fit mixed-effects model
+for (metabolite in metabolite_columns) {
+  # Construct the formula
+  formula <- as.formula(paste0(metabolite,"~ dose", "+" , baseline_dose, "(1 | Genotypes)"))
   # Fit the mixed-effects model
   model <- lmer(formula, data = cc)
   
@@ -183,4 +245,16 @@ for (metabolite in metabolite_columns) {
   models_list[[metabolite]] <- model
 }
 
-# ggplot(cc,aes(x=Cardtox,y=valine_norvaline,col=dose)) + geom_jitter() + geom_boxplot(alpha=0.2) + facet_wrap(~dose)
+
+## ggplot(cc,aes(x=Cardtox,y=valine_norvaline,col=dose)) + geom_jitter() + geom_boxplot(alpha=0.2) + facet_wrap(~dose)
+# models_list <- list()
+# # Loop through metabolite columns and fit mixed-effects model
+# for (metabolite in metabolite_columns) {
+#   # Construct the formula
+#   formula <- as.formula(paste0(metabolite,"~ dose", "+ (1 | Genotypes)"))
+#   # Fit the mixed-effects model
+#   model <- lmer(formula, data = cc)
+#   
+#   # Store the model in the list
+#   models_list[[metabolite]] <- model
+# }
