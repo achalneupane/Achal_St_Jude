@@ -121,12 +121,12 @@ TS <- factor(groupLabels, levels = c("No", "Yes"))
 
 #batch correction: batch can be added as a covariate if needed
 #this code does not do batch correction
-design <- model.matrix(~ 0 + TS )
-colnames(design) <- levels(TS)
+# design <- model.matrix(~ 0 + TS )
+# colnames(design) <- levels(TS)
 
-## adding covariates
-# design <- model.matrix(~ 0 + age +TS )
-# colnames(design) <- c("age",levels(TS))
+# ## adding covariates
+# design <- model.matrix(~ 0 +TS + Sex + Age_at_treatment + Cumulative.anthracycline.dose, data = pheno)
+# colnames(design) <- c(levels(TS), "Sex", "Age_at_treatment", "Cumulative.anthracycline.dose")
 
 dge <- DGEList(counts = counts, group = groupLabels)
 
@@ -139,36 +139,45 @@ dge <- calcNormFactors(dge)
 
 v <- voom(dge, design, plot = F)
 fit <- lmFit(v, design)
-cont.matrix <- makeContrasts(YesvsNo = (Yes - No), levels = design)
+cont.matrix <- makeContrasts(NovsYes = (No - Yes), levels = design)
 fitcon <- contrasts.fit(fit, cont.matrix)
 fitcon <- eBayes(fitcon)
-results1 <- topTable(fitcon, n = Inf, sort.by="P", coef="YesvsNo")
+results1 <- topTable(fitcon, n = Inf, sort.by="P", coef="NovsYes")
 results1$loci <- rownames(results1)
 
-outFile1 <- paste0("Cardiotox_Yes_VS_No_afr_dose_", dose, "_diff.txt")
+outFile1 <- paste0("Cardiotox_No_VS_Yes_afr_dose_", dose, "_diff.txt")
 
-write.table(results1, outFile1, col.names = T, row.names = T, sep = "\t", quote = F)
+write.table(results1, outFile1, col.names = T, row.names = F, sep = "\t", quote = F)
+
+## With P
+gg <- ggplot(results1, aes(x = logFC, y = -log10(P.Value))) +
+  geom_point(aes(color = ifelse(P.Value < 0.05, "Yes", "No")), size = 3) +
+  scale_color_manual(values = c("Yes" = "red", "No" = "black")) +
+  theme_minimal() +
+  labs(title = "Volcano Plot", x = "logFC", y = "-log10(P.Value)", color = "Siginificant")
+
+ggsave(paste0("Cardiotox_No_VS_Yes_afr_dose_", dose, "_diff.tiff"), gg, width = 8, height = 6, dpi = 300)
+
 }
 
 
 PHTF1.vars <- results1[grepl("chr1:11369|chr1:1137", rownames(results1)),]
 PHTF1.vars
+
+MAGI3 <- results1[grepl("chr1:11339\\d{5,}|chr1:1134\\d{5,}|chr1:1135\\d{5,}|chr1:1136\\d{5,}", rownames(results1)),]
+
 # Create a volcano plot
 library(ggplot2)
 
-## Adj P
-ggplot(results1, aes(x = logFC, y = -log10(P.Value))) +
-  geom_point(aes(color = ifelse(adj.P.Val < 0.05, "Yes", "No")), size = 3) +
-  scale_color_manual(values = c("Yes" = "red", "No" = "black")) +
-  theme_minimal() +
-  labs(title = "Volcano Plot", x = "logFC", y = "-log10(P.Value)", color = "Siginificant")
 
-## With P
-ggplot(results1, aes(x = logFC, y = -log10(P.Value))) +
-  geom_point(aes(color = ifelse(P.Value < 0.05, "Yes", "No")), size = 3) +
-  scale_color_manual(values = c("Yes" = "red", "No" = "black")) +
-  theme_minimal() +
-  labs(title = "Volcano Plot", x = "logFC", y = "-log10(P.Value)", color = "Siginificant")
+
+
+# ## Adj P
+# ggplot(results1, aes(x = logFC, y = -log10(P.Value))) +
+#   geom_point(aes(color = ifelse(adj.P.Val < 0.05, "Yes", "No")), size = 3) +
+#   scale_color_manual(values = c("Yes" = "red", "No" = "black")) +
+#   theme_minimal() +
+#   labs(title = "Volcano Plot", x = "logFC", y = "-log10(P.Value)", color = "Siginificant")
 
 
 

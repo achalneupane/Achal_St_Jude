@@ -76,6 +76,14 @@ rs2815063=chr6:39294759:C:A
 Sapkota et al 2020; Cancer Research (AFR)
 rs6689879=chr1:113559097:T:C
 
-Among survivors of 
-African ancestry with rs6689879*C PHTF1 promoter region was hypomethylated (chr1:113696831-113759486)
-chr1:11375
+Among survivors of African ancestry; the rs6689879 is an eQTL for MAGI3, PHTF1 (putative 
+homeodomain transcription factor 1), and two non-coding RNAs (RP5–1073O3.2 and RP4–
+730K3.3) and a sQTL for PHTF1 and DCLRE1B (DNA cross-link repair 1B) in multiple 
+human tissues (Supplementary Figures 4 and 5).
+
+# PHTF1 promoter region was hypomethylated (chr1:113696831-113759486);
+grep -E 'chr1:11369[0-9]{4,}|chr1:1137[0-9]{5,}'  Cardiotox_No_VS_Yes_afr_dose_0_diff.txt
+grep -E 'chr1:11369[0-9]{4,}|chr1:1137[0-9]{5,}'  Cardiotox_No_VS_Yes_afr_dose_1_diff.txt
+grep -E 'chr1:11369[0-9]{4,}|chr1:1137[0-9]{5,}'  Cardiotox_No_VS_Yes_afr_dose_3_diff.txt
+# MAGI3: chr1:113390515-113685923; 
+grep -E 'chr1:11339[0-9]{5,}|chr1:1134[0-9]{5,}|chr1:1135[0-9]{5,}|chr1:1136[0-9]{5,}' Cardiotox_No_VS_Yes_afr_dose_0_diff.txt
