@@ -86,8 +86,9 @@ grep -E 'chr1:11369[0-9]{4,}|chr1:1137[0-9]{5,}'  Cardiotox_No_VS_Yes_afr_dose_0
 grep -E 'chr1:11369[0-9]{4,}|chr1:1137[0-9]{5,}'  Cardiotox_No_VS_Yes_afr_dose_1_diff.txt
 grep -E 'chr1:11369[0-9]{4,}|chr1:1137[0-9]{5,}'  Cardiotox_No_VS_Yes_afr_dose_3_diff.txt
 # MAGI3: chr1:113390515-113685923; 
-grep -E 'chr1:11339[0-9]{5,}|chr1:1134[0-9]{5,}|chr1:1135[0-9]{5,}|chr1:1136[0-9]{5,}' Cardiotox_No_VS_Yes_afr_dose_0_diff.txt
-
+grep -E 'chr1:11339[0-9]{4,}|chr1:1134[0-9]{5,}|chr1:1135[0-9]{5,}|chr1:1136[0-9]{5,}' Cardiotox_No_VS_Yes_afr_dose_0_diff.txt
+grep -E 'chr1:11339[0-9]{4,}|chr1:1134[0-9]{5,}|chr1:1135[0-9]{5,}|chr1:1136[0-9]{5,}' Cardiotox_No_VS_Yes_afr_dose_1_diff.txt
+grep -E 'chr1:11339[0-9]{4,}|chr1:1134[0-9]{5,}|chr1:1135[0-9]{5,}|chr1:1136[0-9]{5,}' Cardiotox_No_VS_Yes_afr_dose_3_diff.txt
 
 ######################################
 ## Check for TTN and BAG3 variants: ##
@@ -105,6 +106,11 @@ grep -E 'chr10:1196[0-9]{5,}'  Cardiotox_No_VS_Yes_afr_dose_1_diff.txt
 
 logFC					AveExpr					t 						P.Value					adj.P.Value				B 						loci	
 -1.15415992375253       0.743022077383263       -2.42802930160121       0.0255413433767928      0.999981350798048       -4.49792974263232       chr10:119644485-119644615
+# logFC indicates that the feature is downregulated in the Cardtox "Yes" condition compared to the "No".
+
+# Positive B: A positive B-statistic indicates that the gene is more likely to be upregulated in the condition of interest compared to the reference condition.
+# Negative B: A negative B-statistic indicates that the gene is more likely to be downregulated in the condition of interest compared to the reference condition.
+# Magnitude of B: The magnitude of B reflects the strength of evidence for differential expression. Larger magnitudes (positive or negative) indicate stronger evidence.
 
 grep -E 'chr10:1196[0-9]{5,}'  Cardiotox_No_VS_Yes_afr_dose_3_diff.txt
 #################################################
@@ -117,10 +123,6 @@ grep -E 'chr1:869[0-9]{5,}|chr1:870[0-9]{5,}'  Cardiotox_No_VS_Yes_afr_dose_3_di
 
 logFC					AveExpr					t 						P.Value					adj.P.Value				B 						loci	
 0.379035881449452       3.71791309721367        2.29170452954945        0.0265005671642148      0.99999531325849        -4.08174094334353       chr1:86913850-86915848
-# SULT1C3: chr2:108239968-108265351
-grep -E 'chr2:10823[0-9]{4,}|chr2:10824[0-9]{4,}|chr2:10825[0-9]{4,}|chr2:10826[0-9]{4,}'  Cardiotox_No_VS_Yes_afr_dose_0_diff.txt
-grep -E 'chr2:10823[0-9]{4,}|chr2:10824[0-9]{4,}|chr2:10825[0-9]{4,}|chr2:10826[0-9]{4,}'  Cardiotox_No_VS_Yes_afr_dose_1_diff.txt
-grep -E 'chr2:10823[0-9]{4,}|chr2:10824[0-9]{4,}|chr2:10825[0-9]{4,}|chr2:10826[0-9]{4,}'  Cardiotox_No_VS_Yes_afr_dose_3_diff.txt
 
 # HS6ST1: chr2:128265480-128318868
 grep -E 'chr2:12823[0-9]{4,}|chr2:12824[0-9]{4,}|chr2:12825[0-9]{4,}|chr2:12826[0-9]{4,}'  Cardiotox_No_VS_Yes_afr_dose_0_diff.txt
@@ -135,6 +137,11 @@ grep -E 'chr13:96[0-9]{6,}' Cardiotox_No_VS_Yes_afr_dose_3_diff.txt
 logFC					AveExpr					t 						P.Value					adj.P.Value				B 						loci	
 0.698169639078131       0.83467008480492        2.05888570329865        0.0451337812817118      0.99999531325849        -4.47363848856412     chr13:96680056-96680372
 -0.663719383781101      0.485882288776097       -1.98106585498666       0.0535179218248778      0.99999531325849        -4.48925518475091     chr13:96574462-96574639
+
+# SULT1C3: chr2:108239968-108265351
+grep -E 'chr2:10823[0-9]{4,}|chr2:10824[0-9]{4,}|chr2:10825[0-9]{4,}|chr2:10826[0-9]{4,}'  Cardiotox_No_VS_Yes_afr_dose_0_diff.txt
+grep -E 'chr2:10823[0-9]{4,}|chr2:10824[0-9]{4,}|chr2:10825[0-9]{4,}|chr2:10826[0-9]{4,}'  Cardiotox_No_VS_Yes_afr_dose_1_diff.txt
+grep -E 'chr2:10823[0-9]{4,}|chr2:10824[0-9]{4,}|chr2:10825[0-9]{4,}|chr2:10826[0-9]{4,}'  Cardiotox_No_VS_Yes_afr_dose_3_diff.txt
 
 # GPC6: chr13:93226807-94408020
 grep -E 'chr13:93[0-9]{6,}|chr13:94[0-9]{6,}' Cardiotox_No_VS_Yes_afr_dose_0_diff.txt

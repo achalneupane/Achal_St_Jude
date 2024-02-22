@@ -124,9 +124,13 @@ for (dose in doses) {
 }
 
 # Display results or further analysis with the p_values vector
-all_p_values <- data.frame( unname(all_p_values))
-colnames(all_p_values) <- c("P", "dose", "metabolites")
-
+all_p_values <- data.frame(all_p_values)
+all_p_values
+all_p_values$metabolites <- sub("*.dose_", "", rownames(all_p_values))
+all_p_values$dose <- sub("dose.*", "dose", rownames(all_p_values))
+# View(all_p_values)
+colnames(all_p_values) <- c("P", "metabolites", "dose")
+all_p_values$metabolites <- sub("^M_", "", all_p_values$metabolites)
 
 library(ggplot2)
 
@@ -142,11 +146,6 @@ ggplot(all_p_values, aes(x = dose, y = P, color = dose)) +
   scale_shape_manual(values = c("0dose" = 16, "1dose" = 17, "3dose" = 18)) +
   theme_minimal()+
   scale_y_reverse()
-
-
-
-
-
 
 #################
 ## Mixed model ##
@@ -209,6 +208,7 @@ for (metabolite in metabolite_columns) {
   result_df <- rbind.data.frame(result_df, result_tmp)
 }
 
+result_df$Adjusted_P_Value <- p.adjust(result_df$P_Value, method = "fdr")
 
 # Given that the baseline_dose is significant, it suggests that there is a
 # significant difference in the response variable (M_1_methylnicotinamide)
@@ -228,8 +228,6 @@ mm.dose3 <- result_df[result_df$variables == "dose3",]
 mm.baseline_dose <- result_df[result_df$variables == "baseline_dose",]
 mm.Genotypes <- result_df[result_df$variables == "GenotypesTC",]
 mm.dose3_Genotypes <- result_df[result_df$variables == "dose3:GenotypesTC",]
-
-
 
 
 ## with dose and genotype interaction
