@@ -208,7 +208,7 @@ for (metabolite in metabolite_columns) {
   result_df <- rbind.data.frame(result_df, result_tmp)
 }
 
-result_df$Adjusted_P_Value <- p.adjust(result_df$P_Value, method = "fdr")
+result_df$Adjusted_P_Value <- p.adjust(result_df$P_Value, method = "BH")
 
 # Given that the baseline_dose is significant, it suggests that there is a
 # significant difference in the response variable (M_1_methylnicotinamide)
