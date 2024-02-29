@@ -109,8 +109,6 @@ pheno$dose <- sub(".*-", "", pheno$new_ID)
 pheno$batch [pheno$new_ID %in% day1] <- "day1"
 pheno$batch [pheno$new_ID %in% day2] <- "day2"
 
-pheno.saved <- pheno
-counts.saved <- counts
 
 #############################
 ## Add additional genotype ##
@@ -126,6 +124,8 @@ annotated.peaks <- annotated.peaks[-1]
 annotated.peaks$Peaks <- paste0(annotated.peaks$Chr, ":", annotated.peaks$Start, "-", annotated.peaks$End)
 
 ####################
+pheno.saved <- pheno
+counts.saved <- counts
 
 
 # pheno <- pheno.saved 
@@ -135,19 +135,32 @@ annotated.peaks$Peaks <- paste0(annotated.peaks$Chr, ":", annotated.peaks$Start,
 
 # PHTF1 <- counts[grepl("chr1:11369|chr1:1137", rownames(counts)),]
 
+# variant <- "chr16.25611595.C.T_T" # kateryna's top variant
+variant <- "chr2.178562809.T.C_C" # TTN
+# variant <- "chr10.119670121.T.C_C" # BAG3
+
+################# Comment this for doe independent analysis ################
 doses <- c(0, 1, 3)
 # dose = 1
 for (dose in doses){
 print (dose)
 ## Dox 0
 pheno <- pheno.saved[pheno.saved$dose == dose,]
+############################################################################
+# dose <- "ALL"
+############################################################################
 counts <- counts.saved[colnames(counts.saved) %in% pheno$new_ID]
 sum(pheno$new_ID != colnames(counts))
 # 0
 
 # define group
-groupLabels <- pheno$Cardtox
+# groupLabels <- pheno$Cardtox
+pheno[variant] <- ifelse(pheno[variant] == 0, "No", "Yes")
+ncarriers <- sum(pheno[,variant] =="Yes")
+
+groupLabels <- pheno[,variant]
 TS <- factor(groupLabels, levels = c("No", "Yes"))
+TS
 
 #batch correction: batch can be added as a covariate if needed
 #this code does not do batch correction
@@ -178,51 +191,60 @@ results1$loci <- rownames(results1)
 sum(results1$loci %in% annotated.peaks$Peaks)
 results1 <- merge(results1, annotated.peaks, by.x = "loci", by.y ="Peaks")
 
-outFile1 <- paste0("annotated_Cardiotox_No_VS_Yes_afr_dose_", dose, "_diff.txt")
+
+outFile1 <- paste0("annotated_Cardiotox_No_VS_Yes_afr_dose_", dose, "_", variant, "_carriers_", ncarriers, "_diff.txt")
 write.table(results1, outFile1, col.names = T, row.names = F, sep = "\t", quote = F)
 
 # significant ones
 results1.sig <- results1[results1$P.Value < 0.05,]
-outFile2 <- paste0("annotated_significant_Cardiotox_No_VS_Yes_afr_dose_", dose, "_diff.txt")
+outFile2 <- paste0("annotated_significant_Cardiotox_No_VS_Yes_afr_dose_", dose, "_", variant, "_carriers_", ncarriers, "_diff.txt")
 write.table(results1.sig, outFile2, col.names = T, row.names = F, sep = "\t", quote = F)
 
-# ## With P
-# gg <- ggplot(results1, aes(x = logFC, y = -log10(P.Value))) +
-#   geom_point(aes(color = ifelse(P.Value < 0.05, "Yes", "No")), size = 3) +
-#   scale_color_manual(values = c("Yes" = "red", "No" = "black")) +
-#   theme_minimal() +
-#   labs(title = "Volcano Plot", x = "logFC", y = "-log10(P.Value)", color = "Siginificant")
-# 
-# ggsave(paste0("Cardiotox_No_VS_Yes_afr_dose_", dose, "_diff.tiff"), gg, width = 8, height = 6, dpi = 300)
+## With P
+gg <- ggplot(results1, aes(x = logFC, y = -log10(P.Value))) +
+  geom_point(aes(color = ifelse(P.Value < 0.05, "Yes", "No")), size = 3) +
+  scale_color_manual(values = c("Yes" = "red", "No" = "black")) +
+  theme_minimal() +
+  labs(title = "Volcano Plot", x = "logFC", y = "-log10(P.Value)", color = "Siginificant")
+
+ggsave(paste0("Cardiotox_No_VS_Yes_afr_dose_", dose, "_", variant, "_carriers_", ncarriers, "_diff.tiff"), gg, width = 8, height = 6, dpi = 300)
 
 }
 
 
 ## Get 250 KB up/downstream of each gene of interest
-dose0.sig <- read.delim("annotated_significant_Cardiotox_No_VS_Yes_afr_dose_0_diff.txt", header = T, sep = "\t")
+dose0.sig <- read.delim(paste0("annotated_significant_Cardiotox_No_VS_Yes_afr_dose_", "0", "_", variant, "_carriers_", ncarriers, "_diff.txt"), header = T, sep = "\t")
 dose0.sig$dose <- 0
-dose1.sig <- read.delim("annotated_significant_Cardiotox_No_VS_Yes_afr_dose_1_diff.txt", header = T, sep = "\t")
+dose1.sig <- read.delim(paste0("annotated_significant_Cardiotox_No_VS_Yes_afr_dose_", "1", "_", variant, "_carriers_", ncarriers, "_diff.txt"), header = T, sep = "\t")
 dose1.sig$dose <- 1
-dose3.sig <- read.delim("annotated_significant_Cardiotox_No_VS_Yes_afr_dose_3_diff.txt", header = T, sep = "\t")
+dose3.sig <- read.delim(paste0("annotated_significant_Cardiotox_No_VS_Yes_afr_dose_", "3", "_", variant, "_carriers_", ncarriers, "_diff.txt"), header = T, sep = "\t")
 dose3.sig$dose <- 3
 
 all.doses.significant <- rbind.data.frame(dose0.sig, dose1.sig, dose3.sig)
 
 # get genes expaning 250kb +-
 
-all.doses.significant$chr=CHR & all.doses.significant$Start=START 
-
-
 library(GenomicRanges)
 library(IRanges)
 # Assuming all.doses.significant$gene contains gene names
 # HS2ST1:  chr1:86914635-87098445
 
+# wanted.genes <- read.table(text="GENE	CHR 	START	END
+# PHTF1	chr1	113696831	113759486
+# MAGI3	chr1	113390515	113685923
+# TTN	chr2	178525989	178807423
+# BAG3	chr10	119651380	119677819
+# HS2ST1	chr1	86914635	87098445
+# HS6ST1	chr2	128265480	128318868
+# HS6ST3	chr13	96090107	96839562
+# SULT1C3	chr2	108239968	108265351
+# GPC6	chr13	93226807	94408020", header= T)
+
 wanted.genes <- read.table(text="GENE	CHR 	START	END
-PHTF1	chr1	113696831	113759486
-MAGI3	chr1	113390515	113685923
-TTN	chr2	178525989	178807423
-BAG3	chr10	119651380	119677819
+# PHTF1	chr1	113696831	113759486
+# MAGI3	chr1	113390515	113685923
+# TTN	chr2	178525989	178807423
+# BAG3	chr10	119651380	119677819
 HS2ST1	chr1	86914635	87098445
 HS6ST1	chr2	128265480	128318868
 HS6ST3	chr13	96090107	96839562
