@@ -5,7 +5,21 @@ library(dplyr)
 library(plyr)
 library(data.table)
 library (birk)
+##################################################################################################
+## Read raw file from Kateryna's gwas top variants: rs112474856; TTN variants and BAG3 variants ##
+##################################################################################################
+eur.kateryna <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/chr16_genotypes_eur.raw", header = T)
+afr.kateryna <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/chr16_genotypes_afr.raw", header = T)
+kateryna.variants[, 7:ncol(kateryna.variants)] <- replace(kateryna.variants[, 7:ncol(kateryna.variants)], kateryna.variants[, 7:ncol(kateryna.variants)] == 2, 1)
 
+
+
+bag3 = read.table('Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/sjlife_chr10_119670121_T_C.raw', header = TRUE)
+bag3$chr10.119670121.T.C_C[bag3$chr10.119670121.T.C_C == 2] <- 1
+
+ttn = read.table('Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/sjlife_chr2_178562809_T_C.raw', header = TRUE)
+ttn$chr2.178562809.T.C_C[ttn$chr2.178562809.T.C_C == 2] <- 1
+##################################################################################################
 data.lastcondt <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Tracking Data/lstcondt.sas7bdat")
 
 
@@ -98,6 +112,12 @@ pheno$batch [pheno$new_ID %in% day2] <- "day2"
 pheno.saved <- pheno
 counts.saved <- counts
 
+#############################
+## Add additional genotype ##
+#############################
+pheno <- cbind.data.frame(pheno, kateryna.variants[match(pheno$SJLID, kateryna.variants$IID),c("chr16.25608384.A.C_C", "chr16.25609966.C.T_T", "chr16.25610265.C.T_T", "chr16.25611595.C.T_T")])
+pheno$chr10.119670121.T.C_C <- bag3$chr10.119670121.T.C_C[na.omit(match(pheno$SJLID, bag3$IID))]
+pheno$chr2.178562809.T.C_C <- ttn$chr2.178562809.T.C_C[na.omit(match(pheno$SJLID, ttn$IID))]
 #####################
 ## Annotated peaks ##
 #####################

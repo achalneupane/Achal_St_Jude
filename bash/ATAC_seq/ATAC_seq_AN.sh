@@ -61,8 +61,21 @@ paste All.kept.Repro.bed.pre $(ls *.bed.count | sort -V)  >> All.counts.dat
 # echo "Region $(ls *.wanted.sites.bed.count | sort -V | cut -d'.' -f1 | tr '\n' ' ')" > All.wanted.sites.counts.dat
 # paste wanted.sites.bed.pre $(ls *.wanted.sites.bed.count | sort -V)  >> All.wanted.sites.counts.dat
 
+####################
+## Annotate peaks ##
+####################
+https://hemtools.readthedocs.io/en/latest/content/Bioinformatics_tools/homer.html
+download the latest homer: http://homer.ucsd.edu/homer/download.html
+./configureHomer.pl -install homer
+export PATH=$PATH:/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/tools/homer/.//bin/
+# download hg38
+./configureHomer.pl -genomename hg38
+awk 'NR > 1 {split($1, parts, "[:-]"); print "Peak_" NR-1, parts[1], parts[2], parts[3], "+"}' All.counts.dat > regions_peak_annotate # homer format
+# awk 'NR > 1 {split($1, parts, "[:-]"); print parts[1], parts[2], parts[3], "Peak_" NR-1, ".", "+"}' All.counts.dat > regions_peak_annotate.bed # bed format
 
-
+# make sure it is tab separated!!!
+sed -i  's/ \+/\t/g' regions_peak_annotate
+annotatePeaks.pl regions_peak_annotate hg38 -annStats annotate.log  > All.counts.dat_annotated
 
 
 #############################################
