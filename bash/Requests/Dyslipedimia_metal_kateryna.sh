@@ -190,79 +190,91 @@ conda env list
 conda activate /research_jude/rgs01_jude/groups/sapkogrp/projects/RNAseq/common/scRNAseq_Paul_cardiomyopathy/codes/yes/envs/python2.7
 conda install scipy.optimize
 
-# /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/mtag.py --sumstats eur_chltot.shared.txt,eur_ldl.shared.txt,eur_hdl.shared.txt,eur_trigly.shared.txt,eur_nonhdl.shared.txt --snp_name snpid --z_name z --ld_ref_panel /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/ld_ref_panel/eur_w_ld_chr_snp --out ./EUR_chltot_ldl_hdl_trigly_nonhdl_mtag --force --n_min 0.0 --stream_stdout
+# # /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/mtag.py --sumstats eur_chltot.shared.txt,eur_ldl.shared.txt,eur_hdl.shared.txt,eur_trigly.shared.txt,eur_nonhdl.shared.txt --snp_name snpid --z_name z --ld_ref_panel /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/ld_ref_panel/eur_w_ld_chr_snp --out ./EUR_chltot_ldl_hdl_trigly_nonhdl_mtag --force --n_min 0.0 --stream_stdout
+# # Warning: The mean chi2 statistic of trait 5 is less 1.02 - MTAG estimates may be unstable.
+# # Dropped 1022520 SNPs due to strand ambiguity, 5549574 SNPs remain in intersection after merging trait1
+# # Dropped 1269 SNPs due to inconsistent allele pairs from phenotype 2. 5547254 SNPs remain.
+# # Dropped 0 SNPs due to strand ambiguity, 5547254 SNPs remain in intersection after merging trait2
+# # Dropped 1961 SNPs due to inconsistent allele pairs from phenotype 3. 5543833 SNPs remain.
+# # Dropped 0 SNPs due to strand ambiguity, 5543833 SNPs remain in intersection after merging trait3
+# # Dropped 742 SNPs due to inconsistent allele pairs from phenotype 4. 5542444 SNPs remain.
+# # Dropped 0 SNPs due to strand ambiguity, 5542444 SNPs remain in intersection after merging trait4
+# # Dropped 110 SNPs due to inconsistent allele pairs from phenotype 5. 5542263 SNPs remain.
+# # Dropped 0 SNPs due to strand ambiguity, 5542263 SNPs remain in intersection after merging trait5
+# # ... Merge of GWAS summary statistics complete. Number of SNPs:   5542263
+# # Using 5542263 SNPs to estimate Omega (0 SNPs excluded due to strand ambiguity)
+# # Estimating sigma..
+# # After merging with reference panel LD, 0 SNPs remain.
+# # Traceback (most recent call last):
+# #   File "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/mtag.py", line 1577, in <module>
+# #     mtag(args)
+# #   File "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/mtag.py", line 1358, in mtag
+# #     args.sigma_hat = estimate_sigma(DATA[not_SA], args)
+# #   File "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/mtag.py", line 472, in estimate_sigma
+# #     rg_results =  sumstats_sig.estimate_rg(args_ldsc_rg, Logger_to_Logging())
+# #   File "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/ldsc_mod/ldscore/sumstats.py", line 423, in estimate_rg
+# #     M_annot, w_ld_cname, ref_ld_cnames, sumstats, _ = _read_ld_sumstats(args, log, None, alleles=True, dropna=True,sumstats=p1)
+# #   File "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/ldsc_mod/ldscore/sumstats.py", line 251, in _read_ld_sumstats
+# #     sumstats = _merge_and_log(ref_ld, sumstats, 'reference panel LD', log)
+# #   File "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/ldsc_mod/ldscore/sumstats.py", line 236, in _merge_and_log
+# #     raise ValueError(msg.format(N=len(sumstats), F=noun))
+# # ValueError: After merging with reference panel LD, 0 SNPs remain.
+# # Analysis terminated from error at Tue Feb 27 15:00:13 2024
+# # Total time elapsed: 6.0m:35.79s
+
+# # # https://github.com/bulik/ldsc/wiki/Heritability-and-Genetic-Correlation
+# # # https://github.com/JonJala/mtag/wiki/Tutorial-1:-The-Basics
+
+# # --ld_ref_panel FOLDER_PATH
+# #                         Specify folder of the ld reference panel (split by
+# #                         chromosome) that will be used in the estimation of the
+# #                         error VCV (sigma). This option is passed to --ref-ld-
+# #                         chr and --w-ld-chr when running LD score regression.
+# #                         The default is to use the reference panel of LD scores
+# #                         computed from 1000 Genomes European subjects
+# #                         (eur_w_ld_chr) that is included with the distribution
+# #                         of MTAG
+
+
+# # uses rsID, so modfying in another copy of ld file
+# cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/ld_ref_panel
+# cp -R eur_w_ld_chr eur_w_ld_chr_snp
+# for file in *ldscore.gz; do
+# 	echo "doing ${file}"
+# gunzip -c ${file} | awk 'NR==1 {print $0; next} {$2 = $1":"$3; print}'| gzip > tmp.gz
+# mv tmp.gz ${file}
+# done
 
 
 
-# Warning: The mean chi2 statistic of trait 5 is less 1.02 - MTAG estimates may be unstable.
-# Dropped 1022520 SNPs due to strand ambiguity, 5549574 SNPs remain in intersection after merging trait1
-# Dropped 1269 SNPs due to inconsistent allele pairs from phenotype 2. 5547254 SNPs remain.
-# Dropped 0 SNPs due to strand ambiguity, 5547254 SNPs remain in intersection after merging trait2
-# Dropped 1961 SNPs due to inconsistent allele pairs from phenotype 3. 5543833 SNPs remain.
-# Dropped 0 SNPs due to strand ambiguity, 5543833 SNPs remain in intersection after merging trait3
-# Dropped 742 SNPs due to inconsistent allele pairs from phenotype 4. 5542444 SNPs remain.
-# Dropped 0 SNPs due to strand ambiguity, 5542444 SNPs remain in intersection after merging trait4
-# Dropped 110 SNPs due to inconsistent allele pairs from phenotype 5. 5542263 SNPs remain.
-# Dropped 0 SNPs due to strand ambiguity, 5542263 SNPs remain in intersection after merging trait5
-# ... Merge of GWAS summary statistics complete. Number of SNPs:   5542263
-# Using 5542263 SNPs to estimate Omega (0 SNPs excluded due to strand ambiguity)
-# Estimating sigma..
-# After merging with reference panel LD, 0 SNPs remain.
-# Traceback (most recent call last):
-#   File "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/mtag.py", line 1577, in <module>
-#     mtag(args)
-#   File "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/mtag.py", line 1358, in mtag
-#     args.sigma_hat = estimate_sigma(DATA[not_SA], args)
-#   File "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/mtag.py", line 472, in estimate_sigma
-#     rg_results =  sumstats_sig.estimate_rg(args_ldsc_rg, Logger_to_Logging())
-#   File "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/ldsc_mod/ldscore/sumstats.py", line 423, in estimate_rg
-#     M_annot, w_ld_cname, ref_ld_cnames, sumstats, _ = _read_ld_sumstats(args, log, None, alleles=True, dropna=True,sumstats=p1)
-#   File "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/ldsc_mod/ldscore/sumstats.py", line 251, in _read_ld_sumstats
-#     sumstats = _merge_and_log(ref_ld, sumstats, 'reference panel LD', log)
-#   File "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/ldsc_mod/ldscore/sumstats.py", line 236, in _merge_and_log
-#     raise ValueError(msg.format(N=len(sumstats), F=noun))
-# ValueError: After merging with reference panel LD, 0 SNPs remain.
-# Analysis terminated from error at Tue Feb 27 15:00:13 2024
-# Total time elapsed: 6.0m:35.79s
-
-# # https://github.com/bulik/ldsc/wiki/Heritability-and-Genetic-Correlation
-# # https://github.com/JonJala/mtag/wiki/Tutorial-1:-The-Basics
-
-# --ld_ref_panel FOLDER_PATH
-#                         Specify folder of the ld reference panel (split by
-#                         chromosome) that will be used in the estimation of the
-#                         error VCV (sigma). This option is passed to --ref-ld-
-#                         chr and --w-ld-chr when running LD score regression.
-#                         The default is to use the reference panel of LD scores
-#                         computed from 1000 Genomes European subjects
-#                         (eur_w_ld_chr) that is included with the distribution
-#                         of MTAG
-
-
-# uses rsID, so modfying in another copy of ld file
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/ld_ref_panel
-cp -R eur_w_ld_chr eur_w_ld_chr_snp
-for file in *ldscore.gz; do
-	echo "doing ${file}"
-gunzip -c ${file} | awk 'NR==1 {print $0; next} {$2 = $1":"$3; print}'| gzip > tmp.gz
-mv tmp.gz ${file}
-done
-
-
-
-## Now trying again
-
+## Now trying again with our own ld panel
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG
+ 
 # EUR
+/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldsc/ldsc.py --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/freq/merged_dyslipidemia_EUR --l2 --ld-wind-cm 1 --yes-really --out merged_dyslipidemia_EUR_LD
+# (python2.7) [aneupane@splprhpc09 MTAG]$ /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldsc/ldsc.py --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/freq/merged_dyslipidemia_EUR --l2 --ld-wind-cm 1 --out merged_dyslipidemia_EUR_LD
+# *********************************************************************
+# * LD Score Regression (LDSC)
+# * Version 1.0.1
+# * (C) 2014-2019 Brendan Bulik-Sullivan and Hilary Finucane
+# * Broad Institute of MIT and Harvard / MIT Department of Mathematics
+# * GNU General Public License v3
+# *********************************************************************
+
+
+# /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/mtag.py --sumstats eur_chltot.shared.txt,eur_ldl.shared.txt,eur_hdl.shared.txt,eur_trigly.shared.txt,eur_nonhdl.shared.txt --snp_name snpid --chr_name chr --bpos_name bpos --z_name z --ld_ref_panel /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/ld_ref_panel/eur_w_ld_chr_snp/ --out ./EUR_chltot_ldl_hdl_trigly_nonhdl_mtag --force --n_min 0.0 --stream_stdout ## with provided 1kg ld panel
+
+# with our own ld panel
 /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/mtag.py --sumstats eur_chltot.shared.txt,eur_ldl.shared.txt,eur_hdl.shared.txt,eur_trigly.shared.txt,eur_nonhdl.shared.txt --snp_name snpid --chr_name chr --bpos_name bpos --z_name z --ld_ref_panel /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/ld_ref_panel/eur_w_ld_chr_snp/ --out ./EUR_chltot_ldl_hdl_trigly_nonhdl_mtag --force --n_min 0.0 --stream_stdout
 
 # AFR (not sure how to create LD score file for AFR)
+/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldsc/ldsc.py --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/freq/merged_dyslipidemia_AFR --l2 --ld-wind-cm 1 --out merged_dyslipidemia_AFR_LD
+
 /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/mtag.py --sumstats afr_chltot.shared.txt,afr_ldl.shared.txt,afr_hdl.shared.txt,afr_trigly.shared.txt,afr_nonhdl.shared.txt --snp_name snpid --chr_name chr --bpos_name bpos --z_name z --ld_ref_panel /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/ld_ref_panel/afr_w_ld_chr_snp/ --out ./AFR_chltot_ldl_hdl_trigly_nonhdl_mtag --force --n_min 0.0 --stream_stdout
 
 
 
 
-(ldsc) [aneupane@splprhpc09 freq]$ python /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldsc/ldsc.py --bfile merged_dyslipidemia_EUR --l2 --ld-wind-cm 1 --out merged_dyslipidemia_EUR_LD
 
 # (ldsc) [aneupane@splprhpc09 freq]$ python /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldsc/ldsc.py --bfile merged_dyslipidemia_EUR --l2 --ld-wind-cm 1 --out merged_dyslipidemia_EUR_LD
 #   File "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldsc/ldsc.py", line 84
