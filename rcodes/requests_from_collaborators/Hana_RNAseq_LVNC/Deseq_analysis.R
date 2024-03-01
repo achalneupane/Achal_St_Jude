@@ -160,16 +160,20 @@ dev.off()
 # in the trabecular/compaction process and how the trabeculations is different
 # between LVNC and two other cardiomyopathy group.
 ###############################################################################################
+## remove controls from properties 
+properties3 <- properties2[properties2$Status != "Control",]
 # Define LVNC group
 LVNC_samples <- c("GW30_CM", "GW30_EC", "GW64_CM", "GW64_EC", "GW159_CM", "GW159_EC")
 
 # Create a new column in colData to indicate LVNC status
-properties2$LVNC_status <- ifelse(rownames(properties2) %in% LVNC_samples, "LVNC", "Other_Cardiomyopathy")
+properties3$LVNC_status <- ifelse(rownames(properties3) %in% LVNC_samples, "LVNC", "Other_Cardiomyopathy")
+
+counts.matrix_ROBI.3 <- counts.matrix_ROBI[,match(rownames(properties3), colnames(counts.matrix_ROBI))]
 
 # Run DESeq2 analysis
 ddset_lvnc_vs_others <- DESeqDataSetFromMatrix(
-  countData = counts.matrix_ROBI,
-  colData = properties2,
+  countData = counts.matrix_ROBI.3,
+  colData = properties3,
   design = ~ LVNC_status + Cell_Type
 )
 

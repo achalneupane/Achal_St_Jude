@@ -10,6 +10,7 @@ library (birk)
 ##################################################################################################
 eur.kateryna <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/chr16_genotypes_eur.raw", header = T)
 afr.kateryna <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/chr16_genotypes_afr.raw", header = T)
+kateryna.variants <- rbind.data.frame(eur.kateryna, afr.kateryna)
 kateryna.variants[, 7:ncol(kateryna.variants)] <- replace(kateryna.variants[, 7:ncol(kateryna.variants)], kateryna.variants[, 7:ncol(kateryna.variants)] == 2, 1)
 
 
