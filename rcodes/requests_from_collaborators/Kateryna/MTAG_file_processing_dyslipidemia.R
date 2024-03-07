@@ -19,8 +19,8 @@ eur_chltot <- eur_chltot[!is.na(eur_chltot$MAF),]
 # 1:  19 19:44908822 44908822  T  ADD   497 0.568303 0.09024 -0.7420 -0.3882 -6.262 8.420e-10   C   T  C -0.565101 0.07492
 # 2:  19 19:44897490 44897490  A  ADD   498 0.592977 0.09166 -0.7022 -0.3429 -5.701 2.077e-08   T   A  T -0.522600 0.03120
 
-eur_chltot <- eur_chltot[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS")]
-colnames(eur_chltot) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "z", "pval", "n")
+eur_chltot <- eur_chltot[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS", "BETA", "SE")]
+colnames(eur_chltot) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "STAT", "pval", "n", "beta", "se")
 
 ## 2. hdl
 eur_hdl <- fread("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/DYSLPDM_eur_hdl_chrALL.assoc.linear.clean.Psorted.formetal.common", header =T)
@@ -38,8 +38,8 @@ eur_hdl <- eur_hdl[!is.na(eur_hdl$MAF),]
 # 1:  19 19:44908822 44908822  T  ADD   497 0.568303 0.09024 -0.7420 -0.3882 -6.262 8.420e-10   C   T  C -0.565101 0.07492
 # 2:  19 19:44897490 44897490  A  ADD   498 0.592977 0.09166 -0.7022 -0.3429 -5.701 2.077e-08   T   A  T -0.522600 0.03120
 
-eur_hdl <- eur_hdl[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS")]
-colnames(eur_hdl) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "z", "pval", "n")
+eur_hdl <- eur_hdl[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS", "BETA", "SE")]
+colnames(eur_hdl) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "STAT", "pval", "n", "beta", "se")
 
 ## 3. ldl
 eur_ldl <- fread("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/DYSLPDM_eur_ldl_chrALL.assoc.linear.clean.Psorted.formetal.common", header =T)
@@ -57,8 +57,8 @@ eur_ldl <- eur_ldl[!is.na(eur_ldl$MAF),]
 # 1:  19 19:44908822 44908822  T  ADD   497 0.568303 0.09024 -0.7420 -0.3882 -6.262 8.420e-10   C   T  C -0.565101 0.07492
 # 2:  19 19:44897490 44897490  A  ADD   498 0.592977 0.09166 -0.7022 -0.3429 -5.701 2.077e-08   T   A  T -0.522600 0.03120
 
-eur_ldl <- eur_ldl[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS")]
-colnames(eur_ldl) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "z", "pval", "n")
+eur_ldl <- eur_ldl[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS", "BETA", "SE")]
+colnames(eur_ldl) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "STAT", "pval", "n", "beta", "se")
 
 ## 4. nonhdl
 eur_nonhdl <- fread("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/DYSLPDM_eur_nonhdl_chrALL.assoc.linear.clean.Psorted.formetal.common", header =T)
@@ -76,8 +76,8 @@ eur_nonhdl <- eur_nonhdl[!is.na(eur_nonhdl$MAF),]
 # 1:  19 19:44908822 44908822  T  ADD   497 0.568303 0.09024 -0.7420 -0.3882 -6.262 8.420e-10   C   T  C -0.565101 0.07492
 # 2:  19 19:44897490 44897490  A  ADD   498 0.592977 0.09166 -0.7022 -0.3429 -5.701 2.077e-08   T   A  T -0.522600 0.03120
 
-eur_nonhdl <- eur_nonhdl[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS")]
-colnames(eur_nonhdl) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "z", "pval", "n")
+eur_nonhdl <- eur_nonhdl[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS", "BETA", "SE")]
+colnames(eur_nonhdl) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "STAT", "pval", "n", "beta", "se")
 
 ## 5. trigly
 eur_trigly <- fread("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/DYSLPDM_eur_trigly_chrALL.assoc.linear.clean.Psorted.formetal.common", header =T)
@@ -95,8 +95,8 @@ eur_trigly <- eur_trigly[!is.na(eur_trigly$MAF),]
 # 1:  19 19:44908822 44908822  T  ADD   497 0.568303 0.09024 -0.7420 -0.3882 -6.262 8.420e-10   C   T  C -0.565101 0.07492
 # 2:  19 19:44897490 44897490  A  ADD   498 0.592977 0.09166 -0.7022 -0.3429 -5.701 2.077e-08   T   A  T -0.522600 0.03120
 
-eur_trigly <- eur_trigly[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS")]
-colnames(eur_trigly) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "z", "pval", "n")
+eur_trigly <- eur_trigly[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS", "BETA", "SE")]
+colnames(eur_trigly) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "STAT", "pval", "n", "beta", "se")
 
 
 # We have dataframes named eur_chltot, eur_ldl, eur_hdl, eur_trigly, eur_nonhdl
@@ -139,8 +139,8 @@ afr_chltot <- afr_chltot[!is.na(afr_chltot$MAF),]
 # 1:  19 19:44908822 44908822  T  ADD   497 0.568303 0.09024 -0.7420 -0.3882 -6.262 8.420e-10   C   T  C -0.565101 0.07492
 # 2:  19 19:44897490 44897490  A  ADD   498 0.592977 0.09166 -0.7022 -0.3429 -5.701 2.077e-08   T   A  T -0.522600 0.03120
 
-afr_chltot <- afr_chltot[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS")]
-colnames(afr_chltot) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "z", "pval", "n")
+afr_chltot <- afr_chltot[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS", "BETA", "SE")]
+colnames(afr_chltot) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "STAT", "pval", "n", "beta", "se")
 
 ## 2. hdl
 afr_hdl <- fread("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/DYSLPDM_afr_hdl_chrALL.assoc.linear.clean.Psorted.formetal.common", header =T)
@@ -158,8 +158,8 @@ afr_hdl <- afr_hdl[!is.na(afr_hdl$MAF),]
 # 1:  19 19:44908822 44908822  T  ADD   497 0.568303 0.09024 -0.7420 -0.3882 -6.262 8.420e-10   C   T  C -0.565101 0.07492
 # 2:  19 19:44897490 44897490  A  ADD   498 0.592977 0.09166 -0.7022 -0.3429 -5.701 2.077e-08   T   A  T -0.522600 0.03120
 
-afr_hdl <- afr_hdl[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS")]
-colnames(afr_hdl) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "z", "pval", "n")
+afr_hdl <- afr_hdl[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS", "BETA", "SE")]
+colnames(afr_hdl) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "STAT", "pval", "n", "beta", "se")
 
 ## 3. ldl
 afr_ldl <- fread("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/DYSLPDM_afr_ldl_chrALL.assoc.linear.clean.Psorted.formetal.common", header =T)
@@ -177,8 +177,8 @@ afr_ldl <- afr_ldl[!is.na(afr_ldl$MAF),]
 # 1:  19 19:44908822 44908822  T  ADD   497 0.568303 0.09024 -0.7420 -0.3882 -6.262 8.420e-10   C   T  C -0.565101 0.07492
 # 2:  19 19:44897490 44897490  A  ADD   498 0.592977 0.09166 -0.7022 -0.3429 -5.701 2.077e-08   T   A  T -0.522600 0.03120
 
-afr_ldl <- afr_ldl[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS")]
-colnames(afr_ldl) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "z", "pval", "n")
+afr_ldl <- afr_ldl[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS", "BETA", "SE")]
+colnames(afr_ldl) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "STAT", "pval", "n", "beta", "se")
 
 ## 4. nonhdl
 afr_nonhdl <- fread("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/DYSLPDM_afr_nonhdl_chrALL.assoc.linear.clean.Psorted.formetal.common", header =T)
@@ -196,8 +196,8 @@ afr_nonhdl <- afr_nonhdl[!is.na(afr_nonhdl$MAF),]
 # 1:  19 19:44908822 44908822  T  ADD   497 0.568303 0.09024 -0.7420 -0.3882 -6.262 8.420e-10   C   T  C -0.565101 0.07492
 # 2:  19 19:44897490 44897490  A  ADD   498 0.592977 0.09166 -0.7022 -0.3429 -5.701 2.077e-08   T   A  T -0.522600 0.03120
 
-afr_nonhdl <- afr_nonhdl[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS")]
-colnames(afr_nonhdl) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "z", "pval", "n")
+afr_nonhdl <- afr_nonhdl[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS", "BETA", "SE")]
+colnames(afr_nonhdl) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "STAT", "pval", "n", "beta", "se")
 
 ## 5. trigly
 afr_trigly <- fread("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/DYSLPDM_afr_trigly_chrALL.assoc.linear.clean.Psorted.formetal.common", header =T)
@@ -215,8 +215,8 @@ afr_trigly <- afr_trigly[!is.na(afr_trigly$MAF),]
 # 1:  19 19:44908822 44908822  T  ADD   497 0.568303 0.09024 -0.7420 -0.3882 -6.262 8.420e-10   C   T  C -0.565101 0.07492
 # 2:  19 19:44897490 44897490  A  ADD   498 0.592977 0.09166 -0.7022 -0.3429 -5.701 2.077e-08   T   A  T -0.522600 0.03120
 
-afr_trigly <- afr_trigly[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS")]
-colnames(afr_trigly) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "z", "pval", "n")
+afr_trigly <- afr_trigly[,c("SNP", "CHR", "BP", "A1", "A2", "MAF", "STAT", "P", "NMISS", "BETA", "SE")]
+colnames(afr_trigly) <- c("snpid", "chr", "bpos", "a1", "a2", "freq", "STAT", "pval", "n", "beta", "se")
 
 # We have dataframes named afr_chltot, afr_ldl, afr_hdl, afr_trigly, afr_nonhdl
 # Create a vector with the overlapping variants 

@@ -250,47 +250,95 @@ conda install scipy.optimize
 ## Now trying again with our own ld panel
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG
  
-# EUR
-/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldsc/ldsc.py --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/freq/merged_dyslipidemia_EUR --l2 --ld-wind-cm 1 --yes-really --out merged_dyslipidemia_EUR_LD
-# (python2.7) [aneupane@splprhpc09 MTAG]$ /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldsc/ldsc.py --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/freq/merged_dyslipidemia_EUR --l2 --ld-wind-cm 1 --out merged_dyslipidemia_EUR_LD
-# *********************************************************************
-# * LD Score Regression (LDSC)
-# * Version 1.0.1
-# * (C) 2014-2019 Brendan Bulik-Sullivan and Hilary Finucane
-# * Broad Institute of MIT and Harvard / MIT Department of Mathematics
-# * GNU General Public License v3
-# *********************************************************************
+## EUR
+# /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldsc/ldsc.py --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/freq/merged_dyslipidemia_EUR --l2 --ld-wind-cm 1 --yes-really --out merged_dyslipidemia_EUR_LD
+# # (python2.7) [aneupane@splprhpc09 MTAG]$ /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldsc/ldsc.py --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/freq/merged_dyslipidemia_EUR --l2 --ld-wind-cm 1 --out merged_dyslipidemia_EUR_LD
+module load plink/1.90b
+# run per chromosome
+# for CHR in {1..22}; do
+# plink --bfile  /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/freq/dyslypidemia_EUR_chr${CHR} --cm-map --make-bed --out dyslypidemia_EUR_chr${CHR}_ldscore
+# /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldsc/ldsc.py --bfile dyslypidemia_EUR_chr${CHR}_ldscore --l2 --ld-wind-cm 1 --yes-really --out dyslipidemia_EUR_chr${CHR}_LD
+# done
+
+https://github.com/bulik/ldsc/wiki/LD-Score-Estimation-Tutorial
+
+https://alkesgroup.broadinstitute.org/Eagle/
+## download genetic map from
+wget https://storage.googleapis.com/broad-alkesgroup-public/Eagle/downloads/tables/genetic_map_hg38_withX.txt.gz
+
+##############
+## European ##
+##############
+
+# for CHR in {1..22}; do
+# # /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldsc/ldsc.py --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/freq//dyslypidemia_EUR_chr${CHR} --l2 --ld-wind-kb 1000 --yes-really --out $PWD/ldscore/dyslipidemia_EUR_chr${CHR}_LD
+# zcat /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/1000GP_Phase3/genetic_map_hg38_withX.txt.gz |grep -w ${CHR}| awk -v chr="${CHR}" '$1 == chr'|awk '{print $2, $3, $4}' > $PWD/ldscore/genetic_map_chr${CHR}_combined_hg38.txt
+# plink --bfile  /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/freq/dyslypidemia_EUR_chr${CHR} --cm-map $PWD/ldscore/genetic_map_chr@_combined_hg38.txt --make-bed --out $PWD/ldscore/dyslypidemia_EUR_chr${CHR}_ldscore
+# /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldsc/ldsc.py --bfile $PWD/ldscore/dyslypidemia_EUR_chr${CHR}_ldscore --l2 --ld-wind-cm 1 --yes-really --out $PWD/ldscore/dyslipidemia_EUR_chr${CHR}_LD
+# done
 
 
-# /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/mtag.py --sumstats eur_chltot.shared.txt,eur_ldl.shared.txt,eur_hdl.shared.txt,eur_trigly.shared.txt,eur_nonhdl.shared.txt --snp_name snpid --chr_name chr --bpos_name bpos --z_name z --ld_ref_panel /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/ld_ref_panel/eur_w_ld_chr_snp/ --out ./EUR_chltot_ldl_hdl_trigly_nonhdl_mtag --force --n_min 0.0 --stream_stdout ## with provided 1kg ld panel
-
-# with our own ld panel
-/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/mtag.py --sumstats eur_chltot.shared.txt,eur_ldl.shared.txt,eur_hdl.shared.txt,eur_trigly.shared.txt,eur_nonhdl.shared.txt --snp_name snpid --chr_name chr --bpos_name bpos --z_name z --ld_ref_panel /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/ld_ref_panel/eur_w_ld_chr_snp/ --out ./EUR_chltot_ldl_hdl_trigly_nonhdl_mtag --force --n_min 0.0 --stream_stdout
-
-# AFR (not sure how to create LD score file for AFR)
-/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldsc/ldsc.py --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/freq/merged_dyslipidemia_AFR --l2 --ld-wind-cm 1 --out merged_dyslipidemia_AFR_LD
-
-/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/mtag.py --sumstats afr_chltot.shared.txt,afr_ldl.shared.txt,afr_hdl.shared.txt,afr_trigly.shared.txt,afr_nonhdl.shared.txt --snp_name snpid --chr_name chr --bpos_name bpos --z_name z --ld_ref_panel /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/ld_ref_panel/afr_w_ld_chr_snp/ --out ./AFR_chltot_ldl_hdl_trigly_nonhdl_mtag --force --n_min 0.0 --stream_stdout
+# # OR liftover: https://mathgen.stats.ox.ac.uk/impute/1000GP%20Phase%203%20haplotypes%206%20October%202014.html
+# wget https://mathgen.stats.ox.ac.uk/impute/1000GP_Phase3.tgz
+# tar -xzvf 1000GP_Phase3.tgz
+# cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/1000GP_Phase3
 
 
 
+for CHR in {1..22}; do
+awk -v CHR=${CHR} '{print CHR, $0}' /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/1000GP_Phase3/genetic_map_chr${CHR}_combined_b37.txt > /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/1000GP_Phase3/tmpfile
+
+awk 'BEGIN {OFS="\t"} NR>1 {print "chr"$1, $2, $2, $3, $4, $5}' /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/1000GP_Phase3/tmpfile > /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/1000GP_Phase3/modified_genetic_map_chr${CHR}_combined_b37.bed
+
+/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/tools/liftover/liftOver /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/1000GP_Phase3/modified_genetic_map_chr${CHR}_combined_b37.bed /home/aneupane/liftover/hg19ToHg38.over.chain /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/1000GP_Phase3/genetic_map_chr${CHR}_combined_hg38_mapped.bed /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/1000GP_Phase3/chr${CHR}unmapped.bed
+
+awk 'BEGIN {OFS="\t"} {print $3, $4, $5}' /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/1000GP_Phase3/genetic_map_chr${CHR}_combined_hg38_mapped.bed > /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/1000GP_Phase3/tmpfile
+
+## Sort position in increasing order
+sort -k1,1n  /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/1000GP_Phase3/tmpfile > /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/1000GP_Phase3/genetic_map_chr${CHR}_combined_hg38_mapped.txt
+
+plink --bfile  /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/freq/dyslypidemia_EUR_chr${CHR} --cm-map /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/1000GP_Phase3/genetic_map_chr@_combined_hg38_mapped.txt --make-bed --out $PWD/ldscore/dyslypidemia_EUR_chr${CHR}_ldscore
+
+/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldsc/ldsc.py --bfile $PWD/ldscore/dyslypidemia_EUR_chr${CHR}_ldscore --l2 --ld-wind-cm 1 --yes-really --out $PWD/ldscore/dyslipidemia_EUR_chr${CHR}_LD
+done
 
 
-# (ldsc) [aneupane@splprhpc09 freq]$ python /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldsc/ldsc.py --bfile merged_dyslipidemia_EUR --l2 --ld-wind-cm 1 --out merged_dyslipidemia_EUR_LD
-#   File "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldsc/ldsc.py", line 84
-#     print msg
-#           ^
-# SyntaxError: Missing parentheses in call to 'print'. Did you mean print(msg)?
+for CHR in {1..22}; do
+zcat dyslipidemia_EUR_chr${CHR}_LD.l2.ldscore.gz |awk 'NR==1 {print $1, $2, $3, $4} NR>1 {sub("chr", "", $2); print $1 "\t" $2 "\t" $3 "\t" $4}' | gzip >  EUR/${CHR}.l2.ldscore.gz
+cp dyslipidemia_EUR_chr${CHR}_LD.l2.M_5_50 EUR/${CHR}.l2.M_5_50
+done
 
-# The output file should be like this
-# (python2.7) [aneupane@splprhpc09 eur_w_ld_chr_snp]$ zcat 16.l2.ldscore.gz| head
-# CHR     SNP     BP      CM      MAF     L2
-# 16 16:86671 86671 0.0014647135 0.0699208443272 1.55472736708
-# 16 16:97354 97354 0.0095049059 0.156992084433 4.4701754616
-# 16 16:101263 101263 0.016875602 0.240105540897 9.75360580621
-# 16 16:103423 103423 0.020952324 0.188654353562 11.1742340486
-# 16 16:105320 105320 0.023162325 0.174142480211 12.4936591546
-# 16 16:105444 105444 0.023245314 0.315303430079 9.96697209695
-# 16 16:107162 107162 0.024392272 0.120052770449 5.53263436053
-# 16 16:107275 107275 0.024467712 0.175461741425 12.5137588861
-# 16 16:110165 110165 0.026435719 0.166226912929 12.5621553255
+
+
+
+## Run MTAG
+/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/mtag.py --sumstats eur_chltot.shared.txt,eur_ldl.shared.txt,eur_hdl.shared.txt,eur_trigly.shared.txt,eur_nonhdl.shared.txt --snp_name snpid --chr_name chr --bpos_name bpos --z_name STAT --ld_ref_panel /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/EUR/ --out ./EUR_chltot_ldl_hdl_trigly_nonhdl_mtag --force --n_min 0.0 --stream_stdout
+
+for trait in {1..5}; do
+ sort -k12,12g EUR_chltot_ldl_hdl_trigly_nonhdl_mtag_trait_${trait}.txt > EUR_chltot_ldl_hdl_trigly_nonhdl_mtag_trait_${trait}_sorted.txt
+done
+
+#############
+## African ##
+#############
+for CHR in {1..22}; do
+plink --bfile  /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/freq/dyslypidemia_AFR_chr${CHR} --cm-map /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/1000GP_Phase3/genetic_map_chr@_combined_hg38_mapped.txt --make-bed --out $PWD/ldscore/dyslypidemia_AFR_chr${CHR}_ldscore
+
+/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldsc/ldsc.py --bfile $PWD/ldscore/dyslypidemia_AFR_chr${CHR}_ldscore --l2 --ld-wind-cm 1 --yes-really --out $PWD/ldscore/dyslipidemia_AFR_chr${CHR}_LD
+done
+
+for CHR in {1..22}; do
+zcat dyslipidemia_AFR_chr${CHR}_LD.l2.ldscore.gz |awk 'NR==1 {print $1, $2, $3, $4} NR>1 {sub("chr", "", $2); print $1 "\t" $2 "\t" $3 "\t" $4}' | gzip >  AFR/${CHR}.l2.ldscore.gz
+cp dyslipidemia_AFR_chr${CHR}_LD.l2.M_5_50 AFR/${CHR}.l2.M_5_50
+done
+
+
+## Run MTAG
+/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/mtag/mtag.py --sumstats afr_chltot.shared.txt,afr_ldl.shared.txt,afr_hdl.shared.txt,afr_trigly.shared.txt,afr_nonhdl.shared.txt --snp_name snpid --chr_name chr --bpos_name bpos --z_name STAT --ld_ref_panel /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/AFR/ --out ./AFR_chltot_ldl_hdl_trigly_nonhdl_mtag_2 --force --n_min 0.0 --stream_stdout
+
+
+for trait in {1..5}; do
+ sort -k12,12g AFR_chltot_ldl_hdl_trigly_nonhdl_mtag_2_trait_${trait}.txt > AFR_chltot_ldl_hdl_trigly_nonhdl_mtag_2_trait_${trait}_sorted.txt
+done
+
+https://github.com/JonJala/mtag/issues/117

@@ -88,7 +88,7 @@ cat HEADER tmp.txt > AFR.Alele1_freq_output_All_in_replication_EUR.chr
 # # Index variants (AFR)
 # chr5:9843018:T:C
 
-## files generated from R script clumping.R
+## files generated from R script clumping.R; --clump-kb 100 option for 100 KB window
 for chr in {1..22}; do
 plink --bfile plink_chr${chr}.AFR.only --extract AFR_5e-06_variants_clumping.txt --make-bed --out AFR_discovery_sig_variants_chr${chr}
 plink --bfile AFR_discovery_sig_variants_chr${chr} --clump TOP.AFR.only.with.P.5e-06.and.results.txt --clump-snp-field MarkerName --clump-r2 0.1 --r2 --out AFR_LD_clumped_variants_chr${chr}
