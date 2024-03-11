@@ -20,12 +20,17 @@ dim(df)  # 20137
 # PLASMA <- PLASMA[!is.na(PLASMA$grade) & PLASMA$grade != -9,]
 
 ## Note: Since we are rounding age down to one decimal place, a 7-days window did not make any difference in terms of the number of rows or samples
-SERUM <- df[grepl("Serum", df$aliquot_type, ignore.case = T),]
+# SERUM <- df[grepl("Serum", df$aliquot_type, ignore.case = T),]
+SERUM <- df[grepl("Plasma", df$aliquot_type, ignore.case = T),]
+
 SERUM.original <- SERUM
 
 ## I see age at serum sample is <18 yrs. Could you identify the samples among 18
 #or higher only? Everyone needs to be adults at serum sample.
 SERUM <- SERUM[which(SERUM$ageatsample >= 18),]
+
+# remove vial zero
+SERUM <- SERUM[SERUM$num_vials > 0 ,]
 
 ## Keep max num vials and alive over dead
 SERUM <- SERUM %>%
@@ -59,13 +64,15 @@ dim(CTCAE)
 CTCAE <- CTCAE[CTCAE$sjlid %in% unique(SERUM$sjlid),]
 dim(CTCAE)
 # 8332
-# 7425
+# 7221 # Serum, 18 or older, vial > 0
+# 7367 Plasma, 18 or older, vial > 0
 
 # CTCAE <- get_rows_with_smaller_sample_age(CTCAE, SERUM, 0)
 CTCAE <- get_rows_with_smaller_sample_age.all(CTCAE, SERUM, 7)
 dim(CTCAE)
 # 8332
-# 7425
+# 7221 SERUM with > 0 vial
+# 7367 PLASMA with > 0 vial
 
 ## Add event number
 CTCAE <- CTCAE %>%
@@ -86,6 +93,10 @@ sum(CTCAE$grade !=0 & CTCAE$event_number==1)
 table(CTCAE$grade)
 # 0    2    3    5 
 # 5120  209   56    1 
+
+## removing num vial 0
+# 0    2    3    5 
+# 4388  207   54    1 
 CTCAE.2 <- CTCAE
 
 
@@ -130,6 +141,27 @@ table(CTCAE.2$event_number,CTCAE.2$grade)
 # 7    5    1    0    0
 # 8    1    0    0    0
 
+# removing num vial zero
+# 0    2    3    5
+# 1 2352    0    0    0
+# 2 1320   44   14    0
+# 3  514   46    8    0
+# 4  156   18    7    1
+# 5   29    4    1    0
+# 6   11    0    1    0
+# 7    5    1    0    0
+# 8    1    0    0    0
+
+# PLASMA with > 0 vial
+# 0    2    3    5
+# 1 3029    0    0    0
+# 2 1337   73   22    0
+# 3  516   49    9    0
+# 4  155   19    7    1
+# 5   29    4    1    0
+# 6   11    0    1    0
+# 7    5    1    0    0
+# 8    1    0    0    0
 table(CTCAE.2$event_number,CTCAE.2$grade_2_or_higher)
 # 1    3563                 0
 # 2    1495                94
@@ -150,6 +182,27 @@ table(CTCAE.2$event_number,CTCAE.2$grade_2_or_higher)
 # 7       5                 1
 # 8       1                 0
 
+# Serum removing num vial zero
+# grade_0 grade_2_or_higher   # after removing num vial= zero
+# 1    2352                 0
+# 2    1320                58
+# 3     514                54
+# 4     156                26
+# 5      29                 5
+# 6      11                 1
+# 7       5                 1
+# 8       1                 0
+
+# Plasma removing num vial zero
+# grade_0 grade_2_or_higher
+# 1    3029                 0
+# 2    1337                95
+# 3     516                58
+# 4     155                27
+# 5      29                 5
+# 6      11                 1
+# 7       5                 1
+# 8       1                 0
 table(CTCAE.2$new_event_number,CTCAE.2$grade)
 # 0    2    3    5
 # 1 4085    0    0    0
@@ -166,6 +219,21 @@ table(CTCAE.2$new_event_number,CTCAE.2$grade)
 # 4   74   11    1    1
 # 5    3    1    0    0
 
+# SERUM after removing num vial zero
+# 0    2    3    5  
+# 1 3174    0    0    0
+# 2  960   82   24    0
+# 3  226   23    7    0
+# 4   27    8    0    1
+# 5    1    0    0    0
+
+# Plasma removing num vial zero
+# 0    2    3    5
+# 1 3384    0    0    0
+# 2 1258   93   28    0
+# 3  367   42   10    1
+# 4   71   10    2    0
+# 5    3    1    0    0
 table(CTCAE.2$new_event_number,CTCAE.2$grade_2_or_higher)
 # 1    4085                 0
 # 2    1296               123
@@ -178,6 +246,22 @@ table(CTCAE.2$new_event_number,CTCAE.2$grade_2_or_higher)
 # 2    1258               114
 # 3     383                55
 # 4      74                13
+# 5       3                 1
+
+# SERUM after removing num vial = 0
+# grade_0 grade_2_or_higher
+# 1    3174                 0
+# 2     960               106
+# 3     226                30
+# 4      27                 9
+# 5       1                 0
+
+# PLASMA after removing num vial = 0
+# grade_0 grade_2_or_higher
+# 1    3384                 0
+# 2    1258               121
+# 3     367                53
+# 4      71                12
 # 5       3                 1
 
 CTCAE.3 <- CTCAE.2[!is.na(CTCAE.2$Sample_age),]
@@ -202,6 +286,16 @@ table(CTCAE.3$event_number,CTCAE.3$grade_2_or_higher)
 # 7       5                 0
 # 8       1                 0
 
+# After removing num vial = zero
+# grade_0 grade_2_or_higher
+# 1    2352                 0
+# 2    1320                32
+# 3     514                26
+# 4     156                12
+# 5      29                 2
+# 6      11                 0
+# 7       5                 0
+# 8       1                 0
 
 table(is.na(CTCAE.2$Sample_age) & CTCAE.2$grade >=2)
 table(CTCAE.2$grade >=2)
@@ -211,8 +305,13 @@ table(CTCAE.2$grade >=2)
 # FALSE  TRUE 
 # 5120   183 
 
+# FALSE  TRUE 
+# 4460    73
 
-write.table(CTCAE.2, "Serum_data_processed_v8.txt", col.names = T, row.names = F, sep = "\t")
-
-
+# after removing vial zero
+# FALSE  TRUE 
+# 4388   145 
+# write.table(CTCAE.2, "Serum_data_processed_v8.txt", col.names = T, row.names = F, sep = "\t")
+# write.table(CTCAE.2, "Plasma_data_processed_v8_after_removing_numvial_0.txt", col.names = T, row.names = F, sep = "\t") ## based on Plasma data
+write.table(CTCAE.2, "Serum_data_processed_v8_after_removing_numvial_0.txt", col.names = T, row.names = F, sep = "\t") ## based on Serum data
 

@@ -1,6 +1,6 @@
-# table_2 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/table_2.txt", header = T, sep = "\t")
-table_2 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/table_2_v8.txt", header = T, sep = "\t")
-
+# table_2 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/table_2.txt", header = T, sep = "\t") # all age and vial zero included
+# table_2 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/table_2_v8.txt", header = T, sep = "\t") # 18 or older only and vial zero excluded 
+table_2 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/table_2_v8_with_vial_zero.txt", header = T, sep = "\t") # 18 or older only but vial zero included
 
 table_2$CAcount[table_2$grade >= 2 & table_2$new_event_number == 2] <- "CA100"
 table_2$CAcount[table_2$grade >= 2 & table_2$new_event_number >=3] <- "CA67"

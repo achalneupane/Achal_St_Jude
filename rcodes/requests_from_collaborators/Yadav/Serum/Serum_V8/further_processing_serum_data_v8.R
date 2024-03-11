@@ -11,7 +11,10 @@ library(tidyr)
 library(haven)
 setwd("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/")
 # CTCAE.serum <- read.table("Serum_data_processed_v6.txt", header = T, sep = "\t")
-CTCAE.serum <- read.table("Serum_data_processed_v8.txt", header = T, sep = "\t")
+# CTCAE.serum <- read.table("Serum_data_processed_v8.txt", header = T, sep = "\t") # removing 18 or younger
+
+# CTCAE.serum <- read.table("Serum_data_processed_v8_after_removing_numvial_0.txt", header = T, sep = "\t") # Serum, 18 or older, vial > 0
+CTCAE.serum <- read.table("Plasma_data_processed_v8_after_removing_numvial_0.txt", header = T, sep = "\t") # Plasma, 18 or older, vial > 0
 
 demographic <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/demographics.sas7bdat")
 chemo <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/chemosum_dose.sas7bdat")
@@ -51,6 +54,22 @@ table(CTCAE.serum$new_event_number, CTCAE.serum$grade)
 # 4   74   11    1    1
 # 5    3    1    0    0
 
+# Serum after removing num vial zero
+# 0    2    3    5
+# 1 3174    0    0    0
+# 2  960   82   24    0
+# 3  226   23    7    0
+# 4   27    8    0    1
+# 5    1    0    0    0
+
+# Plasma after removing num vial zero
+# 0    2    3    5
+# 1 3384    0    0    0
+# 2 1258   93   28    0
+# 3  367   42   10    1
+# 4   71   10    2    0
+# 5    3    1    0    0
+
 # Exposed to either anthracyclines or chest radiation
 CTCAE.serum.1 <- CTCAE.serum[CTCAE.serum$anthracyclines_dose_any > 0 | CTCAE.serum$maxchestrtdose > 200,]
 table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade)
@@ -68,6 +87,21 @@ table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade)
 # 4   73   10    1    1
 # 5    3    1    0    0
 
+# Serum Num vial greater than 0
+     # 0    2    3    5
+# 1 2228    0    0    0
+# 2  787   72   19    0
+# 3  218   23    7    0
+# 4   27    7    0    1
+# 5    1    0    0    0
+
+# Plasma Num vial greater than 0
+# 0    2    3    5
+# 1 2432    0    0    0
+# 2 1078   83   24    0
+# 3  352   42    9    1
+# 4   70    9    2    0
+# 5    3    1    0    0
 table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade >= 2)
 # FALSE TRUE
 # 1  2799    0
@@ -83,9 +117,28 @@ table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade >= 2)
 # 4    73   12
 # 5     3    1
 
+# Serum Num vial greater than 0
+# FALSE TRUE
+# 1  2228    0
+# 2   787   91
+# 3   218   30
+# 4    27    8
+# 5     1    0
+
+# Plasma Num vial greater than 0 
+# FALSE TRUE
+# 1  2432    0
+# 2  1078  107
+# 3   352   52
+# 4    70   11
+# 5     3    1
+
 ## For Table 2 (in Table_counts sheet of Serum_data_processed_v6_corrected_11_18_2023.xlxs)
 table_2 <- CTCAE.serum.1[!is.na(CTCAE.serum.1$grade),]
-write.table(table_2, "table_2_v8.txt", row.names = F, col.names = T, quote = F, sep = "\t")                    
+# write.table(table_2, "table_2_v8_with_vial_zero.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # with Serum                  
+
+# write.table(table_2, "table_2_v8.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Serum, 18 or older, vial > 0
+# write.table(table_2, "plasma_table_2_v8.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Plasma, 18 or older, vial > 0             
 
 ## break down exposed to either anthracyclines or chest radiation by race
 CTCAE.serum.1$race_group [CTCAE.serum.1$race =="White"] <- "White"
@@ -94,6 +147,9 @@ CTCAE.serum.1$race_group[is.na(CTCAE.serum.1$race_group)] <- "Other"
 table(CTCAE.serum.1$race_group)
 # Black Other White 
 # 577   189  3839 
+
+# Black Other White 
+# 423   135  2888
 
 ## Only in White
 CTCAE.serum.1.w <- CTCAE.serum.1[CTCAE.serum.1$race_group =="White",]
@@ -105,6 +161,14 @@ table(CTCAE.serum.1.w$new_event_number,CTCAE.serum.1.w$grade)
 # 4   64    6    1    1
 # 5    3    1    0    0
 
+# # After removing num vial = 0
+# 0    2    3    5
+# 1 1885    0    0    0
+# 2  679   64   17    0
+# 3  187   19    5    0
+# 4   26    4    0    1
+# 5    1    0    0    0
+
 table(CTCAE.serum.1.w$new_event_number,CTCAE.serum.1.w$grade >= 2)
 # FALSE TRUE
 # 1  2340    0
@@ -112,6 +176,14 @@ table(CTCAE.serum.1.w$new_event_number,CTCAE.serum.1.w$grade >= 2)
 # 3   321   49
 # 4    64    8
 # 5     3    1
+
+# after removing num vial = 0
+# FALSE TRUE
+# 1  1885    0
+# 2   679   81
+# 3   187   24
+# 4    26    5
+# 5     1    0
 
 ## Only in Black
 CTCAE.serum.1.w <- CTCAE.serum.1[CTCAE.serum.1$race_group =="Black",]
@@ -121,6 +193,13 @@ table(CTCAE.serum.1.w$new_event_number,CTCAE.serum.1.w$grade)
 # 2 124  12   7
 # 3  45   4   2
 # 4   8   4   0
+
+# after removing num vial zero
+# 0   2   3
+# 1 283   0   0
+# 2  90   8   2
+# 3  30   4   2
+# 4   1   3   0
 
 table(CTCAE.serum.1.w$new_event_number,CTCAE.serum.1.w$grade >= 2)
 # FALSE TRUE

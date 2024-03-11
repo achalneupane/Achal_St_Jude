@@ -1,0 +1,468 @@
+---
+title: "RNAseq analysis for LVNC project"
+output: word_document
+date: "10-27-2023"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, eval=TRUE, echo= TRUE}
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects//RNAseq/common/LVNC_Hana_project/")
+```
+
+## Project description (Notes from Hana)
+I have two sets of samples, on are cardiomyocytes (CM) and the other are
+endocardial cells (EC) and would like to see the differences within each cell
+type.
+
+For each cell type I have 12 samples coming from 4 groups which have 3
+replicates  (each replicate is one hiPSC line, so they are considered
+biological replicates). I have one control group and three cardiomyopathy
+groups. These four groups are : control, LVNC (left ventricular non-compaction
+cardiomyopathy), HCM (hypertrophic cardiomyopathy) and DCM (dilated
+cardiomyopathy).
+
+Here are sample details:
+
+Control: 19-3, 25-3, 26-3
+Cardiomyopathy (DCM): GW10, GW53, GW168
+Cardiomyopathy (HCM): GW129, GW167, GW169
+Cardiomyopathy (LVNC): GW30, GW64, GW159
+
+
+1. The first question is to see differences between control and cardiomyopathy
+group. 
+
+2. The second and more important question is that what is the differences
+between LVNC and other cardiomyopathy groups. Specifically, we are interested
+in the trabecular/compaction process and how the trabeculations is different
+between LVNC and two other cardiomyopathy group.
+
+# Loading libraries and setting location paths
+
+```{r, eval=TRUE, echo= TRUE}
+
+library(ggplot2)
+library(ggfortify)
+library(ggrepel)
+library(dplyr)
+library(DESeq2)
+library(ggplot2)
+library("knitr")
+library("kableExtra")
+```
+
+# Preparing count data
+```{r, eval=TRUE, echo= TRUE}
+counts<-read.table(file='SAPKO-820324-STRANDED_RSEM_gene_count.2024-02-16_18-57-58.txt', header=TRUE)
+# > dim(counts)
+# [1] 60754    28
+
+
+counts$geneSymbol[duplicated(counts$geneSymbol)] <- paste0(counts$geneSymbol, "_", counts$geneID)[duplicated(counts$geneSymbol)]
+
+counts = dplyr::select(counts, -c(geneID, bioType, annotationLevel))
+counts = counts[rowSums(counts[,-1])>20,]
+
+rownames(counts)<-counts[,1]
+counts2<-counts[,-1]
+
+```
+
+
+
+```{r, eval=TRUE, echo= TRUE}
+## data preparaton
+counts.matrix_ROBI<-as.matrix(counts2)
+mode(counts.matrix_ROBI)<-"integer"
+
+properties<-read.table('phenotype_LVNC_project.txt', sep = '\t', header=TRUE)
+properties$Cell_Type=as.factor(properties$Cell_Type)
+properties$Group=as.factor(properties$Group)
+properties$Status=as.factor(properties$Status)
+
+## Create a DESeqDataSet (dds_ROBIS) from the count matrix and phenotype information.
+dds_ROBIS<-DESeqDataSetFromMatrix(countData = counts.matrix_ROBI,colData = properties, design=~1)
+
+## Perform variance-stabilizing transformation (vst) on the DESeqDataSet
+rld_ROBIS<-vst(dds_ROBIS,blind = FALSE)
+mat_ROBIS<-assay(rld_ROBIS)
+
+## Performs principal component analysis (PCA) on the transformed data.
+pcaData<-plotPCA(rld_ROBIS, intgroup=c("Group","Cell_Type"), ntop=100, returnData=TRUE)
+percentVar<-round(100 * attr(pcaData, "percentVar"))
+
+## Plot PCA
+g <- ggplot(pcaData, aes(PC1, PC2))
+g <- g + geom_point(size = 5, aes(fill = Group, col = Group, shape = Cell_Type)) +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(face = "bold", color = "black"),
+    panel.border = element_blank(),
+    axis.line = element_line(colour = "black"),
+    axis.title = element_text(face = "bold", color = "black"),  # Corrected line
+    text = element_text(color = "black", face = "bold")
+  )
+# Save the plot as a TIFF file
+tiff(
+  file = "PCA_LVNC_Project_top_100_genes.tiff",
+  width = 16,
+  height = 14,
+  units = 'cm',
+  res = 300,
+  compression = 'lzw'
+)
+
+# Print the plot
+print(g)
+
+# Close the TIFF device
+dev.off()
+
+## Select the top 500 variable genes based on row variances. Create a heatmap
+## (phm) using pheatmap with clustering of rows and columns.
+library(pheatmap)
+properties2<-properties
+rownames(properties2)<-properties[,1]
+properties2<-subset(properties2, select=-c(sample_ID))
+myMatrix<-SummarizedExperiment::assay(rld_ROBIS)
+topVarGenes<-head(order(rowVars(myMatrix),decreasing = TRUE), 500)
+myMatrixforheatmap<-myMatrix[topVarGenes,]
+phm<-pheatmap(myMatrixforheatmap, scale="row", cluster_rows = TRUE, cluster_cols = TRUE, annotation_col = properties2, show_colnames = TRUE, show_rownames = FALSE)
+tiff(file="Heatmap_LVNC_Project_top_500_genes.tiff",width = 18, height = 32, units = 'cm', res = 300, compression = 'lzw')
+phm
+dev.off()
+```
+
+
+## 1.The first question is to see differences between control and cardiomyopathy group. 
+
+Here, we will conduct differential expression analysis between "Cardiomyopathy" and "Control" groups, filter and categorize significant genes, and create a volcano plot for visualization. The volcano plot highlights genes with significant changes in expression, facilitating the identification of differentially expressed genes.The design in this context includes the factors Status (indicating whether a sample is from the Cardiomyopathy or Control group) while also considering the influence of Cell_Type.
+
+```{r, eval=TRUE, echo= TRUE}
+# Create a DESeqDataSet (ddset) from the count matrix (counts.matrix_ROBI) and
+# phenotype information (properties2).
+ddset = DESeqDataSetFromMatrix(
+    countData = counts.matrix_ROBI, # raw counts
+    colData = properties2, # phenotype data
+    design = ~Status + Cell_Type # analysis model
+)
+
+deseq_object = DESeq(ddset)
+
+# Extracts results from the DESeq analysis, focusing on the contrast between
+# "Cardiomyopathy" and "Control" groups.
+deseq_results = data.frame(results(
+  deseq_object,
+  contrast = c("Status", "Cardiomyopathy", "Control")
+))
+deseq_results = deseq_results[order(deseq_results$padj), ]
+deseq_results_filtered = subset(deseq_results, pvalue < 0.05)
+dim(deseq_results_filtered)
+deseq_results$expression = ifelse(
+  deseq_results$padj < 0.05 &
+    (deseq_results$log2FoldChange) >= (2),
+  "Up",
+  ifelse(
+    deseq_results$padj < 0.05 & (deseq_results$log2FoldChange) <= (-2),
+    "Down",
+    "Stable"
+  )
+)
+deseq_results$expression = factor(deseq_results$expression, levels = c("Up", "Down", "Stable"))
+# deseq_results = subset(deseq_results, abs(log2FoldChange)<5 & !is.na(padj))
+deseq_results = subset(deseq_results,!is.na(padj))
+
+write.table(deseq_results, file="LVNC_project_deseq_results_Cardiomyopathy_vs_Control.txt", sep="\t")
+
+#Create Volcano Plot from DESEQ results
+p = ggplot(data = deseq_results, aes(x = log2FoldChange,
+                                     y = -log10(padj),
+                                     colour = expression,
+                                     label = rownames(deseq_results))) +
+    geom_point(alpha = 0.4, size = 3.5) +
+    scale_color_manual(values=c("red", "blue","grey")) +
+    geom_vline(xintercept = c(-2, 2), lty=4, col="black", lwd=0.8) +
+    geom_hline(yintercept = -log10(0.05), lty=4, col="black", lwd=0.8) +
+    labs(x = expression(bold(log[2]~"fold-change")),
+         y = expression(bold(-log[10]~"adjusted p-value"))) +
+    theme_bw() +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          text = element_text(size=16, colour = "black", face = "bold"),
+          axis.text = element_text(colour = "black", face = "bold"),
+          legend.title = element_blank()) +
+    scale_x_continuous(breaks = seq(-10, 10,3), limits = c(-10, 10))
+
+tiff(file="Volcano_plot_Cardiomyopathy_vs_Control.tiff",
+     width = 18, height = 16, units = 'cm', res = 300, compression = 'lzw')
+p
+dev.off()
+```
+
+# Interpretation:
+```{r, eval=TRUE, echo= F}
+kable(head(deseq_results), format = "pandoc", caption = "DESeq2 Results (showing first 6 genes only)")
+```
+
+**baseMean**: Represents the average of normalized counts across all samples. For example, the gene MEG3 has an average expression level of 17.22.
+
+**log2FoldChange**: Indicates the fold change in expression between the "Cardiomyopathy" and "Control" groups on a logarithmic scale. For instance, MEG3 has a log2 fold change of 21.98, suggesting a substantial increase in expression in the "Cardiomyopathy" group compared to the "Control" group.
+
+**lfcSE (log2FoldChange Standard Error)**: Provides an estimate of the standard error associated with the log2 fold change. A smaller lfcSE indicates a more precise estimate.
+
+**stat**: Represents the Wald statistic, a measure of how many standard errors the estimated log2 fold change is from zero. In this case, higher absolute values of the statistic suggest greater evidence against the null hypothesis.
+
+**pvalue**: Indicates the statistical significance of the log2 fold change. A lower p-value suggests stronger evidence against the null hypothesis.
+
+**padj (adjusted p-value)**: It is the p-value adjusted for false discovery rate (FDR).
+
+**expression**: Categorizes genes based on their expression changes. "Up" indicates upregulation in "Cardiomyopathy," "Down" indicates downregulation, and "Stable" suggests no significant change.
+
+
+## 2.The second and more important question is that what is the differences between LVNC and other cardiomyopathy groups. Specifically, we are interested in the trabecular/compaction process and how the trabeculations is different between LVNC and two other cardiomyopathy group.
+
+Here, we will design our analysis to identify differentially expressed genes between LVNC and Other_Cardiomyopathy groups, considering both the LVNC status and Cell_Type as factors in the design formula.We specify the comparison of interest ("LVNC" and "Other_Cardiomyopathy") to compare the gene expression differences associated with the LVNC status within the context of Cell_Type.
+
+```{r, eval=TRUE, echo= TRUE}
+## remove controls from properties
+properties3 <- properties2[properties2$Status != "Control", ]
+
+# Create a new column in colData to indicate LVNC status
+properties3$LVNC_status <-
+  ifelse(properties3$Group=="LVNC",
+         "LVNC",
+         "Other_Cardiomyopathy")
+
+counts.matrix_ROBI.3 <-
+  counts.matrix_ROBI[, match(rownames(properties3), colnames(counts.matrix_ROBI))]
+
+# Run DESeq2 analysis
+ddset_lvnc_vs_others <- DESeqDataSetFromMatrix(
+  countData = counts.matrix_ROBI.3,
+  colData = properties3,
+  design = ~ LVNC_status + Cell_Type
+)
+
+deseq_object_lvnc_vs_others <- DESeq(ddset_lvnc_vs_others)
+deseq_results_lvnc_vs_others <-
+  data.frame(results(
+    deseq_object_lvnc_vs_others,
+    contrast = c("LVNC_status", "LVNC", "Other_Cardiomyopathy")
+  ))
+deseq_results_lvnc_vs_others <-
+  deseq_results_lvnc_vs_others[order(deseq_results_lvnc_vs_others$padj), ]
+deseq_results_filtered_lvnc_vs_others <-
+  subset(deseq_results_lvnc_vs_others, pvalue < 0.05)
+dim(deseq_results_filtered_lvnc_vs_others)
+
+
+deseq_results_lvnc_vs_others$expression = ifelse(
+  deseq_results_lvnc_vs_others$padj < 0.05 &
+    (deseq_results_lvnc_vs_others$log2FoldChange) >=  (2),
+  "Up",
+  ifelse(
+    deseq_results_lvnc_vs_others$padj < 0.05 &
+      (deseq_results_lvnc_vs_others$log2FoldChange) <= (-2),
+    "Down",
+    "Stable"
+  )
+)
+
+
+deseq_results_lvnc_vs_others$expression = factor(deseq_results_lvnc_vs_others$expression,
+                                                 levels = c("Up", "Down", "Stable"))
+deseq_results_lvnc_vs_others = subset(deseq_results_lvnc_vs_others,!is.na(padj))
+
+
+# Write results to a file
+write.table(deseq_results_lvnc_vs_others, file = "LVNC_project_deseq_results_LVNC_vs_Other_Cardiomyopathy.txt", sep = "\t")
+
+
+
+# Create Volcano Plot
+p_lvnc_vs_others <- ggplot(data = deseq_results_lvnc_vs_others, aes(x = log2FoldChange,
+                                                                    y = -log10(padj),
+                                                                    colour = expression,
+                                                                    label = rownames(deseq_results_lvnc_vs_others))) +
+  geom_point(alpha = 0.4, size = 3.5) +
+  scale_color_manual(values = c("red", "blue", "grey")) +
+  geom_vline(xintercept = c(-2, 2), lty = 4, col = "black", lwd = 0.8) +
+  geom_hline(yintercept = -log10(0.05), lty = 4, col = "black", lwd = 0.8) +
+  labs(x = expression(bold(log[2] ~ "fold-change")),
+       y = expression(bold(-log[10] ~ "adjusted p-value"))) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text = element_text(size = 16, colour = "black", face = "bold"),
+        axis.text = element_text(colour = "black", face = "bold"),
+        legend.title = element_blank()) +
+  scale_x_continuous(breaks = seq(-10, 10, 3), limits = c(-10, 10))
+
+# Save the plot as a TIFF file
+tiff(file = "Volcano_plot_LVNC_vs_Other_Cardiomyopathy.tiff",
+     width = 18, height = 16, units = 'cm', res = 300, compression = 'lzw')
+print(p_lvnc_vs_others)
+dev.off()
+```
+
+# Interpretation of results:
+```{r, eval=TRUE, echo= F}
+kable(head(deseq_results_lvnc_vs_others), format = "pandoc", caption = "LVNC and other cardiomyopathy (showing first 6 genesonly)")
+```
+
+**baseMean**: Represents the average of normalized counts across all samples. For example, the gene AC069277.1 has an average expression level of 12.35.
+
+**log2FoldChange**: Indicates the fold change in expression between "LVNC" and "Other_Cardiomyopathy" groups on a logarithmic scale. For instance, AC069277.1 has a log2 fold change of -4.79, suggesting a substantial decrease in expression in the "LVNC" group compared to the "Other_Cardiomyopathy" group.
+
+**lfcSE (log2FoldChange Standard Error)**: Provides an estimate of the standard error associated with the log2 fold change. A smaller lfcSE indicates a more precise estimate.
+
+**stat**: Represents the Wald statistic, a measure of how many standard errors the estimated log2 fold change is from zero. In this case, higher absolute values of the statistic suggest greater evidence against the null hypothesis.
+
+**pvalue**: Indicates the statistical significance of the log2 fold change. A lower p-value suggests stronger evidence against the null hypothesis.
+
+**padj (adjusted p-value)**: It is the p-value adjusted for false discovery rate (FDR).
+
+**expression**: Categorizes genes based on their expression changes. "Up" indicates upregulation in "Cardiomyopathy," "Down" indicates downregulation, and "Stable" suggests no significant change.
+
+
+# Furthermore, we can compare LVNC vs DCM 
+```{r, eval=TRUE, echo= TRUE}
+# Run DESeq2 analysis
+ddset_lvnc_vs_others <- DESeqDataSetFromMatrix(
+  countData = counts.matrix_ROBI.3,
+  colData = properties3,
+  design = ~ Group + Cell_Type
+)
+
+deseq_object_lvnc_vs_DCM <- DESeq(ddset_lvnc_vs_others)
+deseq_results_lvnc_vs_DCM <-
+  data.frame(results(
+    deseq_object_lvnc_vs_DCM,
+    contrast = c("Group", "LVNC", "DCM")
+  ))
+deseq_results_lvnc_vs_DCM <-
+  deseq_results_lvnc_vs_DCM[order(deseq_results_lvnc_vs_DCM$padj), ]
+deseq_results_filtered_lvnc_vs_DCM <-
+  subset(deseq_results_lvnc_vs_DCM, pvalue < 0.05)
+dim(deseq_results_filtered_lvnc_vs_DCM)
+
+
+deseq_results_lvnc_vs_DCM$expression = ifelse(
+  deseq_results_lvnc_vs_DCM$padj < 0.05 &
+    (deseq_results_lvnc_vs_DCM$log2FoldChange) >=  (2),
+  "Up",
+  ifelse(
+    deseq_results_lvnc_vs_DCM$padj < 0.05 &
+      (deseq_results_lvnc_vs_DCM$log2FoldChange) <= (-2),
+    "Down",
+    "Stable"
+  )
+)
+
+
+deseq_results_lvnc_vs_DCM$expression = factor(deseq_results_lvnc_vs_DCM$expression,
+                                                 levels = c("Up", "Down", "Stable"))
+deseq_results_lvnc_vs_DCM = subset(deseq_results_lvnc_vs_DCM,!is.na(padj))
+
+
+# Write results to a file
+write.table(deseq_results_lvnc_vs_DCM, file = "LVNC_project_deseq_results_LVNC_vs_DCM.txt", sep = "\t")
+
+
+
+# Create Volcano Plot
+p_lvnc_vs_DCM <- ggplot(data = deseq_results_lvnc_vs_DCM, aes(x = log2FoldChange,
+                                                                    y = -log10(padj),
+                                                                    colour = expression,
+                                                                    label = rownames(deseq_results_lvnc_vs_DCM))) +
+  geom_point(alpha = 0.4, size = 3.5) +
+  scale_color_manual(values = c("red", "blue", "grey")) +
+  geom_vline(xintercept = c(-2, 2), lty = 4, col = "black", lwd = 0.8) +
+  geom_hline(yintercept = -log10(0.05), lty = 4, col = "black", lwd = 0.8) +
+  labs(x = expression(bold(log[2] ~ "fold-change")),
+       y = expression(bold(-log[10] ~ "adjusted p-value"))) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text = element_text(size = 16, colour = "black", face = "bold"),
+        axis.text = element_text(colour = "black", face = "bold"),
+        legend.title = element_blank()) +
+  scale_x_continuous(breaks = seq(-10, 10, 3), limits = c(-10, 10))
+
+# Save the plot as a TIFF file
+tiff(file = "Volcano_plot_LVNC_vs_DCM.tiff",
+     width = 18, height = 16, units = 'cm', res = 300, compression = 'lzw')
+print(p_lvnc_vs_DCM)
+dev.off()
+```
+
+# Finally, LVNC vs HCM
+```{r, eval=TRUE, echo= TRUE}
+deseq_object_lvnc_vs_HCM <- DESeq(ddset_lvnc_vs_others)
+deseq_results_lvnc_vs_HCM <-
+  data.frame(results(
+    deseq_object_lvnc_vs_HCM,
+    contrast = c("Group", "LVNC", "HCM")
+  ))
+deseq_results_lvnc_vs_HCM <-
+  deseq_results_lvnc_vs_HCM[order(deseq_results_lvnc_vs_HCM$padj), ]
+deseq_results_filtered_lvnc_vs_HCM <-
+  subset(deseq_results_lvnc_vs_HCM, pvalue < 0.05)
+dim(deseq_results_filtered_lvnc_vs_HCM)
+
+
+deseq_results_lvnc_vs_HCM$expression = ifelse(
+  deseq_results_lvnc_vs_HCM$padj < 0.05 &
+    (deseq_results_lvnc_vs_HCM$log2FoldChange) >=  (2),
+  "Up",
+  ifelse(
+    deseq_results_lvnc_vs_HCM$padj < 0.05 &
+      (deseq_results_lvnc_vs_HCM$log2FoldChange) <= (-2),
+    "Down",
+    "Stable"
+  )
+)
+
+
+deseq_results_lvnc_vs_HCM$expression = factor(deseq_results_lvnc_vs_HCM$expression,
+                                                 levels = c("Up", "Down", "Stable"))
+deseq_results_lvnc_vs_HCM = subset(deseq_results_lvnc_vs_HCM,!is.na(padj))
+
+
+# Write results to a file
+write.table(deseq_results_lvnc_vs_HCM, file = "LVNC_project_deseq_results_LVNC_vs_HCM.txt", sep = "\t")
+
+
+
+# Create Volcano Plot
+p_lvnc_vs_HCM <- ggplot(data = deseq_results_lvnc_vs_HCM, aes(x = log2FoldChange,
+                                                                    y = -log10(padj),
+                                                                    colour = expression,
+                                                                    label = rownames(deseq_results_lvnc_vs_HCM))) +
+  geom_point(alpha = 0.4, size = 3.5) +
+  scale_color_manual(values = c("red", "blue", "grey")) +
+  geom_vline(xintercept = c(-2, 2), lty = 4, col = "black", lwd = 0.8) +
+  geom_hline(yintercept = -log10(0.05), lty = 4, col = "black", lwd = 0.8) +
+  labs(x = expression(bold(log[2] ~ "fold-change")),
+       y = expression(bold(-log[10] ~ "adjusted p-value"))) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text = element_text(size = 16, colour = "black", face = "bold"),
+        axis.text = element_text(colour = "black", face = "bold"),
+        legend.title = element_blank()) +
+  scale_x_continuous(breaks = seq(-10, 10, 3), limits = c(-10, 10))
+
+# Save the plot as a TIFF file
+tiff(file = "Volcano_plot_LVNC_vs_HCM.tiff",
+     width = 18, height = 16, units = 'cm', res = 300, compression = 'lzw')
+print(p_lvnc_vs_HCM)
+dev.off()
+```
