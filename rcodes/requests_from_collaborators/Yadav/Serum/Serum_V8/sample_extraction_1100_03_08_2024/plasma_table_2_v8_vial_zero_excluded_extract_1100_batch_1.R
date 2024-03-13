@@ -3,7 +3,7 @@ library(dplyr)
 table_2 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/plasma_table_2_v8.txt", header = T, sep = "\t") # after removing num vial zero and with 18 or older
 
 zhaoming.control <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/controls.selected.110", header = F, sep = "\t")
-zhaoming.control$V1 %in% SERUM$sjlid
+# zhaoming.control$V1 %in% SERUM$sjlid
 
 ## Add primary diagnosis
 demog <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/demog.sas7bdat")
