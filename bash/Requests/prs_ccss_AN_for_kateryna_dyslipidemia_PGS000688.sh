@@ -18,7 +18,7 @@ mv tmp_bim ccss_exp_extracted_chrALL.bim
 
 ## PRS; studies: PGS000356 (179 vars) PGS000454 (27 vars) PGS003416 (462 vars) ST6 (110 vars)
 mkdir -p prs_out
-study="ST6"
+study="PGS000688"
 # Subset PRS data for each study
 awk -v study=$study '$6==study' GRCh38_PGS000688.dat > prs_out/GRCh38_PGS000688.dat_${study}
 # Check for duplicate variants based on chr:pos
@@ -38,7 +38,7 @@ awk 'NR==FNR{a[$1":"$3];next}!($1":"$3 in a){print}' prs_out/GRCh38_PGS000688.da
 wc -l prs_out/GRCh38_PGS000688.dat_${study}_no_direct_match_final
 
 ## Harmonize alleles
-module load R
+module load R/4.0.2-a-rhel8
 Rscript /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/harmonize_alleles.R prs_out/GRCh38_PGS000688.dat_${study}_no_direct_match_final
 
 ## Update the alleles; It checks if the last field ($NF) in each line is equal to 1; if true, then { print $3, $6, $7, $8, $9 } so we can update the plink file for variants with no direct match
@@ -50,8 +50,8 @@ awk '{print $2}' prs_out/GRCh38_PGS000688.dat_${study}_direct_match > prs_out/GR
 module load plink/1.90b
 
 ## If there are no indirect match, just make this commented first line: --out prs_out/${study} and skip lines with **
-# plink --bfile ccss_exp_extracted_chrALL --extract prs_out/GRCh38_PGS000688.dat_${study}_direct_match_to_extract.txt --make-bed --out prs_out/${study}_direct_match
-plink --bfile ccss_exp_extracted_chrALL --extract prs_out/GRCh38_PGS000688.dat_${study}_direct_match_to_extract.txt --make-bed --out prs_out/${study}
+plink --bfile ccss_exp_extracted_chrALL --extract prs_out/GRCh38_PGS000688.dat_${study}_direct_match_to_extract.txt --make-bed --out prs_out/${study}_direct_match
+# plink --bfile ccss_exp_extracted_chrALL --extract prs_out/GRCh38_PGS000688.dat_${study}_direct_match_to_extract.txt --make-bed --out prs_out/${study}
 plink --bfile ccss_exp_extracted_chrALL --extract prs_out/GRCh38_PGS000688.dat_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --update-alleles prs_out/GRCh38_PGS000688.dat_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --make-bed --out prs_out/${study}_harmonized ##**
 
 
@@ -84,7 +84,7 @@ mv tmp_bim ccss_org_extracted_chrALL.bim
 
 ## PRS; studies: PGS000356 (172 vars out of 179) PGS000454 (27 vars out of 27) PGS003416 (460 vars out of 462) ST6 (110 vars out of 110)
 mkdir -p prs_out
-study="ST6"
+study="PGS000688"
 # Subset PRS data for each study
 awk -v study=$study '$6==study' GRCh37_PGS000688.dat > prs_out/GRCh37_PGS000688.dat_${study}
 # Check for duplicate variants based on chr:pos
