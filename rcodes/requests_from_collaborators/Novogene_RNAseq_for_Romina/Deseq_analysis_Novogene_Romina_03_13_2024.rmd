@@ -11,36 +11,17 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r, eval=TRUE, echo= TRUE}
-setwd("Z:/ResearchHome/Groups/sapkogrp/projects//RNAseq/common/LVNC_Hana_project/")
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects//RNAseq/common/Novogene_Romina_RNAseq/")
 ```
 
-## Project description (Notes from Hana)
-I have two sets of samples, on are cardiomyocytes (CM) and the other are
-endocardial cells (EC) and would like to see the differences within each cell
-type.
+## Project description (Notes from Romina)
+The dataset I am sending corresponds to RNAseq samples from cardiac fibroblasts (CF) and I have 4 cells lines (isogenic cell line (ISO), ROBO1, ROBO2, and SLIT2 knockouts). In addition, the cells were treated with 0 or 0.3uM doxorubicin (DOX). 
+The goal is to address:
+1- Differential expression in the ISO vs KOs cells (not treated with DOX)
+2- Differential expression after treatment with DOX for each cell line (and compare to ISO)
 
-For each cell type I have 12 samples coming from 4 groups which have 3
-replicates  (each replicate is one hiPSC line, so they are considered
-biological replicates). I have one control group and three cardiomyopathy
-groups. These four groups are : control, LVNC (left ventricular non-compaction
-cardiomyopathy), HCM (hypertrophic cardiomyopathy) and DCM (dilated
-cardiomyopathy).
+Let me know how I can help and if you have any questions.
 
-Here are sample details:
-
-Control: 19-3, 25-3, 26-3
-Cardiomyopathy (DCM): GW10, GW53, GW168
-Cardiomyopathy (HCM): GW129, GW167, GW169
-Cardiomyopathy (LVNC): GW30, GW64, GW159
-
-
-1. The first question is to see differences between control and cardiomyopathy
-group. 
-
-2. The second and more important question is that what is the differences
-between LVNC and other cardiomyopathy groups. Specifically, we are interested
-in the trabecular/compaction process and how the trabeculations is different
-between LVNC and two other cardiomyopathy group.
 
 # Loading libraries and setting location paths
 
@@ -58,9 +39,9 @@ library("kableExtra")
 
 # Preparing count data
 ```{r, eval=TRUE, echo= TRUE}
-counts<-read.table(file='Z:/ResearchHome/Groups/sapkogrp/projects//RNAseq/common/LVNC_Hana_project/SAPKO-820324-STRANDED_RSEM_gene_count.2024-02-16_18-57-58.txt', header=TRUE)
+counts<-read.table(file='Z:/ResearchHome/Groups/sapkogrp/projects//RNAseq/common/Novogene_Romina_RNAseq/SAPKO-821633-UNSTRANDED_RSEM_gene_count.2024-03-06_01-10-53.txt', header=TRUE)
 # > dim(counts)
-# [1] 60754    28
+# [1] 60754    52
 
 
 counts$geneSymbol[duplicated(counts$geneSymbol)] <- paste0(counts$geneSymbol, "_", counts$geneID)[duplicated(counts$geneSymbol)]
@@ -71,6 +52,13 @@ counts = counts[rowSums(counts[,-1])>20,]
 rownames(counts)<-counts[,1]
 counts2<-counts[,-1]
 
+## Create properties
+properties <- as.data.frame(colnames(counts2))
+colnames(properties) <- "samples"
+
+properties$Project <- ifelse(grepl("Pr1", properties$samples), "Pr1", "Pr2")
+# properties$samples <- gsub("Pr1_|Pr2_", "", properties$samples)
+properties$samples <- 
 ```
 
 

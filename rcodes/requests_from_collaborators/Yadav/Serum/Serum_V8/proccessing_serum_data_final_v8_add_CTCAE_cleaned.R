@@ -6,11 +6,23 @@ setwd("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/")
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/requests_from_collaborators/Yadav/Serum/get_matching_rows_from_CTCAE.R")
 df <- read.table("Trans-omics CMP profiling Inventory 20230901.txt", header = T)
 dim(df) # 20174
+
+## add TB from Mathew
+TB <- read.table("InventoryforAchal_from_Mathew.txt", header = T, sep = "\t")
+TB$KEY <- paste0(TB$sjlid, TB$num_vials, TB$aliquot_type, TB$ageatsample)
+
+df$Key <- paste0(df$sjlid, df$num_vials, df$aliquot_type, df$ageatsample)
+sum(df$Key %in% TB$KEY)
+df$tb_number <- TB$tb_number[match(df$Key, TB$KEY)]
+
+
 df$ageatsample <- floor(df$ageatsample * 10) / 10
 df.original <- df
 df <- df %>%
   distinct()
 dim(df)  # 20137
+
+
 
 # ## Note: Since we are rounding age down to one decimal place, a 7-days window did not make any difference in terms of the number of rows or samples
 # PLASMA <- df[grepl("Plasma", df$aliquot_type, ignore.case = T),]
