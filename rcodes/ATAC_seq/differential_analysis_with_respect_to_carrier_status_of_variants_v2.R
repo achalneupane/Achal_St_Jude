@@ -141,6 +141,31 @@ counts.saved <- counts
 variant <- "chr2.178562809.T.C_C" # TTN
 # variant <- "chr10.119670121.T.C_C" # BAG3
 
+############################################
+## Annotate Peaks with ChipSeeker package ##
+############################################
+# https://nbis-workshop-epigenomics.readthedocs.io/en/latest/content/tutorials/atac-chip-downstream/lab-PeakAnnot.html
+library(ChIPseeker)
+library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+library(GenomicAlignments)
+library(GenomicFeatures)
+library(clusterProfiler)
+library(biomaRt)
+library(org.Hs.eg.db)
+library(ReactomePA)
+
+rownames(annotated.peaks) <- annotated.peaks$Peaks
+peaks.bed <- annotated.peaks[1:4]
+peaks.gr <- GRanges(seqnames=peaks.bed[,1], ranges=IRanges(peaks.bed[,2], peaks.bed[,3]), strand="*", mcols=data.frame(peakID=peaks.bed[,4]))
+# covplot(peaks.gr, chrs=c("chr14", "chr15"))
+
+txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
+# To annotate peaks with closest genomic features:
+# bed.annot = annotatePeak(peaks.gr, tssRegion=c(-3000, 3000), TxDb=txdb, annoDb="org.Hs.eg.db")
+bed.annot <- annotatePeak(peaks.gr, TxDb = txdb, annoDb = "org.Hs.eg.db", 
+                          genomicAnnotationPriority = c("Promoter", "5UTR", "3UTR", "Exon", "Intron", "Downstream", "Intergenic"), overlap = "TSS")
+annot_peaks=as.data.frame(bed.annot)
+
 ################# Comment this for doe independent analysis ################
 doses <- c(0, 1, 3)
 # dose = 1
@@ -224,33 +249,11 @@ dose3.sig$dose <- 3
 
 all.doses.significant <- rbind.data.frame(dose0.sig, dose1.sig, dose3.sig)
 
-# https://nbis-workshop-epigenomics.readthedocs.io/en/latest/content/tutorials/atac-chip-downstream/lab-PeakAnnot.html
-library(ChIPseeker)
-library(TxDb.Hsapiens.UCSC.hg38.knownGene)
-library(GenomicAlignments)
-library(GenomicFeatures)
-library(clusterProfiler)
-library(biomaRt)
-library(org.Hs.eg.db)
-library(ReactomePA)
-peaks.bed <- annotated.peaks[1:4]
-rownames(peaks.bed) <- annotated.peaks$Peaks
-peaks.gr <- GRanges(seqnames=peaks.bed[,1], ranges=IRanges(peaks.bed[,2], peaks.bed[,3]), strand="*", mcols=data.frame(peakID=peaks.bed[,4]))
-# covplot(peaks.gr, chrs=c("chr14", "chr15"))
 
-txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
-# To annotate peaks with closest genomic features:
-bed.annot = annotatePeak(peaks.gr, tssRegion=c(-3000, 3000), TxDb=txdb, annoDb="org.Hs.eg.db")
-# bed.annot <- annotatePeak(peaks.gr, TxDb = txdb, annoDb = "org.Hs.eg.db", 
-# genomicAnnotationPriority = c("Promoter", "5UTR", "3UTR", "Exon", "Intron", "Downstream", "Intergenic"), overlap = "TSS")
-annot_peaks=as.data.frame(bed.annot)
 
 # get genes expaning 250kb +-
 library(GenomicRanges)
 library(IRanges)
-
-
-
 
 wanted.genes <- read.table(text="VARIANT CHR	POS
 chr16_25608384_C_A chr16 25608384
