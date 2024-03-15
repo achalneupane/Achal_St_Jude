@@ -129,6 +129,8 @@ grep -E 'chr10:1196[0-9]{5,}'  Cardiotox_No_VS_Yes_afr_dose_3_diff.txt
 #################################################
 ## Check for Kateryna's dyslipidemia variants: ##
 #################################################
+# chr16 25608384  C   A, chr16 25609966  T   C, chr16 25610265  T   C, chr16 25611595  T   C **
+
 # HS2ST1:  chr1:86914635-87098445
 grep -E 'chr1:869[0-9]{5,}|chr1:870[0-9]{5,}'  Cardiotox_No_VS_Yes_afr_dose_0_diff.txt
 grep -E 'chr1:869[0-9]{5,}|chr1:870[0-9]{5,}'  Cardiotox_No_VS_Yes_afr_dose_1_diff.txt

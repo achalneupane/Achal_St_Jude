@@ -57,8 +57,14 @@ properties <- as.data.frame(colnames(counts2))
 colnames(properties) <- "samples"
 
 properties$Project <- ifelse(grepl("Pr1", properties$samples), "Pr1", "Pr2")
-# properties$samples <- gsub("Pr1_|Pr2_", "", properties$samples)
-properties$samples <- 
+properties$samples.Pr <- properties$samples
+properties$samples <- gsub("Pr1_|Pr2_", "", properties$samples)
+properties$Cell_type [grepl("ISO", properties$samples, ignore.case = T)] <- "ISO"
+properties$Cell_type [grepl("ROBO1", properties$samples, ignore.case = T)] <- "ROBO1"
+properties$Cell_type [grepl("ROBO2", properties$samples, ignore.case = T)] <- "ROBO2"
+properties$Cell_type [grepl("SLIT2", properties$samples, ignore.case = T)] <- "SLIT2"
+properties$Dox_treatment <- ifelse(grepl("DOX|DX", properties$samples, ignore.case = T), "Yes", "No")
+
 ```
 
 
