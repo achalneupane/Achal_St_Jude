@@ -164,10 +164,12 @@ peaks.gr <- GRanges(seqnames=peaks.bed[,1], ranges=IRanges(peaks.bed[,2], peaks.
 txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
 # To annotate peaks with closest genomic features:
 # bed.annot = annotatePeak(peaks.gr, tssRegion=c(-3000, 3000), TxDb=txdb, annoDb="org.Hs.eg.db")
-bed.annot <- annotatePeak(peaks.gr, TxDb = txdb, annoDb = "org.Hs.eg.db", 
-                          genomicAnnotationPriority = c("Promoter", "5UTR", "3UTR", "Exon", "Intron", "Downstream", "Intergenic"), overlap = "TSS")
+# overlap = "TSS"; level = "transcript"; TxDb=txdb
+bed.annot <- annotatePeak(peaks.gr, tssRegion=c(-3000, 3000), level = "gene", ignoreOverlap = F, TxDb = txdb, annoDb = "org.Hs.eg.db", 
+                          genomicAnnotationPriority = c("Promoter", "5UTR", "3UTR", "Exon", "Intron", "Downstream", "Intergenic"), overlap = "all")
 annot_peaks=as.data.frame(bed.annot)
 
+# write.table(annot_peaks, "All.counts.dat_annotated_with_chipseeker.txt",  col.names = T, row.names = F, sep = "\t")
 ################# Comment this for doe independent analysis ################
 doses <- c(0, 1, 3)
 # dose = 1
@@ -258,6 +260,8 @@ library(GenomicRanges)
 library(IRanges)
 
 wanted.genes <- read.table(text="VARIANT CHR	POS
+chr2_178562809_T_C chr2 178562809
+chr10_119670121_T_C chr10 119670121
 chr16_25608384_C_A chr16 25608384
 chr16_25609966_T_C chr16 25609966
 chr16_25610265_T_C chr16 25610265
