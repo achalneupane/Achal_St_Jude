@@ -63,6 +63,7 @@ library(limma)
 library(dplyr)
 library(tidyr)
 
+
 ## read count data
 counts <- read.table("All.counts.dat", header = TRUE, row.names = 1, check.names = F)
 samples <- unique(gsub("-.*", "", colnames(counts)))
@@ -153,6 +154,7 @@ library(clusterProfiler)
 library(biomaRt)
 library(org.Hs.eg.db)
 library(ReactomePA)
+library(ggplot2)
 
 rownames(annotated.peaks) <- annotated.peaks$Peaks
 peaks.bed <- annotated.peaks[1:4]
@@ -219,12 +221,12 @@ sum(results1$loci %in% annotated.peaks$Peaks)
 results1 <- merge(results1, annotated.peaks, by.x = "loci", by.y ="Peaks")
 
 
-outFile1 <- paste0("annotated_Cardiotox_No_VS_Yes_afr_dose_", dose, "_", variant, "_carriers_", ncarriers, "_diff.txt")
+outFile1 <- paste0("annotated_Cardiotox_No_VS_Yes_afr_dose_", dose, "_", variant, "_carriers_", ncarriers, "_diff_v2.txt")
 write.table(results1, outFile1, col.names = T, row.names = F, sep = "\t", quote = F)
 
 # significant ones
 results1.sig <- results1[results1$P.Value < 0.05,]
-outFile2 <- paste0("annotated_significant_Cardiotox_No_VS_Yes_afr_dose_", dose, "_", variant, "_carriers_", ncarriers, "_diff.txt")
+outFile2 <- paste0("annotated_significant_Cardiotox_No_VS_Yes_afr_dose_", dose, "_", variant, "_carriers_", ncarriers, "_diff_v2.txt")
 write.table(results1.sig, outFile2, col.names = T, row.names = F, sep = "\t", quote = F)
 
 ## With P
@@ -234,17 +236,17 @@ gg <- ggplot(results1, aes(x = logFC, y = -log10(P.Value))) +
   theme_minimal() +
   labs(title = "Volcano Plot", x = "logFC", y = "-log10(P.Value)", color = "Siginificant")
 
-ggsave(paste0("Cardiotox_No_VS_Yes_afr_dose_", dose, "_", variant, "_carriers_", ncarriers, "_diff.tiff"), gg, width = 8, height = 6, dpi = 300)
+ggsave(paste0("Cardiotox_No_VS_Yes_afr_dose_", dose, "_", variant, "_carriers_", ncarriers, "_diff_V2.tiff"), gg, width = 8, height = 6, dpi = 300)
 
 }
 
 
-## Get 250 KB up/downstream of each gene of interest
-dose0.sig <- read.delim(paste0("annotated_significant_Cardiotox_No_VS_Yes_afr_dose_", "0", "_", variant, "_carriers_", ncarriers, "_diff.txt"), header = T, sep = "\t")
+## Get 250 KB up/downstream of each variant of interest
+dose0.sig <- read.delim(paste0("annotated_significant_Cardiotox_No_VS_Yes_afr_dose_", "0", "_", variant, "_carriers_", ncarriers, "_diff_V2.txt"), header = T, sep = "\t")
 dose0.sig$dose <- 0
-dose1.sig <- read.delim(paste0("annotated_significant_Cardiotox_No_VS_Yes_afr_dose_", "1", "_", variant, "_carriers_", ncarriers, "_diff.txt"), header = T, sep = "\t")
+dose1.sig <- read.delim(paste0("annotated_significant_Cardiotox_No_VS_Yes_afr_dose_", "1", "_", variant, "_carriers_", ncarriers, "_diff_V2.txt"), header = T, sep = "\t")
 dose1.sig$dose <- 1
-dose3.sig <- read.delim(paste0("annotated_significant_Cardiotox_No_VS_Yes_afr_dose_", "3", "_", variant, "_carriers_", ncarriers, "_diff.txt"), header = T, sep = "\t")
+dose3.sig <- read.delim(paste0("annotated_significant_Cardiotox_No_VS_Yes_afr_dose_", "3", "_", variant, "_carriers_", ncarriers, "_diff_V2.txt"), header = T, sep = "\t")
 dose3.sig$dose <- 3
 
 all.doses.significant <- rbind.data.frame(dose0.sig, dose1.sig, dose3.sig)
