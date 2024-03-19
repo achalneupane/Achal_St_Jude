@@ -4,23 +4,23 @@ library(haven)
 setwd("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/")
 
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/requests_from_collaborators/Yadav/Serum/get_matching_rows_from_CTCAE.R")
-df <- read.table("Trans-omics CMP profiling Inventory 20230901.txt", header = T)
-dim(df) # 20174
+# df <- read.table("Trans-omics CMP profiling Inventory 20230901.txt", header = T)
+# dim(df) # 20174
 
 ## add TB from Mathew
 TB <- read.table("./data_from_Matthew/ForAchal_Survivors.txt", header = T, sep = "\t")
-TB$KEY <- paste0(TB$sjlid, TB$num_vials, TB$aliquot_type, TB$ageatsample)
-
-df$Key <- paste0(df$sjlid, df$num_vials, df$aliquot_type, df$ageatsample)
-sum(df$Key %in% TB$KEY)
-df$tb_number <- TB$tb_number[match(df$Key, TB$KEY)]
-
-table(TB$aliquot_type) # From Mathew
-# Plasma  Serum 
-# 8208   8175 
-table(df$aliquot_type) # From Kyla
-# Plasma  Serum 
-# 10091  10083 
+# TB$KEY <- paste0(TB$sjlid, TB$num_vials, TB$aliquot_type, TB$ageatsample)
+# 
+# df$Key <- paste0(df$sjlid, df$num_vials, df$aliquot_type, df$ageatsample)
+# sum(df$Key %in% TB$KEY)
+# df$tb_number <- TB$tb_number[match(df$Key, TB$KEY)]
+# 
+# table(TB$aliquot_type) # From Mathew
+# # Plasma  Serum 
+# # 8208   8175 
+# table(df$aliquot_type) # From Kyla
+# # Plasma  Serum 
+# # 10091  10083 
 
 df <- TB
 
@@ -80,7 +80,7 @@ CTCAE <- CTCAE %>%
 arrange(sjlid)
 dim(CTCAE)
 # 9218    9
-
+# 9218    9
 
 CTCAE <- CTCAE[CTCAE$sjlid %in% unique(SERUM$sjlid),]
 dim(CTCAE)
@@ -90,6 +90,7 @@ dim(CTCAE)
 
 ## V9 (after updating with Mathews data)
 # 7428    9 # plasma
+# 7286    9 # serum
 
 # CTCAE <- get_rows_with_smaller_sample_age(CTCAE, SERUM, 0)
 CTCAE <- get_rows_with_smaller_sample_age.all(CTCAE, SERUM, 7)
@@ -99,7 +100,8 @@ dim(CTCAE)
 # 7367 PLASMA with > 0 vial
 
 ## V9 (after updating with Mathews data)
-# 7428   12
+# 7428   12 # plasma
+# # 7286   12 # serum
 ## Add event number
 CTCAE <- CTCAE %>%
   dplyr::group_by(sjlid) %>%
@@ -124,11 +126,15 @@ table(CTCAE$grade)
 # 0    2    3    5 
 # 4388  207   54    1 
 
+
 ## V9 (after updating with Mathews data)
 # Plasma
 # 0    2    3    5 
 # 5085  211   53    1 
 
+# serum
+# 0    2    3    5 
+# 4390  209   55    1
 CTCAE.2 <- CTCAE
 
 
@@ -194,6 +200,28 @@ table(CTCAE.2$event_number,CTCAE.2$grade)
 # 6   11    0    1    0
 # 7    5    1    0    0
 # 8    1    0    0    0
+
+## V9 (after updating with Mathews data)
+# 0    2    3    5 ## plasma
+# 1 3030    0    0    0
+# 2 1338   73   22    0
+# 3  516   49    9    0
+# 4  155   19    7    1
+# 5   29    4    1    0
+# 6   11    0    1    0
+# 7    5    1    0    0
+# 8    1    0    0    0
+
+# 0    2    3    5 ## serum
+# 1 2353    0    0    0
+# 2 1321   44   14    0
+# 3  514   46    8    0
+# 4  156   18    7    1
+# 5   29    4    1    0
+# 6   11    0    1    0
+# 7    5    1    0    0
+# 8    1    0    0    0
+
 table(CTCAE.2$event_number,CTCAE.2$grade_2_or_higher)
 # 1    3563                 0
 # 2    1495                94
@@ -235,6 +263,28 @@ table(CTCAE.2$event_number,CTCAE.2$grade_2_or_higher)
 # 6      11                 1
 # 7       5                 1
 # 8       1                 0
+
+## V9 (after updating with Mathews data)
+# grade_0 grade_2_or_higher ## Plasma
+# 1    3030                 0
+# 2    1338                95
+# 3     516                58
+# 4     155                27
+# 5      29                 5
+# 6      11                 1
+# 7       5                 1
+# 8       1                 0
+
+# grade_0 grade_2_or_higher ## Serum
+# 1    2353                 0
+# 2    1321                58
+# 3     514                54
+# 4     156                26
+# 5      29                 5
+# 6      11                 1
+# 7       5                 1
+# 8       1                 0
+
 table(CTCAE.2$new_event_number,CTCAE.2$grade)
 # 0    2    3    5
 # 1 4085    0    0    0
@@ -266,6 +316,22 @@ table(CTCAE.2$new_event_number,CTCAE.2$grade)
 # 3  367   42   10    1
 # 4   71   10    2    0
 # 5    3    1    0    0
+
+## V9 (after updating with Mathews data)
+# 0    2    3    5 ## Plasma
+# 1 3385    0    0    0
+# 2 1259   93   28    0
+# 3  367   42   10    1
+# 4   71   10    2    0
+# 5    3    1    0    0
+
+# 0    2    3    5 ## Serum
+# 1 3175    0    0    0
+# 2  961   82   24    0
+# 3  226   23    7    0
+# 4   27    8    0    1
+# 5    1    0    0    0
+
 table(CTCAE.2$new_event_number,CTCAE.2$grade_2_or_higher)
 # 1    4085                 0
 # 2    1296               123
@@ -295,6 +361,21 @@ table(CTCAE.2$new_event_number,CTCAE.2$grade_2_or_higher)
 # 3     367                53
 # 4      71                12
 # 5       3                 1
+
+## V9 (after updating with Mathews data)
+# grade_0 grade_2_or_higher ## Plasma
+# 1    3385                 0
+# 2    1259               121
+# 3     367                53
+# 4      71                12
+# 5       3                 1
+
+# grade_0 grade_2_or_higher ## Serum
+# 1    3175                 0
+# 2     961               106
+# 3     226                30
+# 4      27                 9
+# 5       1                 0
 
 CTCAE.3 <- CTCAE.2[!is.na(CTCAE.2$Sample_age),]
 table(CTCAE.3$event_number,CTCAE.3$grade_2_or_higher)
@@ -329,6 +410,27 @@ table(CTCAE.3$event_number,CTCAE.3$grade_2_or_higher)
 # 7       5                 0
 # 8       1                 0
 
+## V9 (after updating with Mathews data)
+# grade_0 grade_2_or_higher
+# 1    3030                 0 ## Plasma
+# 2    1338                62
+# 3     516                29
+# 4     155                13
+# 5      29                 2
+# 6      11                 0
+# 7       5                 0
+# 8       1                 0
+
+# grade_0 grade_2_or_higher ## serum
+# 1    2353                 0
+# 2    1321                32
+# 3     514                26
+# 4     156                12
+# 5      29                 2
+# 6      11                 0
+# 7       5                 0
+# 8       1                 0
+
 table(is.na(CTCAE.2$Sample_age) & CTCAE.2$grade >=2)
 table(CTCAE.2$grade >=2)
 # FALSE  TRUE 
@@ -344,6 +446,10 @@ table(CTCAE.2$grade >=2)
 # FALSE  TRUE 
 # 4388   145 
 
+## V9 (after updating with Mathews data)
+# FALSE  TRUE ## Plasma 
+# 5085   187
+# 4390   145 ## serum
 write.table(CTCAE.2, "Plasma_data_processed_v9_after_removing_numvial_0.txt", col.names = T, row.names = F, sep = "\t") ## based on Plasma data
 # write.table(CTCAE.2, "Serum_data_processed_v9_after_removing_numvial_0.txt", col.names = T, row.names = F, sep = "\t") ## based on Serum data
 

@@ -13,7 +13,7 @@ setwd("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/")
 # CTCAE.serum <- read.table("Serum_data_processed_v6.txt", header = T, sep = "\t")
 # CTCAE.serum <- read.table("Serum_data_processed_v8.txt", header = T, sep = "\t") # removing 18 or younger
 
-# CTCAE.serum <- read.table("Serum_data_processed_v8_after_removing_numvial_0.txt", header = T, sep = "\t") # Serum, 18 or older, vial > 0
+# CTCAE.serum <- read.table("Serum_data_processed_v9_after_removing_numvial_0.txt", header = T, sep = "\t") # Serum, 18 or older, vial > 0
 CTCAE.serum <- read.table("Plasma_data_processed_v9_after_removing_numvial_0.txt", header = T, sep = "\t") # Plasma, 18 or older, vial > 0
 
 demographic <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/demographics.sas7bdat")
@@ -71,14 +71,20 @@ table(CTCAE.serum$new_event_number, CTCAE.serum$grade)
 # 5    3    1    0    0
 
 
-## V9 (after updating with Mathews data) plasma
-# 0    2    3    5
-# 1 2954    0    0    0
-# 2 1253   88   28    0
+## V9 (after updating with Mathews data) 
+# 0    2    3    5 ## plasma
+# 1 3385    0    0    0
+# 2 1259   93   28    0
 # 3  367   42   10    1
 # 4   71   10    2    0
 # 5    3    1    0    0
 
+# 0    2    3    5 ## Serum
+# 1 3175    0    0    0
+# 2  961   82   24    0
+# 3  226   23    7    0
+# 4   27    8    0    1
+# 5    1    0    0    0
 
 # Exposed to either anthracyclines or chest radiation
 CTCAE.serum.1 <- CTCAE.serum[CTCAE.serum$anthracyclines_dose_any > 0 | CTCAE.serum$maxchestrtdose > 200,]
@@ -113,13 +119,20 @@ table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade)
 # 4   70    9    2    0
 # 5    3    1    0    0
 
-## V9 (after updating with Mathews data) plasma
-# 0    2    3    5
-# 1 2156    0    0    0
-# 2 1073   78   24    0
+## V9 (after updating with Mathews data) 
+# 0    2    3    5 ## plasma
+# 1 2433    0    0    0
+# 2 1079   83   24    0
 # 3  352   42    9    1
 # 4   70    9    2    0
 # 5    3    1    0    0
+
+# 0    2    3    5 ## Serum
+# 1 2229    0    0    0
+# 2  788   72   19    0
+# 3  218   23    7    0
+# 4   27    7    0    1
+# 5    1    0    0    0
 table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade >= 2)
 # FALSE TRUE
 # 1  2799    0
@@ -151,18 +164,25 @@ table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade >= 2)
 # 4    70   11
 # 5     3    1
 
-## V9 (after updating with Mathews data) plasma
-# FALSE TRUE
-# 1  2156    0
-# 2  1073  102
+## V9 (after updating with Mathews data) 
+# FALSE TRUE ## plasma
+# 1  2433    0
+# 2  1079  107
 # 3   352   52
 # 4    70   11
 # 5     3    1
 
+# FALSE TRUE ## serum
+# 1  2229    0
+# 2   788   91
+# 3   218   30
+# 4    27    8
+# 5     1    0
+
 ## For Table 2 (in Table_counts sheet of Serum_data_processed_v6_corrected_11_18_2023.xlxs)
 table_2 <- CTCAE.serum.1[!is.na(CTCAE.serum.1$grade),]
 # write.table(table_2, "serum_table_2_v9.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Serum, 18 or older, vial > 0
-# write.table(table_2, "plasma_table_2_v9.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Plasma, 18 or older, vial > 0             
+write.table(table_2, "plasma_table_2_v9.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Plasma, 18 or older, vial > 0
 
 
 

@@ -1,110 +1,68 @@
 library(haven)
 library(dplyr)
-table_2 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/plasma_table_2_v8.txt", header = T, sep = "\t") # after removing num vial zero and with 18 or older
-
+table_2 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/plasma_table_2_v9.txt", header = T, sep = "\t") # after removing num vial zero and with 18 or older
+#########################
+## Zhaoming's controls ##
+#########################
 zhaoming.control <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/controls.selected.110.txt", header = F, sep = "\t")
 # zhaoming.control$V1 %in% SERUM$sjlid
-zhaoming.control.from.mathew <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/data_from_Matthew/forachal_controls.txt", header = F, sep = "\t")
+zhaoming.control.from.mathew <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/data_from_Matthew/forachal_controls.txt", header = T, sep = "\t")
+zhaoming.control.from.mathew <- zhaoming.control.from.mathew[grepl("Plasma", zhaoming.control.from.mathew$aliquot_type, ignore.case = T),]
+## remove 10 samples with the lowest number of vials
+grouped_data <- zhaoming.control.from.mathew %>%
+  group_by(sjlid) %>%
+  summarize(num_vials = min(num_vials))
 
-## Add primary diagnosis
+# Find the 10 sjlid with the lowest number of vials
+sorted_data <- zhaoming.control.from.mathew %>%
+  arrange(num_vials)
+remove.10.samples <- head(unique(sorted_data$sjlid),10)
+
+zhaoming.control.from.mathew <- zhaoming.control.from.mathew[!zhaoming.control.from.mathew$sjlid %in% remove.10.samples,]
+length(unique(zhaoming.control.from.mathew$sjlid))
+# 100
+zhaoming.controls.100 <- unique(zhaoming.control.from.mathew$sjlid)
+###########################
+## Add primary diagnosis ##
+###########################
 demog <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/demog.sas7bdat")
 table_2$primdx <- demog$diag[match(table_2$mrn, demog$MRN)]
 
+###################
+## Get 171 cases ##
+###################
+CA.171 <- table_2[table_2$grade_2_or_higher =="grade_2_or_higher",]
+CA.171 <- unique(CA.171$sjlid)
 
+#################################################################################################
+## randomly select 200 Hodgkin lymphoma survivors from all eligible Hodgkin lymphoma survivors ##
+#################################################################################################
+table_3 <- table_2[!table_2$sjlid %in% CA.171,] # exclude those in CA.171 samples from the original table
+all.hodgkin <- table_3[grepl("\\bHodgkin's\\b", table_3$primdx, ignore.case = T),]
+all.hodgkin <- all.hodgkin[!grepl("non", all.hodgkin$primdx, ignore.case = T),]
 
-# ## Add TB ID
-# TBID <- read.table("All_serum_samples_for_R01_22Aug2023_for_Achal_edited.txt", header = T, sep = "\t")
-# TBID <- TBID[TBID$sjlid %in% table_2$sjlid,]
-# table_2$TBID_YN  <- ifelse(table_2$sjlid %in% TBID$sjlid, "Yes", "No")
+set.seed(54321)
+# select 200
+all.hodgkin.extract <- sample(unique(all.hodgkin$sjlid), 200)
 
-table_2$CAcount[table_2$grade >= 2 & table_2$new_event_number == 2] <- "CA91"
-table_2$CAcount[table_2$grade >= 2 & table_2$new_event_number >=3] <- "CA38"
+####################################################
+## randomly select the remaining 1100-171-200=733 ##
+####################################################
+table_3 <- table_2[!table_2$sjlid %in% c(CA.171,all.hodgkin.extract),] # exclude those in CA.171 + 200 hodgkins samples from the original table
+# Randomly select 733 non- Hodgkin lymphoma survivors from all eligible non- Hodgkin lymphoma survivors.
+all.non.hodgkin <- table_3[!table_3$sjlid %in% all.hodgkin$sjlid,]
 
-CA91.samples <-  table_2$sjlid[which(table_2$CAcount == "CA91")]
-CA38.samples <- table_2$sjlid[which(table_2$CAcount == "CA38")]
+set.seed(54321)
+# select 733
+all.non.hodgkin.extract <- sample(unique(all.non.hodgkin$sjlid), 729)
 
-# #####################
-# ## Get 600 samples ##
-# #####################
-# visit2.grade.0 <- table_2[table_2$grade == 0 & table_2$new_event_number >= 2,]
-# nrow(visit2.grade.0)
-# # 1558 # v6
-# # 1521 # v8
-# # 1033 After removing vial zero
-# ## exclude 100 and 67 from visit2.grade.0
-# to.exclude <- c(CA91.samples, CA38.samples)
-# length(to.exclude)
-# # 177
-# # 167
-# # 129
-# sum(visit2.grade.0$sjlid %in% to.exclude)
-# # 82
-# # 81
-# # 46
-# visit2.grade.0 <- visit2.grade.0 [!visit2.grade.0$sjlid %in% to.exclude,]
-# 
-# ## Get 600-67=532 sjlids from this randomly
-# ## Get 600-38=532 sjlids from this randomly After removin vial zero
-# 
-# set.seed(54321)
-# random_samples.600 <- sample(unique(visit2.grade.0$sjlid), 562)
-# ## add 67 to this:
-# ## add 38 to this: # after removing vial zero
-# random_samples.600 <- c(random_samples.600, CA38.samples)
-# length(random_samples.600)
-# # 600
-# #####################
-# ## Get 800 samples ##
-# #####################
-# ## Now remove 600 and 100 from 2437 and get 800-100=700 samples
-# ## Now remove 600 and 100 from 2228 and get 800-91=709 samples # after removing vial zero
-# CO.2228 <- table_2$sjlid [table_2$grade==0 & table_2$new_event_number ==1]
-# length(CO.2228)
-# # 2799
-# # 2437
-# # 2228 # after removing vial zero
-# 
-# ## remove 600 samples from this
-# CO.2228 <- CO.2228[!CO.2228 %in% random_samples.600]
-# ## also remove 100 samples from this
-# ## also remove 91 samples from this # after removing vial zero
-# CO.2228 <- CO.2228[!CO.2228 %in% CA91.samples]
-# 
-# ## Now randomly select 800-91=709 samples from this
-# random_samples.800 <- sample(unique(CO.2228), 709)
-# ## add 100 to this
-# random_samples.800 <- c(random_samples.800, CA91.samples)
-# 
-# extract.1400 <- c(random_samples.600, random_samples.800)
-# length(extract.1400)
-# # 1400
-# 
-# extract.1400.df <- as.data.frame(extract.1400)
-# extract.1400.df$extracted_group <- ifelse(extract.1400.df$extract.1400 %in% random_samples.600, "600.with.grade0.at.first2visits", "800.with.grade0.at.first.visit")
-# 
-# ## classify CA and CO
-# extract.1400.df$status <- ifelse(extract.1400.df$extract.1400 %in% c(CA38.samples, CA91.samples), "CA", "CO")
-# 
-# # write.table(extract.1400.df, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/table_2_extracted_batch1_1400_samples_v8.txt", col.names = T, row.names = F, sep = "\t")
-# 
-# 
-# # Yadav on 02/15/2024: Can you please add age at serum samples at baseline for
-# # all the 1400 samples, along with age at first follow-up after baseline for the
-# # 600 samples?
-# # extract.1400.df <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/table_2_extracted_batch1_1400_samples.txt", sep = "\t", header = T)
-# 
-# get.baseline <- table_2[table_2$new_event_number == 1,]
-# age.at.first.followup <- table_2[table_2$new_event_number == 2,]
-# 
-# extract.1400.df$serum.sample.age.at.baseline <- get.baseline$Sample_age[match(extract.1400.df$extract.1400, get.baseline$sjlid)]
-# extract.1400.df$age.at.first.follow.up <- age.at.first.followup$Sample_age[match(extract.1400.df$extract.1400, age.at.first.followup$sjlid)]
-# 
-# extract.1400.df$age.at.first.follow.up[extract.1400.df$extracted_group == "800.with.grade0.at.first.visit"] <- NA
-# # write.table(extract.1400.df, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/table_2_extracted_batch1_1400_samples_v8_vial_zero_excluded.txt", col.names = T, row.names = F, sep = "\t")
+#################################
+## concatenate all wanted ones ##
+#################################
+all.wanted.sjlids <- c(CA.171, all.hodgkin.extract, all.non.hodgkin.extract, zhaoming.controls.100)
+length(all.wanted.sjlids)
 
-################################
-## Submitted; round 1; N=1100 ##
-################################
-cases.129 <- c(CA91.samples, CA38.samples)
-
-table_2.hodgkin <- table_2[grepl("Hodgkin", table_2$primdx, ignore.case = T),]
+#########################
+## Now, extract TB IDs ##
+#########################
+extract.1200.samples <- table_2[table_2$sjlid %in% all.wanted.sjlids,]

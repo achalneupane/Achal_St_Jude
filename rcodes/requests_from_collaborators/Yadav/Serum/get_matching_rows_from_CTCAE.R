@@ -53,7 +53,7 @@ get_rows_with_smaller_sample_age.all <- function(CTCAE, SERUM, days){
   CTCAE$Sample_age <- NA  # Initialize ageevent with NA values
   CTCAE$num_vials <- NA
   CTCAE$vitalstatus <- NA
-  
+  CTCAE$tb_number <- NA
   for (i in 1:nrow(CTCAE)) {
     # Subset SERUM and CTCAE data for the current SJLID
     CTCAE_subset <- CTCAE[i, ]
@@ -69,6 +69,7 @@ get_rows_with_smaller_sample_age.all <- function(CTCAE, SERUM, days){
       CTCAE$Sample_age[i] <- SERUM$ageatsample[matching_rows[1]]
       CTCAE$num_vials[i] <- SERUM$num_vials[matching_rows[1]]
       CTCAE$vitalstatus[i] <- SERUM$vitalstatus[matching_rows[1]]
+      CTCAE$tb_number[i] <- SERUM$tb_number[matching_rows[1]]
     }
   }
   return(CTCAE)
