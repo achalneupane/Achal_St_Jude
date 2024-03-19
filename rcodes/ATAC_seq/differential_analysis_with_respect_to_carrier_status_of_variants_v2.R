@@ -162,11 +162,15 @@ peaks.gr <- GRanges(seqnames=peaks.bed[,1], ranges=IRanges(peaks.bed[,2], peaks.
 # covplot(peaks.gr, chrs=c("chr14", "chr15"))
 
 txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
-# To annotate peaks with closest genomic features:
-# bed.annot = annotatePeak(peaks.gr, tssRegion=c(-3000, 3000), TxDb=txdb, annoDb="org.Hs.eg.db")
-# overlap = "TSS"; level = "transcript"; TxDb=txdb
-bed.annot <- annotatePeak(peaks.gr, tssRegion=c(-3000, 3000), level = "gene", ignoreOverlap = F, TxDb = txdb, annoDb = "org.Hs.eg.db", 
+## To annotate peaks with closest genomic features:
+## bed.annot = annotatePeak(peaks.gr, tssRegion=c(-3000, 3000), TxDb=txdb, annoDb="org.Hs.eg.db")
+## overlap = "TSS"; level = "transcript"; TxDb=txdb
+# bed.annot <- annotatePeak(peaks.gr, tssRegion=c(-3000, 3000), level = "gene", ignoreOverlap = F, TxDb = txdb, annoDb = "org.Hs.eg.db", 
+#                           genomicAnnotationPriority = c("Promoter", "5UTR", "3UTR", "Exon", "Intron", "Downstream", "Intergenic"), overlap = "all")
+
+bed.annot <- annotatePeak(peaks.gr, level = "gene", ignoreOverlap = T, TxDb = txdb, annoDb = "org.Hs.eg.db", 
                           genomicAnnotationPriority = c("Promoter", "5UTR", "3UTR", "Exon", "Intron", "Downstream", "Intergenic"), overlap = "all")
+
 annot_peaks=as.data.frame(bed.annot)
 
 # write.table(annot_peaks, "All.counts.dat_annotated_with_chipseeker.txt",  col.names = T, row.names = F, sep = "\t")

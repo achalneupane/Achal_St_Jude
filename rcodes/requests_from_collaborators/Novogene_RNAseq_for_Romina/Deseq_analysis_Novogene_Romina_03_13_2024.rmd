@@ -65,6 +65,11 @@ properties$Cell_type [grepl("ROBO2", properties$samples, ignore.case = T)] <- "R
 properties$Cell_type [grepl("SLIT2", properties$samples, ignore.case = T)] <- "SLIT2"
 properties$Dox_treatment <- ifelse(grepl("DOX|DX", properties$samples, ignore.case = T), "Yes", "No")
 
+
+
+
+
+
 ```
 
 
