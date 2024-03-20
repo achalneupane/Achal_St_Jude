@@ -43,7 +43,7 @@ done
 for chr in {1..22}; do
 echo "Doin Chr $chr"
 # plink --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.sjlid_chr${chr}.PASS.decomposed_geno.0.1_hwe.1e-10 --threads 4 --keep-allele-order --keep EUR_samples.list --make-bed --out plink_chr${chr}.EUR.only
-plink --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.preQC_biallelic_renamed_ID_edited.vcf.gz --threads 4 --keep-allele-order --keep EUR_samples.list --make-bed --out plink_chr${chr}.EUR.only
+plink --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${chr}.preQC_biallelic_renamed_ID_edited.vcf.gz --threads 4 --keep-allele-order --keep ../EUR_samples.list --make-bed --out plink_chr${chr}.EUR.only
 done
 
 #############
