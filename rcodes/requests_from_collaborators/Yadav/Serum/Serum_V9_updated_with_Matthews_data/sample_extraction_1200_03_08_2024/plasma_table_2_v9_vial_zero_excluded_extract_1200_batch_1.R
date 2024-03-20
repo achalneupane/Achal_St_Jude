@@ -123,6 +123,8 @@ sampled_data.120 <- all.wanted.df.1200[sampled_rows, ]
 table_2.keep <- table_2[c("tb_number", "sjlid",  "num_vials", "ageevent", "Sample_age", "vitalstatus", "diaggrp", "CMP_status")]
 ## add community control for the record
 table_2.keep <- rbind.data.frame(table_2.keep, first_ageatsample.zhaoming.100[c("tb_number", "sjlid",  "num_vials", "ageevent", "Sample_age", "vitalstatus", "diaggrp", "CMP_status")])
+table_2.keep$CMP_grade <- table_2$grade[match(table_2.keep$tb_number, table_2$tb_number)]
+table_2.keep$new_event_number <- table_2$new_event_number[match(table_2.keep$tb_number, table_2$tb_number)]
 
 table_2.keep$Batch1.1200.selecion <- all.wanted.df.1200$tb_number[match(table_2.keep$tb_number, all.wanted.df.1200$tb_number)]
 table_2.keep$Batch1.1200.selecion_group <- all.wanted.df.1200$selection_group[match(table_2.keep$tb_number, all.wanted.df.1200$tb_number)]
@@ -130,5 +132,5 @@ table_2.keep$Batch1.1200.selecion_group <- all.wanted.df.1200$selection_group[ma
 table_2.keep$Batch1.1200.subset.120.selecion <- sampled_data.120$tb_number[match(table_2.keep$tb_number, sampled_data.120$tb_number)]
 table_2.keep$Batch1.1200.subset.120.selecion_group <- sampled_data.120$selection_group[match(table_2.keep$tb_number, sampled_data.120$tb_number)]
 
-write.table(table_2.keep, "plasma_data_complete_list_of_table_2_v9.txt", col.names = T, row.names = F, quote = F, sep = "\t")
-write.table(sampled_data.120, "plasma_data_batch1_1200_samples_subset1_120_samples.txt", col.names = T, row.names = F, quote = F, sep = "\t")
+write.table(table_2.keep, "plasma_data_complete_list_of_table_2_v9.txt", col.names = T, row.names = F, quote = F, sep = "\t", na = "")
+write.table(sampled_data.120, "plasma_data_batch1_1200_samples_subset1_120_samples.txt", col.names = T, row.names = F, quote = F, sep = "\t", na="")
