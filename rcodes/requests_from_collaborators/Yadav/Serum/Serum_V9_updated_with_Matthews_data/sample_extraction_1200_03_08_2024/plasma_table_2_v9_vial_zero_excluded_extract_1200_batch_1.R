@@ -93,9 +93,42 @@ all.non.hodgkin.extract <- all.non.hodgkin.extract[c("tb_number", "sjlid",  "num
 all.wanted.df.1200 <- rbind.data.frame(CA.171, all.hodgkin.extract, all.non.hodgkin.extract, first_ageatsample.zhaoming.100)
 dim(all.wanted.df.1200)
 # 1200    9
-#########################
-## Now, extract TB IDs ##
-#########################
-extract.1200.samples <- table_2.first.event[table_2.first.event$sjlid %in% all.wanted.sjlids,]
+
+#######################################################
+## Batch 1, subset 1: Now, extract 120 sample subset ##
+#######################################################
+# This extract should be based on the proportion of all.wanted.df.1200$selection_group
+# Define the counts for each group
+# Define the counts for each group
+counts <- table(all.wanted.df.1200$selection_group)
+groups <- names(counts)
+
+# Calculate the proportion of each group
+proportions <- counts / sum(counts)
+
+# Sample 120 rows based on the proportions
+set.seed(54321) # Set seed for reproducibility
+sampled_rows <- lapply(groups, function(group) {
+  n <- round(proportions[group] * 120)
+  sample(which(all.wanted.df.1200$selection_group == group), n)
+})
+
+# Combine the sampled rows
+sampled_rows <- unlist(sampled_rows)
+
+# Extract the sampled rows
+sampled_data.120 <- all.wanted.df.1200[sampled_rows, ]
 
 
+table_2.keep <- table_2[c("tb_number", "sjlid",  "num_vials", "ageevent", "Sample_age", "vitalstatus", "diaggrp", "CMP_status")]
+## add community control for the record
+table_2.keep <- rbind.data.frame(table_2.keep, first_ageatsample.zhaoming.100[c("tb_number", "sjlid",  "num_vials", "ageevent", "Sample_age", "vitalstatus", "diaggrp", "CMP_status")])
+
+table_2.keep$Batch1.1200.selecion <- all.wanted.df.1200$tb_number[match(table_2.keep$tb_number, all.wanted.df.1200$tb_number)]
+table_2.keep$Batch1.1200.selecion_group <- all.wanted.df.1200$selection_group[match(table_2.keep$tb_number, all.wanted.df.1200$tb_number)]
+
+table_2.keep$Batch1.1200.subset.120.selecion <- sampled_data.120$tb_number[match(table_2.keep$tb_number, sampled_data.120$tb_number)]
+table_2.keep$Batch1.1200.subset.120.selecion_group <- sampled_data.120$selection_group[match(table_2.keep$tb_number, sampled_data.120$tb_number)]
+
+write.table(table_2.keep, "plasma_data_complete_list_of_table_2_v9.txt", col.names = T, row.names = F, quote = F, sep = "\t")
+write.table(sampled_data.120, "plasma_data_batch1_1200_samples_subset1_120_samples.txt", col.names = T, row.names = F, quote = F, sep = "\t")
