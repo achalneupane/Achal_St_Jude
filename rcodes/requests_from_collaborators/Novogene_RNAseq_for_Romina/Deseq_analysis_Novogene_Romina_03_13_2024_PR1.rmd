@@ -54,14 +54,14 @@ counts2<-counts[,-1]
 
 
 properties <- read.table(text="Samples	Project	samples.Pr	Cell_type	Dox_treatment
-ISO	Pr1	Pr1_ISO	ISO CF	No
-ISO_DOX	Pr1	Pr1_ISO_DOX	ISO CF	Yes
-ROBO1	Pr1	Pr1_ROBO1	ROBO1 KO CF	No
-ROBO1_DOX	Pr1	Pr1_ROBO1_DOX	ROBO1 KO CF	Yes
-ROBO2	Pr1	Pr1_ROBO2	ROBO2 KO CF	No
-ROBO2_DOX	Pr1	Pr1_ROBO2_DOX	ROBO2 KO CF	Yes
-SLIT2	Pr1	Pr1_SLIT2	SLIT2 KO CF	No
-SLIT2_DOX	Pr1	Pr1_SLIT2_DOX	SLIT2 KO CF	Yes", header = T, sep = "\t")
+ISO	Pr1	Pr1_ISO	ISO_CF	No
+ISO_DOX	Pr1	Pr1_ISO_DOX	ISO_CF	Yes
+ROBO1	Pr1	Pr1_ROBO1	ROBO1_KO_CF	No
+ROBO1_DOX	Pr1	Pr1_ROBO1_DOX	ROBO1_KO_CF	Yes
+ROBO2	Pr1	Pr1_ROBO2	ROBO2_KO_CF	No
+ROBO2_DOX	Pr1	Pr1_ROBO2_DOX	ROBO2_KO_CF	Yes
+SLIT2	Pr1	Pr1_SLIT2	SLIT2_KO_CF	No
+SLIT2_DOX	Pr1	Pr1_SLIT2_DOX	SLIT2_KO_CF	Yes", header = T, sep = "\t")
 
 
 ```
@@ -73,13 +73,13 @@ SLIT2_DOX	Pr1	Pr1_SLIT2_DOX	SLIT2 KO CF	Yes", header = T, sep = "\t")
 counts.matrix_ROBI<-as.matrix(counts2)
 mode(counts.matrix_ROBI)<-"integer"
 
-properties<-read.table('Z:/ResearchHome/Groups/sapkogrp/projects//RNAseq/common/LVNC_Hana_project/phenotype_LVNC_project.txt', sep = '\t', header=TRUE)
-properties$Cell_Type=as.factor(properties$Cell_Type)
-properties$Group=as.factor(properties$Group)
-properties$Status=as.factor(properties$Status)
-## only cardiomyocyte
-properties <- properties[properties$Cell_Type == "Cardiomyocytes",]
-properties <- properties[, c("sample_ID", "Group", "Status")] # remove Cell_type
+counts.matrix_ROBI <- counts.matrix_ROBI[,grepl("Pr1", colnames(counts.matrix_ROBI))]
+colnames(counts.matrix_ROBI) <- gsub("Pr1_", "", colnames(counts.matrix_ROBI))
+
+properties$Cell_type=as.factor(properties$Cell_type)
+properties$Group=as.factor(properties$Dox_treatment)
+properties$sample_ID <- properties$Samples
+properties <- properties[, c("sample_ID", "Group", "Cell_type")] # remove Cell_type
 counts.matrix_ROBI <- counts.matrix_ROBI[,match(properties$sample_ID, colnames(counts.matrix_ROBI))]
 colnames(counts.matrix_ROBI) == properties$sample_ID
 
@@ -92,12 +92,12 @@ rld_ROBIS<-vst(dds_ROBIS,blind = FALSE)
 mat_ROBIS<-assay(rld_ROBIS)
 
 ## Performs principal component analysis (PCA) on the transformed data.
-pcaData<-plotPCA(rld_ROBIS, intgroup=c("Group"), ntop=100, returnData=TRUE)
+pcaData<-plotPCA(rld_ROBIS, intgroup=c("Group", "Cell_type"), ntop=100, returnData=TRUE)
 percentVar<-round(100 * attr(pcaData, "percentVar"))
 
 ## Plot PCA
 g <- ggplot(pcaData, aes(PC1, PC2))
-g <- g + geom_point(size = 5, aes(fill = Group, col = Group)) +
+g <- g + geom_point(size = 5, aes(fill = Group, col = Group, shape = Cell_type)) +
   theme_bw() +
   theme(
     panel.grid.major = element_blank(),
@@ -110,7 +110,7 @@ g <- g + geom_point(size = 5, aes(fill = Group, col = Group)) +
   )
 # Save the plot as a TIFF file
 tiff(
-  file = "PCA_LVNC_Project_top_100_genes_Cardiomyocytes.tiff",
+  file = "Pr1_top_100_genes.tiff",
   width = 16,
   height = 14,
   units = 'cm',
@@ -134,7 +134,7 @@ myMatrix<-SummarizedExperiment::assay(rld_ROBIS)
 topVarGenes<-head(order(rowVars(myMatrix),decreasing = TRUE), 500)
 myMatrixforheatmap<-myMatrix[topVarGenes,]
 phm<-pheatmap(myMatrixforheatmap, scale="row", cluster_rows = TRUE, cluster_cols = TRUE, annotation_col = properties2, show_colnames = TRUE, show_rownames = FALSE)
-tiff(file="Heatmap_LVNC_Project_top_500_genes_Cardiomyocytes.tiff",width = 18, height = 32, units = 'cm', res = 300, compression = 'lzw')
+tiff(file="Pr1_top_500_genes.tiff",width = 18, height = 32, units = 'cm', res = 300, compression = 'lzw')
 phm
 dev.off()
 ```
@@ -150,7 +150,7 @@ Here, we will conduct differential expression analysis between "Cardiomyopathy" 
 ddset = DESeqDataSetFromMatrix(
     countData = counts.matrix_ROBI, # raw counts
     colData = properties2, # phenotype data
-    design = ~Status
+    design = ~Group + Cell_Type
 )
 
 deseq_object = DESeq(ddset)
@@ -159,7 +159,7 @@ deseq_object = DESeq(ddset)
 # "Cardiomyopathy" and "Control" groups.
 deseq_results = data.frame(results(
   deseq_object,
-  contrast = c("Status", "Cardiomyopathy", "Control")
+  contrast = c("Group", "Yes", "No")
 ))
 deseq_results = deseq_results[order(deseq_results$padj), ]
 deseq_results_filtered = subset(deseq_results, pvalue < 0.05)
@@ -178,7 +178,7 @@ deseq_results$expression = factor(deseq_results$expression, levels = c("Up", "Do
 # deseq_results = subset(deseq_results, abs(log2FoldChange)<5 & !is.na(padj))
 deseq_results = subset(deseq_results,!is.na(padj))
 
-write.table(deseq_results, file="LVNC_project_deseq_results_Cardiomyopathy_vs_Control_Cardiomyocytes.txt", sep="\t")
+write.table(deseq_results, file="Pr1_Dox_vs_Control.txt", sep="\t")
 
 #Create Volcano Plot from DESEQ results
 p = ggplot(data = deseq_results, aes(x = log2FoldChange,
@@ -199,7 +199,7 @@ p = ggplot(data = deseq_results, aes(x = log2FoldChange,
           legend.title = element_blank()) +
     scale_x_continuous(breaks = seq(-10, 10,3), limits = c(-10, 10))
 
-tiff(file="Volcano_plot_Cardiomyopathy_vs_Control_Cardiomyocytes.tiff",
+tiff(file="Pr1_Dox_vs_Control.tiff",
      width = 18, height = 16, units = 'cm', res = 300, compression = 'lzw')
 p
 dev.off()
@@ -225,7 +225,7 @@ kable(head(deseq_results), format = "pandoc", caption = "DESeq2 Results (showing
 **expression**: Categorizes genes based on their expression changes. "Up" indicates upregulation in "Cardiomyopathy," "Down" indicates downregulation, and "Stable" suggests no significant change.
 
 
-## 2.The second and more important question is that what is the differences between LVNC and other cardiomyopathy groups. Specifically, we are interested in the trabecular/compaction process and how the trabeculations is different between LVNC and two other cardiomyopathy group.
+## 2.Pr2
 
 Here, we will design our analysis to identify differentially expressed genes between LVNC and Other_Cardiomyopathy groups, considering the LVNC status as factors in the design formula.We specify the comparison of interest ("LVNC" and "Other_Cardiomyopathy") to compare the gene expression differences associated with the LVNC status.
 
