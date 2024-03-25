@@ -153,7 +153,7 @@ This approach ensures that any observed effect of Group on gene expression is no
 ddset = DESeqDataSetFromMatrix(
     countData = counts.matrix_ROBI, # raw counts
     colData = properties2, # phenotype data
-    design = ~Group + (1|Cell_type)
+    design = ~Group + (1 | Cell_type)
 )
 
 deseq_object = DESeq(ddset)
