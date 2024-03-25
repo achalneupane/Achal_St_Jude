@@ -144,13 +144,16 @@ dev.off()
 
 Here, we will conduct differential expression analysis between "Cardiomyopathy" and "Control" groups, filter and categorize significant genes, and create a volcano plot for visualization. The volcano plot highlights genes with significant changes in expression, facilitating the identification of differentially expressed genes.The design in this context includes the factors Status (indicating whether a sample is from the Cardiomyopathy or Control group).
 
+Since there could be inherent differences in gene expression levels between different cell types (like some cell types naturally express certain genes more than others), treating Cell_type as a fixed effect might not fully capture these differences.Thus, we might miss capturing the baseline variability in gene expression levels between different cell types. This could lead to biased or inaccurate results when analyzing the effect of Group on gene expression.However, including a random effect for Cell_type helps to control for these inherent differences in gene expression levels between different cell types.
+This approach ensures that any observed effect of Group on gene expression is not confounded by differences in cell types. It helps to separate the effects of the experimental treatment (Group) from the inherent differences in gene expression between different cell types.
+
 ```{r, eval=TRUE, echo= TRUE}
 # Create a DESeqDataSet (ddset) from the count matrix (counts.matrix_ROBI) and
 # phenotype information (properties2).
 ddset = DESeqDataSetFromMatrix(
     countData = counts.matrix_ROBI, # raw counts
     colData = properties2, # phenotype data
-    design = ~Group + Cell_Type
+    design = ~Group + (1|Cell_type)
 )
 
 deseq_object = DESeq(ddset)
