@@ -141,3 +141,13 @@ write.table(sampled_data.120, "plasma_data_batch1_1200_samples_subset1_120_sampl
 # the group to ECC people. When you send to the proteomics core, you should only
 # send them tb_number and the group so that they can include all 4 groups of
 # survivors in each experiment.
+
+
+
+# Yadav on 3/26/2024: Achal, can you please provide sex, age at sample and race of these samples?
+demographic <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/demographics.sas7bdat")
+all.wanted.df.1200.to.update <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/plasma_data_batch1_1200_samples.txt", header = T, sep = "\t")
+all.wanted.df.1200.to.update$Sex <- demographic$gender[match(all.wanted.df.1200.to.update$sjlid, demographic$sjlid)]
+all.wanted.df.1200.to.update$racegrp <- demographic$racegrp[match(all.wanted.df.1200.to.update$sjlid, demographic$sjlid)]
+
+write.table(all.wanted.df.1200.to.update, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/plasma_data_batch1_1200_samples_to_proteomics_core.txt", col.names = T, sep = "\t", quote = F)

@@ -151,15 +151,47 @@ Dream: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8055218/; https://bioconduct
 This approach ensures that any observed effect of Group on gene expression is not confounded by differences in cell types. It helps to separate the effects of the experimental treatment (Group) from the inherent differences in gene expression between different cell types.
 
 ```{r, eval=TRUE, echo= TRUE}
-# Create a DESeqDataSet (ddset) from the count matrix (counts.matrix_ROBI) and
-# phenotype information (properties2).
-ddset = DESeqDataSetFromMatrix(
-    countData = counts.matrix_ROBI, # raw counts
-    colData = properties2, # phenotype data
-    design = ~Group + (1 | Cell_type)
-)
+# # Create a DESeqDataSet (ddset) from the count matrix (counts.matrix_ROBI) and
+# # phenotype information (properties2).
+# ddset = DESeqDataSetFromMatrix(
+#     countData = counts.matrix_ROBI, # raw counts
+#     colData = properties2, # phenotype data
+#     design = ~Group + (1 | Cell_type)
+# )
+# 
+# deseq_object = DESeq(ddset)
+# 
 
-deseq_object = DESeq(ddset)
+####################
+## Dream analysis ##
+####################
+library("variancePartition")
+library("edgeR")
+library("BiocParallel")
+
+## normalize with deseq
+dds <- DESeqDataSetFromMatrix(countData = counts.matrix_ROBI,colData = properties, design=~1)
+dds <- estimateSizeFactors(dds)
+
+# identify genes that pass expression cutoff
+isexpr <- rowSums(fpm(dds) > 1) >= 0.5 * ncol(dds)
+
+# compute log2 Fragments Per Million
+# Alternatively, fpkm(), vst() or rlog() could be used
+quantLog <- log2(fpm(dds)[isexpr, ] + 1)
+
+## The variable to be tested must be a fixed effect
+form <- ~ Group + (1 | Cell_type)
+
+## metadata
+info <-  properties2[, c("Group", "Cell_type")]
+
+# fit model and extract variance percents
+varPart <- fitExtractVarPartModel(quantLog, form, info, showWarnings = FALSE)
+head(varPart)
+# violin plot
+plotVarPart(sortCols(varPart), label.angle = 60)
+########################
 
 # Extracts results from the DESeq analysis, focusing on the contrast between
 # "Cardiomyopathy" and "Control" groups.
