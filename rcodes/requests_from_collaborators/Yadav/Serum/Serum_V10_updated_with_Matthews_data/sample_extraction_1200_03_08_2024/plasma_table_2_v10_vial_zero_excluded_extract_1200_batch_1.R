@@ -1,6 +1,6 @@
 library(haven)
 library(dplyr)
-table_2 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/plasma_table_2_v9.txt", header = T, sep = "\t") # after removing num vial zero and with 18 or older
+table_2 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/plasma_table_2_v10.txt", header = T, sep = "\t") # after removing num vial zero and with 18 or older
 diag <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/diagnosis.sas7bdat")
 
 #########################
@@ -12,17 +12,23 @@ zhaoming.control.from.mathew <- read.table("Z:/ResearchHome/ClusterHome/aneupane
 zhaoming.control.from.mathew <- zhaoming.control.from.mathew[grepl("Plasma", zhaoming.control.from.mathew$aliquot_type, ignore.case = T),]
 colnames(zhaoming.control.from.mathew)[colnames(zhaoming.control.from.mathew) == "ageatsample"] <- "Sample_age"
 
+## Keep samples with more than 10 vial and alive
+num_vial.1 <- zhaoming.control.from.mathew$sjlid[zhaoming.control.from.mathew$num_vials < 2]
+# "SJL5107399"
+dim(zhaoming.control.from.mathew)
+# 112   6
 ## select by younger age
 # Find the 10 sjlid with the oldest sample_age of vials
 sorted_data <- zhaoming.control.from.mathew %>%
-  arrange(Sample_age)
-remove.10.samples <- tail(unique(sorted_data$sjlid),9) # remove 10 older samples, we want everyone close to 18 years of age
-remove.10.samples <- c(remove.10.samples, "SJL5125799") # this sample had other carcinoma
+  arrange(Sample_age, )
+remove.10.samples <- tail(unique(sorted_data$sjlid),8) # remove 10 older samples, we want everyone close to 18 years of age
+remove.10.samples <- c(remove.10.samples, "SJL5125799", "SJL5107399") # this sample had other carcinoma
 
 zhaoming.control.from.mathew <- zhaoming.control.from.mathew[!zhaoming.control.from.mathew$sjlid %in% remove.10.samples,]
 length(unique(zhaoming.control.from.mathew$sjlid))
 # 100
-
+dim(zhaoming.control.from.mathew)
+# 103
 # Now get the first Sample_age
 first_ageatsample.zhaoming.100 <- zhaoming.control.from.mathew %>%
   arrange(sjlid, Sample_age) %>%  # Sort by sjlid and ageatsample
@@ -132,9 +138,9 @@ table_2.keep$Batch1.1200.selecion_group <- all.wanted.df.1200$selection_group[ma
 table_2.keep$Batch1.1200.subset.120.selecion <- sampled_data.120$tb_number[match(table_2.keep$tb_number, sampled_data.120$tb_number)]
 table_2.keep$Batch1.1200.subset.120.selecion_group <- sampled_data.120$selection_group[match(table_2.keep$tb_number, sampled_data.120$tb_number)]
 
-write.table(table_2.keep, "plasma_data_complete_list_of_table_2_v9.txt", col.names = T, row.names = F, quote = F, sep = "\t", na = "")
-write.table(all.wanted.df.1200, "plasma_data_batch1_1200_samples.txt", col.names = T, row.names = F, quote = F, sep = "\t", na="")
-write.table(sampled_data.120, "plasma_data_batch1_1200_samples_subset1_120_samples.txt", col.names = T, row.names = F, quote = F, sep = "\t", na="")
+write.table(table_2.keep, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/plasma_data_complete_list_of_table_2_v10.txt", col.names = T, row.names = F, quote = F, sep = "\t", na = "")
+write.table(all.wanted.df.1200, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/plasma_data_batch1_1200_samples.txt", col.names = T, row.names = F, quote = F, sep = "\t", na="")
+write.table(sampled_data.120, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/plasma_data_batch1_1200_samples_subset1_120_samples.txt", col.names = T, row.names = F, quote = F, sep = "\t", na="")
 
 # Note from Yadav: I think you should only provide the necessary information
 # when you send these files. You would only need tb_number, sjlid, num_vials and
@@ -150,7 +156,7 @@ all.wanted.df.1200.to.update <- read.table("Z:/ResearchHome/ClusterHome/aneupane
 all.wanted.df.1200.to.update$Sex <- demographic$gender[match(all.wanted.df.1200.to.update$sjlid, demographic$sjlid)]
 all.wanted.df.1200.to.update$racegrp <- demographic$racegrp[match(all.wanted.df.1200.to.update$sjlid, demographic$sjlid)]
 
-write.table(all.wanted.df.1200.to.update, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/plasma_data_batch1_1200_samples_to_proteomics_core.txt", col.names = T, row.names = F, sep = "\t", quote = F)
+write.table(all.wanted.df.1200.to.update, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/plasma_data_batch1_1200_samples_to_proteomics_core.txt", col.names = T, row.names = F, sep = "\t", quote = F)
 
 
 cases <- all.wanted.df.1200.to.update[all.wanted.df.1200.to.update$selection_group == "171_CMP_cases" & all.wanted.df.1200.to.update$num_vials == 1 &all.wanted.df.1200.to.update$vitalstatus == "Deceased",]
