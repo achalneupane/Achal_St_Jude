@@ -9,7 +9,7 @@
 library(dplyr)
 library(tidyr)
 library(haven)
-setwd("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/")
+setwd("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/")
 # CTCAE.serum <- read.table("Serum_data_processed_v6.txt", header = T, sep = "\t")
 # CTCAE.serum <- read.table("Serum_data_processed_v8.txt", header = T, sep = "\t") # removing 18 or younger
 
@@ -142,7 +142,7 @@ table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade)
 # 4   27    7    0    1
 # 5    1    0    0    0
 
-## V10
+## V10 **
 # 0    2    3    5
 # 1 2176    0    0    0
 # 2  880   83   24    0

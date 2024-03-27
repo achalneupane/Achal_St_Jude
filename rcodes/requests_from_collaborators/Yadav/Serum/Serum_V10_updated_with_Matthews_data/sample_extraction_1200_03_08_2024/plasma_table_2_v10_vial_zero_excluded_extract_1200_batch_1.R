@@ -152,15 +152,48 @@ write.table(sampled_data.120, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_s
 
 # Yadav on 3/26/2024: Achal, can you please provide sex, age at sample and race of these samples?
 demographic <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/demographics.sas7bdat")
-all.wanted.df.1200.to.update <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/plasma_data_batch1_1200_samples.txt", header = T, sep = "\t")
+all.wanted.df.1200.to.update <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/plasma_data_batch1_1200_samples.txt", header = T, sep = "\t")
 all.wanted.df.1200.to.update$Sex <- demographic$gender[match(all.wanted.df.1200.to.update$sjlid, demographic$sjlid)]
 all.wanted.df.1200.to.update$racegrp <- demographic$racegrp[match(all.wanted.df.1200.to.update$sjlid, demographic$sjlid)]
 
 write.table(all.wanted.df.1200.to.update, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/plasma_data_batch1_1200_samples_to_proteomics_core.txt", col.names = T, row.names = F, sep = "\t", quote = F)
+table(all.wanted.df.1200.to.update$num_vials, all.wanted.df.1200.to.update$selection_group)
 
 
+
+
+
+
+## Extra Checks
 cases <- all.wanted.df.1200.to.update[all.wanted.df.1200.to.update$selection_group == "171_CMP_cases" & all.wanted.df.1200.to.update$num_vials == 1 &all.wanted.df.1200.to.update$vitalstatus == "Deceased",]
 cbind.data.frame(sjlid=cases$sjlid, diaggrp = cases$diaggrp, racegrp = cases$racegrp)
+
+cases.num.vials.1 <- all.wanted.df.1200.to.update[all.wanted.df.1200.to.update$selection_group == "171_CMP_cases" & all.wanted.df.1200.to.update$num_vials == 1,]
+cases.num.vials.1 <- cbind.data.frame(sjlid=cases.num.vials.1$sjlid, diaggrp = cases.num.vials.1$diaggrp, racegrp = cases.num.vials.1$racegrp)
+
+cases.num.vials.1 <- table_2[table_2$sjlid %in% cases.num.vials.1$sjlid,]
+
+Num_samples_before_CMP <- cases.num.vials.1 %>%
+  filter(grade_2_or_higher == "grade_0") %>%
+  group_by(sjlid) %>%
+  summarise(grade_2_or_higher_count = n())
+cases.num.vials.1$Num_samples_before_CMP <- Num_samples_before_CMP$grade_2_or_higher_count[match(cases.num.vials.1$sjlid, Num_samples_before_CMP$sjlid)]
+## select vial 1
+cases.num.vials.1 <- cases.num.vials.1[which(cases.num.vials.1$num_vials == 1),]
+cases.num.vials.1$TB_to_exclude[cases.num.vials.1$Num_samples_before_CMP >=2] <- cases.num.vials.1$tb_number[cases.num.vials.1$Num_samples_before_CMP >=2]
+# cases.num.vials.1 <- cases.num.vials.1[match(cc$V1, cases.num.vials.1$sjlid), ] ## cc is the list of 41 samples to order
+cases.num.vials.1 <- cases.num.vials.1[c("sjlid", "diaggrp", "racegrp", "vitalstatus", "Num_samples_before_CMP","TB_to_exclude", "Sample_age")]
+TB <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/data_from_Matthew/ForAchal_Survivors.txt", header = T, sep = "\t")
+df <- TB
+df$ageatsample <- floor(df$ageatsample * 10) / 10
+df$KEY <- paste0(df$sjlid, ":", df$ageatsample)
+df.plasma <- df[df$aliquot_type == "Plasma",]
+df.serum <- df[df$aliquot_type == "Serum",]
+cases.num.vials.1$KEY <- paste0(cases.num.vials.1$sjlid, ":",cases.num.vials.1$Sample_age)
+
+cases.num.vials.1$Plasma_vials <- df.plasma$num_vials[match(cases.num.vials.1$KEY, df.plasma$KEY)]
+cases.num.vials.1$Serum_vials <- df.serum$num_vials[match(cases.num.vials.1$KEY, df.serum$KEY)]
+
 # ## Test
 # library("blockrand")
 # randomized_samples <- block_ra(sample_data, n = 14, id_col = "Sample", block_col = "selection_group", strata_cols = c("Sample_age", "Sex", "racegrp"))

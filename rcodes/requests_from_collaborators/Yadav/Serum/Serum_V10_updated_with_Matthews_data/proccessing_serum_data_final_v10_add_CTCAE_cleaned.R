@@ -318,10 +318,10 @@ table(CTCAE.2$event_number,CTCAE.2$grade_2_or_higher)
 
 ## V10
 # grade_0 grade_2_or_higher
-# 1    2353                 0
-# 2    1321                58
-# 3     514                54
-# 4     156                26
+# 1    2499                 0
+# 2    1238                94
+# 3     485                58
+# 4     145                27
 # 5      29                 5
 # 6      11                 1
 # 7       5                 1
@@ -523,7 +523,7 @@ table(CTCAE.2$grade >=2)
 
 ## V10
 # FALSE  TRUE 
-# 4390   145 
+# 4413   186 
 
 write.table(CTCAE.2, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/Plasma_data_processed_v10_after_removing_numvial_0.txt", col.names = T, row.names = F, sep = "\t") ## based on Plasma data
 # write.table(CTCAE.2, "Serum_data_processed_v9_after_removing_numvial_0.txt", col.names = T, row.names = F, sep = "\t") ## based on Serum data
