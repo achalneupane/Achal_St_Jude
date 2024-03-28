@@ -214,8 +214,7 @@ controls.to.remove <- controls[which(controls$num_vials == 1),]
 controls.to.remove$TB_to_exclude[controls.to.remove$Num_samples >=2] <- controls.to.remove$tb_number[controls.to.remove$Num_samples >=2]
 controls.to.remove <- c(controls.to.remove$TB_to_exclude[controls.to.remove$Num_samples >=2], controls.num.vial.1.last.vial.to.remove)
 all.to.remove <- c(cases.num.vials.1.remove, controls.to.remove)
-write.table(as.data.frame(all.to.remove), "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/all.TB.to.removefrom_V10.txt", sep = "\t", col.names = F, row.names = F)
-write.table(as.data.frame(cases.num.vials.1.remove), "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/remove_cases_TB_with_vial_1.txt", sep = "\t", col.names = F, row.names = F)
+write.table(as.data.frame(all.to.remove), "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/all.TB.to.removefrom_V10.txt", sep = "\t", col.names = F)
 # ## Test
 # library("blockrand")
 # randomized_samples <- block_ra(sample_data, n = 14, id_col = "Sample", block_col = "selection_group", strata_cols = c("Sample_age", "Sex", "racegrp"))
