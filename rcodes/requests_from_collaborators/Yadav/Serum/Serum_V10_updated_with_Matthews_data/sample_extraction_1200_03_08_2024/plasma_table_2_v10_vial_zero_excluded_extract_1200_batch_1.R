@@ -193,7 +193,28 @@ cases.num.vials.1$KEY <- paste0(cases.num.vials.1$sjlid, ":",cases.num.vials.1$S
 
 cases.num.vials.1$Plasma_vials <- df.plasma$num_vials[match(cases.num.vials.1$KEY, df.plasma$KEY)]
 cases.num.vials.1$Serum_vials <- df.serum$num_vials[match(cases.num.vials.1$KEY, df.serum$KEY)]
+cases.num.vials.1.remove <- na.omit(cases.num.vials.1$TB_to_exclude)
 
+## controls
+controls <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/plasma_table_2_v9.txt", header = T, sep = "\t") # after removing num vial zero and with 18 or older
+remove <- unique(all.wanted.df.1200.to.update$sjlid[all.wanted.df.1200.to.update$selection_group == "171_CMP_cases"])
+controls <- controls [!controls$sjlid %in% remove,]
+controls$Num_samples <- ave(controls$sjlid, controls$sjlid, FUN = length)
+controls.num.vial.1 <- controls[controls$num_vials == 1 & controls$Num_samples ==1,]
+
+controls.num.vial.1$KEY <- paste0(controls.num.vial.1$sjlid, ":",controls.num.vial.1$Sample_age)
+controls.num.vial.1$Plasma_vials <- df.plasma$num_vials[match(controls.num.vial.1$KEY, df.plasma$KEY)]
+controls.num.vial.1$Serum_vials <- df.serum$num_vials[match(controls.num.vial.1$KEY, df.serum$KEY)]
+## exclude last vial available 
+controls.num.vial.1.last.vial <- controls.num.vial.1[(controls.num.vial.1$Plasma_vials == 1 & controls.num.vial.1$Serum_vials == 0)|(controls.num.vial.1$Plasma_vials == 1 & is.na(controls.num.vial.1$Serum_vials)),]
+controls.num.vial.1.last.vial.to.remove <- controls.num.vial.1.last.vial$tb_number
+
+## exclude control TB if subsequent TBs are available
+controls.to.remove <- controls[which(controls$num_vials == 1),]
+controls.to.remove$TB_to_exclude[controls.to.remove$Num_samples >=2] <- controls.to.remove$tb_number[controls.to.remove$Num_samples >=2]
+controls.to.remove <- c(controls.to.remove$TB_to_exclude[controls.to.remove$Num_samples >=2], controls.num.vial.1.last.vial.to.remove)
+all.to.remove <- c(cases.num.vials.1.remove, controls.to.remove)
+write.table(as.data.frame(all.to.remove), "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/all.TB.to.removefrom_V10.txt", sep = "\t", col.names = F)
 # ## Test
 # library("blockrand")
 # randomized_samples <- block_ra(sample_data, n = 14, id_col = "Sample", block_col = "selection_group", strata_cols = c("Sample_age", "Sex", "racegrp"))
