@@ -9,12 +9,12 @@
 library(dplyr)
 library(tidyr)
 library(haven)
-setwd("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/")
+setwd("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v11_output/")
 # CTCAE.serum <- read.table("Serum_data_processed_v6.txt", header = T, sep = "\t")
 # CTCAE.serum <- read.table("Serum_data_processed_v8.txt", header = T, sep = "\t") # removing 18 or younger
 
 # CTCAE.serum <- read.table("Serum_data_processed_v9_after_removing_numvial_0.txt", header = T, sep = "\t") # Serum, 18 or older, vial > 0
-CTCAE.serum <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/Plasma_data_processed_v10_after_removing_numvial_0.txt", header = T, sep = "\t") # Plasma, 18 or older, vial > 0
+CTCAE.serum <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v11_output/Plasma_data_processed_v11_after_removing_numvial_0.txt", header = T, sep = "\t") # Plasma, 18 or older, vial > 0
 
 demographic <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/demographics.sas7bdat")
 chemo <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/chemosum_dose.sas7bdat")
@@ -94,6 +94,14 @@ table(CTCAE.serum$new_event_number, CTCAE.serum$grade)
 # 4   51   10    2    0
 # 5    2    1    0    0
 
+## V11
+# 0    2    3    5
+# 1 3385    0    0    0
+# 2 1259   93   28    0
+# 3  367   42   10    1
+# 4   71   10    2    0
+# 5    3    1    0    0
+
 # Exposed to either anthracyclines or chest radiation
 CTCAE.serum.1 <- CTCAE.serum[CTCAE.serum$anthracyclines_dose_any > 0 | CTCAE.serum$maxchestrtdose > 200,]
 table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade)
@@ -142,13 +150,21 @@ table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade)
 # 4   27    7    0    1
 # 5    1    0    0    0
 
-## V10 **
+## V10 
 # 0    2    3    5
 # 1 2176    0    0    0
 # 2  880   83   24    0
 # 3  268   42    9    1
 # 4   50    9    2    0
 # 5    2    1    0    0
+
+## V11 **
+# 0    2    3    5
+# 1 2433    0    0    0
+# 2 1079   83   24    0
+# 3  352   42    9    1
+# 4   70    9    2    0
+# 5    3    1    0    0
 
 table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade >= 2)
 # FALSE TRUE
@@ -204,20 +220,27 @@ table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade >= 2)
 # 4    50   11
 # 5     2    1
 
+## V11
+# FALSE TRUE
+# 1  2433    0
+# 2  1079  107
+# 3   352   52
+# 4    70   11
+# 5     3    1
+
 ## For Table 2 (in Table_counts sheet of Serum_data_processed_v6_corrected_11_18_2023.xlxs)
 table_2 <- CTCAE.serum.1[!is.na(CTCAE.serum.1$grade),]
 
-## This is where we updated from V10
+### write.table(table_2, "serum_table_2_v9.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Serum, 18 or older, vial > 0
+# write.table(table_2, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v11_output/plasma_table_2_v11.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Plasma, 18 or older, vial > 0
+
+## This is where I updated from V10
 ## TB with last vials, with vial 1 when subsequent visits have more number of vials are removed here
 removeTB <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/all.TB.to.removefrom_V10.txt", header = F, sep = "\t")
 removeTB <- removeTB$V2
-SERUM <- SERUM[!SERUM$tb_number %in% removeTB,]
+table_2.keep <- table_2[!table_2$tb_number %in% removeTB,]
 
-# write.table(table_2, "serum_table_2_v9.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Serum, 18 or older, vial > 0
-write.table(table_2, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/plasma_table_2_v10.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Plasma, 18 or older, vial > 0
-
-
-
+write.table(table_2.keep, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v11_output/plasma_table_2_v11.keep.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Plasma, 18 or older, vial > 0
 ######################################################################################################
 
 

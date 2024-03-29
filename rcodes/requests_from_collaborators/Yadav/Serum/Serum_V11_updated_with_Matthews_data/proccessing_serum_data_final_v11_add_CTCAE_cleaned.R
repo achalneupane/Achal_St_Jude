@@ -61,7 +61,7 @@ SERUM <- SERUM[SERUM$num_vials > 0 ,]
 
 
 dim(SERUM)
-# 8564
+# 8879
 
 ## Keep max num vials and alive over dead
 SERUM <- SERUM %>%
@@ -70,7 +70,7 @@ SERUM <- SERUM %>%
   filter(vitalstatus == "Alive" | all(vitalstatus == "Deceased"))
 
 dim(SERUM)
-# [1] 7576    6
+# [1] 8858    6
 
 ## Could you please work on it by merging with the CTCAE grades for cardiomyopathy from the most recent data freeze? Please look at serum and plasma separately.
 # read CTCAE
@@ -112,7 +112,7 @@ dim(CTCAE)
 # 6826    9
 
 # V11
-# 7391    9
+# 7428    9
 # CTCAE <- get_rows_with_smaller_sample_age(CTCAE, SERUM, 0)
 CTCAE <- get_rows_with_smaller_sample_age.all(CTCAE, SERUM, 7)
 dim(CTCAE)
@@ -128,7 +128,7 @@ dim(CTCAE)
 # 6826   13
 
 #V11
-# 7391   13
+# 7428   13
 
 ## Add event number
 CTCAE <- CTCAE %>%
@@ -170,7 +170,7 @@ table(CTCAE$grade)
 
 ## V11
 # 0    2    3    5 
-# 4770  211   53    1 
+# 5085  211   53    1 
 
 CTCAE.2 <- CTCAE
 
@@ -271,10 +271,10 @@ table(CTCAE.2$event_number,CTCAE.2$grade)
 
 ## V11
 # 0    2    3    5
-# 1 2733    0    0    0
-# 2 1324   73   22    0
-# 3  513   49    9    0
-# 4  154   19    7    1
+# 1 3030    0    0    0
+# 2 1338   73   22    0
+# 3  516   49    9    0
+# 4  155   19    7    1
 # 5   29    4    1    0
 # 6   11    0    1    0
 # 7    5    1    0    0
@@ -356,10 +356,10 @@ table(CTCAE.2$event_number,CTCAE.2$grade_2_or_higher)
 
 ## V11
 # grade_0 grade_2_or_higher
-# 1    2733                 0
-# 2    1324                95
-# 3     513                58
-# 4     154                27
+# 1    3030                 0
+# 2    1338                95
+# 3     516                58
+# 4     155                27
 # 5      29                 5
 # 6      11                 1
 # 7       5                 1
@@ -422,11 +422,11 @@ table(CTCAE.2$new_event_number,CTCAE.2$grade)
 
 ## V11
 # 0    2    3    5
-# 1 3351    0    0    0
-# 2 1075  106   33    0
-# 3  291   30    5    1
-# 4   51   10    2    0
-# 5    2    0    0    0
+# 1 3385    0    0    0
+# 2 1259   93   28    0
+# 3  367   42   10    1
+# 4   71   10    2    0
+# 5    3    1    0    0
 
 table(CTCAE.2$new_event_number,CTCAE.2$grade_2_or_higher)
 # 1    4085                 0
@@ -483,11 +483,11 @@ table(CTCAE.2$new_event_number,CTCAE.2$grade_2_or_higher)
 
 ## V11
 # grade_0 grade_2_or_higher
-# 1    3351                 0
-# 2    1075               139
-# 3     291                36
-# 4      51                12
-# 5       2                 0
+# 1    3385                 0
+# 2    1259               121
+# 3     367                53
+# 4      71                12
+# 5       3                 1
 
 CTCAE.3 <- CTCAE.2[!is.na(CTCAE.2$Sample_age),]
 table(CTCAE.3$event_number,CTCAE.3$grade_2_or_higher)
@@ -557,10 +557,10 @@ table(CTCAE.3$event_number,CTCAE.3$grade_2_or_higher)
 
 ## V11
 # grade_0 grade_2_or_higher
-# 1    2733                 0
-# 2    1324                62
-# 3     513                29
-# 4     154                13
+# 1    3030                 0
+# 2    1338                62
+# 3     516                29
+# 4     155                13
 # 5      29                 2
 # 6      11                 0
 # 7       5                 0
@@ -592,7 +592,7 @@ table(CTCAE.2$grade >=2)
 
 ## V11
 # FALSE  TRUE 
-# 4770   187 
+# 5085   187 
 
 write.table(CTCAE.2, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v11_output/Plasma_data_processed_v11_after_removing_numvial_0.txt", col.names = T, row.names = F, sep = "\t") ## based on Plasma data
 # write.table(CTCAE.2, "Serum_data_processed_v9_after_removing_numvial_0.txt", col.names = T, row.names = F, sep = "\t") ## based on Serum data
