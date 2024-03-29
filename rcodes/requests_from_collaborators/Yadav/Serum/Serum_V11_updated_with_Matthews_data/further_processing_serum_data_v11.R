@@ -243,6 +243,18 @@ table_2.keep <- table_2[!table_2$tb_number %in% removeTB,]
 write.table(table_2.keep, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v11_output/plasma_table_2_v11.keep.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Plasma, 18 or older, vial > 0
 ######################################################################################################
 
+cases <- table_2.keep$sjlid[table_2.keep$grade_2_or_higher == "grade_2_or_higher"]
+cases <- table_2.keep[table_2.keep$sjlid %in% cases,]
+
+#######################################################################################################
+
+
+
+
+
+
+
+
 
 
 
