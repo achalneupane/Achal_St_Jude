@@ -96,10 +96,10 @@ table(CTCAE.serum$new_event_number, CTCAE.serum$grade)
 
 ## V11
 # 0    2    3    5
-# 1 3385    0    0    0
-# 2 1259   93   28    0
-# 3  367   42   10    1
-# 4   71   10    2    0
+# 1 3379    0    0    0
+# 2 1253   93   28    0
+# 3  365   42   10    1
+# 4   70   10    2    0
 # 5    3    1    0    0
 
 # Exposed to either anthracyclines or chest radiation
@@ -160,10 +160,10 @@ table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade)
 
 ## V11 **
 # 0    2    3    5
-# 1 2433    0    0    0
-# 2 1079   83   24    0
-# 3  352   42    9    1
-# 4   70    9    2    0
+# 1 2430    0    0    0
+# 2 1076   83   24    0
+# 3  350   42    9    1
+# 4   69    9    2    0
 # 5    3    1    0    0
 
 table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade >= 2)
@@ -222,15 +222,16 @@ table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade >= 2)
 
 ## V11
 # FALSE TRUE
-# 1  2433    0
-# 2  1079  107
-# 3   352   52
-# 4    70   11
+# 1  2430    0
+# 2  1076  107
+# 3   350   52
+# 4    69   11
 # 5     3    1
 
 ## For Table 2 (in Table_counts sheet of Serum_data_processed_v6_corrected_11_18_2023.xlxs)
 table_2 <- CTCAE.serum.1[!is.na(CTCAE.serum.1$grade),]
-
+dim(table_2)
+# 4099   35
 ### write.table(table_2, "serum_table_2_v9.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Serum, 18 or older, vial > 0
 # write.table(table_2, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v11_output/plasma_table_2_v11.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Plasma, 18 or older, vial > 0
 
@@ -238,16 +239,17 @@ table_2 <- CTCAE.serum.1[!is.na(CTCAE.serum.1$grade),]
 ## TB with last vials, with vial 1 when subsequent visits have more number of vials are removed here
 removeTB <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/all.TB.to.removefrom_V10.txt", header = F, sep = "\t")
 removeTB <- removeTB$V2
-table_2.keep <- table_2[!table_2$tb_number %in% removeTB,]
+table_2.updated <- table_2[!table_2$tb_number %in% removeTB,]
 
-write.table(table_2.keep, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v11_output/plasma_table_2_v11.keep.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Plasma, 18 or older, vial > 0
+write.table(table_2.updated, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v11_output/plasma_table_2_v11.updated.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Plasma, 18 or older, vial > 0
 ######################################################################################################
 
-cases <- table_2.keep$sjlid[table_2.keep$grade_2_or_higher == "grade_2_or_higher"]
-cases <- table_2.keep[table_2.keep$sjlid %in% cases,]
+cases <- table_2.updated$sjlid[table_2.updated$grade_2_or_higher == "grade_2_or_higher"]
+cases <- table_2.updated[table_2.updated$sjlid %in% cases,]
 
 #######################################################################################################
-
+## END
+#######################################################################################################
 
 
 
