@@ -2,7 +2,7 @@ library(haven)
 library(dplyr)
 table_2 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v11_output/plasma_table_2_v11.updated.txt", header = T, sep = "\t") # after removing num vial zero and with 18 or older
 dim(table_2)
-# 3793   35
+# 3784   35
 #################################################
 ## We will also remove controls with numvial 1 ##
 #################################################
@@ -13,7 +13,7 @@ dim(controls.with.num.vial.1)
 # 113  35
 table_2 <- table_2[!table_2$sjlid %in% controls.with.num.vial.1$sjlid,]
 dim(table_2)
-# 3680   35
+# 3671   35
 #################################################
 
 diag <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/diagnosis.sas7bdat")
@@ -70,7 +70,7 @@ CA.171 <- unique(CA.171$sjlid)
 table_2$CMP_status <- ifelse(table_2$sjlid %in% CA.171, "Yes", "No")
 table(table_2$CMP_status)
 # No  Yes 
-# 3281  399 
+# 3272  399 
 
 ## Get the frist ageevent for all samples
 table_2.first.event <- table_2 %>%
@@ -79,7 +79,7 @@ table_2.first.event <- table_2 %>%
   slice(1) 
 
 dim(table_2.first.event)
-# 2286   37
+# 2283   37
 
 CA.171 <- table_2.first.event[table_2.first.event$CMP_status == "Yes",]
 CA.171$selection_group <- "171_CMP_cases"
@@ -190,7 +190,7 @@ table(all.wanted.df.1200.to.update$num_vials, all.wanted.df.1200.to.update$selec
 ##############################
 ## Give this to Kyla's team ##
 ##############################
-all.wanted.df.1200.to.update.kyla <- all.wanted.df.1200.to.update[c("tb_number", "Sample_age", "num_vials")]
+all.wanted.df.1200.to.update.kyla <- all.wanted.df.1200.to.update[c("tb_number", "sjlid", "Sample_age", "num_vials")]
 write.table(all.wanted.df.1200.to.update.kyla, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v11_output/plasma_data_batch1_1200_samples_to_ECC.txt", col.names = T, row.names = F, sep = "\t", quote = F)
 
 
