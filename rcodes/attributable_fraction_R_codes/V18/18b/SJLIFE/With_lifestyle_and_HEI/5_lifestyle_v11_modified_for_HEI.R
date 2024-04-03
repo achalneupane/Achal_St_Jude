@@ -382,7 +382,24 @@ diet_iid_dob_18_sorted = diet_iid_dob_18[order(diet_iid_dob_18$sjlid, diet_iid_d
 diet_iid_dob_18_uniq = diet_iid_dob_18_sorted[!duplicated(diet_iid_dob_18_sorted$sjlid),]
 
 
+## HEI 2005
+HEI2005_iid_dob_18 = subset(DIET, agesurvey >= 18)
+# If heavy or risky drink any is 1, then Yes for RiskyHeavyDrink_yn
+HEI2005_iid_dob_18 <- HEI2005_iid_dob_18[!is.na(HEI2005_iid_dob_18$HEI2005_TOTAL_SCORE), ]
+HEI2005_iid_dob_18_sorted = HEI2005_iid_dob_18[order(HEI2005_iid_dob_18$sjlid, HEI2005_iid_dob_18$agesurvey, decreasing = FALSE),]
+HEI2005_iid_dob_18_uniq = HEI2005_iid_dob_18_sorted[!duplicated(HEI2005_iid_dob_18_sorted$sjlid),]
 
+
+
+## HEI 2010
+HEI2010_iid_dob_18 = subset(DIET, agesurvey >= 18)
+# If heavy or risky drink any is 1, then Yes for RiskyHeavyDrink_yn
+HEI2010_iid_dob_18 <- HEI2010_iid_dob_18[!is.na(HEI2010_iid_dob_18$HEI2010_TOTAL_SCORE), ]
+HEI2010_iid_dob_18_sorted = HEI2010_iid_dob_18[order(HEI2010_iid_dob_18$sjlid, HEI2010_iid_dob_18$agesurvey, decreasing = FALSE),]
+HEI2010_iid_dob_18_uniq = HEI2010_iid_dob_18_sorted[!duplicated(HEI2010_iid_dob_18_sorted$sjlid),]
+
+
+## HEI 2015
 HEI2015_iid_dob_18 = subset(DIET, agesurvey >= 18)
 # If heavy or risky drink any is 1, then Yes for RiskyHeavyDrink_yn
 HEI2015_iid_dob_18 <- HEI2015_iid_dob_18[!is.na(HEI2015_iid_dob_18$HEI2015_TOTAL_SCORE), ]
@@ -436,8 +453,42 @@ table(ALL.LIFESTYLE$HEALTHY_Diet_yn)
 # 1       0 Unknown 
 # 306    2850    1245
 
+ALL.LIFESTYLE$HEI2005_TOTAL_SCORE <- HEI2005_iid_dob_18_uniq$HEI2005_TOTAL_SCORE[match(ALL.LIFESTYLE$SJLIFEID, HEI2005_iid_dob_18_uniq$sjlid)]
+ALL.LIFESTYLE$HEI2005_TOTAL_SCORE_agesurvey <- HEI2005_iid_dob_18_uniq$agesurvey[match(ALL.LIFESTYLE$SJLIFEID, HEI2005_iid_dob_18_uniq$sjlid)]
+
+ALL.LIFESTYLE$HEI2010_TOTAL_SCORE <- HEI2010_iid_dob_18_uniq$HEI2010_TOTAL_SCORE[match(ALL.LIFESTYLE$SJLIFEID, HEI2010_iid_dob_18_uniq$sjlid)]
+ALL.LIFESTYLE$HEI2010_TOTAL_SCORE_agesurvey <- HEI2010_iid_dob_18_uniq$agesurvey[match(ALL.LIFESTYLE$SJLIFEID, HEI2010_iid_dob_18_uniq$sjlid)]
+
 ALL.LIFESTYLE$HEI2015_TOTAL_SCORE <- HEI2015_iid_dob_18_uniq$HEI2015_TOTAL_SCORE[match(ALL.LIFESTYLE$SJLIFEID, HEI2015_iid_dob_18_uniq$sjlid)]
 ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey <- HEI2015_iid_dob_18_uniq$agesurvey[match(ALL.LIFESTYLE$SJLIFEID, HEI2015_iid_dob_18_uniq$sjlid)]
+
+
+
+#########################
+## Create HEI tertiles ##
+#########################
+# HEI.to.categorize <- c("HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")
+HEI.to.categorize <- c("HEI2015_TOTAL_SCORE")
+
+## Tertile categories
+for(i in 1:length(HEI.to.categorize)){
+  TERT = unname(quantile(ALL.LIFESTYLE[HEI.to.categorize[i]][ALL.LIFESTYLE[HEI.to.categorize[i]] !=0], c(1/3, 2/3, 1), na.rm = T))
+  if(sum(duplicated(TERT)) > 0) next
+  print (HEI.to.categorize[i])
+  print(TERT)
+  
+  ALL.LIFESTYLE$HEI.tmp.tert.category <- as.character(cut(ALL.LIFESTYLE[,HEI.to.categorize[i]], breaks = c(0, TERT),
+                                                         labels = c("1st", "2nd", "3rd"),
+                                                         include.lowest = TRUE))
+  
+  ALL.LIFESTYLE$HEI.tmp.tert.category[is.na(ALL.LIFESTYLE$HEI.tmp.tert.category)] <- "Unknown"
+  ALL.LIFESTYLE$HEI.tmp.tert.category <- factor(ALL.LIFESTYLE$HEI.tmp.tert.category, levels = c("3rd", "2nd", "1st", "Unknown"))
+  colnames(ALL.LIFESTYLE)[colnames(ALL.LIFESTYLE) == "HEI.tmp.tert.category"] <- paste0(HEI.to.categorize[i], ".tertile.category")
+}
+
+table(PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category)
+############################################################
+
 
 
 # # Yadav's emial on 7/19/2022: In RT dose variables, you may see values of 20 cGy
@@ -654,32 +705,6 @@ PHENO.ANY_SN$epitxn_dose_5.category <- cut(PHENO.ANY_SN$epitxn_dose_5, breaks = 
                                            include.lowest = TRUE)
 levels(PHENO.ANY_SN$epitxn_dose_5.category) <- c(levels(PHENO.ANY_SN$epitxn_dose_5.category), "Unknown")
 PHENO.ANY_SN$epitxn_dose_5.category [is.na(PHENO.ANY_SN$epitxn_dose_5.category)] <- "Unknown"
-
-
-#########################
-## Create HEI tertiles ##
-#########################
-# HEI.to.categorize <- c("HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")
-HEI.to.categorize <- c("HEI2015_TOTAL_SCORE")
-
-## Tertile categories
-for(i in 1:length(HEI.to.categorize)){
-  TERT = unname(quantile(PHENO.ANY_SN[HEI.to.categorize[i]][PHENO.ANY_SN[HEI.to.categorize[i]] !=0], c(1/3, 2/3, 1), na.rm = T))
-  if(sum(duplicated(TERT)) > 0) next
-  print (HEI.to.categorize[i])
-  print(TERT)
-  
-  PHENO.ANY_SN$HEI.tmp.tert.category <- as.character(cut(PHENO.ANY_SN[,HEI.to.categorize[i]], breaks = c(0, TERT),
-                                                         labels = c("1st", "2nd", "3rd"),
-                                                         include.lowest = TRUE))
-  
-  PHENO.ANY_SN$HEI.tmp.tert.category[is.na(PHENO.ANY_SN$HEI.tmp.tert.category)] <- "Unknown"
-  PHENO.ANY_SN$HEI.tmp.tert.category <- factor(PHENO.ANY_SN$HEI.tmp.tert.category, levels = c("3rd", "2nd", "1st", "Unknown"))
-  colnames(PHENO.ANY_SN)[colnames(PHENO.ANY_SN) == "HEI.tmp.tert.category"] <- paste0(HEI.to.categorize[i], ".tertile.category")
-}
-
-table(PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category)
-
 
 
 # save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11_modified_for_HEI_tertiles.RDATA")
