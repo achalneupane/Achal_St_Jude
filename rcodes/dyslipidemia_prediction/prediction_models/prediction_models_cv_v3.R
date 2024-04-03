@@ -6,7 +6,7 @@ library(survival)
 library(mgcv)
 library(dplyr)
 library(splines)
-source("../utilities.R")
+source("utilities.R")
 
 seed <- 2024
 set.seed(seed)
