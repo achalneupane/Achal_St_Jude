@@ -468,7 +468,6 @@ ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey <- HEI2015_iid_dob_18_uniq$agesurvey
 ## Create HEI tertiles ##
 #########################
 # HEI.to.categorize <- c("HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")
-HEI.to.categorize <- c("HEI2015_TOTAL_SCORE")
 
 ## Tertile categories
 for(i in 1:length(HEI.to.categorize)){
@@ -486,7 +485,11 @@ for(i in 1:length(HEI.to.categorize)){
   colnames(ALL.LIFESTYLE)[colnames(ALL.LIFESTYLE) == "HEI.tmp.tert.category"] <- paste0(HEI.to.categorize[i], ".tertile.category")
 }
 
-table(PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category)
+table(ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.tertile.category)
+
+# https://www.fns.usda.gov/cnpp/hei-scores-americans
+
+
 ############################################################
 
 

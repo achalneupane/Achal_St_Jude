@@ -195,7 +195,14 @@ write.table(all.wanted.df.1200.to.update.kyla, "Z:/ResearchHome/ClusterHome/aneu
 
 
 
+## EMAIL from Matt on 4/4/2024: There are a few discrepancies and there are 33
+#samples (attached) that will now be depleted if used. The reason for this
+#discrepancy is because the most updated biorepository (frozen on April 2nd)
+#has a less vial count compared to the biorepository used to make this list
+#(frozen on March 11th).
 
+new.missing <- read_sas("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v11_output/diff.sas7bdat")
+new.missing$selection_group <- all.wanted.df.1200.to.update$selection_group[match(new.missing$tb_number, all.wanted.df.1200.to.update$tb_number)]
 
 # ## Test
 # library("blockrand")
