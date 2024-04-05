@@ -10,8 +10,8 @@ source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/reques
 # dim(df) # 20174
 
 ## add TB from Mathew
-TB <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/data_from_Matthew/ForAchal_Survivors.txt", header = T, sep = "\t") ## March version
-# TB <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/data_from_Matthew/Achal_survivors_04.04.2024.txt", header = T, sep = "\t") ## Updated by Matt in April
+# TB <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/data_from_Matthew/ForAchal_Survivors.txt", header = T, sep = "\t") ## March version
+TB <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/data_from_Matthew/Achal_survivors_04.04.2024.txt", header = T, sep = "\t") ## Updated by Matt in April
 
 df <- TB
 
@@ -48,23 +48,23 @@ SERUM <- SERUM[which(SERUM$ageatsample >= 18),]
 SERUM <- SERUM[SERUM$num_vials > 0 ,]
 
 
-# ## 171 cases to keep 
-# all.wanted.df.1200.to.update <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/plasma_data_batch1_1200_samples.txt", header = T, sep = "\t")
-# keep.171.cases <- all.wanted.df.1200.to.update$sjlid[all.wanted.df.1200.to.update$selection_group == "171_CMP_cases"]
-# keep.171.cases <- SERUM[SERUM$sjlid %in% keep.171.cases,]
-# SERUM <- SERUM[!SERUM$sjlid %in% keep.171.cases$sjlid,] # exclude 171 cases
-# dim(SERUM)
-# # 8427    6
-# ## Now keep only those that have more than one vial and are alive
-# SERUM <- SERUM[SERUM$num_vials > 1 & SERUM$vitalstatus == "Alive",]
-# SERUM <- rbind.data.frame(SERUM, keep.171.cases)
-# dim(SERUM)
-# # [1] 7590    6
+## 171 cases to keep
+all.wanted.df.1200.to.update <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v11_output//plasma_data_batch1_1200_samples.txt", header = T, sep = "\t")
+keep.171.cases <- all.wanted.df.1200.to.update$sjlid[all.wanted.df.1200.to.update$selection_group == "171_CMP_cases"]
+keep.171.cases <- SERUM[SERUM$sjlid %in% keep.171.cases,]
+SERUM <- SERUM[!SERUM$sjlid %in% keep.171.cases$sjlid,] # exclude 171 cases
+dim(SERUM)
+# 8427    6
+## Now keep only those that have more than one vial and are alive
+SERUM <- SERUM[SERUM$num_vials > 1 & SERUM$vitalstatus == "Alive",]
+SERUM <- rbind.data.frame(SERUM, keep.171.cases)
+dim(SERUM)
+# [1] 7590    6
 
 
 dim(SERUM)
 # 8879
-# 8991    7 ## April version
+# 7587    7 ## April 4 version
 
 ## Keep max num vials and alive over dead
 SERUM <- SERUM %>%
@@ -73,12 +73,12 @@ SERUM <- SERUM %>%
   filter(vitalstatus == "Alive" | all(vitalstatus == "Deceased"))
 
 dim(SERUM)
-# [1] 8858    6
+# [1] 7574    6
 
 ## Also removing samples that have duplicate ageevent in CTCAE data
 SERUM <- SERUM[!SERUM$sjlid %in% c("SJL1225801", "SJL1265801", "SJL1430801", "SJL4730101", "SJL5134305", "SJL5146506"),]
 dim(SERUM)
-# 8843    6
+# 7558    6
 ## Could you please work on it by merging with the CTCAE grades for cardiomyopathy from the most recent data freeze? Please look at serum and plasma separately.
 # read CTCAE
 # CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
@@ -120,6 +120,9 @@ dim(CTCAE)
 
 # V11
 # 7406    9
+
+# v12 6824
+
 # CTCAE <- get_rows_with_smaller_sample_age(CTCAE, SERUM, 0)
 CTCAE <- get_rows_with_smaller_sample_age.all(CTCAE, SERUM, 7)
 dim(CTCAE)
@@ -136,6 +139,10 @@ dim(CTCAE)
 
 #V11
 # 7406   13
+
+# V12
+dim(CTCAE)
+# 6824   13
 
 ## Add event number
 CTCAE <- CTCAE %>%
@@ -178,6 +185,10 @@ table(CTCAE$grade)
 ## V11
 # 0    2    3    5 
 # 5070  211   53    1 
+
+## V12
+# 0    2    3    5 
+# 4320  194   52    1 
 
 CTCAE.2 <- CTCAE
 
@@ -287,6 +298,17 @@ table(CTCAE.2$event_number,CTCAE.2$grade)
 # 7    5    1    0    0
 # 8    1    0    0    0
 
+## V12
+# 0    2    3    5
+# 1 2424    0    0    0
+# 2 1225   72   22    0
+# 3  483   49    9    0
+# 4  143   19    7    1
+# 5   28    4    1    0
+# 6   11    0    1    0
+# 7    5    1    0    0
+# 8    1    0    0    0
+
 table(CTCAE.2$event_number,CTCAE.2$grade_2_or_higher)
 # 1    3563                 0
 # 2    1495                94
@@ -372,6 +394,17 @@ table(CTCAE.2$event_number,CTCAE.2$grade_2_or_higher)
 # 7       5                 1
 # 8       1                 0
 
+## V12
+# grade_0 grade_2_or_higher
+# 1    2424                 0
+# 2    1225                94
+# 3     483                58
+# 4     143                27
+# 5      28                 5
+# 6      11                 1
+# 7       5                 1
+# 8       1                 0
+
 table(CTCAE.2$new_event_number,CTCAE.2$grade)
 # 0    2    3    5
 # 1 4085    0    0    0
@@ -435,6 +468,14 @@ table(CTCAE.2$new_event_number,CTCAE.2$grade)
 # 4   70   10    2    0
 # 5    3    1    0    0
 
+## V12
+# 0    2    3    5
+# 1 3018    0    0    0
+# 2  989   92   28    0
+# 3  261   42   10    1
+# 4   50   10    2    0
+# 5    2    1    0    0
+
 table(CTCAE.2$new_event_number,CTCAE.2$grade_2_or_higher)
 # 1    4085                 0
 # 2    1296               123
@@ -495,6 +536,14 @@ table(CTCAE.2$new_event_number,CTCAE.2$grade_2_or_higher)
 # 3     365                53
 # 4      70                12
 # 5       3                 1
+
+## V12
+# grade_0 grade_2_or_higher
+# 1    3018                 0
+# 2     989               120
+# 3     261                53
+# 4      50                12
+# 5       2                 1
 
 CTCAE.3 <- CTCAE.2[!is.na(CTCAE.2$Sample_age),]
 table(CTCAE.3$event_number,CTCAE.3$grade_2_or_higher)
@@ -573,6 +622,17 @@ table(CTCAE.3$event_number,CTCAE.3$grade_2_or_higher)
 # 7       5                 0
 # 8       1                 0
 
+## V12
+# grade_0 grade_2_or_higher
+# 1    2424                 0
+# 2    1225                61
+# 3     483                29
+# 4     143                13
+# 5      28                 2
+# 6      11                 0
+# 7       5                 0
+# 8       1                 0
+
 table(is.na(CTCAE.2$Sample_age) & CTCAE.2$grade >=2)
 table(CTCAE.2$grade >=2)
 # FALSE  TRUE 
@@ -600,10 +660,14 @@ table(CTCAE.2$grade >=2)
 ## V11
 # FALSE  TRUE 
 # 5070   187 
-dim(CTCAE.2)
-# 5257   16
 
-write.table(CTCAE.2, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v11_output/Plasma_data_processed_v11_after_removing_numvial_0.txt", col.names = T, row.names = F, sep = "\t") ## based on Plasma data
+## V12
+# FALSE  TRUE 
+# 4320   186
+dim(CTCAE.2)
+# 4506   16
+
+write.table(CTCAE.2, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/Plasma_data_processed_v12_after_removing_numvial_0.txt", col.names = T, row.names = F, sep = "\t") ## based on Plasma data
 # write.table(CTCAE.2, "Serum_data_processed_v9_after_removing_numvial_0.txt", col.names = T, row.names = F, sep = "\t") ## based on Serum data
 
-# CTCAE.2 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v11_output/Plasma_data_processed_v11_after_removing_numvial_0.txt", sep = "\t", header = T)
+# CTCAE.2 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/Plasma_data_processed_v12_after_removing_numvial_0.txt", sep = "\t", header = T)
