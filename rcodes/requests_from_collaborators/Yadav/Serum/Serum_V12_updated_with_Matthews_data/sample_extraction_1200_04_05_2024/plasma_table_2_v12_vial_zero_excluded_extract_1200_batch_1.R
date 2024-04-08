@@ -224,6 +224,7 @@ all.wanted.df.1200.to.update.kyla$total_serum_for_the_visit <- total_serum.vials
 all.wanted.df.1200.to.update.kyla$total_plasma_for_the_visit[is.na(all.wanted.df.1200.to.update.kyla$total_plasma_for_the_visit)] <- 0
 all.wanted.df.1200.to.update.kyla$total_serum_for_the_visit[is.na(all.wanted.df.1200.to.update.kyla$total_serum_for_the_visit)] <- 0
 all.wanted.df.1200.to.update.kyla$visit_depleted_YN <- ifelse((all.wanted.df.1200.to.update.kyla$total_plasma_for_the_visit + all.wanted.df.1200.to.update.kyla$total_serum_for_the_visit) >= 2, "No", "Yes")
+write.table(all.wanted.df.1200.to.update.kyla, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_data_batch1_1200_samples_to_ECC_with_vials_info.txt", col.names = T, row.names = F, sep = "\t", quote = F)
 #########################
 
 ## EMAIL from Matt on 4/4/2024: There are a few discrepancies and there are 33
