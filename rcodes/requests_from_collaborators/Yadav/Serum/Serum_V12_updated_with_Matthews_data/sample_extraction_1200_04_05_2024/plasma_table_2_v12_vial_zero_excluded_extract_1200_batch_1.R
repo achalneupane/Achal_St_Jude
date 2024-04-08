@@ -156,6 +156,11 @@ write.table(table_2.keep, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum
 write.table(all.wanted.df.1200, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_data_batch1_1200_samples.txt", col.names = T, row.names = F, quote = F, sep = "\t", na="")
 # write.table(sampled_data.120, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_data_batch1_1200_samples_subset1_120_samples.txt", col.names = T, row.names = F, quote = F, sep = "\t", na="")
 
+all.wanted.df.1200.sorted_by_num_vials <- all.wanted.df.1200 %>%
+  arrange(num_vials)
+
+write.table(all.wanted.df.1200.sorted_by_num_vials, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_data_batch1_1200_samples_sorted_by_num_vials.txt", col.names = T, row.names = F, quote = F, sep = "\t", na="")
+
 # Note from Yadav: I think you should only provide the necessary information
 # when you send these files. You would only need tb_number, sjlid, num_vials and
 # the group to ECC people. When you send to the proteomics core, you should only
