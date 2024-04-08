@@ -156,11 +156,6 @@ write.table(table_2.keep, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum
 write.table(all.wanted.df.1200, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_data_batch1_1200_samples.txt", col.names = T, row.names = F, quote = F, sep = "\t", na="")
 # write.table(sampled_data.120, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_data_batch1_1200_samples_subset1_120_samples.txt", col.names = T, row.names = F, quote = F, sep = "\t", na="")
 
-all.wanted.df.1200.sorted_by_num_vials <- all.wanted.df.1200 %>%
-  arrange(num_vials)
-
-write.table(all.wanted.df.1200.sorted_by_num_vials, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_data_batch1_1200_samples_sorted_by_num_vials.txt", col.names = T, row.names = F, quote = F, sep = "\t", na="")
-
 # Note from Yadav: I think you should only provide the necessary information
 # when you send these files. You would only need tb_number, sjlid, num_vials and
 # the group to ECC people. When you send to the proteomics core, you should only
@@ -182,6 +177,33 @@ all.wanted.df.1200.to.update.proteomics <- all.wanted.df.1200.to.update[c("tb_nu
 write.table(all.wanted.df.1200.to.update.proteomics, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_data_batch1_1200_samples_to_proteomics_core.txt", col.names = T, row.names = F, sep = "\t", quote = F)
 table(all.wanted.df.1200.to.update$num_vials, all.wanted.df.1200.to.update$selection_group)
 
+###############################
+## all SERUM and PLASMA data ##
+###############################
+TB <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/data_from_Matthew/Achal_survivors_04.04.2024.txt", header = T, sep = "\t") ## Updated by Matt in April
+TB <- TB[c("sjlid", "num_vials", "aliquot_type", "ageatsample", "vitalstatus",  "tb_number")]
+TB.control <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/data_from_Matthew/forachal_controls.txt", header = T, sep = "\t")
+TB <- rbind.data.frame(TB, TB.control)
+df <- TB
+df$ageatsample <- floor(df$ageatsample * 10) / 10
+df.original <- df
+df <- df %>%
+  distinct()
+dim(df)  # 20137
+# 20779 # Mathew ## March
+# 21041 ## April version
+
+df <- df[which(df$num_vials > 0),]
+total_vials.by.sjlid <- aggregate(num_vials ~ sjlid, data = df, FUN = sum)
+
+df$KEY <- paste0(df$sjlid, ":", df$ageatsample)
+PLASMA <- df[grepl("Plasma", df$aliquot_type, ignore.case = T),]
+SERUM <- df[grepl("Serum", df$aliquot_type, ignore.case = T),]
+
+
+total_plasma.vials.by.sjlid <- aggregate(num_vials ~ KEY, data = PLASMA, FUN = sum)
+total_serum.vials.by.sjlid <- aggregate(num_vials ~ KEY, data = SERUM, FUN = sum)
+
 ##############################
 ## Give this to Kyla's team ##
 ##############################
@@ -189,6 +211,20 @@ all.wanted.df.1200.to.update.kyla <- all.wanted.df.1200.to.update[c("tb_number",
 write.table(all.wanted.df.1200.to.update.kyla, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_data_batch1_1200_samples_to_ECC.txt", col.names = T, row.names = F, sep = "\t", quote = F)
 
 
+
+#########################
+## add total num_vials ##
+#########################
+all.wanted.df.1200.to.update.kyla$total_vials_for_all_visits <- total_vials.by.sjlid$num_vials[match(all.wanted.df.1200.to.update.kyla$sjlid, total_vials.by.sjlid$sjlid)]
+all.wanted.df.1200.to.update.kyla$KEY <- paste0(all.wanted.df.1200.to.update.kyla$sjlid, ":", all.wanted.df.1200.to.update.kyla$Sample_age)
+
+all.wanted.df.1200.to.update.kyla$total_plasma_for_the_visit <- total_plasma.vials.by.sjlid$num_vials[match(all.wanted.df.1200.to.update.kyla$KEY, total_plasma.vials.by.sjlid$KEY)]
+all.wanted.df.1200.to.update.kyla$total_serum_for_the_visit <- total_serum.vials.by.sjlid$num_vials[match(all.wanted.df.1200.to.update.kyla$KEY, total_serum.vials.by.sjlid$KEY)]
+
+all.wanted.df.1200.to.update.kyla$total_plasma_for_the_visit[is.na(all.wanted.df.1200.to.update.kyla$total_plasma_for_the_visit)] <- 0
+all.wanted.df.1200.to.update.kyla$total_serum_for_the_visit[is.na(all.wanted.df.1200.to.update.kyla$total_serum_for_the_visit)] <- 0
+all.wanted.df.1200.to.update.kyla$visit_depleted_YN <- ifelse((all.wanted.df.1200.to.update.kyla$total_plasma_for_the_visit + all.wanted.df.1200.to.update.kyla$total_serum_for_the_visit) >= 2, "No", "Yes")
+#########################
 
 ## EMAIL from Matt on 4/4/2024: There are a few discrepancies and there are 33
 #samples (attached) that will now be depleted if used. The reason for this
