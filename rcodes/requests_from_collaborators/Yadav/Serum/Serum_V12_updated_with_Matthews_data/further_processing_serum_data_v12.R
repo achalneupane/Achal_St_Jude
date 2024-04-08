@@ -273,24 +273,48 @@ table(table_2$new_event_number,table_2$grade)
 ##############################################################
 ## Exclude any vial 1 if other visits have more than 1 vial ##
 ##############################################################
+###############################################################################################
+## We will also remove 1 vial samples if later visits have more vials (especially for cases) ##
+###############################################################################################
 cases <- table_2[table_2$grade_2_or_higher == "grade_2_or_higher",]
 cases <- table_2[table_2$sjlid %in% cases$sjlid,]
 
 controls <- table_2[!table_2$sjlid %in% cases$sjlid,]
 table(controls$num_vials) ## should have zero with num_vials = 1
+# 2    3    4    5    6    7 
+# 794   25   75  301 1849    1 
 
 num_vial1 <- cases[which(cases$num_vials == 1),]
-num_vial1.sjlid <- cases[cases$sjlid %in% num_vial1$sjlid,]
-table(num_vial1.sjlid$sjlid, num_vial1.sjlid$num_vials)
+cases.samples <- cases[cases$sjlid %in% num_vial1$sjlid,]
+
+
+# Filter rows with grade 0
+# Initialize a list to store tb_numbers
+tb.to.remove <- list()
+
+# Loop through each sjlid
+for (sjlid in unique(cases.samples$sjlid)) {
+  # Subset data for the current sjlid
+  sjlid_data <- cases.samples[cases.samples$sjlid == sjlid, ]
+  
+  # Check if there are multiple rows with grade 0 before grade 2 or higher
+  if((nrow(sjlid_data) >=3) & sjlid_data$num_vials[1] == 1){
+    tb.to.remove.tmp <- sjlid_data$tb_number[1]
+  } else {
+    next
+  }
+  tb.to.remove <- c(tb.to.remove,tb.to.remove.tmp)
+}
+
+# Display the extracted tb_numbers
+tb.to.remove <- unlist(tb.to.remove)
 
 
 
-
-
-## TB with last vials, with vial 1 when subsequent visits have more number of vials are removed here
-removeTB <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v10_output/all.TB.to.removefrom_V10.txt", header = F, sep = "\t")
-removeTB <- removeTB$V2
-table_2.updated <- table_2[!table_2$tb_number %in% removeTB,]
+table_2.updated <- table_2[!table_2$tb_number %in% tb.to.remove,]
+dim(table_2.updated)
+# 3671   35 ## V11
+# 3444   35 ## v12
 
 table(table_2.updated$new_event_number,table_2.updated$grade)
 ## V12
@@ -300,6 +324,8 @@ table(table_2.updated$new_event_number,table_2.updated$grade)
 # 3  250   42    9    1
 # 4   49    9    2    0
 # 5    2    1    0    0
+
+table(table_2.updated$num_vials, table_2.updated$grade)
 
 write.table(table_2.updated, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_table_2_v12.updated.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Plasma, 18 or older, vial > 0
 

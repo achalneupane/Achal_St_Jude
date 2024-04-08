@@ -2,20 +2,8 @@ library(haven)
 library(dplyr)
 table_2 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_table_2_v12.updated.txt", header = T, sep = "\t") # after removing num vial zero and with 18 or older
 dim(table_2)
-# 3464   35
-#################################################
-## We will also remove controls with numvial 1 ##
-#################################################
-cases.samples <- table_2$sjlid[table_2$grade_2_or_higher == "grade_2_or_higher"]
-controls.with.num.vial.1 <- table_2[which(table_2$num_vials == 1),]
-controls.with.num.vial.1 <- controls.with.num.vial.1[!controls.with.num.vial.1$sjlid %in% cases.samples,]
-dim(controls.with.num.vial.1)
-# 113  35 ## V11
-# 0   35 ## V12
-table_2 <- table_2[!table_2$sjlid %in% controls.with.num.vial.1$sjlid,]
-dim(table_2)
-# 3671   35 ## V11
-# 3464   35 ## v12
+# 3444   35
+
 #################################################
 
 diag <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/diagnosis.sas7bdat")
@@ -72,7 +60,7 @@ CA.171 <- unique(CA.171$sjlid)
 table_2$CMP_status <- ifelse(table_2$sjlid %in% CA.171, "Yes", "No")
 table(table_2$CMP_status)
 # No  Yes 
-# 3272  399 
+# 3045  399 
 
 ## Get the frist ageevent for all samples
 table_2.first.event <- table_2 %>%
@@ -81,7 +69,7 @@ table_2.first.event <- table_2 %>%
   slice(1) 
 
 dim(table_2.first.event)
-# 2283   37
+# 2162   37
 
 CA.171 <- table_2.first.event[table_2.first.event$CMP_status == "Yes",]
 CA.171$selection_group <- "171_CMP_cases"
@@ -92,7 +80,7 @@ CA.171 <- CA.171[c("tb_number", "sjlid",  "num_vials", "ageevent", "Sample_age",
 table_3 <- table_2.first.event[!table_2.first.event$sjlid %in% CA.171$sjlid,] # exclude those in CA.171 samples from the original table
 all.hodgkin <- table_3[grepl("^Hodgkin", table_3$diaggrp, ignore.case = T),]
 dim(all.hodgkin)
-# 322  37
+# 300  37
 
 set.seed(54321)
 # select 200
@@ -109,7 +97,7 @@ table_3 <- table_2.first.event[!table_2.first.event$tb_number %in% c(CA.171$tb_n
 # Randomly select 733 non- Hodgkin lymphoma survivors from all eligible non- Hodgkin lymphoma survivors.
 all.non.hodgkin <- table_3[!table_3$tb_number %in% all.hodgkin$tb_number,]
 dim(all.non.hodgkin)
-# 1793   37
+# 1691   37
 
 set.seed(54321)
 # select 733
