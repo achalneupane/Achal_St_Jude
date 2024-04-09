@@ -176,6 +176,14 @@ all.wanted.df.1200.to.update.proteomics <- all.wanted.df.1200.to.update[c("tb_nu
 #############################
 write.table(all.wanted.df.1200.to.update.proteomics, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_data_batch1_1200_samples_to_proteomics_core.txt", col.names = T, row.names = F, sep = "\t", quote = F)
 table(all.wanted.df.1200.to.update$num_vials, all.wanted.df.1200.to.update$selection_group)
+# 100_community_controls 171_CMP_cases 200_Hodgkin_lymphoma 729_non_Hodgkin
+# 1                      0            26                    0               0
+# 2                      0            96                   84             287
+# 3                      2             0                    1               3
+# 4                      9             2                   16               5
+# 5                      5             6                   29              36
+# 6                     84            41                   69             398
+# 7                      0             0                    1               0
 
 ###############################
 ## all SERUM and PLASMA data ##
@@ -191,7 +199,7 @@ df <- df %>%
   distinct()
 dim(df)  # 20137
 # 20779 # Mathew ## March
-# 21041 ## April version
+# 21267 ## April version
 
 df <- df[which(df$num_vials > 0),]
 total_vials.by.sjlid <- aggregate(num_vials ~ sjlid, data = df, FUN = sum)
@@ -207,7 +215,7 @@ total_serum.vials.by.sjlid <- aggregate(num_vials ~ KEY, data = SERUM, FUN = sum
 ##############################
 ## Give this to Kyla's team ##
 ##############################
-all.wanted.df.1200.to.update.kyla <- all.wanted.df.1200.to.update[c("tb_number", "sjlid", "Sample_age", "num_vials")]
+all.wanted.df.1200.to.update.kyla <- all.wanted.df.1200.to.update[c("tb_number", "sjlid", "Sample_age", "num_vials", "vitalstatus","selection_group")]
 write.table(all.wanted.df.1200.to.update.kyla, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_data_batch1_1200_samples_to_ECC.txt", col.names = T, row.names = F, sep = "\t", quote = F)
 
 
