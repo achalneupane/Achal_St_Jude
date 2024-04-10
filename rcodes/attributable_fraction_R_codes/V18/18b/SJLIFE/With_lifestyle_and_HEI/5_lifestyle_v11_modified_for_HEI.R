@@ -467,7 +467,7 @@ ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey <- HEI2015_iid_dob_18_uniq$agesurvey
 #########################
 ## Create HEI tertiles ##
 #########################
-# HEI.to.categorize <- c("HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")
+HEI.to.categorize <- c("HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")
 
 ## Tertile categories
 for(i in 1:length(HEI.to.categorize)){
@@ -481,11 +481,13 @@ for(i in 1:length(HEI.to.categorize)){
                                                          include.lowest = TRUE))
   
   ALL.LIFESTYLE$HEI.tmp.tert.category[is.na(ALL.LIFESTYLE$HEI.tmp.tert.category)] <- "Unknown"
-  ALL.LIFESTYLE$HEI.tmp.tert.category <- factor(ALL.LIFESTYLE$HEI.tmp.tert.category, levels = c("3rd", "2nd", "1st", "Unknown"))
+  ALL.LIFESTYLE$HEI.tmp.tert.category <- factor(ALL.LIFESTYLE$HEI.tmp.tert.category, levels = c("1st", "2nd", "3rd", "Unknown"))
   colnames(ALL.LIFESTYLE)[colnames(ALL.LIFESTYLE) == "HEI.tmp.tert.category"] <- paste0(HEI.to.categorize[i], ".tertile.category")
 }
 
 table(ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.tertile.category)
+# 3rd     2nd     1st Unknown 
+# 1180    1179    1181     861 
 
 # https://www.fns.usda.gov/cnpp/hei-scores-americans
 
@@ -710,6 +712,6 @@ levels(PHENO.ANY_SN$epitxn_dose_5.category) <- c(levels(PHENO.ANY_SN$epitxn_dose
 PHENO.ANY_SN$epitxn_dose_5.category [is.na(PHENO.ANY_SN$epitxn_dose_5.category)] <- "Unknown"
 
 
-# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11_modified_for_HEI_tertiles.RDATA")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11_modified_for_HEI_tertiles.RDATA")
 
 # load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11_modified_for_HEI_tertiles.RDATA")

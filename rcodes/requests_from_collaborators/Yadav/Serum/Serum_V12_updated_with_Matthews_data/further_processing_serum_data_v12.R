@@ -259,7 +259,7 @@ dim(table_2)
 ## 3464 35 ## V12
 ### write.table(table_2, "serum_table_2_v9.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Serum, 18 or older, vial > 0
 # write.table(table_2, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_table_2_v12.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Plasma, 18 or older, vial > 0
-
+# table_2 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_table_2_v12.txt", header = T, sep = "\t")
 
 table(table_2$new_event_number,table_2$grade)
 ## V12
@@ -269,6 +269,17 @@ table(table_2$new_event_number,table_2$grade)
 # 3  250   42    9    1
 # 4   49    9    2    0
 # 5    2    1    0    0
+
+table(table_2$event_number,table_2$grade) ## Actual CTCAE visit
+# 0    2    3    5
+# 1 1603    0    0    0
+# 2 1043   66   19    0
+# 3  464   47    8    0
+# 4  138   18    6    1
+# 5   28    3    1    0
+# 6   11    0    1    0
+# 7    5    1    0    0
+# 8    1    0    0    0
 
 ##############################################################
 ## Exclude any vial 1 if other visits have more than 1 vial ##
@@ -324,6 +335,20 @@ table(table_2.updated$new_event_number,table_2.updated$grade)
 # 3  250   42    9    1
 # 4   49    9    2    0
 # 5    2    1    0    0
+
+table(table_2.updated$event_number,table_2.updated$grade) # based on actual CTCAE data
+# 0    2    3    5
+# 1 1583    0    0    0
+# 2 1043   66   19    0
+# 3  464   47    8    0
+# 4  138   18    6    1
+# 5   28    3    1    0
+# 6   11    0    1    0
+# 7    5    1    0    0
+# 8    1    0    0    0
+
+
+
 
 table(table_2.updated$num_vials, table_2.updated$grade)
 

@@ -22,7 +22,19 @@ df <- df %>%
 dim(df)  # 20137
 # 20779 # Mathew ## March
 # 21041 ## April version
-
+# ## Remove those with vials less than 2
+# morethan.2.vials <- df %>%
+#   dplyr::group_by(sjlid, ageatsample) %>%
+#   dplyr::mutate(total_num_vials = sum(num_vials)) %>%
+#   ungroup()
+# morethan.2.vials <- morethan.2.vials[morethan.2.vials$total_num_vials >= 2,]
+# dim(morethan.2.vials)
+# # [1] 20104     8
+# morethan.2.vials <- morethan.2.vials[morethan.2.vials$vitalstatus == "Alive",]
+# dim(morethan.2.vials)
+# # [1] 19161     8
+# morethan.2.vials <- morethan.2.vials[grepl("Plasma", morethan.2.vials$aliquot_type),]
+# morethan.2.vials <- morethan.2.vials[morethan.2.vials$num_vials > 0,]
 
 # ## Note: Since we are rounding age down to one decimal place, a 7-days window did not make any difference in terms of the number of rows or samples
 # PLASMA <- df[grepl("Plasma", df$aliquot_type, ignore.case = T),]
@@ -54,12 +66,12 @@ keep.171.cases <- all.wanted.df.1200.to.update$sjlid[all.wanted.df.1200.to.updat
 keep.171.cases <- SERUM[SERUM$sjlid %in% keep.171.cases,]
 SERUM <- SERUM[!SERUM$sjlid %in% keep.171.cases$sjlid,] # exclude 171 cases
 dim(SERUM)
-# 8427    6
+# 8536    7
 ## Now keep only those that have more than one vial and are alive
 SERUM <- SERUM[SERUM$num_vials > 1 & SERUM$vitalstatus == "Alive",]
 SERUM <- rbind.data.frame(SERUM, keep.171.cases)
 dim(SERUM)
-# [1] 7590    6
+# [1] 7587    6
 
 
 dim(SERUM)
@@ -632,6 +644,17 @@ table(CTCAE.3$event_number,CTCAE.3$grade_2_or_higher)
 # 6      11                 0
 # 7       5                 0
 # 8       1                 0
+
+table(CTCAE.2$event_number,CTCAE.2$grade) ## Actual visit
+# 0    2    3    5
+# 1 2424    0    0    0
+# 2 1225   72   22    0
+# 3  483   49    9    0
+# 4  143   19    7    1
+# 5   28    4    1    0
+# 6   11    0    1    0
+# 7    5    1    0    0
+# 8    1    0    0    0
 
 table(is.na(CTCAE.2$Sample_age) & CTCAE.2$grade >=2)
 table(CTCAE.2$grade >=2)

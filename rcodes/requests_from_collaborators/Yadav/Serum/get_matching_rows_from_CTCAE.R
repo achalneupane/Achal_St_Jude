@@ -55,6 +55,7 @@ get_rows_with_smaller_sample_age.all <- function(CTCAE, SERUM, days){
   CTCAE$vitalstatus <- NA
   CTCAE$tb_number <- NA
   for (i in 1:nrow(CTCAE)) {
+    print(paste0("Doing row: ", i))
     # Subset SERUM and CTCAE data for the current SJLID
     CTCAE_subset <- CTCAE[i, ]
     # Find matching rows in CTCAE based on sjlid and age difference
@@ -74,7 +75,6 @@ get_rows_with_smaller_sample_age.all <- function(CTCAE, SERUM, days){
   }
   return(CTCAE)
 }
-
 
 
 

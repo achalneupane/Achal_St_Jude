@@ -3,7 +3,7 @@ rm(list=ls())
 #########################
 ## Load Phenotype data ##
 #########################
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11_modified_for_HEI_tertiles.RDATA")
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
 ALL.LIFESTYLE <- edit_lifestyle(ALL.LIFESTYLE)
 #########################
@@ -116,7 +116,7 @@ ALL.LIFESTYLE <- ALL.LIFESTYLE[!(ALL.LIFESTYLE$Current_smoker_yn == "Unknown" &
                                    ALL.LIFESTYLE$HEI2015_TOTAL_SCORE == "Unknown"),] ## **
 
 dim(ALL.LIFESTYLE)
-# [1] 4401   16
+# [1] 4401   26
 
 sum((ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey >= 18|
        ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey >= 18|
@@ -153,7 +153,7 @@ ALL.LIFESTYLE$Current_smoker_yn [which(ALL.LIFESTYLE$smoker_former_or_never_yn_a
 ALL.LIFESTYLE$PhysicalActivity_yn [which(ALL.LIFESTYLE$PhysicalActivity_yn_agesurvey != ALL.LIFESTYLE$survey_min)] <- "Unknown"
 ALL.LIFESTYLE$RiskyHeavyDrink_yn [which(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey != ALL.LIFESTYLE$survey_min)] <- "Unknown"
 ALL.LIFESTYLE$Obese_yn [which(ALL.LIFESTYLE$Not_obese_yn_agesurvey != ALL.LIFESTYLE$survey_min)] <- "Unknown"
-ALL.LIFESTYLE$HEI2015_TOTAL_SCORE [which(ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey != ALL.LIFESTYLE$survey_min)] <- "Unknown" ## **
+ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.tertile.category [which(ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey != ALL.LIFESTYLE$survey_min)] <- "Unknown" ## **
 
 
 to.remove <- ALL.LIFESTYLE$SJLIFEID[which(ALL.LIFESTYLE$survey_min > ALL.LIFESTYLE$AGE.ANY_SN)]
@@ -168,12 +168,12 @@ PHENO.ANY_SN  <- PHENO.ANY_SN[PHENO.ANY_SN$sjlid %in% ALL.LIFESTYLE$SJLIFEID,]
 #############################
 ## Addd lifestyle to Pheno ##
 ############################# ** add survey_min
-PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("survey_min", "Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "HEI2015_TOTAL_SCORE", "Obese_yn")]) ## **
+PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("survey_min", "Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "HEI2015_TOTAL_SCORE.tertile.category", "Obese_yn")]) ## **
 
 
 ## Add any missing to each lifestyle variable
 # PHENO.ANY_SN[c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn")]
-PHENO.ANY_SN$any_lifestyle_missing <- apply(PHENO.ANY_SN[c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn", "HEI2015_TOTAL_SCORE")], 1, function(x) any("Unknown" %in% x)) ## **
+PHENO.ANY_SN$any_lifestyle_missing <- apply(PHENO.ANY_SN[c("Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn", "HEI2015_TOTAL_SCORE.tertile.category")], 1, function(x) any("Unknown" %in% x)) ## **
 PHENO.ANY_SN$any_lifestyle_missing  <- factor(ifelse(PHENO.ANY_SN$any_lifestyle_missing == FALSE, "No", "Yes"))
 
 ########################################
@@ -193,28 +193,6 @@ PHENO.ANY_SN$any_tx_missing <- factor(PHENO.ANY_SN$any_tx_missing, levels = c("N
 PHENO.ANY_SN$any_chemo_missing <- factor(PHENO.ANY_SN$any_chemo_missing, levels = c("No", "Yes"))
 PHENO.ANY_SN$any_rt_missing <- factor(PHENO.ANY_SN$any_rt_missing, levels = c("No", "Yes"))
 
-#########################
-## Create HEI tertiles ##
-#########################
-HEI.to.categorize <- c("HEI2005_TOTAL_SCORE", "HEI2010_TOTAL_SCORE", "HEI2015_TOTAL_SCORE")
-
-## Tertile categories
-for(i in 1:length(HEI.to.categorize)){
-  TERT = unname(quantile(PHENO.ANY_SN[HEI.to.categorize[i]][PHENO.ANY_SN[HEI.to.categorize[i]] !=0], c(1/3, 2/3, 1), na.rm = T))
-  if(sum(duplicated(TERT)) > 0) next
-  print (HEI.to.categorize[i])
-  print(TERT)
-  
-  PHENO.ANY_SN$HEI.tmp.tert.category <- as.character(cut(PHENO.ANY_SN[,HEI.to.categorize[i]], breaks = c(0, TERT),
-                                                         labels = c("1st", "2nd", "3rd"),
-                                                         include.lowest = TRUE))
-  
-  PHENO.ANY_SN$HEI.tmp.tert.category[is.na(PHENO.ANY_SN$HEI.tmp.tert.category)] <- "Unknown"
-  PHENO.ANY_SN$HEI.tmp.tert.category <- factor(PHENO.ANY_SN$HEI.tmp.tert.category, levels = c("3rd", "2nd", "1st", "Unknown"))
-  colnames(PHENO.ANY_SN)[colnames(PHENO.ANY_SN) == "HEI.tmp.tert.category"] <- paste0(HEI.to.categorize[i], ".tertile.category")
-}
-
-table(PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category)
 
 #########################
 ## Extract Ethnicities ##
@@ -241,8 +219,8 @@ PHENO.ANY_SN$RiskyHeavyDrink_yn <- droplevels(PHENO.ANY_SN$RiskyHeavyDrink_yn)
 PHENO.ANY_SN$Obese_yn[PHENO.ANY_SN$Obese_yn == "Unknown"] <- "No"
 PHENO.ANY_SN$Obese_yn <- droplevels(PHENO.ANY_SN$Obese_yn)
 
-PHENO.ANY_SN$HEI2015_TOTAL_SCORE[PHENO.ANY_SN$HEI2015_TOTAL_SCORE == "Unknown"] <- "No" ## **
-PHENO.ANY_SN$HEI2015_TOTAL_SCORE <- droplevels(PHENO.ANY_SN$HEI2015_TOTAL_SCORE) ## **
+PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category[PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category == "Unknown"] <- "1st" ## **
+PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category <- droplevels(PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category) ## **
 
 
 ## Missing tx
@@ -408,7 +386,7 @@ PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.catego
                          "maxsegrtdose.category", "maxneckrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category",
                          "maxpelvisrtdose.category", "epitxn_dose_5.category", "anthra_jco_dose_5.category", "aa_class_dose_5.category",
                          "EAS", "AFR", 
-                         "Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn", "HEI2015_TOTAL_SCORE", 
+                         "Current_smoker_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn", "HEI2015_TOTAL_SCORE.tertile.category",
                          "any_lifestyle_missing", "any_tx_missing", "any_chemo_missing", "any_rt_missing",
                          "PY","evt1", "end")]
 

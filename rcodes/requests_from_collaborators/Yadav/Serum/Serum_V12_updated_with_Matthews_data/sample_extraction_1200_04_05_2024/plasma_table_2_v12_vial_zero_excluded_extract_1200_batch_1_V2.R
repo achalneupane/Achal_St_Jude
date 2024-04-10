@@ -4,10 +4,6 @@ table_2 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12
 dim(table_2)
 # 3444   35
 
-CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
-CTCAE <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
-CTCAE$ageevent <- round(CTCAE$ageevent,1)
-
 #################################################
 
 diag <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/diagnosis.sas7bdat")
@@ -81,7 +77,121 @@ CA.171 <- CA.171[c("tb_number", "sjlid",  "num_vials", "ageevent", "Sample_age",
 #################################################################################################
 ## randomly select 200 Hodgkin lymphoma survivors from all eligible Hodgkin lymphoma survivors ##
 #################################################################################################
-table_3 <- table_2.first.event[!table_2.first.event$sjlid %in% CA.171$sjlid,] # exclude those in CA.171 samples from the original table
+CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
+# CTCAE <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
+CTCAE$ageevent <- round(CTCAE$ageevent,1)
+# > dim(CTCAE)
+# [1] 913776     62
+
+## Exclude CA.171 and community controls
+CTCAE <- CTCAE[!CTCAE$sjlid %in% unique(c(CA.171$sjlid, first_ageatsample.zhaoming.100$sjlid)),] # exclude those in CA.171 samples from the original table
+dim(CTCAE)
+# [1] 865250     62
+
+
+TB <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/data_from_Matthew/Achal_survivors_04.04.2024.txt", header = T, sep = "\t") ## Updated by Matt in April
+df <- TB
+
+df$ageatsample <- floor(df$ageatsample * 10) / 10
+df.original <- df
+df <- df %>%
+  distinct()
+dim(df)  # 21041 ## April version
+# 21041
+# ## Remove those with vials less than 2
+# df <- df %>%
+#   dplyr::group_by(sjlid, ageatsample) %>%
+#   dplyr::mutate(total_num_vials = sum(num_vials)) %>%
+#   ungroup()
+# df <- df[df$total_num_vials >= 2,]
+# dim(df)
+# # 20104
+# SERUM <- df[grepl("Serum", df$aliquot_type, ignore.case = T),]
+SERUM <- df[grepl("Plasma", df$aliquot_type, ignore.case = T),]
+SERUM.original <- SERUM
+dim(SERUM.original)
+# 10514  7 ## April version
+## I see age at serum sample is <18 yrs. Could you identify the samples among 18
+#or higher only? Everyone needs to be adults at serum sample.
+SERUM <- SERUM[which(SERUM$ageatsample >= 18),]
+# remove vial zero 0 or 1 
+SERUM <- SERUM[SERUM$num_vials > 1 & SERUM$vitalstatus == "Alive",]
+dim(SERUM)
+# 7484
+source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/requests_from_collaborators/Yadav/Serum/get_matching_rows_from_CTCAE.R")
+CTCAE <- CTCAE[CTCAE$sjlid %in% SERUM$sjlid,]
+dim(CTCAE)
+# 655973     62
+
+CTCAE.SERUM <- get_rows_with_smaller_sample_age.all(CTCAE, SERUM, 7)
+# saveRDS(CTCAE.SERUM, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/HL_non_HL_CTCAE.rds")
+CTCAE.SERUM <- readRDS("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/HL_non_HL_CTCAE.rds")
+CTCAE.SERUM <- CTCAE.SERUM[CTCAE.SERUM$grade != -9,]
+CTCAE.SERUM <- CTCAE.SERUM[!is.na(CTCAE.SERUM$grade),]
+dim(CTCAE.SERUM)
+# 629023     66
+CTCAE.SERUM$diaggrp <- diag$diaggrp[match(CTCAE.SERUM$sjlid, diag$sjlid)]
+
+gg <- CTCAE.SERUM[c("sjlid", "condition", "grade", "ageevent", "Sample_age", "diaggrp")]
+CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM[grepl("cardiomyopathy", CTCAE.SERUM$condition, ignore.case = T),]
+# cardio.gg <- CTCAE.SERUM.cardiomyopathy[c("sjlid", "condition", "grade", "ageevent", "Sample_age", "diaggrp")]
+CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy %>%
+  dplyr::group_by(sjlid) %>%
+  dplyr::arrange(ageevent) %>%
+  dplyr::mutate(event_number = row_number()) %>%
+  dplyr::ungroup() %>%
+  dplyr::arrange(sjlid) 
+
+CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy %>%
+  dplyr::group_by(sjlid) %>%
+  dplyr::arrange(sjlid, event_number) %>%
+  dplyr::mutate(max_grade_prior = cummax(grade))
+
+CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy[!is.na(CTCAE.SERUM.cardiomyopathy$Sample_age),]
+gg <- CTCAE.SERUM.cardiomyopathy[c("sjlid", "condition", "grade", "ageevent", "Sample_age", "diaggrp", "num_vials", "max_grade_prior", "event_number")]
+
+table(CTCAE.SERUM.cardiomyopathy$event_number, CTCAE.SERUM.cardiomyopathy$max_grade_prior)
+# 0    2    3    4
+# 1 2272  103   14    0
+# 2 1228   32   21    0
+# 3  520    6   29    0
+# 4  169    8   21    1
+# 5   41    3   14    0
+# 6   14    1    9    0
+# 7    6    1    1    0
+# 8    2    0    2    0
+# 9    0    0    1    0
+
+CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy %>%
+  dplyr::group_by(sjlid) %>%
+  dplyr::arrange(ageevent) %>%
+  dplyr::mutate(new_event_number = row_number()) %>%
+  dplyr::ungroup() %>%
+  dplyr::arrange(sjlid) 
+
+table(CTCAE.SERUM.cardiomyopathy$new_event_number, CTCAE.SERUM.cardiomyopathy$max_grade_prior)
+# 0    2    3    4
+# 1 2940  137   65    1
+# 2  985   10   33    0
+# 3  271    5   13    0
+# 4   54    2    1    0
+# 5    2    0    0    0
+
+table(CTCAE.SERUM.cardiomyopathy$event_number, CTCAE.SERUM.cardiomyopathy$max_grade_prior)
+
+# table_3$prior_max_CMP_grades <- NA
+# table_3$max_CMP_grades <- NA
+# ## do they have any CMP grade
+# all.sjlid <- table_3$sjlid
+# for (sjlid in 1:nrow(table_3)){
+# check.sample <-  table_3[i,] 
+# check.tmp <- CTCAE[grepl(check.sample$sjlid[1], CTCAE$sjlid),]
+# # index<- 1:which(check.sample$ageevent == check.tmp$ageevent)
+# # table_3$prior_max_CMP_grades <- max(check.tmp$grade[index])
+# table_3$max_CMP_grades <- paste0(check.tmp$grade, collapse = "_")
+# }
+
+
 
 all.hodgkin <- table_3[grepl("^Hodgkin", table_3$diaggrp, ignore.case = T),]
 dim(all.hodgkin)
