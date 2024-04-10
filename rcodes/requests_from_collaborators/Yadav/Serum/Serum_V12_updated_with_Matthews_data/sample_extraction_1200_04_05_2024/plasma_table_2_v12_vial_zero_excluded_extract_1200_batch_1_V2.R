@@ -148,18 +148,17 @@ CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy %>%
   dplyr::mutate(max_grade_prior = cummax(grade))
 
 CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy[!is.na(CTCAE.SERUM.cardiomyopathy$Sample_age),]
-gg <- CTCAE.SERUM.cardiomyopathy[c("sjlid", "condition", "grade", "ageevent", "Sample_age", "diaggrp", "num_vials", "max_grade_prior", "event_number")]
 
 table(CTCAE.SERUM.cardiomyopathy$event_number, CTCAE.SERUM.cardiomyopathy$max_grade_prior)
 # 0    2    3    4
 # 1 2272  103   14    0
-# 2 1228   32   21    0
-# 3  520    6   29    0
-# 4  169    8   21    1
-# 5   41    3   14    0
-# 6   14    1    9    0
-# 7    6    1    1    0
-# 8    2    0    2    0
+# 2 1167   79   33    2
+# 3  462   48   44    1
+# 4  142   23   29    5
+# 5   27    7   18    6
+# 6   11    2    6    5
+# 7    5    1    0    2
+# 8    1    0    2    1
 # 9    0    0    1    0
 
 CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy %>%
@@ -169,15 +168,16 @@ CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy %>%
   dplyr::ungroup() %>%
   dplyr::arrange(sjlid) 
 
+gg <- CTCAE.SERUM.cardiomyopathy[c("sjlid", "condition", "grade", "ageevent", "Sample_age", "diaggrp", "num_vials", "max_grade_prior", "event_number", "new_event_number")]
+
 table(CTCAE.SERUM.cardiomyopathy$new_event_number, CTCAE.SERUM.cardiomyopathy$max_grade_prior)
 # 0    2    3    4
-# 1 2940  137   65    1
-# 2  985   10   33    0
-# 3  271    5   13    0
-# 4   54    2    1    0
+# 1 2853  195   84   11
+# 2  931   49   41    7
+# 3  251   15   20    3
+# 4   50    4    2    1
 # 5    2    0    0    0
 
-table(CTCAE.SERUM.cardiomyopathy$event_number, CTCAE.SERUM.cardiomyopathy$max_grade_prior)
 
 # table_3$prior_max_CMP_grades <- NA
 # table_3$max_CMP_grades <- NA
