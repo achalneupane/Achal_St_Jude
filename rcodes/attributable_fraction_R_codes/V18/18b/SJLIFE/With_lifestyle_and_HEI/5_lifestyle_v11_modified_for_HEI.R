@@ -481,7 +481,7 @@ for(i in 1:length(HEI.to.categorize)){
                                                          include.lowest = TRUE))
   
   ALL.LIFESTYLE$HEI.tmp.tert.category[is.na(ALL.LIFESTYLE$HEI.tmp.tert.category)] <- "Unknown"
-  ALL.LIFESTYLE$HEI.tmp.tert.category <- factor(ALL.LIFESTYLE$HEI.tmp.tert.category, levels = c("1st", "2nd", "3rd", "Unknown"))
+  ALL.LIFESTYLE$HEI.tmp.tert.category <- factor(ALL.LIFESTYLE$HEI.tmp.tert.category, levels = c("3rd", "2nd", "1st", "Unknown"))
   colnames(ALL.LIFESTYLE)[colnames(ALL.LIFESTYLE) == "HEI.tmp.tert.category"] <- paste0(HEI.to.categorize[i], ".tertile.category")
 }
 
@@ -490,6 +490,7 @@ table(ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.tertile.category)
 # 1180    1179    1181     861 
 
 # https://www.fns.usda.gov/cnpp/hei-scores-americans
+gg <- data.frame(ALL.LIFESTYLE$SJLIFEID, ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.tertile.category, ALL.LIFESTYLE$HEI2015_TOTAL_SCORE)
 
 
 ############################################################

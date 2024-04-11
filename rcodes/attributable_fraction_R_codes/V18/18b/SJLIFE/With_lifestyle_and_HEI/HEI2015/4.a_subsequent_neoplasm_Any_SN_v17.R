@@ -113,7 +113,7 @@ ALL.LIFESTYLE <- ALL.LIFESTYLE[!(ALL.LIFESTYLE$Current_smoker_yn == "Unknown" &
                                    ALL.LIFESTYLE$PhysicalActivity_yn == "Unknown" &
                                    ALL.LIFESTYLE$RiskyHeavyDrink_yn == "Unknown" &
                                    ALL.LIFESTYLE$Obese_yn == "Unknown" &
-                                   ALL.LIFESTYLE$HEI2015_TOTAL_SCORE == "Unknown"),] ## **
+                                   ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.tertile.category == "Unknown"),] ## **
 
 dim(ALL.LIFESTYLE)
 # [1] 4401   26
@@ -219,7 +219,7 @@ PHENO.ANY_SN$RiskyHeavyDrink_yn <- droplevels(PHENO.ANY_SN$RiskyHeavyDrink_yn)
 PHENO.ANY_SN$Obese_yn[PHENO.ANY_SN$Obese_yn == "Unknown"] <- "No"
 PHENO.ANY_SN$Obese_yn <- droplevels(PHENO.ANY_SN$Obese_yn)
 
-PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category[PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category == "Unknown"] <- "1st" ## **
+PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category[PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category == "Unknown"] <- "3rd" ## **
 PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category <- droplevels(PHENO.ANY_SN$HEI2015_TOTAL_SCORE.tertile.category) ## **
 
 
