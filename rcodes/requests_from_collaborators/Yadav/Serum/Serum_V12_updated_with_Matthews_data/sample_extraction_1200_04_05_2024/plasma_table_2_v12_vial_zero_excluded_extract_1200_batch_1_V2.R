@@ -179,6 +179,42 @@ table(CTCAE.SERUM.cardiomyopathy$new_event_number, CTCAE.SERUM.cardiomyopathy$ma
 # 5    2    0    0    0
 
 
+# Yutaka on 04/09/2024: The case cohort design selects a "subcohort" randomly
+# from a cohort and then enables comparison of the subcohort with each of
+# different-disease "case" groups.  In our case, we wanted a subcohort
+# consisting of HL and non HL survivors so that we can do multiple
+# case-subcohort comparisons for different diseases.  If we are interested only
+# in cardiomyopathy, your selection is good which is a nested case control
+# design.  But we want to utilize these precious samples for different diseases
+# in future, although there are some technical issues (batch to batch variations
+# cannot be randomized to cases and comparison subjects).  But if we have many
+# subjects with cardiomyopathy prior to plasma sampling, then we lose power as
+# they cannot be used for proteomics/metabolomics analysis for cardiomyopathy.
+# So, we need to assess how many survivors had cardiomyopathy before or at
+# baseline vs. the table you provided.  I know this is confusing, but can you
+# make the table for survivors who were excluded from your table?
+
+table_2.original <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_table_2_v12.txt", header = T, sep = "\t") # after removing num vial zero and with 18 or older
+CTCAE.SERUM.cardiomyopathy.excluded <- CTCAE.SERUM.cardiomyopathy[!CTCAE.SERUM.cardiomyopathy$tb_number %in% table_2.original$tb_number,]
+table(CTCAE.SERUM.cardiomyopathy.excluded$event_number, CTCAE.SERUM.cardiomyopathy.excluded$max_grade_prior)
+# 0   2   3   4
+# 1 826 103  14   0
+# 2 189  79  33   2
+# 3  21  48  44   1
+# 4   7  23  29   5
+# 5   1   7  18   6
+# 6   0   2   6   5
+# 7   0   1   0   2
+# 8   0   0   2   1
+# 9   0   0   1   0
+
+table(CTCAE.SERUM.cardiomyopathy.excluded$new_event_number, CTCAE.SERUM.cardiomyopathy.excluded$max_grade_prior)
+# 0   2   3   4
+# 1 862 195  84  11
+# 2 167  49  41   7
+# 3  13  15  20   3
+# 4   2   4   2   1
+
 # table_3$prior_max_CMP_grades <- NA
 # table_3$max_CMP_grades <- NA
 # ## do they have any CMP grade
