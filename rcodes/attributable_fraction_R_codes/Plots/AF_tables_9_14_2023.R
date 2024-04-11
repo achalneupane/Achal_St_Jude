@@ -277,8 +277,9 @@ close(file_conn)
 
 
 
-
-## Lifestyle with diet (SJLIFE only)
+#######################################
+## Lifestyle with diet (SJLIFE only) ##
+#######################################
 data <- read.table(text="Cohort	SN_types	Variables	Overall	Female	Male	Age.lt.35	Age.ge.35
 SJLIFE	Any SN (303)	Radiation	0.442	0.430	0.456	0.368	0.472
 SJLIFE	Any SN (303)	Chemo	0.016	0.017	0.015	0.030	0.011
@@ -365,6 +366,94 @@ close(file_conn)
 
 
 
+###############################################
+## Lifestyle with diet HEI2015 (SJLIFE only) ##
+###############################################
+data <- read.table(text="Cohort	SN_types	Variables	Overall	Female	Male	Age.lt.35	Age.ge.35
+SJLIFE	Any SN (303)	Radiation	0.442	0.430	0.456	0.368	0.472
+SJLIFE	Any SN (303)	Chemo	0.016	0.017	0.015	0.030	0.011
+SJLIFE	Any SN (303)	All_treatments	0.449	0.439	0.462	0.384	0.476
+SJLIFE	Any SN (303)	PRS	0.179	0.177	0.183	0.182	0.178
+SJLIFE	Any SN (303)	Lifestyle	0.199	0.193	0.206	0.203	0.197
+SJLIFE	Any SN (303)	Combined	0.637	0.629	0.648	0.594	0.655
+SJLIFE	Any SMN (234)	Radiation	0.378	0.375	0.383	0.289	0.412
+SJLIFE	Any SMN (234)	Chemo	0.016	0.017	0.015	0.028	0.012
+SJLIFE	Any SMN (234)	All_treatments	0.388	0.386	0.391	0.307	0.420
+SJLIFE	Any SMN (234)	PRS	0.139	0.137	0.143	0.139	0.140
+SJLIFE	Any SMN (234)	Lifestyle	0.266	0.260	0.273	0.269	0.265
+SJLIFE	Any SMN (234)	Combined	0.613	0.610	0.615	0.560	0.633
+SJLIFE	NMSC (118)	Radiation	0.295	0.282	0.310	0.239	0.307
+SJLIFE	NMSC (118)	Chemo	-	-	-	-	-
+SJLIFE	NMSC (118)	All_treatments	0.295	0.282	0.310	0.239	0.307
+SJLIFE	NMSC (118)	PRS	0.431	0.418	0.447	0.430	0.431
+SJLIFE	NMSC (118)	Lifestyle	-0.401	-0.375	-0.435	-0.375	-0.407
+SJLIFE	NMSC (118)	Combined	0.439	0.430	0.450	0.400	0.448
+SJLIFE	Breast cancer (51)	Radiation	0.473	0.473	-	0.408	0.484
+SJLIFE	Breast cancer (51)	Chemo	0.118	0.118	-	0.112	0.119
+SJLIFE	Breast cancer (51)	All_treatments	0.540	0.540	-	0.474	0.551
+SJLIFE	Breast cancer (51)	PRS	0.216	0.216	-	0.239	0.213
+SJLIFE	Breast cancer (51)	Lifestyle	0.199	0.199	-	0.349	0.174
+SJLIFE	Breast cancer (51)	Combined	0.725	0.725	-	0.734	0.723
+SJLIFE	Thyroid cancer (43)	Radiation	0.612	0.626	0.596	0.546	0.644
+SJLIFE	Thyroid cancer (43)	Chemo	0.246	0.252	0.240	0.343	0.199
+SJLIFE	Thyroid cancer (43)	All_treatments	0.731	0.740	0.720	0.709	0.741
+SJLIFE	Thyroid cancer (43)	PRS	0.600	0.595	0.605	0.611	0.595
+SJLIFE	Thyroid cancer (43)	Lifestyle	0.258	0.235	0.284	0.268	0.253
+SJLIFE	Thyroid cancer (43)	Combined	0.922	0.922	0.923	0.916	0.926
+SJLIFE	Meningioma (81)	Radiation	0.184	0.150	0.225	0.245	0.164
+SJLIFE	Meningioma (81)	Chemo	0.323	0.327	0.318	0.469	0.274
+SJLIFE	Meningioma (81)	All_treatments	0.456	0.437	0.480	0.626	0.400
+SJLIFE	Meningioma (81)	PRS	-0.120	-0.115	-0.124	-0.118	-0.120
+SJLIFE	Meningioma (81)	Lifestyle	0.264	0.262	0.267	0.266	0.264
+SJLIFE	Meningioma (81)	Combined	0.550	0.536	0.566	0.685	0.505", header = T, sep = "\t")
+
+
+data$SN_types_new <- gsub("\\([0-9]+\\)", "", data$SN_types)
+data[data == "-"] <- NA
+
+
+lifestyle <- "lifestyle_with_diet"
+all.group <- c("Overall", "Female", "Male", "Age.lt.35", "Age.ge.35")
+variables <-  c("Combined", "Radiation", "Chemo", "treatments", "PRS", "Lifestyle")
+
+
+# Define the text file path
+data_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/", lifestyle, "_all_table_18b.txt")
+
+file_conn <- file(data_name, "a")
+
+for (j in 1:length(all.group)){
+  group <-  all.group [j]
+  for(i in 1:length(variables)){
+    if(lifestyle== "lifestyle_with_diet" && variables[i] == "Lifestyle"){
+      new_data <- data[grepl(variables[i], data$Variables), c("Cohort", "SN_types", "SN_types_new", "Variables", group)]
+      
+      AF.type <- variables[i]
+      
+      # Filter the data for SJLIFE and CCSS cohorts
+      sjlife_data <- new_data %>% filter(Cohort == "SJLIFE")
+      ccss_data <- new_data %>% filter(Cohort == "CCSS")
+      
+      # Create a new data frame with the desired format
+      result_data <- tibble(
+        "SN types (CA in SJLIFE/CA in CCSS)" = sjlife_data$SN_types,
+        "SJLIFE" = as.numeric(sjlife_data[,group]))
+      
+      # Print the result_data data frame
+      table_name <- paste0(group, "_", AF.type, "_", lifestyle,"\tNA\tNA")
+      # write.table(table_name, data_name, col.names = T, row.names = F, quote = F, append = T, sep = "\t")
+      # write.table(result_data, data_name, col.names = T, row.names = F, quote = F, append = T, sep = "\t")
+      # }
+      
+      cat(table_name, "\n", file = file_conn)
+      write.table(result_data, file = file_conn, col.names = FALSE, row.names = FALSE, quote = FALSE, sep = "\t")
+    }
+  }
+}
+# Close the text file
+close(file_conn)
+######################################
+######################################
 ## create individual tables
 ## Lifestyle without diet
 data <- read.table(text="Cohort	SNtypes	Variables	Overall_all4	Female_all4	Male_all4	Age_lt_35_all4	Age_ge_35_all4	Overall_smk	Female_smk	Male_smk	Age_lt_35_smk	Age_ge_35_smk	Overall_drk	Female_drk	Male_drk	Age_lt_35_drk	Age_ge_35_drk	Overall_PA	Female_PA	Male_PA	Age_lt_35_PA	Age_ge_35_PA	Overall_obese	Female_obese	Male_obese	Age_lt_35_obese	Age_ge_35_obese
@@ -506,6 +595,58 @@ Meningioma	All_treatments	0.456	0.437	0.480	0.626	0.400	0.456	0.437	0.480	0.626	
 Meningioma	PRS	-0.120	-0.115	-0.124	-0.118	-0.120	-0.120	-0.115	-0.124	-0.118	-0.120	-0.120	-0.115	-0.124	-0.118	-0.120	-0.120	-0.115	-0.124	-0.118	-0.120	-0.120	-0.115	-0.124	-0.118	-0.120	-0.120	-0.115	-0.124	-0.118	-0.120
 Meningioma	Lifestyle	0.264	0.262	0.267	0.266	0.264	-0.043	-0.041	-0.045	-0.032	-0.046	-0.133	-0.105	-0.166	-0.122	-0.137	-0.096	-0.112	-0.076	-0.080	-0.101	0.164	0.159	0.171	0.143	0.171	0.352	0.346	0.360	0.355	0.351
 Meningioma	Combined	0.550	0.536	0.566	0.685	0.505	0.364	0.344	0.388	0.564	0.297	0.309	0.304	0.314	0.523	0.237	0.335	0.304	0.372	0.549	0.263	0.492	0.471	0.516	0.639	0.442	0.606	0.589	0.625	0.729	0.564", header = T, sep = "\t")
+
+## combined
+data.sjlife <- data
+
+data.sjlife.wanted <- data.sjlife[grepl("Lifestyle", data.sjlife$Variables),]
+
+variables <- c("diet", "drk", "smk", "PA", "obese")
+
+
+i=1
+sjlife <- data.sjlife.wanted[grepl(paste0("SNtypes|",variables[i]), colnames(data.sjlife.wanted))]
+View(sjlife)
+
+###########################################################
+## Lifestyle with diet HEI (SJLIFE only)
+data <- read.table(text="SNtypes	Variables	Overall_all4	Female_all4	Male_all4	Age_lt_35_all4	Age_ge_35_all4	Overall_smk	Female_smk	Male_smk	Age_lt_35_smk	Age_ge_35_smk	Overall_drk	Female_drk	Male_drk	Age_lt_35_drk	Age_ge_35_drk	Overall_PA	Female_PA	Male_PA	Age_lt_35_PA	Age_ge_35_PA	Overall_obese	Female_obese	Male_obese	Age_lt_35_obese	Age_ge_35_obese	Overall_diet	Female_diet	Male_diet	Age_lt_35_diet	Age_ge_35_diet
+Any_SN	Radiation	0.443	0.433	0.457	0.369	0.473	0.443	0.433	0.457	0.369	0.473	0.443	0.433	0.457	0.369	0.473	0.443	0.433	0.457	0.369	0.473	0.443	0.433	0.457	0.369	0.473	0.443	0.433	0.457	0.369	0.473
+Any_SN	Chemo	0.020	0.020	0.019	0.036	0.013	0.020	0.020	0.019	0.036	0.013	0.020	0.020	0.019	0.036	0.013	0.020	0.020	0.019	0.036	0.013	0.020	0.020	0.019	0.036	0.013	0.020	0.020	0.019	0.036	0.013
+Any_SN	All_treatments	0.453	0.443	0.465	0.389	0.479	0.453	0.443	0.465	0.389	0.479	0.453	0.443	0.465	0.389	0.479	0.453	0.443	0.465	0.389	0.479	0.453	0.443	0.465	0.389	0.479	0.453	0.443	0.465	0.389	0.479
+Any_SN	PRS	0.180	0.178	0.183	0.183	0.179	0.180	0.178	0.183	0.183	0.179	0.180	0.178	0.183	0.183	0.179	0.180	0.178	0.183	0.183	0.179	0.180	0.178	0.183	0.183	0.179	0.180	0.178	0.183	0.183	0.179
+Any_SN	Lifestyle	-0.057	-0.062	-0.049	-0.050	-0.060	-0.059	-0.061	-0.055	-0.052	-0.062	-0.030	-0.028	-0.033	-0.032	-0.029	0.014	0.017	0.010	0.010	0.016	-0.020	-0.021	-0.020	-0.021	-0.020	-0.012	-0.022	0.001	-0.012	-0.012
+Any_SN	Combined	0.525	0.515	0.538	0.470	0.548	0.525	0.516	0.537	0.471	0.547	0.538	0.531	0.548	0.483	0.561	0.558	0.552	0.567	0.504	0.581	0.543	0.535	0.554	0.489	0.565	0.547	0.535	0.563	0.493	0.569
+Any_SMN	Radiation	0.378	0.378	0.379	0.289	0.413	0.378	0.378	0.379	0.289	0.413	0.378	0.378	0.379	0.289	0.413	0.378	0.378	0.379	0.289	0.413	0.378	0.378	0.379	0.289	0.413	0.378	0.378	0.379	0.289	0.413
+Any_SMN	Chemo	0.019	0.019	0.018	0.032	0.013	0.019	0.019	0.018	0.032	0.013	0.019	0.019	0.018	0.032	0.013	0.019	0.019	0.018	0.032	0.013	0.019	0.019	0.018	0.032	0.013	0.019	0.019	0.018	0.032	0.013
+Any_SMN	All_treatments	0.390	0.390	0.389	0.310	0.421	0.390	0.390	0.389	0.310	0.421	0.390	0.390	0.389	0.310	0.421	0.390	0.390	0.389	0.310	0.421	0.390	0.390	0.389	0.310	0.421	0.390	0.390	0.389	0.310	0.421
+Any_SMN	PRS	0.141	0.138	0.144	0.140	0.141	0.141	0.138	0.144	0.140	0.141	0.141	0.138	0.144	0.140	0.141	0.141	0.138	0.144	0.140	0.141	0.141	0.138	0.144	0.140	0.141	0.141	0.138	0.144	0.140	0.141
+Any_SMN	Lifestyle	-0.130	-0.122	-0.139	-0.133	-0.128	-0.103	-0.107	-0.097	-0.108	-0.101	-0.075	-0.076	-0.074	-0.085	-0.071	0.015	0.023	0.005	-0.004	0.022	-0.131	-0.135	-0.126	-0.127	-0.132	-0.082	-0.086	-0.076	-0.095	-0.077
+Any_SMN	Combined	0.405	0.410	0.398	0.322	0.437	0.421	0.419	0.423	0.339	0.452	0.436	0.435	0.437	0.354	0.467	0.483	0.486	0.479	0.402	0.514	0.406	0.405	0.407	0.329	0.436	0.432	0.429	0.436	0.348	0.464
+NMSC	Radiation	0.290	0.278	0.306	0.235	0.302	0.290	0.278	0.306	0.235	0.302	0.290	0.278	0.306	0.235	0.302	0.290	0.278	0.306	0.235	0.302	0.290	0.278	0.306	0.235	0.302	0.290	0.278	0.306	0.235	0.302
+NMSC	Chemo	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+NMSC	All_treatments	0.290	0.278	0.306	0.235	0.302	0.290	0.278	0.306	0.235	0.302	0.290	0.278	0.306	0.235	0.302	0.290	0.278	0.306	0.235	0.302	0.290	0.278	0.306	0.235	0.302	0.290	0.278	0.306	0.235	0.302
+NMSC	PRS	0.441	0.429	0.457	0.441	0.441	0.441	0.429	0.457	0.441	0.441	0.441	0.429	0.457	0.441	0.441	0.441	0.429	0.457	0.441	0.441	0.441	0.429	0.457	0.441	0.441	0.441	0.429	0.457	0.441	0.441
+NMSC	Lifestyle	-0.528	-0.440	-0.640	-0.525	-0.529	-0.044	-0.047	-0.039	-0.070	-0.038	-0.198	-0.177	-0.225	-0.202	-0.197	-0.049	-0.052	-0.047	-0.076	-0.043	-0.172	-0.174	-0.171	-0.176	-0.172	-0.274	-0.233	-0.326	-0.319	-0.264
+NMSC	Combined	0.395	0.409	0.378	0.344	0.407	0.587	0.572	0.606	0.543	0.597	0.526	0.518	0.536	0.481	0.536	0.584	0.569	0.603	0.539	0.594	0.535	0.520	0.555	0.497	0.544	0.496	0.495	0.498	0.437	0.509
+Breast_cancer	Radiation	0.470	0.470	-	0.399	0.481	0.470	0.470	-	0.399	0.481	0.470	0.470	-	0.399	0.481	0.470	0.470	-	0.399	0.481	0.470	0.470	-	0.399	0.481	0.470	0.470	-	0.399	0.481
+Breast_cancer	Chemo	0.109	0.109	-	0.104	0.109	0.109	0.109	-	0.104	0.109	0.109	0.109	-	0.104	0.109	0.109	0.109	-	0.104	0.109	0.109	0.109	-	0.104	0.109	0.109	0.109	-	0.104	0.109
+Breast_cancer	All_treatments	0.531	0.531	-	0.461	0.542	0.531	0.531	-	0.461	0.542	0.531	0.531	-	0.461	0.542	0.531	0.531	-	0.461	0.542	0.531	0.531	-	0.461	0.542	0.531	0.531	-	0.461	0.542
+Breast_cancer	PRS	0.229	0.229	-	0.262	0.224	0.229	0.229	-	0.262	0.224	0.229	0.229	-	0.262	0.224	0.229	0.229	-	0.262	0.224	0.229	0.229	-	0.262	0.224	0.229	0.229	-	0.262	0.224
+Breast_cancer	Lifestyle	-0.908	-0.908	-	-0.589	-0.959	-0.289	-0.289	-	-0.185	-0.306	0.004	0.004	-	0.004	0.004	-0.412	-0.412	-	-0.255	-0.438	-0.042	-0.042	-	-0.038	-0.042	0.043	0.043	-	0.052	0.041
+Breast_cancer	Combined	0.345	0.345	-	0.353	0.344	0.552	0.552	-	0.527	0.556	0.646	0.646	-	0.609	0.653	0.511	0.511	-	0.498	0.514	0.627	0.627	-	0.593	0.633	0.664	0.664	-	0.626	0.670
+Thyroid_cancer	Radiation	0.614	0.625	0.600	0.547	0.646	0.614	0.625	0.600	0.547	0.646	0.614	0.625	0.600	0.547	0.646	0.614	0.625	0.600	0.547	0.646	0.614	0.625	0.600	0.547	0.646	0.614	0.625	0.600	0.547	0.646
+Thyroid_cancer	Chemo	0.246	0.250	0.242	0.336	0.202	0.246	0.250	0.242	0.336	0.202	0.246	0.250	0.242	0.336	0.202	0.246	0.250	0.242	0.336	0.202	0.246	0.250	0.242	0.336	0.202	0.246	0.250	0.242	0.336	0.202
+Thyroid_cancer	All_treatments	0.732	0.741	0.722	0.707	0.744	0.732	0.741	0.722	0.707	0.744	0.732	0.741	0.722	0.707	0.744	0.732	0.741	0.722	0.707	0.744	0.732	0.741	0.722	0.707	0.744	0.732	0.741	0.722	0.707	0.744
+Thyroid_cancer	PRS	0.592	0.587	0.599	0.605	0.586	0.592	0.587	0.599	0.605	0.586	0.592	0.587	0.599	0.605	0.586	0.592	0.587	0.599	0.605	0.586	0.592	0.587	0.599	0.605	0.586	0.592	0.587	0.599	0.605	0.586
+Thyroid_cancer	Lifestyle	-0.732	-0.634	-0.844	-0.780	-0.708	0.065	0.068	0.063	0.050	0.073	-0.260	-0.238	-0.286	-0.268	-0.256	-0.286	-0.316	-0.253	-0.273	-0.293	-0.200	-0.203	-0.195	-0.204	-0.198	-0.604	-0.495	-0.730	-0.688	-0.563
+Thyroid_cancer	Combined	0.815	0.830	0.797	0.793	0.826	0.901	0.903	0.899	0.889	0.907	0.863	0.869	0.857	0.848	0.870	0.862	0.863	0.861	0.849	0.869	0.871	0.874	0.868	0.857	0.878	0.825	0.841	0.806	0.800	0.837
+Meningioma	Radiation	0.185	0.150	0.226	0.245	0.165	0.185	0.150	0.226	0.245	0.165	0.185	0.150	0.226	0.245	0.165	0.185	0.150	0.226	0.245	0.165	0.185	0.150	0.226	0.245	0.165	0.185	0.150	0.226	0.245	0.165
+Meningioma	Chemo	0.324	0.329	0.319	0.470	0.276	0.324	0.329	0.319	0.470	0.276	0.324	0.329	0.319	0.470	0.276	0.324	0.329	0.319	0.470	0.276	0.324	0.329	0.319	0.470	0.276	0.324	0.329	0.319	0.470	0.276
+Meningioma	All_treatments	0.459	0.440	0.482	0.629	0.403	0.459	0.440	0.482	0.629	0.403	0.459	0.440	0.482	0.629	0.403	0.459	0.440	0.482	0.629	0.403	0.459	0.440	0.482	0.629	0.403	0.459	0.440	0.482	0.629	0.403
+Meningioma	PRS	-0.118	-0.114	-0.123	-0.117	-0.119	-0.118	-0.114	-0.123	-0.117	-0.119	-0.118	-0.114	-0.123	-0.117	-0.119	-0.118	-0.114	-0.123	-0.117	-0.119	-0.118	-0.114	-0.123	-0.117	-0.119	-0.118	-0.114	-0.123	-0.117	-0.119
+Meningioma	Lifestyle	-0.127	-0.116	-0.140	-0.125	-0.127	-0.040	-0.038	-0.042	-0.029	-0.043	-0.138	-0.110	-0.171	-0.124	-0.143	-0.084	-0.098	-0.067	-0.069	-0.089	0.163	0.158	0.169	0.141	0.170	0.001	0.002	-0.001	0.005	0.000
+Meningioma	Combined	0.316	0.303	0.331	0.522	0.247	0.370	0.351	0.393	0.569	0.304	0.310	0.306	0.315	0.526	0.238	0.346	0.318	0.380	0.557	0.276	0.494	0.475	0.517	0.641	0.445	0.396	0.378	0.418	0.586	0.333", header = T, sep = "\t")
 
 ## combined
 data.sjlife <- data
