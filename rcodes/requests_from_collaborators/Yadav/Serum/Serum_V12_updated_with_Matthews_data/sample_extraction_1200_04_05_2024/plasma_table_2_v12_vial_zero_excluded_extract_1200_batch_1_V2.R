@@ -184,6 +184,33 @@ table(CTCAE.SERUM.cardiomyopathy$new_event_number, CTCAE.SERUM.cardiomyopathy$ma
 # 4   51    4    2    2
 # 5    2    0    0    0
 
+## at baseline
+CTCAE.SERUM.cardiomyopathy.baseline <- CTCAE.SERUM.cardiomyopathy %>%
+  group_by(sjlid) %>%
+  mutate(row_number = row_number()) %>%
+  filter(max_grade_prior <= 0 | row_number <= which.max(max_grade_prior)) %>%
+  select(-row_number)
+
+table(CTCAE.SERUM.cardiomyopathy.baseline$event_number, CTCAE.SERUM.cardiomyopathy.baseline$max_grade_prior)
+# 0    2    3    4
+# 1 2392  111   20    0
+# 2 1222   71   45    3
+# 3  486   27   35    2
+# 4  148    9   20    5
+# 5   27    0    6    2
+# 6   11    1    1    4
+# 7    5    1    0    0
+# 8    1    0    2    0
+# 9    0    0    1    0
+
+
+table(CTCAE.SERUM.cardiomyopathy.baseline$new_event_number, CTCAE.SERUM.cardiomyopathy.baseline$max_grade_prior)
+# 0    2    3    4
+# 1 3002  214  113   14
+# 2  974    5   14    1
+# 3  263    0    3    1
+# 4   51    1    0    0
+# 5    2    0    0    0
 
 # Yutaka on 04/09/2024: The case cohort design selects a "subcohort" randomly
 # from a cohort and then enables comparison of the subcohort with each of
@@ -201,8 +228,8 @@ table(CTCAE.SERUM.cardiomyopathy$new_event_number, CTCAE.SERUM.cardiomyopathy$ma
 # make the table for survivors who were excluded from your table?
 
 table_2.original <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_table_2_v12.txt", header = T, sep = "\t") # after removing num vial zero and with 18 or older
-CTCAE.SERUM.cardiomyopathy.excluded <- CTCAE.SERUM.cardiomyopathy[!CTCAE.SERUM.cardiomyopathy$tb_number %in% table_2.original$tb_number,]
-table(CTCAE.SERUM.cardiomyopathy.excluded$event_number, CTCAE.SERUM.cardiomyopathy.excluded$max_grade_prior)
+CTCAE.SERUM.cardiomyopathy.baseline.excluded <- CTCAE.SERUM.cardiomyopathy.baseline[!CTCAE.SERUM.cardiomyopathy.baseline$tb_number %in% table_2.original$tb_number,]
+table(CTCAE.SERUM.cardiomyopathy.baseline.excluded$event_number, CTCAE.SERUM.cardiomyopathy.baseline.excluded$max_grade_prior)
 # 0   2   3   4
 # 1 860 111  20   0
 # 2 202  91  48   3
@@ -221,17 +248,8 @@ table(CTCAE.SERUM.cardiomyopathy.excluded$new_event_number, CTCAE.SERUM.cardiomy
 # 3  15  17  22   5
 # 4   2   4   2   2
 
-# table_3$prior_max_CMP_grades <- NA
-# table_3$max_CMP_grades <- NA
-# ## do they have any CMP grade
-# all.sjlid <- table_3$sjlid
-# for (sjlid in 1:nrow(table_3)){
-# check.sample <-  table_3[i,] 
-# check.tmp <- CTCAE[grepl(check.sample$sjlid[1], CTCAE$sjlid),]
-# # index<- 1:which(check.sample$ageevent == check.tmp$ageevent)
-# # table_3$prior_max_CMP_grades <- max(check.tmp$grade[index])
-# table_3$max_CMP_grades <- paste0(check.tmp$grade, collapse = "_")
-# }
+
+CTCAE.SERUM.cardiomyopathy.excluded
 
 
 
