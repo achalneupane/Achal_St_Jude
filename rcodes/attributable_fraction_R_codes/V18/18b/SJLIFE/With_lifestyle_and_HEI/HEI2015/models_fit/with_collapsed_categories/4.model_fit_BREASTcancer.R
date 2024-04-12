@@ -24,6 +24,8 @@ PHENO.ANY_SN$anthra_jco_dose_5.category <- factor(PHENO.ANY_SN$anthra_jco_dose_5
 ######################################
 dat_all = PHENO.ANY_SN
 dat_all = dat_all[dat_all$gender == "Female",]
+table(dat_all$event)
+
 dat_all=dat_all[dat_all$evt1==1,]
 
 fit_all = glm(formula = event ~ 

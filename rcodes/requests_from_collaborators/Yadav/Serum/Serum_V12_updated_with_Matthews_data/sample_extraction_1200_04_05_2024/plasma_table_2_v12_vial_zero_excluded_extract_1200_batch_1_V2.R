@@ -60,7 +60,7 @@ CA.171 <- unique(CA.171$sjlid)
 table_2$CMP_status <- ifelse(table_2$sjlid %in% CA.171, "Yes", "No")
 table(table_2$CMP_status)
 # No  Yes 
-# 3045  399 
+# 3200  399 
 
 ## Get the frist ageevent for all samples
 table_2.first.event <- table_2 %>%
@@ -80,7 +80,7 @@ CA.171 <- CA.171[c("tb_number", "sjlid",  "num_vials", "ageevent", "Sample_age",
 CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
 # CTCAE <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
 CTCAE$ageevent <- round(CTCAE$ageevent,1)
-# > dim(CTCAE)
+dim(CTCAE)
 # [1] 913776     62
 
 ## Exclude CA.171 and community controls
@@ -114,22 +114,28 @@ dim(SERUM.original)
 ## I see age at serum sample is <18 yrs. Could you identify the samples among 18
 #or higher only? Everyone needs to be adults at serum sample.
 SERUM <- SERUM[which(SERUM$ageatsample >= 18),]
-# remove vial zero 0 or 1 
-SERUM <- SERUM[SERUM$num_vials > 1 & SERUM$vitalstatus == "Alive",]
 dim(SERUM)
-# 7484
+# 9141    7
+# remove vial zero 0 or 1 
+SERUM <- SERUM[SERUM$num_vials > 1,] # nrow 7897
+# SERUM <- SERUM[SERUM$num_vials >= 1 & SERUM$vitalstatus == "Alive",] # nrow 8502
+dim(SERUM)
+# 7897
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/requests_from_collaborators/Yadav/Serum/get_matching_rows_from_CTCAE.R")
 CTCAE <- CTCAE[CTCAE$sjlid %in% SERUM$sjlid,]
 dim(CTCAE)
-# 655973     62
+# 693827     62
 
 CTCAE.SERUM <- get_rows_with_smaller_sample_age.all(CTCAE, SERUM, 7)
-# saveRDS(CTCAE.SERUM, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/HL_non_HL_CTCAE.rds")
-CTCAE.SERUM <- readRDS("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/HL_non_HL_CTCAE.rds")
+saveRDS(CTCAE.SERUM, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/HL_non_HL_CTCAE_plasma_vial_ge_2_18yo.rds")
+# saveRDS(CTCAE.SERUM, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/HL_non_HL_CTCAE_plasma_vial_ge_2_18yo_and_alive.rds")
+# saveRDS(CTCAE.SERUM, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/HL_non_HL_CTCAE_plasma_vial_ge_1_18yo_and_alive.rds")
+
+CTCAE.SERUM <- readRDS("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/HL_non_HL_CTCAE_plasma_vial_ge_2_18yo.rds")
 CTCAE.SERUM <- CTCAE.SERUM[CTCAE.SERUM$grade != -9,]
 CTCAE.SERUM <- CTCAE.SERUM[!is.na(CTCAE.SERUM$grade),]
 dim(CTCAE.SERUM)
-# 629023     66
+# 665398     66
 CTCAE.SERUM$diaggrp <- diag$diaggrp[match(CTCAE.SERUM$sjlid, diag$sjlid)]
 
 gg <- CTCAE.SERUM[c("sjlid", "condition", "grade", "ageevent", "Sample_age", "diaggrp")]
@@ -151,14 +157,14 @@ CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy[!is.na(CTCAE.SERUM.card
 
 table(CTCAE.SERUM.cardiomyopathy$event_number, CTCAE.SERUM.cardiomyopathy$max_grade_prior)
 # 0    2    3    4
-# 1 2272  103   14    0
-# 2 1167   79   33    2
-# 3  462   48   44    1
-# 4  142   23   29    5
-# 5   27    7   18    6
-# 6   11    2    6    5
-# 7    5    1    0    2
-# 8    1    0    2    1
+# 1 2392  111   20    0
+# 2 1222   91   48    3
+# 3  486   51   57    3
+# 4  148   25   36    5
+# 5   27    8   20    6
+# 6   11    2    7    8
+# 7    5    1    0    4
+# 8    1    0    2    2
 # 9    0    0    1    0
 
 CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy %>%
@@ -172,10 +178,10 @@ gg <- CTCAE.SERUM.cardiomyopathy[c("sjlid", "condition", "grade", "ageevent", "S
 
 table(CTCAE.SERUM.cardiomyopathy$new_event_number, CTCAE.SERUM.cardiomyopathy$max_grade_prior)
 # 0    2    3    4
-# 1 2853  195   84   11
-# 2  931   49   41    7
-# 3  251   15   20    3
-# 4   50    4    2    1
+# 1 3002  214  113   14
+# 2  974   54   54   10
+# 3  263   17   22    5
+# 4   51    4    2    2
 # 5    2    0    0    0
 
 
@@ -198,22 +204,22 @@ table_2.original <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_
 CTCAE.SERUM.cardiomyopathy.excluded <- CTCAE.SERUM.cardiomyopathy[!CTCAE.SERUM.cardiomyopathy$tb_number %in% table_2.original$tb_number,]
 table(CTCAE.SERUM.cardiomyopathy.excluded$event_number, CTCAE.SERUM.cardiomyopathy.excluded$max_grade_prior)
 # 0   2   3   4
-# 1 826 103  14   0
-# 2 189  79  33   2
-# 3  21  48  44   1
-# 4   7  23  29   5
-# 5   1   7  18   6
-# 6   0   2   6   5
-# 7   0   1   0   2
-# 8   0   0   2   1
+# 1 860 111  20   0
+# 2 202  91  48   3
+# 3  24  51  57   3
+# 4   7  25  36   5
+# 5   1   8  20   6
+# 6   0   2   7   8
+# 7   0   1   0   4
+# 8   0   0   2   2
 # 9   0   0   1   0
 
 table(CTCAE.SERUM.cardiomyopathy.excluded$new_event_number, CTCAE.SERUM.cardiomyopathy.excluded$max_grade_prior)
 # 0   2   3   4
-# 1 862 195  84  11
-# 2 167  49  41   7
-# 3  13  15  20   3
-# 4   2   4   2   1
+# 1 900 214 113  14
+# 2 177  54  54  10
+# 3  15  17  22   5
+# 4   2   4   2   2
 
 # table_3$prior_max_CMP_grades <- NA
 # table_3$max_CMP_grades <- NA
