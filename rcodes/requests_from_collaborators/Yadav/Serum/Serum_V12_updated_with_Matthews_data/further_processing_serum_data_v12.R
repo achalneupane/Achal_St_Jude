@@ -4,7 +4,7 @@
 # Exposed to either anthracyclines or chest radiation
 # With WGS (no restriction on treatment exposures)
 # Exposed to either anthracyclines or chest radiation with WGS
-
+# "SJL1239901" "SJL1261901" "SJL1527107" "SJL4769616" "SJL5015318" "SJL5103906"
 
 library(dplyr)
 library(tidyr)
@@ -104,10 +104,10 @@ table(CTCAE.serum$new_event_number, CTCAE.serum$grade)
 
 ## V12
 # 0    2    3    5
-# 1 3167    0    0    0
-# 2 1032   92   28    0
-# 3  273   42   10    1
-# 4   51   10    2    0
+# 1 3173    0    0    0
+# 2 1038   92   28    0
+# 3  275   42   10    1
+# 4   52   10    2    0
 # 5    2    1    0    0
 
 # Exposed to either anthracyclines or chest radiation
@@ -176,10 +176,10 @@ table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade)
 
 ## v12
 # 0    2    3    5
-# 1 2273    0    0    0
-# 2  863   83   24    0
-# 3  260   42    9    1
-# 4   50    9    2    0
+# 1 2276    0    0    0
+# 2  866   83   24    0
+# 3  262   42    9    1
+# 4   51    9    2    0
 # 5    2    1    0    0
 
 table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade >= 2)
@@ -246,37 +246,37 @@ table(CTCAE.serum.1$new_event_number,CTCAE.serum.1$grade >= 2)
 
 ## V12
 # FALSE TRUE
-# 1  2162    0
-# 2   830  107
-# 3   250   52
-# 4    49   11
+# 1  2276    0
+# 2   866  107
+# 3   262   52
+# 4    51   11
 # 5     2    1
 
 ## For Table 2 (in Table_counts sheet of Serum_data_processed_v6_corrected_11_18_2023.xlxs)
 table_2 <- CTCAE.serum.1[!is.na(CTCAE.serum.1$grade),]
 dim(table_2)
 # 4099   35
-## 3464 35 ## V12
+## 3628 35 ## V12
 ### write.table(table_2, "serum_table_2_v9.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Serum, 18 or older, vial > 0
-# write.table(table_2, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_table_2_v12.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Plasma, 18 or older, vial > 0
+write.table(table_2, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_table_2_v12.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Plasma, 18 or older, vial > 0
 # table_2 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_table_2_v12.txt", header = T, sep = "\t")
 
 table(table_2$new_event_number,table_2$grade)
 ## V12
 # 0    2    3    5
-# 1 2162    0    0    0
-# 2  830   83   24    0
-# 3  250   42    9    1
-# 4   49    9    2    0
+# 1 2276    0    0    0
+# 2  866   83   24    0
+# 3  262   42    9    1
+# 4   51    9    2    0
 # 5    2    1    0    0
 
 table(table_2$event_number,table_2$grade) ## Actual CTCAE visit
 # 0    2    3    5
-# 1 1689    0    0    0
-# 2 1085   66   19    0
-# 3  485   47    8    0
-# 4  144   18    6    1
-# 5   28    3    1    0
+# 1 1691    0    0    0
+# 2 1088   66   19    0
+# 3  486   47    8    0
+# 4  146   18    6    1
+# 5   29    3    1    0
 # 6   11    0    1    0
 # 7    5    1    0    0
 # 8    1    0    0    0
@@ -293,7 +293,7 @@ cases <- table_2[table_2$sjlid %in% cases$sjlid,]
 controls <- table_2[!table_2$sjlid %in% cases$sjlid,]
 table(controls$num_vials) ## should have zero with num_vials = 1
 # 2    3    4    5    6    7 
-# 858   26   76  312 1927    1 
+# 860   26   76  312 1934    1 
 
 num_vial1 <- cases[which(cases$num_vials == 1),]
 cases.samples <- cases[cases$sjlid %in% num_vial1$sjlid,]
@@ -325,24 +325,24 @@ tb.to.remove <- unlist(tb.to.remove)
 table_2.updated <- table_2[!table_2$tb_number %in% tb.to.remove,]
 dim(table_2.updated)
 # 3671   35 ## V11
-# 3599   35 ## v12
+# 3608   35 ## v12
 
 table(table_2.updated$new_event_number,table_2.updated$grade)
 ## V12
 # 0    2    3    5
-# 1 2253    0    0    0
-# 2  863   83   24    0
-# 3  260   42    9    1
-# 4   50    9    2    0
+# 1 2256    0    0    0
+# 2  866   83   24    0
+# 3  262   42    9    1
+# 4   51    9    2    0
 # 5    2    1    0    0
 
 table(table_2.updated$event_number,table_2.updated$grade) # based on actual CTCAE data
 # 0    2    3    5
-# 1 1669    0    0    0
-# 2 1085   66   19    0
-# 3  485   47    8    0
-# 4  144   18    6    1
-# 5   28    3    1    0
+# 1 1671    0    0    0
+# 2 1088   66   19    0
+# 3  486   47    8    0
+# 4  146   18    6    1
+# 5   29    3    1    0
 # 6   11    0    1    0
 # 7    5    1    0    0
 # 8    1    0    0    0
@@ -353,11 +353,11 @@ table(table_2.updated$event_number,table_2.updated$grade) # based on actual CTCA
 table(table_2.updated$num_vials, table_2.updated$grade)
 # 0    2    3    5
 # 1   26    0    1    0
-# 2  955    3    0    0
+# 2  957    3    0    0
 # 3   26    1    0    0
 # 4   80    2    1    0
 # 5  331   22    4    0
-# 6 2009   56   10    0
+# 6 2016   56   10    0
 # 7    1    0    0    0
 
 write.table(table_2.updated, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_table_2_v12.updated.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Plasma, 18 or older, vial > 0

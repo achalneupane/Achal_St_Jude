@@ -76,7 +76,7 @@ dim(SERUM)
 
 dim(SERUM)
 # 8879
-# 7587    7 ## April 4 version
+# 7948    7 ## April 4 version
 
 ## Keep max num vials and alive over dead
 SERUM <- SERUM %>%
@@ -85,12 +85,12 @@ SERUM <- SERUM %>%
   filter(vitalstatus == "Alive" | all(vitalstatus == "Deceased"))
 
 dim(SERUM)
-# [1] 7574    6
+# [1] 7934    6
 
 ## Also removing samples that have duplicate ageevent in CTCAE data
-SERUM <- SERUM[!SERUM$sjlid %in% c("SJL1225801", "SJL1265801", "SJL1430801", "SJL4730101", "SJL5134305", "SJL5146506"),]
+# SERUM <- SERUM[!SERUM$sjlid %in% c("SJL1225801", "SJL1265801", "SJL1430801", "SJL4730101", "SJL5134305", "SJL5146506"),]
 dim(SERUM)
-# 7558    6
+# 7934    6
 ## Could you please work on it by merging with the CTCAE grades for cardiomyopathy from the most recent data freeze? Please look at serum and plasma separately.
 # read CTCAE
 # CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
@@ -133,7 +133,7 @@ dim(CTCAE)
 # V11
 # 7406    9
 
-# v12 7126
+# v12 7148
 
 # CTCAE <- get_rows_with_smaller_sample_age(CTCAE, SERUM, 0)
 CTCAE <- get_rows_with_smaller_sample_age.all(CTCAE, SERUM, 7)
@@ -154,7 +154,7 @@ dim(CTCAE)
 
 # V12
 dim(CTCAE)
-# 7126   13
+# 7148   13
 
 ## Add event number
 CTCAE <- CTCAE %>%
@@ -200,7 +200,7 @@ table(CTCAE$grade)
 
 ## V12
 # 0    2    3    5 
-# 4525  200   53    1 
+# 4540  200   53    1 
 
 CTCAE.2 <- CTCAE
 
@@ -312,11 +312,11 @@ table(CTCAE.2$event_number,CTCAE.2$grade)
 
 ## V12
 # 0    2    3    5
-# 1 2544    0    0    0
-# 2 1280   72   22    0
-# 3  507   49    9    0
-# 4  149   19    7    1
-# 5   28    4    1    0
+# 1 2549    0    0    0
+# 2 1286   72   22    0
+# 3  508   49    9    0
+# 4  151   19    7    1
+# 5   29    4    1    0
 # 6   11    0    1    0
 # 7    5    1    0    0
 # 8    1    0    0    0
@@ -408,11 +408,11 @@ table(CTCAE.2$event_number,CTCAE.2$grade_2_or_higher)
 
 ## V12
 # grade_0 grade_2_or_higher
-# 1    2544                 0
-# 2    1280                94
-# 3     507                58
-# 4     149                27
-# 5      28                 5
+# 1    2549                 0
+# 2    1286                94
+# 3     508                58
+# 4     151                27
+# 5      29                 5
 # 6      11                 1
 # 7       5                 1
 # 8       1                 0
@@ -482,10 +482,10 @@ table(CTCAE.2$new_event_number,CTCAE.2$grade)
 
 ## V12
 # 0    2    3    5
-# 1 3167    0    0    0
-# 2 1032   92   28    0
-# 3  273   42   10    1
-# 4   51   10    2    0
+# 1 3173    0    0    0
+# 2 1038   92   28    0
+# 3  275   42   10    1
+# 4   52   10    2    0
 # 5    2    1    0    0
 
 table(CTCAE.2$new_event_number,CTCAE.2$grade_2_or_higher)
@@ -551,10 +551,10 @@ table(CTCAE.2$new_event_number,CTCAE.2$grade_2_or_higher)
 
 ## V12
 # grade_0 grade_2_or_higher
-# 1    3167                 0
-# 2    1032               120
-# 3     273                53
-# 4      51                12
+# 1    3173                 0
+# 2    1038               120
+# 3     275                53
+# 4      52                12
 # 5       2                 1
 
 CTCAE.3 <- CTCAE.2[!is.na(CTCAE.2$Sample_age),]
@@ -636,22 +636,22 @@ table(CTCAE.3$event_number,CTCAE.3$grade_2_or_higher)
 
 ## V12
 # grade_0 grade_2_or_higher
-# 1    2544                 0
-# 2    1280                61
-# 3     507                29
-# 4     149                13
-# 5      28                 2
+# 1    2549                 0
+# 2    1286                61
+# 3     508                29
+# 4     151                13
+# 5      29                 2
 # 6      11                 0
 # 7       5                 0
 # 8       1                 0
 
 table(CTCAE.2$event_number,CTCAE.2$grade) ## Actual visit
 # 0    2    3    5
-# 1 2544    0    0    0
-# 2 1280   72   22    0
-# 3  507   49    9    0
-# 4  149   19    7    1
-# 5   28    4    1    0
+# 1 2549    0    0    0
+# 2 1286   72   22    0
+# 3  508   49    9    0
+# 4  151   19    7    1
+# 5   29    4    1    0
 # 6   11    0    1    0
 # 7    5    1    0    0
 # 8    1    0    0    0
@@ -686,10 +686,10 @@ table(CTCAE.2$grade >=2)
 
 ## V12
 # FALSE  TRUE 
-# 4320   186
+# 4540   186
 dim(CTCAE.2)
 # 4506   16
-# 4711
+# 4726
 
 write.table(CTCAE.2, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/Plasma_data_processed_v12_after_removing_numvial_0.txt", col.names = T, row.names = F, sep = "\t") ## based on Plasma data
 # write.table(CTCAE.2, "Serum_data_processed_v9_after_removing_numvial_0.txt", col.names = T, row.names = F, sep = "\t") ## based on Serum data

@@ -1,8 +1,9 @@
+rm(list= ls())
 library(haven)
 library(dplyr)
 table_2 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_table_2_v12.updated.txt", header = T, sep = "\t") # after removing num vial zero and with 18 or older
 dim(table_2)
-# 3444   35
+# 3608   35
 
 #################################################
 
@@ -69,7 +70,7 @@ table_2.first.event <- table_2 %>%
   slice(1) 
 
 dim(table_2.first.event)
-# 2162   37
+# 2276   37
 
 CA.171 <- table_2.first.event[table_2.first.event$CMP_status == "Yes",]
 CA.171$selection_group <- "171_CMP_cases"
@@ -77,7 +78,7 @@ CA.171 <- CA.171[c("tb_number", "sjlid",  "num_vials", "ageevent", "Sample_age",
 #################################################################################################
 ## randomly select 200 Hodgkin lymphoma survivors from all eligible Hodgkin lymphoma survivors ##
 #################################################################################################
-CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
+# CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
 # CTCAE <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
 CTCAE$ageevent <- round(CTCAE$ageevent,1)
 dim(CTCAE)
@@ -126,21 +127,26 @@ CTCAE <- CTCAE[CTCAE$sjlid %in% SERUM$sjlid,]
 dim(CTCAE)
 # 693827     62
 
-CTCAE.SERUM <- get_rows_with_smaller_sample_age.all(CTCAE, SERUM, 7)
-saveRDS(CTCAE.SERUM, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/HL_non_HL_CTCAE_plasma_vial_ge_2_18yo.rds")
-# saveRDS(CTCAE.SERUM, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/HL_non_HL_CTCAE_plasma_vial_ge_2_18yo_and_alive.rds")
-# saveRDS(CTCAE.SERUM, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/HL_non_HL_CTCAE_plasma_vial_ge_1_18yo_and_alive.rds")
+# CTCAE.SERUM <- get_rows_with_smaller_sample_age.all(CTCAE, SERUM, 7)
+## saveRDS(CTCAE.SERUM, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/HL_non_HL_CTCAE_plasma_vial_ge_2_18yo_and_alive.rds")
+## saveRDS(CTCAE.SERUM, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/HL_non_HL_CTCAE_plasma_vial_ge_1_18yo_and_alive.rds")
+# saveRDS(CTCAE.SERUM, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/HL_non_HL_CTCAE_plasma_vial_ge_2_18yo.rds")
 
 CTCAE.SERUM <- readRDS("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/HL_non_HL_CTCAE_plasma_vial_ge_2_18yo.rds")
+## removing samples that have duplicate ageevent
+# CTCAE.SERUM <- CTCAE.SERUM[!CTCAE.SERUM$sjlid %in% c("SJL1225801", "SJL1265801", "SJL1430801", "SJL4730101", "SJL5134305", "SJL5146506"),]
 CTCAE.SERUM <- CTCAE.SERUM[CTCAE.SERUM$grade != -9,]
 CTCAE.SERUM <- CTCAE.SERUM[!is.na(CTCAE.SERUM$grade),]
 dim(CTCAE.SERUM)
 # 665398     66
+
 CTCAE.SERUM$diaggrp <- diag$diaggrp[match(CTCAE.SERUM$sjlid, diag$sjlid)]
 
 gg <- CTCAE.SERUM[c("sjlid", "condition", "grade", "ageevent", "Sample_age", "diaggrp")]
 CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM[grepl("cardiomyopathy", CTCAE.SERUM$condition, ignore.case = T),]
 # cardio.gg <- CTCAE.SERUM.cardiomyopathy[c("sjlid", "condition", "grade", "ageevent", "Sample_age", "diaggrp")]
+
+## add event number
 CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy %>%
   dplyr::group_by(sjlid) %>%
   dplyr::arrange(ageevent) %>%
@@ -148,24 +154,23 @@ CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy %>%
   dplyr::ungroup() %>%
   dplyr::arrange(sjlid) 
 
+# remove all rows as soon as row with max_grade (which is prior grade) is greater than 2
 CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy %>%
   dplyr::group_by(sjlid) %>%
   dplyr::arrange(sjlid, event_number) %>%
   dplyr::mutate(max_grade_prior = cummax(grade))
 
-CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy[!is.na(CTCAE.SERUM.cardiomyopathy$Sample_age),]
+dim(CTCAE.SERUM.cardiomyopathy)
+# 7506   69
+gg <- CTCAE.SERUM.cardiomyopathy[c("sjlid", "condition", "grade", "ageevent", "Sample_age", "diaggrp", "num_vials", "max_grade_prior", "event_number")]
 
+CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy[!is.na(CTCAE.SERUM.cardiomyopathy$Sample_age),]
+dim(CTCAE.SERUM.cardiomyopathy)
+# 4803 69
+
+# This is all
 table(CTCAE.SERUM.cardiomyopathy$event_number, CTCAE.SERUM.cardiomyopathy$max_grade_prior)
-# 0    2    3    4
-# 1 2392  111   20    0
-# 2 1222   91   48    3
-# 3  486   51   57    3
-# 4  148   25   36    5
-# 5   27    8   20    6
-# 6   11    2    7    8
-# 7    5    1    0    4
-# 8    1    0    2    2
-# 9    0    0    1    0
+
 
 CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy %>%
   dplyr::group_by(sjlid) %>%
@@ -176,13 +181,8 @@ CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy %>%
 
 gg <- CTCAE.SERUM.cardiomyopathy[c("sjlid", "condition", "grade", "ageevent", "Sample_age", "diaggrp", "num_vials", "max_grade_prior", "event_number", "new_event_number")]
 
+# This is all
 table(CTCAE.SERUM.cardiomyopathy$new_event_number, CTCAE.SERUM.cardiomyopathy$max_grade_prior)
-# 0    2    3    4
-# 1 3002  214  113   14
-# 2  974   54   54   10
-# 3  263   17   22    5
-# 4   51    4    2    2
-# 5    2    0    0    0
 
 ## at baseline
 CTCAE.SERUM.cardiomyopathy.baseline <- CTCAE.SERUM.cardiomyopathy %>%
@@ -191,26 +191,32 @@ CTCAE.SERUM.cardiomyopathy.baseline <- CTCAE.SERUM.cardiomyopathy %>%
   filter(max_grade_prior <= 0 | row_number <= which.max(max_grade_prior)) %>%
   select(-row_number)
 
+remove15.at.baseline <- c("SJL1239901", "SJL1261901", "SJL1437801", "SJL1527107", "SJL4177213", "SJL4769616", "SJL5015318", "SJL5016118", "SJL5041805", "SJL5052915", "SJL5103906", "SJL5104317", "SJL5192513", "SJL5205006", "SJL5310713")
+CTCAE.SERUM.cardiomyopathy.baseline <- CTCAE.SERUM.cardiomyopathy.baseline[!CTCAE.SERUM.cardiomyopathy.baseline$sjlid %in% remove15.at.baseline,]
+# Table: Counts of samples by visit number and grades
+table(CTCAE.SERUM.cardiomyopathy.baseline$new_event_number, CTCAE.SERUM.cardiomyopathy.baseline$max_grade_prior)
+# 0    2    3    4
+# 1 2987  214  113   14
+# 2  972    2   13    1
+# 3  262    0    2    1
+# 4   51    0    0    0
+# 5    2    0    0    0
+
+# Table: Counts of samples by CTCAE visit number and max grades prior to or on the date of plasma sampling.
 table(CTCAE.SERUM.cardiomyopathy.baseline$event_number, CTCAE.SERUM.cardiomyopathy.baseline$max_grade_prior)
 # 0    2    3    4
-# 1 2392  111   20    0
-# 2 1222   71   45    3
-# 3  486   27   35    2
-# 4  148    9   20    5
-# 5   27    0    6    2
+# 1 2379  111   20    0
+# 2 1220   68   45    3
+# 3  484   27   34    2
+# 4  147    8   20    5
+# 5   27    0    5    2
 # 6   11    1    1    4
 # 7    5    1    0    0
 # 8    1    0    2    0
 # 9    0    0    1    0
 
 
-table(CTCAE.SERUM.cardiomyopathy.baseline$new_event_number, CTCAE.SERUM.cardiomyopathy.baseline$max_grade_prior)
-# 0    2    3    4
-# 1 3002  214  113   14
-# 2  974    5   14    1
-# 3  263    0    3    1
-# 4   51    1    0    0
-# 5    2    0    0    0
+
 
 # Yutaka on 04/09/2024: The case cohort design selects a "subcohort" randomly
 # from a cohort and then enables comparison of the subcohort with each of
@@ -227,40 +233,93 @@ table(CTCAE.SERUM.cardiomyopathy.baseline$new_event_number, CTCAE.SERUM.cardiomy
 # baseline vs. the table you provided.  I know this is confusing, but can you
 # make the table for survivors who were excluded from your table?
 
+## Excluding 171 cases
 table_2.original <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_table_2_v12.txt", header = T, sep = "\t") # after removing num vial zero and with 18 or older
-CTCAE.SERUM.cardiomyopathy.baseline.excluded <- CTCAE.SERUM.cardiomyopathy.baseline[!CTCAE.SERUM.cardiomyopathy.baseline$tb_number %in% table_2.original$tb_number,]
+# exclude.CA.177 <- table_2.original$sjlid[table_2.original$grade_2_or_higher == "grade_2_or_higher"]
+CTCAE.SERUM.cardiomyopathy.baseline.excluded <- CTCAE.SERUM.cardiomyopathy.baseline[!CTCAE.SERUM.cardiomyopathy.baseline$sjlid %in% table_2.original$sjlid,]
+
+# Table: Samples not included in table 2 (all 171 cases and controls), but only in Table 7 max grades prior to or on the date of plasma sampling.
+table(CTCAE.SERUM.cardiomyopathy.baseline.excluded$new_event_number, CTCAE.SERUM.cardiomyopathy.baseline.excluded$max_grade_prior)
+# 0   2   3   4
+# 1 882 214 113  14
+# 2 170   2  13   1
+# 3  12   0   2   1
+# 4   1   0   0   0
+
+# Table: Samples not included in table 1 (all 186 cases and controls), but only in Table 7 max grades prior to or on the date of plasma sampling with actual CTCAE visit number.
 table(CTCAE.SERUM.cardiomyopathy.baseline.excluded$event_number, CTCAE.SERUM.cardiomyopathy.baseline.excluded$max_grade_prior)
 # 0   2   3   4
-# 1 860 111  20   0
-# 2 202  91  48   3
-# 3  24  51  57   3
-# 4   7  25  36   5
-# 5   1   8  20   6
-# 6   0   2   7   8
-# 7   0   1   0   4
-# 8   0   0   2   2
+# 1 845 111  20   0
+# 2 196  68  45   3
+# 3  20  27  34   2
+# 4   4   8  20   5
+# 5   0   0   5   2
+# 6   0   1   1   4
+# 7   0   1   0   0
+# 8   0   0   2   0
 # 9   0   0   1   0
 
-table(CTCAE.SERUM.cardiomyopathy.excluded$new_event_number, CTCAE.SERUM.cardiomyopathy.excluded$max_grade_prior)
-# 0   2   3   4
-# 1 900 214 113  14
-# 2 177  54  54  10
-# 3  15  17  22   5
-# 4   2   4   2   2
 
 
-CTCAE.SERUM.cardiomyopathy.excluded
+## Exclude all grade or samples at baseline
+CTCAE.2.original <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/Plasma_data_processed_v12_after_removing_numvial_0.txt", sep = "\t", header = T)
+# exclude.CA.186 <- CTCAE.2.original$sjlid[CTCAE.2.original$grade_2_or_higher=="grade_2_or_higher"]
+CTCAE.SERUM.cardiomyopathy.baseline.excluded186 <- CTCAE.SERUM.cardiomyopathy.baseline[!CTCAE.SERUM.cardiomyopathy.baseline$sjlid %in% CTCAE.2.original$sjlid,]
+CTCAE.SERUM.cardiomyopathy.baseline.excluded186$sjlid[!CTCAE.SERUM.cardiomyopathy.baseline.excluded186$sjlid %in% CTCAE.2.original$sjlid]
+
+sum(CTCAE.SERUM.cardiomyopathy.baseline.excluded186$new_event_number==1 & CTCAE.SERUM.cardiomyopathy.baseline.excluded186$max_grade_prior==0)
+## Should be 0!!
+CTCAE.SERUM.cardiomyopathy.baseline.excluded186$sjlid[CTCAE.SERUM.cardiomyopathy.baseline.excluded186$new_event_number==1 & CTCAE.SERUM.cardiomyopathy.baseline.excluded186$max_grade_prior==0]
+# "SJL1225801" "SJL1265801" "SJL1430801" "SJL4730101" "SJL5134305" "SJL5146506"
+
+table(CTCAE.SERUM.cardiomyopathy.baseline.excluded186$new_event_number, CTCAE.SERUM.cardiomyopathy.baseline.excluded186$max_grade_prior)
+# 2   3   4
+# 1 214 113  14
+# 2   2  13   1
+# 3   0   2   1
+
+table(CTCAE.SERUM.cardiomyopathy.baseline.excluded186$event_number, CTCAE.SERUM.cardiomyopathy.baseline.excluded186$max_grade_prior)
+# 2   3   4
+# 1 111  20   0
+# 2  68  45   3
+# 3  27  34   2
+# 4   8  20   5
+# 5   0   5   2
+# 6   1   1   4
+# 7   1   0   0
+# 8   0   2   0
+# 9   0   1   0
 
 
+dim(SERUM)
+# 7897    7
+length(unique(SERUM$sjlid))
+# 4493
+SERUM.not.CA171 <- SERUM[!SERUM$sjlid %in% CA.171$sjlid,]
+dim(SERUM.not.CA171)
+# 7493
+length(unique(SERUM.not.CA171$sjlid))
+# 4325
+## Add diagnosis 
+SERUM.not.CA171$diaggrp <- diag$diaggrp[match(SERUM.not.CA171$sjlid, diag$sjlid)]
 
-all.hodgkin <- table_3[grepl("^Hodgkin", table_3$diaggrp, ignore.case = T),]
+colnames(SERUM.not.CA171)[colnames(SERUM.not.CA171) == "ageatsample"] <- "Sample_age"
+SERUM.not.CA171$ageevent <- NA
+SERUM.not.CA171$CMP_status <- "No"
+############################
+## randomly select 200 HL ##
+############################
+all.hodgkin <- SERUM.not.CA171[grepl("^Hodgkin", SERUM.not.CA171$diaggrp, ignore.case = T),]
 dim(all.hodgkin)
-# 300  37
+# 829  8
+length(unique(all.hodgkin$sjlid))
+# 447
+table(all.hodgkin$diaggrp)
 
 set.seed(54321)
 # select 200
 all.hodgkin.extract <- sample(all.hodgkin$tb_number, 200)
-all.hodgkin.extract <- table_3[table_3$tb_number %in% all.hodgkin.extract,]
+all.hodgkin.extract <- all.hodgkin[all.hodgkin$tb_number %in% all.hodgkin.extract,]
 dim(all.hodgkin.extract)
 # 200  37
 all.hodgkin.extract$selection_group <- "200_Hodgkin_lymphoma"
@@ -268,16 +327,18 @@ all.hodgkin.extract <- all.hodgkin.extract[c("tb_number", "sjlid",  "num_vials",
 ####################################################
 ## randomly select the remaining 1100-171-200=729 ##
 ####################################################
-table_3 <- table_2.first.event[!table_2.first.event$tb_number %in% c(CA.171$tb_number,all.hodgkin.extract$tb_number),] # exclude those in CA.171 + 200 hodgkins samples from the original table
+all.non.hodgkin <- SERUM.not.CA171[!SERUM.not.CA171$sjlid %in% c(CA.171$sjlid,all.hodgkin$sjlid),] # exclude those in CA.171 + 200 hodgkins samples from the original table
 # Randomly select 733 non- Hodgkin lymphoma survivors from all eligible non- Hodgkin lymphoma survivors.
-all.non.hodgkin <- table_3[!table_3$tb_number %in% all.hodgkin$tb_number,]
 dim(all.non.hodgkin)
-# 1691   37
+# 6664   10
+length(unique(all.non.hodgkin$sjlid))
+# 3878
+table(all.non.hodgkin$diaggrp)
 
 set.seed(54321)
 # select 733
 all.non.hodgkin.extract <- sample(unique(all.non.hodgkin$tb_number), 729)
-all.non.hodgkin.extract <- table_3[table_3$tb_number %in% all.non.hodgkin.extract,]
+all.non.hodgkin.extract <- all.non.hodgkin[all.non.hodgkin$tb_number %in% all.non.hodgkin.extract,]
 all.non.hodgkin.extract$selection_group <- "729_non_Hodgkin"
 all.non.hodgkin.extract <- all.non.hodgkin.extract[c("tb_number", "sjlid",  "num_vials", "ageevent", "Sample_age", "vitalstatus", "diaggrp", "CMP_status", "selection_group")]
 dim(all.non.hodgkin.extract)
@@ -289,47 +350,8 @@ all.wanted.df.1200 <- rbind.data.frame(CA.171, all.hodgkin.extract, all.non.hodg
 dim(all.wanted.df.1200)
 # 1200    9
 
-#######################################################
-## Batch 1, subset 1: Now, extract 120 sample subset ##
-#######################################################
-# This extract should be based on the proportion of all.wanted.df.1200$selection_group
-# Define the counts for each group
-# Define the counts for each group
-counts <- table(all.wanted.df.1200$selection_group)
-groups <- names(counts)
-
-# Calculate the proportion of each group
-proportions <- counts / sum(counts)
-
-# Sample 120 rows based on the proportions
-set.seed(54321) # Set seed for reproducibility
-sampled_rows <- lapply(groups, function(group) {
-  n <- round(proportions[group] * 120)
-  sample(which(all.wanted.df.1200$selection_group == group), n)
-})
-
-# Combine the sampled rows
-sampled_rows <- unlist(sampled_rows)
-
-# Extract the sampled rows
-sampled_data.120 <- all.wanted.df.1200[sampled_rows, ]
-
-
-table_2.keep <- table_2[c("tb_number", "sjlid",  "num_vials", "ageevent", "Sample_age", "vitalstatus", "diaggrp", "CMP_status")]
-## add community control for the record
-table_2.keep <- rbind.data.frame(table_2.keep, first_ageatsample.zhaoming.100[c("tb_number", "sjlid",  "num_vials", "ageevent", "Sample_age", "vitalstatus", "diaggrp", "CMP_status")])
-table_2.keep$CMP_grade <- table_2$grade[match(table_2.keep$tb_number, table_2$tb_number)]
-table_2.keep$new_event_number <- table_2$new_event_number[match(table_2.keep$tb_number, table_2$tb_number)]
-
-table_2.keep$Batch1.1200.selecion <- all.wanted.df.1200$tb_number[match(table_2.keep$tb_number, all.wanted.df.1200$tb_number)]
-table_2.keep$Batch1.1200.selecion_group <- all.wanted.df.1200$selection_group[match(table_2.keep$tb_number, all.wanted.df.1200$tb_number)]
-
-# table_2.keep$Batch1.1200.subset.120.selecion <- sampled_data.120$tb_number[match(table_2.keep$tb_number, sampled_data.120$tb_number)]
-# table_2.keep$Batch1.1200.subset.120.selecion_group <- sampled_data.120$selection_group[match(table_2.keep$tb_number, sampled_data.120$tb_number)]
-
-write.table(table_2.keep, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_data_complete_list_of_table_2_v12.txt", col.names = T, row.names = F, quote = F, sep = "\t", na = "")
 write.table(all.wanted.df.1200, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_data_batch1_1200_samples.txt", col.names = T, row.names = F, quote = F, sep = "\t", na="")
-# write.table(sampled_data.120, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_data_batch1_1200_samples_subset1_120_samples.txt", col.names = T, row.names = F, quote = F, sep = "\t", na="")
+
 
 # Note from Yadav: I think you should only provide the necessary information
 # when you send these files. You would only need tb_number, sjlid, num_vials and
