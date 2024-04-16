@@ -164,9 +164,14 @@ dim(CTCAE.SERUM.cardiomyopathy)
 # 7506   69
 gg <- CTCAE.SERUM.cardiomyopathy[c("sjlid", "condition", "grade", "ageevent", "Sample_age", "diaggrp", "num_vials", "max_grade_prior", "event_number")]
 
-CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy[!is.na(CTCAE.SERUM.cardiomyopathy$Sample_age),]
+CTCAE.SERUM.cardiomyopathy <- CTCAE.SERUM.cardiomyopathy[!(is.na(CTCAE.SERUM.cardiomyopathy$Sample_age) & CTCAE.SERUM.cardiomyopathy$grade == 0),]
 dim(CTCAE.SERUM.cardiomyopathy)
-# 4803 69
+# 5235 69
+
+## Remove rows once grades 2 or higher are seen in ordered df by sjlid and event_number
+CTCAE.SERUM.cardiomyopathy <- filter_rows_by_condition(CTCAE.SERUM.cardiomyopathy, "sjlid", "max_grade_prior")
+dim(CTCAE.SERUM.cardiomyopathy)
+# 4698
 
 # This is all
 table(CTCAE.SERUM.cardiomyopathy$event_number, CTCAE.SERUM.cardiomyopathy$max_grade_prior)
@@ -196,24 +201,23 @@ CTCAE.SERUM.cardiomyopathy.baseline <- CTCAE.SERUM.cardiomyopathy.baseline[!CTCA
 # Table: Counts of samples by visit number and grades
 table(CTCAE.SERUM.cardiomyopathy.baseline$new_event_number, CTCAE.SERUM.cardiomyopathy.baseline$max_grade_prior)
 # 0    2    3    4
-# 1 2987  214  113   14
-# 2  972    2   13    1
-# 3  262    0    2    1
+# 1 2987  262  125    4
+# 2  972    0    0    0
+# 3  262    0    0    0
 # 4   51    0    0    0
 # 5    2    0    0    0
 
 # Table: Counts of samples by CTCAE visit number and max grades prior to or on the date of plasma sampling.
 table(CTCAE.SERUM.cardiomyopathy.baseline$event_number, CTCAE.SERUM.cardiomyopathy.baseline$max_grade_prior)
 # 0    2    3    4
-# 1 2379  111   20    0
-# 2 1220   68   45    3
-# 3  484   27   34    2
-# 4  147    8   20    5
-# 5   27    0    5    2
-# 6   11    1    1    4
-# 7    5    1    0    0
-# 8    1    0    2    0
-# 9    0    0    1    0
+# 1 2379  207  112    4
+# 2 1220   43   10    0
+# 3  484    8    1    0
+# 4  147    3    1    0
+# 5   27    1    1    0
+# 6   11    0    0    0
+# 7    5    0    0    0
+# 8    1    0    0    0
 
 
 
@@ -241,23 +245,19 @@ CTCAE.SERUM.cardiomyopathy.baseline.excluded <- CTCAE.SERUM.cardiomyopathy.basel
 # Table: Samples not included in table 2 (all 171 cases and controls), but only in Table 7 max grades prior to or on the date of plasma sampling.
 table(CTCAE.SERUM.cardiomyopathy.baseline.excluded$new_event_number, CTCAE.SERUM.cardiomyopathy.baseline.excluded$max_grade_prior)
 # 0   2   3   4
-# 1 882 214 113  14
-# 2 170   2  13   1
-# 3  12   0   2   1
+# 1 882 262 125   4
+# 2 170   0   0   0
+# 3  12   0   0   0
 # 4   1   0   0   0
 
 # Table: Samples not included in table 1 (all 186 cases and controls), but only in Table 7 max grades prior to or on the date of plasma sampling with actual CTCAE visit number.
 table(CTCAE.SERUM.cardiomyopathy.baseline.excluded$event_number, CTCAE.SERUM.cardiomyopathy.baseline.excluded$max_grade_prior)
 # 0   2   3   4
-# 1 845 111  20   0
-# 2 196  68  45   3
-# 3  20  27  34   2
-# 4   4   8  20   5
-# 5   0   0   5   2
-# 6   0   1   1   4
-# 7   0   1   0   0
-# 8   0   0   2   0
-# 9   0   0   1   0
+# 1 845 207 112   4
+# 2 196  43  10   0
+# 3  20   8   1   0
+# 4   4   3   1   0
+# 5   0   1   1   0
 
 
 
@@ -274,21 +274,15 @@ CTCAE.SERUM.cardiomyopathy.baseline.excluded186$sjlid[CTCAE.SERUM.cardiomyopathy
 
 table(CTCAE.SERUM.cardiomyopathy.baseline.excluded186$new_event_number, CTCAE.SERUM.cardiomyopathy.baseline.excluded186$max_grade_prior)
 # 2   3   4
-# 1 214 113  14
-# 2   2  13   1
-# 3   0   2   1
+# 1 262 125   4
 
 table(CTCAE.SERUM.cardiomyopathy.baseline.excluded186$event_number, CTCAE.SERUM.cardiomyopathy.baseline.excluded186$max_grade_prior)
 # 2   3   4
-# 1 111  20   0
-# 2  68  45   3
-# 3  27  34   2
-# 4   8  20   5
-# 5   0   5   2
-# 6   1   1   4
-# 7   1   0   0
-# 8   0   2   0
-# 9   0   1   0
+# 1 207 112   4
+# 2  43  10   0
+# 3   8   1   0
+# 4   3   1   0
+# 5   1   1   0
 
 
 dim(SERUM)

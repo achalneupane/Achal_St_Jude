@@ -1,0 +1,207 @@
+# # Yutaka's email on 04/14/2024:
+# Would it be possible to make Table 1 without restricting to people free from CMP at the first visit?
+# I just want to see the numbers in view of the case-cohort design.
+
+library(dplyr)
+library(tidyr)
+library(haven)
+setwd("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/")
+
+source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/requests_from_collaborators/Yadav/Serum/get_matching_rows_from_CTCAE.R")
+# df <- read.table("Trans-omics CMP profiling Inventory 20230901.txt", header = T)
+# dim(df) # 20174
+
+## add TB from Mathew
+# TB <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/data_from_Matthew/ForAchal_Survivors.txt", header = T, sep = "\t") ## March version
+TB <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/data_from_Matthew/Achal_survivors_04.04.2024.txt", header = T, sep = "\t") ## Updated by Matt in April
+
+df <- TB
+
+df$ageatsample <- floor(df$ageatsample * 10) / 10
+df.original <- df
+df <- df %>%
+  distinct()
+dim(df)  # 20137
+
+## Note: Since we are rounding age down to one decimal place, a 7-days window did not make any difference in terms of the number of rows or samples
+SERUM <- df[grepl("Plasma", df$aliquot_type, ignore.case = T),]
+
+SERUM.original <- SERUM
+dim(SERUM.original)
+# [1] 10383     6
+# 10514  7 ## April version
+
+## I see age at serum sample is <18 yrs. Could you identify the samples among 18
+#or higher only? Everyone needs to be adults at serum sample.
+SERUM <- SERUM[which(SERUM$ageatsample >= 18),]
+
+# remove vial zero
+SERUM <- SERUM[SERUM$num_vials > 0 ,]
+
+
+## 171 cases to keep
+all.wanted.df.1200.to.update <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v11_output//plasma_data_batch1_1200_samples.txt", header = T, sep = "\t")
+keep.171.cases <- all.wanted.df.1200.to.update$sjlid[all.wanted.df.1200.to.update$selection_group == "171_CMP_cases"]
+keep.171.cases <- SERUM[SERUM$sjlid %in% keep.171.cases,]
+SERUM <- SERUM[!SERUM$sjlid %in% keep.171.cases$sjlid,] # exclude 171 cases
+dim(SERUM)
+# 8536    7
+## Now keep only those that have more than one vial and are alive
+SERUM <- SERUM[SERUM$num_vials > 1,]
+SERUM <- rbind.data.frame(SERUM, keep.171.cases)
+dim(SERUM)
+# [1] 7948    6
+
+
+dim(SERUM)
+# 8879
+# 7948    7 ## April 4 version
+
+## Keep max num vials and alive over dead
+SERUM <- SERUM %>%
+  group_by(sjlid, ageatsample) %>%
+  filter(num_vials == max(num_vials)) %>%
+  filter(vitalstatus == "Alive" | all(vitalstatus == "Deceased"))
+
+dim(SERUM)
+# [1] 7934    6
+
+## Also removing samples that have duplicate ageevent in CTCAE data
+# SERUM <- SERUM[!SERUM$sjlid %in% c("SJL1225801", "SJL1265801", "SJL1430801", "SJL4730101", "SJL5134305", "SJL5146506"),]
+dim(SERUM)
+# 7934    6
+## Could you please work on it by merging with the CTCAE grades for cardiomyopathy from the most recent data freeze? Please look at serum and plasma separately.
+# read CTCAE
+# CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
+CTCAE <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
+# CTCAE.original <- CTCAE
+CTCAE <- CTCAE.original
+
+CTCAE <- CTCAE.original[c("sjlid", "studypop", "sjlife_cohort", "gender", "organsys", "condition", "gradedt", "grade", "ageevent")]
+# CTCAE.original.2 <- CTCAE.original[c("sjlid", "studypop", "sjlife_cohort", "gender", "organsys", "condition", "gradedt", "grade", "ageevent")]
+## Since Trans-omics CMP ageatsample is in one decimal, I am coverting CTCAE age also to one decimal place.
+CTCAE$ageevent <- round(CTCAE$ageevent,1)
+
+# # CTCAE.cc <- CTCAE[grepl("SJL0253301|SJL1063101", CTCAE$sjlid),]
+# # Condition 1: Skip samples with grade 2 or higher or minimum ageevent with grade 2 or higher. If there are two ageevent that are miniumum value, we still apply this filter (but this did not make any difference)
+# CTCAE <- CTCAE %>%
+#   group_by(sjlid) %>%
+#   filter(
+#     !(grade[which(ageevent == min(ageevent))[1]] != 0)
+#   ) %>%
+#   ungroup() %>%
+#   arrange(sjlid)
+dim(CTCAE)
+# 9218    9
+# 9218    9
+
+# V10 & V11
+# 9218    9
+
+CTCAE <- CTCAE[CTCAE$sjlid %in% unique(SERUM$sjlid),]
+dim(CTCAE)
+# v12 7148
+
+# CTCAE <- get_rows_with_smaller_sample_age(CTCAE, SERUM, 0)
+CTCAE <- get_rows_with_smaller_sample_age.all(CTCAE, SERUM, 7)
+dim(CTCAE)
+# V12
+dim(CTCAE)
+# 8090   13
+
+## Add event number
+CTCAE <- CTCAE %>%
+  dplyr::group_by(sjlid) %>%
+  dplyr::arrange(ageevent) %>%
+  dplyr::mutate(event_number = row_number()) %>%
+  dplyr::ungroup() %>%
+  dplyr::arrange(sjlid)  # Restore the original order
+
+## first event should have sample
+CTCAE <- CTCAE[!(CTCAE$grade == 0 & is.na(CTCAE$Sample_age)),]
+CTCAE <- CTCAE[CTCAE$grade != -9,]
+
+
+## Remove rows once grades 2 or higher are seen in ordered df by sjlid and event_number
+CTCAE <- filter_rows_by_condition(CTCAE, "sjlid", "grade")
+sum(CTCAE$grade !=0 & CTCAE$event_number==1)
+table(CTCAE$grade)
+## V12
+# 0    2    3    5 
+# 4540  200   53    1 
+
+CTCAE.2 <- CTCAE
+
+
+## Add event number
+CTCAE.2 <- CTCAE.2 %>%
+  dplyr::group_by(sjlid) %>%
+  dplyr::arrange(ageevent) %>%
+  dplyr::mutate(new_event_number = row_number()) %>%
+  dplyr::ungroup() %>%
+  dplyr::arrange(sjlid)  # Restore the original order
+
+# # SJL5553107
+# # Skip samples with grade 2 or higher or minimum ageevent with grade 2 or higher
+# CTCAE.2 <- CTCAE.2 %>%
+#   dplyr::group_by(sjlid) %>%
+#   dplyr::filter(
+#     !(grade[which(ageevent == min(ageevent))[1]] != 0)
+#   ) %>%
+#   dplyr::ungroup()
+
+
+## Add event number
+CTCAE.2 <- CTCAE.2 %>%
+  dplyr::group_by(sjlid) %>%
+  dplyr::arrange(ageevent) %>%
+  dplyr::mutate(new_event_number = row_number()) %>%
+  dplyr::ungroup() %>%
+  dplyr::arrange(sjlid)  # Restore the original order
+
+
+CTCAE.2$grade_2_or_higher <- ifelse(CTCAE.2$grade >= 2, "grade_2_or_higher", "grade_0")
+table(CTCAE.2$event_number,CTCAE.2$grade)
+## V12
+# 0    2    3    5
+# 1 2549    0    0    0
+# 2 1286   72   22    0
+# 3  508   49    9    0
+# 4  151   19    7    1
+# 5   29    4    1    0
+# 6   11    0    1    0
+# 7    5    1    0    0
+# 8    1    0    0    0
+
+table(CTCAE.2$event_number,CTCAE.2$grade_2_or_higher)
+## V12
+# grade_0 grade_2_or_higher
+# 1    2549                 0
+# 2    1286                94
+# 3     508                58
+# 4     151                27
+# 5      29                 5
+# 6      11                 1
+# 7       5                 1
+# 8       1                 0
+
+table(CTCAE.2$new_event_number,CTCAE.2$grade)
+## V12
+# 0    2    3    5
+# 1 3173    0    0    0
+# 2 1038   92   28    0
+# 3  275   42   10    1
+# 4   52   10    2    0
+# 5    2    1    0    0
+
+table(CTCAE.2$new_event_number,CTCAE.2$grade_2_or_higher)
+## V12
+# grade_0 grade_2_or_higher
+# 1    3173                 0
+# 2    1038               120
+# 3     275                53
+# 4      52                12
+# 5       2                 1
+
+
+

@@ -11,7 +11,14 @@ PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">0-<18
 PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">=18-<30"] <- ">0-<30"
 PHENO.ANY_SN$maxsegrtdose.category <- factor(PHENO.ANY_SN$maxsegrtdose.category, levels = c("None", ">0-<30", ">=30"))
 
+## Admixture classification
+admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA/SJLIFE_4481_Admixture_PCA_ethnicity.csv", sep = "\t", header = T)
+EUR.admix <- admixture$INDIVIDUAL[admixture$EUR > 0.8]
+AFR.admix <- admixture$INDIVIDUAL[admixture$AFR > 0.6]
 
+PHENO.ANY_SN$admixture <- NA
+PHENO.ANY_SN$admixture [PHENO.ANY_SN$sjlid %in% EUR.admix] <- "EUR"
+PHENO.ANY_SN$admixture [PHENO.ANY_SN$sjlid %in% AFR.admix] <- "AFR"
 ######################################
 ## Attributable fraction of Any SNs ##
 ######################################
@@ -43,6 +50,10 @@ N_all.female = sum(dat_all$pred_all[dat_all$gender == "Female"], na.rm = TRUE) #
 # median(dat_all$AGE_AT_LAST_CONTACT.cs1)
 N_all.lt.35 = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 < 35], na.rm = TRUE) # subset by age 35
 N_all.gteq.35 = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.rm = TRUE) # subset by age 35
+## Subset by ancestry
+N_all.EUR = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 < 35], na.rm = TRUE) # subset by age 35
+N_all.AFR = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.rm = TRUE) # subset by age 35
+
 
 
 #############
