@@ -51,9 +51,8 @@ N_all.female = sum(dat_all$pred_all[dat_all$gender == "Female"], na.rm = TRUE) #
 N_all.lt.35 = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 < 35], na.rm = TRUE) # subset by age 35
 N_all.gteq.35 = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.rm = TRUE) # subset by age 35
 ## Subset by ancestry
-N_all.EUR = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 < 35], na.rm = TRUE) # subset by age 35
-N_all.AFR = sum(dat_all$pred_all[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.rm = TRUE) # subset by age 35
-
+N_all.EUR = sum(dat_all$pred_all[dat_all$admixture == "EUR"], na.rm = TRUE) # subset by ancestry
+N_all.AFR = sum(dat_all$pred_all[dat_all$admixture == "AFR"], na.rm = TRUE) # subset by ancestry
 
 
 #############
@@ -98,6 +97,20 @@ N_no_tx = sum(dat_all$pred_no_tx[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.rm =
 af_by_tx.gteq.35 = (N_all.gteq.35 - N_no_tx) / N_all.gteq.35
 af_by_tx.gteq.35 <- round(af_by_tx.gteq.35,3)
 af_by_tx.gteq.35
+
+
+## EUR
+N_no_tx = sum(dat_all$pred_no_tx[dat_all$admixture == "EUR"], na.rm = TRUE)
+af_by_tx.EUR = (N_all.EUR - N_no_tx) / N_all.EUR
+af_by_tx.EUR <- round(af_by_tx.EUR,3)
+af_by_tx.EUR
+
+## AFR
+N_no_tx = sum(dat_all$pred_no_tx[dat_all$admixture == "AFR"], na.rm = TRUE)
+af_by_tx.AFR = (N_all.AFR - N_no_tx) / N_all.AFR
+af_by_tx.AFR <- round(af_by_tx.AFR,3)
+af_by_tx.AFR
+
 
 #############
 ## RT only ##
@@ -146,6 +159,19 @@ af_by_rt.gteq.35 = (N_all.gteq.35 - N_no_rt) / N_all.gteq.35
 af_by_rt.gteq.35 <- round(af_by_rt.gteq.35,3)
 af_by_rt.gteq.35
 
+
+## EUR
+N_no_rt = sum(dat_all$pred_no_rt[dat_all$admixture == "EUR"], na.rm = TRUE)
+af_by_rt.EUR = (N_all.EUR - N_no_rt) / N_all.EUR
+af_by_rt.EUR <- round(af_by_rt.EUR,3)
+af_by_rt.EUR
+
+## AFR
+N_no_rt = sum(dat_all$pred_no_rt[dat_all$admixture == "AFR"], na.rm = TRUE)
+af_by_rt.AFR = (N_all.AFR - N_no_rt) / N_all.AFR
+af_by_rt.AFR <- round(af_by_rt.AFR,3)
+af_by_rt.AFR
+
 ######################
 ## Treatment and RT ##
 ######################
@@ -193,6 +219,19 @@ N_no_tx.rt = sum(dat_all$pred_no_tx.rt[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], n
 af_by_tx.rt.gteq.35 = (N_all.gteq.35 - N_no_tx.rt) / N_all.gteq.35
 af_by_tx.rt.gteq.35 <- round(af_by_tx.rt.gteq.35,3)
 af_by_tx.rt.gteq.35
+
+## EUR
+N_no_tx.rt = sum(dat_all$pred_no_tx.rt[dat_all$admixture == "EUR"], na.rm = TRUE)
+af_by_tx.rt.EUR = (N_all.EUR - N_no_tx.rt) / N_all.EUR
+af_by_tx.rt.EUR <- round(af_by_tx.rt.EUR,3)
+af_by_tx.rt.EUR
+
+## AFR
+N_no_tx.rt = sum(dat_all$pred_no_tx.rt[dat_all$admixture == "AFR"], na.rm = TRUE)
+af_by_tx.rt.AFR = (N_all.AFR - N_no_tx.rt) / N_all.AFR
+af_by_tx.rt.AFR <- round(af_by_tx.rt.AFR,3)
+af_by_tx.rt.AFR
+
 #########
 ## PRS ##
 #########
@@ -230,6 +269,20 @@ N_no_prs = sum(dat_all$pred_no_prs[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.rm
 af_by_prs.gteq.35 = (N_all.gteq.35 - N_no_prs) / N_all.gteq.35
 af_by_prs.gteq.35 <- round(af_by_prs.gteq.35,3)
 af_by_prs.gteq.35
+
+## EUR
+N_no_prs = sum(dat_all$pred_no_prs[dat_all$admixture == "EUR"], na.rm = TRUE)
+af_by_prs.EUR = (N_all.EUR - N_no_prs) / N_all.EUR
+af_by_prs.EUR <- round(af_by_prs.EUR,3)
+af_by_prs.EUR
+
+## AFR
+N_no_prs = sum(dat_all$pred_no_prs[dat_all$admixture == "AFR"], na.rm = TRUE)
+af_by_prs.AFR = (N_all.AFR - N_no_prs) / N_all.AFR
+af_by_prs.AFR <- round(af_by_prs.AFR,3)
+af_by_prs.AFR
+
+
 ###############
 ## Lifestyle ##
 ###############
@@ -246,6 +299,12 @@ af_by_no_favorable_lifestyle.category.lt.35 <- "-"
 
 ## >= 35
 af_by_no_favorable_lifestyle.category.gteq.35 <- "-"
+
+## EUR
+af_by_no_favorable_lifestyle.category.EUR <- "-"
+
+## AFR
+af_by_no_favorable_lifestyle.category.AFR <- "-"
 
 #################################################
 ## Treatment, Genetics and Lifestyle, combined ##
@@ -299,6 +358,19 @@ af_by_combined.gteq.35 <- round(af_by_combined.gteq.35,3)
 af_by_combined.gteq.35
 
 
+## Male
+N_no_combined = sum(dat_all$pred_no_combined[dat_all$admixture == "EUR"], na.rm = TRUE)
+af_by_combined.EUR = (N_all.EUR - N_no_combined) / N_all.EUR
+af_by_combined.EUR <- round(af_by_combined.EUR,3)
+af_by_combined.EUR
+
+## Female
+N_no_combined = sum(dat_all$pred_no_combined[dat_all$admixture == "AFR"], na.rm = TRUE)
+af_by_combined.AFR = (N_all.AFR - N_no_combined) / N_all.AFR
+af_by_combined.AFR <- round(af_by_combined.AFR,3)
+af_by_combined.AFR
+
+
 
 SN.res <- data.frame(
   Variable = c("Radiation", "Chemo", "All treatments", "PRS", "Lifestyle", "Combined"),
@@ -306,7 +378,9 @@ SN.res <- data.frame(
   Female = c(af_by_rt.female, af_by_tx.female, af_by_tx.rt.female, af_by_prs.female, af_by_no_favorable_lifestyle.category.female, af_by_combined.female),
   Male = c(af_by_rt.male, af_by_tx.male, af_by_tx.rt.male, af_by_prs.male, af_by_no_favorable_lifestyle.category.male, af_by_combined.male),
   age.lt35 = c(af_by_rt.lt.35, af_by_tx.lt.35, af_by_tx.rt.lt.35, af_by_prs.lt.35, af_by_no_favorable_lifestyle.category.lt.35, af_by_combined.lt.35),
-  age.gteq = c(af_by_rt.gteq.35, af_by_tx.gteq.35, af_by_tx.rt.gteq.35, af_by_prs.gteq.35, af_by_no_favorable_lifestyle.category.gteq.35, af_by_combined.gteq.35)
+  age.gteq = c(af_by_rt.gteq.35, af_by_tx.gteq.35, af_by_tx.rt.gteq.35, af_by_prs.gteq.35, af_by_no_favorable_lifestyle.category.gteq.35, af_by_combined.gteq.35),
+  EUR = c(af_by_rt.EUR, af_by_tx.EUR, af_by_tx.rt.EUR, af_by_prs.EUR, af_by_no_favorable_lifestyle.category.EUR, af_by_combined.EUR),
+  AFR = c(af_by_rt.AFR, af_by_tx.AFR, af_by_tx.rt.AFR, af_by_prs.AFR, af_by_no_favorable_lifestyle.category.AFR, af_by_combined.AFR)
 )
 
 
