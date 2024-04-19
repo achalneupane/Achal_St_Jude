@@ -104,3 +104,65 @@ find . -type f -name '*model_fit*' -exec sed -i 's/dat_tx.prs.lifestyle\$Physica
 find . -type f -name '*model_fit*' -exec sed -i 's/dat_tx.prs.lifestyle\$RiskyHeavyDrink_yn = "No"/dat_tx.prs.lifestyle\$RiskyHeavyDrink_yn [!grepl("Unknown", dat_tx.prs.lifestyle\$RiskyHeavyDrink_yn)] = "No"/g' {} \;
 find . -type f -name '*model_fit*' -exec sed -i 's/dat_tx.prs.lifestyle\$HEALTHY_Diet_yn = "Yes"/dat_tx.prs.lifestyle\$HEALTHY_Diet_yn [!grepl("Unknown", dat_tx.prs.lifestyle\$HEALTHY_Diet_yn)] = "Yes"/g' {} \;
 find . -type f -name '*model_fit*' -exec sed -i 's/dat_tx.prs.lifestyle\$Obese_yn = "No"/dat_tx.prs.lifestyle\$Obese_yn [!grepl("Unknown", dat_tx.prs.lifestyle\$Obese_yn)] = "No"/g' {} \;
+
+#########################################################
+## Replace 18b to add startified analysis for ancestry ##
+#########################################################
+# the final files will be saved as V19b
+In these files:
+find . -type f -name '*model_fit*', 
+after this:
+'^af_by_no_favorable_lifestyle.category.gteq.35$'
+
+add the following lines:
+
+'## EUR
+N_no_favorable_lifestyle.category = sum(dat_all$admixture == "EUR"], na.rm = TRUE)
+af_by_no_favorable_lifestyle.category.EUR = (N_all.EUR - N_no_favorable_lifestyle.category) / N_all.EUR
+af_by_no_favorable_lifestyle.category.EUR <- round(af_by_no_favorable_lifestyle.category.EUR,3)
+af_by_no_favorable_lifestyle.category.EUR
+
+## AFR
+N_no_favorable_lifestyle.category = sum(dat_all$admixture == "AFR"], na.rm = TRUE)
+af_by_no_favorable_lifestyle.category.AFR = (N_all.AFR - N_no_favorable_lifestyle.category) / N_all.AFR
+af_by_no_favorable_lifestyle.category.AFR <- round(af_by_no_favorable_lifestyle.category.AFR,3)
+af_by_no_favorable_lifestyle.category.AFR'
+
+
+
+
+
+
+## Add EUR and AFR variables
+find . -type f -name '*model_fit*' -exec sed -i '/^filtered_cc[[:space:]]*$/a \\n## Admixture classification\nadmixture <- read.table("Z:\/ResearchHome\/Groups\/sapkogrp\/projects\/Genomics\/common\/\/sjlife\/MERGED_SJLIFE_1_2\/MERGED_SJLIFE_PLINK_PER_CHR\/PCA\/SJLIFE_4481_Admixture_PCA_ethnicity.csv", sep = "\\t", header = T)\nEUR.admix <- admixture$INDIVIDUAL[admixture$EUR > 0.8]\nAFR.admix <- admixture$INDIVIDUAL[admixture$AFR > 0.6]\n\nPHENO.ANY_SN$admixture <- NA\nPHENO.ANY_SN$admixture [PHENO.ANY_SN$sjlid %in% EUR.admix] <- "EUR"\nPHENO.ANY_SN$admixture [PHENO.ANY_SN$sjlid %in% AFR.admix] <- "AFR"' {} +
+
+## add subset groups
+find . -type f -name '*model_fit*' -exec sed -i '/N_all.gteq.35 = sum(dat_all$pred_all\[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35\], na.rm = TRUE) # subset by age 35/ a\## Subset by ancestry\nN_all.EUR = sum(dat_all$pred_all\[dat_all$admixture == "EUR"\], na.rm = TRUE) # subset by ancestry\nN_all.AFR = sum(dat_all$pred_all\[dat_all$admixture == "AFR"\], na.rm = TRUE) # subset by ancestry' {} +
+
+## ADD for Tx
+find . -type f -name '*model_fit*' -exec sed -i '/^[[:space:]]*af_by_tx\.gteq\.35[[:space:]]*$/a \\n## EUR\nN_no_tx = sum(dat_all$pred_no_tx[dat_all$admixture == "EUR"], na.rm = TRUE)\naf_by_tx.EUR = (N_all.EUR - N_no_tx) / N_all.EUR\naf_by_tx.EUR <- round(af_by_tx.EUR,3)\naf_by_tx.EUR\n\n## AFR\nN_no_tx = sum(dat_all$pred_no_tx[dat_all$admixture == "AFR"], na.rm = TRUE)\naf_by_tx.AFR = (N_all.AFR - N_no_tx) / N_all.AFR\naf_by_tx.AFR <- round(af_by_tx.AFR,3)\naf_by_tx.AFR' {} +
+
+
+## Add for rt
+find . -type f -name '*model_fit*' -exec sed -i '/^[[:space:]]*af_by_rt\.gteq\.35[[:space:]]*$/a \\n## EUR\nN_no_rt = sum(dat_all$pred_no_rt[dat_all$admixture == "EUR"], na.rm = TRUE)\naf_by_rt.EUR = (N_all.EUR - N_no_rt) / N_all.EUR\naf_by_rt.EUR <- round(af_by_rt.EUR,3)\naf_by_rt.EUR\n\n## AFR\nN_no_rt = sum(dat_all$pred_no_rt[dat_all$admixture == "AFR"], na.rm = TRUE)\naf_by_rt.AFR = (N_all.AFR - N_no_rt) / N_all.AFR\naf_by_rt.AFR <- round(af_by_rt.AFR,3)\naf_by_rt.AFR' {} +
+
+## Add for tx and rt
+find . -type f -name '*model_fit*' -exec sed -i '/^[[:space:]]*af_by_tx\.rt\.gteq\.35[[:space:]]*$/a \\n## EUR\nN_no_tx.rt = sum(dat_all$pred_no_tx.rt[dat_all$admixture == "EUR"], na.rm = TRUE)\naf_by_tx.rt.EUR = (N_all.EUR - N_no_tx.rt) / N_all.EUR\naf_by_tx.rt.EUR <- round(af_by_tx.rt.EUR,3)\naf_by_tx.rt.EUR\n\n## AFR\nN_no_tx.rt = sum(dat_all$pred_no_tx.rt[dat_all$admixture == "AFR"], na.rm = TRUE)\naf_by_tx.rt.AFR = (N_all.AFR - N_no_tx.rt) / N_all.AFR\naf_by_tx.rt.AFR <- round(af_by_tx.rt.AFR,3)\naf_by_tx.rt.AFR' {} +
+
+## Add for PRS
+find . -type f -name '*model_fit*' -exec sed -i '/^[[:space:]]*af_by_prs\.gteq\.35[[:space:]]*$/a \\n## EUR\nN_no_prs = sum(dat_all$pred_no_prs[dat_all$admixture == "EUR"], na.rm = TRUE)\naf_by_prs.EUR = (N_all.EUR - N_no_prs) / N_all.EUR\naf_by_prs.EUR <- round(af_by_prs.EUR,3)\naf_by_prs.EUR\n\n## AFR\nN_no_prs = sum(dat_all$pred_no_prs[dat_all$admixture == "AFR"], na.rm = TRUE)\naf_by_prs.AFR = (N_all.AFR - N_no_prs) / N_all.AFR\naf_by_prs.AFR <- round(af_by_prs.AFR,3)\naf_by_prs.AFR' {} +
+
+
+## Add for combined
+find . -type f -name '*model_fit*' -exec sed -i '/^[[:space:]]*af_by_combined\.gteq\.35[[:space:]]*$/a \\n## EUR\nN_no_combined = sum(dat_all$pred_no_combined[dat_all$admixture == "EUR"], na.rm = TRUE)\naf_by_combined.EUR = (N_all.EUR - N_no_combined) / N_all.EUR\naf_by_combined.EUR <- round(af_by_combined.EUR,3)\naf_by_combined.EUR\n\n## AFR\nN_no_combined = sum(dat_all$pred_no_combined[dat_all$admixture == "AFR"], na.rm = TRUE)\naf_by_combined.AFR = (N_all.AFR - N_no_combined) / N_all.AFR\naf_by_combined.AFR <- round(af_by_combined.AFR,3)\naf_by_combined.AFR' {} +
+
+
+## Add lifestyle if no lifestle
+find . -type f -name '*model_fit*' -exec sed -i '/^af_by_no_favorable_lifestyle\.category\.gteq\.35 <- "-"/a \\n## EUR\naf_by_no_favorable_lifestyle.category.EUR <- "-"\n\n## AFR\naf_by_no_favorable_lifestyle.category.AFR <- "-"' {} +
+
+## ADD lifestyle if lifestles
+find . -type f -name '*model_fit*' -exec sed -i '/^[[:space:]]*af_by_no_favorable_lifestyle\.category\.gteq\.35[[:space:]]*$/a \\n## EUR\nN_no_favorable_lifestyle.category = sum(dat_all$admixture == "EUR", na.rm = TRUE)\naf_by_no_favorable_lifestyle.category.EUR = (N_all.EUR - N_no_favorable_lifestyle.category) / N_all.EUR\naf_by_no_favorable_lifestyle.category.EUR <- round(af_by_no_favorable_lifestyle.category.EUR,3)\naf_by_no_favorable_lifestyle.category.EUR\n\n## AFR\nN_no_favorable_lifestyle.category = sum(dat_all$admixture == "AFR", na.rm = TRUE)\naf_by_no_favorable_lifestyle.category.AFR = (N_all.AFR - N_no_favorable_lifestyle.category) / N_all.AFR\naf_by_no_favorable_lifestyle.category.AFR <- round(af_by_no_favorable_lifestyle.category.AFR,3)\naf_by_no_favorable_lifestyle.category.AFR' {} +
+
+
+## add EUR and AFR to final result line
+find . -type f -name '*model_fit*' -exec sed -i 's/age\.gteq = c(af_by_rt\.gteq\.35, af_by_tx\.gteq\.35, af_by_tx\.rt\.gteq\.35, af_by_prs\.gteq\.35, af_by_no_favorable_lifestyle\.category\.gteq\.35, af_by_combined\.gteq\.35)/age.gteq = c(af_by_rt.gteq.35, af_by_tx.gteq.35, af_by_tx.rt.gteq.35, af_by_prs.gteq.35, af_by_no_favorable_lifestyle.category.gteq.35, af_by_combined.gteq.35),\n  EUR = c(af_by_rt.EUR, af_by_tx.EUR, af_by_tx.rt.EUR, af_by_prs.EUR, af_by_no_favorable_lifestyle.category.EUR, af_by_combined.EUR),\n  AFR = c(af_by_rt.AFR, af_by_tx.AFR, af_by_tx.rt.AFR, af_by_prs.AFR, af_by_no_favorable_lifestyle.category.AFR, af_by_combined.AFR)/' {} +

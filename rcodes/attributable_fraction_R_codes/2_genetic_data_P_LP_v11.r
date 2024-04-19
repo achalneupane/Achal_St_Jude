@@ -252,4 +252,4 @@ final.genetic.data <- cbind.data.frame(hallmark.of.cancer.carriers, All.P.LP.car
 PHENO.ANY_SN.with.genetic.data <- cbind.data.frame(PHENO.ANY_SN, final.genetic.data[match(PHENO.ANY_SN$sjlid, final.genetic.data$IID), -1])
 
 ## Save RDS
-saveRDS(PHENO.ANY_SN.with.genetic.data, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/2_genetic_data_P_LP.rds")
+# saveRDS(PHENO.ANY_SN.with.genetic.data, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/2_genetic_data_P_LP.rds")

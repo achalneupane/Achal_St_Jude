@@ -161,7 +161,7 @@ p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) 
   geom_text(
     data = data_melted %>% filter(!is.na(new_value)),
     aes(label = new_value, y = new_value),  # Adjust y position
-    position = position_dodge(width = 0.3),
+    position = position_dodge(width = 0.4),
     vjust = -0.20,  # Adjust vertical justification
     hjust = 0.5,  # Center text horizontally
     size = 5.5,
@@ -176,10 +176,12 @@ p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title =
 
 p
 # Save the plot as a high-resolution image
-plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/overall/", group, "_", AF.type, "_", lifestyle, ".tiff")
+plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/overall/", group, "_", AF.type, "_", lifestyle, ".tiff")
 
 ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
 }
+
+
 
 ################################
 ## PRS and treatment together ##
@@ -256,7 +258,7 @@ p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title =
 p
 
 # Save the plot as a high-resolution image
-plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/overall/", group, "_", AF.type,"_", lifestyle, ".tiff")
+plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/overall/", group, "_", AF.type,"_", lifestyle, ".tiff")
 
 ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
 
@@ -336,7 +338,7 @@ p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title =
 p
 
 # Save the plot as a high-resolution image
-plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/overall/", group, "_", AF.type,"_", lifestyle, ".tiff")
+plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/overall/", group, "_", AF.type,"_", lifestyle, ".tiff")
 
 ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
 
@@ -403,7 +405,7 @@ for(i in 1:length(variables)){
     geom_text(
       data = data_melted,
       aes(label = new_value, y = new_value),  # Adjust y position
-      position = position_dodge(width = 0.3),
+      position = position_dodge(width = 0.4),
       vjust = -0.20,  # Adjust vertical justification
       hjust = 0.5,  # Center text horizontally
       size = 5.5,
@@ -418,7 +420,7 @@ for(i in 1:length(variables)){
   
   p
   # Save the plot as a high-resolution image
-  plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/female/", group, "_", AF.type, "_", lifestyle, ".tiff")
+  plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/female/", group, "_", AF.type, "_", lifestyle, ".tiff")
   
   ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
 }
@@ -500,7 +502,7 @@ p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title =
 p
 
 # Save the plot as a high-resolution image
-plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/female/", group, "_", AF.type,"_", lifestyle, ".tiff")
+plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/female/", group, "_", AF.type,"_", lifestyle, ".tiff")
 
 ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
 
@@ -579,7 +581,7 @@ p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title =
 
 p
 # Save the plot as a high-resolution image
-plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/female/", group, "_", AF.type,"_", lifestyle, ".tiff")
+plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/female/", group, "_", AF.type,"_", lifestyle, ".tiff")
 
 ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
 
@@ -650,7 +652,7 @@ for(i in 1:length(variables)){
     geom_text(
       data = data_melted,
       aes(label = new_value, y = new_value),  # Adjust y position
-      position = position_dodge(width = 0.3),
+      position = position_dodge(width = 0.4),
       vjust = -0.20,  # Adjust vertical justification
       hjust = 0.5,  # Center text horizontally
       size = 5.5,
@@ -665,7 +667,7 @@ for(i in 1:length(variables)){
   
   p
   # Save the plot as a high-resolution image
-  plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/male/", group, "_", AF.type, "_", lifestyle, ".tiff")
+  plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/male/", group, "_", AF.type, "_", lifestyle, ".tiff")
   
   ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
 }
@@ -747,7 +749,7 @@ p
 p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
 p
 # Save the plot as a high-resolution image
-plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/male/", group, "_", AF.type,"_", lifestyle, ".tiff")
+plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/male/", group, "_", AF.type,"_", lifestyle, ".tiff")
 
 ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
 
@@ -826,7 +828,7 @@ p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title =
 
 p
 # Save the plot as a high-resolution image
-plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/male/", group, "_", AF.type,"_", lifestyle, ".tiff")
+plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/male/", group, "_", AF.type,"_", lifestyle, ".tiff")
 
 ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
 
@@ -892,7 +894,7 @@ for(i in 1:length(variables)){
     geom_text(
       data = data_melted,
       aes(label = new_value, y = new_value),  # Adjust y position
-      position = position_dodge(width = 0.3),
+      position = position_dodge(width = 0.4),
       vjust = -0.20,  # Adjust vertical justification
       hjust = 0.5,  # Center text horizontally
       size = 5.5,
@@ -907,7 +909,7 @@ for(i in 1:length(variables)){
   
   p
   # Save the plot as a high-resolution image
-  plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/lt35/", group, "_", AF.type, "_", lifestyle, ".tiff")
+  plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/lt35/", group, "_", AF.type, "_", lifestyle, ".tiff")
   
   ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
 }
@@ -987,7 +989,7 @@ p
 p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
 p
 # Save the plot as a high-resolution image
-plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/lt35/", group, "_", AF.type,"_", lifestyle, ".tiff")
+plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/lt35/", group, "_", AF.type,"_", lifestyle, ".tiff")
 
 ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
 
@@ -1066,7 +1068,7 @@ p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title =
 
 p
 # Save the plot as a high-resolution image
-plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/lt35/", group, "_", AF.type,"_", lifestyle, ".tiff")
+plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/lt35/", group, "_", AF.type,"_", lifestyle, ".tiff")
 
 ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
 
@@ -1132,7 +1134,7 @@ for(i in 1:length(variables)){
     geom_text(
       data = data_melted,
       aes(label = new_value, y = new_value),  # Adjust y position
-      position = position_dodge(width = 0.3),
+      position = position_dodge(width = 0.4),
       vjust = -0.20,  # Adjust vertical justification
       hjust = 0.5,  # Center text horizontally
       size = 5.5,
@@ -1147,7 +1149,7 @@ for(i in 1:length(variables)){
   
   p
   # Save the plot as a high-resolution image
-  plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/ge35/", group, "_", AF.type, "_", lifestyle, ".tiff")
+  plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/ge35/", group, "_", AF.type, "_", lifestyle, ".tiff")
   
   ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
 }
@@ -1227,7 +1229,7 @@ p
 p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
 p
 # Save the plot as a high-resolution image
-plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/ge35/", group, "_", AF.type,"_", lifestyle, ".tiff")
+plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/ge35/", group, "_", AF.type,"_", lifestyle, ".tiff")
 
 ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
 
@@ -1306,6 +1308,6 @@ p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title =
 
 p
 # Save the plot as a high-resolution image
-plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v18b/ge35/", group, "_", AF.type,"_", lifestyle, ".tiff")
+plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/ge35/", group, "_", AF.type,"_", lifestyle, ".tiff")
 
 ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")

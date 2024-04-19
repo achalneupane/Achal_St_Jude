@@ -181,6 +181,37 @@ plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/at
 ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
 }
 
+
+## Get radial plot
+data_melted <- data[grepl("Combined", data$Variables), c("Cohort", "SN_types", "Variables", group)]
+colnames(data_melted) <- c("variable", "SN_types", "AF_by", "value")
+data_melted$value <- as.numeric(data_melted$value); data_melted <- data_melted[complete.cases(data_melted),]
+data_melted$variable <- factor(data_melted$variable, levels = c("SJLIFE", "CCSS"))
+data_melted$new_value <- round(data_melted$value,2)*100
+
+library(geomtextpath)
+ggplot(data_melted, aes(x = SN_types, y = new_value, 
+                        fill = variable, label = new_value)) +
+  geom_col(position = position_dodge(width = 0.9)) +
+  geom_vline(xintercept = seq(1.5, 19.5, by = 3), linetype = "dashed") +
+  geom_textpath(position = position_dodge(width = 1), vjust = 1, size = 5) + 
+  # scale_fill_manual(values = c('deepskyblue4', 'orangered'),
+  scale_fill_manual(values = c('#1E90FF', '#FF6347'),
+                    labels = c("SJLIFE", "CCSS")) + 
+  scale_y_continuous(breaks = seq(0, 100, by = 10)) + 
+  coord_curvedpolar() +
+  theme_minimal() +
+  theme(panel.grid.major.y = element_line(color = "gray", linetype = "dotted"), 
+        panel.grid.minor = element_blank(),
+        axis.line = element_blank(),  
+        axis.text = element_text(size = 14, color = "black"), 
+        axis.title = element_text(size = 14, color = "black"), 
+        legend.title = element_text(size = 14, color = "black"), 
+        legend.text = element_text(size = 12, color = "black")) + 
+  labs(x = NULL, y = "Attributable fraction (%)", fill = "Cohort")
+
+
+
 ################################
 ## PRS and treatment together ##
 ################################
