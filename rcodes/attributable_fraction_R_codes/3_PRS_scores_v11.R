@@ -1,3 +1,4 @@
+rm(list=ls())
 ####################################################
 ## Read Phenotype data from 2_genetic_data_P_LP.r ##
 ####################################################
@@ -51,7 +52,8 @@ THYROID <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/
 PHENO.ANY_SN$Thyroid_PRS <-  THYROID$SCORE [match(PHENO.ANY_SN$sjlid, THYROID$IID)]
 
 ## NMSCs
-BASALcell <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/prs_out/Basal_cell_carcinoma_PRSWeb_prs.profile", header = T)
+# BASALcell <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/prs_out/Basal_cell_carcinoma_PRSWeb_prs.profile", header = T)
+BASALcell <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/prs_out/Basal_cell_carcinoma_PGS000119_prs.profile", header = T)
 PHENO.ANY_SN$BASALcell_PRS <-  BASALcell$SCORE [match(PHENO.ANY_SN$sjlid, BASALcell$IID)]
 
 
@@ -123,6 +125,21 @@ PHENO.ANY_SN$tmp.tert.category <- as.character(cut(PHENO.ANY_SN[,PRS.to.categori
 PHENO.ANY_SN$tmp.tert.category <- factor(PHENO.ANY_SN$tmp.tert.category, levels = c("1st", "2nd", "3rd"))
 colnames(PHENO.ANY_SN)[colnames(PHENO.ANY_SN) == "tmp.tert.category"] <- paste0(PRS.to.categorize[i], ".decile.category")
 }
+
+
+
+
+
+## PRS Z-scores
+## Breaks are not unique for Meningioma_Dobbins_PRS
+for(i in 1:length(PRS.to.categorize)){
+  print (i)
+  PRS.var <- as.numeric(unlist(PHENO.ANY_SN[PRS.to.categorize[[i]]]))
+  # PHENO.ANY_SN$tmp.prs.z <- (PRS.var-mean(PRS.var, na.rm=TRUE))/sd(PRS.var, na.rm=TRUE)
+  PHENO.ANY_SN$tmp.prs.z <- as.numeric(scale(PRS.var, scale = TRUE, center = TRUE))
+  colnames(PHENO.ANY_SN)[colnames(PHENO.ANY_SN) == "tmp.prs.z"] <- paste0(PRS.to.categorize[i], ".Zscore")
+}
+
 
 
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores_categories_v11.RDATA")
