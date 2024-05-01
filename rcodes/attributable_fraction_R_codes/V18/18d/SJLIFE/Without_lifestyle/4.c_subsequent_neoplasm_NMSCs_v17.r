@@ -232,15 +232,16 @@ SNs_py$PY <- SNs_py$end-SNs_py$start
 
 ###############
 ###############
-PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.category", "BASALcell_PRS.tertile.category", 
-                         "Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category", "Thyroid_PRS.tertile.category",
-                         "Meningioma_PRS.tertile.category", "Sarcoma_Machiela_PRS.tertile.category",
-                         "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4",
-                         "AGE_AT_DIAGNOSIS", "gender", 
-                         "maxsegrtdose.category", "maxneckrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category",
-                         "maxpelvisrtdose.category", "epitxn_dose_5.category", "anthra_jco_dose_5.category", "aa_class_dose_5.category",
-                         "EAS", "AFR", 
-                         "PY","evt1", "end")]
+PHENO.ANY_SN <- SNs_py
+# PHENO.ANY_SN <- SNs_py[c("sjlid", "event", "Pleiotropy_PRSWEB_PRS.tertile.category", "BASALcell_PRS.tertile.category", 
+#                          "Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category", "Thyroid_PRS.tertile.category",
+#                          "Meningioma_PRS.tertile.category", "Sarcoma_Machiela_PRS.tertile.category",
+#                          "AGE_AT_LAST_CONTACT.cs1", "AGE_AT_LAST_CONTACT.cs2", "AGE_AT_LAST_CONTACT.cs3", "AGE_AT_LAST_CONTACT.cs4",
+#                          "AGE_AT_DIAGNOSIS", "gender", 
+#                          "maxsegrtdose.category", "maxneckrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category",
+#                          "maxpelvisrtdose.category", "epitxn_dose_5.category", "anthra_jco_dose_5.category", "aa_class_dose_5.category",
+#                          "EAS", "AFR", 
+#                          "PY","evt1", "end")]
 
 
 

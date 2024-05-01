@@ -6,92 +6,92 @@ library(dplyr)
 
 
 
-## V18 b
+## V19 b (Without lifestyle)
 data <- read.table(text="Cohort	SN_types	Variables	Overall	Female	Male	Age.lt.35	Age.ge.35
-SJLIFE	Any SN (605)	Radiation	0.425	0.417	0.435	0.400	0.447
-SJLIFE	Any SN (605)	Chemo	0.080	0.079	0.080	0.109	0.054
-SJLIFE	Any SN (605)	All_treatments	0.469	0.462	0.478	0.463	0.474
-SJLIFE	Any SN (605)	PRS	0.125	0.123	0.129	0.126	0.125
-SJLIFE	Any SN (605)	Lifestyle	-	-	-	-	-
-SJLIFE	Any SN (605)	Combined	0.536	0.530	0.545	0.531	0.541
-SJLIFE	SMN (462)	Radiation	0.372	0.371	0.373	0.340	0.396
-SJLIFE	SMN (462)	Chemo	0.033	0.033	0.032	0.047	0.022
-SJLIFE	SMN (462)	All_treatments	0.392	0.392	0.392	0.370	0.409
-SJLIFE	SMN (462)	PRS	0.122	0.119	0.125	0.122	0.122
-SJLIFE	SMN (462)	Lifestyle	-	-	-	-	-
-SJLIFE	SMN (462)	Combined	0.467	0.466	0.468	0.447	0.482
-SJLIFE	NMSC (249)	Radiation	0.441	0.431	0.453	0.413	0.457
-SJLIFE	NMSC (249)	Chemo	-	-	-	-	-
-SJLIFE	NMSC (249)	All_treatments	0.441	0.431	0.453	0.413	0.457
-SJLIFE	NMSC (249)	PRS	0.441	0.432	0.452	0.440	0.442
+SJLIFE	SNs (605)	Radiation	0.425	0.417	0.435	0.400	0.447
+SJLIFE	SNs (605)	Chemotherapy	0.080	0.079	0.080	0.109	0.054
+SJLIFE	SNs (605)	All_treatments	0.469	0.462	0.478	0.463	0.474
+SJLIFE	SNs (605)	PRS	0.125	0.123	0.129	0.126	0.125
+SJLIFE	SNs (605)	Lifestyle	-	-	-	-	-
+SJLIFE	SNs (605)	Combined	0.536	0.530	0.545	0.531	0.541
+SJLIFE	SMNs (462)	Radiation	0.372	0.371	0.373	0.340	0.396
+SJLIFE	SMNs (462)	Chemotherapy	0.033	0.033	0.032	0.047	0.022
+SJLIFE	SMNs (462)	All_treatments	0.392	0.392	0.392	0.370	0.409
+SJLIFE	SMNs (462)	PRS	0.122	0.119	0.125	0.122	0.122
+SJLIFE	SMNs (462)	Lifestyle	-	-	-	-	-
+SJLIFE	SMNs (462)	Combined	0.467	0.466	0.468	0.447	0.482
+SJLIFE	NMSC (249)	Radiation	0.437	0.427	0.448	0.408	0.453
+SJLIFE	NMSC (249)	Chemotherapy	-	-	-	-	-
+SJLIFE	NMSC (249)	All_treatments	0.437	0.427	0.448	0.408	0.453
+SJLIFE	NMSC (249)	PRS	0.276	0.263	0.292	0.274	0.278
 SJLIFE	NMSC (249)	Lifestyle	-	-	-	-	-
-SJLIFE	NMSC (249)	Combined	0.688	0.680	0.698	0.671	0.698
+SJLIFE	NMSC (249)	Combined	0.591	0.579	0.605	0.569	0.604
 SJLIFE	Breast cancer (74)	Radiation	0.493	0.493	-	0.475	0.498
-SJLIFE	Breast cancer (74)	Chemo	0.193	0.193	-	0.228	0.184
+SJLIFE	Breast cancer (74)	Chemotherapy	0.193	0.193	-	0.228	0.184
 SJLIFE	Breast cancer (74)	All_treatments	0.602	0.602	-	0.594	0.604
 SJLIFE	Breast cancer (74)	PRS	0.255	0.255	-	0.261	0.254
 SJLIFE	Breast cancer (74)	Lifestyle	-	-	-	-	-
 SJLIFE	Breast cancer (74)	Combined	0.704	0.704	-	0.701	0.705
-SJLIFE	Thyroid cancer (86)	Radiation	0.620	0.622	0.616	0.594	0.650
-SJLIFE	Thyroid cancer (86)	Chemo	0.233	0.235	0.231	0.293	0.163
+SJLIFE	Thyroid cancer (86)	Radiation	0.62	0.622	0.616	0.594	0.65
+SJLIFE	Thyroid cancer (86)	Chemotherapy	0.233	0.235	0.231	0.293	0.163
 SJLIFE	Thyroid cancer (86)	All_treatments	0.726	0.727	0.723	0.725	0.727
 SJLIFE	Thyroid cancer (86)	PRS	0.517	0.519	0.514	0.519	0.514
 SJLIFE	Thyroid cancer (86)	Lifestyle	-	-	-	-	-
 SJLIFE	Thyroid cancer (86)	Combined	0.866	0.867	0.866	0.866	0.868
-SJLIFE	Meningioma (149)	Radiation	0.198	0.171	0.233	0.226	0.175
-SJLIFE	Meningioma (149)	Chemo	0.363	0.372	0.350	0.475	0.270
-SJLIFE	Meningioma (149)	All_treatments	0.490	0.479	0.505	0.602	0.399
-SJLIFE	Meningioma (149)	PRS	-0.130	-0.122	-0.141	-0.127	-0.133
+SJLIFE	Meningioma (149)	Radiation	0.197	0.172	0.23	0.223	0.176
+SJLIFE	Meningioma (149)	Chemotherapy	0.361	0.371	0.349	0.472	0.271
+SJLIFE	Meningioma (149)	All_treatments	0.489	0.478	0.504	0.598	0.4
+SJLIFE	Meningioma (149)	PRS	-	-	-	-	-
 SJLIFE	Meningioma (149)	Lifestyle	-	-	-	-	-
-SJLIFE	Meningioma (149)	Combined	0.423	0.414	0.435	0.550	0.319
+SJLIFE	Meningioma (149)	Combined	0.425	0.416	0.437	0.549	0.323
 SJLIFE	Sarcoma (32)	Radiation	-	-	-	-	-
-SJLIFE	Sarcoma (32)	Chemo	0.323	0.326	0.319	0.306	0.349
-SJLIFE	Sarcoma (32)	All_treatments	0.323	0.326	0.319	0.306	0.349
-SJLIFE	Sarcoma (32)	PRS	-0.010	-0.011	-0.010	-0.010	-0.011
+SJLIFE	Sarcoma (32)	Chemotherapy	0.324	0.329	0.32	0.308	0.351
+SJLIFE	Sarcoma (32)	All_treatments	0.324	0.329	0.32	0.308	0.351
+SJLIFE	Sarcoma (32)	PRS	-	-	-	-	-
 SJLIFE	Sarcoma (32)	Lifestyle	-	-	-	-	-
-SJLIFE	Sarcoma (32)	Combined	0.316	0.319	0.312	0.299	0.341
-CCSS	Any SN (1611)	Radiation	0.387	0.380	0.398	0.372	0.398
-CCSS	Any SN (1611)	Chemo	0.031	0.030	0.033	0.047	0.019
-CCSS	Any SN (1611)	All_treatments	0.407	0.400	0.418	0.403	0.410
-CCSS	Any SN (1611)	PRS	0.048	0.047	0.049	0.047	0.048
-CCSS	Any SN (1611)	Lifestyle	-	-	-	-	-
-CCSS	Any SN (1611)	Combined	0.435	0.428	0.446	0.431	0.438
-CCSS	SMN (762)	Radiation	0.255	0.254	0.257	0.213	0.283
-CCSS	SMN (762)	Chemo	0.042	0.042	0.042	0.070	0.024
-CCSS	SMN (762)	All_treatments	0.290	0.289	0.293	0.271	0.303
-CCSS	SMN (762)	PRS	0.047	0.046	0.047	0.046	0.047
-CCSS	SMN (762)	Lifestyle	-	-	-	-	-
-CCSS	SMN (762)	Combined	0.323	0.322	0.326	0.305	0.336
-CCSS	NMSC (769)	Radiation	0.391	0.386	0.396	0.385	0.394
-CCSS	NMSC (769)	Chemo	-	-	-	-	-
-CCSS	NMSC (769)	All_treatments	0.391	0.386	0.396	0.385	0.394
-CCSS	NMSC (769)	PRS	0.304	0.306	0.302	0.306	0.303
+SJLIFE	Sarcoma (32)	Combined	0.311	0.315	0.306	0.294	0.337
+CCSS	SNs (1611)	Radiation	0.387	0.380	0.398	0.372	0.398
+CCSS	SNs (1611)	Chemotherapy	0.031	0.030	0.033	0.047	0.019
+CCSS	SNs (1611)	All_treatments	0.407	0.400	0.418	0.403	0.410
+CCSS	SNs (1611)	PRS	0.048	0.047	0.049	0.047	0.048
+CCSS	SNs (1611)	Lifestyle	-	-	-	-	-
+CCSS	SNs (1611)	Combined	0.435	0.428	0.446	0.431	0.438
+CCSS	SMNs (762)	Radiation	0.255	0.254	0.257	0.213	0.283
+CCSS	SMNs (762)	Chemotherapy	0.042	0.042	0.042	0.070	0.024
+CCSS	SMNs (762)	All_treatments	0.290	0.289	0.293	0.271	0.303
+CCSS	SMNs (762)	PRS	0.047	0.046	0.047	0.046	0.047
+CCSS	SMNs (762)	Lifestyle	-	-	-	-	-
+CCSS	SMNs (762)	Combined	0.323	0.322	0.326	0.305	0.336
+CCSS	NMSC (769)	Radiation	0.393	0.388	0.398	0.387	0.396
+CCSS	NMSC (769)	Chemotherapy	-	-	-	-	-
+CCSS	NMSC (769)	All_treatments	0.393	0.388	0.398	0.387	0.396
+CCSS	NMSC (769)	PRS	0.31	0.308	0.313	0.312	0.309
 CCSS	NMSC (769)	Lifestyle	-	-	-	-	-
-CCSS	NMSC (769)	Combined	0.577	0.575	0.578	0.574	0.578
+CCSS	NMSC (769)	Combined	0.582	0.578	0.587	0.58	0.583
 CCSS	Breast cancer (289)	Radiation	0.474	0.474	-	0.452	0.478
-CCSS	Breast cancer (289)	Chemo	0.187	0.187	-	0.224	0.180
+CCSS	Breast cancer (289)	Chemotherapy	0.187	0.187	-	0.224	0.180
 CCSS	Breast cancer (289)	All_treatments	0.593	0.593	-	0.589	0.593
 CCSS	Breast cancer (289)	PRS	0.365	0.365	-	0.369	0.365
 CCSS	Breast cancer (289)	Lifestyle	-	-	-	-	-
 CCSS	Breast cancer (289)	Combined	0.743	0.743	-	0.741	0.743
 CCSS	Thyroid cancer (163)	Radiation	0.443	0.445	0.439	0.413	0.489
-CCSS	Thyroid cancer (163)	Chemo	0.055	0.055	0.056	0.073	0.029
+CCSS	Thyroid cancer (163)	Chemotherapy	0.055	0.055	0.056	0.073	0.029
 CCSS	Thyroid cancer (163)	All_treatments	0.476	0.477	0.472	0.457	0.504
 CCSS	Thyroid cancer (163)	PRS	0.358	0.362	0.352	0.355	0.363
 CCSS	Thyroid cancer (163)	Lifestyle	-	-	-	-	-
-CCSS	Thyroid cancer (163)	Combined	0.664	0.665	0.661	0.650	0.684
-CCSS	Meningioma (255)	Radiation	0.370	0.332	0.423	0.392	0.347
-CCSS	Meningioma (255)	Chemo	0.084	0.077	0.095	0.119	0.048
-CCSS	Meningioma (255)	All_treatments	0.428	0.391	0.479	0.471	0.382
-CCSS	Meningioma (255)	PRS	0.028	0.027	0.028	0.032	0.024
+CCSS	Thyroid cancer (163)	Combined	0.664	0.665	0.661	0.65	0.684
+CCSS	Meningioma (255)	Radiation	0.37	0.333	0.422	0.394	0.345
+CCSS	Meningioma (255)	Chemotherapy	0.082	0.076	0.092	0.118	0.045
+CCSS	Meningioma (255)	All_treatments	0.426	0.391	0.475	0.471	0.378
+CCSS	Meningioma (255)	PRS	0.032	0.032	0.033	0.036	0.028
 CCSS	Meningioma (255)	Lifestyle	-	-	-	-	-
-CCSS	Meningioma (255)	Combined	0.444	0.408	0.495	0.487	0.398
+CCSS	Meningioma (255)	Combined	0.444	0.41	0.494	0.49	0.397
 CCSS	Sarcoma (60)	Radiation	-	-	-	-	-
-CCSS	Sarcoma (60)	Chemo	0.343	0.327	0.359	0.338	0.348
-CCSS	Sarcoma (60)	All_treatments	0.343	0.327	0.359	0.338	0.348
-CCSS	Sarcoma (60)	PRS	0.029	0.031	0.026	0.028	0.029
+CCSS	Sarcoma (60)	Chemotherapy	0.342	0.327	0.358	0.337	0.348
+CCSS	Sarcoma (60)	All_treatments	0.342	0.327	0.358	0.337	0.348
+CCSS	Sarcoma (60)	PRS	0.024	0.026	0.022	0.023	0.025
 CCSS	Sarcoma (60)	Lifestyle	-	-	-	-	-
-CCSS	Sarcoma (60)	Combined	0.362	0.348	0.376	0.357	0.367", header = T, sep = "\t")
+CCSS	Sarcoma (60)	Combined	0.358	0.345	0.372	0.353	0.364", header = T, sep = "\t")
 
 data$SN_types <- trimws(gsub("\\([0-9]+\\)", "", data$SN_types))
 data[data == "-"] <- NA
@@ -108,7 +108,7 @@ saved.data <- data
 group <- "Overall"
 variables <- unique(data$Variables)
 
-custom_colors <- c("SJLIFE" = "#1E90FF", "CCSS" = "#FF6347")
+custom_colors <- c("SJLIFE" = "darkred", "CCSS" = "darkblue")
 legend_order <- c("SJLIFE", "CCSS")
 
 
@@ -196,98 +196,19 @@ new_data$value <- as.numeric(new_data$value)
 
 # Reshape the data for ggplot2
 library(reshape2)
-
 data_melted <-new_data
+data_melted$new_value <- round(data_melted$value,2)*100
+
 order <- unique(data_melted$SN_types)
 AF.type <- "treatment_PRS"
 lifestyle <- "without_lifestyle"
 
-data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
-
-data_melted$new_value <- round(data_melted$value,2)*100
+data_melted$legend_group <- gsub("_", " ", factor(paste(data_melted$variable, data_melted$AF_by, sep = "-")))
 
 
 # Define custom colors and legend order
-custom_colors <- c("SJLIFE_PRS" = "#87CEFA", "CCSS_PRS" = "#FFA07A", "SJLIFE_All_treatments" = "#1E90FF", "CCSS_All_treatments" = "#FF6347")
-legend_order <- c("SJLIFE_PRS", "CCSS_PRS", "SJLIFE_All_treatments", "CCSS_All_treatments")
-# Order the levels of the legend_group factor
-data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
-# Create a factor with the desired order
-data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
-
-
-p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
-  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.8) +
-  # Customize the theme and appearance
-  # geom_hline(yintercept = 0, color = "black", linetype = "solid", size = 0.7) +
-  # Add Y lines
-  # geom_vline(xintercept = 0.5, color = "black", linetype = "solid", size = 0.7) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 16, color = "black"),
-        axis.text.y = element_text(size = 16, color = "black"),
-        axis.title.y = element_text(size = 20, color = "black"), 
-        axis.line.x = element_line(color="black"), 
-        axis.line.y = element_line(color="black"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 16, color = "black"),
-        plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank()) +
-  
-  # Customize colors
-  scale_fill_manual(values = custom_colors, breaks = legend_order) +
-  
-  # Add labels with geom_text
-  geom_text(
-    data = data_melted %>% filter(!is.na(new_value)),
-    aes(label = new_value, y = new_value),  # Adjust y position
-    position = position_dodge(width = 0.8),
-    vjust = -0.20,  # Adjust vertical justification
-    hjust = 0.5,  # Center text horizontally
-    size = 5.5,
-    color = "black"
-  ) +
-  # Adjust legend position
-  theme(legend.position = "top", legend.box = "horizontal") +
-  # Additional adjustments
-  scale_x_discrete(limits = order) +
-  coord_cartesian(clip = "off")
-p
-p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
-
-p
-
-# Save the plot as a high-resolution image
-plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/overall/", group, "_", AF.type,"_", lifestyle, ".tiff")
-
-ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
-
-##################################
-## Chemo and Radiation together ##
-##################################
-group <- "Overall"
-
-variables <- "Chemo|Radiation"
-
-new_data <- data[grepl(variables, data$Variables), c("Cohort", "SN_types", "Variables", group)]
-colnames(new_data) <- c("variable", "SN_types", "AF_by", "value")
-new_data$value <- as.numeric(new_data$value)
-
-# Reshape the data for ggplot2
-library(reshape2)
-data_melted <-new_data
-data_melted$new_value <- round(data_melted$value,2)*100
-
-order <- unique(data_melted$SN_types)
-AF.type <- "Chemo_Radiation"
-lifestyle <- "without_lifestyle"
-
-data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
-
-
-# Define custom colors and legend order
-custom_colors <- c("SJLIFE_Chemo" = "#87CEFA", "CCSS_Chemo" = "#FFA07A", "SJLIFE_Radiation" = "#1E90FF", "CCSS_Radiation" = "#FF6347")
-legend_order <- c("SJLIFE_Chemo", "CCSS_Chemo", "SJLIFE_Radiation", "CCSS_Radiation")
+custom_colors <- c("SJLIFE-All treatments" = "darkred", "CCSS-All treatments" = "darkblue", "SJLIFE-PRS" = "red", "CCSS-PRS" = "blue")
+legend_order <- c("SJLIFE-All treatments", "CCSS-All treatments", "SJLIFE-PRS", "CCSS-PRS")
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
@@ -333,7 +254,95 @@ p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) 
   scale_x_discrete(limits = order) +
   coord_cartesian(clip = "off")
 p
-p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + 
+  labs(title = "", y = "Attributable fraction (%)", x =  NULL) +
+  theme(axis.title.x = element_text(size = 18, color = "black")) +
+  theme(axis.title.y = element_text(size = 18, color = "black"))
+
+p
+
+# Save the plot as a high-resolution image
+plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/overall/", group, "_", AF.type,"_", lifestyle, ".tiff")
+
+ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
+
+
+
+##################################
+## Chemo and Radiation together ##
+##################################
+group <- "Overall"
+
+variables <- "Radiation|Chemotherapy"
+
+new_data <- data[grepl(variables, data$Variables), c("Cohort", "SN_types", "Variables", group)]
+colnames(new_data) <- c("variable", "SN_types", "AF_by", "value")
+new_data$value <- as.numeric(new_data$value)
+
+# Reshape the data for ggplot2
+library(reshape2)
+data_melted <-new_data
+data_melted$new_value <- round(data_melted$value,2)*100
+
+order <- unique(data_melted$SN_types)
+AF.type <- "Chemo_Radiation"
+lifestyle <- "without_lifestyle"
+
+data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "-"))
+
+
+# Define custom colors and legend order
+custom_colors <- c("SJLIFE-Radiation" = "darkred", "CCSS-Radiation" = "darkblue", "SJLIFE-Chemotherapy" = "red", "CCSS-Chemotherapy" = "blue")
+legend_order <- c("SJLIFE-Radiation", "CCSS-Radiation", "SJLIFE-Chemotherapy", "CCSS-Chemotherapy")
+# Order the levels of the legend_group factor
+data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
+
+# Create a factor with the desired order
+data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
+
+# Create the grouped bar chart
+# Create the plot
+p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.8) +
+  # Customize the theme and appearance
+  # geom_hline(yintercept = 0, color = "black", linetype = "solid", size = 0.7) +
+  # Add Y lines
+  # geom_vline(xintercept = 0.5, color = "black", linetype = "solid", size = 0.7) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 16, color = "black"),
+        axis.text.y = element_text(size = 16, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"), 
+        axis.line.x = element_line(color="black"), 
+        axis.line.y = element_line(color="black"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 16, color = "black"),
+        plot.title = element_text(size = 16, hjust = 0.5, vjust = 1.5, face = "bold"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  
+  # Customize colors
+  scale_fill_manual(values = custom_colors, breaks = legend_order) +
+  
+  # Add labels with geom_text
+  geom_text(
+    data = data_melted,
+    aes(label = new_value, y = new_value),  # Adjust y position
+    position = position_dodge(width = 0.8),
+    vjust = -0.20,  # Adjust vertical justification
+    hjust = 0.5,  # Center text horizontally
+    size = 5.5,
+    color = "black"
+  ) +
+  # Adjust legend position
+  theme(legend.position = "top", legend.box = "horizontal") +
+  # Additional adjustments
+  scale_x_discrete(limits = order) +
+  coord_cartesian(clip = "off")
+p
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + 
+  labs(title = "", y = "Attributable fraction (%)", x =  NULL) +
+  theme(axis.title.x = element_text(size = 18, color = "black")) +
+  theme(axis.title.y = element_text(size = 18, color = "black"))
 
 p
 
@@ -355,7 +364,7 @@ data <- saved.data
 group <- "Female"
 variables <- unique(data$Variables)
 
-custom_colors <- c("SJLIFE" = "#1E90FF", "CCSS" = "#FF6347")
+custom_colors <- c("SJLIFE" = "darkred", "CCSS" = "darkblue")
 legend_order <- c("SJLIFE", "CCSS")
 
 for(i in 1:length(variables)){
@@ -439,20 +448,18 @@ new_data$value <- as.numeric(new_data$value)
 # Reshape the data for ggplot2
 library(reshape2)
 data_melted <-new_data
-
+data_melted$new_value <- round(data_melted$value,2)*100
 
 order <- unique(data_melted$SN_types)
 AF.type <- "treatment_PRS"
 lifestyle <- "without_lifestyle"
 
-data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
+data_melted$legend_group <- gsub("_", " ", factor(paste(data_melted$variable, data_melted$AF_by, sep = "-")))
 
-
-data_melted$new_value <- round(data_melted$value,2)*100
 
 # Define custom colors and legend order
-custom_colors <- c("SJLIFE_PRS" = "#87CEFA", "CCSS_PRS" = "#FFA07A", "SJLIFE_All_treatments" = "#1E90FF", "CCSS_All_treatments" = "#FF6347")
-legend_order <- c("SJLIFE_PRS", "CCSS_PRS", "SJLIFE_All_treatments", "CCSS_All_treatments")
+custom_colors <- c("SJLIFE-All treatments" = "darkred", "CCSS-All treatments" = "darkblue", "SJLIFE-PRS" = "red", "CCSS-PRS" = "blue")
+legend_order <- c("SJLIFE-All treatments", "CCSS-All treatments", "SJLIFE-PRS", "CCSS-PRS")
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
@@ -498,7 +505,11 @@ p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) 
   scale_x_discrete(limits = order) +
   coord_cartesian(clip = "off")
 p
-p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + 
+  labs(title = "", y = "Attributable fraction (%)", x =  NULL) +
+  theme(axis.title.x = element_text(size = 18, color = "black")) +
+  theme(axis.title.y = element_text(size = 18, color = "black"))
+
 p
 
 # Save the plot as a high-resolution image
@@ -506,12 +517,14 @@ plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/at
 
 ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
 
+
+
 ##################################
 ## Chemo and Radiation together ##
 ##################################
 group <- "Female"
 
-variables <- "Chemo|Radiation"
+variables <- "Radiation|Chemotherapy"
 
 new_data <- data[grepl(variables, data$Variables), c("Cohort", "SN_types", "Variables", group)]
 colnames(new_data) <- c("variable", "SN_types", "AF_by", "value")
@@ -526,12 +539,12 @@ order <- unique(data_melted$SN_types)
 AF.type <- "Chemo_Radiation"
 lifestyle <- "without_lifestyle"
 
-data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
+data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "-"))
 
 
 # Define custom colors and legend order
-custom_colors <- c("SJLIFE_Chemo" = "#87CEFA", "CCSS_Chemo" = "#FFA07A", "SJLIFE_Radiation" = "#1E90FF", "CCSS_Radiation" = "#FF6347")
-legend_order <- c("SJLIFE_Chemo", "CCSS_Chemo", "SJLIFE_Radiation", "CCSS_Radiation")
+custom_colors <- c("SJLIFE-Radiation" = "darkred", "CCSS-Radiation" = "darkblue", "SJLIFE-Chemotherapy" = "red", "CCSS-Chemotherapy" = "blue")
+legend_order <- c("SJLIFE-Radiation", "CCSS-Radiation", "SJLIFE-Chemotherapy", "CCSS-Chemotherapy")
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
@@ -577,13 +590,18 @@ p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) 
   scale_x_discrete(limits = order) +
   coord_cartesian(clip = "off")
 p
-p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + 
+  labs(title = "", y = "Attributable fraction (%)", x =  NULL) +
+  theme(axis.title.x = element_text(size = 18, color = "black")) +
+  theme(axis.title.y = element_text(size = 18, color = "black"))
 
 p
+
 # Save the plot as a high-resolution image
 plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/female/", group, "_", AF.type,"_", lifestyle, ".tiff")
 
 ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
+
 
 ## 3.___________________________________________________________________________ Male analysis
 ## 3.___________________________________________________________________________ Male analysis
@@ -593,11 +611,12 @@ ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compres
 
 
 data <- saved.data
+data <- data[!data$SN_types %in% "Breast cancer",]
 
 group <- "Male"
 variables <- unique(data$Variables)
 
-custom_colors <- c("SJLIFE" = "#1E90FF", "CCSS" = "#FF6347")
+custom_colors <- c("SJLIFE" = "darkred", "CCSS" = "darkblue")
 legend_order <- c("SJLIFE", "CCSS")
 
 for(i in 1:length(variables)){
@@ -686,26 +705,23 @@ new_data$value <- as.numeric(new_data$value)
 # Reshape the data for ggplot2
 library(reshape2)
 data_melted <-new_data
-data_melted <- data_melted[!grepl("Breast", data_melted$SN_types),]
+data_melted$new_value <- round(data_melted$value,2)*100
 
 order <- unique(data_melted$SN_types)
 AF.type <- "treatment_PRS"
 lifestyle <- "without_lifestyle"
 
-data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
+data_melted$legend_group <- gsub("_", " ", factor(paste(data_melted$variable, data_melted$AF_by, sep = "-")))
 
-
-data_melted$new_value <- round(data_melted$value,2)*100
 
 # Define custom colors and legend order
-custom_colors <- c("SJLIFE_PRS" = "#87CEFA", "CCSS_PRS" = "#FFA07A", "SJLIFE_All_treatments" = "#1E90FF", "CCSS_All_treatments" = "#FF6347")
-legend_order <- c("SJLIFE_PRS", "CCSS_PRS", "SJLIFE_All_treatments", "CCSS_All_treatments")
+custom_colors <- c("SJLIFE-All treatments" = "darkred", "CCSS-All treatments" = "darkblue", "SJLIFE-PRS" = "red", "CCSS-PRS" = "blue")
+legend_order <- c("SJLIFE-All treatments", "CCSS-All treatments", "SJLIFE-PRS", "CCSS-PRS")
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
 # Create a factor with the desired order
 data_melted$SN_types <- factor(data_melted$SN_types, levels = order)
-
 
 # Create the grouped bar chart
 # Create the plot
@@ -746,8 +762,13 @@ p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) 
   scale_x_discrete(limits = order) +
   coord_cartesian(clip = "off")
 p
-p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + 
+  labs(title = "", y = "Attributable fraction (%)", x =  NULL) +
+  theme(axis.title.x = element_text(size = 18, color = "black")) +
+  theme(axis.title.y = element_text(size = 18, color = "black"))
+
 p
+
 # Save the plot as a high-resolution image
 plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/male/", group, "_", AF.type,"_", lifestyle, ".tiff")
 
@@ -758,7 +779,7 @@ ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compres
 ##################################
 group <- "Male"
 
-variables <- "Chemo|Radiation"
+variables <- "Radiation|Chemotherapy"
 
 new_data <- data[grepl(variables, data$Variables), c("Cohort", "SN_types", "Variables", group)]
 colnames(new_data) <- c("variable", "SN_types", "AF_by", "value")
@@ -767,18 +788,18 @@ new_data$value <- as.numeric(new_data$value)
 # Reshape the data for ggplot2
 library(reshape2)
 data_melted <-new_data
-data_melted <- data_melted[!grepl("Breast", data_melted$SN_types),]
 data_melted$new_value <- round(data_melted$value,2)*100
+
 order <- unique(data_melted$SN_types)
 AF.type <- "Chemo_Radiation"
 lifestyle <- "without_lifestyle"
 
-data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
+data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "-"))
 
 
 # Define custom colors and legend order
-custom_colors <- c("SJLIFE_Chemo" = "#87CEFA", "CCSS_Chemo" = "#FFA07A", "SJLIFE_Radiation" = "#1E90FF", "CCSS_Radiation" = "#FF6347")
-legend_order <- c("SJLIFE_Chemo", "CCSS_Chemo", "SJLIFE_Radiation", "CCSS_Radiation")
+custom_colors <- c("SJLIFE-Radiation" = "darkred", "CCSS-Radiation" = "darkblue", "SJLIFE-Chemotherapy" = "red", "CCSS-Chemotherapy" = "blue")
+legend_order <- c("SJLIFE-Radiation", "CCSS-Radiation", "SJLIFE-Chemotherapy", "CCSS-Chemotherapy")
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
@@ -824,7 +845,10 @@ p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) 
   scale_x_discrete(limits = order) +
   coord_cartesian(clip = "off")
 p
-p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + 
+  labs(title = "", y = "Attributable fraction (%)", x =  NULL) +
+  theme(axis.title.x = element_text(size = 18, color = "black")) +
+  theme(axis.title.y = element_text(size = 18, color = "black"))
 
 p
 # Save the plot as a high-resolution image
@@ -844,7 +868,7 @@ data <- saved.data
 group <- "Age.lt.35"
 variables <- unique(data$Variables)
 
-custom_colors <- c("SJLIFE" = "#1E90FF", "CCSS" = "#FF6347")
+custom_colors <- c("SJLIFE" = "darkred", "CCSS" = "darkblue")
 legend_order <- c("SJLIFE", "CCSS")
 
 for(i in 1:length(variables)){
@@ -928,19 +952,18 @@ new_data$value <- as.numeric(new_data$value)
 # Reshape the data for ggplot2
 library(reshape2)
 data_melted <-new_data
-# order <- c("Any SN", "Any SMN", "NMSC", "Breast cancer", "Thyroid cancer", "Meningioma", "Sarcoma")
+data_melted$new_value <- round(data_melted$value,2)*100
+
 order <- unique(data_melted$SN_types)
 AF.type <- "treatment_PRS"
 lifestyle <- "without_lifestyle"
 
-data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
+data_melted$legend_group <- gsub("_", " ", factor(paste(data_melted$variable, data_melted$AF_by, sep = "-")))
 
-
-data_melted$new_value <- round(data_melted$value,2)*100
 
 # Define custom colors and legend order
-custom_colors <- c("SJLIFE_PRS" = "#87CEFA", "CCSS_PRS" = "#FFA07A", "SJLIFE_All_treatments" = "#1E90FF", "CCSS_All_treatments" = "#FF6347")
-legend_order <- c("SJLIFE_PRS", "CCSS_PRS", "SJLIFE_All_treatments", "CCSS_All_treatments")
+custom_colors <- c("SJLIFE-All treatments" = "darkred", "CCSS-All treatments" = "darkblue", "SJLIFE-PRS" = "red", "CCSS-PRS" = "blue")
+legend_order <- c("SJLIFE-All treatments", "CCSS-All treatments", "SJLIFE-PRS", "CCSS-PRS")
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
@@ -986,7 +1009,11 @@ p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) 
   scale_x_discrete(limits = order) +
   coord_cartesian(clip = "off")
 p
-p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + 
+  labs(title = "", y = "Attributable fraction (%)", x =  NULL) +
+  theme(axis.title.x = element_text(size = 18, color = "black")) +
+  theme(axis.title.y = element_text(size = 18, color = "black"))
+
 p
 # Save the plot as a high-resolution image
 plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/lt35/", group, "_", AF.type,"_", lifestyle, ".tiff")
@@ -998,7 +1025,7 @@ ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compres
 ##################################
 group <- "Age.lt.35"
 
-variables <- "Chemo|Radiation"
+variables <- "Radiation|Chemotherapy"
 
 new_data <- data[grepl(variables, data$Variables), c("Cohort", "SN_types", "Variables", group)]
 colnames(new_data) <- c("variable", "SN_types", "AF_by", "value")
@@ -1007,18 +1034,18 @@ new_data$value <- as.numeric(new_data$value)
 # Reshape the data for ggplot2
 library(reshape2)
 data_melted <-new_data
-
 data_melted$new_value <- round(data_melted$value,2)*100
+
 order <- unique(data_melted$SN_types)
 AF.type <- "Chemo_Radiation"
 lifestyle <- "without_lifestyle"
 
-data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
+data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "-"))
 
 
 # Define custom colors and legend order
-custom_colors <- c("SJLIFE_Chemo" = "#87CEFA", "CCSS_Chemo" = "#FFA07A", "SJLIFE_Radiation" = "#1E90FF", "CCSS_Radiation" = "#FF6347")
-legend_order <- c("SJLIFE_Chemo", "CCSS_Chemo", "SJLIFE_Radiation", "CCSS_Radiation")
+custom_colors <- c("SJLIFE-Radiation" = "darkred", "CCSS-Radiation" = "darkblue", "SJLIFE-Chemotherapy" = "red", "CCSS-Chemotherapy" = "blue")
+legend_order <- c("SJLIFE-Radiation", "CCSS-Radiation", "SJLIFE-Chemotherapy", "CCSS-Chemotherapy")
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
@@ -1064,7 +1091,10 @@ p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) 
   scale_x_discrete(limits = order) +
   coord_cartesian(clip = "off")
 p
-p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + 
+  labs(title = "", y = "Attributable fraction (%)", x =  NULL) +
+  theme(axis.title.x = element_text(size = 18, color = "black")) +
+  theme(axis.title.y = element_text(size = 18, color = "black"))
 
 p
 # Save the plot as a high-resolution image
@@ -1083,7 +1113,7 @@ data <- saved.data
 group <- "Age.ge.35"
 variables <- unique(data$Variables)
 
-custom_colors <- c("SJLIFE" = "#1E90FF", "CCSS" = "#FF6347")
+custom_colors <- c("SJLIFE" = "darkred", "CCSS" = "darkblue")
 legend_order <- c("SJLIFE", "CCSS")
 
 for(i in 1:length(variables)){
@@ -1167,20 +1197,19 @@ new_data$value <- as.numeric(new_data$value)
 
 # Reshape the data for ggplot2
 library(reshape2)
-
 data_melted <-new_data
+data_melted$new_value <- round(data_melted$value,2)*100
+
 order <- unique(data_melted$SN_types)
 AF.type <- "treatment_PRS"
 lifestyle <- "without_lifestyle"
 
-data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
+data_melted$legend_group <- gsub("_", " ", factor(paste(data_melted$variable, data_melted$AF_by, sep = "-")))
 
-
-data_melted$new_value <- round(data_melted$value,2)*100
 
 # Define custom colors and legend order
-custom_colors <- c("SJLIFE_PRS" = "#87CEFA", "CCSS_PRS" = "#FFA07A", "SJLIFE_All_treatments" = "#1E90FF", "CCSS_All_treatments" = "#FF6347")
-legend_order <- c("SJLIFE_PRS", "CCSS_PRS", "SJLIFE_All_treatments", "CCSS_All_treatments")
+custom_colors <- c("SJLIFE-All treatments" = "darkred", "CCSS-All treatments" = "darkblue", "SJLIFE-PRS" = "red", "CCSS-PRS" = "blue")
+legend_order <- c("SJLIFE-All treatments", "CCSS-All treatments", "SJLIFE-PRS", "CCSS-PRS")
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
@@ -1226,7 +1255,11 @@ p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) 
   scale_x_discrete(limits = order) +
   coord_cartesian(clip = "off")
 p
-p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + 
+  labs(title = "", y = "Attributable fraction (%)", x =  NULL) +
+  theme(axis.title.x = element_text(size = 18, color = "black")) +
+  theme(axis.title.y = element_text(size = 18, color = "black"))
+
 p
 # Save the plot as a high-resolution image
 plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/ge35/", group, "_", AF.type,"_", lifestyle, ".tiff")
@@ -1238,7 +1271,7 @@ ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compres
 ##################################
 group <- "Age.ge.35"
 
-variables <- "Chemo|Radiation"
+variables <- "Radiation|Chemotherapy"
 
 new_data <- data[grepl(variables, data$Variables), c("Cohort", "SN_types", "Variables", group)]
 colnames(new_data) <- c("variable", "SN_types", "AF_by", "value")
@@ -1253,12 +1286,12 @@ order <- unique(data_melted$SN_types)
 AF.type <- "Chemo_Radiation"
 lifestyle <- "without_lifestyle"
 
-data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "_"))
+data_melted$legend_group <- factor(paste(data_melted$variable, data_melted$AF_by, sep = "-"))
 
 
 # Define custom colors and legend order
-custom_colors <- c("SJLIFE_Chemo" = "#87CEFA", "CCSS_Chemo" = "#FFA07A", "SJLIFE_Radiation" = "#1E90FF", "CCSS_Radiation" = "#FF6347")
-legend_order <- c("SJLIFE_Chemo", "CCSS_Chemo", "SJLIFE_Radiation", "CCSS_Radiation")
+custom_colors <- c("SJLIFE-Radiation" = "darkred", "CCSS-Radiation" = "darkblue", "SJLIFE-Chemotherapy" = "red", "CCSS-Chemotherapy" = "blue")
+legend_order <- c("SJLIFE-Radiation", "CCSS-Radiation", "SJLIFE-Chemotherapy", "CCSS-Chemotherapy")
 # Order the levels of the legend_group factor
 data_melted$legend_group <- factor(data_melted$legend_group, levels = legend_order)
 
@@ -1304,8 +1337,10 @@ p <- ggplot(data_melted, aes(x = SN_types, y = new_value, fill = legend_group)) 
   scale_x_discrete(limits = order) +
   coord_cartesian(clip = "off")
 p
-p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + labs(title = "", y = "Attributable fraction (%)", x = NULL) 
-
+p <- p + scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) + 
+  labs(title = "", y = "Attributable fraction (%)", x =  NULL) +
+  theme(axis.title.x = element_text(size = 18, color = "black")) +
+  theme(axis.title.y = element_text(size = 18, color = "black"))
 p
 # Save the plot as a high-resolution image
 plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v19b/ge35/", group, "_", AF.type,"_", lifestyle, ".tiff")

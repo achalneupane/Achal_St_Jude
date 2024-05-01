@@ -76,7 +76,7 @@ saved.PHENO.ANY_SN <- PHENO.ANY_SN
 
 # lapply(list(wgspop, wgsdiag, subneo, radiation, drug, demog, adultbmi, adolhabits, adlthabits), dim)
 # save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores_v11.RDATA")
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores_v11.RDATA")
+# load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores_v11.RDATA") ## This was causing problem
 
 ## Removing sample that has no genetic data SJL5450006
 PHENO.ANY_SN <- PHENO.ANY_SN[!grepl("SJL5450006", PHENO.ANY_SN$sjlid),]

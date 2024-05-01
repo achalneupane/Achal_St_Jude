@@ -146,6 +146,10 @@ find . -type f -name '*model_fit*' -exec sed -i '/^[[:space:]]*af_by_tx\.gteq\.3
 ## Add for rt
 find . -type f -name '*model_fit*' -exec sed -i '/^[[:space:]]*af_by_rt\.gteq\.35[[:space:]]*$/a \\n## EUR\nN_no_rt = sum(dat_all$pred_no_rt[dat_all$admixture == "EUR"], na.rm = TRUE)\naf_by_rt.EUR = (N_all.EUR - N_no_rt) / N_all.EUR\naf_by_rt.EUR <- round(af_by_rt.EUR,3)\naf_by_rt.EUR\n\n## AFR\nN_no_rt = sum(dat_all$pred_no_rt[dat_all$admixture == "AFR"], na.rm = TRUE)\naf_by_rt.AFR = (N_all.AFR - N_no_rt) / N_all.AFR\naf_by_rt.AFR <- round(af_by_rt.AFR,3)\naf_by_rt.AFR' {} +
 
+
+## Add for missing RT
+find . -type f -name '*model_fit*' -exec sed -i '/^af_by_rt\.gteq\.35 <- "-"/a \\n## EUR\naf_by_rt.EUR <- "-"\n\n## AFR\naf_by_rt.AFR <- "-"' {} +
+
 ## Add for tx and rt
 find . -type f -name '*model_fit*' -exec sed -i '/^[[:space:]]*af_by_tx\.rt\.gteq\.35[[:space:]]*$/a \\n## EUR\nN_no_tx.rt = sum(dat_all$pred_no_tx.rt[dat_all$admixture == "EUR"], na.rm = TRUE)\naf_by_tx.rt.EUR = (N_all.EUR - N_no_tx.rt) / N_all.EUR\naf_by_tx.rt.EUR <- round(af_by_tx.rt.EUR,3)\naf_by_tx.rt.EUR\n\n## AFR\nN_no_tx.rt = sum(dat_all$pred_no_tx.rt[dat_all$admixture == "AFR"], na.rm = TRUE)\naf_by_tx.rt.AFR = (N_all.AFR - N_no_tx.rt) / N_all.AFR\naf_by_tx.rt.AFR <- round(af_by_tx.rt.AFR,3)\naf_by_tx.rt.AFR' {} +
 
@@ -160,9 +164,38 @@ find . -type f -name '*model_fit*' -exec sed -i '/^[[:space:]]*af_by_combined\.g
 ## Add lifestyle if no lifestle
 find . -type f -name '*model_fit*' -exec sed -i '/^af_by_no_favorable_lifestyle\.category\.gteq\.35 <- "-"/a \\n## EUR\naf_by_no_favorable_lifestyle.category.EUR <- "-"\n\n## AFR\naf_by_no_favorable_lifestyle.category.AFR <- "-"' {} +
 
+
 ## ADD lifestyle if lifestles
 find . -type f -name '*model_fit*' -exec sed -i '/^[[:space:]]*af_by_no_favorable_lifestyle\.category\.gteq\.35[[:space:]]*$/a \\n## EUR\nN_no_favorable_lifestyle.category = sum(dat_all$admixture == "EUR", na.rm = TRUE)\naf_by_no_favorable_lifestyle.category.EUR = (N_all.EUR - N_no_favorable_lifestyle.category) / N_all.EUR\naf_by_no_favorable_lifestyle.category.EUR <- round(af_by_no_favorable_lifestyle.category.EUR,3)\naf_by_no_favorable_lifestyle.category.EUR\n\n## AFR\nN_no_favorable_lifestyle.category = sum(dat_all$admixture == "AFR", na.rm = TRUE)\naf_by_no_favorable_lifestyle.category.AFR = (N_all.AFR - N_no_favorable_lifestyle.category) / N_all.AFR\naf_by_no_favorable_lifestyle.category.AFR <- round(af_by_no_favorable_lifestyle.category.AFR,3)\naf_by_no_favorable_lifestyle.category.AFR' {} +
 
 
 ## add EUR and AFR to final result line
 find . -type f -name '*model_fit*' -exec sed -i 's/age\.gteq = c(af_by_rt\.gteq\.35, af_by_tx\.gteq\.35, af_by_tx\.rt\.gteq\.35, af_by_prs\.gteq\.35, af_by_no_favorable_lifestyle\.category\.gteq\.35, af_by_combined\.gteq\.35)/age.gteq = c(af_by_rt.gteq.35, af_by_tx.gteq.35, af_by_tx.rt.gteq.35, af_by_prs.gteq.35, af_by_no_favorable_lifestyle.category.gteq.35, af_by_combined.gteq.35),\n  EUR = c(af_by_rt.EUR, af_by_tx.EUR, af_by_tx.rt.EUR, af_by_prs.EUR, af_by_no_favorable_lifestyle.category.EUR, af_by_combined.EUR),\n  AFR = c(af_by_rt.AFR, af_by_tx.AFR, af_by_tx.rt.AFR, af_by_prs.AFR, af_by_no_favorable_lifestyle.category.AFR, af_by_combined.AFR)/' {} +
+
+
+# ## Replace admixture files in CCSS
+# ## Admixture classification
+# admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
+# admixture$INDIVIDUAL <- sapply(strsplit(admixture$INDIVIDUAL,"_"), `[`, 1)
+
+
+
+## Replace V18b with V19b
+# find . -type f -name '*model_fit*' -exec sed -i 's/V18b/V19b/g' {} +
+find . -type f -exec sed -i 's/V18b/V19b/g' {} +
+
+
+## replace $sjlid with $ccssid
+/home/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V19b/19b/CCSS
+find . -type f -name '*model_fit*' -exec sed -i 's/\$sjlid/\$ccssid/g' {} +
+
+
+## uncomment 
+find . -type f -name '*model_fit*' -exec sed -i 's/# EAS + AFR +/EAS + AFR +/' {} +
+
+
+find . -type f -name '*model_fit*' -exec sed -i 's|admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA/SJLIFE_4481_Admixture_PCA_ethnicity.csv", sep = "\\t", header = T)|admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)|' {} +
+
+
+
+

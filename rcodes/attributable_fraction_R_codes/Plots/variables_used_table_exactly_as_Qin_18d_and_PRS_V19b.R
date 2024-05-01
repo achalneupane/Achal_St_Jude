@@ -36,7 +36,7 @@ results <- data.frame(
 
 
 
-ANY_SN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
+ANY_SN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS", results$Predictor, ignore.case = T),]
 ANY_SN.vars
 ###################################
 ## Attributable fraction of SMNs ##
@@ -69,7 +69,7 @@ results <- data.frame(
 
 
 
-SMN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
+SMN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS", results$Predictor, ignore.case = T),]
 SMN.vars
 ########################################
 ## Attributable fraction of Any NMSCs ##
@@ -104,7 +104,7 @@ results <- data.frame(
 
 
 
-NMSC.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
+NMSC.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS", results$Predictor, ignore.case = T),]
 NMSC.vars
 ################################################
 ## Attributable fraction of Any Breast cancer ##
@@ -146,7 +146,7 @@ results <- data.frame(
 
 
 
-BREASTCANCER.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
+BREASTCANCER.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS", results$Predictor, ignore.case = T),]
 BREASTCANCER.vars
 ##########################################
 ## Attributable fraction of Any THYROID ##
@@ -163,7 +163,8 @@ fit_all = glm(formula = event ~
                 Thyroid_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + 
-                maxneckrtdose.category + epitxn_dose_5.category,
+                maxneckrtdose.category + epitxn_dose_5.category +
+              EAS + AFR,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
 summary(fit_all)
@@ -183,7 +184,7 @@ results <- data.frame(
 
 
 
-THYROID.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
+THYROID.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS", results$Predictor, ignore.case = T),]
 THYROID.vars
 
 #############################################
@@ -198,7 +199,8 @@ dat_all=dat_all[dat_all$evt1==1,]
 fit_all = glm(formula = event ~ Meningioma_PRS.tertile.category + 
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + 
-                maxsegrtdose.category + epitxn_dose_5.category,
+                maxsegrtdose.category + epitxn_dose_5.category +
+                EAS + AFR,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
 summary(fit_all)
@@ -218,7 +220,7 @@ results <- data.frame(
 
 
 
-MENINGIOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
+MENINGIOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS", results$Predictor, ignore.case = T),]
 MENINGIOMA.vars
 
 ##########################################
@@ -248,7 +250,8 @@ dat_all=dat_all[dat_all$evt1==1,]
 fit_all = glm(formula = event ~ Sarcoma_Machiela_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 gender + 
-                aa_class_dose_5.category,
+                aa_class_dose_5.category +
+              EAS + AFR,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
 summary(fit_all)
@@ -267,7 +270,7 @@ results <- data.frame(
 
 
 
-SARCOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
+SARCOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose|anthra|epitxn|prs|AFR|EAS", results$Predictor, ignore.case = T),]
 SARCOMA.vars
 
 ## Combine all
@@ -298,7 +301,7 @@ p_columns <- empty_dataframe[, grepl("^P_", colnames(empty_dataframe))]
 # Convert the selected columns to numeric
 for (col in colnames(p_columns)) {
   empty_dataframe[, col] <- as.numeric(empty_dataframe[, col])
-  empty_dataframe[, col][empty_dataframe[, col] < 0.0001] <- "< .0001"
+  # empty_dataframe[, col][empty_dataframe[, col] < 0.0001] <- "< .0001"  ## change to 0.0001
 }
 
 
@@ -312,13 +315,15 @@ empty_dataframe.ordered <- empty_dataframe[match(c(NA, "AGE_AT_DIAGNOSIS5-9", "A
                             NA, "aa_class_dose_5.category1st", "aa_class_dose_5.category2nd", "aa_class_dose_5.category3rd", "aa_class_dose_5.categoryUnknown",
                             NA, "anthra_jco_dose_5.category1st",  "anthra_jco_dose_5.category2nd", "anthra_jco_dose_5.category3rd", "anthra_jco_dose_5.categoryUnknown",
                             NA, "epitxn_dose_5.category1st", "epitxn_dose_5.category2nd", "epitxn_dose_5.category3rd", "epitxn_dose_5.categoryUnknown",
-                            NA, "PRS_tertile_2nd", "PRS_tertile_3rd"), empty_dataframe$Predictor),]
+                            NA, "PRS_tertile_2nd", "PRS_tertile_3rd",
+                            NA, "AFR", "EAS"), empty_dataframe$Predictor),]
 
 
 # Fill missing values with NA
 empty_dataframe.ordered[is.na(empty_dataframe.ordered)] <- ""                  
-
-
+desired_order <- c("Predictor",  "RR (95% CI)_ANY_SN", "P_ANY_SN", "RR (95% CI)_SMN", "P_SMN", "RR (95% CI)_NMSC", "P_NMSC", "RR (95% CI)_Breast", "P_Breast",
+  "RR (95% CI)_Thyroid", "P_Thyroid", "RR (95% CI)_Meningioma", "P_Meningioma", "RR (95% CI)_Sarcoma", "P_Sarcoma")
+empty_dataframe.ordered <- empty_dataframe.ordered[, desired_order]
 
 ## 2.------------------------------------- SJLIFE
 
@@ -373,7 +378,7 @@ results <- data.frame(
 
 
 
-ANY_SN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
+ANY_SN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS", results$Predictor, ignore.case = T),]
 
 ###################################
 ## Attributable fraction of SMNs ##
@@ -418,7 +423,7 @@ results <- data.frame(
 
 
 
-SMN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
+SMN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS", results$Predictor, ignore.case = T),]
 
 ########################################
 ## Attributable fraction of Any NMSCs ##
@@ -471,7 +476,7 @@ results <- data.frame(
 
 
 
-NMSC.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
+NMSC.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS", results$Predictor, ignore.case = T),]
 NMSC.vars
 ################################################
 ## Attributable fraction of Any Breast cancer ##
@@ -526,7 +531,7 @@ results <- data.frame(
 
 
 
-BREASTCANCER.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
+BREASTCANCER.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS", results$Predictor, ignore.case = T),]
 
 ##########################################
 ## Attributable fraction of Any THYROID ##
@@ -555,7 +560,8 @@ dat_all=dat_all[dat_all$evt1==1,]
 fit_all = glm(formula = event ~ Thyroid_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + 
-                maxneckrtdose.category + epitxn_dose_5.category,
+                maxneckrtdose.category + epitxn_dose_5.category +
+                EAS + AFR,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
 summary(fit_all)
@@ -575,7 +581,7 @@ results <- data.frame(
 
 
 
-THYROID.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
+THYROID.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS", results$Predictor, ignore.case = T),]
 
 
 #############################################
@@ -609,7 +615,8 @@ dat_all=dat_all[dat_all$evt1==1,]
 fit_all = glm(formula = event ~ Meningioma_PRS.tertile.category + 
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + 
-                maxsegrtdose.category + epitxn_dose_5.category,
+                maxsegrtdose.category + epitxn_dose_5.category +
+                EAS + AFR,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
 summary(fit_all)
@@ -629,7 +636,7 @@ results <- data.frame(
 
 
 
-MENINGIOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
+MENINGIOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS", results$Predictor, ignore.case = T),]
 
 
 ##########################################
@@ -679,8 +686,8 @@ results <- data.frame(
 
 
 
-SARCOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose|anthra|epitxn|prs", results$Predictor, ignore.case = T),]
-
+SARCOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose|anthra|epitxn|prs|AFR|EAS", results$Predictor, ignore.case = T),]
+SARCOMA.vars
 
 ## Combine all
 
@@ -710,7 +717,7 @@ p_columns <- empty_dataframe[, grepl("^P_", colnames(empty_dataframe))]
 # Convert the selected columns to numeric
 for (col in colnames(p_columns)) {
   empty_dataframe[, col] <- as.numeric(empty_dataframe[, col])
-  empty_dataframe[, col][empty_dataframe[, col] < 0.0001] <- "< .0001"
+  # empty_dataframe[, col][empty_dataframe[, col] < 0.0001] <- "< .0001" ## change to <0.001
 }
 
 
@@ -724,12 +731,15 @@ empty_dataframe.ordered <- empty_dataframe[match(c(NA, "AGE_AT_DIAGNOSIS5-9", "A
                                                    NA, "aa_class_dose_5.category1st", "aa_class_dose_5.category2nd", "aa_class_dose_5.category3rd", "aa_class_dose_5.categoryUnknown",
                                                    NA, "anthra_jco_dose_5.category1st",  "anthra_jco_dose_5.category2nd", "anthra_jco_dose_5.category3rd", "anthra_jco_dose_5.categoryUnknown",
                                                    NA, "epitxn_dose_5.category1st", "epitxn_dose_5.category2nd", "epitxn_dose_5.category3rd", "epitxn_dose_5.categoryUnknown",
-                                                   NA, "PRS_tertile_2nd", "PRS_tertile_3rd"), empty_dataframe$Predictor),]
+                                                   NA, "PRS_tertile_2nd", "PRS_tertile_3rd",
+                                                   NA, "AFR", "EAS"), empty_dataframe$Predictor),]
 
 
 # Fill missing values with NA
 empty_dataframe.ordered[is.na(empty_dataframe.ordered)] <- ""   
-
+desired_order <- c("Predictor",  "RR (95% CI)_ANY_SN", "P_ANY_SN", "RR (95% CI)_SMN", "P_SMN", "RR (95% CI)_NMSC", "P_NMSC", "RR (95% CI)_Breast", "P_Breast",
+                   "RR (95% CI)_Thyroid", "P_Thyroid", "RR (95% CI)_Meningioma", "P_Meningioma", "RR (95% CI)_Sarcoma", "P_Sarcoma")
+empty_dataframe.ordered <- empty_dataframe.ordered[, desired_order]
 
 
 #####################################
