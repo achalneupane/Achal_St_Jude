@@ -1,0 +1,393 @@
+---
+title: "Additional analysis for LVNC project (Cardiomyocytes)"
+output: word_document
+date: "05-1-2024"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, eval=TRUE, echo= TRUE}
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects//RNAseq/common/LVNC_Hana_project/")
+```
+
+## Project description (Notes from Hana)
+I have two sets of samples, on are cardiomyocytes (CM) and the other are
+endocardial cells (EC) and would like to see the differences within each cell
+type.
+
+For each cell type I have 12 samples coming from 4 groups which have 3
+replicates  (each replicate is one hiPSC line, so they are considered
+biological replicates). I have one control group and three cardiomyopathy
+groups. These four groups are : control, LVNC (left ventricular non-compaction
+cardiomyopathy), HCM (hypertrophic cardiomyopathy) and DCM (dilated
+cardiomyopathy).
+
+Here are sample details:
+
+Control: 19-3, 25-3, 26-3
+Cardiomyopathy (DCM): GW10, GW53, GW168
+Cardiomyopathy (HCM): GW129, GW167, GW169
+Cardiomyopathy (LVNC): GW30, GW64, GW159
+
+
+
+## Additional analysis for Hana:
+I was going through the RNAseq analysis and realised we would need to include more comparisons. Whenever you got the chance, would you please be bale to send me these comparison for each cell type separately?
+
+LVNC vs Control
+HCM vs Control
+DCM vs Control
+
+
+# Loading libraries and setting location paths
+
+```{r, eval=TRUE, echo= FALSE}
+
+library(ggplot2)
+library(ggfortify)
+library(ggrepel)
+library(dplyr)
+library(DESeq2)
+library(ggplot2)
+library("knitr")
+library("kableExtra")
+```
+
+# Preparing count data
+```{r, eval=TRUE, echo= TRUE}
+counts<-read.table(file='Z:/ResearchHome/Groups/sapkogrp/projects//RNAseq/common/LVNC_Hana_project/SAPKO-820324-STRANDED_RSEM_gene_count.2024-02-16_18-57-58.txt', header=TRUE)
+# > dim(counts)
+# [1] 60754    28
+
+
+counts$geneSymbol[duplicated(counts$geneSymbol)] <- paste0(counts$geneSymbol, "_", counts$geneID)[duplicated(counts$geneSymbol)]
+
+counts = dplyr::select(counts, -c(geneID, bioType, annotationLevel))
+counts = counts[rowSums(counts[,-1])>20,]
+
+rownames(counts)<-counts[,1]
+counts2<-counts[,-1]
+
+```
+
+## Read Pheno file
+
+```{r, eval=TRUE, echo= TRUE}
+## data preparaton
+counts.matrix_ROBI.save<-as.matrix(counts2)
+mode(counts.matrix_ROBI.save)<-"integer"
+
+properties<-read.table('Z:/ResearchHome/Groups/sapkogrp/projects//RNAseq/common/LVNC_Hana_project/phenotype_LVNC_project.txt', sep = '\t', header=TRUE)
+properties$Cell_Type=as.factor(properties$Cell_Type)
+properties$Group=as.factor(properties$Group)
+properties$Status=as.factor(properties$Status)
+properties.save <- properties
+```
+
+
+## 1. LVNC vs Control (cardiomyocytes)
+
+```{r, eval=TRUE, echo= TRUE}
+## only cardiomyocyte
+properties <- properties.save[properties.save$Cell_Type == "Cardiomyocytes",]
+# Keep LVNC and Control
+properties <- properties[grepl("Control|LVNC",properties$Group),]
+properties$Status <- properties$Group
+properties <- properties[, c("sample_ID", "Status")] # remove Cell_type
+counts.matrix_ROBI <- counts.matrix_ROBI.save[,match(properties$sample_ID, colnames(counts.matrix_ROBI.save))]
+colnames(counts.matrix_ROBI) == properties$sample_ID
+
+
+## Create a DESeqDataSet (dds_ROBIS) from the count matrix and phenotype information.
+dds_ROBIS<-DESeqDataSetFromMatrix(countData = counts.matrix_ROBI,colData = properties, design=~1)
+
+## Perform variance-stabilizing transformation (vst) on the DESeqDataSet
+rld_ROBIS<-vst(dds_ROBIS,blind = FALSE)
+
+## Select the top 500 variable genes based on row variances. Create a heatmap
+## (phm) using pheatmap with clustering of rows and columns.
+library(pheatmap)
+properties2<-properties
+rownames(properties2)<-properties[,1]
+properties2<-subset(properties2, select=-c(sample_ID))
+myMatrix<-SummarizedExperiment::assay(rld_ROBIS)
+topVarGenes<-head(order(rowVars(myMatrix),decreasing = TRUE), 500)
+myMatrixforheatmap<-myMatrix[topVarGenes,]
+phm<-pheatmap(myMatrixforheatmap, scale="row", cluster_rows = TRUE, cluster_cols = TRUE, annotation_col = properties2, show_colnames = TRUE, show_rownames = FALSE)
+tiff(file="Heatmap_top_500_genes_LVNC_Control_Cardiomyocytes.tiff",width = 18, height = 32, units = 'cm', res = 300, compression = 'lzw')
+phm
+dev.off()
+```
+
+
+
+
+Here, we will conduct differential expression analysis between "LVNC" and "Control" groups, filter and categorize significant genes, and create a volcano plot for visualization. The volcano plot highlights genes with significant changes in expression, facilitating the identification of differentially expressed genes.The design in this context includes the factors Status (indicating whether a sample is from the LVNC or Control group).
+
+```{r, eval=TRUE, echo= TRUE}
+# Create a DESeqDataSet (ddset) from the count matrix (counts.matrix_ROBI) and
+# phenotype information (properties2).
+ddset = DESeqDataSetFromMatrix(
+    countData = counts.matrix_ROBI, # raw counts
+    colData = properties2, # phenotype data
+    design = ~Status
+)
+
+deseq_object = DESeq(ddset)
+
+# Extracts results from the DESeq analysis, focusing on the contrast between
+# "LVNC" and "Control" groups.
+deseq_results = data.frame(results(
+  deseq_object,
+  contrast = c("Status", "LVNC", "Control")
+))
+deseq_results = deseq_results[order(deseq_results$padj), ]
+deseq_results_filtered = subset(deseq_results, pvalue < 0.05)
+dim(deseq_results_filtered)
+deseq_results$expression = ifelse(
+  deseq_results$padj < 0.05 &
+    (deseq_results$log2FoldChange) >= (1.5),
+  "Up",
+  ifelse(
+    deseq_results$padj < 0.05 & (deseq_results$log2FoldChange) <= (-1.5),
+    "Down",
+    "Stable"
+  )
+)
+deseq_results$expression = factor(deseq_results$expression, levels = c("Up", "Down", "Stable"))
+# deseq_results = subset(deseq_results, abs(log2FoldChange)<5 & !is.na(padj))
+deseq_results = subset(deseq_results,!is.na(padj))
+
+write.table(deseq_results, file="deseq_results_LVNC_vs_Control_Cardiomyocytes.txt", sep="\t")
+
+#Create Volcano Plot from DESEQ results
+p = ggplot(data = deseq_results, aes(x = log2FoldChange,
+                                     y = -log10(padj),
+                                     colour = expression,
+                                     label = rownames(deseq_results))) +
+    geom_point(alpha = 0.4, size = 3.5) +
+    scale_color_manual(values=c("red", "blue","grey")) +
+    geom_vline(xintercept = c(-2, 2), lty=4, col="black", lwd=0.8) +
+    geom_hline(yintercept = -log10(0.05), lty=4, col="black", lwd=0.8) +
+    labs(x = expression(bold(log[2]~"fold-change")),
+         y = expression(bold(-log[10]~"adjusted p-value"))) +
+    theme_bw() +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          text = element_text(size=16, colour = "black", face = "bold"),
+          axis.text = element_text(colour = "black", face = "bold"),
+          legend.title = element_blank()) +
+    scale_x_continuous(breaks = seq(-15, 15,3), limits = c(-15, 15))
+
+tiff(file="Volcano_plot_LVNC_vs_Control_Cardiomyocytes.tiff",
+     width = 18, height = 16, units = 'cm', res = 300, compression = 'lzw')
+p
+dev.off()
+```
+
+
+## 2. HCM vs Control (cardiomyocytes)
+
+```{r, eval=TRUE, echo= TRUE}
+## only cardiomyocyte
+properties <- properties.save[properties.save$Cell_Type == "Cardiomyocytes",]
+# Keep HCM and Control
+properties <- properties[grepl("Control|HCM",properties$Group),]
+properties$Status <- properties$Group
+properties <- properties[, c("sample_ID", "Status")] # remove Cell_type
+counts.matrix_ROBI <- counts.matrix_ROBI.save[,match(properties$sample_ID, colnames(counts.matrix_ROBI.save))]
+colnames(counts.matrix_ROBI) == properties$sample_ID
+
+
+## Create a DESeqDataSet (dds_ROBIS) from the count matrix and phenotype information.
+dds_ROBIS<-DESeqDataSetFromMatrix(countData = counts.matrix_ROBI,colData = properties, design=~1)
+
+## Perform variance-stabilizing transformation (vst) on the DESeqDataSet
+rld_ROBIS<-vst(dds_ROBIS,blind = FALSE)
+
+## Select the top 500 variable genes based on row variances. Create a heatmap
+## (phm) using pheatmap with clustering of rows and columns.
+library(pheatmap)
+properties2<-properties
+rownames(properties2)<-properties[,1]
+properties2<-subset(properties2, select=-c(sample_ID))
+myMatrix<-SummarizedExperiment::assay(rld_ROBIS)
+topVarGenes<-head(order(rowVars(myMatrix),decreasing = TRUE), 500)
+myMatrixforheatmap<-myMatrix[topVarGenes,]
+phm<-pheatmap(myMatrixforheatmap, scale="row", cluster_rows = TRUE, cluster_cols = TRUE, annotation_col = properties2, show_colnames = TRUE, show_rownames = FALSE)
+tiff(file="Heatmap_top_500_genes_HCM_Control_Cardiomyocytes.tiff",width = 18, height = 32, units = 'cm', res = 300, compression = 'lzw')
+phm
+dev.off()
+```
+
+
+
+
+Here, we will conduct differential expression analysis between "HCM" and "Control" groups, filter and categorize significant genes, and create a volcano plot for visualization. The volcano plot highlights genes with significant changes in expression, facilitating the identification of differentially expressed genes.The design in this context includes the factors Status (indicating whether a sample is from the HCM or Control group).
+
+```{r, eval=TRUE, echo= TRUE}
+# Create a DESeqDataSet (ddset) from the count matrix (counts.matrix_ROBI) and
+# phenotype information (properties2).
+ddset = DESeqDataSetFromMatrix(
+  countData = counts.matrix_ROBI, # raw counts
+  colData = properties2, # phenotype data
+  design = ~Status
+)
+
+deseq_object = DESeq(ddset)
+
+# Extracts results from the DESeq analysis, focusing on the contrast between
+# "HCM" and "Control" groups.
+deseq_results = data.frame(results(
+  deseq_object,
+  contrast = c("Status", "HCM", "Control")
+))
+deseq_results = deseq_results[order(deseq_results$padj), ]
+deseq_results_filtered = subset(deseq_results, pvalue < 0.05)
+dim(deseq_results_filtered)
+deseq_results$expression = ifelse(
+  deseq_results$padj < 0.05 &
+    (deseq_results$log2FoldChange) >= (1.5),
+  "Up",
+  ifelse(
+    deseq_results$padj < 0.05 & (deseq_results$log2FoldChange) <= (-1.5),
+    "Down",
+    "Stable"
+  )
+)
+deseq_results$expression = factor(deseq_results$expression, levels = c("Up", "Down", "Stable"))
+# deseq_results = subset(deseq_results, abs(log2FoldChange)<5 & !is.na(padj))
+deseq_results = subset(deseq_results,!is.na(padj))
+
+write.table(deseq_results, file="deseq_results_HCM_vs_Control_Cardiomyocytes.txt", sep="\t")
+
+#Create Volcano Plot from DESEQ results
+p = ggplot(data = deseq_results, aes(x = log2FoldChange,
+                                     y = -log10(padj),
+                                     colour = expression,
+                                     label = rownames(deseq_results))) +
+  geom_point(alpha = 0.4, size = 3.5) +
+  scale_color_manual(values=c("red", "blue","grey")) +
+  geom_vline(xintercept = c(-2, 2), lty=4, col="black", lwd=0.8) +
+  geom_hline(yintercept = -log10(0.05), lty=4, col="black", lwd=0.8) +
+  labs(x = expression(bold(log[2]~"fold-change")),
+       y = expression(bold(-log[10]~"adjusted p-value"))) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text = element_text(size=16, colour = "black", face = "bold"),
+        axis.text = element_text(colour = "black", face = "bold"),
+        legend.title = element_blank()) +
+  scale_x_continuous(breaks = seq(-15, 15,3), limits = c(-15, 15))
+
+tiff(file="Volcano_plot_HCM_vs_Control_Cardiomyocytes.tiff",
+     width = 18, height = 16, units = 'cm', res = 300, compression = 'lzw')
+p
+dev.off()
+```
+
+
+
+## 3. DCM vs Control (cardiomyocytes)
+
+```{r, eval=TRUE, echo= TRUE}
+## only cardiomyocyte
+properties <- properties.save[properties.save$Cell_Type == "Cardiomyocytes",]
+# Keep DCM and Control
+properties <- properties[grepl("Control|DCM",properties$Group),]
+properties$Status <- properties$Group
+properties <- properties[, c("sample_ID", "Status")] # remove Cell_type
+counts.matrix_ROBI <- counts.matrix_ROBI.save[,match(properties$sample_ID, colnames(counts.matrix_ROBI.save))]
+colnames(counts.matrix_ROBI) == properties$sample_ID
+
+
+## Create a DESeqDataSet (dds_ROBIS) from the count matrix and phenotype information.
+dds_ROBIS<-DESeqDataSetFromMatrix(countData = counts.matrix_ROBI,colData = properties, design=~1)
+
+## Perform variance-stabilizing transformation (vst) on the DESeqDataSet
+rld_ROBIS<-vst(dds_ROBIS,blind = FALSE)
+
+## Select the top 500 variable genes based on row variances. Create a heatmap
+## (phm) using pheatmap with clustering of rows and columns.
+library(pheatmap)
+properties2<-properties
+rownames(properties2)<-properties[,1]
+properties2<-subset(properties2, select=-c(sample_ID))
+myMatrix<-SummarizedExperiment::assay(rld_ROBIS)
+topVarGenes<-head(order(rowVars(myMatrix),decreasing = TRUE), 500)
+myMatrixforheatmap<-myMatrix[topVarGenes,]
+phm<-pheatmap(myMatrixforheatmap, scale="row", cluster_rows = TRUE, cluster_cols = TRUE, annotation_col = properties2, show_colnames = TRUE, show_rownames = FALSE)
+tiff(file="Heatmap_top_500_genes_DCM_Control_Cardiomyocytes.tiff",width = 18, height = 32, units = 'cm', res = 300, compression = 'lzw')
+phm
+dev.off()
+```
+
+
+
+
+Here, we will conduct differential expression analysis between "DCM" and "Control" groups, filter and categorize significant genes, and create a volcano plot for visualization. The volcano plot highlights genes with significant changes in expression, facilitating the identification of differentially expressed genes.The design in this context includes the factors Status (indicating whether a sample is from the DCM or Control group).
+
+```{r, eval=TRUE, echo= TRUE}
+# Create a DESeqDataSet (ddset) from the count matrix (counts.matrix_ROBI) and
+# phenotype information (properties2).
+ddset = DESeqDataSetFromMatrix(
+  countData = counts.matrix_ROBI, # raw counts
+  colData = properties2, # phenotype data
+  design = ~Status
+)
+
+deseq_object = DESeq(ddset)
+
+# Extracts results from the DESeq analysis, focusing on the contrast between
+# "DCM" and "Control" groups.
+deseq_results = data.frame(results(
+  deseq_object,
+  contrast = c("Status", "DCM", "Control")
+))
+deseq_results = deseq_results[order(deseq_results$padj), ]
+deseq_results_filtered = subset(deseq_results, pvalue < 0.05)
+dim(deseq_results_filtered)
+deseq_results$expression = ifelse(
+  deseq_results$padj < 0.05 &
+    (deseq_results$log2FoldChange) >= (1.5),
+  "Up",
+  ifelse(
+    deseq_results$padj < 0.05 & (deseq_results$log2FoldChange) <= (-1.5),
+    "Down",
+    "Stable"
+  )
+)
+deseq_results$expression = factor(deseq_results$expression, levels = c("Up", "Down", "Stable"))
+# deseq_results = subset(deseq_results, abs(log2FoldChange)<5 & !is.na(padj))
+deseq_results = subset(deseq_results,!is.na(padj))
+
+write.table(deseq_results, file="deseq_results_DCM_vs_Control_Cardiomyocytes.txt", sep="\t")
+
+#Create Volcano Plot from DESEQ results
+p = ggplot(data = deseq_results, aes(x = log2FoldChange,
+                                     y = -log10(padj),
+                                     colour = expression,
+                                     label = rownames(deseq_results))) +
+  geom_point(alpha = 0.4, size = 3.5) +
+  scale_color_manual(values=c("red", "blue","grey")) +
+  geom_vline(xintercept = c(-2, 2), lty=4, col="black", lwd=0.8) +
+  geom_hline(yintercept = -log10(0.05), lty=4, col="black", lwd=0.8) +
+  labs(x = expression(bold(log[2]~"fold-change")),
+       y = expression(bold(-log[10]~"adjusted p-value"))) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        text = element_text(size=16, colour = "black", face = "bold"),
+        axis.text = element_text(colour = "black", face = "bold"),
+        legend.title = element_blank()) +
+  scale_x_continuous(breaks = seq(-15, 15,3), limits = c(-15, 15))
+
+tiff(file="Volcano_plot_DCM_vs_Control_Cardiomyocytes.tiff",
+     width = 18, height = 16, units = 'cm', res = 300, compression = 'lzw')
+p
+dev.off()
+```

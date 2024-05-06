@@ -204,4 +204,57 @@ table(CTCAE.2$new_event_number,CTCAE.2$grade_2_or_higher)
 # 5       2                 1
 
 
+####################################
+## Email from Yadav on 04/30/2024 ##
+####################################
+# Yutaka and I discussed about these samples and would like to ask you provide the following variables for 1100 survivors you have identified:
+# Age at primary cancer diagnosis
+# Year of cancer diagnosis
+# Age at plasma sample
+# Cancer diagnosis type
+# An indicator variable showing if they had cardiomyopathy (Grade 2 or higher) at baseline plasma sample
+# Yes/no variable indicating if they were exposed to anthracyclines or heart RT
+# Category (incident cardiomyopathy, HL or not HL survivors)
 
+## Adding requested variables
+# Age at primary cancer diagnosis & Year of cancer diagnosis
+all.wanted.df.1200.to.update <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_data_batch1_1200_samples.txt", header = T, sep = "\t")
+diagnosis <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/diagnosis.sas7bdat')
+diagnosis$KEY <- paste0(diagnosis$sjlid, "_", diagnosis$diaggrp)
+all.wanted.df.1200.to.update$KEY <- paste0(all.wanted.df.1200.to.update$sjlid, "_", all.wanted.df.1200.to.update$diaggrp)
+all.wanted.df.1200.to.update$agedx <- diagnosis$agedx[match(all.wanted.df.1200.to.update$KEY, diagnosis$KEY)]
+all.wanted.df.1200.to.update$diagdt <- diagnosis$diagdt[match(all.wanted.df.1200.to.update$KEY, diagnosis$KEY)]
+
+
+chemo <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/chemosum_dose.sas7bdat")
+chemo <- chemo[c("sjlid", "anthracyclines_dose_any",	"anthracyclines_dose_prim",	"anthracyclines_dose_5",	"anthracyclines_dose_10")]
+
+radiation <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/radiation_dosimetry.sas7bdat")
+radiation <- radiation[c("sjlid", "maxchestrtdose")]
+
+all.wanted.df.1200.to.update <- cbind.data.frame(all.wanted.df.1200.to.update, chemo[match(all.wanted.df.1200.to.update$sjlid, chemo$sjlid), "anthracyclines_dose_any"])
+all.wanted.df.1200.to.update <- cbind.data.frame(all.wanted.df.1200.to.update, radiation[match(all.wanted.df.1200.to.update$sjlid, radiation$sjlid),"maxchestrtdose"])
+
+all.wanted.df.1200.to.update$anthra_or_chestRT <- ifelse((all.wanted.df.1200.to.update$anthracyclines_dose_any > 0 | all.wanted.df.1200.to.update$maxchestrtdose > 200), "Yes", "No")
+
+  
+table(CTCAE.2$new_event_number,CTCAE.2$grade)
+sum(CTCAE.2$new_event_number >= 2 & CTCAE.2$grade >=2)
+# 186
+remove.sjl <- CTCAE.2$sjlid[CTCAE.2$new_event_number >= 2 & CTCAE.2$grade >=2]
+CTCAE.3 <- CTCAE.2[!CTCAE.2$sjlid %in% remove.sjl,]
+table(CTCAE.3$new_event_number,CTCAE.3$grade)
+# 0    2    3    4
+# 1 2987  262  125    4
+# 2  972    0    0    0
+# 3  262    0    0    0
+# 4   51    0    0    0
+# 5    2    0    0    0
+ge.grade2.baseline <- unique(CTCAE.3$sjlid[CTCAE.3$new_event_number == 1 & CTCAE.3$grade >=2])
+length(ge.grade2.baseline)
+# 391
+
+all.wanted.df.1200.to.update$CMP_at_baseline [all.wanted.df.1200.to.update$sjlid %in% ge.grade2.baseline] <- "Yes"
+all.wanted.df.1200.to.update$CMP_at_baseline[all.wanted.df.1200.to.update$CMP_status == "Yes"] <- "No"
+
+write.table(all.wanted.df.1200.to.update, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma.df.1100.with_additional_variables_toYadav.txt", col.names = T, row.names = F, sep = "\t", quote = F)

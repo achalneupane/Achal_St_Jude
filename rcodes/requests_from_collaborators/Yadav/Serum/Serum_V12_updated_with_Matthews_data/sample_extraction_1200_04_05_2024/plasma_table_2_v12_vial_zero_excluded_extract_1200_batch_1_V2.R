@@ -79,7 +79,7 @@ CA.171 <- CA.171[c("tb_number", "sjlid",  "num_vials", "ageevent", "Sample_age",
 ## randomly select 200 Hodgkin lymphoma survivors from all eligible Hodgkin lymphoma survivors ##
 #################################################################################################
 # CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
-# CTCAE <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
+## CTCAE <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
 CTCAE$ageevent <- round(CTCAE$ageevent,1)
 dim(CTCAE)
 # [1] 913776     62
@@ -424,7 +424,7 @@ all.wanted.df.1200.to.update.kyla$total_plasma_for_the_visit[is.na(all.wanted.df
 all.wanted.df.1200.to.update.kyla$total_serum_for_the_visit[is.na(all.wanted.df.1200.to.update.kyla$total_serum_for_the_visit)] <- 0
 all.wanted.df.1200.to.update.kyla$visit_depleted_YN <- ifelse((all.wanted.df.1200.to.update.kyla$total_plasma_for_the_visit + all.wanted.df.1200.to.update.kyla$total_serum_for_the_visit) >= 2, "No", "Yes")
 write.table(all.wanted.df.1200.to.update.kyla, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_data_batch1_1200_samples_to_ECC_with_vials_info.txt", col.names = T, row.names = F, sep = "\t", quote = F)
-#########################
+
 
 ## EMAIL from Matt on 4/4/2024: There are a few discrepancies and there are 33
 #samples (attached) that will now be depleted if used. The reason for this
@@ -441,3 +441,5 @@ new.missing$selection_group <- all.wanted.df.1200.to.update$selection_group[matc
 # 
 # # View the randomized samples
 # randomized_samples
+
+

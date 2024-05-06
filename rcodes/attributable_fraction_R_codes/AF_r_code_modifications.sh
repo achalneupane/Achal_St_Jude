@@ -199,3 +199,5 @@ find . -type f -name '*model_fit*' -exec sed -i 's|admixture <- read.table("Z:/R
 
 
 
+## Replace in 20b
+find . -type f -exec sed -i 's/V19b/V20b/g' {} +
