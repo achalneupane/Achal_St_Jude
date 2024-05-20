@@ -201,3 +201,15 @@ find . -type f -name '*model_fit*' -exec sed -i 's|admixture <- read.table("Z:/R
 
 ## Replace in 20b
 find . -type f -exec sed -i 's/V19b/V20b/g' {} +
+
+
+
+find . -type f -name '*model_fit*' -exec sed -i 's/tertile\.Rdata/lt60.Rdata/g' {} +
+find . -type f -name '*model_fit*' -exec sed -i 's/HEI2015_TOTAL_SCORE\.tertile\.category/HEI2015_TOTAL_SCORE.lt60.category/g' {} +
+find . -type f -name '*model_fit*' -exec sed -i 's/category = "3rd"/category = "No"/g' {} +
+
+
+
+
+Cardiomyocytes: 0-3, 4 (??), 5-7, 9
+Unknowns: 8, 10-15

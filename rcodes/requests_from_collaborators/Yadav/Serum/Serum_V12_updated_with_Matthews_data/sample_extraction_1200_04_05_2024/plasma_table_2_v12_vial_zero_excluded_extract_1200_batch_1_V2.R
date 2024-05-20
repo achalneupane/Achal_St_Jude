@@ -61,7 +61,7 @@ CA.171 <- unique(CA.171$sjlid)
 table_2$CMP_status <- ifelse(table_2$sjlid %in% CA.171, "Yes", "No")
 table(table_2$CMP_status)
 # No  Yes 
-# 3200  399 
+# 3209  399 
 
 ## Get the frist ageevent for all samples
 table_2.first.event <- table_2 %>%
@@ -300,6 +300,8 @@ SERUM.not.CA171$diaggrp <- diag$diaggrp[match(SERUM.not.CA171$sjlid, diag$sjlid)
 colnames(SERUM.not.CA171)[colnames(SERUM.not.CA171) == "ageatsample"] <- "Sample_age"
 SERUM.not.CA171$ageevent <- NA
 SERUM.not.CA171$CMP_status <- "No"
+
+write.table(SERUM.not.CA171, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/SERUM.not.CA171.txt", col.names = T, row.names = F, quote = F, sep = "\t", na="")
 ############################
 ## randomly select 200 HL ##
 ############################
@@ -322,6 +324,7 @@ all.hodgkin.extract <- all.hodgkin.extract[c("tb_number", "sjlid",  "num_vials",
 ## randomly select the remaining 1100-171-200=729 ##
 ####################################################
 all.non.hodgkin <- SERUM.not.CA171[!SERUM.not.CA171$sjlid %in% c(CA.171$sjlid,all.hodgkin$sjlid),] # exclude those in CA.171 + 200 hodgkins samples from the original table
+# all.non.hodgkin <- all.non.hodgkin[all.non.hodgkin$diaggrp!="",]
 # Randomly select 733 non- Hodgkin lymphoma survivors from all eligible non- Hodgkin lymphoma survivors.
 dim(all.non.hodgkin)
 # 6664   10

@@ -489,6 +489,12 @@ table(ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.tertile.category)
 # 3rd     2nd     1st Unknown 
 # 1180    1179    1181     861 
 
+
+## Create HEI2015 <60
+ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.lt60.category <- ifelse(ALL.LIFESTYLE$HEI2015_TOTAL_SCORE >= 60, "No", "Yes") 
+ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.lt60.category[is.na(ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.lt60.category)] <- "Unknown"
+ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.lt60.category <- factor(ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.lt60.category, levels = c("No", "Yes", "Unknown"))
+
 # https://www.fns.usda.gov/cnpp/hei-scores-americans
 gg <- data.frame(ALL.LIFESTYLE$SJLIFEID, ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.tertile.category, ALL.LIFESTYLE$HEI2015_TOTAL_SCORE)
 

@@ -258,3 +258,32 @@ all.wanted.df.1200.to.update$CMP_at_baseline [all.wanted.df.1200.to.update$sjlid
 all.wanted.df.1200.to.update$CMP_at_baseline[all.wanted.df.1200.to.update$CMP_status == "Yes"] <- "No"
 
 write.table(all.wanted.df.1200.to.update, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma.df.1100.with_additional_variables_toYadav.txt", col.names = T, row.names = F, sep = "\t", quote = F)
+
+
+
+diagnosis <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/diagnosis.sas7bdat')
+diagnosis <- diagnosis[which(diagnosis$primdx ==1),] # primary diagnosis
+diagnosis$KEY <- paste0(diagnosis$sjlid, "_", diagnosis$diaggrp)
+# diagnosis$dups <- duplicated(diagnosis$KEY)
+SERUM.not.CA171 <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/SERUM.not.CA171.txt", sep = "\t", header = T)
+# SERUM.not.CA171$diagrp2 <- diagnosis$diaggrp[match(SERUM.not.CA171$sjlid, diagnosis$sjlid)]
+
+SERUM.not.CA171$agedx <- diagnosis$agedx[match(SERUM.not.CA171$sjlid, diagnosis$sjlid)]
+SERUM.not.CA171$diagdt <- diagnosis$diagdt[match(SERUM.not.CA171$sjlid, diagnosis$sjlid)]
+
+SERUM.not.CA171$CMP_at_baseline [SERUM.not.CA171$sjlid %in% ge.grade2.baseline] <- "Yes"
+# SERUM.not.CA171$CMP_at_baseline[is.na(SERUM.not.CA171$CMP_at_baseline)] <- "No"
+
+SERUM.not.CA171 <- cbind.data.frame(SERUM.not.CA171, chemo[match(SERUM.not.CA171$sjlid, chemo$sjlid), "anthracyclines_dose_any"])
+SERUM.not.CA171 <- cbind.data.frame(SERUM.not.CA171, radiation[match(SERUM.not.CA171$sjlid, radiation$sjlid),"maxchestrtdose"])
+
+SERUM.not.CA171$anthra_or_chestRT <- ifelse((SERUM.not.CA171$anthracyclines_dose_any > 0 | SERUM.not.CA171$maxchestrtdose > 200), "Yes", "No")
+
+SERUM.not.CA171 <- SERUM.not.CA171[c("tb_number", "sjlid", "num_vials", "ageevent", "vitalstatus", "agedx", "diagdt", "Sample_age", "diaggrp", "CMP_at_baseline", "anthra_or_chestRT")]
+
+all.hodgkin <- SERUM.not.CA171[grepl("^Hodgkin", SERUM.not.CA171$diaggrp, ignore.case = T),]
+all.non.hodgkin <- SERUM.not.CA171[!SERUM.not.CA171$sjlid %in% c(all.hodgkin$sjlid),] # exclude those in CA.171 + 200 hodgkins samples from the original table
+all.non.hodgkin <- all.non.hodgkin[all.non.hodgkin$diaggrp!="",]
+
+write.table(all.hodgkin, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/hodgkin_all.txt", col.names = T, row.names = F, sep = "\t", quote = F)
+write.table(all.non.hodgkin, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/nonhodgkin_all.txt", col.names = T, row.names = F, sep = "\t", quote = F)
