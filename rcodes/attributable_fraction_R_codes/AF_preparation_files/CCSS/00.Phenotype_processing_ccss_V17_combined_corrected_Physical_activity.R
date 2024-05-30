@@ -201,12 +201,23 @@ CCSS_data$PhysicalActivity_yn[is.na(CCSS_data$PhysicalActivity_yn)] <- "Unknown"
 CCSS_data$PhysicalActivity_yn <- factor(CCSS_data$PhysicalActivity_yn, level = c("Yes", "No", "Unknown")) 
 
 # Smoker
+# Smoking status from most recent data (1=Never, 2=Former, 3=Current)
 CCSS_data$SMK <- smk_iid_dob_18_uniq$smk[match(CCSS_data$ccssid, smk_iid_dob_18_uniq$ccssid)]
 CCSS_data$Current_smoker_yn_agesurvey <- as.numeric(smk_iid_dob_18_uniq$age[match(CCSS_data$ccssid, smk_iid_dob_18_uniq$ccssid)])
 CCSS_data$Current_smoker_yn <- factor(CCSS_data$SMK)
 CCSS_data$Current_smoker_yn <- factor(ifelse(CCSS_data$Current_smoker_yn != 3, "No", "Yes"))
 CCSS_data$Current_smoker_yn <- factor(CCSS_data$Current_smoker_yn, level = c("No", "Yes", "Unknown")) 
 CCSS_data$Current_smoker_yn[is.na(CCSS_data$Current_smoker_yn)] <- "Unknown"
+
+## Smoker ever vs never
+CCSS_data$Smoker_ever_yn_agesurvey <- as.numeric(smk_iid_dob_18_uniq$age[match(CCSS_data$ccssid, smk_iid_dob_18_uniq$ccssid)])
+CCSS_data$Smoker_ever_yn <- factor(CCSS_data$SMK)
+CCSS_data$Smoker_ever_yn <- factor(ifelse(CCSS_data$Smoker_ever_yn != 1, "Yes", "No"))
+CCSS_data$Smoker_ever_yn <- factor(CCSS_data$Smoker_ever_yn, level = c("No", "Yes", "Unknown")) 
+CCSS_data$Smoker_ever_yn[is.na(CCSS_data$Smoker_ever_yn)] <- "Unknown"
+table(CCSS_data$Smoker_ever_yn)
+# No     Yes Unknown 
+# 7212    2429     106
 
 # drinker
 CCSS_data$DRK <- drk_iid_dob_18_uniq$riskydrk[match(CCSS_data$ccssid, drk_iid_dob_18_uniq$ccssid)]
@@ -272,7 +283,7 @@ subneo <- CCSS_data
 PHENO.ANY_SN <- CCSS_data[c('ccssid', 'SEX', 'agedx', 'AGE_AT_DIAGNOSIS', 'agelstcontact', 
                            'chestrtgrp', 'neckrtgrp', 'abdomenrtgrp', 'abdomenrtgrp', 'brainrtgrp', 'pelvisrtgrp', 
                            'chestmaxrtdose', 'neckmaxrtdose', 'pelvismaxrtdose', 'abdmaxrtdose', 'maxsegrtdose', 'anth_DED5', 'alk_CED5', 'epipdose5', 'pt_cisED5', 
-                           "Obese_yn_agesurvey", "Obese_yn", "PhysicalActivity_yn_agesurvey", "PhysicalActivity_yn", "Current_smoker_yn_agesurvey", "Current_smoker_yn", "RiskyHeavyDrink_yn_agesurvey", "RiskyHeavyDrink_yn")]
+                           "Obese_yn_agesurvey", "Obese_yn", "PhysicalActivity_yn_agesurvey", "PhysicalActivity_yn", "Smoker_ever_yn", "Smoker_ever_yn_agesurvey", "Current_smoker_yn_agesurvey", "Current_smoker_yn", "RiskyHeavyDrink_yn_agesurvey", "RiskyHeavyDrink_yn")]
 PHENO.ANY_SN <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$ccssid),]
 
 
@@ -380,7 +391,7 @@ PHENO.ANY_SN <- PHENO.ANY_SN[c('ccssid', 'gender', "agedx", 'agelstcontact', 'AG
                                  'maxchestrtdose.category', 'maxneckrtdose.category', 'maxabdrtdose.category', 'maxsegrtdose.category', 'maxpelvisrtdose.category',
                                  'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category',
                                'chestmaxrtdose', 'neckmaxrtdose', 'pelvismaxrtdose', 'abdmaxrtdose', 'maxsegrtdose', 'anth_DED5', 'alk_CED5', 'epipdose5', 'pt_cisED5',
-                               "Obese_yn_agesurvey", "Obese_yn", "PhysicalActivity_yn_agesurvey", "PhysicalActivity_yn", "Current_smoker_yn_agesurvey", "Current_smoker_yn", "RiskyHeavyDrink_yn_agesurvey", "RiskyHeavyDrink_yn")]
+                               "Obese_yn_agesurvey", "Obese_yn", "PhysicalActivity_yn_agesurvey", "PhysicalActivity_yn", "Smoker_ever_yn", "Smoker_ever_yn_agesurvey", "Current_smoker_yn_agesurvey", "Current_smoker_yn", "RiskyHeavyDrink_yn_agesurvey", "RiskyHeavyDrink_yn")]
 ## Meningioma_from_variants_also_in_CCSS_org_prs.profile-----------------------------------------------
 Meningioma.exp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Meningioma_from_variants_also_in_CCSS_org_prs.profile", header = T)
 Meningioma.org <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/prs_out/Meningioma_prs.profile", header = T)

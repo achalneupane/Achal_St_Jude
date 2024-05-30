@@ -209,7 +209,8 @@ find . -type f -name '*model_fit*' -exec sed -i 's/HEI2015_TOTAL_SCORE\.tertile\
 find . -type f -name '*model_fit*' -exec sed -i 's/category = "3rd"/category = "No"/g' {} +
 
 
-
-
-Cardiomyocytes: 0-3, 4 (??), 5-7, 9
-Unknowns: 8, 10-15
+## Replace Current smoker with Smoker ever variable
+cd /home/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V21b/21b
+find . -type f  -exec sed -i 's/Current_smoker_yn/Smoker_ever_yn/g' {} +
+find . -type f  -exec sed -i 's/smoker_former_or_never_yn_agesurvey/Smoker_ever_yn_agesurvey/g' {} +
+find . -type f -exec sed -i 's/V20b/V21b/g' {} +

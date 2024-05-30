@@ -154,9 +154,9 @@ smk_iid_dob_18_sorted = smk_iid_dob_18[order(smk_iid_dob_18$sjlid, smk_iid_dob_1
 smk_iid_dob_18_uniq = smk_iid_dob_18_sorted[!duplicated(smk_iid_dob_18_sorted$sjlid),]
 
 smk_iid_dob_18_uniq$smoker_former_or_never_yn <- as.numeric(ifelse(smk_iid_dob_18_uniq$smkStat != 2, 1, 0))
-smk_iid_dob_18_uniq$smoker_never_yn <- as.numeric(ifelse(smk_iid_dob_18_uniq$smkStat == 3, 1, 0))
-
-
+# smk_iid_dob_18_uniq$smoker_never_yn <- as.numeric(ifelse(smk_iid_dob_18_uniq$smkStat == 3, 1, 0))
+smk_iid_dob_18_uniq$smoker_ever_yn <- as.numeric(ifelse(smk_iid_dob_18_uniq$smkStat != 3, 1, 0))
+table(smk_iid_dob_18_uniq$smoker_ever_yn)
 
 ## 3.-----------Drinking
 drk_iid_dob_18 = subset(lifestyle, agesurvey >= 18)
@@ -215,10 +215,17 @@ smk_iid_dob_18_uniq.2 = smk_iid_dob_18_sorted.2[!duplicated(smk_iid_dob_18_sorte
 # adlthabits$smoker[adlthabits$smoker == 2] <- "Current"
 # adlthabits$smoker[adlthabits$smoker == 3] <- "Never"
 smk_iid_dob_18_uniq.2$smoker_former_or_never_yn <- as.numeric(ifelse(smk_iid_dob_18_uniq.2$smoker != 2, 1, 0))
-smk_iid_dob_18_uniq.2$smoker_never_yn <- as.numeric(ifelse(smk_iid_dob_18_uniq.2$smoker == 3, 1, 0))
+# smk_iid_dob_18_uniq.2$smoker_never_yn <- as.numeric(ifelse(smk_iid_dob_18_uniq.2$smoker == 3, 1, 0))
+smk_iid_dob_18_uniq.2$smoker_ever_yn <- ifelse(smk_iid_dob_18_uniq.2$smoker != 3, "Yes", "No")
+table(smk_iid_dob_18_uniq.2$smoker_ever_yn)
 
 table(smk_iid_dob_18_uniq.2$smoker)
 table(smk_iid_dob_18_uniq$smkStat)
+
+
+table(smk_iid_dob_18_uniq.2$smoker_ever_yn)
+# No    Yes 
+# 2425 1129 
 
 # PHENO.ANY_SN$smk_iid_dob_18_uniq.2 <- smk_iid_dob_18_uniq.2$smoker[match(PHENO.ANY_SN$sjlid, smk_iid_dob_18_uniq.2$sjlid)]
 # PHENO.ANY_SN$smk_iid_dob_18_uniq <- smk_iid_dob_18_uniq$smkStat[match(PHENO.ANY_SN$sjlid, smk_iid_dob_18_uniq$sjlid)]
@@ -428,6 +435,14 @@ ALL.LIFESTYLE$smoker_former_or_never_yn <- factor(ALL.LIFESTYLE$smoker_former_or
 table(ALL.LIFESTYLE$smoker_former_or_never_yn)
 # 1       0 Unknown 
 # 2784     770     847 
+
+ALL.LIFESTYLE$Smoker_ever_yn <- smk_iid_dob_18_uniq.2$smoker_ever_yn[match(ALL.LIFESTYLE$SJLIFEID, smk_iid_dob_18_uniq.2$SJLIFEID)]
+ALL.LIFESTYLE$Smoker_ever_yn_agesurvey <- smk_iid_dob_18_uniq.2$agesurvey[match(ALL.LIFESTYLE$SJLIFEID, smk_iid_dob_18_uniq.2$SJLIFEID)]
+ALL.LIFESTYLE$Smoker_ever_yn[is.na(ALL.LIFESTYLE$smoker_ever_yn)] <- "Unknown"
+ALL.LIFESTYLE$Smoker_ever_yn <- factor(ALL.LIFESTYLE$Smoker_ever_yn, level = c("No", "Yes", "Unknown")) 
+table(ALL.LIFESTYLE$Smoker_ever_yn)
+# No       Yes Unknown 
+# 2425    1129       0 
 
 ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn <- drk_iid_dob_18_uniq.2$NOT_RiskyHeavyDrink_yn[match(ALL.LIFESTYLE$SJLIFEID, drk_iid_dob_18_uniq.2$SJLIFEID)]
 ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn_agesurvey <- drk_iid_dob_18_uniq.2$agesurvey[match(ALL.LIFESTYLE$SJLIFEID, drk_iid_dob_18_uniq.2$SJLIFEID)]

@@ -169,64 +169,88 @@ library("variancePartition")
 library("edgeR")
 library(limma)
 library("BiocParallel")
-
-## normalize with deseq
-dds <- DESeqDataSetFromMatrix(countData = counts.matrix_ROBI,colData = properties, design=~1)
-dds <- estimateSizeFactors(dds)
-
-
-y <- DGEList(counts=counts)
-y <- calcNormFactors(y)
-
-
-# identify genes that pass expression cutoff
-isexpr <- rowSums(fpm(dds) > 1) >= 0.5 * ncol(dds)
-
-# compute log2 Fragments Per Million
-# Alternatively, fpkm(), vst() or rlog() could be used
-quantLog <- log2(fpm(dds)[isexpr, ] + 1)
-
-## The variable to be tested must be a fixed effect
-form <- ~ Group + (1 | Cell_type)
-
+# https://www.bioconductor.org/packages/devel/workflows/vignettes/RNAseq123/inst/doc/limmaWorkflow.html
 ## metadata
 info <-  properties2[, c("Group", "Cell_type")]
+# info$Group <- factor(info$Group, levels= c("Yes", "No"))
 
-# fit model and extract variance percents
-varPart <- fitExtractVarPartModel(quantLog, form, info, showWarnings = FALSE)
-head(varPart)
-# violin plot
-plotVarPart(sortCols(varPart), label.angle = 60)
+# Create a DGEList object and normalize the data:
+y <- DGEList(counts=counts.matrix_ROBI)
+y <- calcNormFactors(y)
+
+# Design matrix and blocking factor:
+design <- model.matrix(~ Group, data=info)
+block <- info$Cell_type
+
+# Estimate the dispersion:
+y <- estimateDisp(y, design)
+
+# Convert the DGEList to a voom object:
+v <- voom(y, design)
+
+# Estimate the correlation: The duplicateCorrelation function estimates the
+# correlation between repeated measures or related samples. In our case, it is
+# used to account for the random effect of cell type. This step is essential
+# because it adjusts for the fact that measurements within the same cell type
+# may be more similar to each other than to measurements from different cell
+# types.
+corfit <- duplicateCorrelation(v, design, block=block)
+
+# Fit the linear model: These lines fit a linear model to the data, taking into
+# account the correlation structure estimated in the previous step, and then
+# apply empirical Bayes moderation to the standard errors to improve the
+# statistical inference.
+
+# lmFit fits a linear model to the expression data, adjusting for the
+# block-specific correlation. This means it models the expression level of each
+# gene as a function of the specified experimental conditions (Group) while
+# considering the similarity of samples within the same cell type.
+fit <- lmFit(v, design, block=block, correlation=corfit$consensus)
+
+# eBayes applies empirical Bayes moderation to the standard errors of the
+# estimated coefficients. This step improves the accuracy and stability of the
+# differential expression analysis, especially when the number of samples is
+# small. It shrinks the standard errors towards a common value, which stabilizes
+# the inference of differential expression.
+
+# The fit object contains moderated t-statistics, log-odds of differential
+# expression, and other statistics that are adjusted for the correlation within
+# blocks and the empirical Bayes moderation.
+fit <- eBayes(fit)
+
+# Extract the results: coef: Specifies which coefficient's results to extract.
+# "GroupYes" refers to the coefficient for the Group variable, comparing "Yes"
+# versus "No". 
+
+# number: Specifies the number of top-ranked genes to return. Inf
+# means all genes will be returned.
+results <- topTable(fit, coef="GroupYes", number=Inf)
 ########################
 
 # Extracts results from the DESeq analysis, focusing on the contrast between
 # "Cardiomyopathy" and "Control" groups.
-deseq_results = data.frame(results(
-  deseq_object,
-  contrast = c("Group", "Yes", "No")
-))
-deseq_results = deseq_results[order(deseq_results$padj), ]
-deseq_results_filtered = subset(deseq_results, pvalue < 0.05)
+deseq_results = results[order(results$adj.P.Val), ]
+deseq_results_filtered = subset(deseq_results, P.Value < 0.05)
 dim(deseq_results_filtered)
 deseq_results$expression = ifelse(
-  deseq_results$padj < 0.05 &
-    (deseq_results$log2FoldChange) >= (1.5),
+  deseq_results$adj.P.Val < 0.05 &
+    (deseq_results$logFC) >= (1.5),
   "Up",
   ifelse(
-    deseq_results$padj < 0.05 & (deseq_results$log2FoldChange) <= (-1.5),
+    deseq_results$adj.P.Val < 0.05 & (deseq_results$logFC) <= (-1.5),
     "Down",
     "Stable"
   )
 )
 deseq_results$expression = factor(deseq_results$expression, levels = c("Up", "Down", "Stable"))
 # deseq_results = subset(deseq_results, abs(log2FoldChange)<5 & !is.na(padj))
-deseq_results = subset(deseq_results,!is.na(padj))
+deseq_results = subset(deseq_results,!is.na(adj.P.Val))
 
 write.table(deseq_results, file="Pr1_Dox_vs_Control.txt", sep="\t")
 
 #Create Volcano Plot from DESEQ results
-p = ggplot(data = deseq_results, aes(x = log2FoldChange,
-                                     y = -log10(padj),
+p = ggplot(data = deseq_results, aes(x = logFC,
+                                     y = -log10(adj.P.Val),
                                      colour = expression,
                                      label = rownames(deseq_results))) +
     geom_point(alpha = 0.4, size = 3.5) +
@@ -275,7 +299,139 @@ Here, we will design our analysis to identify differentially expressed genes bet
 
 ```{r, eval=TRUE, echo= TRUE}
 ## remove controls from properties
-properties3 <- properties2[properties2$Status != "Control", ]
+properties <- read.table(text="Samples	Project	samples.Pr	Cell_type	CO-CULTURED	Dox_treatment
+ISO	Pr2	Pr2_ISO	ISO CM	NO	No
+ISO_DX	Pr2	Pr2_ISO_DX	ISO CM	NO	Yes
+ISO_ISO	Pr2	Pr2_ISO_ISO	ISO CM	ISO CF	No
+ISO_ISO_DX	Pr2	Pr2_ISO_ISO_DX	ISO CM	ISO CF	Yes
+ISO_R1	Pr2	Pr2_ISO_R1	ISO CM	ROBO1 KO CF	No
+ISO_R1_DX	Pr2	Pr2_ISO_R1_DX	ISO CM	ROBO1 KO CF	Yes
+ISO_R2	Pr2	Pr2_ISO_R2	ISO CM	ROBO2 KO CF	No
+ISO_R2_DX	Pr2	Pr2_ISO_R2_DX	ISO CM	ROBO2 KO CF	Yes
+ISO_S2	Pr2	Pr2_ISO_S2	ISO CM	SLIT2 KO CF	No
+ISO_S2_DX	Pr2	Pr2_ISO_S2_DX	ISO CM	SLIT2 KO CF	Yes
+R1	Pr2	Pr2_R1	ROBO1 KO CM	NO	No
+R1_DX	Pr2	Pr2_R1_DX	ROBO1 KO CM	NO	Yes
+R1_ISO	Pr2	Pr2_R1_ISO	ROBO1 KO CM	ISO CF	No
+R1_ISO_DX	Pr2	Pr2_R1_ISO_DX	ROBO1 KO CM	ISO CF	Yes
+R1_R1	Pr2	Pr2_R1_R1	ROBO1 KO CM	ROBO1 KO CF	No
+R1_R1_DX	Pr2	Pr2_R1_R1_DX	ROBO1 KO CM	ROBO1 KO CF	Yes
+R1_R2	Pr2	Pr2_R1_R2	ROBO1 KO CM	ROBO2 KO CF	No
+R1_R2_DX	Pr2	Pr2_R1_R2_DX	ROBO1 KO CM	ROBO2 KO CF	Yes
+R1_S2	Pr2	Pr2_R1_S2	ROBO1 KO CM	SLIT2 KO CF	No
+R1_S2_DX	Pr2	Pr2_R1_S2_DX	ROBO1 KO CM	SLIT2 KO CF	Yes
+R2	Pr2	Pr2_R2	ROBO2 KO CM	NO	No
+R2_DX	Pr2	Pr2_R2_DX	ROBO2 KO CM	NO	Yes
+R2_ISO	Pr2	Pr2_R2_ISO	ROBO2 KO CM	ISO CF	No
+R2_ISO_DX	Pr2	Pr2_R2_ISO_DX	ROBO2 KO CM	ISO CF	Yes
+R2_R1	Pr2	Pr2_R2_R1	ROBO2 KO CM	ROBO1 KO CF	No
+R2_R1_DX	Pr2	Pr2_R2_R1_DX	ROBO2 KO CM	ROBO1 KO CF	Yes
+R2_R2	Pr2	Pr2_R2_R2	ROBO2 KO CM	ROBO2 KO CF	No
+R2_R2_DX	Pr2	Pr2_R2_R2_DX	ROBO2 KO CM	ROBO2 KO CF	Yes
+R2_S2	Pr2	Pr2_R2_S2	ROBO2 KO CM	SLIT2 KO CF	No
+R2_S2_DX	Pr2	Pr2_R2_S2_DX	ROBO2 KO CM	SLIT2 KO CF	Yes
+S2	Pr2	Pr2_S2	SLIT2 KO CM	NO	No
+S2_DX	Pr2	Pr2_S2_DX	SLIT2 KO CM	NO	Yes
+S2_ISO	Pr2	Pr2_S2_ISO	SLIT2 KO CM	ISO CF	No
+S2_ISO_DX	Pr2	Pr2_S2_ISO_DX	SLIT2 KO CM	ISO CF	Yes
+S2_R1	Pr2	Pr2_S2_R1	SLIT2 KO CM	ROBO1 KO CF	No
+S2_R1_DX	Pr2	Pr2_S2_R1_DX	SLIT2 KO CM	ROBO1 KO CF	Yes
+S2_R2	Pr2	Pr2_S2_R2	SLIT2 KO CM	ROBO2 KO CF	No
+S2_R2_DX	Pr2	Pr2_S2_R2_DX	SLIT2 KO CM	ROBO2 KO CF	Yes
+S2_S2	Pr2	Pr2_S2_S2	SLIT2 KO CM	SLIT2 KO CF	No
+S2_S2_DX	Pr2	Pr2_S2_S2_DX	SLIT2 KO CM	SLIT2 KO CF	Yes", header = T, sep = "\t")
+
+
+## data preparaton
+counts.matrix_ROBI<-as.matrix(counts2)
+mode(counts.matrix_ROBI)<-"integer"
+
+counts.matrix_ROBI <- counts.matrix_ROBI[,grepl("Pr2", colnames(counts.matrix_ROBI))]
+colnames(counts.matrix_ROBI) <- gsub("Pr2_", "", colnames(counts.matrix_ROBI))
+
+properties$Cell_type=as.factor(gsub(" ", "_", properties$Cell_type))
+properties$tx_Group=as.factor(gsub(" ", "_", properties$Dox_treatment))
+properties$culture_Group <- gsub(" ", "_", properties$CO.CULTURED)
+properties$sample_ID <- properties$Samples
+properties <- properties[, c("sample_ID", "tx_Group", "culture_Group", "Cell_type")] # remove Cell_type
+counts.matrix_ROBI <- counts.matrix_ROBI[,match(properties$sample_ID, colnames(counts.matrix_ROBI))]
+colnames(counts.matrix_ROBI) == properties$sample_ID
+
+
+## Create a DESeqDataSet (dds_ROBIS) from the count matrix and phenotype information.
+dds_ROBIS<-DESeqDataSetFromMatrix(countData = counts.matrix_ROBI,colData = properties, design=~1)
+
+## Perform variance-stabilizing transformation (vst) on the DESeqDataSet
+rld_ROBIS<-vst(dds_ROBIS,blind = FALSE)
+mat_ROBIS<-assay(rld_ROBIS)
+
+## Performs principal component analysis (PCA) on the transformed data.
+pcaData<-plotPCA(rld_ROBIS, intgroup=c("tx_Group", "Cell_type"), ntop=100, returnData=TRUE)
+percentVar<-round(100 * attr(pcaData, "percentVar"))
+
+## Plot PCA
+g <- ggplot(pcaData, aes(PC1, PC2))
+g <- g + geom_point(size = 5, aes(fill = tx_Group, col = tx_Group, shape = Cell_type)) +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(face = "bold", color = "black"),
+    panel.border = element_blank(),
+    axis.line = element_line(colour = "black"),
+    axis.title = element_text(face = "bold", color = "black"),  # Corrected line
+    text = element_text(color = "black", face = "bold")
+  )
+# Save the plot as a TIFF file
+tiff(
+  file = "Pr2_top_100_genes.tiff",
+  width = 16,
+  height = 14,
+  units = 'cm',
+  res = 300,
+  compression = 'lzw'
+)
+
+# Print the plot
+print(g)
+
+# Close the TIFF device
+dev.off()
+
+## Select the top 500 variable genes based on row variances. Create a heatmap
+## (phm) using pheatmap with clustering of rows and columns.
+library(pheatmap)
+properties2<-properties
+rownames(properties2)<-properties[,1]
+properties2<-subset(properties2, select=-c(sample_ID))
+myMatrix<-SummarizedExperiment::assay(rld_ROBIS)
+topVarGenes<-head(order(rowVars(myMatrix),decreasing = TRUE), 500)
+myMatrixforheatmap<-myMatrix[topVarGenes,]
+phm<-pheatmap(myMatrixforheatmap, scale="row", cluster_rows = TRUE, cluster_cols = TRUE, annotation_col = properties2, show_colnames = TRUE, show_rownames = FALSE, legend = T)
+
+g <- phm$gtable
+g <- gtable::gtable_add_padding(g, padding = unit(c(l=-2, r=1, t=0, b=0), "cm"))
+
+# Save the heatmap to a file with adjusted dimensions
+tiff(file = "Pr2_top_500_genes.tiff", width = 18, height = 32, units = 'cm', res = 600, compression = 'lzw')
+grid::grid.draw(g)
+dev.off()
+
+# tiff(file="Pr2_top_500_genes.tiff",width = 18, height = 32, units = 'cm', res = 300, compression = 'lzw')
+# phm
+# dev.off()
+
+
+
+
+
+
+
+
+
+
+
+properties3 <- properties[properties$Status != "Control", ]
 
 # Create a new column in colData to indicate LVNC status
 properties3$LVNC_status <-
