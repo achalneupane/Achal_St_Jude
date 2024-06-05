@@ -74,7 +74,7 @@ dim(SERUM)
 # read CTCAE
 # CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
 CTCAE <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
-# CTCAE.original <- CTCAE
+CTCAE.original <- CTCAE
 CTCAE <- CTCAE.original
 
 CTCAE <- CTCAE.original[c("sjlid", "studypop", "sjlife_cohort", "gender", "organsys", "condition", "gradedt", "grade", "ageevent")]
@@ -218,7 +218,7 @@ table(CTCAE.2$new_event_number,CTCAE.2$grade_2_or_higher)
 
 ## Adding requested variables
 # Age at primary cancer diagnosis & Year of cancer diagnosis
-all.wanted.df.1200.to.update <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_data_batch1_1200_samples.txt", header = T, sep = "\t")
+all.wanted.df.1200.to.update <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_data_batch1_1185_samples_v3_updated.txt", header = T, sep = "\t")
 diagnosis <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/diagnosis.sas7bdat')
 diagnosis$KEY <- paste0(diagnosis$sjlid, "_", diagnosis$diaggrp)
 all.wanted.df.1200.to.update$KEY <- paste0(all.wanted.df.1200.to.update$sjlid, "_", all.wanted.df.1200.to.update$diaggrp)
@@ -257,7 +257,7 @@ length(ge.grade2.baseline)
 all.wanted.df.1200.to.update$CMP_at_baseline [all.wanted.df.1200.to.update$sjlid %in% ge.grade2.baseline] <- "Yes"
 all.wanted.df.1200.to.update$CMP_at_baseline[all.wanted.df.1200.to.update$CMP_status == "Yes"] <- "No"
 
-write.table(all.wanted.df.1200.to.update, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma.df.1100.with_additional_variables_toYadav.txt", col.names = T, row.names = F, sep = "\t", quote = F)
+write.table(all.wanted.df.1200.to.update, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma.df.1185.with_additional_variables_toYadav.txt", col.names = T, row.names = F, sep = "\t", quote = F)
 
 
 

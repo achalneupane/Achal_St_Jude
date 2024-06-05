@@ -2,7 +2,9 @@ library(dplyr)
 library(tidyr)
 library(haven)
 library(stringr)
-
+#######################
+## 1. Process SJLIFE ##
+#######################
 ## Phenotype for all samples sequenced
 all.samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/sample_mapping.txt", header = F)
 
@@ -204,12 +206,19 @@ table_df <- table_df %>%
 
 
 table_df.status_gt_0 <- table_df[grepl("status_gt_0", table_df$variable),]
+table(table_df.status_gt_0$status_1 > 25)
+# FALSE  TRUE 
+# 90   160 
 
 table_df.status_gt_2 <- table_df[grepl("status_gt_2", table_df$variable),]
+table(table_df.status_gt_2$status_1 > 25)
+# FALSE  TRUE 
+# 164    86
 
 table_df.status_gt_3 <- table_df[grepl("status_gt_3", table_df$variable),]
-
-
+table(table_df.status_gt_3$status_1 > 25)
+# FALSE  TRUE 
+# 228    22 
 
 
 
@@ -220,5 +229,10 @@ filtered_table_df <- table_df %>%
 #   filter(status_0 >= 25, status_1 >= 25)
 
 
+# Afferent_pupillary_defect <- CTCAE.data[grepl("Afferent pupillary defect", CTCAE.data$condition),]
 
-Afferent_pupillary_defect <- CTCAE.data[grepl("Afferent pupillary defect", CTCAE.data$condition),]
+#####################
+## 2. Process CCSS ##
+#####################
+
+
