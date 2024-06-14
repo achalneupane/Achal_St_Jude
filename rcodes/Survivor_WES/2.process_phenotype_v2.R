@@ -209,16 +209,19 @@ table_df.status_gt_0 <- table_df[grepl("status_gt_0", table_df$variable),]
 table(table_df.status_gt_0$status_1 > 25)
 # FALSE  TRUE 
 # 90   160 
+table_df.status_gt_0.all <-  table_df.status_gt_0[table_df.status_gt_0$status_1 > 25,]
 
 table_df.status_gt_2 <- table_df[grepl("status_gt_2", table_df$variable),]
 table(table_df.status_gt_2$status_1 > 25)
 # FALSE  TRUE 
 # 164    86
+table_df.status_gt_2.all <- table_df.status_gt_2[table_df.status_gt_2$status_1 > 25,]
 
 table_df.status_gt_3 <- table_df[grepl("status_gt_3", table_df$variable),]
 table(table_df.status_gt_3$status_1 > 25)
 # FALSE  TRUE 
 # 228    22 
+table_df.status_gt_3.all <- table_df.status_gt_3[table_df.status_gt_3$status_1 > 25,]
 
 
 
@@ -231,8 +234,7 @@ filtered_table_df <- table_df %>%
 
 # Afferent_pupillary_defect <- CTCAE.data[grepl("Afferent pupillary defect", CTCAE.data$condition),]
 
-#####################
-## 2. Process CCSS ##
-#####################
+
+
 
 

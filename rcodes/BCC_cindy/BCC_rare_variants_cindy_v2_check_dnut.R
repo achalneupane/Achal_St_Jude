@@ -1,7 +1,22 @@
 ## read WES annotation files for POI option 1
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/")
+load("EURpcs.RData")
+load("../Achal_carrier.status.RData")
+ls()
+fam <- read.table("all_BCC_rare_variants.fam")
+fam <- fam[fam$V2 %in% subdf$studyid,]
+write.table(fam, "fam_all_EUR_from_subdf.txt", col.names = T, row.names = F, quote = F, sep = "\t")
+write.table(cbind.data.frame(fam$V1, fam$V2), "IID_fam_all_EUR_from_subdf.txt", col.names = F, row.names = F, quote = F, sep = "\t")
 
 gene_regions <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/all_genes_gene_regions.txt", header = T, sep = "\t")
+
+######################
+## Sample frequency ##
+######################
+sample.freq <- read.table("all_BCC_rare_variants_EUR_freq_tabsep.frq", sep = "\t", header = T)
+table(sample.freq$MAF < 0.01)
+sample.freq <- sample.freq[sample.freq$MAF < 0.01,]
+sample.freq$SNP <- sub(";.*", "", sample.freq$SNP)
 
 ## 1. clinvar
 clinvar <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/all_new_clinvar_P_LP.txt", header = T, sep = "\t", stringsAsFactors = F)
@@ -16,6 +31,9 @@ clinvar$AF_afr <- as.numeric(clinvar$AF_afr)
 # make rare; .all is based on allee frequency from gnomAD global population; .eur is gnomAD EUR_nfe; .afr is gnomAD AFR
 clinvar.all <- clinvar[which(clinvar$AF <0.01),]
 clinvar.eur <- clinvar[which(clinvar$AF <0.01 & clinvar$AF_nfe < 0.01),]
+table(clinvar.eur$SNP %in% sample.freq$SNP)
+clinvar.eur <- clinvar.eur[clinvar.eur$SNP %in% sample.freq$SNP,]
+
 clinvar.afr <- clinvar[which(clinvar$AF <0.01 & clinvar$AF_afr < 0.01),]
 
 
@@ -40,6 +58,8 @@ loftee$POS <- sub("chr[0-9XY]+:(\\d+):.+", "\\1", loftee$SNP)
 # make rare
 loftee.all <- loftee[which(loftee$AF <0.01),]
 loftee.eur <- loftee[which(loftee$AF <0.01 & loftee$AF_nfe < 0.01),]
+loftee.eur <- loftee.eur[loftee.eur$SNP %in% sample.freq$SNP,]
+
 loftee.afr <- loftee[which(loftee$AF <0.01 & loftee$AF_afr < 0.01),]
 
 
@@ -55,17 +75,23 @@ snpeff$AF_afr <- as.numeric(snpeff$AF_afr)
 # make rare
 snpeff.all <- snpeff[which(snpeff$AF <0.01),]
 snpeff.eur <- snpeff[which(snpeff$AF <0.01 & snpeff$AF_nfe < 0.01),]
+snpeff.eur <- snpeff.eur[snpeff.eur$SNP %in% sample.freq$SNP,]
+
 snpeff.afr <- snpeff[which(snpeff$AF <0.01 & snpeff$AF_afr < 0.01),]
 
 
 
 
-length(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
-# 46076
-cc <- as.data.frame(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
+length(unique(c(clinvar.eur$SNP, loftee.eur$SNP, snpeff.eur$SNP)))
+# 36484
+cc <- as.data.frame(unique(c(clinvar.eur$SNP, loftee.eur$SNP, snpeff.eur$SNP)))
 dim(cc)
-# 46076
-write.table(cc, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/rare_variants_to_extract.txt", row.names = F, col.names = F, quote = F)
+# 36484
+write.table(cc, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/rare_variants_to_extract_EUR_maf_0.01.txt", row.names = F, col.names = F, quote = F)
+
+clinvar.all <- clinvar.eur
+loftee.all <- loftee.eur
+snpeff.all <- snpeff.eur
 # Dear Achal,
 #
 # I am writing to ask you for your help. Do you think you might be able to help
@@ -182,9 +208,9 @@ length(unique(kim_ST1.csg172$Gene.Name[!kim_ST1.csg172$Gene.Name %in% kim_ST1.cs
 
 kim_ST1.csg172.clinvar.all$KEY <- paste0(kim_ST1.csg172.clinvar.all$CHROM, ":", kim_ST1.csg172.clinvar.all$POS)
 ## check if they are in CSG172 vars lists
-kim_ST1.csg172.vars <- read.delim("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/rare_variants/kim_et_al/CS20-0146R1 Kim Supp tables1-3_010721.txt", header = T, sep = "\t")
+kim_ST1.csg172.vars <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/rare_variants/kim_et_al/CS20-0146R1 Kim Supp tables1-3_010721.txt", header = T, sep = "\t")
 kim_ST1.csg172.vars <- kim_ST1.csg172.vars[grepl("Clinvar", kim_ST1.csg172.vars$Method.of.classification, ignore.case = T),]
-grch38 <- read.delim("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/rare_variants/kim_et_al/hglft_genome_d359_661a0.bed", header = F, sep = "\t")
+grch38 <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/rare_variants/kim_et_al/hglft_genome_d359_661a0.bed", header = F, sep = "\t")
 
 kim_ST1.csg172.vars$KEY <- paste0(kim_ST1.csg172.vars$Chr, ":", kim_ST1.csg172.vars$Position)
 grch38$POS37KEY <- sub("-.*", "", grch38$V4)
@@ -296,7 +322,8 @@ clinvar.BCC.result.snpeff.all <- snpeff.all[snpeff.all$ANN....GENE %in% clinvar.
 ## Get carrier status ##
 ########################
 library("data.table")
-raw <- fread("all_BCC_rare_variants_recodeA.raw", header = T)
+# raw <- fread("all_BCC_rare_variants_recodeA.raw", header = T)
+raw <- fread("all_BCC_rare_variants_EUR_0.01_recodeA.raw", header = T)
 raw <- as.data.frame(raw)
 HEADER = sub(pattern="_[T,A,G,C,*]+",replacement="",colnames(raw))
 # HEADER = gsub(pattern=";rs\\d+",replacement="",HEADER)

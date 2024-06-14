@@ -1,6 +1,10 @@
 ## read WES annotation files for POI option 1
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/")
 
+## NOTE, variants NA mean not there in the data, so they are basically rare in nfe
+sample.freq <- read.table("all_BCC_rare_variants_EUR_freq_tabsep.frq", header = T, sep ="\t")
+
+
 gene_regions <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/all_genes_gene_regions.txt", header = T, sep = "\t")
 
 ## 1. clinvar
@@ -18,6 +22,8 @@ clinvar.all <- clinvar[which(clinvar$AF <0.01),]
 clinvar.eur <- clinvar[which(clinvar$AF <0.01 & clinvar$AF_nfe < 0.01),]
 clinvar.afr <- clinvar[which(clinvar$AF <0.01 & clinvar$AF_afr < 0.01),]
 
+cc1 <- cbind.data.frame(clinvar.all$AF_nfe, clinvar.all$AF, clinvar.all$AF_joint, clinvar.all$AF_joint_nfe, clinvar.all$ID)
+cc2 <- clinvar.all[grepl("chr10:102550088:C:T", clinvar.all$ID),]
 
 loftee <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/loftee/loftee_HC_all_chr_with_gnomad.txt", header = T, sep = "\t", stringsAsFactors = F)
 dim(loftee)
@@ -27,6 +33,7 @@ loftee <- loftee[!grepl("NAGNAG_SITE|NON_CAN_SPLICE", loftee$LoF_flags),]
 table(loftee$LoF_flags)
 # - 
 # 70494 
+
 
 loftee <- loftee[!duplicated(loftee$SNP),]
 
@@ -62,6 +69,7 @@ snpeff.afr <- snpeff[which(snpeff$AF <0.01 & snpeff$AF_afr < 0.01),]
 
 length(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
 # 46076
+
 cc <- as.data.frame(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
 dim(cc)
 # 46076

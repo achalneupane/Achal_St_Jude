@@ -1,6 +1,6 @@
 # Specify the file path
 # setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round2/")
-setwd("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3")
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3")
 ##-------------------------------------POI option 1
 # Option 1: Variants in selected genes with the following 3 rare variant masks will be included :
 # a.	Predicted deleterious missense variants: Annotation will be performed using SnpEff27. We will use dbNSFP28 (version 4.1a), which uses 30 in silico prediction tools for annotation . Missense variants will be classified as deleterious if >90% of collated annotations (across all tools) predict deleteriousness.
@@ -360,6 +360,8 @@ length(common_snps.90percent.overlap)
 common_snps <- common_snps[order(-common_snps$Freq), ]
 
 write.table(common_snps, "missense_variants_with_overlap_in_more_than_90_percent_of_prediction_tools.txt", col.names = T, row.names = F, quote = F, sep = "\t")
+
+common_snps <- read.table("missense_variants_with_overlap_in_more_than_90_percent_of_prediction_tools.txt", header = T)
 
 
 ## Now extract these lines

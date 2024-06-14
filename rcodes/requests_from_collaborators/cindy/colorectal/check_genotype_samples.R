@@ -63,3 +63,49 @@ sjlife$in_wgs <- ifelse(sjlife$studyid %in% sjlife_fam$V2, 1,0)
 sjlife$in_wes <- ifelse(sjlife$studyid %in% WES$V2,1,0)
 
 write.table(sjlife, "Z:/ResearchHome/ClusterHome/aneupane/data/request/cindy/colorectal/SJLIFE_colorectal_patients_2024-06-05_AN.txt", col.names = T, row.names = F, sep = "\t")
+
+
+
+
+## With the unique ones
+## On 6/5/2024
+# Yes, you should check for the unique ids but the lists of below 32 individuals and the 29 in the previous Excel are different. Can you check using both list of SJLIFE ids with the 137 unique CCSS survivors?
+ccss <- read_excel("Z:/ResearchHome/ClusterHome/aneupane/data/request/cindy/colorectal/CCSS_colorectal_patients_2024-06-05.xlsx", trim_ws = TRUE)
+ccss$CCSSID <- trimws(ccss$CCSSID)
+ccss <- ccss[!duplicated(ccss$CCSSID),]
+dim(ccss)
+
+sjlife <- read_excel("Z:/ResearchHome/ClusterHome/aneupane/data/request/cindy/colorectal/SJLIFE_colorectal_patients_2024-06-05.xlsx", trim_ws = TRUE)
+sjlife$sjlife <- trimws(sjlife$studyid)
+
+overlaps <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/gwas/pheno/SJLIFE_WGS_samples_overlap_with_CCSS_org_SNP_samples.txt", header = T)
+
+## Remove SJLIFE and CCSS overlaps from CCSS
+ccss$SJLID_overlaps <- overlaps$V1[match(ccss$CCSSID,overlaps$ccssid)]
+dim(ccss)
+# 137
+
+ccss$overlap_in_SJLIFE <- ccss$SJLID_overlaps %in% sjlife$studyid
+
+# Check how many have genetic data
+
+sjlife_fam <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr7.preQC_biallelic_renamed_ID_edited.vcf.gz.fam", header = F)
+ccss_org <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/plink/CCSS_org_GRCh37_chr22.fam", header = F)
+ccss_exp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/preQC_VCF_per_chromosome/CCSS_exp_biallelic_chr22_ID_edited.fam", header = F)
+WES <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic_ID_updated.fam", header = F)
+library(stringr)
+
+# Split the values in column v1 by "_" and keep the first item
+ccss_org$ccssid <- str_split(ccss_org$V1, "_", simplify = TRUE)[, 1]
+
+ccss$In_ccss_org <- ifelse(ccss$CCSSID %in% ccss_org$ccssid, 1,0)
+ccss$In_ccss_exp <- ifelse(ccss$CCSSID %in% ccss_exp$V1, 1,0)
+ccss$In_ccss_wes <- ifelse(ccss$CCSSID %in% WES$V2, 1,0)
+ccss$all_genotype <- ifelse((ccss$In_ccss_org + ccss$In_ccss_exp + ccss$In_ccss_wes)> 0, 1, 0)
+
+write.table(ccss, "Z:/ResearchHome/ClusterHome/aneupane/data/request/cindy/colorectal/CCSS_colorectal_patients_2024-06-05_AN_unique.txt", col.names = T, row.names = F, sep = "\t")
+
+sjlife$in_wgs <- ifelse(sjlife$studyid %in% sjlife_fam$V2, 1,0)
+sjlife$in_wes <- ifelse(sjlife$studyid %in% WES$V2,1,0)
+
+write.table(sjlife, "Z:/ResearchHome/ClusterHome/aneupane/data/request/cindy/colorectal/SJLIFE_colorectal_patients_2024-06-05_AN.txt", col.names = T, row.names = F, sep = "\t")

@@ -357,7 +357,9 @@ ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivo
 module load plink/1.90b
 plink --bfile chr.ALL.Survivor_WES.GATK4180.hg38_biallelic_ID_updated --extract rare_variants_to_extract.txt --keep-allele-order --make-bed -out all_BCC_rare_variants
 
-plink --bfile all_BCC_rare_variants --recodeA --out all_BCC_rare_variants_recodeA
+plink --bfile all_BCC_rare_variants_EUR --extract rare_variants_to_extract_EUR_maf_0.01.txt --keep-allele-order --make-bed -out all_BCC_rare_variants_EUR_0.01
+plink --bfile all_BCC_rare_variants_EUR_0.01 --recodeA --out all_BCC_rare_variants_EUR_0.01_recodeA
+awk 'BEGIN{OFS="\t"} {print $1, $2, $3, $4, $5, $6}' all_BCC_rare_variants_EUR_freq.frq > all_BCC_rare_variants_EUR_freq_tabsep.frq
 
 
 
@@ -465,3 +467,7 @@ CSG172 variants present in WES but not P/LP (all uncertain significance)
 22      chr22:28725242:C:T;rs121908698      0       28725242        T       C ## conflicting
 
 
+
+plink --bfile all_BCC_rare_variants --keep IID_fam_all_EUR_from_subdf.txt --make-bed --out all_BCC_rare_variants_EUR
+
+plink --bfile all_BCC_rare_variants_EUR --freq --out all_BCC_rare_variants_EUR_freq
