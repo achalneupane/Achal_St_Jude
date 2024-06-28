@@ -73,5 +73,10 @@ ccss_exp.samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomic
 ccss_exp.samples$Zhaoming_carriers <-  zhaoming.ccss.raw$Zhaoming_carriers[match(ccss_exp.samples$V2, zhaoming.ccss.raw$IID)]
 ccss_exp.samples$Qin_without_Zhaoming_vars_carriers <-  qin.ccss.raw$Qin_without_Zhaoming_vars_carriers[match(ccss_exp.samples$V2, qin.ccss.raw$IID)]
 
+table(ccss_exp.samples$Zhaoming_carriers)
+# 16
+table(ccss_exp.samples$Qin_without_Zhaoming_vars_carriers)
+# 94
+
 save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss_exp_P_LP_zhaoming_qin_v17.Rdata")
 
