@@ -33,4 +33,27 @@ for (i in 1:length(files)){
   write.table(cc, writefile, sep = "\t", col.names = T, row.names = F, quote = F)
 }
 
+####################################################################
+## Check whether PRSICE and PLINK methods give correlated results ##
+####################################################################
+plink.method <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Dyslipidemia/PRS_CCSS/ccss_exp/prs_out/PGS000688_prs_tab_separated.profile", header = T, sep = "\t")
+prsice.method <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Dyslipidemia/PRS_CCSS/ccss_exp/PGS000688_PRS_output.all_score", header = T, sep = " ")
+prsice.method$plinkscores <- plink.method$SCORE[match(prsice.method$IID, plink.method$IID)]
+# Compute the correlation
+correlation <- cor(prsice.method$Pt_1, prsice.method$plinkscores)
+correlation
+# 0.9955616
+print(paste("Correlation: ", correlation))
+
+# Create a scatter plot with a regression line
+library(ggplot2)
+ggplot(prsice.method, aes(x = Pt_1, y = plinkscores)) +
+  geom_point() +
+  geom_smooth(method = "lm", col = "blue") +
+  labs(title = paste("Correlation between Pt_1 and Plink Scores: ", round(correlation, 2)),
+       x = "Pt_1",
+       y = "Plink Scores") +
+  theme_minimal()
+
+
 
