@@ -5,6 +5,7 @@ library(ggrepel)
 library(dplyr)
 library(ggpattern)
 library("ggpubr")
+library(RColorBrewer)
 # https://r-charts.com/colors/
 
 ## v21b (Without lifestyle)
@@ -209,6 +210,113 @@ plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/at
 ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
 }
 }
+
+
+##################
+## Sarcoma only ##
+##################
+sn_types <- "Sarcoma"
+
+for (j in 1:length(group.all)){
+  group <- group.all[j]
+  variables <- unique(data$Variables)
+  # order = c("Combined", "Treatments", "Radiotherapy", "Chemotherapy", "PRS")
+  order = c("Combined", "Chemotherapy", "PRS")
+  
+  # custom_colors <- brewer.pal(7, "Dark2")
+  custom_colors <- c("#1B9E77", "#E7298A", "#A6761D")
+  legend_order <- order
+  
+  for(i in 1:length(sn_types)){
+    data_melted <- data[grepl(sn_types[i], data$SN_types), c("Cohort", "SN_types", "Variables", group)]
+    ## Remove Treatments and Radiotherapy since treatment and chemotherapy is
+    ## same for Sarcoma and it does not include any radiotherapy)
+    data_melted <- data_melted[!grepl("Treatments|Radiotherapy", data_melted$Variables),]
+    
+    data_melted$value <- as.numeric(data_melted[,group]*100)
+    if(sn_types[i] == "Breast cancer" && group == "Male"){next}
+    data_melted <- data_melted[complete.cases(data_melted),]
+    data_melted$new_value <- paste0(round(data_melted$value,2), "%")
+    
+    # Reshape the data for ggplot2
+    library(reshape2)
+    lifestyle <- "without_lifestyle"
+    if(lifestyle== "without_lifestyle" && sn_types[i] == "Lifestyle"){
+      next
+    }
+    
+    data_melted$legend_group <- factor(data_melted$Variables, levels = order)
+    
+    # Create a factor with the desired order
+    data_melted$Variables <- factor(data_melted$Variables, levels = order)
+    
+    Cohort <- c("SJLIFE", "CCSS")
+    data_melted$Cohort <- factor(data_melted$Cohort, levels = Cohort)
+    
+    p <- ggplot(data_melted, aes(x = Cohort, y = value, fill = legend_group)) +
+      geom_bar(stat = "identity", position = position_dodge(width = 0.9), width = 0.8) +
+      geom_text(
+        data = data_melted %>% filter(!is.na(new_value)),
+        aes(label = new_value, y = value),  # Adjust y position
+        position = position_dodge(width = 0.9),
+        vjust = -0.20,  # Adjust vertical justification
+        hjust = 0.5,  # Center text horizontally
+        size = 6.5,
+        color = "black"
+      ) +
+      geom_vline(xintercept = 1.5, linetype = "dashed", color = "black", size = 1) +  # Add vertical line
+      theme_minimal() +
+      theme(
+        axis.text.x = element_text(angle = 0, hjust = 1, vjust = 1, size = 20, color = "black"),
+        axis.text.y = element_text(size = 18, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"),
+        axis.line.x = element_line(color = "black"),
+        axis.line.y = element_line(color = "black"),
+        legend.title = element_text(size = 22, color = "black", face = "bold"),  # Increase legend title size
+        legend.text = element_text(size = 18, color = "black"),
+        legend.position = "top",
+        legend.box = "horizontal",
+        legend.margin = margin(t = 10, b = 10, l = 10, r = 200),
+        plot.margin = margin(t=20, b=80, l=20, r=20),  # Adjust plot margins
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.key = element_rect(color = "black", size = 1),  # Add border around legend
+        legend.background = element_rect(fill = "white", color = "black", size = 1)  # Add background to legend
+      ) +
+      # Customize colors
+      scale_fill_manual(
+        values = custom_colors,
+        breaks = legend_order,
+        labels = c("Higher exposure levels of chemotherapy + Elevated genetic risks", 
+                   # "Higher exposure levels of cancer treatments", 
+                   # "Higher exposure levels of radiotherapy", 
+                   "Higher exposure levels of chemotherapy", 
+                   "Elevated genetic risks")
+      ) +
+      # Adjust legend title and position
+      labs(fill = "Risk factors:") +
+      coord_cartesian(clip = "off") +
+      # Remove expand gaps
+      scale_x_discrete(expand = c(0, 0)) +
+      scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) +
+      labs(title = "", y = "Attributable fraction (%)", x = NULL) +
+      # Guide adjustments for legend layout
+      guides(fill = guide_legend(
+        title.position = "top",  # Position the legend title at the top
+        title.hjust = 0,  # Center align the legend title
+        label.hjust = 0,  # Left align the legend labels
+        ncol = 1  # Adjust number of columns in legend
+      ))
+    
+    # Print the plot
+    print(p)
+    DF <- gsub("s$|cancer| ", "", sn_types[i])  
+    plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v21b/", DF,"/", sn_types[i], "_",group,"_without_lifestyle_plot.tiff")
+    ggsave(plot_name, p, width = 12, height = 8, dpi = 600, device = "tiff", compression = "lzw")
+  }
+}
+
+
 #####################################
 
 
