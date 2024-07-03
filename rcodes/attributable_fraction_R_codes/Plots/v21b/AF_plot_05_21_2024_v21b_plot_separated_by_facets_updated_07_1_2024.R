@@ -287,10 +287,10 @@ for (j in 1:length(group.all)){
       scale_fill_manual(
         values = custom_colors,
         breaks = legend_order,
-        labels = c("Higher exposure levels of chemotherapy + Elevated genetic risks", 
+        labels = c("Higher exposure levels of cancer treatments (chemotherapy) + Elevated genetic risks", 
                    # "Higher exposure levels of cancer treatments", 
                    # "Higher exposure levels of radiotherapy", 
-                   "Higher exposure levels of chemotherapy", 
+                   "Higher exposure levels of cancer treatments (chemotherapy)", 
                    "Elevated genetic risks")
       ) +
       # Adjust legend title and position
