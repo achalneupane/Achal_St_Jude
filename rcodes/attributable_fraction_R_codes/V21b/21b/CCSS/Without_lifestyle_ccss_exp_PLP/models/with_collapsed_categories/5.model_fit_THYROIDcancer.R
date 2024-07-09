@@ -334,6 +334,56 @@ af_by_plp.zhaoming.Qin.AFR = (N_all.AFR - N_no_plp.zhaoming.qin) / N_all.AFR
 af_by_plp.zhaoming.Qin.AFR <- round(af_by_plp.zhaoming.Qin.AFR,3)
 af_by_plp.zhaoming.Qin.AFR
 
+
+###################################
+## P/LP Zhaoming and Qin and PRS ##
+###################################
+## P/LP Zhaoming, Qin without Zhaoming and PRS
+dat_plp = dat_all
+dat_plp$Zhaoming_carriers = dat_plp$Qin_without_Zhaoming_vars_carriers = "N"
+dat_plp$Thyroid_PRS.tertile.category = "1st"  # **
+
+dat_all$pred_no_plp.zhaoming.Qin = predict(fit_all, newdata = dat_plp, type = "response")
+
+# Overall.plp
+N_no_plp.zhaoming.qin = sum(dat_all$pred_no_plp.zhaoming.Qin, na.rm = T)
+af_by_plp.zhaoming.Qin.prs = (N_all - N_no_plp.zhaoming.qin) / N_all
+round(af_by_plp.zhaoming.Qin.prs,3)
+# 0.028
+
+## Male
+N_no_plp.zhaoming.qin = sum(dat_all$pred_no_plp.zhaoming.Qin[dat_all$gender == "Male"], na.rm = TRUE)
+af_by_plp.zhaoming.Qin.prs.male = (N_all.male - N_no_plp.zhaoming.qin) / N_all.male
+round(af_by_plp.zhaoming.Qin.prs.male,3)
+
+## Female
+N_no_plp.zhaoming.qin = sum(dat_all$pred_no_plp.zhaoming.Qin[dat_all$gender == "Female"], na.rm = TRUE)
+af_by_plp.zhaoming.Qin.prs.female = (N_all.female - N_no_plp.zhaoming.qin) / N_all.female
+round(af_by_plp.zhaoming.Qin.prs.female,3)
+
+## < 35
+N_no_plp.zhaoming.qin = sum(dat_all$pred_no_plp.zhaoming.Qin[dat_all$AGE_AT_LAST_CONTACT.cs1 < 35], na.rm = TRUE)
+af_by_plp.zhaoming.Qin.prs.lt.35 = (N_all.lt.35 - N_no_plp.zhaoming.qin) / N_all.lt.35
+round(af_by_plp.zhaoming.Qin.prs.lt.35,3)
+
+
+## >= 35
+N_no_plp.zhaoming.qin = sum(dat_all$pred_no_plp.zhaoming.Qin[dat_all$AGE_AT_LAST_CONTACT.cs1 >= 35], na.rm = TRUE)
+af_by_plp.zhaoming.Qin.prs.gteq.35 = (N_all.gteq.35 - N_no_plp.zhaoming.qin) / N_all.gteq.35
+round(af_by_plp.zhaoming.Qin.prs.gteq.35,3)
+
+## EUR
+N_no_plp.zhaoming.qin = sum(dat_all$pred_no_plp.zhaoming.Qin[dat_all$admixture == "EUR"], na.rm = TRUE)
+af_by_plp.zhaoming.Qin.prs.EUR = (N_all.EUR - N_no_plp.zhaoming.qin) / N_all.EUR
+af_by_plp.zhaoming.Qin.prs.EUR <- round(af_by_plp.zhaoming.Qin.prs.EUR,3)
+af_by_plp.zhaoming.Qin.prs.EUR
+
+## AFR
+N_no_plp.zhaoming.qin = sum(dat_all$pred_no_plp.zhaoming.Qin[dat_all$admixture == "AFR"], na.rm = TRUE)
+af_by_plp.zhaoming.Qin.prs.AFR = (N_all.AFR - N_no_plp.zhaoming.qin) / N_all.AFR
+af_by_plp.zhaoming.Qin.prs.AFR <- round(af_by_plp.zhaoming.Qin.prs.AFR,3)
+af_by_plp.zhaoming.Qin.prs.AFR
+
 ###############
 ## Lifestyle ##
 ###############
@@ -419,14 +469,14 @@ af_by_combined.AFR
 
 ##
 Thyroid.res <- data.frame(
-  Variable = c("PLP", "Radiation", "Chemo", "All treatments", "PRS", "Lifestyle", "Combined"),
-  Overall = c(round(af_by_plp.zhaoming.Qin,3), af_by_rt, af_by_tx, af_by_tx.rt, af_by_prs, af_by_no_favorable_lifestyle.category, af_by_combined),
-  Female = c(round(af_by_plp.zhaoming.Qin.female,3), af_by_rt.female, af_by_tx.female, af_by_tx.rt.female, af_by_prs.female, af_by_no_favorable_lifestyle.category.female, af_by_combined.female),
-  Male = c(round(af_by_plp.zhaoming.Qin.male,3), af_by_rt.male, af_by_tx.male, af_by_tx.rt.male, af_by_prs.male, af_by_no_favorable_lifestyle.category.male, af_by_combined.male),
-  age.lt35 = c(round(af_by_plp.zhaoming.Qin.lt.35,3), af_by_rt.lt.35, af_by_tx.lt.35, af_by_tx.rt.lt.35, af_by_prs.lt.35, af_by_no_favorable_lifestyle.category.lt.35, af_by_combined.lt.35),
-  age.gteq = c(round(af_by_plp.zhaoming.Qin.gteq.35,3), af_by_rt.gteq.35, af_by_tx.gteq.35, af_by_tx.rt.gteq.35, af_by_prs.gteq.35, af_by_no_favorable_lifestyle.category.gteq.35, af_by_combined.gteq.35),
-  EUR = c(round(af_by_plp.zhaoming.Qin.EUR, 3), af_by_rt.EUR, af_by_tx.EUR, af_by_tx.rt.EUR, af_by_prs.EUR, af_by_no_favorable_lifestyle.category.EUR, af_by_combined.EUR),
-  AFR = c(round(af_by_plp.zhaoming.Qin.AFR, 3), af_by_rt.AFR, af_by_tx.AFR, af_by_tx.rt.AFR, af_by_prs.AFR, af_by_no_favorable_lifestyle.category.AFR, af_by_combined.AFR)
+  Variable = c("PLP", "Radiation", "Chemo", "All treatments", "PRS", "Lifestyle", "Combined", "PLP_PRS"),
+  Overall = c(round(af_by_plp.zhaoming.Qin,3), af_by_rt, af_by_tx, af_by_tx.rt, af_by_prs, af_by_no_favorable_lifestyle.category, af_by_combined, round(af_by_plp.zhaoming.Qin.prs, 3)),
+  Female = c(round(af_by_plp.zhaoming.Qin.female,3), af_by_rt.female, af_by_tx.female, af_by_tx.rt.female, af_by_prs.female, af_by_no_favorable_lifestyle.category.female, af_by_combined.female, round(af_by_plp.zhaoming.Qin.prs.female, 3)),
+  Male = c(round(af_by_plp.zhaoming.Qin.male,3), af_by_rt.male, af_by_tx.male, af_by_tx.rt.male, af_by_prs.male, af_by_no_favorable_lifestyle.category.male, af_by_combined.male, round(af_by_plp.zhaoming.Qin.prs.male, 3)),
+  age.lt35 = c(round(af_by_plp.zhaoming.Qin.lt.35,3), af_by_rt.lt.35, af_by_tx.lt.35, af_by_tx.rt.lt.35, af_by_prs.lt.35, af_by_no_favorable_lifestyle.category.lt.35, af_by_combined.lt.35, round(af_by_plp.zhaoming.Qin.prs.lt.35, 3)),
+  age.gteq = c(round(af_by_plp.zhaoming.Qin.gteq.35,3), af_by_rt.gteq.35, af_by_tx.gteq.35, af_by_tx.rt.gteq.35, af_by_prs.gteq.35, af_by_no_favorable_lifestyle.category.gteq.35, af_by_combined.gteq.35, round(af_by_plp.zhaoming.Qin.prs.gteq.35, 3)),
+  EUR = c(round(af_by_plp.zhaoming.Qin.EUR, 3), af_by_rt.EUR, af_by_tx.EUR, af_by_tx.rt.EUR, af_by_prs.EUR, af_by_no_favorable_lifestyle.category.EUR, af_by_combined.EUR, round(af_by_plp.zhaoming.Qin.prs.EUR, 3)),
+  AFR = c(round(af_by_plp.zhaoming.Qin.AFR, 3), af_by_rt.AFR, af_by_tx.AFR, af_by_tx.rt.AFR, af_by_prs.AFR, af_by_no_favorable_lifestyle.category.AFR, af_by_combined.AFR, round(af_by_plp.zhaoming.Qin.prs.AFR, 3))
 )
 
 # View(Thyroid.res)
