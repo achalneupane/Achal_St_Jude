@@ -1,6 +1,6 @@
 # Specify the file path
 
-setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/")
+setwd("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/")
 ##-------------------------------------POI option 1
 # Option 1: Variants in selected genes with the following 3 rare variant masks will be included :
 # a.	Predicted deleterious missense variants: Annotation will be performed using SnpEff27. We will use dbNSFP28 (version 4.1a), which uses 30 in silico prediction tools for annotation . Missense variants will be classified as deleterious if >90% of collated annotations (across all tools) predict deleteriousness.
@@ -291,8 +291,8 @@ for(i in 1:22){
 # # Remove objects not ending in "*final"
 # objects_to_remove <- setdiff(all_objects, final_objects)
 # rm(list = objects_to_remove)
-  
-# save.image("all_missense_deleterious.RData")
+rm(df)  
+save.image("all_missense_deleterious.RData")
 load("all_missense_deleterious.RData")
 ## Save final only
 
