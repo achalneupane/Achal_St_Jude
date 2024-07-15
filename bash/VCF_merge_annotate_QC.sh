@@ -502,10 +502,23 @@ echo "DONE for ${CHR}" >> annotation_step.txt
 #########
 
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/loftee
-ls chr19.preQC_biallelic_renamed_ID.loftee.tsv| sort -V| xargs cat| grep -v ^##| awk -F'\t' 'NR==1 || ($81 ~ /HC/)' > Loftee_HC_all_chr.txt
+ls chr*.preQC_biallelic_renamed_ID.loftee.tsv| sort -V| xargs cat| grep -v ^##| awk -F'\t' 'NR==1 || ($81 ~ /HC/)' > Loftee_HC_all_chr.txt
+awk 'NR > 1 {print $1}' Loftee_HC_all_chr.txt| sort -V | uniq > loftee_unique_HC_variants.txt
+## Extract annotated file lines that match HC
+for i in {1..22}; do 
+export CHR="chr${i}"; 
+echo "Working on $CHR"; 
+head -1 ../${CHR}.preQC_biallelic_renamed_ID_edited_gnomAD_clinvar_12_10_2023_FIELDS-simple4.txt > ${CHR}_loftee_HC_variant_extracted_v4.txt
+grep -F -f loftee_unique_HC_variants.txt ../${CHR}.preQC_biallelic_renamed_ID_edited_gnomAD_clinvar_12_10_2023_FIELDS-simple4.txt >> ${CHR}_loftee_HC_variant_extracted_v4.txt
+done
 
-
-
+## Extract missense variants
+for i in {1..22}; do 
+export CHR="chr${i}"; 
+echo "Working on $CHR"; 
+head -1 ${CHR}.preQC_biallelic_renamed_ID_edited_gnomAD_clinvar_12_10_2023_FIELDS-simple4.txt > ${CHR}_missense_variant_v4.txt
+grep missense ${CHR}.preQC_biallelic_renamed_ID_edited_gnomAD_clinvar_12_10_2023_FIELDS-simple4.txt >> ${CHR}_missense_variant_v4.txt
+done
 
 
 

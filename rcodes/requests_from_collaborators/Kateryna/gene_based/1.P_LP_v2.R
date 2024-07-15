@@ -1,6 +1,6 @@
 # Specify the file path
-
-setwd("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/")
+rm(list = ls())
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/")
 ##-------------------------------------POI option 1
 # Option 1: Variants in selected genes with the following 3 rare variant masks will be included :
 # a.	Predicted deleterious missense variants: Annotation will be performed using SnpEff27. We will use dbNSFP28 (version 4.1a), which uses 30 in silico prediction tools for annotation . Missense variants will be classified as deleterious if >90% of collated annotations (across all tools) predict deleteriousness.
@@ -45,7 +45,7 @@ VEST4.final <- {}
 for(i in 1:22){
   CHR=paste0("chr", i)
   print(CHR)
-  file_path <- paste0(CHR, ".preQC_biallelic_renamed_ID_edited_gnomAD_clinvar_12_10_2023_FIELDS-simple4.txt")
+  file_path <- paste0(CHR, "_missense_variant_v4.txt")
   df <- fread(file_path, header = TRUE, sep ='\t')
   df[df == "."] <- NA
   colnames(df)
@@ -291,9 +291,9 @@ for(i in 1:22){
 # # Remove objects not ending in "*final"
 # objects_to_remove <- setdiff(all_objects, final_objects)
 # rm(list = objects_to_remove)
-rm(df)  
-save.image("all_missense_deleterious.RData")
-load("all_missense_deleterious.RData")
+rm(df); rm(missense) 
+# save.image("all_missense_deleterious.RData")
+# load("all_missense_deleterious.RData")
 ## Save final only
 
 Aloft.final$SNP <- sub(";.*", "", Aloft.final$ID)
@@ -369,7 +369,7 @@ all.missense <- {}
 for(i in 1:22){
   CHR=paste0("chr", i)
   print(CHR)
-  file_path <- paste0(CHR, ".preQC_biallelic_renamed_ID_edited_gnomAD_clinvar_12_10_2023_FIELDS-simple4.txt")
+  file_path <- paste0(CHR, "_missense_variant_v4.txt")
   df <- fread(file_path, header = TRUE, sep ='\t')
   df[df == "."] <- NA
   colnames(df)
@@ -409,22 +409,22 @@ dim(all.missense)
 ## Loftee ##
 ############
 ## Adding gnomad AF because loftee seems to replace with its own
-loftee <- fread("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/loftee/Loftee_HC_all_chr.txt", header = T, sep ="\t")
+loftee <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/loftee/Loftee_HC_all_chr.txt", header = T, sep ="\t")
 
 loftee.lines <- {}
 for(i in 1:22){
   CHR=paste0("chr", i)
   print(CHR)
-  file_path <- paste0(CHR, ".preQC_biallelic_renamed_ID_edited_gnomAD_clinvar_12_10_2023_FIELDS-simple4.txt")
+  file_path <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/loftee/", CHR, "_loftee_HC_variant_extracted_v4.txt")
   df <- fread(file_path, header = TRUE, sep ='\t')
   df[df == "."] <- NA
   colnames(df)
   df$SNP <- sub(";.*", "", df$ID)
-  df <- df[df$SNP %in% loftee$Uploaded_variation,]
+  df <- df[df$SNP %in% loftee$`#Uploaded_variation`,]
   loftee.lines <- rbind.data.frame(loftee.lines, df)
 }
 
-write.table(loftee.lines, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/loftee/loftee_lines_HC_all_cols.txt", col.names = T, row.names = F, quote = F, sep = "\t")
+write.table(loftee.lines, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/loftee/loftee_lines_HC_all_cols.txt", col.names = T, row.names = F, quote = F, sep = "\t")
 
-loftee2 <- cbind.data.frame(loftee, loftee.lines[match(loftee$Uploaded_variation, loftee.lines$SNP), c("AF_afr", "AF_nfe", "AF_eas", "AF_sas", "AF_raw", "AF")])
-write.table(loftee2, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/loftee/loftee_HC_all_chr_with_gnomad.txt", col.names = T, row.names = F, quote = F, sep = "\t")
+loftee2 <- cbind.data.frame(loftee, loftee.lines[match(loftee$`#Uploaded_variation`, loftee.lines$SNP), c("AF_afr", "AF_nfe", "AF_eas", "AF_sas", "AF_raw", "AF")])
+write.table(loftee2, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/loftee/loftee_HC_all_chr_with_gnomad.txt", col.names = T, row.names = F, quote = F, sep = "\t")
