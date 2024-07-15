@@ -522,8 +522,16 @@ done
 
 
 
+## P/LP clinvar
+cut -d$'\t' -f210 chr*.preQC_biallelic_renamed_ID_edited_gnomAD_clinvar_12_10_2023_FIELDS-simple4.txt| sort -V | uniq
+awk -F'\t' 'NR==1 || ($210 ~ /Pathogenic|Likely_pathogenic/) && $210 !~ /Conflicting|Benign/' \
+chr*.preQC_biallelic_renamed_ID_edited_gnomAD_clinvar_12_10_2023_FIELDS-simple4.txt > all_new_clinvar_P_LP.txt
 
+# (base) [aneupane@splprhpc07 snpEff_round3]$ wc -l all_new_clinvar_P_LP.txt
+# 99787 all_new_clinvar_P_LP.txt
 
+# extract unique
+awk -F'\t' '!seen[$3]++' all_new_clinvar_P_LP.txt > all_new_clinvar_P_LP_unique.txt
 
 
 

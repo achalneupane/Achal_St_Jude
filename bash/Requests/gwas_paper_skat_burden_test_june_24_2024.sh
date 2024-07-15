@@ -1,15 +1,14 @@
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff
-cut -d$'\t' -f29 MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-latest-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.gnomAD.gnomAD_clinvar_12_10_2023-clinvar_12_10_2023_FIELDS-simple2.txt| sort -V | uniq
-awk -F'\t' 'NR==1 || ($29 ~ /Pathogenic|Likely_pathogenic/) && $29 !~ /Conflicting|Benign/' \
-MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr*.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-latest-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.gnomAD.gnomAD_clinvar_12_10_2023-clinvar_12_10_2023_FIELDS-simple2.txt > all_new_clinvar_P_LP.txt
+awk -F'\t' 'NR==1 || ($210 ~ /Pathogenic|Likely_pathogenic/) && $210 !~ /Conflicting|Benign/' \
+chr*.preQC_biallelic_renamed_ID_edited_gnomAD_clinvar_12_10_2023_FIELDS-simple4.txt > all_new_clinvar_P_LP.txt
 
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/gwas/rare_variants/geneBased_June_24_2024
-ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/all_new_clinvar_P_LP.txt .
-cut -f3 all_new_clinvar_P_LP.txt| cut -d';' -f1 > extract_PLP.txt
+# ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/all_new_clinvar_P_LP.txt .
+# cut -f3 all_new_clinvar_P_LP.txt| cut -d';' -f1 > extract_PLP.txt
 # extract variants for EUR and AFR
 module load plink/1.90b
 for i in {1..22}; do
-plink --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${i}.PASS.decomposed --extract extract_PLP.txt --keep EURsamples.list --max-maf 0.01 --keep-allele-order --make-bed --out tmp_NFE_filtered_variants_EUR_chr${i}.dat
+plink --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${i}.PASS.decomposed --extract extract_PLP.txt --keep EURsamples.list --max-maf 0.05 --keep-allele-order --make-bed --out tmp_NFE_filtered_variants_EUR_chr${i}.dat
 done
 
 ## EUR
@@ -21,7 +20,7 @@ plink2 --bfile tmp_EUR_merged_data_plink --freq counts --out tmp_EUR_merged_data
 ## AFR
 module load plink/1.90b
 for i in {1..22}; do
-plink --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${i}.PASS.decomposed --extract extract_PLP.txt --keep AFRsamples.list --max-maf 0.01 --keep-allele-order --make-bed --out tmp_AFR_filtered_variants_AFR_chr${i}.dat
+plink --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr${i}.PASS.decomposed --extract extract_PLP.txt --keep AFRsamples.list --max-maf 0.05 --keep-allele-order --make-bed --out tmp_AFR_filtered_variants_AFR_chr${i}.dat
 done
 ls -1 tmp_AFR_filtered_variants_AFR_chr*bed| sort -V | sed 's/\.bed//' > AFRmerge_list.txt
 plink --merge-list AFRmerge_list.txt --keep-allele-order --make-bed --out tmp_AFR_merged_data_plink
@@ -30,8 +29,8 @@ plink2 --bfile tmp_AFR_merged_data_plink --freq counts --out tmp_AFR_merged_data
 
 
 
-## Extract EUR with maf 0.01, mac >=2 and with at least 2 variants
-plink --bfile tmp_EUR_merged_data_plink --extract vars.clinvar.nfe.maf0.01.mac3.txt --keep-allele-order --make-bed --out EUR_final
+## Extract EUR with maf 0.05, mac >=2 and with at least 2 variants
+plink --bfile tmp_EUR_merged_data_plink --extract vars.clinvar.missense.loftee.eur.maf0.01.mac3.txt --keep-allele-order --make-bed --out EUR_final
 
 # Now run gene based analysis. First prepare datasets
 mkdir EUR
