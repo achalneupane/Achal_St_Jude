@@ -23,6 +23,10 @@ dim(clinvar)
 clinvar$AF <- as.numeric(clinvar$AF)
 clinvar$AF_nfe <- as.numeric(clinvar$AF_nfe)
 clinvar$AF_afr <- as.numeric(clinvar$AF_afr)
+
+clinvar <- clinvar[,!duplicated(colnames(clinvar))]
+
+colnames(clinvar) <- gsub("ANN\\[\\*\\]\\.", "", colnames(clinvar))
 #############
 ## EUR PLP ##
 #############
@@ -35,30 +39,31 @@ EUR_MAC <- fread("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/commo
 EUR_MAC <- EUR_MAC[EUR_MAC$ALT_CTS >= 3,]
 clinvar.nfe <- clinvar.nfe[clinvar.nfe$ID %in% EUR_MAC$ID,] # These are also MAF < 0.05 in our EUR data
 dim(clinvar.nfe)
-# 67
+# 572
 
+library(dplyr)
 # Keeping only those with 2 or more variants in each gene 
 # Count the occurrences of each gene
 gene_counts <- clinvar.nfe %>%
-  group_by(`ANN....GENE`) %>%
+  group_by(GENE) %>%
   summarise(count = n())
 
 # Merge the counts back into the original data frame
 clinvar.nfe <- clinvar.nfe %>%
-  left_join(gene_counts, by = "ANN....GENE") %>%
+  left_join(gene_counts, by = "GENE") %>%
   rename(gene.counts.NFE = count)
 # cc <- cbind.data.frame(clinvar.nfe$ID, clinvar.nfe$AF, clinvar.nfe$AF_nfe, clinvar.nfe$AF_afr, clinvar.nfe$CLNSIG, clinvar.nfe$gene.counts.NFE, clinvar.nfe$ANN....GENE)
 dim(clinvar.nfe)
-# 67
+# 572
 
 clinvar.nfe <- clinvar.nfe[clinvar.nfe$gene.counts.NFE >= 2,]
 dim(clinvar.nfe)
-# 10
+# 102
 
-write.table(as.data.frame(clinvar.nfe$ID), "Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/gwas/rare_variants/geneBased_June_24_2024/vars.clinvar.missense.loftee.nfe.maf0.05.mac3.txt", col.names = F, row.names = F, quote = F)
+write.table(as.data.frame(clinvar.nfe$ID), "Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/gwas/rare_variants/geneBased_June_24_2024/vars.clinvar.missense.loftee.eur.maf0.05.mac3.txt", col.names = F, row.names = F, quote = F)
 
 ## Write genesets
-EUR <- cbind.data.frame(CHROM=clinvar.nfe$CHROM, GENE=clinvar.nfe$ANN....GENE, SNPID=clinvar.nfe$ID)
+EUR <- cbind.data.frame(CHROM=clinvar.nfe$CHROM, GENE=clinvar.nfe$GENE, SNPID=clinvar.nfe$ID)
 write.table(EUR, "Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/gwas/rare_variants/geneBased_June_24_2024/extract-variants-final-EUR.GENE-SNP", sep = "\t", row.names = F, quote = F, col.names = F)
 
 
@@ -66,39 +71,40 @@ write.table(EUR, "Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/commo
 #############
 ## AFR PLP ##
 #############
-clinvar.afr <- clinvar[which(clinvar$AF < 0.05 & clinvar$AF_nfe < 0.05),]
+clinvar.afr <- clinvar[which(clinvar$AF < 0.05 & clinvar$AF_afr < 0.05),]
 dim(clinvar.afr)
-# 18645   
+# 18582
 ## Read MAC data with 0.05 maf
 AFR_MAC <- fread("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/gwas/rare_variants/geneBased_June_24_2024/tmp_AFR_merged_data_plink_MAC_AFR.acount", header = T, stringsAsFactors = F, skip = 'CHROM')
 ## Selecting variants that have MAC of at least 3
 AFR_MAC <- AFR_MAC[AFR_MAC$ALT_CTS >= 3,]
 clinvar.afr <- clinvar.afr[clinvar.afr$ID %in% AFR_MAC$ID,] # These are also MAF < 0.05 in our AFR data
 dim(clinvar.afr)
-# 3
+# 223
 
+library(dplyr)
 # Keeping only those with 2 or more variants in each gene 
 # Count the occurrences of each gene
 gene_counts <- clinvar.afr %>%
-  group_by(`ANN....GENE`) %>%
+  group_by(GENE) %>%
   summarise(count = n())
 
 # Merge the counts back into the original data frame
 clinvar.afr <- clinvar.afr %>%
-  left_join(gene_counts, by = "ANN....GENE") %>%
-  rename(gene.counts.NFE = count)
-# cc <- cbind.data.frame(clinvar.afr$ID, clinvar.afr$AF, clinvar.afr$AF_nfe, clinvar.afr$AF_afr, clinvar.afr$CLNSIG, clinvar.afr$gene.counts.NFE, clinvar.afr$ANN....GENE)
+  left_join(gene_counts, by = "GENE") %>%
+  rename(gene.counts.AFR = count)
+# cc <- cbind.data.frame(clinvar.afr$ID, clinvar.afr$AF, clinvar.afr$AF_afr, clinvar.afr$AF_afr, clinvar.afr$CLNSIG, clinvar.afr$gene.counts.afr, clinvar.afr$ANN....GENE)
 dim(clinvar.afr)
-# 3
+# 223
 
-clinvar.afr <- clinvar.afr[clinvar.afr$gene.counts.NFE >= 2,]
+clinvar.afr <- clinvar.afr[clinvar.afr$gene.counts.AFR >= 2,]
 dim(clinvar.afr)
-# 0
+# 14
 
 write.table(as.data.frame(clinvar.afr$ID), "Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/gwas/rare_variants/geneBased_June_24_2024/vars.clinvar.missense.loftee.afr.maf0.05.mac3.txt", col.names = F, row.names = F, quote = F)
 
 ## Write genesets
-AFR <- cbind.data.frame(CHROM=clinvar.nfe$CHROM, GENE=clinvar.nfe$ANN....GENE, SNPID=clinvar.nfe$ID)
+AFR <- cbind.data.frame(CHROM=clinvar.afr$CHROM, GENE=clinvar.afr$GENE, SNPID=clinvar.afr$ID)
 write.table(AFR, "Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/gwas/rare_variants/geneBased_June_24_2024/extract-variants-final-AFR.GENE-SNP", sep = "\t", row.names = F, quote = F, col.names = F)
 
 
