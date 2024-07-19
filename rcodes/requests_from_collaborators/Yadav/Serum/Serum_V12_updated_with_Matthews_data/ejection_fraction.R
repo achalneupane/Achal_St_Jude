@@ -87,9 +87,11 @@ table_2.600.event1$gradedtBase <- table_2.600.event1$gradedt
 
 table_2.600.event1$ejection_fraction_FU <- table_2.600.event2$ejection_fraction[match(table_2.600.event1$sjlid, table_2.600.event2$sjlid)]
 table_2.600.event1$gradedtFU <- table_2.600.event2$gradedt[match(table_2.600.event1$sjlid, table_2.600.event2$sjlid)]
+table_2.600.event1$age_at_baseline <- table_2.600.event1$ageevent
 
-table_2.600.event <- table_2.600.event1[c("sjlid",	"gender",	"condition", "gradedtBase", "gradedtFU", "ejection_fraction_Baseline", "ejection_fraction_FU")]
+table_2.600.event <- table_2.600.event1[c("sjlid",	"gender",	"condition", "age_at_baseline", "gradedtBase", "gradedtFU", "ejection_fraction_Baseline", "ejection_fraction_FU")]
 
+table_2.600.event$time_diff_years <- as.numeric(difftime(table_2.600.event$gradedtFU, table_2.600.event$gradedtBase, units = "days")) / 365.25
 
 write.table(table_2.600.event, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/table_2_plasma_600_ejection_fraction_updated.txt", col.names = T, row.names = F, quote = F, sep = "\t")
 
@@ -130,3 +132,7 @@ print(t_test_result)
 # 
 # Additionally, the paired t-test conducted to assess the change in ejection fraction from baseline to follow-up revealed a statistically significant difference (P=1.16×10⁻⁵). The mean difference between baseline and follow-up ejection fractions was -0.017 (95% CI=-0.024 to -0.0095), which highlights a meaningful decrease in ejection fraction.
 
+
+table_2.600.event.to.yutaka <- table_2.600.event[c("sjlid", "age_at_baseline",  "time_diff_years", "ejection_fraction_Baseline", "ejection_fraction_FU", "change_in_ef")]
+
+save(table_2.600.event.to.yutaka, file= "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/table_2.600.event.to.yutaka.RData")
