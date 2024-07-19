@@ -110,3 +110,14 @@ for chr in {1..22}; do \
 cd chr${chr}; mkdir geneset-${set}; perl /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/gwas/rare_variants/get_gene.perl chr${chr}-${BASE}-${set}.GENE-SNP; mv *.gene geneset-${set}; cd ${HOMEDIR}; done
 
 # Now Run SKAT-loop-OPTIMAL.r
+
+
+
+
+## Next, perform association analysis with echo:
+
+plink --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr16.PASS.decomposed --extract chr16:25611595:C:T.txt --keep EURsamples.list --keep-allele-order --make-bed --out chr16:25611595:C:T_EUR.dat
+plink --bfile chr16:25611595:C:T_EUR.dat --keep-allele-order --allow-no-sex --recode A --out chr16_25611595_C_T_EUR.dat_recodeA
+
+plink --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr16.PASS.decomposed --extract chr16:25611595:C:T.txt --keep AFRsamples.list --keep-allele-order --make-bed --out chr16:25611595:C:T_AFR.dat
+plink --bfile chr16:25611595:C:T_AFR.dat --keep-allele-order --allow-no-sex --recode A --out chr16_25611595_C_T_AFR.dat_recodeA
