@@ -1,4 +1,4 @@
-
+library(data.table)
 ## Missense
 all.missense <- as.data.frame(fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common//MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/missense_variants_with_overlap_in_more_than_90_percent_of_prediction_tools_all_cols.txt", header = T, stringsAsFactors = F))
 ## Loftee
@@ -11,6 +11,10 @@ loftee <- as.data.frame(loftee[loftee$SNP %in% loftee2$`#Uploaded_variation`,])
 # Main folder: /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/diabetes
 clinvar <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/all_new_clinvar_P_LP.txt", header = T, stringsAsFactors = F)
 clinvar$SNP <- sub(";.*", "", clinvar$ID)
+
+all.missense$from <- "missense"
+loftee$from <- "loftee"
+clinvar$from <- "clinvar"
 clinvar <- rbind.data.frame(all.missense, loftee, clinvar)
 
 clinvar$ID <- sub(";.*", "", clinvar$ID)
@@ -41,6 +45,8 @@ clinvar.nfe <- clinvar.nfe[clinvar.nfe$ID %in% EUR_MAC$ID,] # These are also MAF
 dim(clinvar.nfe)
 # 572
 
+
+
 library(dplyr)
 # Keeping only those with 2 or more variants in each gene 
 # Count the occurrences of each gene
@@ -59,6 +65,8 @@ dim(clinvar.nfe)
 clinvar.nfe <- clinvar.nfe[clinvar.nfe$gene.counts.NFE >= 2,]
 dim(clinvar.nfe)
 # 102
+
+table(clinvar.nfe$from)
 
 write.table(as.data.frame(clinvar.nfe$ID), "Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/gwas/rare_variants/geneBased_June_24_2024/vars.clinvar.missense.loftee.eur.maf0.05.mac3.txt", col.names = F, row.names = F, quote = F)
 
@@ -100,6 +108,8 @@ dim(clinvar.afr)
 clinvar.afr <- clinvar.afr[clinvar.afr$gene.counts.AFR >= 2,]
 dim(clinvar.afr)
 # 14
+
+table(clinvar.afr$from)
 
 write.table(as.data.frame(clinvar.afr$ID), "Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/gwas/rare_variants/geneBased_June_24_2024/vars.clinvar.missense.loftee.afr.maf0.05.mac3.txt", col.names = F, row.names = F, quote = F)
 

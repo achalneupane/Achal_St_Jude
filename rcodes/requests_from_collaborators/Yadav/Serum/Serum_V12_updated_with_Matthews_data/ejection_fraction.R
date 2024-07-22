@@ -93,12 +93,12 @@ table_2.600.event <- table_2.600.event1[c("sjlid",	"gender",	"condition", "age_a
 
 table_2.600.event$time_diff_years <- as.numeric(difftime(table_2.600.event$gradedtFU, table_2.600.event$gradedtBase, units = "days")) / 365.25
 
-write.table(table_2.600.event, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/table_2_plasma_600_ejection_fraction_updated.txt", col.names = T, row.names = F, quote = F, sep = "\t")
+# write.table(table_2.600.event, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/table_2_plasma_600_ejection_fraction_updated.txt", col.names = T, row.names = F, quote = F, sep = "\t")
 
-table_2.600.event <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/table_2_plasma_600_ejection_fraction_updated.txt", header = T, sep = "\t") # 18 or older only and vial zero excluded
+# table_2.600.event <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/table_2_plasma_600_ejection_fraction_updated.txt", header = T, sep = "\t") # 18 or older only and vial zero excluded
 
 # calculate the change in two EF and provide a summary of the change
-table_2.600.event$change_in_ef <- table_2.600.event$ejection_fraction_Baseline-table_2.600.event$ejection_fraction_FU
+table_2.600.event$change_in_ef <- table_2.600.event$ejection_fraction_FU-table_2.600.event$ejection_fraction_Baseline
 
 
 
@@ -136,3 +136,29 @@ print(t_test_result)
 table_2.600.event.to.yutaka <- table_2.600.event[c("sjlid", "age_at_baseline",  "time_diff_years", "ejection_fraction_Baseline", "ejection_fraction_FU", "change_in_ef")]
 
 save(table_2.600.event.to.yutaka, file= "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/table_2.600.event.to.yutaka.RData")
+
+
+
+table_2.600.event.to.yutaka <- na.omit(table_2.600.event.to.yutaka)
+
+
+# Percentage of samples with decline
+percentage_declined <- sum(table_2.600.event.to.yutaka$change_in_ef < 0) / nrow(table_2.600.event.to.yutaka) * 100
+
+# Calculate average annual decline (assuming the time between baseline and follow-up is in years)
+# For this example, let's assume it's 2 years.
+average_change <- mean(table_2.600.event.to.yutaka$change_in_ef/table_2.600.event.to.yutaka$time_diff_years)
+average_annual_decline <- average_change / mean(table_2.600.event.to.yutaka$time_diff_years)
+
+# Calculate quantiles for the top 10%, 20%, 30%, and 50% of declines
+decline_quantiles <- quantile(table_2.600.event.to.yutaka$change_in_ef[table_2.600.event.to.yutaka$change_in_ef < 0], probs = c(0.1, 0.2, 0.3, 0.5))
+
+# Print the results
+cat("Percentage of samples with decline:", percentage_declined, "%\n")
+cat("Average annual decline: ", average_annual_decline, "\n")
+cat("Decline quantiles:\n")
+cat("10% decline or more: ", decline_quantiles[1], "\n")
+cat("20% decline or more: ", decline_quantiles[2], "\n")
+cat("30% decline or more: ", decline_quantiles[3], "\n")
+cat("50% decline or more: ", decline_quantiles[4], "\n")
+

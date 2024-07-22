@@ -147,5 +147,11 @@ chr.tmp <- chr.tmp[-1,]
 chrALL <- rbind.data.frame(chrALL, chr.tmp)
 }
 
+
 colnames(chrALL) <- c("genelist","SNPID","N0","N1","SKAT","SKATO","BURDEN")
+
+chrALL$SKAT_FDR <- p.adjust(as.numeric(chrALL$SKAT), method = "fdr")
+chrALL$SKATO_FDR <- p.adjust(as.numeric(chrALL$SKATO), method = "fdr")
+chrALL$BURDEN_FDR <- p.adjust(as.numeric(chrALL$BURDEN), method = "fdr")
+
 write.table(chrALL, paste(workdir, set, "_chrALL","_SKAT_dox.pval",sep=""), sep="\t", col.names=T, row.names=F, quote=F)
