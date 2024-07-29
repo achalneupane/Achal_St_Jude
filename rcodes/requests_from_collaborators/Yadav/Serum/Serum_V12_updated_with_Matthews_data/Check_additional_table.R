@@ -287,3 +287,211 @@ all.non.hodgkin <- all.non.hodgkin[all.non.hodgkin$diaggrp!="",]
 
 write.table(all.hodgkin, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/hodgkin_all.txt", col.names = T, row.names = F, sep = "\t", quote = F)
 write.table(all.non.hodgkin, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/nonhodgkin_all.txt", col.names = T, row.names = F, sep = "\t", quote = F)
+
+
+###############################################################################################################
+###############################################################################################################
+###############################################################################################################
+###############################################################################################################
+# Yadav on 07/29/2024:
+# Can you please randomly sample 200 SJLIFE survivors who have 1) cardiomyopathy
+# grade 2 or higher at Baseline and 2) at least 1 plasma sample and were >=18
+# years of age at plasma? Once you identify these 200, I need to the crosstab of
+# their sex and race as shown below.
+library(dplyr)
+library(tidyr)
+library(haven)
+
+setwd("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/")
+
+source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/requests_from_collaborators/Yadav/Serum/get_matching_rows_from_CTCAE.R")
+# df <- read.table("Trans-omics CMP profiling Inventory 20230901.txt", header = T)
+# dim(df) # 20174
+
+## add TB from Mathew
+# TB <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/data_from_Matthew/ForAchal_Survivors.txt", header = T, sep = "\t") ## March version
+TB <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/data_from_Matthew/Achal_survivors_04.04.2024.txt", header = T, sep = "\t") ## Updated by Matt in April
+
+df <- TB
+
+df$ageatsample <- floor(df$ageatsample * 10) / 10
+df.original <- df
+df <- df %>%
+  distinct()
+dim(df)  # 20137
+
+## Note: Since we are rounding age down to one decimal place, a 7-days window did not make any difference in terms of the number of rows or samples
+SERUM <- df[grepl("Plasma", df$aliquot_type, ignore.case = T),]
+
+SERUM.original <- SERUM
+dim(SERUM.original)
+# [1] 10383     6
+# 10514  7 ## April version
+
+## I see age at serum sample is <18 yrs. Could you identify the samples among 18
+#or higher only? Everyone needs to be adults at serum sample.
+SERUM <- SERUM[which(SERUM$ageatsample >= 18),]
+
+# remove vial zero
+SERUM <- SERUM[SERUM$num_vials > 0 ,]
+
+
+## 171 cases to keep
+all.wanted.df.1200.to.update <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v11_output//plasma_data_batch1_1200_samples.txt", header = T, sep = "\t")
+keep.171.cases <- all.wanted.df.1200.to.update$sjlid[all.wanted.df.1200.to.update$selection_group == "171_CMP_cases"]
+keep.171.cases <- SERUM[SERUM$sjlid %in% keep.171.cases,]
+SERUM <- SERUM[!SERUM$sjlid %in% keep.171.cases$sjlid,] # exclude 171 cases
+dim(SERUM)
+# 8536    7
+## Now keep only those that have more than one vial and are alive
+SERUM <- SERUM[SERUM$num_vials > 1,]
+SERUM <- rbind.data.frame(SERUM, keep.171.cases)
+dim(SERUM)
+# [1] 7948    6
+
+
+dim(SERUM)
+# 8879
+# 7948    7 ## April 4 version
+
+## Keep max num vials and alive over dead
+SERUM <- SERUM %>%
+  group_by(sjlid, ageatsample) %>%
+  filter(num_vials == max(num_vials)) %>%
+  filter(vitalstatus == "Alive" | all(vitalstatus == "Deceased"))
+
+dim(SERUM)
+# [1] 7934    6
+
+## Also removing samples that have duplicate ageevent in CTCAE data
+# SERUM <- SERUM[!SERUM$sjlid %in% c("SJL1225801", "SJL1265801", "SJL1430801", "SJL4730101", "SJL5134305", "SJL5146506"),]
+dim(SERUM)
+# 7934    6
+## Could you please work on it by merging with the CTCAE grades for cardiomyopathy from the most recent data freeze? Please look at serum and plasma separately.
+# read CTCAE
+# CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
+CTCAE <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
+CTCAE.original <- CTCAE
+CTCAE <- CTCAE.original
+
+CTCAE <- CTCAE.original[c("sjlid", "studypop", "sjlife_cohort", "gender", "organsys", "condition", "gradedt", "grade", "ageevent")]
+# CTCAE.original.2 <- CTCAE.original[c("sjlid", "studypop", "sjlife_cohort", "gender", "organsys", "condition", "gradedt", "grade", "ageevent")]
+## Since Trans-omics CMP ageatsample is in one decimal, I am coverting CTCAE age also to one decimal place.
+CTCAE$ageevent <- round(CTCAE$ageevent,1)
+
+# # CTCAE.cc <- CTCAE[grepl("SJL0253301|SJL1063101", CTCAE$sjlid),]
+# # Condition 1: Skip samples with grade 2 or higher or minimum ageevent with grade 2 or higher. If there are two ageevent that are miniumum value, we still apply this filter (but this did not make any difference)
+# CTCAE <- CTCAE %>%
+#   group_by(sjlid) %>%
+#   filter(
+#     !(grade[which(ageevent == min(ageevent))[1]] != 0)
+#   ) %>%
+#   ungroup() %>%
+#   arrange(sjlid)
+dim(CTCAE)
+# 9218    9
+# 9218    9
+
+# V10 & V11
+# 9218    9
+
+CTCAE <- CTCAE[CTCAE$sjlid %in% unique(SERUM$sjlid),]
+dim(CTCAE)
+# v12 7148
+
+# CTCAE <- get_rows_with_smaller_sample_age(CTCAE, SERUM, 0)
+CTCAE <- get_rows_with_smaller_sample_age.all(CTCAE, SERUM, 7)
+dim(CTCAE)
+# V12
+dim(CTCAE)
+# 8090   13
+
+## Add event number
+CTCAE <- CTCAE %>%
+  dplyr::group_by(sjlid) %>%
+  dplyr::arrange(ageevent) %>%
+  dplyr::mutate(event_number = row_number()) %>%
+  dplyr::ungroup() %>%
+  dplyr::arrange(sjlid)  # Restore the original order
+
+## first event should have sample
+CTCAE <- CTCAE[!(CTCAE$grade == 0 & is.na(CTCAE$Sample_age)),]
+CTCAE <- CTCAE[CTCAE$grade != -9,]
+
+
+## Remove rows once grades 2 or higher are seen in ordered df by sjlid and event_number
+CTCAE <- filter_rows_by_condition(CTCAE, "sjlid", "grade")
+sum(CTCAE$grade !=0 & CTCAE$event_number==1)
+table(CTCAE$grade)
+## V12
+# 0    2    3    5 
+# 4540  200   53    1 
+
+CTCAE.2 <- CTCAE
+
+
+## Add event number
+CTCAE.2 <- CTCAE.2 %>%
+  dplyr::group_by(sjlid) %>%
+  dplyr::arrange(ageevent) %>%
+  dplyr::mutate(new_event_number = row_number()) %>%
+  dplyr::ungroup() %>%
+  dplyr::arrange(sjlid)  # Restore the original order
+
+# # SJL5553107
+# # Skip samples with grade 2 or higher or minimum ageevent with grade 2 or higher
+# CTCAE.2 <- CTCAE.2 %>%
+#   dplyr::group_by(sjlid) %>%
+#   dplyr::filter(
+#     !(grade[which(ageevent == min(ageevent))[1]] != 0)
+#   ) %>%
+#   dplyr::ungroup()
+
+
+## Add event number
+CTCAE.2 <- CTCAE.2 %>%
+  dplyr::group_by(sjlid) %>%
+  dplyr::arrange(ageevent) %>%
+  dplyr::mutate(new_event_number = row_number()) %>%
+  dplyr::ungroup() %>%
+  dplyr::arrange(sjlid)  # Restore the original order
+
+
+CTCAE.2$grade_2_or_higher <- ifelse(CTCAE.2$grade >= 2, "grade_2_or_higher", "grade_0")
+table(CTCAE.2$event_number,CTCAE.2$grade)
+
+
+sum(CTCAE.2$new_event_number == 1 & CTCAE.2$grade >=2)
+# 413
+
+gradeGE2.baseline <- CTCAE.2[CTCAE.2$new_event_number == 1 & CTCAE.2$grade >=2,]
+
+length(unique(gradeGE2.baseline$sjlid))
+dim(gradeGE2.baseline)
+
+demographic <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/demographics.sas7bdat")
+gradeGE2.baseline$Race <- demographic$race[match(gradeGE2.baseline$sjlid, demographic$sjlid)]
+gradeGE2.baseline$Racegrp <- demographic$racegrp2[match(gradeGE2.baseline$sjlid, demographic$sjlid)]
+
+table(gradeGE2.baseline$Race)
+table(gradeGE2.baseline$Racegrp)
+
+# Extract unique sjlid values
+unique_sjlids <- unique(gradeGE2.baseline$sjlid)
+
+set.seed(54321)
+# Randomly sample 200 unique sjlid values
+sampled_sjlids <- sample(unique_sjlids, size = 200)
+gradeGE2.baseline.200 <- gradeGE2.baseline[gradeGE2.baseline$sjlid %in% sampled_sjlids,]
+
+table(gradeGE2.baseline.200$Race)
+table(gradeGE2.baseline.200$Racegrp)
+
+males <-  gradeGE2.baseline.200[gradeGE2.baseline.200$gender== "Male",]
+as.data.frame(table(males$Racegrp))
+round((as.data.frame(table(males$Racegrp))[2]/123)*100, 2)
+
+
+females <- gradeGE2.baseline.200[gradeGE2.baseline.200$gender== "Female",]
+as.data.frame(table(females$Racegrp))
+round((as.data.frame(table(females$Racegrp))[2]/77)*100, 2)
