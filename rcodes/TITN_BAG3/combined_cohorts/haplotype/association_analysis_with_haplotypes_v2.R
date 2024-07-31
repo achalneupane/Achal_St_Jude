@@ -128,7 +128,7 @@ for (i in 1:length(haplos)){
 }
 
 # ## Only these two haplotypes were found significant:
-# haplo_11110; haplo_00001    ## r2 < 0.2
+# haplo_11110; haplo_00001    ## r2 > 0.8
 # haplo.test.adj <- glm(formula = CMP ~  haplo_0111111101 + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, 
 #                       family = binomial,
 #                       data = pheno)

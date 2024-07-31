@@ -5,7 +5,7 @@ setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/"
 ###############################
 ## After extracting haplotypes with extract_haplotypes.py, now check the association of the haplotypes
 pheno <- read.table("pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno", header = T)
-haplotypes <- read.table("haplotypes_ttn_r2_0.8.txt", header = T, sep = "\t", stringsAsFactors = FALSE, colClasses = "character") # r2 > 0.8
+haplotypes <- read.table("haplotypes_ttn_r2_0.8_haplo.glm.txt", header = T, sep = "\t", stringsAsFactors = FALSE, colClasses = "character") # r2 > 0.8
 # # haplotypes$haplo <- gsub('\\(|\\)|\\[|\\]',"", apply(haplotypes[2:11], 1, function(x) paste(x, collapse = "")))
 # haplotypes$haplo <- gsub('\\(|\\)|\\[|\\]',"", apply(haplotypes[2:10], 1, function(x) paste(x, collapse = "")))
 # # haplotypes$haplo <- apply(haplotypes[2:11], 1, function(x) paste(x, collapse = ""))
@@ -66,70 +66,105 @@ freq <- read.table(text="index  haplotype     freq         SE
 dim(freq)
 
 
-pheno$Best1 <- as.factor(haplotypes$Best1[match(pheno$IID, haplotypes$sample)])
-pheno$Best2 <- as.factor(haplotypes$Best2[match(pheno$IID, haplotypes$sample)])
+pheno$Best1 <- haplotypes$Best1[match(pheno$IID, haplotypes$sample)]
+pheno$Best2 <- haplotypes$Best2[match(pheno$IID, haplotypes$sample)]
+
+pheno.best1 <- cbind.data.frame(IID = pheno$IID, Best1 = pheno$Best1)
+pheno.best2 <- cbind.data.frame(IID = pheno$IID, Best2 = pheno$Best2)
+
+## Best 1
+haplotypes <- unique(pheno$Best1)
+for (i in 1:length(haplotypes)){
+  pheno.best1[haplotypes[i]] <- ifelse(pheno.best1$Best1 %in% haplotypes[i], 1, 0)
+}
+
+## Best2
+haplotypes <- unique(pheno$Best2)
+for (i in 1:length(haplotypes)){
+  pheno.best2[haplotypes[i]] <- ifelse(pheno.best2$Best2 %in% haplotypes[i], 1, 0)
+}
+
+all_columns <- unique(c(colnames(pheno.best1), colnames(pheno.best2)))
+result_df <- data.frame(matrix(NA, nrow = nrow(pheno.best1), ncol = length(all_columns)))
+colnames(result_df) <- all_columns
+result_df$IID <- pheno.best1$IID
+result_df$Best1 <- pheno.best1$Best1
+result_df$Best2 <- pheno.best2$Best2
+
+# Fill the new dataframe by summing or copying the values
+for (col in all_columns) {
+  if (col %in% c("IID", "Best1", "Best2")) next
+  
+  if (col %in% colnames(pheno.best1) && col %in% colnames(pheno.best2)) {
+    result_df[[col]] <- pheno.best1[[col]] + pheno.best2[[col]]
+  } else if (col %in% colnames(pheno.best1)) {
+    result_df[[col]] <- pheno.best1[[col]]
+  } else if (col %in% colnames(pheno.best2)) {
+    result_df[[col]] <- pheno.best2[[col]]
+  }
+}
+
+result_df <- result_df[!grepl("Best", colnames(result_df))]
+colnames(result_df)[-1] <- paste0("haplo_", colnames(result_df))[-1]
+merged_pheno <- merge(pheno, result_df, by = "IID")
+save.pheno <- pheno
+pheno <- merged_pheno
 
 pheno$CMP <- as.factor(pheno$CMP)
 
-pheno$haplo <- as.factor(paste0(pheno$Best1, "_", pheno$Best2))
+haplos <- colnames(pheno)[grepl("haplo_", colnames(pheno))]
 
-
-install.packages("haplo.stats")
-library(haplo.stats)
-
-
-haplos <- pheno[grepl("haplo", colnames(pheno))]
-haplos <- haplos$haplo
-
-# Specify the haplotype data
-haplo_data <- as.matrix(pheno[, c("Best1", "Best2")])
-
-# Create the haplo.id object
-haplo_id <- haplo.em(haplo_data)
-
-
-
-  formulas <- paste0("CMP ~ ", "Best1 + Best2 + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10")
-  haplo.test.adj <- glm(formula = formulas, family = binomial,
-                        data = pheno)
-  print(summary(haplo.test.adj))
-  summary_table <- as.data.frame(summary(haplo.test.adj)$coefficients[, c(1, 2, 4)])
-  summary_table$haplotype <- gsub("Best1|Best2", "", rownames(summary_table))
-  summary_table$freq <- freq$freq[match(summary_table$haplotype, freq$haplotype)]
-  summary_table <- summary_table[!is.na(summary_table$freq),]
-  summary_table$dups <- duplicated(summary_table$haplotype)
+wanted.vars <- {}
+## Check association of haplotypes
+for (haplo in haplos) {
+  cat("Doing:", haplo, "\n")
+  formula <- as.formula(paste("CMP ~", haplo, "+ agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10"))
+  haplo.test.adj <- glm(formula, family = binomial, data = pheno)
   
-  P <- round(summary_table[ROW,3],3)
-  OR <- as.numeric(sprintf("%.2f", exp(summary_table[ROW,1])))
-  CI1 <- paste0(" (",round(exp(summary_table[ROW,1]) -1.96*summary_table[ROW,2],2), 
-                " to ", round(exp(summary_table[ROW,1]) +1.96*summary_table[ROW,2], 2),")")
-  OR <- paste0(OR, CI1)
+  summary_table <- summary(haplo.test.adj)$coefficients
+  row <- grep(haplo, rownames(summary_table))
+  P <- summary_table[row, "Pr(>|z|)"]
+  OR <- exp(summary_table[row, "Estimate"])
+  CI1 <- exp(summary_table[row, "Estimate"] - 1.96 * summary_table[row, "Std. Error"])
+  CI2 <- exp(summary_table[row, "Estimate"] + 1.96 * summary_table[row, "Std. Error"])
   
-  wanted.vars.tmp <- c(wanted.haplo, wanted.freq, OR, P)
-  wanted.vars <- rbind(wanted.vars, wanted.vars.tmp)
-  Sys.sleep(10)
+  # Round OR and CI values and handle values greater than 99
+  OR_str <- sprintf("%.2f", OR)
+  CI1_str <- ifelse(CI1 > 99, ">99", sprintf("%.2f", CI1))
+  CI2_str <- ifelse(CI2 > 99, ">99", sprintf("%.2f", CI2))
+  
+  OR_CI <- paste0(OR_str, " (", CI1_str, " to ", CI2_str, ")")
+  
+  # Format p-value
+  P_str <- ifelse(P <= 0.001, format(P, scientific = TRUE, digits = 2),
+                  sprintf("%.2f", P))
+  
+  wanted.haplo <- gsub("haplo_", "", haplo)
+  wanted.freq <- freq$freq[match(wanted.haplo, freq$haplotype)]
+  wanted.freq.SE <- freq$SE[match(wanted.haplo, freq$haplotype)]
+  wanted.freq_str <- paste0(wanted.freq, " (", wanted.freq.SE, ")")
+  
+  wanted.vars[[haplo]] <- c(haplotype = wanted.haplo, frequency = wanted.freq_str, OR_CI = OR_CI, P_value = P_str)
 }
 
-# ## Only these two haplotypes were found significant:
-# haplo_11110; haplo_00001    ## r2 < 0.2
-# haplo.test.adj <- glm(formula = CMP ~  haplo_0111111101 + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, 
-#                       family = binomial,
-#                       data = pheno)
-# summary(haplo.test.adj)
-# 
-# 
-# haplo.test.adj <- glm(formula = CMP ~  haplo_1000000010 + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, 
-#                       family = binomial,
-#                       data = pheno)
-# summary(haplo.test.adj)
+wanted.vars <- do.call(rbind, wanted.vars)
+wanted.vars <- as.data.frame(wanted.vars, stringsAsFactors = FALSE)
+colnames(wanted.vars) <- c("Haplotype", "Frequency (SE)", "OR (95% CI)", "P-value")
 
-haplo.test.adj <- glm(formula = CMP ~  haplo_111101 + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, 
+print(wanted.vars)
+
+  
+# haplo_000000010      2.898e-01  1.057e-01   2.743  0.00609 **
+# haplo_111111101     -2.192e-01  1.066e-01  -2.055   0.0398 *  
+
+
+haplo.test.adj <- glm(formula = CMP ~  haplo_000000010 + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, 
                       family = binomial,
                       data = pheno)
 summary(haplo.test.adj)
 
 
-haplo.test.adj <- glm(formula = CMP ~  haplo_000010 + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, 
+haplo.test.adj <- glm(formula = CMP ~  haplo_111111101 + agedx + agelstcontact + gender + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, 
                       family = binomial,
                       data = pheno)
 summary(haplo.test.adj)

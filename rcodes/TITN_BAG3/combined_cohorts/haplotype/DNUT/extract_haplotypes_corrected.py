@@ -38,7 +38,7 @@ with open("haplotype_phase.out", "r") as f:
                     best2 = ""
 
 # Write the extracted data into a file
-with open("haplotypes_ttn_r2_0.8.txt", "w") as f:
+with open("haplotypes_ttn_r2_0.8_haplo.glm.txt", "w") as f:
     f.write("sample\tBest1\tBest2\n")
     for id, haplotypes in ids_to_haplotypes.items():
         f.write(f"{id}\t{haplotypes['Best1']}\t{haplotypes['Best2']}\n")
