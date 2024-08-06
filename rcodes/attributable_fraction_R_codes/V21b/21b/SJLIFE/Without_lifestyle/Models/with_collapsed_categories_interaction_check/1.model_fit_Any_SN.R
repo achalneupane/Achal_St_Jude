@@ -27,6 +27,7 @@ PHENO.ANY_SN$maxsegrtdose.category <- factor(PHENO.ANY_SN$maxsegrtdose.category,
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 
+# Null model
 fit_all = glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + 
