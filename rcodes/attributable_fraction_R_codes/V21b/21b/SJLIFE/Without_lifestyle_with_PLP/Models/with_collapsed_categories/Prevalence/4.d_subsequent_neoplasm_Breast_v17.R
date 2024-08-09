@@ -188,7 +188,7 @@ round(prevalence_carriers_no_any_sns,2)
 # prevalence all
 prevalence.counts <- sum(PHENO.ANY_SN$Qin_without_Zhaoming_vars.Non.Ref.Counts > 0)
 table(ifelse(PHENO.ANY_SN$Qin_without_Zhaoming_vars.Non.Ref.Counts > 0, "Y", "N"))
-round((prop.test(prevalence.counts, 4401)$estimate*100), 2)
+round((prop.test(prevalence.counts, 2089)$estimate*100), 2)
 
 ## Zhaoming ##
 
@@ -214,4 +214,4 @@ round(prevalence_carriers_no_any_sns,2)
 # prevalence all
 prevalence.counts <- sum(PHENO.ANY_SN$Zhaoming_Non.Ref.Counts > 0)
 table(ifelse(PHENO.ANY_SN$Zhaoming_Non.Ref.Counts > 0, "Y", "N"))
-round((prop.test(prevalence.counts, 4401)$estimate*100), 2)
+round((prop.test(prevalence.counts, 2089)$estimate*100), 2)
