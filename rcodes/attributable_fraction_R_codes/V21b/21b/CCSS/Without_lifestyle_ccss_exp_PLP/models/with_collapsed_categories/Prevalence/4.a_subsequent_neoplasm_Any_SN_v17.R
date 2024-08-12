@@ -1,14 +1,14 @@
+## **
 # Following Qi's email on 05/03/2023 (subject: [Encrypt] CCSS help). Running Piecewise-exponential regression.
 rm(list=ls())
-#########################
-## Load Phenotype data ##
-#########################
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
-source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
-ALL.LIFESTYLE <- edit_lifestyle(ALL.LIFESTYLE)
-#########################
-## Subsequent Neoplasm ##
-#########################
+# load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_combined_Genetic_data_P_LP_v14.Rdata")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_Genetic_data_P_LP_v17.Rdata")
+
+## Add PLP and subset ccss exp
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss_exp_P_LP_zhaoming_qin_v17.Rdata")
+PHENO.ANY_SN <- PHENO.ANY_SN[PHENO.ANY_SN$ccssid %in% ccss_exp.samples$V2,]
+PHENO.ANY_SN$Zhaoming_carriers <- ccss_exp.samples$Zhaoming_carriers[match(PHENO.ANY_SN$ccssid, ccss_exp.samples$V2)]
+PHENO.ANY_SN$Qin_without_Zhaoming_vars_carriers <- ccss_exp.samples$Qin_without_Zhaoming_vars_carriers[match(PHENO.ANY_SN$ccssid, ccss_exp.samples$V2)]
 
 library(haven)
 library(benchmarkme)
@@ -23,101 +23,106 @@ library(lubridate)
 # benchmarkme::get_ram()
 library(survival)
 
-# subneo <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/subneo.sas7bdat")
-# subneo <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_07_22_2023_subneo.txt", header = T, stringsAsFactors = F)
-subneo <- read_sas('Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/subneoplasms.sas7bdat')
+## Edit lifestyle variables
+source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
+PHENO.ANY_SN <- edit_lifestyle.ccss(PHENO.ANY_SN)
 
-head(subneo)
-table(subneo$diaggrp)
-dim(subneo)
-# 1731 9
 
-subneo <- subneo[subneo$sjlid %in% PHENO.ANY_SN$sjlid ,]
-dim(subneo)
-# 1717
-
-# add diagnosis date 
-subneo$diagdt <-  PHENO.ANY_SN$diagdt [match(subneo$sjlid , PHENO.ANY_SN$sjlid)]
-subneo$agedx <-  PHENO.ANY_SN$agedx [match(subneo$sjlid , PHENO.ANY_SN$sjlid)]
-# add DOB
-subneo$DOB <- PHENO.ANY_SN$dob[match(subneo$sjlid, PHENO.ANY_SN$sjlid)]
-
-subneo$gradedt <- as.Date(subneo$gradedt, "%m/%d/%Y") ## **
-
-subneo$AGE.ANY_SN <- time_length(interval(as.Date(subneo$DOB), as.Date(subneo$gradedt)), "years")
-
-## These two dates should be the (almost) same
-subneo$AGE.ANY_SN.after.childhood.cancer <- time_length(interval(as.Date(subneo$diagdt), as.Date(subneo$gradedt)), "years")
+#########################
+## Subsequent neoplasm ##
+#########################
 subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <- subneo$AGE.ANY_SN - subneo$agedx
 
+
+#####################
+## Check malignant ##
+#####################
+subneo$malKey <- paste(subneo$ccssid, subneo$groupdx3, subneo$a_candx, subneo$count, sep = ":")
+malignantStatus <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/CCSS_Data_from_Huiqi/RE__CCSS_phenotype_data2/ExportedCCSS_data_update_malignant.txt", header = T, stringsAsFactors = F)
+malignantStatus <- malignantStatus[malignantStatus$a_candx !=".",]
+malignantStatus$malKey <- paste(malignantStatus$ccssid, malignantStatus$groupdx3, malignantStatus$a_candx, malignantStatus$count, sep = ":")
+# malignantStatus$dupli <- duplicated(malignantStatus$Key)
+
+## Add malignant status
+subneo$seersmn <- malignantStatus$seersmn[match(subneo$malKey, malignantStatus$malKey)]
 
 ########################################
 # How many SNs after 5 years
 subneo.after5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx > 5,]
-length(unique(subneo.after5$sjlid))
-# 612
+length(unique(subneo.after5$ccssid))
+# 1619
+
+subneo.within5 <- subneo[subneo$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
+sum(!duplicated(subneo.within5$ccssid))
+# 26
+
 
 #############
 ## Any SNs ##
 #############
-# Get BREASTcancer for the first time and Age at First BREASTcancer.
+# Get SNs for the first time and Age at First SN.
 # For this, I will first sort the table by date
 library(data.table)
-
-BREASTcancer <- subneo[grepl("breast", subneo$diag, ignore.case = T),]
-
-## SN within 5 years
-subneo.within5 <- BREASTcancer[BREASTcancer$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
-sum(!duplicated(subneo.within5$sjlid))
-# 0
-
-BREASTcancer <- setDT(BREASTcancer)[,.SD[which.min(gradedt)],by=sjlid][order(gradedt, decreasing = FALSE)]
-
-## Remove SNs as cases that are within 5 years of primary diagnosis
-BREASTcancer <- BREASTcancer[!BREASTcancer$sjlid %in% subneo.within5$sjlid,]
-nrow(BREASTcancer)
-# 78
+ANY_SNs <- setDT(subneo)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
 
 
-## Remove BREASTcancer if younger than 18
-PHENO.ANY_SN$gradedt <- BREASTcancer$gradedt[match(PHENO.ANY_SN$sjlid, BREASTcancer$sjlid)]
-PHENO.ANY_SN$AGE.ANY_SN <- BREASTcancer$AGE.ANY_SN [match(PHENO.ANY_SN$sjlid, BREASTcancer$sjlid)]
+dim(PHENO.ANY_SN)
+# 7943   50
+
+
+PHENO.ANY_SN$AGE.ANY_SN <- ANY_SNs$gradedt[match(PHENO.ANY_SN$ccssid, ANY_SNs$ccssid)] ## 2009-02-12
+## Remove SNs if younger than 18 **
 # if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
-# PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
+#   PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 # }
 
-## remove within 5 years of diagnosis
-sum(PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid)
-# 0
-PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.within5$sjlid,]
 
 
-# ## Keep females only
-# BREASTcancer$gender <-  PHENO.ANY_SN$gender[match(BREASTcancer$sjlid , PHENO.ANY_SN$sjlid)]
-# BREASTcancer <- BREASTcancer[BREASTcancer$gender == "Female",]
-
-# ## Remove those that are not breast cancer
-# subneo.not.breast.cancer <- unique(subneo$sjlid[!subneo$sjlid %in% unique(BREASTcancer$sjlid)])
-# PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% subneo.not.breast.cancer,]
+# "a_dx"  : Primary cancer diagnosis age
+# "a_end" : age at last contact
+# "d_candx" : Date when second cancer was diagnosed                                    
+# "a_candx": Age at second cancer diagnosis
 
 
-PHENO.ANY_SN$BREASTcancer <- factor(ifelse(!PHENO.ANY_SN$sjlid %in% BREASTcancer$sjlid, 0, 1))
-PHENO.ANY_SN <- PHENO.ANY_SN[PHENO.ANY_SN$gender == "Female",]
+# dat[,c("ccssid","strokedt","event","dob","agelstcontact","agedx")]
+ANY_SNs$gradeage <- ANY_SNs$gradedt
+ANY_SNs$gradedt <- as.Date(ANY_SNs$d_candx, format = "%d%b%Y")
+## Calculate DOB
+ANY_SNs$dob <- ANY_SNs$gradedt - as.numeric(ANY_SNs$gradeage) * 365.2422
+PHENO.ANY_SN$dob <- ANY_SNs$dob[match(PHENO.ANY_SN$ccssid, ANY_SNs$ccssid)] ## 2009-02-12
+PHENO.ANY_SN$gradedt <- ANY_SNs$gradedt[match(PHENO.ANY_SN$ccssid, ANY_SNs$ccssid)] ## 2009-02-12
 
-table(PHENO.ANY_SN$BREASTcancer)
+
+
+dim(PHENO.ANY_SN)
+## 7943 51  END
+
+# Removing samples with SN within the 5 years of childhood cancer 
+sum(PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid)
+# 25
+PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid,]
+dim(PHENO.ANY_SN)
+# 7918 END
+
+## CA CO status
+PHENO.ANY_SN$ANY_SNs <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% ANY_SNs$ccssid, 0, 1))
+table(PHENO.ANY_SN$ANY_SNs)
 # 0    1 
-# 4323   78 
+# 6307 1611
+
 
 #################
-## missingness ##
+## Missingness ##
 #################
-PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxchestrtdose.category", "anthra_jco_dose_5.category")], 1, function(x) any("Unknown" %in% x))
+PHENO.ANY_SN$any_tx_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category", "epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
 PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FALSE, "No", "Yes"))
 
-PHENO.ANY_SN$any_chemo_missing <- apply(PHENO.ANY_SN[c("anthra_jco_dose_5.category")], 1, function(x) any("Unknown" %in% x))
+table(PHENO.ANY_SN$any_tx_missing)
+
+PHENO.ANY_SN$any_chemo_missing <- apply(PHENO.ANY_SN[c("epitxn_dose_5.category")], 1, function(x) any("Unknown" %in% x))
 PHENO.ANY_SN$any_chemo_missing  <- factor(ifelse(PHENO.ANY_SN$any_chemo_missing == FALSE, "No", "Yes"))
 
-PHENO.ANY_SN$any_rt_missing <- apply(PHENO.ANY_SN[c("maxchestrtdose.category")], 1, function(x) any("Unknown" %in% x))
+PHENO.ANY_SN$any_rt_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "maxabdrtdose.category", "maxchestrtdose.category")], 1, function(x) any("Unknown" %in% x))
 PHENO.ANY_SN$any_rt_missing  <- factor(ifelse(PHENO.ANY_SN$any_rt_missing == FALSE, "No", "Yes"))
 
 PHENO.ANY_SN$any_tx_missing <- factor(PHENO.ANY_SN$any_tx_missing, levels = c("No", "Yes"))
@@ -128,12 +133,14 @@ PHENO.ANY_SN$any_rt_missing <- factor(PHENO.ANY_SN$any_rt_missing, levels = c("N
 #########################
 ## Add admixture ethnicity 
 ethnicity.admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
-PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$sjlid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
+ethnicity.admixture$INDIVIDUAL <- sapply(strsplit(ethnicity.admixture$INDIVIDUAL,"_"), `[`, 1)
+PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ethnicity.admixture[match(PHENO.ANY_SN$ccssid, ethnicity.admixture$INDIVIDUAL), c("EUR", "EAS", "AFR")])
 
 
 ############################################################
 ## Drop Unknown level from the lifestyle factor variables ##
 ############################################################
+## Recode tx variables to fit the model for missingness
 ## Missing tx
 PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == "Unknown"] <- "None"
 PHENO.ANY_SN$maxsegrtdose.category <- droplevels(PHENO.ANY_SN$maxsegrtdose.category)
@@ -167,7 +174,7 @@ PHENO.ANY_SN$aa_class_dose_5.category <- droplevels(PHENO.ANY_SN$aa_class_dose_5
 ## Qin without Zhaoming
 
 # Output of the table function
-table_data <- table(PHENO.ANY_SN$Qin_without_Zhaoming_vars_carriers, PHENO.ANY_SN$BREASTcancer)
+table_data <- table(PHENO.ANY_SN$Qin_without_Zhaoming_vars_carriers, PHENO.ANY_SN$ANY_SNs)
 
 # Calculate the total number of individuals with and without Any_SNs
 total_no_any_sns <- sum(table_data[, "0"])
@@ -186,14 +193,13 @@ round(prevalence_carriers_with_any_sns,2)
 round(prevalence_carriers_no_any_sns,2)
 
 # prevalence all
-prevalence.counts <- sum(PHENO.ANY_SN$Qin_without_Zhaoming_vars.Non.Ref.Counts > 0)
-table(ifelse(PHENO.ANY_SN$Qin_without_Zhaoming_vars.Non.Ref.Counts > 0, "Y", "N"))
+prevalence.counts <- sum(PHENO.ANY_SN$Qin_without_Zhaoming_vars_carriers == "Y", na.rm = T)
 round((prop.test(prevalence.counts, nrow(PHENO.ANY_SN))$estimate*100), 2)
 
 ## Zhaoming ##
 
 # Output of the table function
-table_data <- table(PHENO.ANY_SN$Zhaoming_carriers, PHENO.ANY_SN$BREASTcancer)
+table_data <- table(PHENO.ANY_SN$Zhaoming_carriers, PHENO.ANY_SN$ANY_SNs)
 
 # Calculate the total number of individuals with and without Any_SNs
 total_no_any_sns <- sum(table_data[, "0"])
@@ -212,6 +218,6 @@ round(prevalence_carriers_with_any_sns,2)
 round(prevalence_carriers_no_any_sns,2)
 
 # prevalence all
-prevalence.counts <- sum(PHENO.ANY_SN$Zhaoming_Non.Ref.Counts > 0)
-table(ifelse(PHENO.ANY_SN$Zhaoming_Non.Ref.Counts > 0, "Y", "N"))
+prevalence.counts <- sum(PHENO.ANY_SN$Zhaoming_carriers  == "Y", na.rm = T)
 round((prop.test(prevalence.counts, nrow(PHENO.ANY_SN))$estimate*100), 2)
+
