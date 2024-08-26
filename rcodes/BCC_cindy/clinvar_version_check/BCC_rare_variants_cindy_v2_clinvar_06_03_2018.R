@@ -1,14 +1,11 @@
 ## read WES annotation files for POI option 1
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/")
 
-# ## NOTE, variants NA mean not there in the data, so they are basically rare in nfe
-# sample.freq <- read.table("all_BCC_rare_variants_EUR_freq_tabsep.frq", header = T, sep ="\t")
-
 
 gene_regions <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/all_genes_gene_regions.txt", header = T, sep = "\t")
 
 ## 1. clinvar
-clinvar <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/all_new_clinvar_P_LP.txt", header = T, sep = "\t", stringsAsFactors = F)
+clinvar <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/clinvar_version_check/clinvar_06_03_2018//all_new_clinvar_P_LP.txt", header = T, sep = "\t", stringsAsFactors = F)
 dim(clinvar)
 clinvar$SNP <- sub(";.*", "", clinvar$ID)
 clinvar <- clinvar[!duplicated(clinvar$SNP),]
@@ -20,62 +17,18 @@ clinvar$AF_afr <- as.numeric(clinvar$AF_afr)
 # make rare; .all is based on allee frequency from gnomAD global population; .eur is gnomAD EUR_nfe; .afr is gnomAD AFR
 clinvar.all <- clinvar[which(clinvar$AF <0.01),]
 length(unique(clinvar.all$SNP))
-# 7528
+# 4627
+# clinvar$dbNSFP_ExAC_AF <- as.numeric(clinvar$dbNSFP_ExAC_AF)
+# clinvar.all <- clinvar[which(clinvar$dbNSFP_ExAC_AF <0.01),]
+cc <- cbind.data.frame(clinvar.all$SNP, clinvar.all$AF, clinvar.all$AF_nfe, clinvar.all$AF_afr, clinvar.all$dbNSFP_ExAC_AF, clinvar.all$CLNSIG)
+
 clinvar.eur <- clinvar[which(clinvar$AF <0.01 & clinvar$AF_nfe < 0.01),]
 clinvar.afr <- clinvar[which(clinvar$AF <0.01 & clinvar$AF_afr < 0.01),]
 
-cc1 <- cbind.data.frame(clinvar.all$AF_nfe, clinvar.all$AF_afr, clinvar.all$AF, clinvar.all$ID, clinvar.all$CLNSIG, clinvar.all$ANN....GENE)
-cc2 <- clinvar.all[grepl("chr10:102550088:C:T", clinvar.all$ID),]
-
-loftee <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/loftee/loftee_HC_all_chr_with_gnomad.txt", header = T, sep = "\t", stringsAsFactors = F)
-dim(loftee)
-loftee$SNP <- sub(";.*", "", loftee$Uploaded_variation)
-# LOF variants flagged by LOFTEE as dubious (e.g., affecting poorly conserved exons and splice variants affecting NAGNAG sites or non-canonical splice regions) will be excluded.
-loftee <- loftee[!grepl("NAGNAG_SITE|NON_CAN_SPLICE", loftee$LoF_flags),]
-table(loftee$LoF_flags)
-# - 
-# 70494 
-
-
-loftee <- loftee[!duplicated(loftee$SNP),]
-
-
-loftee$AF <- as.numeric(loftee$AF.1)
-loftee$AF_nfe <- as.numeric(loftee$AF_nfe)
-loftee$AF_afr <- as.numeric(loftee$AF_afr)
-loftee$CHROM  <- sub("([0-9XY]+):.+", "\\1", loftee$SNP)
-loftee$POS <- sub("chr[0-9XY]+:(\\d+):.+", "\\1", loftee$SNP)
-
-# make rare
-loftee.all <- loftee[which(loftee$AF <0.01),]
-loftee.eur <- loftee[which(loftee$AF <0.01 & loftee$AF_nfe < 0.01),]
-loftee.afr <- loftee[which(loftee$AF <0.01 & loftee$AF_afr < 0.01),]
-
-
-snpeff <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/missense_variants_with_overlap_in_more_than_90_percent_of_prediction_tools_all_cols.txt", header = T, sep = "\t", stringsAsFactors = F)
-dim(snpeff)
-snpeff <- snpeff[!duplicated(snpeff$SNP),]
-
-snpeff$AF <- as.numeric(snpeff$AF)
-snpeff$AF_nfe <- as.numeric(snpeff$AF_nfe)
-snpeff$AF_afr <- as.numeric(snpeff$AF_afr)
-
-
-# make rare
-snpeff.all <- snpeff[which(snpeff$AF <0.01),]
-snpeff.eur <- snpeff[which(snpeff$AF <0.01 & snpeff$AF_nfe < 0.01),]
-snpeff.afr <- snpeff[which(snpeff$AF <0.01 & snpeff$AF_afr < 0.01),]
-
-
-
-
-length(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
-# 46076
-
-cc <- as.data.frame(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
+cc <- as.data.frame(unique(c(clinvar.all$SNP)))
 dim(cc)
-# 46076
-# write.table(cc, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/rare_variants_to_extract.txt", row.names = F, col.names = F, quote = F)
+# 4882
+write.table(cc, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/clinvar_version_check/06_03_2018/rare_variants_to_extract.txt", row.names = F, col.names = F, quote = F)
 # Dear Achal,
 #
 # I am writing to ask you for your help. Do you think you might be able to help
@@ -312,12 +265,7 @@ clinvar.BCC.result.snpeff.all <- snpeff.all[snpeff.all$ANN....GENE %in% clinvar.
 ## Get carrier status ##
 ########################
 library("data.table")
-## This file is from WES data that has not been QCed
-# raw <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/all_BCC_rare_variants_recodeA.raw", header = T)
-## This file is from WES data that has been QCed for GQ, DP and VQSR only
-# raw <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis2/all_BCC_rare_variants_VQSR_recodeA.raw", header = T)
-## This file is from WES data that has been completely QCed (including for GQ, DP and VQSR)
-raw <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis2/all_BCC_rare_variants_recodeA.raw", header = T)
+raw <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/clinvar_version_check/06_03_2018/all_BCC_rare_variants_recodeA.raw", header = T)
 raw <- as.data.frame(raw)
 HEADER = sub(pattern="_[T,A,G,C,*]+",replacement="",colnames(raw))
 # HEADER = gsub(pattern=";rs\\d+",replacement="",HEADER)
@@ -339,13 +287,6 @@ raw$cohort[(raw$FID %in% ccss_exp$V1)] <- "CCSS_exp"
 ###########
 ## Extract variant carrier status
 col.extract <- colnames(raw)[colnames(raw) %in% kim_ST1.csg60.clinvar.all$SNP]
-
-# check which of CSG60 variants are also in Zhaomings paper
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/1_demographics.RDATA")
-sum(colnames(Zhaoming_vars) %in% col.extract)
-colnames(Zhaoming_vars)[!col.extract %in% colnames(Zhaoming_vars)]
-###########
-
 raw$kim_ST1.csg60.clinvar.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 ## Extract variant carrier status
@@ -362,10 +303,6 @@ raw$kim_ST1.csg60.snpeff.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.
 
 ## Extract variant carrier status
 col.extract <- colnames(raw)[colnames(raw) %in% kim_ST1.csg172.clinvar.all$SNP]
-# col.extract <- col.extract[!col.extract %in% c("chr3:69964940:G:A", "chr3:142555897:A:AT", "chr3:142555897:AT:A", "chr7:142750600:A:C",
-#                                                "chr7:142751920:G:C", "chr7:142751938:G:A", "chr13:20189473:C:T", "chr13:20189546:AC:A")]
-# col.extract <- col.extract[!col.extract %in% c("chr3:142555897:A:AT", "chr3:142555897:AT:A", "chr7:142751920:G:C")]
-
 raw$kim_ST1.csg172.clinvar.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 ## Extract variant carrier status
@@ -376,26 +313,6 @@ raw$kim_ST1.csg172.loftee.all.status <- ifelse(rowSums(raw[, c(col.extract)], na
 col.extract <- colnames(raw)[colnames(raw) %in% kim_ST1.csg172.snpeff.all$SNP]
 raw$kim_ST1.csg172.snpeff.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
-
-# test<-  kim_ST1.csg172.clinvar.all[!kim_ST1.csg172.clinvar.all$ANN....GENE %in% kim_ST1.csg60.clinvar.all$ANN....GENE,]
-# gg <- cbind.data.frame(test$ID, test$SNP, test$AF, test$AF_nfe, test$AF_afr, test$ANN....GENE, test$CLNSIG)
-# col.extract <- colnames(raw)[colnames(raw) %in% test$SNP]
-# pp <- raw[, c(col.extract)]
-# for(i in 1:ncol(pp)){
-#   if(table(pp[i])[2]> 25){
-#     print(table(pp[i]))
-#   }
-#   # Sys.sleep(1)
-# }
-
-# ## Check the highly prevalent variants in WGS
-# wgsrecodeA <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/tasks/merged_data_recodeA.raw", header = T)
-# wgsrecodeA <- wgsrecodeA[grepl("chr", colnames(wgsrecodeA))]
-# for(i in 1:ncol(wgsrecodeA)){
-#   # if(table(wgsrecodeA[i])[2]> 25){
-#     print(table(wgsrecodeA[i]))
-# # }
-# }
 
 ################
 ## NCI_table3 ##
@@ -445,11 +362,11 @@ raw$clinvar.BCC.result.loftee.all.status <- ifelse(rowSums(raw[, c(col.extract)]
 col.extract <- colnames(raw)[colnames(raw) %in% clinvar.BCC.result.snpeff.all$SNP]
 raw$clinvar.BCC.result.snpeff.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
-
-
-## Extract  cohort specific carrier status
 carrier.status <- raw[,!grepl("chr", colnames(raw))]
+
 carrier.status <- carrier.status[!is.na(carrier.status$cohort),]
+
+
 raw.sjlife <- raw[which(raw$cohort == "SJLIFE"),1:2]
 
 carrier.status.sjlife <- carrier.status[grepl("SJLIFE", carrier.status$cohort),]

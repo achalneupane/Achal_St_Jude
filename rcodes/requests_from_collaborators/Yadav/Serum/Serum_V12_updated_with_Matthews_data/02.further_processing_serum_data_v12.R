@@ -362,6 +362,20 @@ table(table_2.updated$num_vials, table_2.updated$grade)
 
 write.table(table_2.updated, "Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_table_2_v12.updated.txt", row.names = F, col.names = T, quote = F, sep = "\t")  # Plasma, 18 or older, vial > 0
 
+table_2.updated <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/plasma_table_2_v12.updated.txt", header = T, sep = "\t")
+
+# 0n 8/16/2024
+# Hi Achal – can you please see if the attached samples (with dates) overlap
+# with the plasma samples you selected for proteomics and metabolomics
+# experiments? Please check the incident cardiomyopathy cases only because these
+# are limited (~171 or so) and we want to make sure we retain these.
+
+check.171 <- table_2.updated[table_2.updated$grade_2_or_higher == "grade_2_or_higher",]
+check.171.all <- table_2.updated[table_2.updated$sjlid %in% check.171$sjlid ,]
+depleted <- read.table("Z:/ResearchHome/ClusterHome/aneupane/data/Yadav_serum/v12_output/N_8_N_68 Depleted Samples.txt", header = T, sep = "\t")
+
+check.171.all$depleted <- check.171.all$tb_number %in% depleted$tb_number
+
 #######################################################################################################
 ## END
 #######################################################################################################

@@ -1,3 +1,4 @@
+rm(list = ls())
 library(dplyr)
 library(tidyr)
 library(haven)
@@ -15,7 +16,7 @@ sum(is.na(CTCAE.data$grade))
 CTCAE.data <- CTCAE.data[!is.na(CTCAE.data$grade),]
 CTCAE.data <- CTCAE.data[-which(CTCAE.data$grade==-9),]
 
-cc <- CTCAE.data[1:30, 1:11]
+# cc <- CTCAE.data[1:30, 1:11]
 
 
 # Filter rows where all grades are zero: if all grades are zero, get the row with the max gradedt (i.e., latest grade date)
@@ -26,7 +27,7 @@ result_zero <- CTCAE.data %>%
   ungroup()
 
 # Filter rows where any grade is greater than 0: 
-## If the any grade is 1 or higher, then get the row with max grade (Also note, if there are multiple grades >=1, get the row with first gradedt with max grades) 
+## If any grade is 1 or higher, then get the row with max grade (Also note, if there are multiple grades >=1, get the row with first gradedt with max grades) 
 result_non_zero <- CTCAE.data %>%
   group_by(sjlid, condition) %>%
   filter(any(grade > 0)) %>%
@@ -57,7 +58,6 @@ CTCAE.data.3 <- CTCAE.data.2 %>%
   select(c(all_of(first_columns), sort(names(.))))
 
 
-# Assuming CTCAE.data.3 is your data frame
 columns_to_replace <- grepl("grade", colnames(CTCAE.data.3))
 # Replace NAs with 0 in the specified columns
 CTCAE.data.3[columns_to_replace] <- lapply(CTCAE.data.3[columns_to_replace], function(x) replace(x, is.na(x), 0))
@@ -97,6 +97,7 @@ CTCAE.data.4 <- CTCAE.data.4 %>%
                 .names = "{str_remove(.col, '_grade')}_status_gt_3")) %>%
   select(c(all_of(first_columns), sort(names(.))))
 
+CTCAE.data.4.saved <- CTCAE.data.4
 ###########################################
 ## Add clinical and demographic features ##
 ###########################################
@@ -233,7 +234,8 @@ filtered_table_df <- table_df %>%
 
 
 # Afferent_pupillary_defect <- CTCAE.data[grepl("Afferent pupillary defect", CTCAE.data$condition),]
-
+rm(CTCAE.data)
+# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/Survivors/analysis/phenotype.RData")
 
 
 
