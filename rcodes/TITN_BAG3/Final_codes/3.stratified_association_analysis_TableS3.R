@@ -118,45 +118,6 @@ ttn.gender <- table_data
 
 
 # Overall Analysis (carrier and gender in the same model):
-#
-# carrier: The coefficient estimate of carrier1 (genetic carrier status) is
-# -0.4032, with a standard error of 0.1562. The z-value is -2.581, and the
-# p-value is 0.00985. The p-value is less than the significance level of 0.05,
-# indicating that the genetic carrier status (carrier) is statistically
-# significant in predicting the odds of CMP. The negative coefficient suggests
-# that being a carrier is associated with a decrease in the log odds of CMP.
-# gender: The coefficient estimate of gender is -0.2944, with a standard error
-# of 0.1574. The z-value is -1.870, and the p-value is 0.06148. The p-value is
-# greater than the significance level of 0.05, indicating that gender is not
-# statistically significant in predicting the odds of CMP. The negative
-# coefficient suggests that being male is associated with a decrease in the log
-# odds of CMP. 
-
-# Analysis for Males (carrier in the male-specific model):
-#
-# carrier: The coefficient estimate of carrier1 (genetic carrier status) is
-# -0.4469, with a standard error of 0.2059. The z-value is -2.171, and the
-# p-value is 0.02994. The p-value is less than 0.05, indicating that genetic
-# carrier status (carrier) is statistically significant in predicting the odds
-# of CMP for males. The negative coefficient suggests that being a carrier is
-# associated with a decrease in the log odds of CMP among males. 
-
-# Analysis for Females (carrier in the female-specific model):
-#
-# carrier: The coefficient estimate of carrier1 (genetic carrier status) is
-# -0.3245, with a standard error of 0.2438. The z-value is -1.331, and the
-# p-value is 0.1831. The p-value is greater than 0.05, indicating that genetic
-# carrier status (carrier) is not statistically significant in predicting the
-# odds of CMP for females. The negative coefficient suggests that being a
-# carrier is associated with a decrease in the log odds of CMP among females,
-# but the effect is not statistically significant at the chosen significance
-# level.
-#
-# In summary, the analysis suggests that genetic carrier status (carrier) is
-# statistically significant in predicting the odds of CMP in the overall model
-# and among males. However, the effect of genetic carrier status on CMP among
-# females is not statistically significant. Gender (gender) itself does not
-# appear to be a significant predictor of CMP in the overall model.
 
 
 # Based on https://www.thelancet.com/journals/lanonc/article/PIIS1470-2045(23)00012-8/fulltext

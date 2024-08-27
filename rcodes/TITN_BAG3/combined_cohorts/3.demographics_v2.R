@@ -248,9 +248,9 @@ final.df <- cbind.data.frame(sjlife_with_CMP , sjlife_without_CMP, CCSS_org_with
 write.table(final.df, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/manuscript_table1.txt", col.names = T, sep = "\t", quote = F)
 
 
-#########################################
-## Concatenated analysis on 02/20/2023 ##
-#########################################
+#####################################
+## Combined analysis on 02/20/2023 ##
+#####################################
 dim(sjlife.to.concat.1)
 dim(sjlife.to.concat.0)
 # agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10
