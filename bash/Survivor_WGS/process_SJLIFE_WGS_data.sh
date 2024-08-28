@@ -10,11 +10,11 @@ module load R/3.3.1
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed
 ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS/chr*.Survivor_WGS.GATK4180.hg38.vcf.gz .
 ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS/chr*.Survivor_WGS.GATK4180.hg38.vcf.gz.tbi .
-ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS/wgs_sampleIDs_SJLIDmatch_23March2023.txt .
+cp /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS/wgs_sampleIDs_SJLIDmatch_23March2023.txt ./Phenotypes
 
-##############################################
-## 1. Merge VCF for missingness calculation ##
-##############################################
+########################################
+## 1. Merge VCF for missingness check ##
+########################################
 module load gatk/4.1.8.0 
 #!/bin/bash
 # Create a list of VCF files to merge (same samples but split by chromosomes)
@@ -31,7 +31,7 @@ gatk IndexFeatureFile -I chrALL.Survivor_WGS.GATK4180.hg38.vcf.gz
 
 
 ## Get VCF samples names from one of the VCFs
- zcat chrY.Survivor_WGS.GATK4180.hg38.vcf.gz | head -10000 | grep "^#CHROM" | awk '{for (i=10; i<=NF; i++) print $i}' > VCFsample_names.txt
+ # zcat chrY.Survivor_WGS.GATK4180.hg38.vcf.gz | head -10000 | grep "^#CHROM" | awk '{for (i=10; i<=NF; i++) print $i}' > VCFsample_names.txt
  #---------------- Sample QC --------------------------
 
 ## Rename 2 samples in the master VCF file, these are incorrectly labelled for wrong samples
@@ -40,6 +40,7 @@ tabix -pvcf VCF_original/SJLIFE.GERMLINE.3006.GATKv3.4.vqsr.release.0714.vcf.gz
 
 WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed" 
 ## Per-sample missingness, using the GIANT VCF file
+## This command is used to calculate the per-sample and per-variant missingness in a large VCF file (chrALL.Survivor_WGS.GATK4180.hg38.vcf.gz) using PLINK. It runs on a high-performance computing (HPC) cluster, utilizing 100 threads to expedite the process. The job is submitted to the priority queue with a high memory allocation (200000 MB) to handle the large dataset. The output, which will include detailed statistics on missing genotypes, is directed to a specified file (QC/chrALL.Survivor_WGS.GATK4180.hg38_missingness). The purpose of this analysis is to identify and quantify the extent of missing data, which is crucial for ensuring data quality and informing further steps in the analysis pipeline, such as filtering out low-quality samples or variants.
 bsub -q priority -P SurvivorGWAS -J missing -eo log/missing.err -oo log/missing.out -R "rusage[mem=200000]" "plink --nonfounders \
  --vcf chrALL.Survivor_WGS.GATK4180.hg38.vcf.gz \
  --threads 100 \

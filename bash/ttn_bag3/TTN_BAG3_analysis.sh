@@ -157,61 +157,10 @@ cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_
 # - Post-Pr(# of causal SNPs is k)   :
 #   (0 -> 0)
 #    1 -> 1
-mv *.cred1 *.bf1 *.config *.snp *.log_sss /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/assuming_1_causal_SNP/
-
-## >>>>>>>>>>> Without any asumptions for the number of causal SNP
-./finemap_v1.4.1_x86_64 --sss --log --in-files samplesnp_TITN_gt_MAF_1_perc --dataset 1
-# - Number of GWAS samples           : 1645
-# - Number of SNPs                   : 947
-# - Prior-Pr(# of causal SNPs is k)  :
-#   (0 -> 0)
-#    1 -> 0.583
-#    2 -> 0.291
-#    3 -> 0.097
-#    4 -> 0.0242
-#    5 -> 0.00482
-# - 947 configurations evaluated (0.100/100%) : converged after 100 iterations
-# - Computing causal SNP statistics  : done!
-# - Regional SNP heritability        : 0.00173 (SD: 0.00161 ; 95% CI: [2.26e-05,0.00593])
-# - Log10-BF of >= one causal SNP    : -0.199
-# - Post-expected # of causal SNPs   : 1
-# - Post-Pr(# of causal SNPs is k)   :
-#   (0 -> 0)
-#    1 -> 1
-#    2 -> 0
-#    3 -> 0
-#    4 -> 0
-#    5 -> 0
-
-./finemap_v1.4.1_x86_64 --sss --log --in-files samplesnp_BAG3_gt_MAF_1_perc --dataset 1
-# - Number of GWAS samples           : 1645
-# - Number of SNPs                   : 1594
-# - Prior-Pr(# of causal SNPs is k)  :
-#   (0 -> 0)
-#    1 -> 0.583
-#    2 -> 0.291
-#    3 -> 0.097
-#    4 -> 0.0242
-#    5 -> 0.00484
-# - 1604 configurations evaluated (0.133/100%) : converged after 133 iterations
-# - Computing causal SNP statistics  : done!
-# - Regional SNP heritability        : 0.00212 (SD: 0.00172 ; 95% CI: [0.00013,0.00654])
-# - Log10-BF of >= one causal SNP    : -0.24
-# - Post-expected # of causal SNPs   : 1
-# - Post-Pr(# of causal SNPs is k)   :
-#   (0 -> 0)
-#    1 -> 0.995
-#    2 -> 0.00489
-#    3 -> 0
-#    4 -> 0
-#    5 -> 0
-
-mv *.cred1 *.bf1 *.config *.snp *.log_sss /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/FINEMAP_results/without_assumption_4_causal_SNP
-
 
 ## >>>>>>>>>>> Configuring each SNP of interest
 # Note: log10bf column contains the log10 Bayes factors. The Bayes factor quantifies the evidence that the i-{th} SNP is causal with log10 Bayes factors greater than 2 reporting considerable evidence
-./finemap_v1.4.1_x86_64 --config --in-files samplesnp_TITN_gt_MAF_1_perc --dataset 1 --rsids chr2:178562809:T:C
+./finemap_v1.4.1_x86_64 --config --in-files samplesnp_TITN_gt_MAF_1_perc --dataset 1 --rsids chr2:178562809:T:C,chr10:119670121:T:C
 # - SNPs in causal configuration     : chr2:178562809:T:C
 # ------------------------------------
 # - Log-Likelihood of configuration  : -2330.787730
@@ -226,32 +175,6 @@ mv *.cred1 *.bf1 *.config *.snp *.log_sss /research_jude/rgs01_jude/groups/sapko
 # - Regional SNP heritability        : 0.00274 (SD: 0.00217 ; 95% CI: [8.41e-05,0.00823])
 
 
-./finemap_v1.4.1_x86_64 --config --in-files samplesnp_BAG3_gt_MAF_1_perc --dataset 1 --rsids chr10:119670121:T:C
-# - SNPs in causal configuration     : chr10:119670121:T:C
-# ------------------------------------
-# - Log-Likelihood of configuration  : -2331.429058
-# - ML causal effect estimates       : -0.0896417
-# - SE of ML causal effect estimates : 0.0424663
-# - P-values for causal effects      : 0.0347816
-# ------------------------------------
-# - Log10-BF of configuration        : 0.421902
-# - Posterior mean of causal effects : -0.0721079
-# - Posterior SD of causal effects   : 0.0381389
-# ------------------------------------
-# - Regional SNP heritability        : 0.00224 (SD: 0.00197 ; 95% CI: [1.42e-05,0.0072])
-
-# - Run time                         : 0 hours, 0 minutes, 0 seconds
-
-
-
-## Email: 08/11/2022  "can you please also run GCTA analysis but conditioning on the SNPs in bold for both TTN and BAG3 separately?"
-# gcta64  --bfile test  --chr 1 --maf 0.01 --cojo-file test.ma --cojo-cond cond.bag3.snplist --out test_chr1
-
-# <cond.TTN.snplist>
-# chr2:178562809:T:C
-
-# <cond.BAG3.snplist>
-# chr10:119670121:T:C
 
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/FINEMAP/finemap_v1.4.1_x86_64/cojo_test
 gcta64  --bfile samplesnp_TITN_gt_MAF_1_perc_vars.dat  --chr 2 --maf 0.01 --cojo-file samplesnp_TITN_gt_MAF_1_perc_vars.ma --cojo-slct --cojo-p 0.00017925 --cojo-wind 100000 --out TITN_cojo
@@ -295,15 +218,27 @@ gcta64  --bfile samplesnp_BAG3_gt_MAF_1_perc_vars.dat --chr 10 --maf 0.01 --cojo
 ########################################################
 ## Extract lines from Annotated VCF for TITN and BAG3 ##
 ########################################################
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/annovar/
-head -1 ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr2.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > TITN_BAG3_region_all/chr2_header
-awk '$2 ~ /^178/' ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr2.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > TITN_BAG3_region_all/chr2_178_list.txt
-cat chr2_header chr2_178_list.txt > chr2_178_list_ALL.txt
+# cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/annovar/
+# head -1 ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr2.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > TITN_BAG3_region_all/chr2_header
+# awk '$2 ~ /^178/' ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr2.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > TITN_BAG3_region_all/chr2_178_list.txt
+# cat chr2_header chr2_178_list.txt > chr2_178_list_ALL.txt
 
-head -1 ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr10.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > TITN_BAG3_region_all/chr10_header
-awk '$2 ~ /^119/' ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr10.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > TITN_BAG3_region_all/chr10_119_list.txt
-cat chr10_header chr10_119_list.txt > chr10_119_list_ALL.txt
+# head -1 ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr10.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > TITN_BAG3_region_all/chr10_header
+# awk '$2 ~ /^119/' ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr10.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt > TITN_BAG3_region_all/chr10_119_list.txt
+# cat chr10_header chr10_119_list.txt > chr10_119_list_ALL.txt
 
+
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff
+head -1 chr2.preQC_biallelic_renamed_ID_edited_gnomAD_clinvar_12_10_2023_FIELDS-simple4.txt > ./TTN_BAG3//chr2_header_08_27_2024
+awk '$2 >= 178312809 && $2 <= 178812809' chr2.preQC_biallelic_renamed_ID_edited_gnomAD_clinvar_12_10_2023_FIELDS-simple4.txt > ./TTN_BAG3/chr2_178_list_08_27_2024.txt
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3
+cat chr2_header_08_27_2024 chr2_178_list_08_27_2024.txt > chr2_178_list_ALL_08_27_2024.txt
+
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff
+head -1 chr10.preQC_biallelic_renamed_ID_edited_gnomAD_clinvar_12_10_2023_FIELDS-simple4.txt > ./TTN_BAG3/chr10_header_08_27_2024
+awk '$2 >= 119420121 && $2 <= 119920121'  chr10.preQC_biallelic_renamed_ID_edited_gnomAD_clinvar_12_10_2023_FIELDS-simple4.txt > ./TTN_BAG3/chr10_119_list_08_27_2024.txt
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3
+cat chr10_header_08_27_2024 chr10_119_list_08_27_2024.txt > chr10_119_list_ALL_08_27_2024.txt
 
 # The extract VCF using extract.sh with bcftools
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/TTN_BAG3
@@ -398,14 +333,34 @@ plink --bfile ccss_exp --keep sjlife_ccss_org_ccss_exp_samples.txt --keep-allele
 
 ## Merge the above three
 plink --bfile sjlife_to_concat --merge-list merge_list.txt --keep-allele-order --out sjlife_ccss_org_ccss_exp_samples
+<merged_list.txt>
+ccss_org_to_concat
+ccss_exp_to_concat
 
 ## Calculate frequency
 plink --bfile sjlife_ccss_org_ccss_exp_samples --freq --keep-allele-order --out sjlife_ccss_org_ccss_exp_samples_freq_out
 
+
+
+# Harmonize alleles using merge association files
+plink --bfile sjlife_to_concat --update-name harmonize.txt --make-bed --out sjlife_to_concat_updated
+plink --bfile ccss_org_to_concat --update-name harmonize.txt --make-bed --out ccss_org_to_concat_updated
+plink --bfile ccss_exp_to_concat --update-name harmonize.txt --make-bed --out ccss_exp_to_concat_updated
+
+## Merge the above three
+plink --bfile sjlife_to_concat_updated --merge-list merge_list.txt --keep-allele-order --out sjlife_ccss_org_ccss_exp_samples_updated
+<merged_list.txt>
+ccss_org_to_concat_updated
+ccss_exp_to_concat_updated
+
+## Calculate frequency
+plink --bfile sjlife_ccss_org_ccss_exp_samples_updated --freq --keep-allele-order --out sjlife_ccss_org_ccss_exp_samples_updated_freq_out
+
+
 ## Run association analysis
  plink \
  --allow-no-sex \
- --bfile sjlife_ccss_org_ccss_exp_samples \
+ --bfile sjlife_ccss_org_ccss_exp_samples_updated \
  --maf 0.01 \
  --hwe 1e-06 \
  --logistic hide-covar \
@@ -413,26 +368,117 @@ plink --bfile sjlife_ccss_org_ccss_exp_samples --freq --keep-allele-order --out 
  --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
  --pheno-name CMP \
  --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
- --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+ --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10,cohort_two \
  --out sjlife_ccss_org_ccss_exp_samples_results
 
 
 
 
 ## Run association analysis with ccss_org and ccss_exp
-plink --bfile ccss_org_to_concat --bmerge ccss_exp_to_concat --make-bed --out merged_ccss
+plink --bfile ccss_org_to_concat_updated --bmerge ccss_exp_to_concat_updated --keep-allele-order --make-bed --out merged_ccss
 
 
- plink \
+ # plink \
+ # --allow-no-sex \
+ # --bfile merged_ccss \
+ # --maf 0.01 \
+ # --hwe 1e-06 \
+ # --logistic hide-covar \
+ # --snp assoc_test_two_vars.txt \
+ # --ci 0.95 \
+ # --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
+ # --pheno-name CMP \
+ # --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
+ # --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+ # --out ccss_org_ccss_exp_vars
+
+
+plink \
  --allow-no-sex \
  --bfile merged_ccss \
  --maf 0.01 \
  --hwe 1e-06 \
  --logistic hide-covar \
- --extract assoc_test_two_vars.txt \
  --ci 0.95 \
  --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
  --pheno-name CMP \
  --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
  --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
- --out sccss_org_ccss_exp_vars
+ --out ccss_org_ccss_exp
+
+
+plink \
+ --allow-no-sex \
+ --bfile ccss_org_to_concat_updated \
+ --maf 0.01 \
+ --hwe 1e-06 \
+ --logistic hide-covar \
+ --ci 0.95 \
+ --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
+ --pheno-name CMP \
+ --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
+ --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+ --out ccss_org
+
+plink \
+ --allow-no-sex \
+ --bfile ccss_exp_to_concat_updated \
+ --maf 0.01 \
+ --hwe 1e-06 \
+ --logistic hide-covar \
+ --ci 0.95 \
+ --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
+ --pheno-name CMP \
+ --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
+ --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+ --out ccss_exp
+
+
+plink \
+ --allow-no-sex \
+ --bfile sjlife_to_concat_updated \
+ --maf 0.01 \
+ --hwe 1e-06 \
+ --logistic hide-covar \
+ --ci 0.95 \
+ --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
+ --pheno-name CMP \
+ --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
+ --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+ --out sjlife_results
+
+## LD check (based on Kateryna's email on 03/17/2023)
+# 2 (window size kb, needs to be more than 2) 1 (step size, it could be 1 or 2 in such a small dataset) and 0.8 (it is r2 threshold), generated  plink.prune.in will contain variants that pass the threshold.
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3
+plink --bfile ttn_significant_ld --indep-pairwise 2 1 0.8
+
+
+# ## Keep PED with plink.prune.in variants
+# plink --bfile ttn_significant_ld --extract plink.prune.in --keep-allele-order --recode --out haplotype_input
+plink --bfile ttn_significant_ld --extract plink.prune.in --keep-allele-order --recodeA --out haplotype_input
+
+# plink --bfile ttn_significant_ld --recode --out haplotype_input
+# plink --file haplotype_input --hap plink.prune.in 
+
+## In plink 1.70
+# plink --bfile ttn_significant_ld --hap plink.prune.in --noweb
+
+
+# ## Since got this error in plink 1.90: Error: The --hap... family of flags has not been reimplemented in PLINK 1.9 due; I am using beagle
+#  plink --bfile ttn_significant_ld --recode beagle --out ttn_significant_ld_beagle
+
+## Run convert_raw_to_phasing_v2.R script, then run PHASE
+ PHASE haplotype_input_edited.txt haplotype_phase.out
+
+
+#  ## Repeat with r2 0.2
+#  ## LD check (based on Kateryna's email on 03/17/2023)
+# # 2 (window size kb, needs to be more than 2) 1 (step size, it could be 1 or 2 in such a small dataset) and 0.2 (it is r2 threshold), generated  plink.prune.in will contain variants that pass the threshold.
+# # also, just to note, this is a random pruning, so I guess we will need to make sure that after pruning our snp of interest remains in the list (we could just repeat the pruning with different step if it is removed - instead of 1 use 2 or 3 for example)
+# plink --bfile ttn_significant_ld --indep-pairwise 2 1 0.2 --out prune_0.02
+
+# # ## Keep PED with plink.prune.in variants
+# # plink --bfile ttn_significant_ld --extract plink.prune.in --keep-allele-order --recode --out haplotype_input
+# plink --bfile ttn_significant_ld --extract prune_0.02.prune.in --keep-allele-order --recodeA --out haplotype_input_0.2
+# PHASE -c haplotype_input_edited_0.2.txt haplotype_phase_0.2.out
+
