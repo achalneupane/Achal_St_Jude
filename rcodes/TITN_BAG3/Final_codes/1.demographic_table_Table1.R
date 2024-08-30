@@ -100,3 +100,49 @@ get_demographic(merged.dat_without_CMP, n)
 n = nrow(merged.dat)
 get_demographic(merged.dat, n)
 
+
+#############
+## African ##
+#############
+# > colnames(sjlife.afr.dat)
+# [1] "FID"                       "IID"                       "ejection_fraction_hrt"     "gender"                   
+# [5] "anthra_jco_dose_any"       "hrtavg"                    "PC1"                       "PC2"                      
+# [9] "PC3"                       "PC4"                       "PC5"                       "PC6"                      
+# [13] "PC7"                       "PC8"                       "PC9"                       "PC10"                     
+# [17] "PC11"                      "PC12"                      "PC13"                      "PC14"                     
+# [21] "PC15"                      "PC16"                      "PC17"                      "PC18"                     
+# [25] "PC19"                      "PC20"                      "agedx_cat_5_10"            "agedx_cat_10_15"          
+# [29] "agedx_cat_15_19.7"         "agelstcontact_cat_25_35"   "agelstcontact_cat_35_65.9" "CMP_EF_HEIRARCHY"         
+# [33] "Final_Heirarchy_Grade"     "CMP"                       "agedx"                     "agelstcontact"            
+# > colnames(merged.dat)
+# [1] "FID"                   "IID"                   "CMP"                   "agedx"                 "agelstcontact"        
+# [6] "gender"                "anthra_jco_dose_any"   "hrtavg"                "agevent"               "ejection_fraction_hrt"
+# [11] "PC1"                   "PC2"                   "PC3"                   "PC4"                   "PC5"                  
+# [16] "PC6"                   "PC7"                   "PC8"                   "PC9"                   "PC10"                 
+# [21] "cohort"                "cohort_two"           
+
+
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno")
+sjlife.afr.dat <- read.table("sjlife_ttn_bag3_afr.pheno", header = T)
+dim(sjlife.afr.dat)
+
+## Need to add ageevent to African Phenotype
+CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
+CTCAE <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
+
+
+sjlife.afr.dat_with_CMP <- sjlife.afr.dat[sjlife.afr.dat$CMP == 2,]
+sjlife.afr.dat_without_CMP <- sjlife.afr.dat[sjlife.afr.dat$CMP == 1,]
+
+## With CMP
+n=nrow(sjlife.afr.dat_with_CMP)
+get_demographic(sjlife.afr.dat_with_CMP, n)
+
+## Without CMP
+n=nrow(sjlife.afr.dat_without_CMP)
+get_demographic(sjlife.afr.dat_without_CMP, n)
+
+
+# ALL
+n = nrow(sjlife.afr.dat)
+get_demographic(sjlife.afr.dat, n)

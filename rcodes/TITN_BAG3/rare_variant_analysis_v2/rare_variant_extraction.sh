@@ -307,3 +307,57 @@ plink --bfile ccss_all_genes_maf_lt_0.01_final --remove /research_jude/rgs01_jud
 plink --bfile ccss_all_genes_maf_lt_0.01_final_without_younger_samples --extract ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife.txt --recodeA --out ccss_SNPS_maf_lt_0.01_gnomad_also_common_in_sjlife_without_younger_samples_recodeA
 
 
+
+
+
+
+## Rare P/LP analysis for SJLIFE (EUR and African) echo 
+# First merge all rare PLP plink files for SJLIFE together.
+echo "sjlife_BAG3_maf_lt_0.01" > merge_list.txt
+echo "sjlife_DSP_maf_lt_0.01" >> merge_list.txt
+echo "sjlife_LMNA_maf_lt_0.01" >> merge_list.txt
+echo "sjlife_MYH7_maf_lt_0.01" >> merge_list.txt
+echo "sjlife_SCN5A_maf_lt_0.01" >> merge_list.txt
+echo "sjlife_TCAP_maf_lt_0.01" >> merge_list.txt
+echo "sjlife_TNNC1_maf_lt_0.01" >> merge_list.txt
+echo "sjlife_TNNT2_maf_lt_0.01" >> merge_list.txt
+echo "sjlife_TTN_maf_lt_0.01" >> merge_list.txt
+
+plink --merge-list merge_list.txt --make-bed --extract sjlife_SNPS_maf_lt_0.01_gnomad_also_common_in_ccss.txt --out merged_data_maf_lt_0.01
+## Keep with carriers only
+plink --bfile merged_data_maf_lt_0.01 --out ALL_sjlife_samples_SNPS_maf_lt_0.01_gnomad_also_common_in_ccss_recodeA --recode A
+# LMNA
+chr1:156138821:C:T 
+# TNTT2
+chr1:201361214:C:T
+chr1:201364335:CG:C
+# TTN
+chr2:178542266:A:G
+chr2:178577602:C:T
+chr2:178615321:A:G
+chr2:178630241:G:A
+chr2:178651534:G:T
+chr2:178664926:G:C
+chr2:178665777:G:A
+chr2:178669675:G:T
+chr2:178692016:C:T
+chr2:178693609:C:T
+chr2:178701528:C:G
+chr2:178702065:T:A
+chr2:178728776:G:T
+chr2:178746079:G:A
+chr2:178782806:C:T
+# BAG3
+chr10:119672255:C:T
+
+(base) [aneupane@splprhpc11 pablo_garcia_et_al_nine_genes]$ vi LMNA_sjlife_vars
+(base) [aneupane@splprhpc11 pablo_garcia_et_al_nine_genes]$ vi TNTT2_sjlife_vars
+(base) [aneupane@splprhpc11 pablo_garcia_et_al_nine_genes]$ vi TTN_sjlife_vars
+(base) [aneupane@splprhpc11 pablo_garcia_et_al_nine_genes]$ vi BAG3_sjlife_vars
+(base) [aneupane@splprhpc11 pablo_garcia_et_al_nine_genes]$ vi ALL_PLP_sjlife_vars
+
+plink --bfile merged_data_maf_lt_0.01 --extract LMNA_sjlife_vars --out LMNA_PLP_SJLIFE_recodeA --recode A
+plink --bfile merged_data_maf_lt_0.01 --extract TNTT2_sjlife_vars --out TNTT2_PLP_SJLIFE_recodeA --recode A
+plink --bfile merged_data_maf_lt_0.01 --extract TTN_sjlife_vars --out TTN_PLP_SJLIFE_recodeA --recode A
+plink --bfile merged_data_maf_lt_0.01 --extract BAG3_sjlife_vars --out BAG3_PLP_SJLIFE_recodeA --recode A
+plink --bfile merged_data_maf_lt_0.01 --extract ALL_PLP_sjlife_vars --out ALL_PLP_SJLIFE_recodeA --recode A

@@ -1,4 +1,4 @@
-## Read phenotype files SJLIFE and CCSS expansion
+## Read phenotype files
 pheno.sjlife_ttn_bag3 <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ccss_exp_ttn_bag3.pheno", header = T)
 pheno.sjlife_ttn_bag3$CMP <- factor(pheno.sjlife_ttn_bag3$CMP)
 #########################
@@ -64,15 +64,14 @@ df$V1[!df$V1 %in% HEADER]
 
 genes <- unique(sjlife_vars_bim$GENE)
 
-
-
-
-i=5
+i=1:5
 ## SJLIFE analysis
 for (i in 1:length(genes)){
   genes[i]
   rm(total.carriers, total.cases, carriers.cases, total.controls, carriers.controls, OR.CI, pvalue, OR.CI.adj, pvalue.adj)
   genes.carriers <-  sjlife.raw[c(2,grep(paste0(gsub(":" , "\\.",paste0("chr", sjlife_vars_bim$KEY[grepl(genes[i], sjlife_vars_bim$GENE)], ".")), collapse = "|"), colnames(sjlife.raw)))]
+  # If checking for All PLP
+  # genes.carriers <-  sjlife.raw[c(2,grep(paste0(gsub(":" , "\\.",paste0("chr", sjlife_vars_bim$KEY[(sjlife_vars_bim$GENE %in% genes)], ".")), collapse = "|"), colnames(sjlife.raw)))]
   # See how many variants had carrier: Were there carriers in our data for all
   # these variants? For example, if no one had variant for chr10:119672255:C:T,
   # you would not have included in the generation of carrier status. This is what
@@ -130,4 +129,4 @@ for (i in 1:length(genes)){
 }
 
 
-write.table(sjlife_vars_bim, "overlapping_rare_variants_in_sjlife_ccss_maf_0.01.txt", sep = "\t", col.names = T, row.names = F, quote = F)
+# write.table(sjlife_vars_bim, "overlapping_rare_variants_in_sjlife_ccss_maf_0.01.txt", sep = "\t", col.names = T, row.names = F, quote = F)

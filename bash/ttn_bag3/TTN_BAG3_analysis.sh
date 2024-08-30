@@ -447,6 +447,46 @@ plink \
  --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
  --out sjlife_results
 
+
+## AFR
+# plink 
+#   --bfile sjlife
+#   --extract common_missense_variants.txt
+#   --keep pheno/sjlife_ttn_bag3_afr.pheno
+#   --make-bed
+#   --out sjlife_afr_ttn_bag3
+
+tail -n +2 common_missense_variants.txt | cut -f1> extract_common_missense_vars
+tail -n +2 pheno/sjlife_ttn_bag3_afr.pheno | cut -f1,2 > afr_samples
+
+plink --bfile sjlife --update-name harmonize.txt --make-bed --out sjlife_afr_to_concat_updated
+plink --bfile sjlife_afr_to_concat_updated --extract extract_common_missense_vars --keep afr_samples --make-bed --out sjlife_afr_ttn_bag3_AN
+
+
+plink \
+  --1 \
+  --allow-no-sex \
+  --bfile sjlife_afr_ttn_bag3_AN \
+  --ci 0.95 \
+  --covar pheno/sjlife_ttn_bag3_afr.pheno \
+  --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+  --hwe 1e-06 \
+  --logistic hide-covar \
+  --out sjlife_results_afr_AN \
+  --pheno pheno/sjlife_ttn_bag3_afr.pheno \
+  --pheno-name CMP
+
+plink --bfile sjlife_afr_ttn_bag3_AN --freq --keep afr_samples --out sjlife_results_afr_freq_AN
+
+
+
+
+
+
+
+
+
+
 ## LD check (based on Kateryna's email on 03/17/2023)
 # 2 (window size kb, needs to be more than 2) 1 (step size, it could be 1 or 2 in such a small dataset) and 0.8 (it is r2 threshold), generated  plink.prune.in will contain variants that pass the threshold.
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3
@@ -481,4 +521,6 @@ plink --bfile ttn_significant_ld --extract plink.prune.in --keep-allele-order --
 # # plink --bfile ttn_significant_ld --extract plink.prune.in --keep-allele-order --recode --out haplotype_input
 # plink --bfile ttn_significant_ld --extract prune_0.02.prune.in --keep-allele-order --recodeA --out haplotype_input_0.2
 # PHASE -c haplotype_input_edited_0.2.txt haplotype_phase_0.2.out
+
+
 
