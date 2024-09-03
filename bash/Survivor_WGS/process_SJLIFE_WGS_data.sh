@@ -55,8 +55,9 @@ Please note the exclusion of high-LD regions before performing admixture analyse
 See https://genome.sph.umich.edu/wiki/Regions_of_high_linkage_disequilibrium_(LD) for high LD regions based on hg38 coordinates to exclude.
 
 ## For chr1-22, perform sequence-level QC, fix multiallelic variants, run gross HWE check, and run LD pruning
-for chr in {1..22};do
-  bsub -q priority -P SurvivorGWAS -J QC1.chr$chr -eo log/QC1.$chr.err -oo log/QC1.$chr.out -R "rusage[mem=5000]" bash process_SJLIFE_WGS_data_perchr.sh $chr
+for chr in {1..22} X Y;do
+  export chr=${chr}
+  bsub -q priority -P SurvivorGWAS -J QC1.chr$chr -eo log/QC1.$chr.err -oo log/QC1.$chr.out -R "rusage[mem=20000]" bash process_SJLIFE_WGS_data_perchr.sh $chr
 done
 
 ## Process these files to include biallelic markers only to perform additional sample QCs

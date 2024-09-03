@@ -17,17 +17,21 @@ INDIR=//research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Surviv
 
 OUTDIR=//research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/QC
 
-VCFROOT="chrALL.Survivor_WGS.GATK4180.hg38_renamed"
+VCFROOT="Survivor_WGS.GATK4180.hg38_renamed"
 
 stats=//research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/QC/stats/
 
 cd $OUTDIR
 
+
+
 # Process data per chromosome
 # chr=$1
 
+
+echo "Doing chromosome chr${chr}"
 # Split data for each chromosome
-vcftools --gzvcf ${INDIR}/${VCFROOT}.vcf.gz --remove ${OUTDIR}/chrALL.Survivor_WGS.GATK4180.hg38_missingness.imiss.0.05plus_renamed --chr chr$chr --recode  --stdout | bgzip  > ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz
+vcftools --gzvcf ${INDIR}/chrALL.${VCFROOT}.vcf.gz --remove ${OUTDIR}/chrALL.Survivor_WGS.GATK4180.hg38_missingness.imiss.0.05plus_renamed --chr chr$chr --recode  --stdout | bgzip  > ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz
 
 # Index the VCF file
 tabix -pvcf ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz

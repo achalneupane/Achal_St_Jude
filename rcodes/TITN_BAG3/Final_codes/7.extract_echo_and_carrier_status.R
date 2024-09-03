@@ -19,6 +19,7 @@ dim(sjlife)
 ## Get echo parameters ##
 #########################
 library(haven)
+library(dplyr)
 machine <- read_sas("/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/echo_machine.sas7bdat")
 research <- read_sas("/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/echo_research.sas7bdat")
 # sum(sjlife$IID %in% research$sjlid)
@@ -31,7 +32,7 @@ sum(sjlife$IID %in% machine$sjlid)
 # 1891
 
 machine <- machine[machine$sjlid %in% sjlife$IID ,]
-machine.get <- machine [c("sjlid", "studydatetime", "visittype", "LV_Ejection_Fraction_3D", "LV_End_Diastolic_Volume_3D", "LV_End_Systolic_Volume_3D" ,
+machine.get <- machine [c("sjlid", "studydatetime", "visittype", "BodySurfaceArea", "LV_Ejection_Fraction_3D", "LV_End_Diastolic_Volume_3D", "LV_End_Systolic_Volume_3D" ,
 "LV_Stroke_Volume_3D", "LVMassMM_Index", "LV_GLPS_AVG", "LV_Relative_Wall_Thickness")]
 table(machine.get$visittype)
 # Other Visit SJLIFE Visit 1 SJLIFE Visit 2 SJLIFE Visit 3 SJLIFE Visit 4 SJLIFE Visit 5 SJLIFE Visit 6 SJLIFE Visit 7 
