@@ -35,22 +35,28 @@ gatk IndexFeatureFile -I chrALL.Survivor_WGS.GATK4180.hg38.vcf.gz
  #---------------- Sample QC --------------------------
 
 ## Rename 2 samples in the master VCF file, these are incorrectly labelled for wrong samples
-bcftools reheader -s Phenotypes/master_vcf_rename_2_samples.txt VCF_original/SJLIFE.GERMLINE.3006.GATKv3.4.vqsr.release.0714_org.vcf.gz > VCF_original/SJLIFE.GERMLINE.3006.GATKv3.4.vqsr.release.0714.vcf.gz
-tabix -pvcf VCF_original/SJLIFE.GERMLINE.3006.GATKv3.4.vqsr.release.0714.vcf.gz
+bcftools reheader -s Phenotypes/master_vcf_rename.txt VCF_original/chrALL.Survivor_WGS.GATK4180.hg38.vcf.gz > VCF_original/chrALL.Survivor_WGS.GATK4180.hg38_renamed.vcf.gz
+tabix -pvcf VCF_original/chrALL.Survivor_WGS.GATK4180.hg38_renamed.vcf.gz
 
 WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed" 
 ## Per-sample missingness, using the GIANT VCF file
 ## This command is used to calculate the per-sample and per-variant missingness in a large VCF file (chrALL.Survivor_WGS.GATK4180.hg38.vcf.gz) using PLINK. It runs on a high-performance computing (HPC) cluster, utilizing 100 threads to expedite the process. The job is submitted to the priority queue with a high memory allocation (200000 MB) to handle the large dataset. The output, which will include detailed statistics on missing genotypes, is directed to a specified file (QC/chrALL.Survivor_WGS.GATK4180.hg38_missingness). The purpose of this analysis is to identify and quantify the extent of missing data, which is crucial for ensuring data quality and informing further steps in the analysis pipeline, such as filtering out low-quality samples or variants.
 bsub -q priority -P SurvivorGWAS -J missing -eo log/missing.err -oo log/missing.out -R "rusage[mem=200000]" "plink --nonfounders \
- --vcf chrALL.Survivor_WGS.GATK4180.hg38.vcf.gz \
+ --vcf chrALL.Survivor_WGS.GATK4180.hg38_renamed.vcf.gz \
  --threads 100 \
  --missing \
  --out QC/chrALL.Survivor_WGS.GATK4180.hg38_missingness"
 awk 'FNR==1 || $6 > 0.05 {print $1"_"$2}' QC/chrALL.Survivor_WGS.GATK4180.hg38_missingness.imiss > QC/chrALL.Survivor_WGS.GATK4180.hg38_missingness.imiss.0.05plus
 
+
+
+## Download 
+Please note the exclusion of high-LD regions before performing admixture analyses (this is also true for performing PCA and IBD analyses). 
+See https://genome.sph.umich.edu/wiki/Regions_of_high_linkage_disequilibrium_(LD) for high LD regions based on hg38 coordinates to exclude.
+
 ## For chr1-22, perform sequence-level QC, fix multiallelic variants, run gross HWE check, and run LD pruning
 for chr in {1..22};do
-  bsub -q priority -P SurvivorGWAS -J QC1.chr$chr -eo log/QC1.$chr.err -oo log/QC1.$chr.out -R "rusage[mem=5000]" bash ~/bin/process_SJLIFE_WGS_data_perchr.sh $chr
+  bsub -q priority -P SurvivorGWAS -J QC1.chr$chr -eo log/QC1.$chr.err -oo log/QC1.$chr.out -R "rusage[mem=5000]" bash process_SJLIFE_WGS_data_perchr.sh $chr
 done
 
 ## Process these files to include biallelic markers only to perform additional sample QCs
@@ -329,3 +335,16 @@ cd ../Analyses
 bash scripts/preprocess.sh
 
 
+
+
+# # Also remove
+# SJNORM041129_G1 REMOVE-not SJLIFE       REMOVE  NA      SJNORM041129_G1-TB-15-5985      REMOVE
+# SJNORM041129_G2 REMOVE-not SJLIFE       REMOVE  NA      SJNORM041129_G2-TB-15-6901      REMOVE
+# SJNORM041130_G1 REMOVE-not SJLIFE       REMOVE  NA      SJNORM041130_G1-TB-15-6225      REMOVE
+# SJNORM041130_G2 REMOVE-not SJLIFE       REMOVE  NA      SJNORM041130_G2-TB-15-6902      REMOVE
+# SJNORM041131_G1 REMOVE-not SJLIFE       REMOVE  NA      SJNORM041131_G1-TB-15-6369      REMOVE
+# SJNORM041131_G2 REMOVE-not SJLIFE       REMOVE  NA      SJNORM041131_G2-TB-15-6903      REMOVE
+# SJNORM041132_G1 REMOVE-not SJLIFE       REMOVE  NA      SJNORM041132_G1-TB-15-6370      REMOVE
+# SJNORM041132_G2 REMOVE-not SJLIFE       REMOVE  NA      SJNORM041132_G2-TB-15-6904      REMOVE
+# SJNORM041133_G1 REMOVE-not SJLIFE       REMOVE  NA      SJNORM041133_G1-TB-15-6399      REMOVE
+# SJNORM041133_G2 REMOVE-not SJLIFE       REMOVE  NA      SJNORM041133_G2-TB-15-6905      REMOVE

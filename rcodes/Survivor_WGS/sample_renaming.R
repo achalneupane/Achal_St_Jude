@@ -21,3 +21,4 @@ sampleID$VCFrename[sampleID$VCFrename==""] <- sampleID$CCSSID[sampleID$VCFrename
 sampleID <- sampleID[c("CompBioID_WGS", "ERF_note", "SJLID", "CCSSID", "VCFID", "VCFrename")]
 
 write.table(sampleID, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/Phenotypes/wgs_sampleIDs_cleaned_AN.txt", col.names = T, row.names = F, sep ="\t", quote = F)
+write.table(sampleID[c("VCFID", "VCFrename")], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/Phenotypes/master_vcf_rename.txt", col.names = T, row.names = F, sep ="\t", quote = F)

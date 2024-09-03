@@ -121,12 +121,22 @@ get_demographic(merged.dat, n)
 # [16] "PC6"                   "PC7"                   "PC8"                   "PC9"                   "PC10"                 
 # [21] "cohort"                "cohort_two"           
 
+cc <- merged.dat[match(pheno_gwas$IID, merged.dat$IID),]
+table(pheno_gwas$CMP == cc$CMP)
+cc <- merged.dat[(merged.dat$IID %in% pheno_gwas$IID),]
+cc.ca <-cc[cc$CMP == 2,]
+
+gradefile<-  CTCAE[CTCAE$grade>0,]
+gradefile <- gradefile[!duplicated(gradefile$sjlid),]
+cc.ca$IID[(cc.ca$IID %in% gradefile$sjlid)] # grade 2
+cc.ca$IID[!(cc.ca$IID %in% gradefile$sjlid)] # grade 0
 
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno")
 sjlife.afr.dat <- read.table("sjlife_ttn_bag3_afr.pheno", header = T)
 dim(sjlife.afr.dat)
 
 ## Need to add ageevent to African Phenotype
+library(haven)
 CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
 CTCAE <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
 

@@ -361,3 +361,11 @@ plink --bfile merged_data_maf_lt_0.01 --extract TNTT2_sjlife_vars --out TNTT2_PL
 plink --bfile merged_data_maf_lt_0.01 --extract TTN_sjlife_vars --out TTN_PLP_SJLIFE_recodeA --recode A
 plink --bfile merged_data_maf_lt_0.01 --extract BAG3_sjlife_vars --out BAG3_PLP_SJLIFE_recodeA --recode A
 plink --bfile merged_data_maf_lt_0.01 --extract ALL_PLP_sjlife_vars --out ALL_PLP_SJLIFE_recodeA --recode A
+
+
+
+# SJL1751413
+# SJL4172706
+# SJL5203001
+
+# SJL1727210 # CTCAE grade 0

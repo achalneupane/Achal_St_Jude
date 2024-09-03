@@ -31,7 +31,7 @@ sum(sjlife$IID %in% machine$sjlid)
 # 1891
 
 machine <- machine[machine$sjlid %in% sjlife$IID ,]
-machine.get <- machine [c("sjlid", "DateVisitStart", "visittype", "LV_Ejection_Fraction_3D", "LV_End_Diastolic_Volume_3D", "LV_End_Systolic_Volume_3D" ,
+machine.get <- machine [c("sjlid", "studydatetime", "visittype", "LV_Ejection_Fraction_3D", "LV_End_Diastolic_Volume_3D", "LV_End_Systolic_Volume_3D" ,
 "LV_Stroke_Volume_3D", "LVMassMM_Index", "LV_GLPS_AVG", "LV_Relative_Wall_Thickness")]
 table(machine.get$visittype)
 # Other Visit SJLIFE Visit 1 SJLIFE Visit 2 SJLIFE Visit 3 SJLIFE Visit 4 SJLIFE Visit 5 SJLIFE Visit 6 SJLIFE Visit 7 
@@ -76,8 +76,45 @@ sjlife$BAG3.PLP_carrier <- sjlife.BAG3.PLP$carrier[match(sjlife$IID, sjlife.BAG3
 sjlife$ALL.PLP_carrier <- sjlife.ALL.PLP$carrier[match(sjlife$IID, sjlife.ALL.PLP$IID)]
 
 merged_df <- merge(machine.get, sjlife, by.x = "sjlid", by.y = "IID", all.x = TRUE)
+# merged_df <- merged_df[!is.na(merged_df$studydatetime),]
 
-echo.PLP.eur <- merged_df[merged_df$sjlid %in% sjlife.eur.dat$IID,]
-echo.PLP.afr <- merged_df[merged_df$sjlid %in% sjlife.afr.dat$IID,]
+merged_df$studydatetime <- as.Date(merged_df$studydatetime)
+merged_df <- merged_df %>%
+  arrange(sjlid, desc(studydatetime)) %>%
+  group_by(sjlid) %>%
+  mutate(RecentVisitNumber = if_else(!is.na(studydatetime), row_number(), NA_integer_)) %>%
+  ungroup()
+
+sum(!duplicated(merged_df$sjlid) & is.na(merged_df$studydatetime))
+# 4
+merged_df$RecentVisitNumber[(!duplicated(merged_df$sjlid) & is.na(merged_df$studydatetime))] <- 1
+
+echo.PLP.eur <- merged_df[merged_df$ancestry=="EUR",]
+echo.PLP.afr <- merged_df[merged_df$ancestry=="AFR",]
 save(echo.PLP.eur, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/echo.PLP.eur.RData")
 save(echo.PLP.afr, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/echo.PLP.afr.RData")
+
+# visit1 <- echo.PLP.eur[which(echo.PLP.eur$RecentVisitNumber == 1),]
+# dim(visit1)
+# # [1] 1645   37
+# table(is.na(visit1$LV_Ejection_Fraction_3D))
+# # 1233   412 
+# table(is.na(pheno_final$LV_Ejection_Fraction_3D))
+# 1233   412 
+
+visitBaseline <- echo.PLP.eur[which(echo.PLP.eur$visittype == "SJLIFE Visit 1"),]
+dim(visitBaseline)
+table(is.na(visitBaseline$LV_Ejection_Fraction_3D))
+# [1] 854   791
+
+# cc <- echo.PLP.eur[which(echo.PLP.eur$RecentVisitNumber == 1),]
+# dim(cc)
+# 
+# table(is.na(cc$LV_Ejection_Fraction_3D))
+# table(is.na(pheno_final$LV_Ejection_Fraction_3D))
+# pheno_final$IID[!pheno_final$IID %in% cc$sjlid]
+# table(pheno_final$IID == cc$sjlid)
+# pheno_final$LV_Ejection_Fraction_3D == cc$LV_Ejection_Fraction_3D
+# 
+# # pheno_final$IID[!pheno_final$IID %in% cc$sjlid]
+# # [1] "SJL1083001" "SJL1731909" "SJL4176516" "SJL4829107"
