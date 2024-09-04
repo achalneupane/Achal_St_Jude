@@ -131,8 +131,9 @@ for (i in 1:length(genes)){
 
 # write.table(sjlife_vars_bim, "overlapping_rare_variants_in_sjlife_ccss_maf_0.01.txt", sep = "\t", col.names = T, row.names = F, quote = F)
 
-
-## Run for African
+#############################
+## Run analysis in African ##
+#############################
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/echo.PLP.afr.RData")
 
 

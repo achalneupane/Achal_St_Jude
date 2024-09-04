@@ -462,6 +462,7 @@ tail -n +2 pheno/sjlife_ttn_bag3_afr.pheno | cut -f1,2 > afr_samples
 plink --bfile sjlife --update-name harmonize.txt --make-bed --out sjlife_afr_to_concat_updated
 plink --bfile sjlife_afr_to_concat_updated --extract extract_common_missense_vars --keep afr_samples --make-bed --out sjlife_afr_ttn_bag3_AN
 
+plink --bfile sjlife_afr_ttn_bag3_AN
 
 plink \
   --1 \

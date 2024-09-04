@@ -83,6 +83,7 @@ out
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno")
 merged.dat <- read.table("sjlife_ccss_org_ccss_exp_ttn_bag3.pheno", header = T)
 dim(merged.dat)
+# merged.dat$hrtavg <- merged.dat$hrtavg/100
 
 merged.dat_with_CMP <- merged.dat[merged.dat$CMP == 2,]
 merged.dat_without_CMP <- merged.dat[merged.dat$CMP == 1,]
@@ -213,15 +214,16 @@ get_demographic <- function(df, n){
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno")
 sjlife.afr.dat <- read.table("sjlife_ttn_bag3_afr.pheno", header = T)
 dim(sjlife.afr.dat)
+sjlife.afr.dat$hrtavg <- sjlife.afr.dat$hrtavg/100
 
-## Need to add ageevent to African Phenotype
-library(haven)
-CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
-CTCAE <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
+# ## Need to add ageevent to African Phenotype
+# library(haven)
+# CTCAE <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Event Data/ctcaegrades.sas7bdat")
+# CTCAE <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
 
 
-sjlife.afr.dat_with_CMP <- sjlife.afr.dat[sjlife.afr.dat$CMP == 2,]
-sjlife.afr.dat_without_CMP <- sjlife.afr.dat[sjlife.afr.dat$CMP == 1,]
+sjlife.afr.dat_with_CMP <- sjlife.afr.dat[sjlife.afr.dat$CMP == 1,]
+sjlife.afr.dat_without_CMP <- sjlife.afr.dat[sjlife.afr.dat$CMP == 0,]
 
 ## With CMP
 n=nrow(sjlife.afr.dat_with_CMP)

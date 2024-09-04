@@ -4,6 +4,8 @@ load('Rcodes/echo.PLP.eur.RData')
 load('Rcodes/echo.PLP.afr.RData')
 echo.PLP.eur$chr2.178562809.T.C_C_yn = ifelse(echo.PLP.eur$chr2.178562809.T.C_C>0, "Yes", "No")
 echo.PLP.eur$chr10.119670121.T.C_C_yn = ifelse(echo.PLP.eur$chr10.119670121.T.C_C>0, "Yes", "No")
+echo.PLP.afr$chr2.178562809.T.C_C_yn = ifelse(echo.PLP.afr$chr2.178562809.T.C_C>0, "Yes", "No")
+echo.PLP.afr$chr10.119670121.T.C_C_yn = ifelse(echo.PLP.afr$chr10.119670121.T.C_C>0, "Yes", "No")
 # Clean the outliers
 # Some EF values are in fractions; change them to percentages
 # EUR
@@ -91,7 +93,125 @@ print(res)
 res.ttn <- res[grepl("chr2", res$snp),]
 res.bag3 <- res[grepl("chr10", res$snp),]
 
+##########
+## Male ##
+##########
+## Baseline
+eur_baseline = subset(echo.PLP.eur, visittype=="SJLIFE Visit 1")
+## 0 is  male, 1 is female
+eur_baseline <- eur_baseline[eur_baseline$gender == 0,]
+dim(eur_baseline)
+afr_baseline = subset(echo.PLP.afr, visittype=="SJLIFE Visit 1")
+## 0 is  male, 1 is female
+afr_baseline <- afr_baseline[afr_baseline$gender == 0,]
+dim(afr_baseline)
 
+## Fit regression models for each visit (EUR)
+param = colnames(eur_baseline)[grep("^LV", colnames(eur_baseline))]
+snps = c('chr2.178562809.T.C_C', 'chr10.119670121.T.C_C')
+dat = eur_baseline
+res = NULL
+for (p in 1:length(param)){
+  echo_p  = param[p]
+  for (s in (1:2)){
+    snp_s = snps[s]
+    fit = lm(scale(dat[[echo_p]])~dat[[snp_s]]+agedx+agelstcontact+gender+anthra_jco_dose_any+hrtavg+
+               PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10, data=dat)
+    beta = summary(fit)$coef[2,1]
+    se = summary(fit)$coef[2,2]
+    pval = summary(fit)$coef[2,4]
+    res = rbind(res, data.frame(parameter = echo_p, snp = snp_s, beta, se, pval))
+  }
+}
+print(res)
+
+res.ttn <- res[grepl("chr2", res$snp),]
+res.bag3 <- res[grepl("chr10", res$snp),]
+
+
+
+## Fit regression models for each visit (AFR)
+param = colnames(afr_baseline)[grep("^LV", colnames(afr_baseline))]
+snps = c('chr2.178562809.T.C_C', 'chr10.119670121.T.C_C')
+dat = afr_baseline
+res = NULL
+for (p in 1:length(param)){
+  echo_p  = param[p]
+  for (s in (1:2)){
+    snp_s = snps[s]
+    fit = lm(scale(dat[[echo_p]])~dat[[snp_s]]+agedx+agelstcontact+gender+anthra_jco_dose_any+hrtavg+
+               PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10, data=dat)
+    beta = summary(fit)$coef[2,1]
+    se = summary(fit)$coef[2,2]
+    pval = summary(fit)$coef[2,4]
+    res = rbind(res, data.frame(parameter = echo_p, snp = snp_s, beta, se, pval))
+  }
+}
+print(res)
+
+res.ttn <- res[grepl("chr2", res$snp),]
+res.bag3 <- res[grepl("chr10", res$snp),]
+
+
+
+##########
+## Female ##
+##########
+## Baseline
+eur_baseline = subset(echo.PLP.eur, visittype=="SJLIFE Visit 1")
+## 0 is  male, 1 is female
+eur_baseline <- eur_baseline[eur_baseline$gender == 1,]
+dim(eur_baseline)
+afr_baseline = subset(echo.PLP.afr, visittype=="SJLIFE Visit 1")
+## 0 is  male, 1 is female
+afr_baseline <- afr_baseline[afr_baseline$gender == 1,]
+dim(afr_baseline)
+
+## Fit regression models for each visit (EUR)
+param = colnames(eur_baseline)[grep("^LV", colnames(eur_baseline))]
+snps = c('chr2.178562809.T.C_C', 'chr10.119670121.T.C_C')
+dat = eur_baseline
+res = NULL
+for (p in 1:length(param)){
+  echo_p  = param[p]
+  for (s in (1:2)){
+    snp_s = snps[s]
+    fit = lm(scale(dat[[echo_p]])~dat[[snp_s]]+agedx+agelstcontact+gender+anthra_jco_dose_any+hrtavg+
+               PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10, data=dat)
+    beta = summary(fit)$coef[2,1]
+    se = summary(fit)$coef[2,2]
+    pval = summary(fit)$coef[2,4]
+    res = rbind(res, data.frame(parameter = echo_p, snp = snp_s, beta, se, pval))
+  }
+}
+print(res)
+
+res.ttn <- res[grepl("chr2", res$snp),]
+res.bag3 <- res[grepl("chr10", res$snp),]
+
+
+
+## Fit regression models for each visit (AFR)
+param = colnames(afr_baseline)[grep("^LV", colnames(afr_baseline))]
+snps = c('chr2.178562809.T.C_C', 'chr10.119670121.T.C_C')
+dat = afr_baseline
+res = NULL
+for (p in 1:length(param)){
+  echo_p  = param[p]
+  for (s in (1:2)){
+    snp_s = snps[s]
+    fit = lm(scale(dat[[echo_p]])~dat[[snp_s]]+agedx+agelstcontact+gender+anthra_jco_dose_any+hrtavg+
+               PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10, data=dat)
+    beta = summary(fit)$coef[2,1]
+    se = summary(fit)$coef[2,2]
+    pval = summary(fit)$coef[2,4]
+    res = rbind(res, data.frame(parameter = echo_p, snp = snp_s, beta, se, pval))
+  }
+}
+print(res)
+
+res.ttn <- res[grepl("chr2", res$snp),]
+res.bag3 <- res[grepl("chr10", res$snp),]
 
 
 # # Regression for change in echo parameters
