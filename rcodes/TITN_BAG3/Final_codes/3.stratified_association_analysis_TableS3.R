@@ -432,3 +432,5 @@ combined_info <- do.call(rbind, lapply(objects_list, extract_info))
 # Print the combined information
 print(combined_info)
 
+
+

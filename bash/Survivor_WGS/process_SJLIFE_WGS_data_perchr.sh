@@ -4,7 +4,7 @@
 
 # Load software packages
 module load vcftools/0.1.13
-module load bcftools/1.4.1
+module load bcftools/1.17
 #module load vt/2016.11.07
 module load plink/1.90b
 # module load R/3.4.0
@@ -26,12 +26,13 @@ cd $OUTDIR
 
 
 # Process data per chromosome
-# chr=$1
+chr=$1
 
 
 echo "Doing chromosome chr${chr}"
 # Split data for each chromosome
-vcftools --gzvcf ${INDIR}/chrALL.${VCFROOT}.vcf.gz --remove ${OUTDIR}/chrALL.Survivor_WGS.GATK4180.hg38_missingness.imiss.0.05plus_renamed --chr chr$chr --recode  --stdout | bgzip  > ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz
+# vcftools --gzvcf ${INDIR}/chrALL.${VCFROOT}.vcf.gz --remove ${OUTDIR}/chrALL.Survivor_WGS.GATK4180.hg38_missingness.imiss.0.05plus_renamed --chr chr$chr --recode  --stdout | bgzip  > ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz
+bcftools view -S ^${OUTDIR}/chrALL.Survivor_WGS.GATK4180.hg38_missingness.imiss.0.05plus_renamed -r chr$chr -Oz -o ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz ${INDIR}/chrALL.${VCFROOT}.vcf.gz
 
 # Index the VCF file
 tabix -pvcf ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz
@@ -39,15 +40,17 @@ tabix -pvcf ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz
 # Write stats
 bcftools stats ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz > ${stats}/${VCFROOT}_chr${chr}.bcftools_stats
 
-# Run basic QC - sequence level
-vcftools --gzvcf ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz \
---chr chr$chr \
---keep-filtered PASS \
---minGQ 20 \
---min-meanDP 10 \
---recode \
---stdout \
-| bgzip > ${INDIR}/${VCFROOT}_chr${chr}.PASS.vcf.gz
+# # Run basic QC - sequence level
+# vcftools --gzvcf ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz \
+# --chr chr$chr \
+# --keep-filtered PASS \
+# --minGQ 20 \
+# --min-meanDP 10 \
+# --recode \
+# --stdout \
+# | bgzip > ${INDIR}/${VCFROOT}_chr${chr}.PASS.vcf.gz
+
+bcftools view -f PASS -i 'MIN(GQ)>20 & MEAN(DP)>10' -Oz -o ${INDIR}/${VCFROOT}_chr${chr}.PASS.vcf.gz ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz
 
 # Write stats
 bcftools stats ${INDIR}/${VCFROOT}_chr${chr}.PASS.vcf.gz > ${stats}/${VCFROOT}_chr${chr}.PASS.bcftools_stats

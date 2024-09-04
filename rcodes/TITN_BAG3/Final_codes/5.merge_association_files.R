@@ -8,7 +8,7 @@ sum(duplicated(combined.bim$KEY))
 keys <- combined.bim$KEY[duplicated(combined.bim$KEY)]
 harmonize <- combined.bim[combined.bim$KEY %in% keys,]
 harmonize <- harmonize[c("V2", "KEY")]
-write.table(harmonize, "Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/harmonize.txt", sep = "\t", col.names = F, row.names = F, quote = F)
+# write.table(harmonize, "Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/harmonize.txt", sep = "\t", col.names = F, row.names = F, quote = F)
 
 ##############
 ## Combined ##
@@ -21,11 +21,16 @@ sum(duplicated(combined.bim$KEY1))
 combined$REF <- combined.bim$V6[match(combined$SNP, combined.bim$V2)]
 combined$ALT <- combined.bim$V5[match(combined$SNP, combined.bim$V2)]
 table(combined$ALT == combined$A1)
-combined[combined$ALT != combined$A1, c("ALT", "REF")] <- combined[combined$ALT != combined$A1, c("REF", "ALT")]
+swapped <- combined$ALT != combined$A1
+# Swap ALT and REF for these rows
+combined[swapped, c("ALT", "REF")] <- combined[swapped, c("REF", "ALT")]
+# Adjust OR, L95, and U95 for swapped alleles
+combined[swapped, c("OR", "L95", "U95")] <- 1 / combined[swapped, c("OR", "U95", "L95")]
 table(combined$ALT == combined$A1)
 combined$OR_95CI <- paste0(round(combined$OR,2), " (", round(combined$L95, 2), "-", round(combined$U95,2), ")")
 combined$KEY <- paste0("chr", combined$CHR, ":", combined$BP, ":", combined$REF, ":", combined$A1)  
 combined <- combined[c("SNP", "CHR", "BP", "A1", "REF", "OR_95CI", "P", "KEY")]
+
 
 ############
 ## SJLIFE ##
@@ -39,10 +44,14 @@ sum(duplicated(sjlife.bim$KEY1))
 sjlife$REF <- sjlife.bim$V6[match(sjlife$SNP, sjlife.bim$V2)]
 sjlife$ALT <- sjlife.bim$V5[match(sjlife$SNP, sjlife.bim$V2)]
 table(sjlife$ALT == sjlife$A1)
-sjlife[sjlife$ALT != sjlife$A1, c("ALT", "REF")] <- sjlife[sjlife$ALT != sjlife$A1, c("REF", "ALT")]
+swapped <- sjlife$ALT != sjlife$A1
+# Swap ALT and REF for these rows
+sjlife[swapped, c("ALT", "REF")] <- sjlife[swapped, c("REF", "ALT")]
+# Adjust OR, L95, and U95 for swapped alleles
+sjlife[swapped, c("OR", "L95", "U95")] <- 1 / sjlife[swapped, c("OR", "U95", "L95")]
 sjlife$OR_95CI <- paste0(round(sjlife$OR,2), " (", round(sjlife$L95, 2), "-", round(sjlife$U95,2), ")")
 sjlife$KEY <- paste0("chr", sjlife$CHR, ":", sjlife$BP, ":", sjlife$REF, ":", sjlife$A1)  
-sjlife <- sjlife[c("OR_95CI", "P", "KEY")]
+sjlife <- sjlife[c("OR_95CI", "P", "KEY", "A1")]
 
 # ##############
 # ## CCSS_org ##
@@ -86,11 +95,16 @@ ccss_org_ccss_exp.bim$KEY1 <- paste0(ccss_org_ccss_exp.bim$V1, ":", ccss_org_ccs
 sum(duplicated(ccss_org_ccss_exp.bim$KEY1))
 ccss_org_ccss_exp$REF <- ccss_org_ccss_exp.bim$V6[match(ccss_org_ccss_exp$SNP, ccss_org_ccss_exp.bim$V2)]
 ccss_org_ccss_exp$ALT <- ccss_org_ccss_exp.bim$V5[match(ccss_org_ccss_exp$SNP, ccss_org_ccss_exp.bim$V2)]
-table(ccss_org_ccss_exp$ALT == ccss_org_ccss_exp$A1)
-ccss_org_ccss_exp[ccss_org_ccss_exp$ALT != ccss_org_ccss_exp$A1, c("ALT", "REF")] <- ccss_org_ccss_exp[ccss_org_ccss_exp$ALT != ccss_org_ccss_exp$A1, c("REF", "ALT")]
+table(ccss_org_ccss_exp$ALT != ccss_org_ccss_exp$A1)
+swapped <- ccss_org_ccss_exp$ALT != ccss_org_ccss_exp$A1
+# Swap ALT and REF for these rows
+ccss_org_ccss_exp[swapped, c("ALT", "REF")] <- ccss_org_ccss_exp[swapped, c("REF", "ALT")]
+# Adjust OR, L95, and U95 for swapped alleles
+ccss_org_ccss_exp[swapped, c("OR", "L95", "U95")] <- 1 / ccss_org_ccss_exp[swapped, c("OR", "U95", "L95")]
+
 ccss_org_ccss_exp$OR_95CI <- paste0(round(ccss_org_ccss_exp$OR,2), " (", round(ccss_org_ccss_exp$L95, 2), "-", round(ccss_org_ccss_exp$U95,2), ")")
 ccss_org_ccss_exp$KEY <- paste0("chr", ccss_org_ccss_exp$CHR, ":", ccss_org_ccss_exp$BP, ":", ccss_org_ccss_exp$REF, ":", ccss_org_ccss_exp$A1)  
-ccss_org_ccss_exp <- ccss_org_ccss_exp[c("OR_95CI", "P", "KEY")]
+ccss_org_ccss_exp <- ccss_org_ccss_exp[c("OR_95CI", "P", "KEY", "A1")]
 
 
 
@@ -106,13 +120,14 @@ final_merged_df <- reduce(dfs, merge, by = "KEY")
 #                                "OR_95CI_ccss_org_exp", "P_ccss_org_exp")
 
 colnames(final_merged_df) <- c("SNP", "KEY", "CHR", "BP", "A1", "REF", "OR_95CI_combined", "P_combined", 
-                               "OR_95CI_sjlife", "P_sjlife", 
-                               "OR_95CI_ccss_org_exp", "P_ccss_org_exp")
+                               "OR_95CI_sjlife", "P_sjlife", "A1_sjlife", 
+                               "OR_95CI_ccss_org_exp", "P_ccss_org_exp", "A1_ccss_org_exp")
 
 
 freq.df <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/sjlife_ccss_org_ccss_exp_samples_updated_freq_out.frq", header = T)
 dim(freq.df)
 final_merged_df$combinedMAF <- freq.df$MAF[match(final_merged_df$SNP, freq.df$SNP)]
+# final_merged_df$freqA1 <- freq.df$A1[match(final_merged_df$SNP, freq.df$SNP)]
 
 ## Filter for MAF > 0.05
 final_merged_df <- final_merged_df[final_merged_df$combinedMAF > 0.05,]
@@ -173,16 +188,77 @@ sum(duplicated(sjlife_afr.bim$KEY1))
 afr.frq <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/sjlife_results_afr_freq_AN.frq", header = T)
 table(sjlife_afr$SNP %in% afr.frq$SNP)
 sjlife_afr$afr_MAF <- afr.frq$MAF[match(sjlife_afr$SNP, afr.frq$SNP)]
+sjlife_afr$afr_freqA1 <- afr.frq$A1[match(sjlife_afr$SNP, afr.frq$SNP)]
 
 sjlife_afr$REF <- sjlife_afr.bim$V6[match(sjlife_afr$SNP, sjlife_afr.bim$V2)]
 sjlife_afr$ALT <- sjlife_afr.bim$V5[match(sjlife_afr$SNP, sjlife_afr.bim$V2)]
-table(sjlife_afr$ALT == sjlife_afr$A1)
-sjlife_afr[sjlife_afr$ALT != sjlife_afr$A1, c("ALT", "REF")] <- sjlife_afr[sjlife_afr$ALT != sjlife_afr$A1, c("REF", "ALT")]
-sjlife_afr$OR_95CI_afr <- paste0(round(sjlife_afr$OR,2), " (", round(sjlife_afr$L95, 2), "-", round(sjlife_afr$U95,2), ")")
+table(sjlife_afr$ALT != sjlife_afr$A1)
+# swapped <- sjlife_afr$ALT != sjlife_afr$A1
+# sjlife_afr[swapped,]
+# # Swap ALT and REF for these rows
+# sjlife_afr[swapped, c("ALT", "REF")] <- sjlife_afr[swapped, c("REF", "ALT")]
+# # Adjust OR, L95, and U95 for swapped alleles
+# sjlife_afr[swapped, c("OR", "L95", "U95")] <- 1 / sjlife_afr[swapped, c("OR", "U95", "L95")]
+# sjlife_afr$OR_95CI_afr <- paste0(round(sjlife_afr$OR,2), " (", round(sjlife_afr$L95, 2), "-", round(sjlife_afr$U95,2), ")")
 sjlife_afr$KEY <- paste0("chr", sjlife_afr$CHR, ":", sjlife_afr$BP, ":", sjlife_afr$REF, ":", sjlife_afr$A1)  
-sjlife_afr <- sjlife_afr[c("OR_95CI_afr", "P", "KEY", "afr_MAF", "SNP")]
-cc$OR_95CI_afr <- sjlife_afr$OR_95CI_afr[match(cc$KEY, sjlife_afr$SNP)]
+# sjlife_afr <- sjlife_afr[c("OR_95CI_afr", "P", "KEY", "afr_MAF", "SNP", "A1")]
+# cc$OR_95CI_afr <- sjlife_afr$OR_95CI_afr[match(cc$KEY, sjlife_afr$SNP)]
+cc$OR_afr <- sjlife_afr$OR[match(cc$KEY, sjlife_afr$SNP)]
+cc$L95_afr <- sjlife_afr$L95[match(cc$KEY, sjlife_afr$SNP)]
+cc$U95_afr <- sjlife_afr$U95[match(cc$KEY, sjlife_afr$SNP)]
 cc$P_afr <- sjlife_afr$P[match(cc$KEY, sjlife_afr$SNP)]
 cc$afr_MAF <- sjlife_afr$afr_MAF[match(cc$KEY, sjlife_afr$SNP)]
+cc$afr_freqA1 <- sjlife_afr$afr_freqA1[match(cc$KEY, sjlife_afr$SNP)]
+cc$A1_sjlife_afr <- sjlife_afr$A1[match(cc$KEY, sjlife_afr$SNP)]
+# cc$ALT_sjlife_afr <- sjlife_afr$ALT[match(cc$KEY, sjlife_afr$SNP)]
+
+table(cc$A1 != cc$A1_sjlife_afr)
+swapped <- cc$A1 != cc$A1_sjlife_afr
+# Swap ALT and REF for these rows
+# cc[swapped, c("ALT", "REF")] <- cc[swapped, c("REF", "ALT")]
+# Adjust OR, L95, and U95 for swapped alleles
+cc[swapped, c("OR_afr", "L95_afr", "U95_afr")] <- 1 / cc[swapped, c("OR_afr", "U95_afr", "L95_afr")]
+cc$OR_95CI_afr <- paste0(round(cc$OR_afr,2), " (", round(cc$L95_afr, 2), "-", round(cc$U95_afr,2), ")")
+
 write.table(cc, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/common_missense_variants.txt", col.names = T, sep = "\t", quote = F, row.names = F)
 
+
+
+
+# reference <- read.table(text="chr	pos	EA	NEA
+# 2	178633315	C	T
+# 2	178580212	T	C
+# 2	178566270	A	G
+# 2	178571293	A	G
+# 2	178586693	A	G
+# 2	178556967	G	A
+# 2	178599800	C	T
+# 2	178532834	T	C
+# 2	178541464	T	C
+# 2	178592420	A	G
+# 2	178562809	C	T
+# 2	178693639	C	T
+# 2	178593864	T	C
+# 2	178718769	G	T
+# 2	178722403	G	C
+# 2	178714366	C	T
+# 2	178717600	T	C
+# 2	178785681	A	G
+# 2	178795185	A	G
+# 2	178717810	T	G
+# 2	178567458	G	A
+# 2	178681132	T	C
+# 2	178780128	T	C
+# 2	178689578	T	C
+# 2	178759031	C	T
+# 2	178764734	C	T
+# 2	178756224	C	T
+# 2	178751160	T	C
+# 2	178741811	A	G
+# 2	178663651	T	C
+# 2	178747656	T	C
+# 2	178710784	T	C
+# 10	119670121	C	T
+# 10	119676774	T	C", header = T)
+# 
+# reference$KEY <- paste0("chr", reference$chr,":", reference$pos)
