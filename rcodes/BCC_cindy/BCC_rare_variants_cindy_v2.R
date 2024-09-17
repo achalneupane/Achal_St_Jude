@@ -15,7 +15,7 @@ clinvar <- clinvar[!duplicated(clinvar$SNP),]
 clinvar$AF <- as.numeric(clinvar$AF)
 clinvar$AF_nfe <- as.numeric(clinvar$AF_nfe)
 clinvar$AF_afr <- as.numeric(clinvar$AF_afr)
-
+dim(clinvar)
 
 # make rare; .all is based on allee frequency from gnomAD global population; .eur is gnomAD EUR_nfe; .afr is gnomAD AFR
 clinvar.all <- clinvar[which(clinvar$AF <0.01),]
@@ -26,6 +26,7 @@ clinvar.afr <- clinvar[which(clinvar$AF <0.01 & clinvar$AF_afr < 0.01),]
 
 cc1 <- cbind.data.frame(clinvar.all$AF_nfe, clinvar.all$AF_afr, clinvar.all$AF, clinvar.all$ID, clinvar.all$CLNSIG, clinvar.all$ANN....GENE)
 cc2 <- clinvar.all[grepl("chr10:102550088:C:T", clinvar.all$ID),]
+cc3 <- cbind.data.frame(clinvar$AF_nfe, clinvar$AF_afr, clinvar$AF, clinvar$ID, clinvar$CLNSIG, clinvar$ANN....GENE)
 
 loftee <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/loftee/loftee_HC_all_chr_with_gnomad.txt", header = T, sep = "\t", stringsAsFactors = F)
 dim(loftee)
@@ -343,7 +344,88 @@ col.extract <- colnames(raw)[colnames(raw) %in% kim_ST1.csg60.clinvar.all$SNP]
 # check which of CSG60 variants are also in Zhaomings paper
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/1_demographics.RDATA")
 sum(colnames(Zhaoming_vars) %in% col.extract)
-colnames(Zhaoming_vars)[!col.extract %in% colnames(Zhaoming_vars)]
+# 89/ 144 Zhaoming variants match (QC'ed)
+# 104/ 144 Zhaoming variants match (preQC)
+# 232 PLP variants in CSG 60 genes in WES data
+colnames(Zhaoming_vars)[!colnames(Zhaoming_vars) %in% col.extract ]
+# "chr1:17028711:G:GC (not in gnomad)"      "chr1:17033077:C:T (uncertain sig)"       "chr1:17044824:C:T (QC/PLP)"      
+# [5] "chr1:241512001:G:C (uncertain sig)"      "chr3:52404500:A:C (QC/PLP)"       "chr5:112834948:T:G (not in gnomad)"      "chr7:5987504:G:A"       
+# [9] "chr7:5995628:G:C (QC/PLP)"        "chr9:37002705:C:T (not in gnomad)"       "chr9:37020778:C:CA (not in gnomad)"      "chr9:95458145:GC:G (not in gnomad)"     
+# [13] "chr9:95485696:G:GTA (not in gnomad)"     "chr9:95485875:C:T (uncertain sig)"       "chr9:95516639:TC:T (not reported)"      "chr10:43119576:G:A" (uncertain sig)     
+# [17] "chr10:87863635:C:T (uncertain sig)"      "chr10:102509250:G:A (not in gnomad)"     "chr10:102550088:C:T (QC/PLP)"     "chr10:102627189:AG:A (not in gnomad)"   
+# [21] "chr10:102630077:CAA:C (not in gnomad)"   "chr11:32396281:G:GT (not in gnomad)"     "chr11:32428554:G:A (not in gnomad)"      "chr11:112093129:C:T (not reported)"    
+# [25] "chr13:32356607:C:T (QC/PLP)"      "chr13:32357741:G:A (QC/PLP)"      "chr13:48303716:G:T (not in WES/PLP)"      "chr13:48303931:C:T (uncertain sig/ sig in 2024)"     
+# [29] "chr13:48303990:G:GC (not reported)"     "chr13:48345089:AT:A (not in gnomad)"     "chr13:48349000:G:A (not reported)"      "chr13:48360062:T:A (not in gnomad)"     
+# [33] "chr13:48364922:TA:T (not in gnomad)"     "chr13:48368549:C:T (QC/PLP)"      "chr13:48368550:G:GA (not in gnomad)"     "chr13:48368580:TA:T (QC/PLP)"    
+# [37] "chr13:48379594:C:T (QC/PLP)"      "chr13:48380237:T:TAGCA (not in gnomad)"  "chr13:48381280:AT:A (not in gnomad)"     "chr13:48456349:G:T (not in gnomad)"     
+# [41] "chr13:48459720:CTT:C (not in gnomad)"    "chr13:48465238:C:T (uncertain sig)"      "chr13:48465335:TG:T (not in gnomad)"     "chr14:95104074:TGAAAG:T (not in gnomad)"
+# [45] "chr17:7673780:T:A (QC/PLP)"       "chr17:7674217:C:G (QC/PLP)"       "chr17:7674250:C:T (QC/PLP)"       "chr17:7675058:C:T (uncertain sig)"      
+# [49] "chr17:7675070:C:T (uncertain sig)"       "chr17:31169999:T:G (not in gnomad)"      "chr17:31206360:C:T (QC/PLP)"      "chr17:31219040:TA:T (not in gnomad)"    
+# [53] "chr17:31227289:G:T (not in gnomad)"      "chr17:31259059:C:CG (not in gnomad)"     "chr17:31265242:GA:G (not in gnomad)"     "chr17:31352280:G:A (QC/PLP)"     
+
+## Check for Zhaoming vars (PreQC)
+raw <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/all_BCC_rare_variants_recodeA.raw", header = T)
+raw <- as.data.frame(raw)
+HEADER = sub(pattern="_[T,A,G,C,*]+",replacement="",colnames(raw))
+colnames(raw) = HEADER
+raw <- raw[, !(colnames(raw) %in% c("PAT", "MAT", "SEX", "PHENOTYPE"))]
+
+df.zhaoming.vars <- as.data.frame(names(Zhaoming_vars)[grepl("chr", names(Zhaoming_vars))])
+colnames(df.zhaoming.vars) <- "SNP"
+table(df.zhaoming.vars$SNP %in% colnames(raw))
+# FALSE  TRUE 
+# 35   109
+df.zhaoming.vars$preQC <- df.zhaoming.vars$SNP %in% colnames(raw)
+
+# post QC
+raw <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis2/all_BCC_rare_variants_recodeA.raw", header = T)
+raw <- as.data.frame(raw)
+HEADER = sub(pattern="_[T,A,G,C,*]+",replacement="",colnames(raw))
+colnames(raw) = HEADER
+raw <- raw[, !(colnames(raw) %in% c("PAT", "MAT", "SEX", "PHENOTYPE"))]
+table(df.zhaoming.vars$SNP %in% colnames(raw))
+# FALSE  TRUE 
+# 50   94
+df.zhaoming.vars$postQC <- df.zhaoming.vars$SNP %in% colnames(raw)
+df.zhaoming.vars$CLNSIG <- clinvar$CLNSIG[match(df.zhaoming.vars$SNP, clinvar$SNP)]
+
+# write.table(df.zhaoming.vars, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/qin_zhaoming_PLP_comparison/zhaoming_PLP_comparison.txt", col.names = T, row.names = F, sep = "\t", quote = F)
+
+cc <- clinvar.all[clinvar.all$SNP %in% col.extract ,]
+cc3 <- cbind.data.frame(cc$SNP, cc$AF_nfe, cc$AF_afr, cc$AF, cc$CLNSIG, cc$ANN....GENE)
+cc3 <- cbind.data.frame(cc3, df.zhaoming.vars[match(cc3$`cc$SNP`, df.zhaoming.vars$SNP),])
+
+## Check for Qin vars (PreQC)
+raw <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/all_BCC_rare_variants_recodeA.raw", header = T)
+raw <- as.data.frame(raw)
+HEADER = sub(pattern="_[T,A,G,C,*]+",replacement="",colnames(raw))
+colnames(raw) = HEADER
+raw <- raw[, !(colnames(raw) %in% c("PAT", "MAT", "SEX", "PHENOTYPE"))]
+# limit to clinvar
+raw <- raw[colnames(raw) %in% clinvar$SNP]
+
+
+df.qin.vars <- as.data.frame(names(QIN_vars)[grepl("chr", names(QIN_vars))])
+colnames(df.qin.vars) <- "SNP"
+table(df.qin.vars$SNP %in% colnames(raw))
+# FALSE  TRUE 
+# 201   185
+df.qin.vars$preQC <- df.qin.vars$SNP %in% colnames(raw)
+
+# post QC
+raw <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis2/all_BCC_rare_variants_recodeA.raw", header = T)
+raw <- as.data.frame(raw)
+HEADER = sub(pattern="_[T,A,G,C,*]+",replacement="",colnames(raw))
+colnames(raw) = HEADER
+raw <- raw[, !(colnames(raw) %in% c("PAT", "MAT", "SEX", "PHENOTYPE"))]
+# limit to clinvar
+raw <- raw[colnames(raw) %in% clinvar$SNP]
+table(df.qin.vars$SNP %in% colnames(raw))
+# FALSE  TRUE 
+# 222   164
+df.qin.vars$postQC <- df.qin.vars$SNP %in% colnames(raw)
+df.qin.vars$CLNSIG <- clinvar$CLNSIG[match(df.qin.vars$SNP, clinvar$SNP)]
+# write.table(df.qin.vars, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/qin_zhaoming_PLP_comparison/qin_PLP_comparison.txt", col.names = T, row.names = F, sep = "\t", quote = F)
 ###########
 
 raw$kim_ST1.csg60.clinvar.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")

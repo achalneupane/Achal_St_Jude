@@ -31,33 +31,33 @@ chr=$1
 
 echo "Doing chromosome chr${chr}"
 # Split data for each chromosome
-vcftools --gzvcf ${INDIR}/chrALL.${VCFROOT}.vcf.gz --remove ${OUTDIR}/chrALL.Survivor_WGS.GATK4180.hg38_missingness.imiss.0.05plus_renamed --chr chr$chr --recode  --stdout | bgzip  > ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz
-# bcftools view -S ^${OUTDIR}/chrALL.Survivor_WGS.GATK4180.hg38_missingness.imiss.0.05plus_renamed -r chr$chr -Oz -o ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz ${INDIR}/chrALL.${VCFROOT}.vcf.gz
+# vcftools --gzvcf ${INDIR}/chrALL.${VCFROOT}.vcf.gz --remove ${OUTDIR}/chrALL.Survivor_WGS.GATK4180.hg38_missingness.imiss.0.05plus_renamed --chr chr$chr --recode  --stdout | bgzip  > ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz
+# # bcftools view -S ^${OUTDIR}/chrALL.Survivor_WGS.GATK4180.hg38_missingness.imiss.0.05plus_renamed -r chr$chr -Oz -o ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz ${INDIR}/chrALL.${VCFROOT}.vcf.gz
 
-# Index the VCF file
-tabix -pvcf ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz
+# # Index the VCF file
+# tabix -pvcf ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz
 
-# Write stats
-bcftools stats ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz > ${stats}/${VCFROOT}_chr${chr}.bcftools_stats
+# # Write stats
+# bcftools stats ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz > ${stats}/${VCFROOT}_chr${chr}.bcftools_stats
 
-# Run basic QC - sequence level
-vcftools --gzvcf ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz \
---chr chr$chr \
---keep-filtered PASS \
---minGQ 20 \
---min-meanDP 10 \
---recode \
---stdout \
-| bgzip > ${INDIR}/${VCFROOT}_chr${chr}.PASS.vcf.gz
+# # Run basic QC - sequence level
+# vcftools --gzvcf ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz \
+# --chr chr$chr \
+# --keep-filtered PASS \
+# --minGQ 20 \
+# --min-meanDP 10 \
+# --recode \
+# --stdout \
+# | bgzip > ${INDIR}/${VCFROOT}_chr${chr}.PASS.vcf.gz
 
-# bcftools view -f PASS -i 'MIN(GQ)>20 & MEAN(DP)>10' -Oz -o ${INDIR}/${VCFROOT}_chr${chr}.PASS.vcf.gz ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz
+# # bcftools view -f PASS -i 'MIN(GQ)>20 & MEAN(DP)>10' -Oz -o ${INDIR}/${VCFROOT}_chr${chr}.PASS.vcf.gz ${INDIR}/${VCFROOT}_chr${chr}.vcf.gz
 
-# Write stats
-bcftools stats ${INDIR}/${VCFROOT}_chr${chr}.PASS.vcf.gz > ${stats}/${VCFROOT}_chr${chr}.PASS.bcftools_stats
+# # Write stats
+# bcftools stats ${INDIR}/${VCFROOT}_chr${chr}.PASS.vcf.gz > ${stats}/${VCFROOT}_chr${chr}.PASS.bcftools_stats
 
 # Fix multi-allelic markers and normalize
 bcftools norm -Ou -m -any ${INDIR}/${VCFROOT}_chr${chr}.PASS.vcf.gz \
- | bcftools norm -Ou -f hg38.fa \
+ | bcftools norm -Ou -f /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/hg38.fa \
  | bcftools annotate -Ob -x ID -I +'%CHROM:%POS:%REF:%ALT' \
  | bcftools view -Oz \
  > ${INDIR}/${VCFROOT}_chr${chr}.PASS.decomposed.vcf.gz

@@ -3,22 +3,28 @@
   # analysis, you should compare survivors with 2 or more variants vs those with
   # no variants.
 
-setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/yadav_dox_abstract_06_03_2024/")
+library(data.table)
+library(haven)
+
+# setwd("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/yadav_dox_abstract_09_04_2024")
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/snpEff/yadav_dox_abstract_09_04_2024/")
 df <- read.table("dox_abstract.txt", header = T, sep = "\t")
 df$ID <- sub(";.*", "", df$ID)
+df$CHROM <- sub(".*:", "", df$CHROM)
+eight.genes <- c("HSPA12A", "RBM20", "ADRB1", "PDZD8", "MYCBP2", "ABCC4", "EDNRB", "GPR180")
+
+df <- df[df$ANN....GENE %in% eight.genes,]
 
 ####################
 ## Read geno file ##
 ####################
-library(data.table)
-library(haven)
 raw <- as.data.frame(fread("extract_vars_dox_recodeA.raw", header = T) )
 rownames(raw) <- raw$IID
 raw <- raw[,-c(1:6)]
 HEADER = sub(pattern="_[T,A,G,C,*]+",replacement="",colnames(raw))
 colnames(raw) <- gsub("\\.", ":", HEADER)
 sum(df$ID %in% colnames(raw))
-# 67172
+# 1266495
 
 ####################
 ## Non-Synonymous ##
@@ -28,14 +34,22 @@ df.nonsynonymous = df[grepl('missense', df$ANN....EFFECT),]
 table(df.nonsynonymous$ANN....EFFECT)
 table(df.nonsynonymous$ANN....GENE)
 raw.nonsynonymous <- raw[colnames(raw) %in% df.nonsynonymous$ID]
-raw.nonsynonymous$varSum <- rowSums(raw.nonsynonymous)
+# convert all 2 to 1
+raw.nonsynonymous[raw.nonsynonymous == 2] <- 1
+raw.nonsynonymous$varSum <- rowSums(raw.nonsynonymous, na.rm = T)
 raw.nonsynonymous$carrier <- ifelse (raw.nonsynonymous$varSum > 0, 1,0)
 
 df.nonsynonymous.unique <- df.nonsynonymous[!duplicated(df.nonsynonymous$ID),]
 table(df.nonsynonymous.unique$ANN....GENE)
-# CHPT1    GNPTAB   SLC25A3 UHRF1BP1L 
-# 24        57        21        83 
+# ABCC4    ABLIM1     ACSL5      ADD3    ADRA2A     ADRB1   AFAP1L2     BBIP1     CASP7     DUSP5     EDNRB     GFRA1      GPC6    GPR180 
+# 76        50        40        35        23        25        56        13        45        24        30        32        29        22 
+# HSPA12A     MBNL2    MYCBP2    NHLRC2      NRAP     PDCD4     PDZD8  PNLIPRP2 RAB11FIP2     RBM20     SHOC2    SLAIN1   SLC18A2    TCF7L2 
+# 43         9       109        34       148        19        58        36        25        82        17        33        21        37 
+# TGDS     UGGT2     VTI1A 
+# 11       107        13 
+## All 31 genes were found!
 
+table(df.nonsynonymous$CHROM)
 ##########
 ## P/LP ##
 ##########
@@ -44,8 +58,24 @@ table(df.clinvar$ANN....EFFECT)
 table(df.clinvar$ANN....GENE)
 
 raw.clinvar <- raw[colnames(raw) %in% df.clinvar$ID]
-raw.clinvar$varSum <- rowSums(raw.clinvar)
+# convert all 2 to 1
+raw.clinvar[raw.clinvar == 2] <- 1
+raw.clinvar$varSum <- rowSums(raw.clinvar, na.rm = T)
 raw.clinvar$carrier <- ifelse (raw.clinvar$varSum > 0, 1,0)
+
+# rm(df)
+# rm(raw)
+# save.image("yadav_dox_abstract_09_04_2024_eight_genes.Rdata")
+
+load("yadav_dox_abstract_09_04_2024_eight_genes.Rdata")
+
+table(df.nonsynonymous.unique$CHROM)
+# chr10 chr13 
+# 876   426
+# Since they are in two chrmosomes only, we can analyze CHR10
+table(df.nonsynonymous.unique$ANN....GENE)
+
+# View(as.data.frame(table(raw.nonsynonymous$varSum)))
 #############################################
 ## Pheno with anthra > 0 and chestRT < 200 ##
 #############################################
@@ -72,7 +102,7 @@ pheno.sjlife$carrier_PLP_clinvar <- raw.clinvar$carrier[match(pheno.sjlife$IID, 
 
 # nonsynonymous
 pheno.sjlife$varSum.nonsynonymous <- raw.nonsynonymous$varSum[match(pheno.sjlife$IID, rownames(raw.nonsynonymous))]
-table(pheno.sjlife$varSum.nonsynonymous)
+View(as.data.frame(table(pheno.sjlife$varSum.nonsynonymous)))
 ## clinvar
 pheno.sjlife$varSum.clinvar <- raw.clinvar$varSum[match(pheno.sjlife$IID, rownames(raw.clinvar))]
 

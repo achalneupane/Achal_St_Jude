@@ -1,10 +1,13 @@
 #!/bin/bash
 
 module load vcftools/0.1.13
-module load bcftools/1.4.1
+module load bcftools/1.17
+#module load vt/2016.11.07
 module load plink/1.90b
+# module load R/3.4.0
+module load R/4.2.2-rhel8
+module load bedtools/2.25.0
 module load htslib/1.3.1
-module load R/3.3.1
 
 # cd /home/ysapkota/Work/WGS_SJLIFE
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed
@@ -35,7 +38,7 @@ gatk IndexFeatureFile -I chrALL.Survivor_WGS.GATK4180.hg38.vcf.gz
  #---------------- Sample QC --------------------------
 
 ## Rename 2 samples in the master VCF file, these are incorrectly labelled for wrong samples
-bcftools reheader -s Phenotypes/master_vcf_rename.txt VCF_original/chrALL.Survivor_WGS.GATK4180.hg38.vcf.gz > VCF_original/chrALL.Survivor_WGS.GATK4180.hg38_renamed.vcf.gz
+bcftools reheader -s Phenotypes/master_vcf_rename.txt VCF_original/chrALL.Survivor_WGS.GATK4180.hg38.vcf.gz > VCF_original/chrALL.Survivor_WGS.GATK4180.hg38_renamed2.vcf.gz
 tabix -pvcf VCF_original/chrALL.Survivor_WGS.GATK4180.hg38_renamed.vcf.gz
 
 WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed" 
@@ -53,6 +56,9 @@ awk 'FNR==1 || $6 > 0.05 {print $1"_"$2}' QC/chrALL.Survivor_WGS.GATK4180.hg38_m
 ## Download 
 Please note the exclusion of high-LD regions before performing admixture analyses (this is also true for performing PCA and IBD analyses). 
 See https://genome.sph.umich.edu/wiki/Regions_of_high_linkage_disequilibrium_(LD) for high LD regions based on hg38 coordinates to exclude.
+
+cp /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS/hg38.fa* .
+gatk CreateSequenceDictionary -R hg38.fa -O hg38.dict
 
 ## For chr1-22, perform sequence-level QC, fix multiallelic variants, run gross HWE check, and run LD pruning
 for chr in {1..22} X Y;do
