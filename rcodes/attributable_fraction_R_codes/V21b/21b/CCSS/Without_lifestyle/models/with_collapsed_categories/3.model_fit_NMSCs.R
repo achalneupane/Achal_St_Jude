@@ -29,6 +29,32 @@ PHENO.ANY_SN$maxpelvisrtdose.category <- factor(PHENO.ANY_SN$maxpelvisrtdose.cat
 
 # table(PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$NMSCs == 0])
 
+## check prevalence
+gg <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$ccssid),]
+# Calculate total and prevalence
+total <- sum(table(gg$NMSCs))  # 4149 + 251
+n_with_NMSC <- table(gg$NMSCs)[2]  # Count for '1' which is 251
+prevalence <- n_with_NMSC / total
+prevalence_percent <- prevalence * 100
+prevalence_percent 
+
+gg <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$ccssid),]
+gg <- gg[grepl("EUR", gg$admixture),]
+# Calculate total and prevalence
+total <- sum(table(gg$NMSCs))  # 4149 + 251
+n_with_NMSC <- table(gg$NMSCs)[2]  # Count for '1' which is 251
+prevalence <- n_with_NMSC / total
+prevalence_percent <- prevalence * 100
+prevalence_percent 
+
+gg <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$ccssid),]
+gg <- gg[grepl("AFR", gg$admixture),]
+# Calculate total and prevalence
+total <- sum(table(gg$NMSCs))  # 4149 + 251
+n_with_NMSC <- table(gg$NMSCs)[2]  # Count for '1' which is 251
+prevalence <- n_with_NMSC / total
+prevalence_percent <- prevalence * 100
+prevalence_percent
 ######################################
 ## Attributable fraction of Any SNs ##
 ######################################

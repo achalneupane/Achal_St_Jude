@@ -6,6 +6,7 @@ cc
 filtered_cc <- cc[cc[, 2] < 10 | cc[, 3] < 10, 1]
 filtered_cc
 
+
 ## Admixture classification
 admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
 EUR.admix <- admixture$INDIVIDUAL[admixture$EUR > 0.8]
@@ -27,6 +28,32 @@ PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$maxpelvisrtdose.category == "
 PHENO.ANY_SN$maxpelvisrtdose.category <- factor(PHENO.ANY_SN$maxpelvisrtdose.category, levels = c("None", "Any"))
 
 # table(PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$NMSCs == 0])
+## check prevalence
+gg <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$sjlid),]
+# Calculate total and prevalence
+total <- sum(table(gg$NMSCs))  # 4149 + 251
+n_with_NMSC <- table(gg$NMSCs)[2]  # Count for '1' which is 251
+prevalence <- n_with_NMSC / total
+prevalence_percent <- prevalence * 100
+prevalence_percent 
+
+gg <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$sjlid),]
+gg <- gg[grepl("EUR", gg$admixture),]
+# Calculate total and prevalence
+total <- sum(table(gg$NMSCs))  # 4149 + 251
+n_with_NMSC <- table(gg$NMSCs)[2]  # Count for '1' which is 251
+prevalence <- n_with_NMSC / total
+prevalence_percent <- prevalence * 100
+prevalence_percent 
+
+gg <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$sjlid),]
+gg <- gg[grepl("AFR", gg$admixture),]
+# Calculate total and prevalence
+total <- sum(table(gg$NMSCs))  # 4149 + 251
+n_with_NMSC <- table(gg$NMSCs)[2]  # Count for '1' which is 251
+prevalence <- n_with_NMSC / total
+prevalence_percent <- prevalence * 100
+prevalence_percent 
 
 ######################################
 ## Attributable fraction of Any SNs ##
