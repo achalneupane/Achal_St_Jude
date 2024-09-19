@@ -124,7 +124,7 @@ plink --bfile all_BCC_rare_variants_EUR --freq --out all_BCC_rare_variants_EUR_f
 
 
 ##################################
-## 08/15/2024 ##                ##
+## 08/15/2024                   ##
 ## Discrepancy check for CSG172 ##
 ##################################
 
@@ -145,7 +145,7 @@ penetrance (hereafter, CSG-60) previously reported"
 "Variants were categorized as pathogenic (P), likely pathogenic (LP), variant of uncertain significance, likely benign, or benign using a hierarchical classification system based on ClinVar, the Human
 Gene Mutation Database, and InterVar" >>>>> In our case, we are considering Clinvar only
 
-CSG60: Percent P/LP (95% CI) 4.1 (3.6 to 4.7) 1.3 (0.4 to 2.3
+
 CSG172: Percent P/LP (95% CI) 11.9 (11.0 to 12.8) 7.7 (5.6 to 9.8)         
 #################################
 ## Discrepancy check for CSG60 ##
@@ -157,6 +157,7 @@ cancer".
 received radiotherapy), 1,120 SNs were diagnosed among 439 survivors (14.6%), and 175 P/LP
 mutations were identified in 5.8% (95% CI, 5.0% to 6.7%) of survivors."
 
+CSG60: Percent P/LP (95% CI) 4.1 (3.6 to 4.7) 1.3 (0.4 to 2.3)
 
 ## Extract variants
 # clinvar P/LP variants with very high prevalence in WGS data

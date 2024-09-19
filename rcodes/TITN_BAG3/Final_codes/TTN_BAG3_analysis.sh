@@ -525,3 +525,44 @@ plink --bfile ttn_significant_ld --extract plink.prune.in --keep-allele-order --
 
 
 
+## Extract common variants for Kendrick
+egrep "178562809|178633315|178580212|178566270|178571293|178586693|178556967|178599800|178532834|178541464|178592420|178693639|178593864|178718769|178722403|178714366|178717600|178785681|178795185|178717810|178567458|178681132|178780128|178689578|178759031|178764734|178756224|178751160|178741811|178663651|178747656|178710784|119676774|119670121" sjlife_ccss_org_ccss_exp_samples_updated.bim
+vi extract_common_missense_vars
+# chr2:178562809:T:C**
+# chr2:178532834:C:T
+# chr2:178541464:C:T
+# chr2:178556967:A:G
+# chr2:178566270:G:A
+# chr2:178567458:A:G
+# chr2:178571293:G:A
+# chr2:178580212:C:T
+# chr2:178586693:G:A
+# chr2:178592420:G:A
+# chr2:178593864:C:T
+# chr2:178599800:T:C
+# chr2:178633315:T:C
+# chr2:178663651:C:T
+# chr2:178681132:C:T
+# chr2:178689578:C:T
+# chr2:178693639:T:C
+# chr2:178710784:C:T
+# chr2:178714366:T:C
+# chr2:178717600:C:T
+# chr2:178717810:G:T
+# chr2:178718769:T:G
+# chr2:178722403:C:G
+# chr2:178741811:G:A
+# chr2:178747656:C:T
+# chr2:178751160:C:T
+# chr2:178756224:T:C
+# chr2:178759031:T:C
+# chr2:178764734:T:C
+# chr2:178780128:C:T
+# chr2:178785681:G:A
+# chr2:178795185:G:A
+# chr10:119676774:C:T
+# chr10:119670121:T:C**
+
+
+plink --bfile sjlife_ccss_org_ccss_exp_samples_updated --extract extract_common_missense_vars --out common_missense_vars_recodeA --recode A 
+plink --bfile sjlife_afr_to_concat_updated --extract extract_common_missense_vars --out common_missense_vars_AFR_recodeA --recode A 
