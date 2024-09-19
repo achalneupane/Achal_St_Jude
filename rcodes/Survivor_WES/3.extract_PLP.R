@@ -43,6 +43,7 @@ loftee.afr <- loftee[which(loftee$AF <0.01 & loftee$AF_afr < 0.01),]
 
 snpeff <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/missense_variants_with_overlap_in_more_than_90_percent_of_prediction_tools_all_cols.txt", header = T, sep = "\t", stringsAsFactors = F)
 dim(snpeff)
+snpeff$SNP <- sub(";.*", "", snpeff$ID)
 snpeff <- snpeff[!duplicated(snpeff$SNP),]
 
 snpeff$AF <- as.numeric(snpeff$AF)
@@ -65,5 +66,28 @@ dim(cc)
 # 46076
 write.table(cc, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WES_rare_variant/sjlife/rare_variants_to_extract.txt", row.names = F, col.names = F, quote = F)
 
-bim.preQC <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic_ID_updated.bim")
+cc <- cc$`unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP))`
+
+## preQC
+bim.preQC <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic_ID_updated.bim")
 table(cc %in% bim.preQC$V2)
+# TRUE 
+# 46076
+
+## QCed for GQ, DP and VQSR
+bim.QC <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic_ID_updated.bim")
+table(cc %in% bim.QC$V2)
+# FALSE  TRUE 
+# 12848 33228 
+
+## Final SJLIFE QCed data
+bim.QC.sjlife <- fread("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/Survivor_WES/biallelic2/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_ID_updated.bim")
+table(cc %in% bim.QC.sjlife$V2)
+# FALSE  TRUE 
+# 16676 29400
+
+
+bim.QC.sjlife.PLP <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WES_rare_variant//sjlife/all_rare_variants_maf0.01_all_sjlife.bim")
+table(cc %in% bim.QC.sjlife.PLP$V2)
+# FALSE  TRUE 
+# 16818 29258

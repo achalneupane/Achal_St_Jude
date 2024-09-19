@@ -235,7 +235,7 @@ filtered_table_df <- table_df %>%
 
 # Afferent_pupillary_defect <- CTCAE.data[grepl("Afferent pupillary defect", CTCAE.data$condition),]
 rm(CTCAE.data)
-# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/Survivors/analysis/phenotype.RData")
+# save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WES_rare_variant/sjlife/phenotype.RData")
 
 
 

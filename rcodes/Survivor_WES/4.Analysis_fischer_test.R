@@ -1,4 +1,4 @@
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/Survivors/analysis/phenotype.RData")
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WES_rare_variant/sjlife/phenotype.RData")
 ## 1. clinvar
 clinvar <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/all_new_clinvar_P_LP.txt", header = T, sep = "\t", stringsAsFactors = F)
 dim(clinvar)
@@ -41,6 +41,7 @@ loftee.afr <- loftee[which(loftee$AF <0.01 & loftee$AF_afr < 0.01),]
 
 snpeff <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/missense_variants_with_overlap_in_more_than_90_percent_of_prediction_tools_all_cols.txt", header = T, sep = "\t", stringsAsFactors = F)
 dim(snpeff)
+snpeff$SNP <- sub(";.*", "", snpeff$ID)
 snpeff <- snpeff[!duplicated(snpeff$SNP),]
 
 snpeff$AF <- as.numeric(snpeff$AF)
@@ -53,5 +54,9 @@ snpeff.all <- snpeff[which(snpeff$AF <0.01),]
 snpeff.eur <- snpeff[which(snpeff$AF <0.01 & snpeff$AF_nfe < 0.01),]
 snpeff.afr <- snpeff[which(snpeff$AF <0.01 & snpeff$AF_afr < 0.01),]
 
+
+cc <- as.data.frame(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
+dim(cc)
+# 46076
 
 CTCAE.data.4
