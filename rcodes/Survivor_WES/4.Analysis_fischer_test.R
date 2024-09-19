@@ -59,4 +59,13 @@ cc <- as.data.frame(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
 dim(cc)
 # 46076
 
+cc <- c(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
+
+bim.QC.sjlife.PLP <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WES_rare_variant//sjlife/all_rare_variants_maf0.01_all_sjlife.bim")
+table(cc %in% bim.QC.sjlife.PLP$V2)
+# FALSE  TRUE 
+# 16818 29258 
+
+raw <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WES_rare_variant//sjlife/all_rare_variants_maf0.01_all_sjlife_recodeA.raw")
+
 CTCAE.data.4
