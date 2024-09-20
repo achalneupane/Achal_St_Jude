@@ -180,6 +180,28 @@ all.samples$V4 <- sub(".*CCSS-", "", all.samples$V4)
 write.table(all.samples, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/rename_samples.txt", col.names = F, row.names = F, quote = F)
 
 
+## There are duplicate SJLIFE IDs, we can romove the ones with low call rate here:
+# Check for duplicated IID values
+imiss = read.table("/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/Survivors/chr.ALL.SURVIVORS_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_updated_missing.imiss", header=TRUE)
+duplicate_samples <- imiss[duplicated(imiss$IID) | duplicated(imiss$IID, fromLast = TRUE), ]
+dim(duplicate_samples)
+# 69
+
+# Sort and keep only the sample with the lowest F_MISS for each IID
+library(dplyr)
+samples_to_keep <- duplicate_samples %>%
+  group_by(IID) %>%
+  slice_min(F_MISS, with_ties = FALSE)  # with_ties = FALSE ensures only one sample is kept per group
+
+# Identify the samples to remove by selecting all not in 'samples_to_keep'
+samples_to_remove <- anti_join(duplicate_samples, samples_to_keep, by = c("FID", "IID"))
+
+# View the samples to be removed
+# View(samples_to_remove)
+dim(samples_to_remove)
+## 35
+write.table(samples_to_remove[, c("FID", "IID")], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/Survivors/duplicate_samples_to_remove.txt", row.names = FALSE, col.names = FALSE, quote = FALSE)
+
 ################################################################################################################
 ################################################################################################################
 ################################################################################################################
