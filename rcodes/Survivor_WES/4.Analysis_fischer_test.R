@@ -69,10 +69,11 @@ table(cc %in% bim.QC.sjlife.PLP$V2)
 
 raw <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WES_rare_variant//sjlife/all_rare_variants_maf0.01_all_sjlife_recodeA.raw")
 sum(duplicated(raw$IID))
+dim(raw)
 # 0
 # raw <- raw[!(duplicated(raw$IID)),]
 raw <- as.data.frame(raw)
-rownames(raw) <- raw$
+rownames(raw) <- raw$IID
 raw <- raw[,-c(1:6)]
 # HEADER <- colnames(raw)[-c(1:6)]
 HEADER=colnames(raw)
@@ -90,7 +91,12 @@ table(bim.QC.sjlife.PLP$V2 %in% colnames(raw))
 
 ## run fisher exact test with grade 2 or higher ones with clinvar.all
 raw.clinvar.all <- raw[colnames(raw) %in% clinvar.all$SNP ]
+# dim(raw.clinvar.all)
+# [1] 4516 6451
 
-ifelse(rowSums(sjlife.TCAP.PLP.EUR[grepl("chr", colnames(sjlife.TCAP.PLP.EUR))], na.rm = T) > 0, 1, 0)
+raw.clinvar.all$carrier <- ifelse(rowSums(raw.clinvar.all[grepl("chr", colnames(raw.clinvar.all))], na.rm = T) > 0, 1, 0)
+table(raw.clinvar.all$carrier)
+# 0    1 
+# 701 3815 
 
-CTCAE.data.4
+CTCAE.data.4$sjlid %in% raw.clinvar.all$

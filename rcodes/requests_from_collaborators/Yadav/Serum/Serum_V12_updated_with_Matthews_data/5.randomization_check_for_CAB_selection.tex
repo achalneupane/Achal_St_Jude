@@ -1,0 +1,2054 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Distribution of Factors Across Batches},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Distribution of Factors Across Batches}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Set up knitr}
+\NormalTok{knitr}\SpecialCharTok{::}\NormalTok{opts\_chunk}\SpecialCharTok{$}\FunctionTok{set}\NormalTok{(}\AttributeTok{echo =} \ConstantTok{TRUE}\NormalTok{)}
+
+\CommentTok{\# Load the libraries}
+\FunctionTok{library}\NormalTok{(dplyr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'dplyr' was built under R version 4.2.3
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'dplyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'ggplot2' was built under R version 4.2.3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(knitr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'knitr' was built under R version 4.2.3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df }\OtherTok{\textless{}{-}} \FunctionTok{read.table}\NormalTok{(}\StringTok{"Z:/ResearchHome/ClusterHome/aneupane/data/Yadav\_serum/v12\_output/CAB\_randomized\_batch1\_1200\_samples/Re\_ SJLIFE samples for proteomics\_metabolomics experiments/Output\_for\_Experiment\_Design\_\_v0.0.1.txt"}\NormalTok{, }\AttributeTok{header =}\NormalTok{ T, }\AttributeTok{sep =} \StringTok{"}\SpecialCharTok{\textbackslash{}t}\StringTok{"}\NormalTok{)}
+\NormalTok{df }\OtherTok{\textless{}{-}}\NormalTok{ df[}\SpecialCharTok{!}\FunctionTok{grepl}\NormalTok{(}\StringTok{"IR"}\NormalTok{, df}\SpecialCharTok{$}\NormalTok{sampleID),]}
+
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{batchID }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{batchID, }\AttributeTok{levels =} \FunctionTok{unique}\NormalTok{(}\FunctionTok{c}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{batchID)))}
+
+\CommentTok{\# 1. Check distribution of factor1 across batches}
+\NormalTok{factor1\_batch\_table }\OtherTok{\textless{}{-}} \FunctionTok{table}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{factor1, df}\SpecialCharTok{$}\NormalTok{batchID)}
+\CommentTok{\# print(factor1\_batch\_table)}
+\FunctionTok{kable}\NormalTok{(factor1\_batch\_table, }\AttributeTok{caption =} \StringTok{"Distribution of Factor 1 Across Batches"}\NormalTok{, }\AttributeTok{format =} \StringTok{"markdown"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0352}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0107}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0107}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0107}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0107}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0107}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0107}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0107}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0107}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0107}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0122}}@{}}
+\caption{Distribution of Factor 1 Across Batches}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch1
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch2
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch3
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch4
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch5
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch6
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch7
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch8
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch9
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch10
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch11
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch12
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch13
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch14
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch15
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch16
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch17
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch18
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch19
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch20
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch21
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch22
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch23
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch24
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch25
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch26
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch27
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch28
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch29
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch30
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch31
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch32
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch33
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch34
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch35
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch36
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch37
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch38
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch39
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch40
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch41
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch42
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch43
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch44
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch45
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch46
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch47
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch48
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch49
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch50
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch51
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch52
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch53
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch54
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch55
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch56
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch57
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch58
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch59
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch60
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch61
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch62
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch63
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch64
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch65
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch66
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch67
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch68
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch69
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch70
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch71
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch72
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch73
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch74
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch75
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch76
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch77
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch78
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch79
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch80
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch1
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch2
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch3
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch4
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch5
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch6
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch7
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch8
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch9
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch10
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch11
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch12
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch13
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch14
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch15
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch16
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch17
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch18
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch19
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch20
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch21
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch22
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch23
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch24
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch25
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch26
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch27
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch28
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch29
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch30
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch31
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch32
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch33
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch34
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch35
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch36
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch37
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch38
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch39
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch40
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch41
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch42
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch43
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch44
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch45
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch46
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch47
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch48
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch49
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch50
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch51
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch52
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch53
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch54
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch55
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch56
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch57
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch58
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch59
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch60
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch61
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch62
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch63
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch64
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch65
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch66
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch67
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch68
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch69
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch70
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch71
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch72
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch73
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch74
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch75
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch76
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch77
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch78
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch79
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch80
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+100\_community\_controls & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2
+& 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1
+& 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1
+& 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1
+& 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+171\_CMP\_cases & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2
+& 2 & 2 & 2 & 2 & 2 & 2 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 2
+& 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2
+& 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2
+& 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 \\
+200\_Hodgkin\_lymphoma & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 &
+2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 &
+2 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 &
+3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 3 &
+3 & 3 & 3 & 3 & 3 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 \\
+729\_non\_Hodgkin & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 &
+9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 &
+9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 &
+9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 &
+9 & 9 & 9 & 9 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ggplot2)}
+
+\CommentTok{\# Creating proportional table for each factor}
+\DocumentationTok{\#\# Factor 1}
+\NormalTok{prop\_table }\OtherTok{\textless{}{-}} \FunctionTok{prop.table}\NormalTok{(factor1\_batch\_table, }\AttributeTok{margin =} \DecValTok{2}\NormalTok{)}
+\CommentTok{\# Convert to a data frame for ggplot2}
+\NormalTok{prop\_df }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{as.table}\NormalTok{(prop\_table))}
+\FunctionTok{colnames}\NormalTok{(prop\_df) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Factor1"}\NormalTok{, }\StringTok{"Batch"}\NormalTok{, }\StringTok{"Proportion"}\NormalTok{)}
+
+\CommentTok{\# Create the stacked bar plot}
+\NormalTok{f1 }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(prop\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ Batch, }\AttributeTok{y =}\NormalTok{ Proportion, }\AttributeTok{fill =}\NormalTok{ Factor1)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat =} \StringTok{"identity"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Proportion of Selection{-}group Across Batches"}\NormalTok{, }\AttributeTok{x =} \StringTok{"Batch"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Proportion"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{90}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+\NormalTok{f1}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{5.randomization_check_for_CAB_selection_files/figure-latex/setup-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 2. Check distribution of factor2 across batches}
+\NormalTok{factor2\_batch\_table }\OtherTok{\textless{}{-}} \FunctionTok{table}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{factor2, df}\SpecialCharTok{$}\NormalTok{batchID)}
+\CommentTok{\# print(factor2\_batch\_table)}
+\FunctionTok{kable}\NormalTok{(factor2\_batch\_table, }\AttributeTok{caption =} \StringTok{"Distribution of Factor 2 Across Batches"}\NormalTok{, }\AttributeTok{format =} \StringTok{"markdown"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}@{}}
+\caption{Distribution of Factor 2 Across Batches}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch1
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch2
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch3
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch4
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch5
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch6
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch7
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch8
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch9
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch10
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch11
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch12
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch13
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch14
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch15
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch16
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch17
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch18
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch19
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch20
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch21
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch22
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch23
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch24
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch25
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch26
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch27
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch28
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch29
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch30
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch31
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch32
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch33
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch34
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch35
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch36
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch37
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch38
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch39
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch40
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch41
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch42
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch43
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch44
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch45
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch46
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch47
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch48
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch49
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch50
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch51
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch52
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch53
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch54
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch55
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch56
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch57
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch58
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch59
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch60
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch61
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch62
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch63
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch64
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch65
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch66
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch67
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch68
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch69
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch70
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch71
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch72
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch73
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch74
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch75
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch76
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch77
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch78
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch79
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch80
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch1
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch2
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch3
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch4
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch5
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch6
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch7
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch8
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch9
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch10
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch11
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch12
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch13
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch14
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch15
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch16
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch17
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch18
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch19
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch20
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch21
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch22
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch23
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch24
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch25
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch26
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch27
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch28
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch29
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch30
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch31
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch32
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch33
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch34
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch35
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch36
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch37
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch38
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch39
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch40
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch41
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch42
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch43
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch44
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch45
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch46
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch47
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch48
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch49
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch50
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch51
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch52
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch53
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch54
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch55
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch56
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch57
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch58
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch59
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch60
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch61
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch62
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch63
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch64
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch65
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch66
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch67
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch68
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch69
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch70
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch71
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch72
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch73
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch74
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch75
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch76
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch77
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch78
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch79
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch80
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Female & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 &
+9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 &
+9 & 8 & 8 & 8 & 8 & 7 & 7 & 7 & 7 & 7 & 7 & 7 & 7 & 7 & 7 & 7 & 7 & 7 &
+7 & 7 & 7 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 5 & 5 & 5 & 5 &
+5 & 5 & 5 & 5 & 5 & 5 & 5 & 5 & 5 & 5 \\
+Male & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6
+& 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6 & 6
+& 7 & 7 & 7 & 7 & 8 & 8 & 8 & 8 & 8 & 8 & 8 & 8 & 8 & 8 & 8 & 8 & 8 & 8
+& 8 & 8 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 9 & 10 & 10 & 10 & 10
+& 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\# Factor 2}
+\NormalTok{prop\_table }\OtherTok{\textless{}{-}} \FunctionTok{prop.table}\NormalTok{(factor2\_batch\_table, }\AttributeTok{margin =} \DecValTok{2}\NormalTok{)}
+\CommentTok{\# Convert to a data frame for ggplot2}
+\NormalTok{prop\_df }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{as.table}\NormalTok{(prop\_table))}
+\FunctionTok{colnames}\NormalTok{(prop\_df) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Factor2"}\NormalTok{, }\StringTok{"Batch"}\NormalTok{, }\StringTok{"Proportion"}\NormalTok{)}
+
+\CommentTok{\# Create the stacked bar plot}
+\NormalTok{f2 }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(prop\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ Batch, }\AttributeTok{y =}\NormalTok{ Proportion, }\AttributeTok{fill =}\NormalTok{ Factor2)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat =} \StringTok{"identity"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Proportion of Sex Across Batches"}\NormalTok{, }\AttributeTok{x =} \StringTok{"Batch"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Proportion"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{90}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+\NormalTok{f2}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{5.randomization_check_for_CAB_selection_files/figure-latex/setup-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 3. Check distribution of factor3 across batches}
+\NormalTok{factor3\_batch\_table }\OtherTok{\textless{}{-}} \FunctionTok{table}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{factor3, df}\SpecialCharTok{$}\NormalTok{batchID)}
+\CommentTok{\# print(factor3\_batch\_table)}
+\FunctionTok{kable}\NormalTok{(factor3\_batch\_table, }\AttributeTok{caption =} \StringTok{"Distribution of Factor 3 Across Batches"}\NormalTok{, }\AttributeTok{format =} \StringTok{"markdown"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0125}}@{}}
+\caption{Distribution of Factor 3 Across Batches}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch1
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch2
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch3
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch4
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch5
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch6
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch7
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch8
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch9
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch10
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch11
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch12
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch13
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch14
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch15
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch16
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch17
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch18
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch19
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch20
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch21
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch22
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch23
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch24
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch25
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch26
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch27
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch28
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch29
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch30
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch31
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch32
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch33
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch34
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch35
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch36
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch37
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch38
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch39
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch40
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch41
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch42
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch43
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch44
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch45
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch46
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch47
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch48
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch49
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch50
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch51
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch52
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch53
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch54
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch55
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch56
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch57
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch58
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch59
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch60
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch61
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch62
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch63
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch64
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch65
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch66
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch67
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch68
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch69
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch70
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch71
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch72
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch73
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch74
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch75
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch76
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch77
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch78
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch79
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch80
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch1
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch2
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch3
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch4
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch5
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch6
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch7
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch8
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch9
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch10
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch11
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch12
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch13
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch14
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch15
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch16
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch17
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch18
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch19
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch20
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch21
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch22
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch23
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch24
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch25
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch26
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch27
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch28
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch29
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch30
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch31
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch32
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch33
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch34
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch35
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch36
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch37
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch38
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch39
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch40
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch41
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch42
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch43
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch44
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch45
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch46
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch47
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch48
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch49
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch50
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch51
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch52
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch53
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch54
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch55
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch56
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch57
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch58
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch59
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch60
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch61
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch62
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch63
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch64
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch65
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch66
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch67
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch68
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch69
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch70
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch71
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch72
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch73
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch74
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch75
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch76
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch77
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch78
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch79
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch80
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+(24,30{]} & 5 & 2 & 2 & 2 & 2 & 5 & 5 & 4 & 3 & 4 & 4 & 2 & 3 & 5 & 0 &
+4 & 3 & 5 & 3 & 3 & 3 & 6 & 1 & 5 & 3 & 3 & 3 & 3 & 2 & 1 & 2 & 4 & 7 &
+4 & 2 & 5 & 1 & 4 & 4 & 2 & 4 & 3 & 3 & 2 & 5 & 5 & 3 & 3 & 4 & 2 & 5 &
+3 & 6 & 4 & 3 & 6 & 2 & 3 & 4 & 3 & 4 & 5 & 6 & 3 & 2 & 5 & 3 & 3 & 5 &
+3 & 2 & 3 & 5 & 2 & 2 & 2 & 2 & 2 & 6 & 5 \\
+(30,36{]} & 5 & 5 & 4 & 5 & 2 & 2 & 5 & 3 & 4 & 4 & 4 & 4 & 5 & 4 & 4 &
+3 & 5 & 1 & 4 & 6 & 6 & 2 & 5 & 2 & 2 & 4 & 6 & 4 & 3 & 5 & 3 & 4 & 1 &
+5 & 3 & 3 & 4 & 3 & 4 & 1 & 2 & 2 & 4 & 5 & 5 & 2 & 3 & 5 & 6 & 4 & 5 &
+4 & 4 & 4 & 0 & 1 & 3 & 6 & 1 & 1 & 3 & 4 & 4 & 6 & 5 & 4 & 3 & 6 & 2 &
+4 & 4 & 3 & 4 & 3 & 3 & 6 & 4 & 5 & 3 & 1 \\
+(36,42{]} & 2 & 2 & 4 & 4 & 0 & 3 & 2 & 3 & 1 & 1 & 2 & 0 & 2 & 3 & 2 &
+1 & 2 & 3 & 1 & 1 & 2 & 3 & 1 & 3 & 3 & 1 & 2 & 4 & 6 & 4 & 3 & 0 & 3 &
+2 & 0 & 3 & 2 & 3 & 3 & 4 & 1 & 2 & 2 & 2 & 1 & 3 & 3 & 1 & 0 & 1 & 2 &
+3 & 2 & 2 & 2 & 5 & 4 & 2 & 1 & 3 & 2 & 1 & 1 & 3 & 3 & 4 & 6 & 3 & 2 &
+2 & 1 & 3 & 2 & 1 & 3 & 2 & 2 & 2 & 1 & 2 \\
+(42,48{]} & 1 & 2 & 0 & 1 & 3 & 1 & 0 & 2 & 1 & 0 & 1 & 2 & 2 & 1 & 1 &
+2 & 1 & 1 & 1 & 1 & 0 & 1 & 1 & 0 & 0 & 2 & 1 & 0 & 0 & 1 & 1 & 3 & 0 &
+0 & 3 & 1 & 3 & 1 & 1 & 2 & 2 & 1 & 3 & 2 & 1 & 3 & 0 & 2 & 1 & 5 & 1 &
+4 & 2 & 2 & 2 & 2 & 2 & 3 & 2 & 2 & 2 & 0 & 1 & 0 & 0 & 0 & 2 & 0 & 1 &
+2 & 0 & 4 & 1 & 1 & 2 & 1 & 0 & 1 & 0 & 2 \\
+(48,54{]} & 0 & 0 & 1 & 0 & 3 & 0 & 1 & 0 & 2 & 0 & 0 & 3 & 0 & 0 & 2 &
+0 & 1 & 1 & 0 & 0 & 0 & 0 & 2 & 0 & 1 & 2 & 1 & 0 & 0 & 1 & 0 & 0 & 1 &
+1 & 0 & 1 & 2 & 2 & 0 & 3 & 0 & 2 & 0 & 1 & 0 & 0 & 1 & 0 & 2 & 1 & 0 &
+0 & 0 & 0 & 1 & 0 & 0 & 0 & 2 & 1 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 0 &
+0 & 1 & 1 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+(54,60{]} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 &
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 2 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 &
+0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 &
+0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 &
+0 & 0 & 0 & 0 & 1 & 0 & 0 & 2 & 1 & 0 & 0 \\
+(60,66{]} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 &
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 &
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 &
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 &
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+{[}18,24{]} & 2 & 4 & 4 & 3 & 5 & 4 & 2 & 3 & 4 & 6 & 4 & 4 & 3 & 2 & 6
+& 4 & 3 & 4 & 6 & 4 & 4 & 3 & 5 & 4 & 4 & 3 & 2 & 3 & 3 & 3 & 5 & 4 & 3
+& 3 & 6 & 2 & 3 & 2 & 3 & 3 & 6 & 5 & 3 & 2 & 2 & 2 & 5 & 4 & 2 & 2 & 2
+& 1 & 1 & 3 & 6 & 1 & 4 & 1 & 5 & 4 & 4 & 5 & 3 & 2 & 4 & 2 & 1 & 2 & 5
+& 4 & 7 & 1 & 3 & 6 & 4 & 3 & 4 & 3 & 4 & 4 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\# Factor 3}
+\NormalTok{prop\_table }\OtherTok{\textless{}{-}} \FunctionTok{prop.table}\NormalTok{(factor3\_batch\_table, }\AttributeTok{margin =} \DecValTok{2}\NormalTok{)}
+\CommentTok{\# Convert to a data frame for ggplot2}
+\NormalTok{prop\_df }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{as.table}\NormalTok{(prop\_table))}
+\FunctionTok{colnames}\NormalTok{(prop\_df) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Factor3"}\NormalTok{, }\StringTok{"Batch"}\NormalTok{, }\StringTok{"Proportion"}\NormalTok{)}
+
+\CommentTok{\# Create the stacked bar plot}
+\NormalTok{f3 }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(prop\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ Batch, }\AttributeTok{y =}\NormalTok{ Proportion, }\AttributeTok{fill =}\NormalTok{ Factor3)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat =} \StringTok{"identity"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Proportion of Age Across Batches"}\NormalTok{, }\AttributeTok{x =} \StringTok{"Batch"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Proportion"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{90}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+\NormalTok{f3}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{5.randomization_check_for_CAB_selection_files/figure-latex/setup-3.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 4. Check distribution of factor4 across batches}
+\NormalTok{factor4\_batch\_table }\OtherTok{\textless{}{-}} \FunctionTok{table}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{factor4, df}\SpecialCharTok{$}\NormalTok{batchID)}
+\CommentTok{\# print(factor4\_batch\_table)}
+\FunctionTok{kable}\NormalTok{(factor4\_batch\_table, }\AttributeTok{caption =} \StringTok{"Distribution of Factor 4 Across Batches"}\NormalTok{, }\AttributeTok{format =} \StringTok{"markdown"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0094}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0110}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 160\tabcolsep) * \real{0.0126}}@{}}
+\caption{Distribution of Factor 4 Across Batches}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch1
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch2
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch3
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch4
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch5
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch6
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch7
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch8
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch9
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch10
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch11
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch12
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch13
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch14
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch15
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch16
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch17
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch18
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch19
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch20
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch21
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch22
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch23
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch24
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch25
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch26
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch27
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch28
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch29
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch30
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch31
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch32
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch33
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch34
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch35
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch36
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch37
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch38
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch39
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch40
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch41
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch42
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch43
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch44
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch45
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch46
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch47
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch48
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch49
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch50
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch51
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch52
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch53
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch54
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch55
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch56
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch57
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch58
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch59
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch60
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch61
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch62
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch63
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch64
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch65
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch66
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch67
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch68
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch69
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch70
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch71
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch72
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch73
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch74
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch75
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch76
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch77
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch78
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch79
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch80
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch1
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch2
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch3
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch4
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch5
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch6
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch7
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch8
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch9
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch10
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch11
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch12
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch13
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch14
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch15
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch16
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch17
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch18
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch19
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch20
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch21
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch22
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch23
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch24
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch25
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch26
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch27
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch28
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch29
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch30
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch31
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch32
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch33
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch34
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch35
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch36
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch37
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch38
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch39
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch40
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch41
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch42
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch43
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch44
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch45
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch46
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch47
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch48
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch49
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch50
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch51
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch52
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch53
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch54
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch55
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch56
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch57
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch58
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch59
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch60
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch61
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch62
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch63
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch64
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch65
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch66
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch67
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch68
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch69
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch70
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch71
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch72
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch73
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch74
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch75
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch76
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch77
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch78
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch79
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+batch80
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Black & 1 & 4 & 1 & 4 & 2 & 1 & 2 & 1 & 3 & 3 & 3 & 1 & 4 & 6 & 3 & 3 &
+2 & 1 & 3 & 2 & 4 & 1 & 2 & 3 & 1 & 3 & 3 & 3 & 2 & 3 & 2 & 1 & 1 & 3 &
+1 & 2 & 1 & 1 & 3 & 2 & 2 & 2 & 3 & 1 & 2 & 1 & 3 & 2 & 1 & 2 & 3 & 2 &
+1 & 1 & 3 & 2 & 5 & 2 & 1 & 1 & 2 & 1 & 4 & 2 & 3 & 2 & 1 & 3 & 4 & 4 &
+1 & 3 & 4 & 3 & 1 & 0 & 2 & 3 & 2 & 0 \\
+Other & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 2 & 0 & 1 & 0 & 1 & 0 & 0 & 1 & 0 &
+1 & 1 & 0 & 0 & 0 & 0 & 2 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 1 & 1 & 1 &
+0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 0 &
+0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 1 & 1 & 0 & 1 & 1 & 0 & 0 &
+2 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+White & 14 & 11 & 14 & 11 & 13 & 14 & 12 & 12 & 12 & 11 & 12 & 13 & 11 &
+9 & 11 & 12 & 12 & 13 & 12 & 13 & 11 & 14 & 11 & 11 & 14 & 12 & 12 & 12
+& 13 & 11 & 13 & 13 & 13 & 11 & 14 & 13 & 14 & 13 & 12 & 13 & 13 & 13 &
+12 & 13 & 13 & 13 & 12 & 13 & 14 & 13 & 11 & 13 & 14 & 14 & 12 & 13 & 10
+& 13 & 13 & 14 & 13 & 13 & 11 & 12 & 11 & 13 & 13 & 11 & 11 & 11 & 12 &
+12 & 11 & 11 & 13 & 15 & 13 & 12 & 13 & 15 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\# Factor 4}
+\NormalTok{prop\_table }\OtherTok{\textless{}{-}} \FunctionTok{prop.table}\NormalTok{(factor4\_batch\_table, }\AttributeTok{margin =} \DecValTok{2}\NormalTok{)}
+\CommentTok{\# Convert to a data frame for ggplot2}
+\NormalTok{prop\_df }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{as.table}\NormalTok{(prop\_table))}
+\FunctionTok{colnames}\NormalTok{(prop\_df) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Factor4"}\NormalTok{, }\StringTok{"Batch"}\NormalTok{, }\StringTok{"Proportion"}\NormalTok{)}
+
+\CommentTok{\# Create the stacked bar plot}
+\NormalTok{f4 }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(prop\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ Batch, }\AttributeTok{y =}\NormalTok{ Proportion, }\AttributeTok{fill =}\NormalTok{ Factor4)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat =} \StringTok{"identity"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Proportion of Race Across Batches"}\NormalTok{, }\AttributeTok{x =} \StringTok{"Batch"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Proportion"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{90}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+\NormalTok{f4}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{5.randomization_check_for_CAB_selection_files/figure-latex/setup-4.pdf}
+
+\end{document}
