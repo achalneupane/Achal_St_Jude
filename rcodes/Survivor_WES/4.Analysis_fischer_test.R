@@ -1,3 +1,4 @@
+library(data.table)
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WES_rare_variant/sjlife/phenotype.RData")
 ## 1. clinvar
 clinvar <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/all_new_clinvar_P_LP.txt", header = T, sep = "\t", stringsAsFactors = F)
@@ -64,8 +65,32 @@ cc <- c(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
 bim.QC.sjlife.PLP <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WES_rare_variant//sjlife/all_rare_variants_maf0.01_all_sjlife.bim")
 table(cc %in% bim.QC.sjlife.PLP$V2)
 # FALSE  TRUE 
-# 16818 29258 
+# 16818 29254
 
 raw <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WES_rare_variant//sjlife/all_rare_variants_maf0.01_all_sjlife_recodeA.raw")
+sum(duplicated(raw$IID))
+# 0
+# raw <- raw[!(duplicated(raw$IID)),]
+raw <- as.data.frame(raw)
+rownames(raw) <- raw$
+raw <- raw[,-c(1:6)]
+# HEADER <- colnames(raw)[-c(1:6)]
+HEADER=colnames(raw)
+HEADER = sub(pattern="_[T,A,G,C,*]+",replacement="",HEADER)
+HEADER = gsub(pattern=";rs\\d+",replacement="",HEADER)
+HEADER = gsub("._...DEL", "",HEADER)
+HEADER = gsub("....DEL.", ".<*:DEL>",HEADER)
+HEADER = gsub("\\.", ":", HEADER)
+colnames(raw) <- HEADER
+table(bim.QC.sjlife.PLP$V2 %in% colnames(raw))
+# TRUE 
+# 29254 
+# colnames(raw)[!colnames(raw) %in% bim.QC.sjlife.PLP$V2]
+
+
+## run fisher exact test with grade 2 or higher ones with clinvar.all
+raw.clinvar.all <- raw[colnames(raw) %in% clinvar.all$SNP ]
+
+ifelse(rowSums(sjlife.TCAP.PLP.EUR[grepl("chr", colnames(sjlife.TCAP.PLP.EUR))], na.rm = T) > 0, 1, 0)
 
 CTCAE.data.4
