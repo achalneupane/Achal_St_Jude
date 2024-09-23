@@ -1,0 +1,157 @@
+# Load required packages
+library(shiny)
+library(ggplot2)
+
+# Define UI for the CMP prediction app
+ui <- fluidPage(
+  titlePanel("CMP Risk Prediction Model"),
+  
+  sidebarLayout(
+    sidebarPanel(
+      selectInput("age_diagnosis", "Age at Primary Diagnosis (years):",
+                  choices = list("≤5" = "5", ">5-10" = "5_10", ">10-15" = "10_15", ">15" = "15")),
+      selectInput("sex", "Sex:", choices = list("Female" = "female", "Male" = "male")),
+      selectInput("anthracycline", "Cumulative Anthracycline Dose (mg/m2):",
+                  choices = list("None" = "none", ">0-100" = "0_100", ">100-250" = "100_250", ">250" = "250")),
+      selectInput("radiation", "Mean Heart Radiation Dose (Gray):",
+                  choices = list("None" = "none", ">5" = "5", ">5-15" = "5_15", ">15-35" = "15_35", ">35" = "35")),
+      selectInput("age_baseline", "Age at Baseline (years):",
+                  choices = list("≤25" = "25", ">25-35" = "25_35", ">35-45" = "35_45", ">45" = "45")),
+      selectInput("hypertension", "Hypertension:", choices = list("No" = "no", "Yes" = "yes")),
+      selectInput("ancestry", "Genetic Ancestry:",
+                  choices = list("European" = "european", "African" = "african", "Others" = "others")),
+      selectInput("pr_score", "Polygenic Risk Scores:",
+                  choices = list("Hypertrophic cardiomyopathy" = "hcm", "Left ventricular end-systolic volume index" = "lv_esvi"))
+    ),
+    
+    mainPanel(
+      h3("Predicted CMP Risk"),
+      textOutput("risk_output"),
+      uiOutput("risk_level"),
+      plotOutput("risk_plot")
+    )
+  )
+)
+
+# Define server logic for CMP risk prediction
+server <- function(input, output) {
+  
+  # Function to calculate risk based on inputs
+  calculate_risk <- function() {
+    # Coefficients from the provided table (log(RR))
+    coeffs <- list(
+      "age_diagnosis" = c("5" = 0, "5_10" = -0.0382, "10_15" = -0.1181, "15" = -0.2631),
+      "sex" = c("female" = 0, "male" = 0.4457),
+      "anthracycline" = c("none" = 0, "0_100" = -0.0157, "100_250" = 0.9204, "250" = 1.7179),
+      "radiation" = c("none" = 0, "5" = -0.1228, "5_15" = 0.3428, "15_35" = 0.9745, "35" = 2.818),
+      "age_baseline" = c("25" = 0, "25_35" = 0.1775, "35_45" = 0.6221, "45" = 0.9118),
+      "hypertension" = c("no" = 0, "yes" = 0.8247),
+      "ancestry" = c("european" = 0, "african" = 0.6572, "others" = -0.5715),
+      "pr_score" = c("hcm" = -0.1316, "lv_esvi" = 0.1361)
+    )
+    
+    # Retrieve the relevant coefficients
+    age_diagnosis_coeff <- coeffs$age_diagnosis[[input$age_diagnosis]]
+    sex_coeff <- coeffs$sex[[input$sex]]
+    anthracycline_coeff <- coeffs$anthracycline[[input$anthracycline]]
+    radiation_coeff <- coeffs$radiation[[input$radiation]]
+    age_baseline_coeff <- coeffs$age_baseline[[input$age_baseline]]
+    hypertension_coeff <- coeffs$hypertension[[input$hypertension]]
+    ancestry_coeff <- coeffs$ancestry[[input$ancestry]]
+    pr_score_coeff <- coeffs$pr_score[[input$pr_score]]
+    
+    # Calculate the overall log risk, starting from the intercept
+    log_risk <- -4.7265 + age_diagnosis_coeff + sex_coeff + anthracycline_coeff +
+      radiation_coeff + age_baseline_coeff + hypertension_coeff +
+      ancestry_coeff + pr_score_coeff
+    
+    # Convert log risk back to relative risk (RR)
+    risk <- exp(log_risk)
+    return(risk)
+  }
+  
+  # Calculate the risk for the selected inputs
+  output$risk_output <- renderText({
+    risk <- calculate_risk()
+    paste("The predicted relative risk is: ", round(risk, 2))
+  })
+  
+  # Display risk level based on predicted risk
+  output$risk_level <- renderUI({
+    risk <- calculate_risk()
+    
+    if (risk < 1.5) {
+      tagList(span("Predicted risk level: Low", style = "color: green;"))
+    } else if (risk < 3.0) {
+      tagList(span("Predicted risk level: Moderate", style = "color: orange;"))
+    } else {
+      tagList(span("Predicted risk level: High", style = "color: red;"))
+    }
+  })
+  
+  # Plot the risk across different age stages
+  output$risk_plot <- renderPlot({
+    # Define the age stages
+    age_stages <- c("5", "5_10", "10_15", "15")
+    
+    # Calculate risks for each stage
+    risks <- sapply(age_stages, function(stage) {
+      local_age_diagnosis <- stage
+      coeffs <- list(
+        "age_diagnosis" = c("5" = 0, "5_10" = -0.0382, "10_15" = -0.1181, "15" = -0.2631),
+        "sex" = c("female" = 0, "male" = 0.4457),
+        "anthracycline" = c("none" = 0, "0_100" = -0.0157, "100_250" = 0.9204, "250" = 1.7179),
+        "radiation" = c("none" = 0, "5" = -0.1228, "5_15" = 0.3428, "15_35" = 0.9745, "35" = 2.818),
+        "age_baseline" = c("25" = 0, "25_35" = 0.1775, "35_45" = 0.6221, "45" = 0.9118),
+        "hypertension" = c("no" = 0, "yes" = 0.8247),
+        "ancestry" = c("european" = 0, "african" = 0.6572, "others" = -0.5715),
+        "pr_score" = c("hcm" = -0.1316, "lv_esvi" = 0.1361)
+      )
+      
+      age_diagnosis_coeff <- coeffs$age_diagnosis[[local_age_diagnosis]]
+      sex_coeff <- coeffs$sex[[input$sex]]
+      anthracycline_coeff <- coeffs$anthracycline[[input$anthracycline]]
+      radiation_coeff <- coeffs$radiation[[input$radiation]]
+      age_baseline_coeff <- coeffs$age_baseline[[input$age_baseline]]
+      hypertension_coeff <- coeffs$hypertension[[input$hypertension]]
+      ancestry_coeff <- coeffs$ancestry[[input$ancestry]]
+      pr_score_coeff <- coeffs$pr_score[[input$pr_score]]
+      
+      log_risk <- -4.7265 + age_diagnosis_coeff + sex_coeff + anthracycline_coeff +
+        radiation_coeff + age_baseline_coeff + hypertension_coeff +
+        ancestry_coeff + pr_score_coeff
+      
+      risk <- exp(log_risk)
+      return(risk)
+    })
+    
+    # Create a data frame for plotting
+    risk_data <- data.frame(
+      Age_Stage = c("≤5", ">5-10", ">10-15", ">15"),
+      Risk = risks
+    )
+    
+    # Fixed limits for y-axis (can be adjusted as needed)
+    y_min <- 0
+    y_max <- 50  # Adjust this value based on the expected maximum relative risk
+    
+    # Fancy plot with custom colors
+    ggplot(risk_data, aes(x = Age_Stage, y = Risk, fill = Age_Stage)) +
+      geom_bar(stat = "identity", color = "black", size = 0.5) +
+      scale_fill_manual(values = c("#3498DB", "#9B59B6", "#E74C3C", "#2ECC71")) +
+      scale_y_log10(limits = c(1, 100), breaks = c(1, 10, 100)) +  # Set y-axis limits and breaks
+      theme_minimal() +
+      labs(title = "Predicted Risk Across Age Stages", x = "Age Stage", y = "Relative Risk") +
+      theme(
+        plot.title = element_text(size = 20, face = "bold", hjust = 0.5),
+        axis.text.x = element_text(size = 14),
+        axis.text.y = element_text(size = 14),
+        axis.title = element_text(size = 16)
+      ) +
+      ylim(y_min, y_max) +  # Fixed y-axis limit
+      geom_text(aes(label = round(Risk, 2)), vjust = -0.5, size = 5)
+  })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server)

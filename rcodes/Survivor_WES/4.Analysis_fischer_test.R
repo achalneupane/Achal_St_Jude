@@ -9,11 +9,17 @@ clinvar$AF <- as.numeric(clinvar$AF)
 clinvar$AF_nfe <- as.numeric(clinvar$AF_nfe)
 clinvar$AF_afr <- as.numeric(clinvar$AF_afr)
 
+# MAF <- 0.01
+MAF <- 0.0001
+
+## Raw file maf
+MAFname <- format(as.numeric(MAF), scientific = FALSE, digits = 5)
+MAFname <- "" # no MAF filter in raw
 
 # make rare; .all is based on allee frequency from gnomAD global population; .eur is gnomAD EUR_nfe; .afr is gnomAD AFR
-clinvar.all <- clinvar[which(clinvar$AF <0.01),]
-clinvar.eur <- clinvar[which(clinvar$AF <0.01 & clinvar$AF_nfe < 0.01),]
-clinvar.afr <- clinvar[which(clinvar$AF <0.01 & clinvar$AF_afr < 0.01),]
+clinvar.all <- clinvar[which(clinvar$AF < MAF),]
+clinvar.eur <- clinvar[which(clinvar$AF < MAF & clinvar$AF_nfe <  MAF),]
+clinvar.afr <- clinvar[which(clinvar$AF < MAF & clinvar$AF_afr <  MAF),]
 
 
 loftee <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/loftee/loftee_HC_all_chr_with_gnomad.txt", header = T, sep = "\t", stringsAsFactors = F)
@@ -35,9 +41,9 @@ loftee$CHROM  <- sub("([0-9XY]+):.+", "\\1", loftee$SNP)
 loftee$POS <- sub("chr[0-9XY]+:(\\d+):.+", "\\1", loftee$SNP)
 
 # make rare
-loftee.all <- loftee[which(loftee$AF <0.01),]
-loftee.eur <- loftee[which(loftee$AF <0.01 & loftee$AF_nfe < 0.01),]
-loftee.afr <- loftee[which(loftee$AF <0.01 & loftee$AF_afr < 0.01),]
+loftee.all <- loftee[which(loftee$AF < MAF),]
+loftee.eur <- loftee[which(loftee$AF < MAF & loftee$AF_nfe <  MAF),]
+loftee.afr <- loftee[which(loftee$AF < MAF & loftee$AF_afr <  MAF),]
 
 
 snpeff <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/missense_variants_with_overlap_in_more_than_90_percent_of_prediction_tools_all_cols.txt", header = T, sep = "\t", stringsAsFactors = F)
@@ -51,26 +57,29 @@ snpeff$AF_afr <- as.numeric(snpeff$AF_afr)
 
 
 # make rare
-snpeff.all <- snpeff[which(snpeff$AF <0.01),]
-snpeff.eur <- snpeff[which(snpeff$AF <0.01 & snpeff$AF_nfe < 0.01),]
-snpeff.afr <- snpeff[which(snpeff$AF <0.01 & snpeff$AF_afr < 0.01),]
+snpeff.all <- snpeff[which(snpeff$AF < MAF),]
+snpeff.eur <- snpeff[which(snpeff$AF < MAF & snpeff$AF_nfe <  MAF),]
+snpeff.afr <- snpeff[which(snpeff$AF < MAF & snpeff$AF_afr <  MAF),]
 
 
 cc <- as.data.frame(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
 dim(cc)
-# 46076
-
+# 46076 
+# 
 cc <- c(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
 
-bim.QC.sjlife.PLP <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WES_rare_variant//sjlife/all_rare_variants_maf0.01_all_sjlife.bim")
+bim.QC.sjlife.PLP <- fread(paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WES_rare_variant//sjlife/all_rare_variants", MAFname,"_all_sjlife.bim"))
 table(cc %in% bim.QC.sjlife.PLP$V2)
 # FALSE  TRUE 
-# 16818 29254
+# 16818 29254 # maf 0.01
+# 34256 11820 # maf 0.0001
 
-raw <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WES_rare_variant//sjlife/all_rare_variants_maf0.01_all_sjlife_recodeA.raw")
+raw <- fread(paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WES_rare_variant//sjlife/all_rare_variants", MAFname,"_all_sjlife_recodeA.raw"))
 sum(duplicated(raw$IID))
-dim(raw)
 # 0
+dim(raw)
+# 4516 11826 # maf 0.0001
+
 # raw <- raw[!(duplicated(raw$IID)),]
 raw <- as.data.frame(raw)
 rownames(raw) <- raw$IID
@@ -85,18 +94,130 @@ HEADER = gsub("\\.", ":", HEADER)
 colnames(raw) <- HEADER
 table(bim.QC.sjlife.PLP$V2 %in% colnames(raw))
 # TRUE 
-# 29254 
+# 29254 # maf 0.01
+# 11820 # maf 0.0001
 # colnames(raw)[!colnames(raw) %in% bim.QC.sjlife.PLP$V2]
-
+raw$IID <- rownames(raw)
 
 ## run fisher exact test with grade 2 or higher ones with clinvar.all
-raw.clinvar.all <- raw[colnames(raw) %in% clinvar.all$SNP ]
-# dim(raw.clinvar.all)
-# [1] 4516 6451
+raw.clinvar.all <- raw[colnames(raw) %in% c("IID", clinvar.all$SNP) ]
+dim(raw.clinvar.all)
+# 4516 6452 # maf 0.01
+# 4516 2144 # maf 0.0001
 
 raw.clinvar.all$carrier <- ifelse(rowSums(raw.clinvar.all[grepl("chr", colnames(raw.clinvar.all))], na.rm = T) > 0, 1, 0)
 table(raw.clinvar.all$carrier)
 # 0    1 
-# 701 3815 
+# 598 3918 
 
-CTCAE.data.4$sjlid %in% raw.clinvar.all$
+CTCAE.data.4 <- CTCAE.data.4[CTCAE.data.4$sjlid %in% raw.clinvar.all$IID,]
+CTCAE.data.4$carrier <- raw.clinvar.all$carrier[match(CTCAE.data.4$sjlid, raw.clinvar.all$IID)]
+
+table(CTCAE.data.4$carrier)
+
+##########################################################
+## run fisher's exact test for grade greater than zero! ##
+##########################################################
+# Create an empty dataframe to store the results
+results <- data.frame(variable = character(),
+                      pvalue = numeric(),
+                      OR.CI = character(),
+                      stringsAsFactors = FALSE)
+
+# Loop over all columns that end with '_status_gt_0'
+for (col_name in names(CTCAE.data.4)) {
+  if (grepl("_status_gt_0$", col_name)) {
+    
+    # Try to apply Fisher's test for each column with carrier
+    tryCatch({
+      gene.test <- fisher.test(table(CTCAE.data.4[[col_name]], CTCAE.data.4$carrier))
+      pvalue <- gene.test$p.value
+      OR.CI <- paste0(round(gene.test$estimate, 2), " (", 
+                      paste0(round(gene.test$conf.int, 2), collapse = "-"), ")")
+    }, error = function(e) {
+      pvalue <- NA
+      OR.CI <- NA
+    })
+    
+    # Append the result to the dataframe
+    results <- rbind(results, data.frame(variable = col_name,
+                                         pvalue = pvalue,
+                                         OR.CI = OR.CI,
+                                         stringsAsFactors = FALSE))
+  }
+}
+
+# View the final results
+print(results)
+
+
+#########################################################
+## run fisher's exact test for grade greater than two! ##
+#########################################################
+# Create an empty dataframe to store the results
+results <- data.frame(variable = character(),
+                      pvalue = numeric(),
+                      OR.CI = character(),
+                      stringsAsFactors = FALSE)
+
+# Loop over all columns that end with '_status_gt_2'
+for (col_name in names(CTCAE.data.4)) {
+  if (grepl("_status_gt_2$", col_name)) {
+    
+    # Try to apply Fisher's test for each column with carrier
+    tryCatch({
+      gene.test <- fisher.test(table(CTCAE.data.4[[col_name]], CTCAE.data.4$carrier))
+      pvalue <- gene.test$p.value
+      OR.CI <- paste0(round(gene.test$estimate, 2), " (", 
+                      paste0(round(gene.test$conf.int, 2), collapse = "-"), ")")
+    }, error = function(e) {
+      pvalue <- NA
+      OR.CI <- NA
+    })
+    
+    # Append the result to the dataframe
+    results <- rbind(results, data.frame(variable = col_name,
+                                         pvalue = pvalue,
+                                         OR.CI = OR.CI,
+                                         stringsAsFactors = FALSE))
+  }
+}
+
+# View the final results
+print(results)
+
+
+###########################################################
+## run fisher's exact test for grade greater than three! ##
+###########################################################
+# Create an empty dataframe to store the results
+results <- data.frame(variable = character(),
+                      pvalue = numeric(),
+                      OR.CI = character(),
+                      stringsAsFactors = FALSE)
+
+# Loop over all columns that end with '_status_gt_3'
+for (col_name in names(CTCAE.data.4)) {
+  if (grepl("_status_gt_3$", col_name)) {
+    
+    # Try to apply Fisher's test for each column with carrier
+    tryCatch({
+      gene.test <- fisher.test(table(CTCAE.data.4[[col_name]], CTCAE.data.4$carrier))
+      pvalue <- gene.test$p.value
+      OR.CI <- paste0(round(gene.test$estimate, 2), " (", 
+                      paste0(round(gene.test$conf.int, 2), collapse = "-"), ")")
+    }, error = function(e) {
+      pvalue <- NA
+      OR.CI <- NA
+    })
+    
+    # Append the result to the dataframe
+    results <- rbind(results, data.frame(variable = col_name,
+                                         pvalue = pvalue,
+                                         OR.CI = OR.CI,
+                                         stringsAsFactors = FALSE))
+  }
+}
+
+# View the final results
+print(results)
