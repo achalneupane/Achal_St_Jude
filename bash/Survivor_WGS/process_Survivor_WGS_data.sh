@@ -45,10 +45,10 @@ WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Surv
 ## Per-sample missingness, using the GIANT VCF file
 ## This command is used to calculate the per-sample and per-variant missingness in a large VCF file (chrALL.Survivor_WGS.GATK4180.hg38.vcf.gz) using PLINK. It runs on a high-performance computing (HPC) cluster, utilizing 100 threads to expedite the process. The job is submitted to the priority queue with a high memory allocation (200000 MB) to handle the large dataset. The output, which will include detailed statistics on missing genotypes, is directed to a specified file (QC/chrALL.Survivor_WGS.GATK4180.hg38_missingness). The purpose of this analysis is to identify and quantify the extent of missing data, which is crucial for ensuring data quality and informing further steps in the analysis pipeline, such as filtering out low-quality samples or variants.
 bsub -q priority -P SurvivorGWAS -J missing -eo log/missing.err -oo log/missing.out -R "rusage[mem=200000]" "plink --nonfounders \
- --vcf chrALL.Survivor_WGS.GATK4180.hg38_renamed.vcf.gz \
+ --vcf VCF_original/chrALL.Survivor_WGS.GATK4180.hg38_renamed.vcf.gz \
  --threads 100 \
  --missing \
- --out QC/chrALL.Survivor_WGS.GATK4180.hg38_missingness"
+ --out QC/chrALL.Survivor_WGS.GATK4180.hg38_missingness2"
 awk 'FNR==1 || $6 > 0.05 {print $1"_"$2}' QC/chrALL.Survivor_WGS.GATK4180.hg38_missingness.imiss > QC/chrALL.Survivor_WGS.GATK4180.hg38_missingness.imiss.0.05plus
 
 

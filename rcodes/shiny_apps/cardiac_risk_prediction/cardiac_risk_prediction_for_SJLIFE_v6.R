@@ -8,8 +8,7 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel(
-      selectInput("age_diagnosis", "Age at Primary Diagnosis (years):",
-                  choices = list("≤5" = "5", ">5-10" = "5_10", ">10-15" = "10_15", ">15" = "15")),
+      numericInput("age_diagnosis", "Age at Primary Diagnosis (years):", value = 0, min = 0, max = 20, step = 1),
       selectInput("sex", "Sex:", choices = list("Female" = "female", "Male" = "male")),
       selectInput("anthracycline", "Cumulative Anthracycline Dose (mg/m2):",
                   choices = list("None" = "none", ">0-100" = "0_100", ">100-250" = "100_250", ">250" = "250")),
@@ -36,6 +35,19 @@ ui <- fluidPage(
 # Define server logic for CMP risk prediction
 server <- function(input, output) {
   
+  # Function to categorize continuous age into ranges
+  categorize_age_diagnosis <- function(age) {
+    if (age <= 5) {
+      return("5")
+    } else if (age > 5 && age <= 10) {
+      return("5_10")
+    } else if (age > 10 && age <= 15) {
+      return("10_15")
+    } else {
+      return("15")
+    }
+  }
+  
   # Function to calculate risk based on inputs
   calculate_risk <- function() {
     # Coefficients from the provided table (log(RR))
@@ -50,8 +62,11 @@ server <- function(input, output) {
       "pr_score" = c("hcm" = -0.1316, "lv_esvi" = 0.1361)
     )
     
+    # Categorize the age diagnosis
+    categorized_age <- categorize_age_diagnosis(input$age_diagnosis)
+    
     # Retrieve the relevant coefficients
-    age_diagnosis_coeff <- coeffs$age_diagnosis[[input$age_diagnosis]]
+    age_diagnosis_coeff <- coeffs$age_diagnosis[[categorized_age]]
     sex_coeff <- coeffs$sex[[input$sex]]
     anthracycline_coeff <- coeffs$anthracycline[[input$anthracycline]]
     radiation_coeff <- coeffs$radiation[[input$radiation]]
@@ -155,3 +170,13 @@ server <- function(input, output) {
 
 # Run the application 
 shinyApp(ui = ui, server = server)
+
+
+
+
+# ## Data check
+# library(readxl)
+# model13 <- read_xlsx("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Papers/Kateryna_CMP_risk_prediction/figure_2_all_new_13.xlsx", sheet = "Model_13")
+# dfgene <- read.table("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Papers/Kateryna_CMP_risk_prediction/df_gene.csv", sep = ",", header = T)
+# dfgene$pred_est <- model13$pred_est[match(dfgene$sjlid, model13$sjlid)]
+

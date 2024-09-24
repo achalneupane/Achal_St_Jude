@@ -58,12 +58,13 @@ cd ${WORKDIR}
 
 VCF="${INPUT_VCF}"
 
-bcftools norm -Ou -m -any ${VCF} \
- | bcftools norm -Ou -f /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/hg38.fa \
- | bcftools annotate -Ob -x ID -I +'%CHROM:%POS:%REF:%ALT' \
- | bcftools view -Oz \
- > ${VCF}.decomposed.vcf.gz
+# bcftools norm -Ou -m -any ${VCF} \
+#  | bcftools norm -Ou -f /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/hg38.fa \
+#  | bcftools annotate -Ob -x ID -I +'%CHROM:%POS:%REF:%ALT' \
+#  | bcftools view -Oz \
+#  > ${VCF}.decomposed.vcf.gz
 
+tabix -p vcf ${VCF}.decomposed.vcf.gz
 
 MAX_HEADER_LINES=5000
 ANNOT_SOURCE="new_${VCF}"; ANNOT_PROJECT="new_${VCF%.*}-annot"

@@ -208,3 +208,57 @@ jw10_1.LMNA <- cbind.data.frame(LMNA.Pos,jw10_1[match(LMNA.Pos$KEY, jw10_1$KEY),
 
 
 write.table(jw10_1.LMNA, "jw10_1.LMNA.geno.txt", sep = "\t", quote = F, row.names = F, col.names = T)
+
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WGS_Northwestern_110_samples/VQSR_ApplyRecalibration_edited/HANA_Northwestern_request")
+Hana.lmna <- read.table("Hana_LMNA_genotype.txt", sep = "\t", header = T)
+
+raw <- read.table("LMNA_WGS_193_recodeA.raw", header = T)
+HEADER = gsub("\\.", ":", sub(pattern="_[T,A,G,C,*]+",replacement="",colnames(raw)))
+HEADER = gsub(pattern=";rs\\d+",replacement="",HEADER)
+colnames(raw) = HEADER
+
+# exclude chr9.84286010.A.G
+raw <- raw[!grepl("FID|PAT|MAT|SEX|PHENOTYPE", colnames(raw))]
+colnames(raw) # check this with the .bim REF and NON-REFERENCE alleles
+
+rownames(raw) <- raw$IID
+raw <- raw[!grepl("IID", colnames(raw))]
+
+
+df.list <- list()
+for (i in 1:ncol(raw)){
+  # i=1
+  df.list.tmp <- raw[i]
+  
+  REF = unlist(strsplit(colnames(df.list.tmp), "\\:"))[3]
+  ALT = unlist(strsplit(colnames(df.list.tmp), "\\:"))[4]
+  
+  df.list.tmp$genotype <- as.character(df.list.tmp[,1])
+  df.list.tmp$genotype <- gsub("0", paste(REF,REF, sep = "/"), df.list.tmp$genotype)
+  df.list.tmp$genotype <- gsub("1", paste(REF,ALT, sep = "/"), df.list.tmp$genotype)
+  df.list.tmp$genotype <- gsub("2", paste(ALT,ALT, sep = "/"), df.list.tmp$genotype)
+  df.list.tmp$samples <- row.names(df.list.tmp)
+  colnames(df.list.tmp)
+  df.list.tmp[1] <- df.list.tmp$genotype
+  df.list.tmp <- df.list.tmp[-2]
+  df.list[[i]] <- df.list.tmp
+}
+
+cc <- Reduce(function(...) merge(..., by= "samples", all.x=T), df.list)
+dd <- as.data.frame(t(cc))
+colnames(dd) <- dd[1,]
+dd$var <- rownames(dd)
+dd <- as.data.frame( dd[-1,])
+rownames(dd) <- NULL
+colnames(dd) <- c("geno", "variant")
+head(dd)
+
+dd$variant <- gsub("::_:", ":*", dd$variant)
+
+table(dd$variant %in% Hana.lmna$SNP_ID)
+# FALSE  TRUE 
+# 4   173 
+dd$variant[!dd$variant %in% Hana.lmna$SNP_ID]
+Hana.lmna$WGS_193 <- dd$geno[match(Hana.lmna$SNP_ID, dd$variant)]
+
+write.table(Hana.lmna, "Hana_LMNA_genotype_with_WGS_193.txt", row.names = F, col.names = T, sep = "\t", quote = F)
