@@ -79,7 +79,7 @@ length(unique(subneo.after5$ccssid))
 library(data.table)
 
 # This will include basal cell, squamous cell and melanoma
-NMSCs <- subneo[which((subneo$nmsc ==1| (subneo$nmsc == 2 & subneo$groupdx3 == "Skin"))),]
+NMSCs <- subneo[which(subneo$nmsc ==1),]
 # cc <- cbind.data.frame(NMSC$KEY, NMSC$nmsc, NMSC$AGE.ANY_SN, NMSC$groupdx3)
 
 subneo.within5 <- NMSCs[NMSCs$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
