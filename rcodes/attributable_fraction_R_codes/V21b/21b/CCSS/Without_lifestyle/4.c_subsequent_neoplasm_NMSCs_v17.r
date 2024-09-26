@@ -73,6 +73,7 @@ library(data.table)
 
 # This will include basal cell, squamous cell and melanoma
 NMSCs <- subneo[which((subneo$nmsc ==1| (subneo$nmsc == 2 & subneo$groupdx3 == "Skin"))),]
+
 # cc <- cbind.data.frame(NMSC$KEY, NMSC$nmsc, NMSC$AGE.ANY_SN, NMSC$groupdx3)
 
 subneo.within5 <- NMSCs[NMSCs$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
@@ -83,6 +84,11 @@ sum(!duplicated(subneo.within5$sjlid))
 NMSCs <- setDT(NMSCs)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
 nrow(NMSCs)
 # 775
+
+NMSCs.saved <- NMSCs
+NMSCs <- NMSCs[,-c(49,52:53)]
+save(NMSCs, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_from_Qi_Liu/NMSCs.RData")
+
 ## Remove SNs if younger than 18 **
 dim(PHENO.ANY_SN)
 # 7943   50
