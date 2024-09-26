@@ -3,6 +3,11 @@ rm(list=ls())
 ## Perform stratified association analysis with top TTN and BAG3 common missense variants
 
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/EUR_common_variants.RData")
+
+## From Kendrick
+sjlife_cmp_data <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Re_A_new_manuscript_on_TTN_BAG3_for_your_review//sjlife_ccm_analysis_dat.rds") # N = 3686
+ccss_cmp_data <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Re_A_new_manuscript_on_TTN_BAG3_for_your_review/ccss_ccm_analysis_dat.rds") 
+
 dat_final <- EUR_common_variants
 dat_final$CMP <- factor(ifelse(dat_final$CMP == 2, 1, 0))
 

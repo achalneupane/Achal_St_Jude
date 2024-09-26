@@ -40,7 +40,7 @@ table(data1$KEY %in% subneo$KEY)
 # FALSE  TRUE 
 # 4629  4434 
 subneo$nmsc <- data1$nmsc[match(subneo$KEY, data1$KEY)]
-
+subneo$candxo3 <- data1$candxo3[match(subneo$KEY, data1$KEY)]
 # cc <- cbind.data.frame(subneo$KEY, subneo$nmsc, subneo$AGE.ANY_SN, subneo$groupdx3)
 
 # Now get age of SN after first cancer
@@ -71,8 +71,9 @@ length(unique(subneo.after5$ccssid))
 # For this, I will first sort the table by date
 library(data.table)
 
-# This will include basal cell, squamous cell and melanoma
-NMSCs <- subneo[which((subneo$nmsc ==1| (subneo$nmsc == 2 & subneo$groupdx3 == "Skin"))),]
+# This will include basal cell and squamous cell
+# NMSCs <- subneo[which((subneo$nmsc ==1| (subneo$nmsc == 2 & subneo$groupdx3 == "Skin"))),]
+NMSCs <- subneo[which(subneo$nmsc ==1),]
 
 # cc <- cbind.data.frame(NMSC$KEY, NMSC$nmsc, NMSC$AGE.ANY_SN, NMSC$groupdx3)
 
@@ -83,17 +84,56 @@ sum(!duplicated(subneo.within5$sjlid))
 # NMSCs <- subneo[grepl("skin", subneo$groupdx3, ignore.case = T),]
 NMSCs <- setDT(NMSCs)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
 nrow(NMSCs)
-# 775
+# 729
 
-NMSCs.saved <- NMSCs
-NMSCs <- NMSCs[,-c(49,52:53)]
-save(NMSCs, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_from_Qi_Liu/NMSCs.RData")
+# load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.NMSCs_without_lifestyle.V20b.Rdata")
+# ccssid <- PHENO.ANY_SN$ccssid[PHENO.ANY_SN$event==1]
+# checkNMSCs <- NMSCs[NMSCs$ccssid %in% ccssid,]
+## BCC SCC 
+## 658  70
+
+# NMSCs.saved <- NMSCs
+# NMSCs <- NMSCs[,-c(49,52:53)]
+# save(NMSCs, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_from_Qi_Liu/NMSCs.RData")
+
+
+## Based on Qi's email on 9/26/2024
+# # Filter for NMSC cases
+sngroups <- NMSCs
+nmsc <- sngroups %>%
+  filter(nmsc == 1)
+# Frequency table for candxo3 in the nmsc dataset
+table(nmsc$candxo3)
+# Yadav said: In the final analysis, Basosquamous carcinoma was excluded, per Smita.
+# Filter for Basosquamous carcinoma
+basosquamous <- sngroups %>%
+  filter(candxo3 == 8094.3)  # All 8094.3 are NMSC
+# Frequency table for nmsc in the basosquamous dataset
+table(basosquamous$nmsc)
+# Create sngroup data frame with conditions for BCC and BCC_exclude
+sngroup <- sngroups %>%
+  mutate(BCC = ifelse(candxo3 > 8090 & candxo3 != 8094.3 & nmsc == 1, 1, 0),
+         BCC_exclude = ifelse(candxo3 == 8094.3, 1, 0))
+# Optionally, if you want to see the resulting dataset:
+head(sngroup)
+
+
+# exclude basosquamous
+table(sngroup$BCC_exclude != 1)
+# FALSE  TRUE 
+# 1   728 
+sngroup <- sngroup[sngroup$BCC_exclude != 1]
+NMSCs <- NMSCs[NMSCs$ccssid %in% sngroup$ccssid,]
+NMSCs$nmsc_type <- ifelse(sngroup$BCC==1, "BCC", "SCC")
+dim(NMSCs)
+# 728
 
 ## Remove SNs if younger than 18 **
 dim(PHENO.ANY_SN)
 # 7943   50
 
 PHENO.ANY_SN$AGE.ANY_SN <- NMSCs$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, NMSCs$ccssid)]
+PHENO.ANY_SN$nmsc_type <- NMSCs$nmsc_type[match(PHENO.ANY_SN$ccssid, NMSCs$ccssid)]
 # if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 #   PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$AGE.ANY_SN < 18),]
 # }
@@ -129,7 +169,7 @@ dim(PHENO.ANY_SN)
 PHENO.ANY_SN$NMSCs <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% NMSCs$ccssid, 0, 1))
 table(PHENO.ANY_SN$NMSCs)
 # 0    1 
-# 7168  774 
+# 7215  727 
 
 
 #################

@@ -183,10 +183,15 @@ shinyApp(ui = ui, server = server)
 
 
 
-# ## Data check
-library(readxl)
-model13 <- read_xlsx("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Papers/Kateryna_CMP_risk_prediction/figure_2_all_new_13.xlsx", sheet = "Model_13")
-dfgene <- read.table("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Papers/Kateryna_CMP_risk_prediction/df_gene.csv", sep = ",", header = T)
-dfgene$pred_est <- model13$pred_est[match(dfgene$sjlid, model13$sjlid)]
-
-# SJL5085717; HCM = -3.316509E-7; LVEV = -1.283923176
+# # ## Data check
+# library(readxl)
+# model13 <- read_xlsx("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Papers/Kateryna_CMP_risk_prediction/figure_2_all_new_13.xlsx", sheet = "Model_13")
+# dfgene <- read.table("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Papers/Kateryna_CMP_risk_prediction/df_gene.csv", sep = ",", header = T)
+# dfgene$pred_est <- model13$pred_est[match(dfgene$sjlid, model13$sjlid)]
+# 
+# # SJL5085717; HCM = -3.316509E-7; LVEV = -1.283923176 
+# SJL5085717 Works
+# SJL5088113 Works
+# SJL5162009 Works
+# SJL1751607 works (Afr)
+# SJL4175007 works (Afr)

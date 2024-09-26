@@ -54,6 +54,7 @@ table(data1$KEY %in% subneo$KEY)
 # FALSE  TRUE 
 # 4629  4434 
 subneo$nmsc <- data1$nmsc[match(subneo$KEY, data1$KEY)]
+subneo$candxo3 <- data1$candxo3[match(subneo$KEY, data1$KEY)]
 
 # cc <- cbind.data.frame(subneo$KEY, subneo$nmsc, subneo$AGE.ANY_SN, subneo$groupdx3)
 
@@ -73,8 +74,8 @@ length(unique(subneo.after5$ccssid))
 # For this, I will first sort the table by date
 library(data.table)
 
-# This will include basal cell, squamous cell and melanoma
-NMSCs <- subneo[which((subneo$nmsc ==1| (subneo$nmsc == 2 & subneo$groupdx3 == "Skin"))),]
+# This will include basal cell and squamous cell
+NMSCs <- subneo[which(subneo$nmsc ==1),]
 # cc <- cbind.data.frame(NMSC$KEY, NMSC$nmsc, NMSC$AGE.ANY_SN, NMSC$groupdx3)
 
 subneo.within5 <- NMSCs[NMSCs$AGE.ANY_SN.after.childhood.cancer.from.agedx <= 5,]
@@ -84,10 +85,43 @@ sum(!duplicated(subneo.within5$sjlid))
 # NMSCs <- subneo[grepl("skin", subneo$groupdx3, ignore.case = T),]
 NMSCs <- setDT(NMSCs)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
 nrow(NMSCs)
-# 775
+# 729
+
+
+## Based on Qi's email on 9/26/2024
+# # Filter for NMSC cases
+sngroups <- NMSCs
+nmsc <- sngroups %>%
+  filter(nmsc == 1)
+# Frequency table for candxo3 in the nmsc dataset
+table(nmsc$candxo3)
+# Yadav said: In the final analysis, Basosquamous carcinoma was excluded, per Smita.
+# Filter for Basosquamous carcinoma
+basosquamous <- sngroups %>%
+  filter(candxo3 == 8094.3)  # All 8094.3 are NMSC
+# Frequency table for nmsc in the basosquamous dataset
+table(basosquamous$nmsc)
+# Create sngroup data frame with conditions for BCC and BCC_exclude
+sngroup <- sngroups %>%
+  mutate(BCC = ifelse(candxo3 > 8090 & candxo3 != 8094.3 & nmsc == 1, 1, 0),
+         BCC_exclude = ifelse(candxo3 == 8094.3, 1, 0))
+# Optionally, if you want to see the resulting dataset:
+head(sngroup)
+
+
+# exclude basosquamous
+table(sngroup$BCC_exclude != 1)
+# FALSE  TRUE 
+# 1   728 
+sngroup <- sngroup[sngroup$BCC_exclude != 1]
+NMSCs <- NMSCs[NMSCs$ccssid %in% sngroup$ccssid,]
+NMSCs$nmsc_type <- ifelse(sngroup$BCC==1, "BCC", "SCC")
+dim(NMSCs)
+# 728  55
+
 ## Remove SNs if younger than 18 **
 dim(PHENO.ANY_SN)
-# 7943   50
+# 7943   57
 
 PHENO.ANY_SN$AGE.ANY_SN <- NMSCs$AGE.ANY_SN[match(PHENO.ANY_SN$ccssid, NMSCs$ccssid)]
 if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
@@ -95,7 +129,7 @@ if(sum(PHENO.ANY_SN$AGE.ANY_SN < 18, na.rm = T) > 0){
 }
 
 dim(PHENO.ANY_SN)
-## 7937 51 ** END
+## 7937 58 ** END
 
 # Removing samples with SN within the 5 years of childhood cancer **
 sum(PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid)
@@ -119,13 +153,13 @@ PHENO.ANY_SN$gradedt <- NMSCs$gradedt[match(PHENO.ANY_SN$ccssid, NMSCs$ccssid)] 
 
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid,]
 dim(PHENO.ANY_SN)
-# 7936   58 ** END
+# 7936   60 ** END
 
 ## CA CO status
 PHENO.ANY_SN$NMSCs <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% NMSCs$ccssid, 0, 1))
 table(PHENO.ANY_SN$NMSCs)
 # 0    1 
-# 7168  768 
+# 7215  721 
 
 
 ######################### **
@@ -147,7 +181,7 @@ PHENO.ANY_SN <- PHENO.ANY_SN[!(PHENO.ANY_SN$Smoker_ever_yn == "Unknown" &
                                  PHENO.ANY_SN$Obese_yn == "Unknown" ),]
 
 dim(PHENO.ANY_SN)
-# 7852   52
+# 7852   61
 
 sum((PHENO.ANY_SN$Smoker_ever_yn_agesurvey >= 18|
        PHENO.ANY_SN$PhysicalActivity_yn_agesurvey >= 18|
@@ -186,7 +220,7 @@ PHENO.ANY_SN$Obese_yn [which(PHENO.ANY_SN$Obese_yn_agesurvey != PHENO.ANY_SN$sur
 ## Remove SN cases if the diagnosis date is prior to the youngest adult survey date
 PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$survey_min > PHENO.ANY_SN$AGE.ANY_SN),]
 dim(PHENO.ANY_SN)
-# 7775   53
+# 7737   62
 ######################### ** END
 
 
@@ -197,7 +231,7 @@ PHENO.ANY_SN$any_lifestyle_missing  <- factor(ifelse(PHENO.ANY_SN$any_lifestyle_
 
 table(PHENO.ANY_SN$any_lifestyle_missing)
 # No  Yes 
-# 72 7703
+# 6034 1703
 ########################################
 ## Do the same for missing treatments ##
 ########################################
@@ -206,7 +240,7 @@ PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FAL
 
 table(PHENO.ANY_SN$any_tx_missing)
 # No  Yes 
-# 7131  514  
+# 7227  510  
 PHENO.ANY_SN$any_rt_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "maxabdrtdose.category", "maxpelvisrtdose.category")], 1, function(x) any("Unknown" %in% x))
 PHENO.ANY_SN$any_rt_missing  <- factor(ifelse(PHENO.ANY_SN$any_rt_missing == FALSE, "No", "Yes"))
 
