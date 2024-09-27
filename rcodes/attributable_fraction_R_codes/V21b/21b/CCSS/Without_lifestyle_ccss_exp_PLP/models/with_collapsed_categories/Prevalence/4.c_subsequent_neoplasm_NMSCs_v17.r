@@ -47,7 +47,7 @@ table(data1$KEY %in% subneo$KEY)
 # FALSE  TRUE 
 # 4629  4434 
 subneo$nmsc <- data1$nmsc[match(subneo$KEY, data1$KEY)]
-
+subneo$candxo3 <- data1$candxo3[match(subneo$KEY, data1$KEY)]
 # cc <- cbind.data.frame(subneo$KEY, subneo$nmsc, subneo$AGE.ANY_SN, subneo$groupdx3)
 
 # Now get age of SN after first cancer
@@ -64,6 +64,7 @@ malignantStatus$malKey <- paste(malignantStatus$ccssid, malignantStatus$groupdx3
 
 ## Add malignant status
 subneo$seersmn <- malignantStatus$seersmn[match(subneo$malKey, malignantStatus$malKey)]
+
 
 ########################################
 # How many SNs after 5 years
@@ -89,7 +90,39 @@ sum(!duplicated(subneo.within5$sjlid))
 # NMSCs <- subneo[grepl("skin", subneo$groupdx3, ignore.case = T),]
 NMSCs <- setDT(NMSCs)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreasing = FALSE)]
 nrow(NMSCs)
-# 775
+# 729
+
+## Based on Qi's email on 9/26/2024
+# # Filter for NMSC cases
+sngroups <- NMSCs
+nmsc <- sngroups %>%
+  filter(nmsc == 1)
+# Frequency table for candxo3 in the nmsc dataset
+table(nmsc$candxo3)
+# Yadav said: In the final analysis, Basosquamous carcinoma was excluded, per Smita.
+# Filter for Basosquamous carcinoma
+basosquamous <- sngroups %>%
+  filter(candxo3 == 8094.3)  # All 8094.3 are NMSC
+# Frequency table for nmsc in the basosquamous dataset
+table(basosquamous$nmsc)
+# Create sngroup data frame with conditions for BCC and BCC_exclude
+sngroup <- sngroups %>%
+  mutate(BCC = ifelse(candxo3 > 8090 & candxo3 != 8094.3 & nmsc == 1, 1, 0),
+         BCC_exclude = ifelse(candxo3 == 8094.3, 1, 0))
+# Optionally, if you want to see the resulting dataset:
+head(sngroup)
+
+
+# exclude basosquamous
+table(sngroup$BCC_exclude != 1)
+# FALSE  TRUE 
+# 1   728 
+sngroup <- sngroup[sngroup$BCC_exclude != 1]
+NMSCs <- NMSCs[NMSCs$ccssid %in% sngroup$ccssid,]
+NMSCs$nmsc_type <- ifelse(sngroup$BCC==1, "BCC", "SCC")
+dim(NMSCs)
+# 728
+
 ## Remove SNs if younger than 18 **
 dim(PHENO.ANY_SN)
 # 7943   50
@@ -117,20 +150,20 @@ PHENO.ANY_SN$gradedt <- NMSCs$gradedt[match(PHENO.ANY_SN$ccssid, NMSCs$ccssid)] 
 
 
 dim(PHENO.ANY_SN)
-## 7943 ** END
+## 2936   62
 
 # Removing samples with SN within the 5 years of childhood cancer **
 sum(PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid)
-# 1
+# 0
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$ccssid %in% subneo.within5$ccssid,]
 dim(PHENO.ANY_SN)
-# 7942   51 ** END
+# 2936   62
 
 ## CA CO status
 PHENO.ANY_SN$NMSCs <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% NMSCs$ccssid, 0, 1))
 table(PHENO.ANY_SN$NMSCs)
 # 0    1 
-# 7168  774 
+# 2847   89 
 
 
 #################
@@ -141,7 +174,7 @@ PHENO.ANY_SN$any_tx_missing  <- factor(ifelse(PHENO.ANY_SN$any_tx_missing == FAL
 
 table(PHENO.ANY_SN$any_tx_missing)
 # No  Yes 
-# 7421  521 
+# 2754  182
 PHENO.ANY_SN$any_rt_missing <- apply(PHENO.ANY_SN[c("maxsegrtdose.category", "maxabdrtdose.category", "maxpelvisrtdose.category")], 1, function(x) any("Unknown" %in% x))
 PHENO.ANY_SN$any_rt_missing  <- factor(ifelse(PHENO.ANY_SN$any_rt_missing == FALSE, "No", "Yes"))
 

@@ -2,14 +2,28 @@ rm(list=ls())
 
 ## Perform stratified association analysis with top TTN and BAG3 common missense variants
 
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/EUR_common_variants.RData")
-
 ## From Kendrick
-sjlife_cmp_data <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Re_A_new_manuscript_on_TTN_BAG3_for_your_review//sjlife_ccm_analysis_dat.rds") # N = 3686
-ccss_cmp_data <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Re_A_new_manuscript_on_TTN_BAG3_for_your_review/ccss_ccm_analysis_dat.rds") 
+# sjlife_cmp_data <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Re_A_new_manuscript_on_TTN_BAG3_for_your_review//sjlife_ccm_analysis_dat.rds") # N = 3686
+# ccss_cmp_data <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Re_A_new_manuscript_on_TTN_BAG3_for_your_review/ccss_ccm_analysis_dat.rds") 
+EUR_common_Kendrick <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Re_TTN_BAG3_project/EUR_common_data_CMP_clean.rds")
+
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/EUR_common_variants.RData")
+EUR_common_variants <- EUR_common_variants[EUR_common_variants$IID %in% EUR_common_Kendrick$iid,]
+EUR_common_variants$CMP <- factor(ifelse(EUR_common_variants$CMP == 2, 1, 0))
+EUR_common_variants$CMP_kendrick <- EUR_common_Kendrick$pre_diag_5_cmp[match(EUR_common_variants$IID, EUR_common_Kendrick$iid)]
+table(Our=EUR_common_variants$CMP, Kendrick=EUR_common_variants$CMP_kendrick)
+
+EUR_common_variants$anthra_jco_dose_any.kendrick <- EUR_common_Kendrick$anthracyclines_dose_5[match(EUR_common_variants$IID, EUR_common_Kendrick$iid)]
+table(EUR_common_variants$anthra_jco_dose_any == EUR_common_variants$anthra_jco_dose_any.kendrick)
+EUR_common_variants$hrtavg.kendrick <- EUR_common_Kendrick$heartavg[match(EUR_common_variants$IID, EUR_common_Kendrick$iid)]
+table(EUR_common_variants$hrtavg==EUR_common_variants$hrtavg.kendrick)
+
+EUR_common_variants$hrtavg <- EUR_common_variants$hrtavg.kendrick
+EUR_common_variants$anthra_jco_dose_any <- EUR_common_variants$anthra_jco_dose_any.kendrick
+EUR_common_variants$CMP <- EUR_common_variants$CMP_kendrick
 
 dat_final <- EUR_common_variants
-dat_final$CMP <- factor(ifelse(dat_final$CMP == 2, 1, 0))
+# dat_final$CMP <- factor(ifelse(dat_final$CMP == 2, 1, 0))
 
 
 # Function to calculate odds ratio and confidence interval
@@ -29,7 +43,7 @@ combine_or_ci <- function(estimate, ci_lower, ci_upper) {
 
 # Extract Gender, P_Value, and OR_CI
 extract_info <- function(df) {
-  gender <- df$Gender
+  gender <- df$Group
   p_value <- df$P_Value
   or_ci <- df$OR_CI
   N = df$n
@@ -578,7 +592,7 @@ bag3.female <- table_data
 
 
 # Create a list of your objects
-objects_list <- list(ttn.all, ttn.male, ttn.female, ttn.high.risk.trt, ttn.moderate.risk.trt, ttn.low.risk.trt, bag3.all, bag3.male, bag3.female, bag3.high.risk.trt, bag3.low.risk.trt)
+objects_list <- list(ttn.all, ttn.male, ttn.female, ttn.high.risk.trt, ttn.moderate.risk.trt, ttn.low.risk.trt, bag3.all, bag3.male, bag3.female, bag3.high.risk.trt, bag3.moderate.risk.trt, bag3.low.risk.trt)
 
 # Extract information and combine into a data frame
 combined_info <- do.call(rbind, lapply(objects_list, extract_info))

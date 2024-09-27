@@ -86,11 +86,7 @@ NMSCs <- setDT(NMSCs)[,.SD[which.min(gradedt)],by=ccssid][order(gradedt, decreas
 nrow(NMSCs)
 # 729
 
-# load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.NMSCs_without_lifestyle.V20b.Rdata")
-# ccssid <- PHENO.ANY_SN$ccssid[PHENO.ANY_SN$event==1]
-# checkNMSCs <- NMSCs[NMSCs$ccssid %in% ccssid,]
-## BCC SCC 
-## 658  70
+
 
 # NMSCs.saved <- NMSCs
 # NMSCs <- NMSCs[,-c(49,52:53)]
@@ -122,11 +118,18 @@ head(sngroup)
 table(sngroup$BCC_exclude != 1)
 # FALSE  TRUE 
 # 1   728 
-sngroup <- sngroup[sngroup$BCC_exclude != 1]
+# sngroup <- sngroup[sngroup$BCC_exclude != 1]
 NMSCs <- NMSCs[NMSCs$ccssid %in% sngroup$ccssid,]
 NMSCs$nmsc_type <- ifelse(sngroup$BCC==1, "BCC", "SCC")
 dim(NMSCs)
-# 728
+# 729
+
+
+# load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.NMSCs_without_lifestyle.V20b.Rdata")
+# ccssid <- PHENO.ANY_SN$ccssid[PHENO.ANY_SN$event==1]
+# checkNMSCs <- NMSCs[!NMSCs$ccssid %in% ccssid,]
+## BCC SCC Basosquamous
+## 658  70 1
 
 ## Remove SNs if younger than 18 **
 dim(PHENO.ANY_SN)

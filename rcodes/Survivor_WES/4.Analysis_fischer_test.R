@@ -79,7 +79,7 @@ sum(duplicated(raw$IID))
 # 0
 dim(raw)
 # 4516 11826 # maf 0.0001
-
+# 4516 29406 no maf filtered raw
 # raw <- raw[!(duplicated(raw$IID)),]
 raw <- as.data.frame(raw)
 rownames(raw) <- raw$IID
@@ -96,19 +96,21 @@ table(bim.QC.sjlife.PLP$V2 %in% colnames(raw))
 # TRUE 
 # 29254 # maf 0.01
 # 11820 # maf 0.0001
+# 29400 # no maf filtered raw
 # colnames(raw)[!colnames(raw) %in% bim.QC.sjlife.PLP$V2]
 raw$IID <- rownames(raw)
 
 ## run fisher exact test with grade 2 or higher ones with clinvar.all
 raw.clinvar.all <- raw[colnames(raw) %in% c("IID", clinvar.all$SNP) ]
 dim(raw.clinvar.all)
-# 4516 6452 # maf 0.01
-# 4516 2144 # maf 0.0001
+# 4516 6452 # gnomAD maf 0.01
+# 4516 5276 # gnomAD maf 0.0001
 
 raw.clinvar.all$carrier <- ifelse(rowSums(raw.clinvar.all[grepl("chr", colnames(raw.clinvar.all))], na.rm = T) > 0, 1, 0)
 table(raw.clinvar.all$carrier)
 # 0    1 
 # 598 3918 
+# 1698 2818 ## gnomAD maf 0.0001
 
 CTCAE.data.4 <- CTCAE.data.4[CTCAE.data.4$sjlid %in% raw.clinvar.all$IID,]
 CTCAE.data.4$carrier <- raw.clinvar.all$carrier[match(CTCAE.data.4$sjlid, raw.clinvar.all$IID)]
