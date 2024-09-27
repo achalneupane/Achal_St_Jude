@@ -123,13 +123,14 @@ NMSCs <- NMSCs[NMSCs$ccssid %in% sngroup$ccssid,]
 NMSCs$nmsc_type <- ifelse(sngroup$BCC==1, "BCC", "SCC")
 dim(NMSCs)
 # 729
+NMSCs$nmsc_type[NMSCs$ccssid %in% sngroup$ccssid[sngroup$BCC_exclude == 1]] <- "Basosquamous"
 
 
 # load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.NMSCs_without_lifestyle.V20b.Rdata")
-# ccssid <- PHENO.ANY_SN$ccssid[PHENO.ANY_SN$event==1]
-# checkNMSCs <- NMSCs[!NMSCs$ccssid %in% ccssid,]
-## BCC SCC Basosquamous
-## 658  70 1
+# checkNMSCs <- PHENO.ANY_SN[PHENO.ANY_SN$event==1,]
+# table(checkNMSCs$nmsc_type)
+# ## BCC SCC Basosquamous
+# ## 657  70 1
 
 ## Remove SNs if younger than 18 **
 dim(PHENO.ANY_SN)

@@ -206,20 +206,38 @@ Rhabdomyosarcoma  <- sum(grepl("Rhabdomyosarcoma", PHENO.ANY_SN$diaggrp, ignore.
 ##################
 ## Radiotherapy ##
 ##################
-##
-brainRT <- sum(PHENO.ANY_SN$maxsegrtdose > 200, na.rm = T)
-neckRT <- sum(PHENO.ANY_SN$neckmaxrtdose > 200, na.rm = T)
-chestRT <- sum(PHENO.ANY_SN$chestmaxrtdose > 200, na.rm = T)
-abdomenRT <- sum(PHENO.ANY_SN$abdmaxrtdose > 200, na.rm = T)
-pelvisRT <- sum(PHENO.ANY_SN$pelvismaxrtdose > 200, na.rm = T)
+PHENO.ANY_SN$maxsegrtdose <- as.numeric(PHENO.ANY_SN$maxsegrtdose)
+PHENO.ANY_SN$neckmaxrtdose <- as.numeric(PHENO.ANY_SN$neckmaxrtdose)
+PHENO.ANY_SN$chestmaxrtdose <- as.numeric(PHENO.ANY_SN$chestmaxrtdose)
+PHENO.ANY_SN$abdmaxrtdose <- as.numeric(PHENO.ANY_SN$abdmaxrtdose)
+PHENO.ANY_SN$pelvismaxrtdose <- as.numeric(PHENO.ANY_SN$pelvismaxrtdose)
+
+brainRT <- sum(PHENO.ANY_SN$maxsegrtdose > 0, na.rm = T)
+round((brainRT/7943)*100,1)
+
+neckRT <- sum(PHENO.ANY_SN$neckmaxrtdose > 0, na.rm = T)
+round((neckRT/7943)*100,1)
+
+chestRT <- sum(PHENO.ANY_SN$chestmaxrtdose > 0, na.rm = T)
+round((chestRT/7943)*100,1)
+
+abdomenRT <- sum(PHENO.ANY_SN$abdmaxrtdose > 0, na.rm = T)
+round((abdomenRT/7943)*100,1)
+
+pelvisRT <- sum(PHENO.ANY_SN$pelvismaxrtdose > 0, na.rm = T)
+round((pelvisRT/7943)*100,1)
 
 ##################
 ## Chemotherapy ##
 ##################
 alkylating <- sum(PHENO.ANY_SN$alk_CED5 > 0, na.rm = T)
-anthracyclines <- sum(PHENO.ANY_SN$anth_DED5 > 0, na.rm = T)
-epipodophyllotoxins <- sum(PHENO.ANY_SN$epipdose5 > 0, na.rm = T)
+round((alkylating/7943)*100,1)
 
+anthracyclines <- sum(PHENO.ANY_SN$anth_DED5 > 0, na.rm = T)
+round((anthracyclines/7943)*100,1)
+
+epipodophyllotoxins <- sum(PHENO.ANY_SN$epipdose5 > 0, na.rm = T)
+round((epipodophyllotoxins/7943)*100,1)
 ## age at diagnosis
 median.agedx <- round(median(PHENO.ANY_SN$agedx), 1)
 agedx.IQR <- paste0(unname(round((quantile(PHENO.ANY_SN$agedx, prob=c(.25,.5,.75), type=1, na.rm = T))[c(1,3)], 1)), collapse = " ")
