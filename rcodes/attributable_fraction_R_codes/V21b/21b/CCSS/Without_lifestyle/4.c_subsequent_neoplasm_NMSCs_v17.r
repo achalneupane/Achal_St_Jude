@@ -100,7 +100,7 @@ nmsc <- sngroups %>%
   filter(nmsc == 1)
 # Frequency table for candxo3 in the nmsc dataset
 table(nmsc$candxo3)
-# Yadav said: In the final analysis, Basosquamous carcinoma was excluded, per Smita.
+# Yadav said: In the final analysis, Basosquamous carcinoma was excluded, per Smita. (but we will include)
 # Filter for Basosquamous carcinoma
 basosquamous <- sngroups %>%
   filter(candxo3 == 8094.3)  # All 8094.3 are NMSC

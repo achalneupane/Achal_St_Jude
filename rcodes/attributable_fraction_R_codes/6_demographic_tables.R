@@ -117,12 +117,12 @@ pelvisRT <- sum(PHENO.ANY_SN$maxpelvisrtdose > 200, na.rm = T)
 ##################
 ## Chemotherapy ##
 ##################
-alkylating <- sum(PHENO.ANY_SN$aa_class_dose_5_yn == "Y", na.rm = T)
-# table(PHENO.ANY_SN$aa_class_dose_5 > 0)
-anthracyclines <- sum(PHENO.ANY_SN$anthra_jco_dose_5_yn == "Y", na.rm = T)
-# table(PHENO.ANY_SN$anthra_cog_dose_5 > 0)
-epipodophyllotoxins <- sum(PHENO.ANY_SN$epitxn_dose_5_yn == "Y", na.rm = T)
-# table(PHENO.ANY_SN$epitxn_dose_5 > 0)
+# alkylating <- sum(PHENO.ANY_SN$aa_class_dose_5_yn == "Y", na.rm = T)
+alkylating <- sum(PHENO.ANY_SN$aa_class_dose_5 > 0, na.rm = T)
+# anthracyclines <- sum(PHENO.ANY_SN$anthra_jco_dose_5_yn == "Y", na.rm = T)
+anthracyclines <- sum(PHENO.ANY_SN$anthra_jco_dose_5 > 0, na.rm = T)
+# epipodophyllotoxins <- sum(PHENO.ANY_SN$epitxn_dose_5_yn == "Y", na.rm = T)
+epipodophyllotoxins <- sum(PHENO.ANY_SN$epitxn_dose_5 > 0, na.rm = T)
 
 ## age at diagnosis
 median.agedx <- round(median(PHENO.ANY_SN$agedx), 1)
