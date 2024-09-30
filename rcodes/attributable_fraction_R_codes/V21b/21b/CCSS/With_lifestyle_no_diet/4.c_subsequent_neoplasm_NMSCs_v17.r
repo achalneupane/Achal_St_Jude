@@ -157,6 +157,7 @@ dim(PHENO.ANY_SN)
 
 ## CA CO status
 PHENO.ANY_SN$NMSCs <- factor(ifelse(!PHENO.ANY_SN$ccssid %in% NMSCs$ccssid, 0, 1))
+PHENO.ANY_SN$nmsc_type <- NMSCs$nmsc_type[match(PHENO.ANY_SN$ccssid, NMSCs$ccssid)]
 table(PHENO.ANY_SN$NMSCs)
 # 0    1 
 # 7215  721 

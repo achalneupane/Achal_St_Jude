@@ -123,7 +123,7 @@ table(sngroup$BCC_exclude != 1)
 NMSCs <- NMSCs[NMSCs$ccssid %in% sngroup$ccssid,]
 NMSCs$nmsc_type <- ifelse(sngroup$BCC==1, "BCC", "SCC")
 dim(NMSCs)
-# 728
+# 729
 
 
 
