@@ -13,7 +13,7 @@ harmonize <- harmonize[c("V2", "KEY")]
 ##############
 ## Combined ##
 ##############
-combined <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/sjlife_ccss_org_ccss_exp_samples_results_kendrick.assoc.logistic", header = T, sep = "")
+combined <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/sjlife_ccss_org_ccss_exp_samples_results.assoc.logistic", header = T, sep = "")
 dim(combined)
 combined.bim <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/sjlife_ccss_org_ccss_exp_samples_updated.bim", header = F, sep = "")
 combined.bim$KEY1 <- paste0(combined.bim$V1, ":", combined.bim$V4)
@@ -35,7 +35,7 @@ combined <- combined[c("SNP", "CHR", "BP", "A1", "REF", "OR_95CI", "P", "KEY")]
 ############
 ## SJLIFE ##
 ############
-sjlife <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/sjlife_results_kendrick.assoc.logistic", header = T, sep = "")
+sjlife <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/sjlife_results.assoc.logistic", header = T, sep = "")
 dim(sjlife)
 sjlife.bim <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/sjlife_to_concat_updated.bim", header = F, sep = "")
 sjlife.bim$KEY1 <- paste0(sjlife.bim$V1, ":", sjlife.bim$V4)
@@ -88,7 +88,7 @@ sjlife <- sjlife[c("OR_95CI", "P", "KEY", "A1")]
 ###################
 ## CCSS_combined ##
 ###################
-ccss_org_ccss_exp <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/ccss_org_ccss_exp_kendrick.assoc.logistic", header = T, sep = "")
+ccss_org_ccss_exp <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/ccss_org_ccss_exp.assoc.logistic", header = T, sep = "")
 dim(ccss_org_ccss_exp)
 ccss_org_ccss_exp.bim <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/merged_ccss.bim", header = F, sep = "")
 ccss_org_ccss_exp.bim$KEY1 <- paste0(ccss_org_ccss_exp.bim$V1, ":", ccss_org_ccss_exp.bim$V4)
@@ -124,7 +124,7 @@ colnames(final_merged_df) <- c("SNP", "KEY", "CHR", "BP", "A1", "REF", "OR_95CI_
                                "OR_95CI_ccss_org_exp", "P_ccss_org_exp", "A1_ccss_org_exp")
 
 
-freq.df <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/sjlife_ccss_org_ccss_exp_samples_updated_freq_out_kendrick.frq", header = T)
+freq.df <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/sjlife_ccss_org_ccss_exp_samples_updated_freq_out.frq", header = T)
 dim(freq.df)
 final_merged_df$combinedMAF <- freq.df$MAF[match(final_merged_df$SNP, freq.df$SNP)]
 # final_merged_df$freqA1 <- freq.df$A1[match(final_merged_df$SNP, freq.df$SNP)]
@@ -179,13 +179,13 @@ cc <- cc[grepl("TTN|BAG3", cc$Gene),]
 ################
 ## SJLIFE afr ##
 ################
-sjlife_afr <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/sjlife_results_afr_AN_kendrick.assoc.logistic", header = T, sep = "")
+sjlife_afr <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/sjlife_results_afr_AN.assoc.logistic", header = T, sep = "")
 dim(sjlife_afr)
 sjlife_afr.bim <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/sjlife_afr_to_concat_updated.bim", header = F, sep = "")
 sjlife_afr.bim$KEY1 <- paste0(sjlife_afr.bim$V1, ":", sjlife_afr.bim$V4)
 sum(duplicated(sjlife_afr.bim$KEY1))
 
-afr.frq <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/sjlife_results_afr_freq_AN_kendrick.frq", header = T)
+afr.frq <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/sjlife_results_afr_freq_AN.frq", header = T)
 table(sjlife_afr$SNP %in% afr.frq$SNP)
 sjlife_afr$afr_MAF <- afr.frq$MAF[match(sjlife_afr$SNP, afr.frq$SNP)]
 sjlife_afr$afr_freqA1 <- afr.frq$A1[match(sjlife_afr$SNP, afr.frq$SNP)]
@@ -220,7 +220,7 @@ swapped <- cc$A1 != cc$A1_sjlife_afr
 cc[swapped, c("OR_afr", "L95_afr", "U95_afr")] <- 1 / cc[swapped, c("OR_afr", "U95_afr", "L95_afr")]
 cc$OR_95CI_afr <- paste0(round(cc$OR_afr,2), " (", round(cc$L95_afr, 2), "-", round(cc$U95_afr,2), ")")
 
-write.table(cc, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/common_missense_variants_from_kendricks_pheno.txt", col.names = T, sep = "\t", quote = F, row.names = F)
+write.table(cc, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/common_missense_variants.txt", col.names = T, sep = "\t", quote = F, row.names = F)
 
 
 

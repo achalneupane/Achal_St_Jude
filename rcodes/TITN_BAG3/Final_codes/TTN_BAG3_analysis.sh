@@ -483,6 +483,151 @@ plink --bfile sjlife_afr_ttn_bag3_AN --freq --keep afr_samples --out sjlife_resu
 
 
 
+##########################################################################
+## 0n 10/1/2024, repeating the association analysis with Kendricks data ##
+##########################################################################
+
+
+## Run association analysis
+ plink \
+ --allow-no-sex \
+ --bfile sjlife_ccss_org_ccss_exp_samples_updated \
+ --maf 0.01 \
+ --hwe 1e-06 \
+ --logistic hide-covar \
+ --ci 0.95 \
+ --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
+ --pheno-name CMP \
+ --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
+ --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10,cohort_two \
+ --out sjlife_ccss_org_ccss_exp_samples_results_kendrick
+
+
+plink --bfile sjlife_ccss_org_ccss_exp_samples_updated --freq --keep-allele-order --keep pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno --out sjlife_ccss_org_ccss_exp_samples_updated_freq_out_kendrick
+
+## Run association analysis with ccss_org and ccss_exp
+# plink --bfile ccss_org_to_concat_updated --bmerge ccss_exp_to_concat_updated --keep-allele-order --make-bed --out merged_ccss
+
+
+ # plink \
+ # --allow-no-sex \
+ # --bfile merged_ccss \
+ # --maf 0.01 \
+ # --hwe 1e-06 \
+ # --logistic hide-covar \
+ # --snp assoc_test_two_vars.txt \
+ # --ci 0.95 \
+ # --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
+ # --pheno-name CMP \
+ # --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno \
+ # --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+ # --out ccss_org_ccss_exp_vars
+
+
+plink \
+ --allow-no-sex \
+ --bfile merged_ccss \
+ --maf 0.01 \
+ --hwe 1e-06 \
+ --logistic hide-covar \
+ --ci 0.95 \
+ --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
+ --pheno-name CMP \
+ --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
+ --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+ --out ccss_org_ccss_exp_kendrick
+
+
+plink \
+ --allow-no-sex \
+ --bfile ccss_org_to_concat_updated \
+ --maf 0.01 \
+ --hwe 1e-06 \
+ --logistic hide-covar \
+ --ci 0.95 \
+ --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
+ --pheno-name CMP \
+ --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
+ --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+ --out ccss_org_kendrick
+
+plink \
+ --allow-no-sex \
+ --bfile ccss_exp_to_concat_updated \
+ --maf 0.01 \
+ --hwe 1e-06 \
+ --logistic hide-covar \
+ --ci 0.95 \
+ --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
+ --pheno-name CMP \
+ --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
+ --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+ --out ccss_exp_kendrick
+
+
+plink \
+ --allow-no-sex \
+ --bfile sjlife_to_concat_updated \
+ --maf 0.01 \
+ --hwe 1e-06 \
+ --logistic hide-covar \
+ --ci 0.95 \
+ --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
+ --pheno-name CMP \
+ --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
+ --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+ --out sjlife_results_kendrick
+
+
+## AFR
+# plink 
+#   --bfile sjlife
+#   --extract common_missense_variants.txt
+#   --keep pheno/sjlife_ttn_bag3_afr.pheno
+#   --make-bed
+#   --out sjlife_afr_ttn_bag3
+
+tail -n +2 common_missense_variants.txt | cut -f1> extract_common_missense_vars
+tail -n +2 pheno/sjlife_ttn_bag3_afr.pheno | cut -f1,2 > afr_samples
+
+plink --bfile sjlife --update-name harmonize.txt --make-bed --out sjlife_afr_to_concat_updated
+plink --bfile sjlife_afr_to_concat_updated --extract extract_common_missense_vars --keep afr_samples --make-bed --out sjlife_afr_ttn_bag3_AN
+
+plink --bfile sjlife_afr_ttn_bag3_AN
+
+plink \
+  --allow-no-sex \
+  --bfile sjlife_afr_ttn_bag3_AN \
+  --ci 0.95 \
+  --covar pheno/sjlife_ttn_bag3_afr_kendrick.pheno \
+  --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+  --hwe 1e-06 \
+  --logistic hide-covar \
+  --out sjlife_results_afr_AN_kendrick \
+  --pheno pheno/sjlife_ttn_bag3_afr_kendrick.pheno \
+  --pheno-name CMP
+
+plink --bfile sjlife_afr_ttn_bag3_AN --freq --keep pheno/sjlife_ttn_bag3_afr_kendrick.pheno --out sjlife_results_afr_freq_AN_kendrick
+
+
+## End of analyis with Kentdricks samples
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

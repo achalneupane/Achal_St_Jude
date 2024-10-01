@@ -1,0 +1,10 @@
+name: Cardiomyopathy_Risk_Calculator
+title:
+username: ysapkota
+account: ysapkota
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 12888789
+bundleId: 9169547
+url: https://ysapkota.shinyapps.io/Cardiomyopathy_Risk_Calculator/
+version: 1

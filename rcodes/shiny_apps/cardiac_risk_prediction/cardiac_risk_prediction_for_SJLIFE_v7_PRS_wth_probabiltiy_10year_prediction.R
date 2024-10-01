@@ -101,10 +101,10 @@ server <- function(input, output) {
     paste("The predicted probability is: ", round(results$probability * 100, 2), "%")
   })
   
-  # Calculate and display the relative risk; comment out this to not display rr
+  # # Calculate and display the relative risk; comment out this to not display rr
   output$rr_output <- renderText({
     results <- calculate_prob_and_rr()
-    paste("The predicted relative risk (RR) is: ", round(results$rr, 4))
+    paste("The predicted risk is: ", round(results$rr, 4))
   })
   
   # Display risk level based on predicted probability

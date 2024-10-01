@@ -17,9 +17,13 @@ colnames(EUR_common_Kendrick) <- gsub("^pc", "PC", colnames(EUR_common_Kendrick)
 EUR_common_Kendrick <- EUR_common_Kendrick[!(is.na(EUR_common_Kendrick$anthracyclines_dose_5)|is.na(EUR_common_Kendrick$heartavg)),]
 colnames(EUR_common_Kendrick)[colnames(EUR_common_Kendrick) == "fid"] <- "FID"
 colnames(EUR_common_Kendrick)[colnames(EUR_common_Kendrick) == "iid"] <- "IID"
-EUR_common_Kendrick.pheno <- EUR_common_Kendrick[c("FID", "IID", "CMP", "agelstcontact", "gender", "agevent", "ejection_fraction_hrt", "PC1", "PC2",
-  "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "cohort", "cohort_two", "agedx", "anthra_jco_dose_any", "hrtavg"),]
+EUR_common_Kendrick.pheno <- EUR_common_Kendrick[,c("FID", "IID", "CMP", "agelstcontact", "gender", "agevent", "ejection_fraction_hrt", "PC1", "PC2",
+                                                   "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "cohort", "cohort_two", "agedx", "anthra_jco_dose_any", "hrtavg")]
 
+EUR_common_Kendrick.pheno$CMP[EUR_common_Kendrick.pheno$CMP==1] <- 2; EUR_common_Kendrick.pheno$CMP[EUR_common_Kendrick.pheno$CMP==0] <- 1
+table(EUR_common_Kendrick.pheno$CMP)
+# 1    2 
+# 5729  453 
 # write.table(EUR_common_Kendrick.pheno, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno", sep ="\t", col.names = T, row.names = F, quote = F)
 
 AFR_common_Kendrick <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Final_analysis//AFR_CMP_analysis_data.rds")
@@ -34,11 +38,14 @@ colnames(AFR_common_Kendrick) <- gsub("^pc", "PC", colnames(AFR_common_Kendrick)
 AFR_common_Kendrick <- AFR_common_Kendrick[!(is.na(AFR_common_Kendrick$anthracyclines_dose_5)|is.na(AFR_common_Kendrick$heartavg)),]
 colnames(AFR_common_Kendrick)[colnames(AFR_common_Kendrick) == "fid"] <- "FID"
 colnames(AFR_common_Kendrick)[colnames(AFR_common_Kendrick) == "iid"] <- "IID"
-AFR_common_Kendrick.pheno <- AFR_common_Kendrick[c("FID", "IID", "CMP", "agelstcontact", "gender", "agevent", "ejection_fraction_hrt", "PC1", "PC2",
-                                                   "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "cohort", "cohort_two", "agedx", "anthra_jco_dose_any", "hrtavg"),]
+AFR_common_Kendrick.pheno <- AFR_common_Kendrick[,c("FID", "IID", "CMP", "agelstcontact", "gender", "ejection_fraction_hrt", "PC1", "PC2",
+                                                   "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "cohort", "agedx", "anthra_jco_dose_any", "hrtavg")]
 
+AFR_common_Kendrick.pheno$CMP[AFR_common_Kendrick.pheno$CMP==1] <- 2; AFR_common_Kendrick.pheno$CMP[AFR_common_Kendrick.pheno$CMP==0] <- 1
+table(AFR_common_Kendrick.pheno$CMP)
+# 1   2 
+# 201  37
 # write.table(AFR_common_Kendrick.pheno, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ttn_bag3_afr_kendrick.pheno", sep ="\t", col.names = T, row.names = F, quote = F)
-
 
 
 
@@ -402,7 +409,7 @@ all_data <- dat_final[(dat_final$anthra_jco_dose_any >=250)|
                         (dat_final$hrtavg >=30)| 
                         (dat_final$anthra_jco_dose_any >=100 &  dat_final$hrtavg >= 15),]
 
-cc <- cbind.data.frame(dat_final$IID, dat_final$hrtavg, dat_final$anthra_jco_dose_any, dat_final$risk_group)
+cc <- cbind.data.frame(dat_final$iid, dat_final$hrtavg, dat_final$anthra_jco_dose_any, dat_final$risk_group)
 
 
 # Overall Analysis
