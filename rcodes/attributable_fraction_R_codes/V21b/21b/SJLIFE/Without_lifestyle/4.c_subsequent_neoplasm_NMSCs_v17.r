@@ -92,6 +92,10 @@ table(PHENO.ANY_SN$NMSCs)
 # 0    1 
 # 4149  251
 
+# cc <- NMSCs[NMSCs$sjlid %in% cc,]
+# table(grepl("basal", cc$diag, ignore.case = T))
+# BCC = 209; SCC=42
+
 #################
 ## missingness ##
 #################

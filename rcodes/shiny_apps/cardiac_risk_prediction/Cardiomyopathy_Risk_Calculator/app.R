@@ -6,42 +6,33 @@ library(ggplot2)
 
 # Define UI for the CMP prediction app
 ui <- fluidPage(
-  titlePanel("Cardiomyopathy 10-year Risk Prediction"),
+  titlePanel("The 10-year risk prediction of cardiomyopathy"),
   
   sidebarLayout(
     sidebarPanel(
-      numericInput("age_diagnosis", "Age at Primary Diagnosis (years):", value = 0, min = 0, max = 200, step = 1),
-      # numericInput("follow_up_years", "Follow-up years:", value = 0, min = 0, max = 200, step = 1),
+      numericInput("age_diagnosis", "Age at childhood cancer diagnosis (years):", value = 0, min = 0, max = 200, step = 1),
       selectInput("sex", "Sex:", choices = list("Female" = "female", "Male" = "male")),
-      selectInput("anthracycline", "Cumulative Anthracycline Dose (mg/m²):",
+      selectInput("anthracycline", "Cumulative anthracycline dose (mg/m²):",
                   choices = list("None" = "none", ">0-100" = "0_100", ">100-250" = "100_250", ">250" = "250")),
-      selectInput("radiation", "Mean Heart Radiation Dose (Gray):",
+      selectInput("radiation", "Average heart radiation dose (Gray):",
                   choices = list("None" = "none", ">5" = "5", ">5-15" = "5_15", ">15-35" = "15_35", ">35" = "35")),
-      selectInput("age_baseline", "Age at Baseline (years):",
+      selectInput("age_baseline", "Current age (years):",
                   choices = list("≤25" = "25", ">25-35" = "25_35", ">35-45" = "35_45", ">45" = "45")),
       selectInput("hypertension", "Hypertension:", choices = list("No" = "no", "Yes" = "yes")),
-      selectInput("ancestry", "Genetic Ancestry:",
+      selectInput("ancestry", "Genetic ancestry:",
                   choices = list("European" = "european", "African" = "african", "Other" = "others")),
-      numericInput("pr_score1", "Polygenic Risk Score HCM:", value = 0, min = -3.167714, max = 4.547851, step = 0.001),
-      numericInput("pr_score2", "Polygenic Risk Score LVEVi:", value = 0, min = -4.668462, max = 3.601426, step = 0.001),
-      actionButton("predict", "Predict")
+      numericInput("pr_score1", "Polygenic risk score hypertropic cardiomyopathy (z-score):", value = NA, min = -3.167714, max = 4.547851, step = 0.001),
+      numericInput("pr_score2", "Polygenic risk score left ventricular end-systolic volume index (z-score):", value = NA, min = -4.668462, max = 3.601426, step = 0.001),
+      actionButton("calculate", "Calculate")
     ),
     
-    # mainPanel(
-    #   h3("Cardiomyopathy 10-year Risk Prediction"),
-    #   textOutput("prob_output"),
-    #   textOutput("rr_output"),
-    #   uiOutput("risk_level"),
-    #   plotOutput("prob_plot")
-    # )
     mainPanel(
       h3("Cardiomyopathy 10-year risk prediction"),
-      uiOutput("prob_output"),  # Use uiOutput instead of textOutput
-      textOutput("rr_output"),  
+      uiOutput("prob_output"),  # Use uiOutput instead of textOutput for better control of styling
+      uiOutput("rr_output"),    # Update to uiOutput for relative risk
       uiOutput("risk_level"),
       plotOutput("prob_plot")
     )
-    
   )
 )
 
@@ -86,15 +77,15 @@ server <- function(input, output) {
     hypertension_coeff <- coeffs$hypertension[[input$hypertension]]
     ancestry_coeff <- coeffs$ancestry[[input$ancestry]]
     
-    # Incorporate the Polygenic Risk Scores
-    pr_score_coeff1 <- input$pr_score1 * -0.1316  # Adjust based on model's impact
-    pr_score_coeff2 <- input$pr_score2 * 0.1361   # Adjust based on model's impact  
+    # Incorporate the Polygenic Risk Scores and handle NA values
+    pr_score1 <- ifelse(is.na(input$pr_score1), 0, as.numeric(input$pr_score1)) * -0.1316
+    pr_score2 <- ifelse(is.na(input$pr_score2), 0, as.numeric(input$pr_score2)) * 0.1361
     
     ## Remove offset for 10-year prediction; removing log(input$follow_up_years / 10) will give 10-year estimate
-    # Calculate the log risk and relative risk; 
+    # Calculate the log risk and relative risk
     log_risk <- -4.7265 + age_diagnosis_coeff + sex_coeff + anthracycline_coeff +
       radiation_coeff + age_baseline_coeff + hypertension_coeff +
-      ancestry_coeff + pr_score_coeff1 + pr_score_coeff2
+      ancestry_coeff + pr_score1 + pr_score2
     
     relative_risk <- exp(log_risk)
     probability <- 1 - exp(-exp(log_risk))
@@ -102,8 +93,8 @@ server <- function(input, output) {
     return(list(probability = probability, rr = relative_risk))
   }
   
-  observeEvent(input$predict, {
-    # Make sure all inputs are provided before calculating
+  observeEvent(input$calculate, {
+    # Validate inputs; check for missing/invalid values
     if (is.null(input$age_diagnosis) || 
         is.null(input$sex) || 
         is.null(input$anthracycline) ||
@@ -111,33 +102,28 @@ server <- function(input, output) {
         is.null(input$age_baseline) || 
         is.null(input$hypertension) ||
         is.null(input$ancestry) ||
-        is.null(input$pr_score1) || 
-        is.null(input$pr_score2)) {
-      output$prob_output <- renderText("Please provide all inputs to get the prediction.")
+        is.na(input$pr_score1) || 
+        is.na(input$pr_score2)) {
+      output$prob_output <- renderText("Please provide all inputs to calculate the prediction!")
       return()
     }
     
     # Perform the prediction
     results <- calculate_prob_and_rr()
     
-    # # Display predicted probability
-    # output$prob_output <- renderText({
-    #   paste("The predicted probability is: ", round(results$probability * 100, 2), "%")
-    # })
-    
+    # Display predicted probability in a styled manner
     output$prob_output <- renderUI({
-      results <- calculate_prob_and_rr()  # Assuming this function is defined
       prob_text <- paste("The predicted probability is: ", round(results$probability * 100, 2), "%")
       tags$span(prob_text, style = "font-size: 20px; font-weight: bold;")
     })
     
-    # # Calculate and display the relative risk; comment out this to not display risk
-    # output$rr_output <- renderText({
-    #   results <- calculate_prob_and_rr()
-    #   paste("The predicted risk is: ", round(results$rr, 4))
+    # # Display relative risk in the app
+    # output$rr_output <- renderUI({
+    #   rr_text <- paste("The predicted relative risk is: ", round(results$rr, 4))
+    #   tags$span(rr_text, style = "font-size: 20px; font-weight: bold;")
     # })
     
-    # # Display risk level
+    # # Display risk level based on probability
     # output$risk_level <- renderUI({
     #   prob <- results$probability
     #   
@@ -154,6 +140,7 @@ server <- function(input, output) {
 
 # Run the application 
 shinyApp(ui = ui, server = server)
+
 
 ## deploy
 # library(rsconnect)

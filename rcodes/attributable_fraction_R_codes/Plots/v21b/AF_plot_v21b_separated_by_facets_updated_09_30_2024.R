@@ -64,9 +64,9 @@ CCSS	SMNs (762)	Treatments	29	29	29	27	30	29	27
 CCSS	SMNs (762)	PRS	5	5	5	5	5	5	6
 CCSS	SMNs (762)	Lifestyle	NA	NA	NA	NA	NA	NA	NA
 CCSS	SMNs (762)	Combined	32	32	33	31	34	33	31
-CCSS	NMSCs (728)	Radiation	42	41	42	41	42	42	45
+CCSS	NMSCs (728)	Radiotherapy	42	41	42	41	42	42	45
 CCSS	NMSCs (728)	Chemotherapy	NA	NA	NA	NA	NA	NA	NA
-CCSS	NMSCs (728)	All_treatments	42	41	42	41	42	42	45
+CCSS	NMSCs (728)	Treatments	42	41	42	41	42	42	45
 CCSS	NMSCs (728)	PRS	33	33	33	33	33	34	8
 CCSS	NMSCs (728)	Lifestyle	NA	NA	NA	NA	NA	NA	NA
 CCSS	NMSCs (728)	Combined	61	61	61	61	61	62	49
@@ -127,7 +127,72 @@ custom_colors <- brewer.pal(5, "Dark2")
 legend_order <- order
 
 
+## combined all SNs
 data_melted <- data[, c("Cohort", "SN_types", "Variables", group)]
+data_melted <- data_melted[grepl("Combined", data_melted$Variables),]
+
+data_melted$value <- as.numeric(data_melted[,group]*100)
+data_melted$legend_group <- factor(data_melted$Cohort, levels = c("SJLIFE", "CCSS"))
+
+# Create a factor with the desired order
+data_melted$Variables <- factor(data_melted$Variables, levels = order)
+
+Cohort <- c("SJLIFE", "CCSS")
+data_melted$Cohort <- factor(data_melted$Cohort, levels = Cohort)
+data_melted <- data_melted[complete.cases(data_melted),]
+data_melted$new_value <- paste0(round(data_melted$value,2), "%")
+
+data_melted$SN_types <- factor(data_melted$SN_types, levels = unique(data_melted$SN_types))
+
+p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.6), width = 0.6) +
+  geom_text(
+    data = data_melted %>% filter(!is.na(new_value)),
+    aes(label = new_value, y = value),  # Adjust y position
+    position = position_dodge(width = 0.6),
+    vjust = -0.30,  # Adjust vertical justification
+    hjust = 0.5,  # Center text horizontally
+    size = 5.0,
+    color = "black"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 60, hjust = 1, vjust = 1, size = 20, color = "black"),  # Tilt x-axis labels 45 degrees
+    axis.text.y = element_text(size = 16, color = "black"),  # Make y-axis text black
+    axis.title.y = element_text(size = 24, color = "black"),  # Make y-axis title black
+    axis.title.x = element_blank(),
+    axis.line.x = element_line(color = "black"),  # Make x-axis black
+    axis.line.y = element_line(color = "black"),  # Make y-axis black
+    legend.title = element_text(size = 22, color = "black", face = "bold"),  # Increase legend title size
+    legend.text = element_text(size = 18, color = "black"),
+    legend.position = "top",
+    legend.box = "horizontal",
+    legend.margin = margin(t = 10, b = 10, l = 10, r = 200),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    legend.key = element_rect(color = "black", size = 1),  # Add border around legend
+    # legend.background = element_rect(fill = "white", color = "black", size = 1)  # Add background to legend
+    legend.background = element_blank()  # Remove background and borders from legend box
+  ) +
+  labs(fill = "Cohorts: ") +
+  coord_cartesian(clip = "off") +
+  scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) +
+  labs(title = "", y = "Attributable fraction (%)", x = NULL) +
+  scale_fill_manual(
+    values = c("SJLIFE" = "#D95F02", "CCSS" = "#7570B3"),  # Custom colors: burgundy for SJLIFE, dark red for CCSS
+    breaks = levels(data_melted$legend_group),  # Ensure breaks match the levels of legend_group
+)
+
+p
+plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v21b/combined_all_SNs_without_lifestyle_plot.tiff")
+ggsave(plot_name, p, width = 10, height = 9, dpi = 600, device = "tiff", compression = "lzw")
+
+
+
+# SN and SMN
+data_melted <- data[, c("Cohort", "SN_types", "Variables", group)]
+data_melted <- data_melted[grepl(paste0(unique(data_melted$SN_types)[1:2], collapse="|"), data_melted$SN_types),]
+
 data_melted$value <- as.numeric(data_melted[,group]*100)
 data_melted$legend_group <- factor(data_melted$Variables, levels = order)
 
@@ -139,8 +204,10 @@ data_melted$Cohort <- factor(data_melted$Cohort, levels = Cohort)
 data_melted <- data_melted[complete.cases(data_melted),]
 data_melted$new_value <- paste0(round(data_melted$value,2), "%")
 
+data_melted$SN_types <- factor(data_melted$SN_types, levels = unique(data_melted$SN_types)[1:2])
 
-ggplot(data_melted, aes(x = Cohort, y = value, fill = legend_group)) +
+# Create the plot
+p <- ggplot(data_melted, aes(x = Cohort, y = value, fill = legend_group)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.9), width = 0.8) +
   geom_text(
     data = data_melted %>% filter(!is.na(new_value)),
@@ -148,30 +215,34 @@ ggplot(data_melted, aes(x = Cohort, y = value, fill = legend_group)) +
     position = position_dodge(width = 0.9),
     vjust = -0.20,  # Adjust vertical justification
     hjust = 0.5,  # Center text horizontally
-    size = 4.0,
+    size = 6.5,
     color = "black"
   ) +
   geom_vline(xintercept = 1.5, linetype = "dashed", color = "black", size = 1) +  # Add vertical line
   theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 0, hjust = 1, vjust = 1, size = 20, color = "black"),
-    axis.text.y = element_text(size = 18, color = "black"),
-    axis.title.y = element_text(size = 20, color = "black"),
+    axis.text.x = element_text(angle = 0, hjust = 1, vjust = 1, size = 24, color = "black"),
+    axis.text.y = element_text(size = 20, color = "black"),
+    axis.title.y = element_text(size = 24, color = "black"),
+    axis.title.x = element_blank(),
     axis.line.x = element_line(color = "black"),
     axis.line.y = element_line(color = "black"),
     legend.title = element_text(size = 22, color = "black", face = "bold"),  # Increase legend title size
     legend.text = element_text(size = 18, color = "black"),
     legend.position = "top",
     legend.box = "horizontal",
-    legend.margin = margin(t = 10, b = 10, l = 10, r = 200),
-    plot.margin = margin(t=20, b=80, l=20, r=20),  # Adjust plot margins
+    legend.margin = margin(t = 10, b = 10, l = 20, r = 180),
+    plot.margin = margin(t = 20, b = 80, l = 20, r = 20),  # Adjust plot margins
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
     legend.key = element_rect(color = "black", size = 1),  # Add border around legend
-    legend.background = element_rect(fill = "white", color = "black", size = 1)  # Add background to legend
+    legend.background = element_rect(fill = "white", color = "black", size = 1),  # Add background to legend
+    strip.text = element_blank(),  # Remove facet labels (SN types)
+    panel.spacing = unit(3, "lines")  # Increase space between facets
   ) +
   scale_fill_manual(
-    values = custom_colors,
+    values = c("Combined" = "#D95F02", "Treatments" = "#7570B3", "Radiotherapy" = "#1B9E77", 
+               "Chemotherapy" = "#E6AB02", "PRS" = "#66A61E"),  # Specify colors for each legend_group
     breaks = levels(data_melted$legend_group),  # Ensure breaks match the levels of legend_group
     labels = c("Higher exposure levels of cancer treatments + Elevated genetic risks", 
                "Higher exposure levels of cancer treatments", 
@@ -180,9 +251,8 @@ ggplot(data_melted, aes(x = Cohort, y = value, fill = legend_group)) +
                "Elevated genetic risks")
   ) +
   labs(fill = "Risk factors:") +
-  coord_cartesian(clip = "off") +
-  scale_x_discrete(expand = c(0, 0)) +
-  scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) +
+  scale_x_discrete(expand = c(0, 0), labels = c("SJLIFE", "CCSS")) +  # Set custom x-axis labels
+  scale_y_continuous(limits = c(0, 100), breaks = c(0, 50, 100), expand = c(0, 0)) +
   labs(title = "", y = "Attributable fraction (%)", x = NULL) +
   guides(fill = guide_legend(
     title.position = "top",  # Position the legend title at the top
@@ -190,5 +260,107 @@ ggplot(data_melted, aes(x = Cohort, y = value, fill = legend_group)) +
     label.hjust = 0,  # Left align the legend labels
     ncol = 1  # Adjust number of columns in legend
   )) +
-  facet_wrap(~ SN_types, ncol = 3)  # Add faceting by SN_types
+  facet_wrap(~ SN_types, ncol = 1, scales='free') +  # Add faceting by SN_types
+  # Adding the SN_types label at the top right of each facet
+  geom_text(data = unique(data_melted %>% select(SN_types)),
+            aes(x = Inf, y = Inf, label = SN_types),  # Place at the top right
+            size = 8,
+            fontface = "bold",
+            hjust = 1,
+            vjust = 2,
+            color = "black",
+            inherit.aes = FALSE) +
+  coord_cartesian(clip = "off")  # Prevent clipping of text
+
+p
+plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v21b/combined_SNs_and_SMNs_without_lifestyle_plot.tiff")
+ggsave(plot_name, p, width = 11.6, height = 10, dpi = 600, device = "tiff", compression = "lzw")
+
+
+
+## "NMSCs",  "Breast cancer",  "Thyroid cancer", "Meningioma", "Sarcoma" 
+data_melted <- data[, c("Cohort", "SN_types", "Variables", group)]
+data_melted <- data_melted[grepl(paste0(unique(data_melted$SN_types)[-c(1:2)], collapse="|"), data_melted$SN_types),]
+
+data_melted$value <- as.numeric(data_melted[,group]*100)
+data_melted$legend_group <- factor(data_melted$Variables, levels = order)
+
+# Create a factor with the desired order
+data_melted$Variables <- factor(data_melted$Variables, levels = order)
+
+Cohort <- c("SJLIFE", "CCSS")
+data_melted$Cohort <- factor(data_melted$Cohort, levels = Cohort)
+data_melted <- data_melted[complete.cases(data_melted),]
+data_melted$new_value <- paste0(round(data_melted$value,2), "%")
+
+data_melted$SN_types <- factor(data_melted$SN_types, levels = unique(data_melted$SN_types))
+
+p <- ggplot(data_melted, aes(x = Cohort, y = value, fill = legend_group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.9), width = 0.8) +
+  geom_text(
+    data = data_melted %>% filter(!is.na(new_value)),
+    aes(label = new_value, y = value),  # Adjust y position
+    position = position_dodge(width = 0.9),
+    vjust = -0.20,  # Adjust vertical justification
+    hjust = 0.5,  # Center text horizontally
+    size = 6.5,
+    color = "black"
+  ) +
+  geom_vline(xintercept = 1.5, linetype = "dashed", color = "black", size = 1) +  # Add vertical line
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 1, vjust = 1, size = 24, color = "black"),
+    axis.text.y = element_text(size = 20, color = "black"),
+    axis.title.y = element_text(size = 24, color = "black"),
+    axis.title.x = element_blank(),
+    axis.line.x = element_line(color = "black"),
+    axis.line.y = element_line(color = "black"),
+    legend.title = element_text(size = 22, color = "black", face = "bold"),  # Increase legend title size
+    legend.text = element_text(size = 18, color = "black"),
+    legend.position = "top",
+    legend.box = "horizontal",
+    legend.margin = margin(t = 30, b = 10, l = 20, r = 180),
+    plot.margin = margin(t = 40, b = 80, l = 20, r = 20),  # Adjust plot margins
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    legend.key = element_rect(color = "black", size = 1),  # Add border around legend
+    legend.background = element_rect(fill = "white", color = "black", size = 1),  # Add background to legend
+    strip.text = element_blank(),  # Remove facet labels (SN types)
+    panel.spacing = unit(3, "lines")  # Increase space between facets
+  ) +
+  scale_fill_manual(
+    values = c("Combined" = "#D95F02", "Treatments" = "#7570B3", "Radiotherapy" = "#1B9E77", 
+               "Chemotherapy" = "#E6AB02", "PRS" = "#66A61E"),  # Specify colors for each legend_group
+    breaks = levels(data_melted$legend_group),  # Ensure breaks match the levels of legend_group
+    labels = c("Higher exposure levels of cancer treatments + Elevated genetic risks", 
+               "Higher exposure levels of cancer treatments", 
+               "Higher exposure levels of radiotherapy", 
+               "Higher exposure levels of chemotherapy", 
+               "Elevated genetic risks")
+  ) +
+  labs(fill = "Risk factors:") +
+  scale_x_discrete(expand = c(0, 0), labels = c("SJLIFE", "CCSS")) +  # Set custom x-axis labels
+  scale_y_continuous(limits = c(0, 100), breaks = c(0, 50, 100), expand = c(0, 0)) +
+  labs(title = "", y = "Attributable fraction (%)", x = NULL) +
+  guides(fill = guide_legend(
+    title.position = "top",  # Position the legend title at the top
+    title.hjust = 0,  # Center align the legend title
+    label.hjust = 0,  # Left align the legend labels
+    ncol = 1  # Adjust number of columns in legend
+  )) +
+  facet_wrap(~ SN_types, ncol = 1, scales='free') +  # Add faceting by SN_types
+  # Adding the SN_types label at the top right of each facet
+  geom_text(data = unique(data_melted %>% select(SN_types)),
+            aes(x = Inf, y = Inf, label = SN_types),  # Place at the top right
+            size = 8,
+            fontface = "bold",
+            hjust = 1,
+            vjust = 1,
+            color = "black",
+            inherit.aes = FALSE) +
+  coord_cartesian(clip = "off")  # Prevent clipping of text
+
+p
+plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v21b/combined_5SNs_without_lifestyle_plot.tiff")
+ggsave(plot_name, p, width = 12, height = 15, dpi = 400, device = "tiff", compression = "lzw")
 

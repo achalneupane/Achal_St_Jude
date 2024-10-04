@@ -31,6 +31,15 @@ length(unique(subneo.after5$ccssid))
 # 1619
 
 
+subneo$malKey <- paste(subneo$ccssid, subneo$groupdx3, subneo$a_candx, subneo$count, sep = ":")
+malignantStatus <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/CCSS_Data_from_Huiqi/RE__CCSS_phenotype_data2/ExportedCCSS_data_update_malignant.txt", header = T, stringsAsFactors = F)
+malignantStatus <- malignantStatus[malignantStatus$a_candx !=".",]
+malignantStatus$malKey <- paste(malignantStatus$ccssid, malignantStatus$groupdx3, malignantStatus$a_candx, malignantStatus$count, sep = ":")
+# malignantStatus$dupli <- duplicated(malignantStatus$Key)
+
+## Add malignant status
+subneo$seersmn <- malignantStatus$seersmn[match(subneo$malKey, malignantStatus$malKey)]
+
 #############
 ## Any SNs ##
 #############

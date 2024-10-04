@@ -409,7 +409,7 @@ all_data <- dat_final[(dat_final$anthra_jco_dose_any >=250)|
                         (dat_final$hrtavg >=30)| 
                         (dat_final$anthra_jco_dose_any >=100 &  dat_final$hrtavg >= 15),]
 
-cc <- cbind.data.frame(dat_final$iid, dat_final$hrtavg, dat_final$anthra_jco_dose_any, dat_final$risk_group)
+# cc <- cbind.data.frame(dat_final$iid, dat_final$hrtavg, dat_final$anthra_jco_dose_any, dat_final$risk_group)
 
 
 # Overall Analysis

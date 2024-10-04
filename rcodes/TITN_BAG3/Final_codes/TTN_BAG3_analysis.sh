@@ -537,6 +537,8 @@ plink \
  --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
  --out ccss_org_ccss_exp_kendrick
 
+plink --bfile merged_ccss --freq --keep-allele-order --keep pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno --out merged_ccss_freq_out_kendrick
+
 
 plink \
  --allow-no-sex \
@@ -578,6 +580,8 @@ plink \
  --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
  --out sjlife_results_kendrick
 
+
+plink --bfile sjlife_to_concat_updated --freq --keep-allele-order --keep pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno --out sjlife_to_concat_updated_freq_out_kendrick
 
 ## AFR
 # plink 
