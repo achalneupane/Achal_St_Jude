@@ -126,6 +126,8 @@ plink --nonfounders \
  --remove dropsamples/excessHet.drop.samples \
  --genome \
  --out Survivor_WGS.GATK4180.hg38_renamed_chr1-22.PASS.decomposed_common_pruned_indep_biallelic_varnames_updated_ibd
+
+
 # Potentially related pairs of samples - keep them as a flag list only
 awk 'FNR==1 || $10 > 0.2' Survivor_WGS.GATK4180.hg38_renamed_chr1-22.PASS.decomposed_common_pruned_indep_biallelic_varnames_updated_ibd.genome \
  > dropsamples/relatedness.flag.samples
@@ -135,22 +137,24 @@ awk 'FNR==1 || $10 > 0.2' Survivor_WGS.GATK4180.hg38_renamed_chr1-22.PASS.decomp
 mkdir -p pca
 cd pca
 
-# Extract genotype data for these SNPs from 1000G data - use hg38 because SJLIFE data is in hg38 coordinates
+# Extract genotype data for these SNPs from 1000G data - use hg38 because Survivor_WGS data is in hg38 coordinates
 for chr in {1..22};do
  plink --nonfounders \
-  --bfile ~/Work/1000G_phase_3/20130502/hg38/PLINKformat/ALL.chr${chr}_GRCh38.genotypes.20170504_biallelic_uniq_chrpos \
+  --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/1kGP/plink/ALL.chr${chr}_GRCh38.genotypes.20170504_biallelic_uniq_chrpos \
   --extract ../Survivor_WGS.GATK4180.hg38_renamed_chr${chr}.PASS.decomposed_common_pruned_indep.bim_biallelic_update_var_names.list \
   --make-bed \
-  --out ALL.chr${chr}_GRCh38.genotypes.20170504_biallelic_uniq_chrpos_SJLIFEWGS
+  --out ALL.chr${chr}_GRCh38.genotypes.20170504_biallelic_uniq_chrpos_SurvivorWGS
 done
+
 # Combine genotype data from chr1-22 into one file
+rm merge_list_1kGP.txt
 for chr in {2..22}; do
- echo ALL.chr${chr}_GRCh38.genotypes.20170504_biallelic_uniq_chrpos_SJLIFEWGS.bed \
- ALL.chr${chr}_GRCh38.genotypes.20170504_biallelic_uniq_chrpos_SJLIFEWGS.bim \
- ALL.chr${chr}_GRCh38.genotypes.20170504_biallelic_uniq_chrpos_SJLIFEWGS.fam >> merge_list_1kGP.txt
+ echo ALL.chr${chr}_GRCh38.genotypes.20170504_biallelic_uniq_chrpos_SurvivorWGS.bed \
+ ALL.chr${chr}_GRCh38.genotypes.20170504_biallelic_uniq_chrpos_SurvivorWGS.bim \
+ ALL.chr${chr}_GRCh38.genotypes.20170504_biallelic_uniq_chrpos_SurvivorWGS.fam >> merge_list_1kGP.txt
 done
 plink --nonfounders \
- --bfile ALL.chr1_GRCh38.genotypes.20170504_biallelic_uniq_chrpos_SJLIFEWGS \
+ --bfile ALL.chr1_GRCh38.genotypes.20170504_biallelic_uniq_chrpos_SurvivorWGS \
  --merge-list merge_list_1kGP.txt \
  --make-bed \
  --out ALL.chr1-22_GRCh38.genotypes.20240923_biallelic_uniq_chrpos_Survivor_WGS
@@ -159,12 +163,12 @@ plink --nonfounders \
  --bfile ../Survivor_WGS.GATK4180.hg38_renamed_chr1-22.PASS.decomposed_common_pruned_indep_biallelic_varnames_updated \
  --bmerge ALL.chr1-22_GRCh38.genotypes.20240923_biallelic_uniq_chrpos_Survivor_WGS.bed ALL.chr1-22_GRCh38.genotypes.20240923_biallelic_uniq_chrpos_Survivor_WGS.bim ALL.chr1-22_GRCh38.genotypes.20240923_biallelic_uniq_chrpos_Survivor_WGS.fam \
  --make-bed \
- --out SJLIFE_and_1kGP_tmp1
+ --out Survivor_WGS_and_1kGP_tmp1
 # Exclude variants with multiple alleles
 for file in ../Survivor_WGS.GATK4180.hg38_renamed_chr1-22.PASS.decomposed_common_pruned_indep_biallelic_varnames_updated ALL.chr1-22_GRCh38.genotypes.20240923_biallelic_uniq_chrpos_Survivor_WGS; do
  plink --nonfounders \
   --bfile $file \
-  --exclude SJLIFE_and_1kGP_tmp1-merge.missnp \
+  --exclude Survivor_WGS_and_1kGP_tmp1-merge.missnp \
   --make-bed \
   --out $file.clean
 done
@@ -175,88 +179,88 @@ plink --nonfounders \
  ALL.chr1-22_GRCh38.genotypes.20240923_biallelic_uniq_chrpos_Survivor_WGS.clean.bed ALL.chr1-22_GRCh38.genotypes.20240923_biallelic_uniq_chrpos_Survivor_WGS.clean.bim ALL.chr1-22_GRCh38.genotypes.20240923_biallelic_uniq_chrpos_Survivor_WGS.clean.fam \
  --geno 0.1 \
  --make-bed \
- --out SJLIFE_and_1kGP_final
+ --out Survivor_WGS_and_1kGP_final
 
 # Perform PCA and obtain top 20 PCs
 plink --nonfounders \
- --bfile SJLIFE_and_1kGP_final \
+ --bfile Survivor_WGS_and_1kGP_final \
  --remove ../dropsamples/excessHet.drop.samples \
- --exclude range ~/bin/high-ld_regions_to_exclude_hg38.txt \
+ --exclude range /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/high-LD-regions-GRCh38.txt \
  --range \
  --pca 20 \
- --out SJLIFE_and_1kGP_final_top_20_PCs
-# Plot and identfiication of genetic ancestry is done using R script [~/bin/PCA_plot_for_SJLIFEWGS_samples.R] - this script generates list of individuals with EUR and AFR acnestries (based on genotype data).
-Rscript ~/bin/PCA_plot_for_SJLIFEWGS_samples.R
+ --out Survivor_WGS_and_1kGP_final_top_20_PCs
+# Plot and identfiication of genetic ancestry is done using R script [~/bin/PCA_plot_for_SurvivorWGS_samples.R] - this script generates list of individuals with EUR and AFR acnestries (based on genotype data).
+Rscript ~/bin/PCA_plot_for_SurvivorWGS_samples.R
 
 # Compute top 20 PCs for Europeans and Africans alone
 plink --nonfounders \
- --bfile SJLIFE_and_1kGP_final \
- --keep SJLIFEWGS_EUR_based_on_1kGP_Phase_3_data.txt \
+ --bfile Survivor_WGS_and_1kGP_final \
+ --keep SurvivorWGS_EUR_based_on_1kGP_Phase_3_data.txt \
  --exclude range ~/bin/high-ld_regions_to_exclude_hg38.txt \
  --pca 20 \
- --out SJLIFE_and_1kGP_final_EUR_top_20_PCs
+ --out Survivor_WGS_and_1kGP_final_EUR_top_20_PCs
  
  plink --nonfounders \
- --bfile SJLIFE_and_1kGP_final \
- --keep SJLIFEWGS_AFR_based_on_1kGP_Phase_3_data.txt \
+ --bfile Survivor_WGS_and_1kGP_final \
+ --keep SurvivorWGS_AFR_based_on_1kGP_Phase_3_data.txt \
  --exclude range ~/bin/high-ld_regions_to_exclude_hg38.txt \
  --pca 20 \
- --out SJLIFE_and_1kGP_final_AFR_top_20_PCs
+ --out Survivor_WGS_and_1kGP_final_AFR_top_20_PCs
 
-# Also compute top 20 PCs for all the 2986 SJLIFE samples, just in case; however analysis of all samples is not recommended
+# Also compute top 20 PCs for all the 2986 Survivor_WGS samples, just in case; however analysis of all samples is not recommended
 plink --nonfounders \
- --bfile SJLIFE_and_1kGP_final \
+ --bfile Survivor_WGS_and_1kGP_final \
  --keep ../Survivor_WGS.GATK4180.hg38_renamed_chr1-22.PASS.decomposed_common_pruned_indep_biallelic_varnames_updated.clean.fam \
  --remove ../dropsamples/excessHet.drop.samples \
  --pca 20 \
- --out SJLIFE_and_1kGP_final_all_SJLIFE_samples_20_PCs
+ --out Survivor_WGS_and_1kGP_final_all_Survivor_WGS_samples_20_PCs
 
-#---------------- Rename PCGP ids in the VCF files to SJLIFE ids --------------------------
+#---------------- Rename PCGP ids in the VCF files to Survivor_WGS ids --------------------------
 
-# Rename sample ids in the VCF file to SJLIFE ids, while excluding the 20 samples with excess heetrozygosity
+# Rename sample ids in the VCF file to Survivor_WGS ids, while excluding the 20 samples with excess heetrozygosity
 cd ../../VCF_original
-awk 'FNR>1{if($4!~/SJ/) vcfid=$NF; else vcfid=$3"-"$2;print vcfid, $1}' ../Phenotypes/VCF_ids_to_SJLIDs.map_edited > ../Phenotypes/SJLIFEWGS_3006_vcfid_to_sjlid.linkfile
+awk 'FNR>1{if($4!~/SJ/) vcfid=$NF; else vcfid=$3"-"$2;print vcfid, $1}' ../Phenotypes/VCF_ids_to_SJLIDs.map_edited > ../Phenotypes/SurvivorWGS_3006_vcfid_to_sjlid.linkfile
 awk '{print $1"_"$2}' ../QC/dropsamples/excessHet.drop.samples \
- | grep -F -w -f - ../Phenotypes/SJLIFEWGS_3006_vcfid_to_sjlid.linkfile \
+ | grep -F -w -f - ../Phenotypes/SurvivorWGS_3006_vcfid_to_sjlid.linkfile \
  | awk '{print $2}' \
- > ../Phenotypes/SJLIFEWGS_20_excessHet_to_drop_sjlid.sample
+ > ../Phenotypes/SurvivorWGS_20_excessHet_to_drop_sjlid.sample
 # Also prepare PC files including SJLIDS
-awk '{if($1~/SJ/) $1=$1"_"$2; else $1=$1; print}' ../QC/pca/SJLIFE_and_1kGP_final_EUR_top_20_PCs.eigenvec \
- | awk 'NR==FNR{a[$1]=$2;next}($1 in a){$1=$2=a[$1]; print}' ../Phenotypes/SJLIFEWGS_3006_vcfid_to_sjlid.linkfile - \
- > ../Phenotypes/SJLIFE_and_1kGP_final_EUR_top_20_PCs.eigenvec.sjlid
-awk '{if($1~/SJ/) $1=$1"_"$2; else $1=$1; print}' ../QC/pca/SJLIFE_and_1kGP_final_AFR_top_20_PCs.eigenvec \
- | awk 'NR==FNR{a[$1]=$2;next}($1 in a){$1=$2=a[$1]; print}' ../Phenotypes/SJLIFEWGS_3006_vcfid_to_sjlid.linkfile - \
- > ../Phenotypes/SJLIFE_and_1kGP_final_AFR_top_20_PCs.eigenvec.sjlid 
+awk '{if($1~/SJ/) $1=$1"_"$2; else $1=$1; print}' ../QC/pca/Survivor_WGS_and_1kGP_final_EUR_top_20_PCs.eigenvec \
+ | awk 'NR==FNR{a[$1]=$2;next}($1 in a){$1=$2=a[$1]; print}' ../Phenotypes/SurvivorWGS_3006_vcfid_to_sjlid.linkfile - \
+ > ../Phenotypes/Survivor_WGS_and_1kGP_final_EUR_top_20_PCs.eigenvec.sjlid
+awk '{if($1~/SJ/) $1=$1"_"$2; else $1=$1; print}' ../QC/pca/Survivor_WGS_and_1kGP_final_AFR_top_20_PCs.eigenvec \
+ | awk 'NR==FNR{a[$1]=$2;next}($1 in a){$1=$2=a[$1]; print}' ../Phenotypes/SurvivorWGS_3006_vcfid_to_sjlid.linkfile - \
+ > ../Phenotypes/Survivor_WGS_and_1kGP_final_AFR_top_20_PCs.eigenvec.sjlid 
  
 for chr in {1..22}; do
- bsub -q priority -P SurvivorGWAS -J sjlifewgs_rename$chr -eo ../log/sjlifewgs_rename$chr.err -oo ../log/sjlifewgs_rename$chr.out -R "rusage[mem=3000]" \
- "bcftools reheader -s ../Phenotypes/SJLIFEWGS_3006_vcfid_to_sjlid.linkfile Survivor_WGS.GATK4180.hg38_renamed_chr${chr}.PASS.decomposed.vcf.gz \
-  | bcftools view -S ^../Phenotypes/SJLIFEWGS_20_excessHet_to_drop.sample.sjlid \
-  > SJLIFE.GERMLINE.2986.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid.vcf.gz"
+ bsub -q priority -P SurvivorGWAS -J SurvivorWGS_rename$chr -eo ../log/SurvivorWGS_rename$chr.err -oo ../log/SurvivorWGS_rename$chr.out -R "rusage[mem=3000]" \
+ "bcftools reheader -s ../Phenotypes/SurvivorWGS_3006_vcfid_to_sjlid.linkfile Survivor_WGS.GATK4180.hg38_renamed_chr${chr}.PASS.decomposed.vcf.gz \
+  | bcftools view -S ^../Phenotypes/SurvivorWGS_20_excessHet_to_drop.sample.sjlid \
+  > Survivor_WGS.GERMLINE.2986.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid.vcf.gz"
 done
 # Exclude variants with more than 10% missingness
 for chr in {1..22}; do 
- bsub -q priority -P SurvivorGWAS -J sjlifewgs_all_missing$chr -eo ../log/sjlifewgs_all_missing$chr.err -oo ../log/sjlifewgs_all_missing$chr.out -R "rusage[mem=3000]" \
+ bsub -q priority -P SurvivorGWAS -J SurvivorWGS_all_missing$chr -eo ../log/SurvivorWGS_all_missing$chr.err -oo ../log/SurvivorWGS_all_missing$chr.out -R "rusage[mem=3000]" \
  "vcftools \
- --gzvcf SJLIFE.GERMLINE.2986.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid.vcf.gz \
+ --gzvcf Survivor_WGS.GERMLINE.2986.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid.vcf.gz \
  --max-missing 0.90 \
  --recode \
  --stdout \
  | bgzip \
- > SJLIFE.GERMLINE.2986.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid.qced.vcf.gz"
+ > Survivor_WGS.GERMLINE.2986.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid.qced.vcf.gz"
 done
  
 # Write stats
 for chr in {1..22}; do 
- bsub -P SurvivorGWAS -J sjlifewgs_all_qced_stats$chr -eo ../log/sjlifewgs_all_qced_stats$chr.err -oo ../log/sjlifewgs_all_qced_stats$chr.out -R "rusage[mem=3000]" \
-  "bcftools stats SJLIFE.GERMLINE.2986.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid.qced.vcf.gz \
-  > ../QC/stats/SJLIFE.GERMLINE.2986.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid.qced.bcftools_stats"
+ bsub -P SurvivorGWAS -J SurvivorWGS_all_qced_stats$chr -eo ../log/SurvivorWGS_all_qced_stats$chr.err -oo ../log/SurvivorWGS_all_qced_stats$chr.out -R "rusage[mem=3000]" \
+  "bcftools stats Survivor_WGS.GERMLINE.2986.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid.qced.vcf.gz \
+  > ../QC/stats/Survivor_WGS.GERMLINE.2986.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid.qced.bcftools_stats"
 done
 
 # Index the VCF files
 for chr in {1..22}; do
- bsub -P SurvivorGWAS -J sjlifewgs_idx_all$chr -eo ../log/sjlifewgs_idx_all$chr.err -oo ../log/sjlifewgs_idx_all$chr.out -R "rusage[mem=3000]" \
-  "tabix -pvcf SJLIFE.GERMLINE.2986.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid.qced.vcf.gz"
+ bsub -P SurvivorGWAS -J SurvivorWGS_idx_all$chr -eo ../log/SurvivorWGS_idx_all$chr.err -oo ../log/SurvivorWGS_idx_all$chr.out -R "rusage[mem=3000]" \
+  "tabix -pvcf Survivor_WGS.GERMLINE.2986.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid.qced.vcf.gz"
 done
 
 #---------------- Prepare VCF files for EUR and AFR separately, excluding the 20 samples with excess heterozygosity --------------------------
@@ -264,53 +268,53 @@ mkdir -p EUR
 mkdir -p AFR
 
 # Prepare sample files for both EUR and AFR samples
-awk 'FNR>1{if($1!~/SJ/) $1=$1; else $1=$1"_"$2; print $1}' ../QC/pca/SJLIFEWGS_EUR_based_on_1kGP_Phase_3_data.txt \
- | awk 'NR==FNR{a[$1];next}($1 in a){print $2}' - ../Phenotypes/SJLIFEWGS_3006_vcfid_to_sjlid.linkfile \
- > ../Phenotypes/SJLIFEWGS_EUR_PCA_1kGP.sjlid
-awk 'FNR>1{if($1!~/SJ/) $1=$1; else $1=$1"_"$2; print $1}' ../QC/pca/SJLIFEWGS_AFR_based_on_1kGP_Phase_3_data.txt \
- | awk 'NR==FNR{a[$1];next}($1 in a){print $2}' - ../Phenotypes/SJLIFEWGS_3006_vcfid_to_sjlid.linkfile \
- > ../Phenotypes/SJLIFEWGS_AFR_PCA_1kGP.sjlid 
+awk 'FNR>1{if($1!~/SJ/) $1=$1; else $1=$1"_"$2; print $1}' ../QC/pca/SurvivorWGS_EUR_based_on_1kGP_Phase_3_data.txt \
+ | awk 'NR==FNR{a[$1];next}($1 in a){print $2}' - ../Phenotypes/SurvivorWGS_3006_vcfid_to_sjlid.linkfile \
+ > ../Phenotypes/SurvivorWGS_EUR_PCA_1kGP.sjlid
+awk 'FNR>1{if($1!~/SJ/) $1=$1; else $1=$1"_"$2; print $1}' ../QC/pca/SurvivorWGS_AFR_based_on_1kGP_Phase_3_data.txt \
+ | awk 'NR==FNR{a[$1];next}($1 in a){print $2}' - ../Phenotypes/SurvivorWGS_3006_vcfid_to_sjlid.linkfile \
+ > ../Phenotypes/SurvivorWGS_AFR_PCA_1kGP.sjlid 
 
 # Now subset VCF files for EUR and AFR using the above sample files, while excluding variants with >10% missingness and not in HWE (P < 1e-10)
 for chr in {1..22}; do
- bsub -P SurvivorGWAS -J sjlifewgs_eur$chr -eo ../log/sjlifewgs_eur$chr.err -oo ../log/sjlifewgs_eur$chr.out -R "rusage[mem=3000]" \
+ bsub -P SurvivorGWAS -J SurvivorWGS_eur$chr -eo ../log/SurvivorWGS_eur$chr.err -oo ../log/SurvivorWGS_eur$chr.out -R "rusage[mem=3000]" \
   "vcftools \
-   --gzvcf SJLIFE.GERMLINE.2986.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid.vcf.gz \
-   --keep ../Phenotypes/SJLIFEWGS_EUR_PCA_1kGP.sjlid \
+   --gzvcf Survivor_WGS.GERMLINE.2986.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid.vcf.gz \
+   --keep ../Phenotypes/SurvivorWGS_EUR_PCA_1kGP.sjlid \
    --max-missing 0.90 \
    --hwe 1e-10 \
    --recode \
    --stdout \
    | bgzip \
-   > EUR/SJLIFE.GERMLINE.2364.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_eur.qced.vcf.gz"
- bsub -P SurvivorGWAS -J sjlifewgs_afr$chr -eo ../log/sjlifewgs_afr$chr.err -oo ../log/sjlifewgs_afr$chr.out -R "rusage[mem=3000]" \
+   > EUR/Survivor_WGS.GERMLINE.2364.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_eur.qced.vcf.gz"
+ bsub -P SurvivorGWAS -J SurvivorWGS_afr$chr -eo ../log/SurvivorWGS_afr$chr.err -oo ../log/SurvivorWGS_afr$chr.out -R "rusage[mem=3000]" \
   "vcftools \
-   --gzvcf SJLIFE.GERMLINE.2986.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid.vcf.gz \
-   --keep ../Phenotypes/SJLIFEWGS_AFR_PCA_1kGP.sjlid \
+   --gzvcf Survivor_WGS.GERMLINE.2986.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid.vcf.gz \
+   --keep ../Phenotypes/SurvivorWGS_AFR_PCA_1kGP.sjlid \
    --max-missing 0.90 \
    --hwe 1e-10 \
    --recode \
    --stdout \
    | bgzip \
-   > AFR/SJLIFE.GERMLINE.412.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_afr.qced.vcf.gz"
+   > AFR/Survivor_WGS.GERMLINE.412.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_afr.qced.vcf.gz"
 done
 
 # Write stats
 for chr in {1..22}; do 
- bsub -P SurvivorGWAS -J sjlifewgs_eur_qced_stats$chr -eo ../log/sjlifewgs_eur_qced_stats$chr.err -oo ../log/sjlifewgs_eur_qced_stats$chr.out -R "rusage[mem=3000]" \
-  "bcftools stats EUR/SJLIFE.GERMLINE.2364.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_eur.qced.vcf.gz \
-  > ../QC/stats/SJLIFE.GERMLINE.2364.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_eur.qced.bcftools_stats"
-  bsub -P SurvivorGWAS -J sjlifewgs_afr_qced_stats$chr -eo ../log/sjlifewgs_afr_qced_stats$chr.err -oo ../log/sjlifewgs_afr_qced_stats$chr.out -R "rusage[mem=3000]" \
-  "bcftools stats AFR/SJLIFE.GERMLINE.412.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_afr.qced.vcf.gz \
-  > ../QC/stats/SJLIFE.GERMLINE.412.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_afr.qced.bcftools_stats"
+ bsub -P SurvivorGWAS -J SurvivorWGS_eur_qced_stats$chr -eo ../log/SurvivorWGS_eur_qced_stats$chr.err -oo ../log/SurvivorWGS_eur_qced_stats$chr.out -R "rusage[mem=3000]" \
+  "bcftools stats EUR/Survivor_WGS.GERMLINE.2364.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_eur.qced.vcf.gz \
+  > ../QC/stats/Survivor_WGS.GERMLINE.2364.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_eur.qced.bcftools_stats"
+  bsub -P SurvivorGWAS -J SurvivorWGS_afr_qced_stats$chr -eo ../log/SurvivorWGS_afr_qced_stats$chr.err -oo ../log/SurvivorWGS_afr_qced_stats$chr.out -R "rusage[mem=3000]" \
+  "bcftools stats AFR/Survivor_WGS.GERMLINE.412.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_afr.qced.vcf.gz \
+  > ../QC/stats/Survivor_WGS.GERMLINE.412.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_afr.qced.bcftools_stats"
 done
 
 # Index the VCF files
 for chr in {1..22}; do
- bsub -P SurvivorGWAS -J sjlifewgs_idx_eur$chr -eo ../log/sjlifewgs_idx_eur$chr.err -oo ../log/sjlifewgs_idx_eur$chr.out -R "rusage[mem=3000]" \
-  "tabix -pvcf EUR/SJLIFE.GERMLINE.2364.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_eur.qced.vcf.gz"
- bsub -P SurvivorGWAS -J sjlifewgs_idx_afr -eo ../log/sjlifewgs_idx_afr.err -oo ../log/sjlifewgs_idx_afr.out -R "rusage[mem=3000]" \
-  "tabix -pvcf AFR/SJLIFE.GERMLINE.412.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_afr.qced.vcf.gz" 
+ bsub -P SurvivorGWAS -J SurvivorWGS_idx_eur$chr -eo ../log/SurvivorWGS_idx_eur$chr.err -oo ../log/SurvivorWGS_idx_eur$chr.out -R "rusage[mem=3000]" \
+  "tabix -pvcf EUR/Survivor_WGS.GERMLINE.2364.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_eur.qced.vcf.gz"
+ bsub -P SurvivorGWAS -J SurvivorWGS_idx_afr -eo ../log/SurvivorWGS_idx_afr.err -oo ../log/SurvivorWGS_idx_afr.out -R "rusage[mem=3000]" \
+  "tabix -pvcf AFR/Survivor_WGS.GERMLINE.412.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_afr.qced.vcf.gz" 
 done
 
 #---------------- Prepare corresponding PLINK files ----------------
@@ -319,22 +323,22 @@ mkdir -p PLINK/AFR
 mkdir -p PLINK/ALL
 
 for chr in {1..22}; do
- bsub -q priority -P SurvivorGWAS -J sjlifewgs_plink$chr -eo ../log/sjlifewgs_plink$chr.err -oo ../log/sjlifewgs_plink$chr.out -R "rusage[mem=3000]" \
-  "plink --vcf SJLIFE.GERMLINE.2986.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid.qced.vcf.gz \
+ bsub -q priority -P SurvivorGWAS -J SurvivorWGS_plink$chr -eo ../log/SurvivorWGS_plink$chr.err -oo ../log/SurvivorWGS_plink$chr.out -R "rusage[mem=3000]" \
+  "plink --vcf Survivor_WGS.GERMLINE.2986.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid.qced.vcf.gz \
    --keep-allele-order \
    --allow-extra-chr \
    --make-bed \
-   --out PLINK/ALL/SJLIFE.GERMLINE.2364.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid;
-  plink --vcf EUR/SJLIFE.GERMLINE.2364.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_eur.qced.vcf.gz \
+   --out PLINK/ALL/Survivor_WGS.GERMLINE.2364.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid;
+  plink --vcf EUR/Survivor_WGS.GERMLINE.2364.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_eur.qced.vcf.gz \
    --keep-allele-order \
    --allow-extra-chr \
    --make-bed \
-   --out PLINK/EUR/SJLIFE.GERMLINE.2364.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_eur;
-  plink --vcf AFR/SJLIFE.GERMLINE.412.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_afr.qced.vcf.gz \
+   --out PLINK/EUR/Survivor_WGS.GERMLINE.2364.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_eur;
+  plink --vcf AFR/Survivor_WGS.GERMLINE.412.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_afr.qced.vcf.gz \
    --keep-allele-order \
    --allow-extra-chr \
    --make-bed \
-   --out PLINK/AFR/SJLIFE.GERMLINE.412.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_afr" 
+   --out PLINK/AFR/Survivor_WGS.GERMLINE.412.GATKv3.4.vqsr.release.0714_chr${chr}.PASS.decomposed.sjlid_afr" 
 done
 
 #---------------- Prepare group files ----------------

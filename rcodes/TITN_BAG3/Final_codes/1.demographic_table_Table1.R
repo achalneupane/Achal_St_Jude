@@ -81,7 +81,8 @@ out
 ## ccss_org, CCSS_exp and SJLIFE ##
 ###################################
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno")
-merged.dat <- read.table("sjlife_ccss_org_ccss_exp_ttn_bag3.pheno", header = T)
+# merged.dat <- read.table("sjlife_ccss_org_ccss_exp_ttn_bag3.pheno", header = T)
+merged.dat <- read.table("sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno", header = T) # new data from Kendrick
 dim(merged.dat)
 # merged.dat$hrtavg <- merged.dat$hrtavg/100
 
@@ -100,6 +101,62 @@ get_demographic(merged.dat_without_CMP, n)
 # ALL
 n = nrow(merged.dat)
 get_demographic(merged.dat, n)
+
+
+
+
+############
+## SJLIFE ##
+############
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno")
+# merged.dat <- read.table("sjlife_ccss_org_ccss_exp_ttn_bag3.pheno", header = T)
+merged.dat <- read.table("sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno", header = T)
+merged.dat <- merged.dat[merged.dat$cohort_two ==1,]
+dim(merged.dat)
+# merged.dat$hrtavg <- merged.dat$hrtavg/100
+
+merged.dat_with_CMP <- merged.dat[merged.dat$CMP == 2,]
+merged.dat_without_CMP <- merged.dat[merged.dat$CMP == 1,]
+
+## With CMP
+n=nrow(merged.dat_with_CMP)
+get_demographic(merged.dat_with_CMP, n)
+
+## Without CMP
+n=nrow(merged.dat_without_CMP)
+get_demographic(merged.dat_without_CMP, n)
+
+
+# ALL
+n = nrow(merged.dat)
+get_demographic(merged.dat, n)
+
+##########
+## CCSS ##
+##########
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno")
+# merged.dat <- read.table("sjlife_ccss_org_ccss_exp_ttn_bag3.pheno", header = T)
+merged.dat <- read.table("sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno", header = T)
+merged.dat <- merged.dat[merged.dat$cohort_two ==2,]
+dim(merged.dat)
+# merged.dat$hrtavg <- merged.dat$hrtavg/100
+
+merged.dat_with_CMP <- merged.dat[merged.dat$CMP == 2,]
+merged.dat_without_CMP <- merged.dat[merged.dat$CMP == 1,]
+
+## With CMP
+n=nrow(merged.dat_with_CMP)
+get_demographic(merged.dat_with_CMP, n)
+
+## Without CMP
+n=nrow(merged.dat_without_CMP)
+get_demographic(merged.dat_without_CMP, n)
+
+
+# ALL
+n = nrow(merged.dat)
+get_demographic(merged.dat, n)
+
 
 
 #############
@@ -212,9 +269,10 @@ get_demographic <- function(df, n){
 # cc.ca$IID[!(cc.ca$IID %in% gradefile$sjlid)] # grade 0
 
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno")
-sjlife.afr.dat <- read.table("sjlife_ttn_bag3_afr.pheno", header = T)
+# sjlife.afr.dat <- read.table("sjlife_ttn_bag3_afr.pheno", header = T)
+sjlife.afr.dat <- read.table("sjlife_ttn_bag3_afr_kendrick.pheno", header = T)
 dim(sjlife.afr.dat)
-sjlife.afr.dat$hrtavg <- sjlife.afr.dat$hrtavg/100
+# sjlife.afr.dat$hrtavg <- sjlife.afr.dat$hrtavg/100
 
 # ## Need to add ageevent to African Phenotype
 # library(haven)
@@ -222,8 +280,8 @@ sjlife.afr.dat$hrtavg <- sjlife.afr.dat$hrtavg/100
 # CTCAE <- CTCAE[grepl("Cardiomyopathy", CTCAE$condition),]
 
 
-sjlife.afr.dat_with_CMP <- sjlife.afr.dat[sjlife.afr.dat$CMP == 1,]
-sjlife.afr.dat_without_CMP <- sjlife.afr.dat[sjlife.afr.dat$CMP == 0,]
+sjlife.afr.dat_with_CMP <- sjlife.afr.dat[sjlife.afr.dat$CMP == 2,]
+sjlife.afr.dat_without_CMP <- sjlife.afr.dat[sjlife.afr.dat$CMP == 1,]
 
 ## With CMP
 n=nrow(sjlife.afr.dat_with_CMP)

@@ -152,14 +152,14 @@ p <- ggplot(data_melted, aes(x = SN_types, y = value, fill = legend_group)) +
     position = position_dodge(width = 0.6),
     vjust = -0.30,  # Adjust vertical justification
     hjust = 0.5,  # Center text horizontally
-    size = 5.0,
+    size = 4.5,
     color = "black"
   ) +
   theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 60, hjust = 1, vjust = 1, size = 20, color = "black"),  # Tilt x-axis labels 45 degrees
+    axis.text.x = element_text(angle = 60, hjust = 1, vjust = 1, size = 16, color = "black"),  # Tilt x-axis labels 45 degrees
     axis.text.y = element_text(size = 16, color = "black"),  # Make y-axis text black
-    axis.title.y = element_text(size = 24, color = "black"),  # Make y-axis title black
+    axis.title.y = element_text(size = 20, color = "black"),  # Make y-axis title black
     axis.title.x = element_blank(),
     axis.line.x = element_line(color = "black"),  # Make x-axis black
     axis.line.y = element_line(color = "black"),  # Make y-axis black
@@ -240,10 +240,10 @@ p <- ggplot(data_melted, aes(x = Cohort, y = value, fill = legend_group)) +
     strip.text = element_blank(),  # Remove facet labels (SN types)
     panel.spacing = unit(3, "lines")  # Increase space between facets
   ) +
+  # Customize colors
   scale_fill_manual(
-    values = c("Combined" = "#D95F02", "Treatments" = "#7570B3", "Radiotherapy" = "#1B9E77", 
-               "Chemotherapy" = "#E6AB02", "PRS" = "#66A61E"),  # Specify colors for each legend_group
-    breaks = levels(data_melted$legend_group),  # Ensure breaks match the levels of legend_group
+    values = custom_colors,
+    breaks = legend_order,
     labels = c("Higher exposure levels of cancer treatments + Elevated genetic risks", 
                "Higher exposure levels of cancer treatments", 
                "Higher exposure levels of radiotherapy", 
@@ -328,10 +328,10 @@ p <- ggplot(data_melted, aes(x = Cohort, y = value, fill = legend_group)) +
     strip.text = element_blank(),  # Remove facet labels (SN types)
     panel.spacing = unit(3, "lines")  # Increase space between facets
   ) +
+  # Customize colors
   scale_fill_manual(
-    values = c("Combined" = "#D95F02", "Treatments" = "#7570B3", "Radiotherapy" = "#1B9E77", 
-               "Chemotherapy" = "#E6AB02", "PRS" = "#66A61E"),  # Specify colors for each legend_group
-    breaks = levels(data_melted$legend_group),  # Ensure breaks match the levels of legend_group
+    values = custom_colors,
+    breaks = legend_order,
     labels = c("Higher exposure levels of cancer treatments + Elevated genetic risks", 
                "Higher exposure levels of cancer treatments", 
                "Higher exposure levels of radiotherapy", 

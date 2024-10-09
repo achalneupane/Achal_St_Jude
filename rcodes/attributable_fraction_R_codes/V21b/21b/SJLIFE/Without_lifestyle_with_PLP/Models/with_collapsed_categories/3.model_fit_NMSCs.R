@@ -83,6 +83,12 @@ af_by_tx.lt.35 <- "-"
 ## >= 35
 af_by_tx.gteq.35 <- "-"
 
+## < EUR
+af_by_tx.EUR <- "-"
+
+## >= AFR
+af_by_tx.AFR <- "-"
+
 #############
 ## RT only ##
 #############

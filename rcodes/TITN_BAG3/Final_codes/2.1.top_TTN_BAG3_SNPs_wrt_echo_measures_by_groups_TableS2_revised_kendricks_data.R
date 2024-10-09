@@ -1,7 +1,7 @@
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/")
 ## Load echo data
-load('Rcodes/echo.PLP.eur.RData')
-load('Rcodes/echo.PLP.afr.RData')
+load('Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/DNUT/echo.PLP.eur.RData')
+load('Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/DNUT/echo.PLP.afr.RData')
 echo.PLP.eur$chr2.178562809.T.C_C_yn = ifelse(echo.PLP.eur$chr2.178562809.T.C_C>0, "Yes", "No")
 echo.PLP.eur$chr10.119670121.T.C_C_yn = ifelse(echo.PLP.eur$chr10.119670121.T.C_C>0, "Yes", "No")
 echo.PLP.afr$chr2.178562809.T.C_C_yn = ifelse(echo.PLP.afr$chr2.178562809.T.C_C>0, "Yes", "No")

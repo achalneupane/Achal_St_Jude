@@ -10,7 +10,7 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel(
-      numericInput("age_diagnosis", "Age at childhood cancer diagnosis (years):", value = 0, min = 0, max = 200, step = 1),
+      numericInput("age_diagnosis", "Age at childhood cancer diagnosis (>0 to ≤23.5 years):", value = 0, min = 0, max = 200, step = 1),
       selectInput("sex", "Sex:", choices = list("Female" = "female", "Male" = "male")),
       selectInput("anthracycline", "Cumulative anthracycline dose (mg/m²):",
                   choices = list("None" = "none", ">0-100" = "0_100", ">100-250" = "100_250", ">250" = "250")),

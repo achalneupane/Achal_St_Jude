@@ -17,7 +17,7 @@ sd_het = sd(hetCalc$het)
 lower_het = mean_het-3*sd_het
 upper_het = mean_het+3*sd_het
 outlier = hetCalc[hetCalc$het<lower_het | hetCalc$het>upper_het,]
-# dim(outlier)
+dim(outlier)
 # [1] 128   7
 
 write.table(outlier, 'Survivor_WGS_Per_sample_heterozygosity_outlier_check.txt', row.names=F, quote=F, sep="\t")

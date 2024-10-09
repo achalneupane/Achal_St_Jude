@@ -5,6 +5,6 @@ account: ysapkota
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 12888789
-bundleId: 9178853
+bundleId: 9192775
 url: https://ysapkota.shinyapps.io/Cardiomyopathy_Risk_Calculator/
 version: 1
