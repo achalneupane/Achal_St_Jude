@@ -8,6 +8,8 @@ mart_grch37 <- useEnsembl(biomart = "ENSEMBL_MART_SNP", dataset = "hsapiens_snp"
 
 # For GRCh38 (new genome build)
 mart_grch38 <- useEnsembl(biomart = "ENSEMBL_MART_SNP", dataset = "hsapiens_snp")
+# mart_grch38 <- useEnsembl(biomart = "ENSEMBL_MART_SNP", dataset = "hsapiens_snp", mirror = "useast")
+
 
 # List available filters for GRCh38 mart
 listFilters(mart_grch38)
@@ -20,18 +22,35 @@ chromosome <- "1"  # Example chromosome
 start_position <- 156138821
 end_position <- 156138821
 
+# Create a data frame in R
+df <- data.frame(
+  Chromosome = rep("2", 16),
+  start_position = c(179399704, 179400742, 179410112, 179414849, 179422284, 179425091, 179428124, 
+            179432234, 179435679, 179441250, 179446855, 179453355, 179478777, 
+            179571683, 179604819, 179631116),
+  end_position = c(179399704, 179400742, 179410112, 179414849, 179422284, 179425091, 179428124, 
+          179432234, 179435679, 179441250, 179446855, 179453355, 179478777, 
+          179571683, 179604819, 179631116)
+)
 
+df$end_position <- df$end_position+1
+# Print the data frame
+# print(df)
+
+chromosome <- df$Chromosome
+start_position <- df$start_position
+end_position <- df$end_position
 
 # Query variants in GRCh37
-variants_grch37 <- getBM(attributes = c('chr_name', 'chrom_start'),
-                         filters = c('chr_name', 'start', 'end'),
-                         values = list(chromosome, start_position, end_position),
+variants_grch37 <- getBM(attributes = c('chr_name', 'chrom_start', 'snp'),
+                         filters = c('chr_name', 'start'),
+                         values = list(chromosome, start_position),
                          mart = mart_grch37)
 
 
-variants_grch38 <- getBM(attributes = c('chr_name', 'chrom_start'),
-                         filters = c('chr_name', 'start', 'end'),
-                         values = list(chromosome, start_position, end_position),
+variants_grch38 <- getBM(attributes = c('chr_name', 'chrom_start', 'snp'),
+                         filters = c('chr_name', 'start'),
+                         values = list(chromosome, start_position),
                          mart = mart_grch38)
 
 

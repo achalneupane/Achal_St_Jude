@@ -39,6 +39,9 @@ sjlife.SCN5A.PLP.EUR$carrier <- ifelse(rowSums(sjlife.SCN5A.PLP.EUR[grepl("chr",
 sjlife.TCAP.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/TCAP_EUR_vars_recodeA.raw", header = T)
 sjlife.TCAP.PLP.EUR$carrier <- ifelse(rowSums(sjlife.TCAP.PLP.EUR[grepl("chr", colnames(sjlife.TCAP.PLP.EUR))], na.rm = T) > 0, 1, 0)
 
+sjlife.TNNC1.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/TNNC1_EUR_vars_recodeA.raw", header = T)
+sjlife.TNNC1.PLP.EUR$carrier <- ifelse(rowSums(sjlife.TNNC1.PLP.EUR[grepl("chr", colnames(sjlife.TNNC1.PLP.EUR))], na.rm = T) > 0, 1, 0)
+
 sjlife.TNNT2.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/TNNT2_EUR_vars_recodeA.raw", header = T)
 sjlife.TNNT2.PLP.EUR$carrier <- ifelse(rowSums(sjlife.TNNT2.PLP.EUR[grepl("chr", colnames(sjlife.TNNT2.PLP.EUR))], na.rm = T) > 0, 1, 0)
 
@@ -68,6 +71,7 @@ EUR.dat.PLP$LMNA.PLP.carrier <- sjlife.LMNA.PLP.EUR$carrier[match(EUR.dat.PLP$II
 EUR.dat.PLP$MYH7.PLP.carrier <- sjlife.MYH7.PLP.EUR$carrier[match(EUR.dat.PLP$IID, sjlife.MYH7.PLP.EUR$IID)]
 EUR.dat.PLP$SCN5A.PLP.carrier <- sjlife.SCN5A.PLP.EUR$carrier[match(EUR.dat.PLP$IID, sjlife.SCN5A.PLP.EUR$IID)]
 EUR.dat.PLP$TCAP.PLP.carrier <- sjlife.TCAP.PLP.EUR$carrier[match(EUR.dat.PLP$IID, sjlife.TCAP.PLP.EUR$IID)]
+EUR.dat.PLP$TNNC1.PLP.carrier <- sjlife.TNNC1.PLP.EUR$carrier[match(EUR.dat.PLP$IID, sjlife.TNNC1.PLP.EUR$IID)]
 EUR.dat.PLP$TNNT2.PLP.carrier <- sjlife.TNNT2.PLP.EUR$carrier[match(EUR.dat.PLP$IID, sjlife.TNNT2.PLP.EUR$IID)]
 EUR.dat.PLP$TTN_PSI.PLP.carrier <- sjlife.TTN_PSI.PLP.EUR$carrier[match(EUR.dat.PLP$IID, sjlife.TTN_PSI.PLP.EUR$IID)]
 EUR.dat.PLP$TTN_PSI_A_Band.PLP.carrier <- sjlife.TTN_PSI_A_Band.PLP.EUR$carrier[match(EUR.dat.PLP$IID, sjlife.TTN_PSI_A_Band.PLP.EUR$IID)]
@@ -97,6 +101,9 @@ sjlife.SCN5A.PLP.AFR$carrier <- ifelse(rowSums(sjlife.SCN5A.PLP.AFR[grepl("chr",
 sjlife.TCAP.PLP.AFR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/TCAP_AFR_vars_recodeA.raw", header = T)
 sjlife.TCAP.PLP.AFR$carrier <- ifelse(rowSums(sjlife.TCAP.PLP.AFR[grepl("chr", colnames(sjlife.TCAP.PLP.AFR))], na.rm = T) > 0, 1, 0)
 
+sjlife.TNNC1.PLP.AFR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/TNNC1_AFR_vars_recodeA.raw", header = T)
+sjlife.TNNC1.PLP.AFR$carrier <- ifelse(rowSums(sjlife.TNNC1.PLP.AFR[grepl("chr", colnames(sjlife.TNNC1.PLP.AFR))], na.rm = T) > 0, 1, 0)
+
 sjlife.TNNT2.PLP.AFR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/TNNT2_AFR_vars_recodeA.raw", header = T)
 sjlife.TNNT2.PLP.AFR$carrier <- ifelse(rowSums(sjlife.TNNT2.PLP.AFR[grepl("chr", colnames(sjlife.TNNT2.PLP.AFR))], na.rm = T) > 0, 1, 0)
 
@@ -125,6 +132,7 @@ AFR.dat.PLP$LMNA.PLP.carrier <- sjlife.LMNA.PLP.AFR$carrier[match(AFR.dat.PLP$II
 AFR.dat.PLP$MYH7.PLP.carrier <- sjlife.MYH7.PLP.AFR$carrier[match(AFR.dat.PLP$IID, sjlife.MYH7.PLP.AFR$IID)]
 AFR.dat.PLP$SCN5A.PLP.carrier <- sjlife.SCN5A.PLP.AFR$carrier[match(AFR.dat.PLP$IID, sjlife.SCN5A.PLP.AFR$IID)]
 AFR.dat.PLP$TCAP.PLP.carrier <- sjlife.TCAP.PLP.AFR$carrier[match(AFR.dat.PLP$IID, sjlife.TCAP.PLP.AFR$IID)]
+AFR.dat.PLP$TNNC1.PLP.carrier <- sjlife.TNNC1.PLP.AFR$carrier[match(AFR.dat.PLP$IID, sjlife.TNNC1.PLP.AFR$IID)]
 AFR.dat.PLP$TNNT2.PLP.carrier <- sjlife.TNNT2.PLP.AFR$carrier[match(AFR.dat.PLP$IID, sjlife.TNNT2.PLP.AFR$IID)]
 AFR.dat.PLP$TTN_PSI.PLP.carrier <- sjlife.TTN_PSI.PLP.AFR$carrier[match(AFR.dat.PLP$IID, sjlife.TTN_PSI.PLP.AFR$IID)]
 AFR.dat.PLP$TTN_PSI_A_Band.PLP.carrier <- sjlife.TTN_PSI_A_Band.PLP.AFR$carrier[match(AFR.dat.PLP$IID, sjlife.TTN_PSI_A_Band.PLP.AFR$IID)]

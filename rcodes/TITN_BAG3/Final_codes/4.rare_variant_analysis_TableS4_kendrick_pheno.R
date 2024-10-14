@@ -1,4 +1,6 @@
-setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Final_analysis")
+rm(list=ls())
+# setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Final_analysis")
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/")
 load("EUR.dat.PLP.RData")
 # EUR_common_Kendrick <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Final_analysis//EUR_CMP_analysis_data.rds")
 # EUR.dat.PLP <- EUR.dat.PLP[EUR.dat.PLP$IID %in% EUR_common_Kendrick$iid,]
@@ -64,6 +66,7 @@ for (i in 1:length(genes)){
 # View the results
 print(results)
 
+rm(list=ls())
 ## AFR analysis
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/AFR.dat.PLP.RData")
 # AFR_common_Kendrick <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Final_analysis/AFR_CMP_analysis_data.rds")
@@ -131,3 +134,67 @@ for (i in 1:length(genes)){
 
 # View the results
 print(results)
+
+
+## Check prevalence of rare variants EUR
+sum(EUR.dat.PLP$BAG3.PLP.carrier==1)/nrow(EUR.dat.PLP)*100
+# 0.58
+(sum(EUR.dat.PLP$DSP.PLP.carrier==1)/nrow(EUR.dat.PLP))*100
+# 0.03
+(sum(EUR.dat.PLP$LMNA.PLP.carrier==1)/nrow(EUR.dat.PLP))*100
+# 0.91
+(sum(EUR.dat.PLP$MYH7.PLP.carrier==1)/nrow(EUR.dat.PLP))*100
+# 0.75
+(sum(EUR.dat.PLP$SCN5A.PLP.carrier==1)/nrow(EUR.dat.PLP))*100
+# 0
+(sum(EUR.dat.PLP$TCAP.PLP.carrier==1)/nrow(EUR.dat.PLP))*100
+# 0.23
+(sum(EUR.dat.PLP$TNNC1.PLP.carrier==1)/nrow(EUR.dat.PLP))*100
+# 0.03
+(sum(EUR.dat.PLP$TNNT2.PLP.carrier==1)/nrow(EUR.dat.PLP))*100
+# 0.23
+(sum(EUR.dat.PLP$TTN_PSI.PLP.carrier==1)/nrow(EUR.dat.PLP))*100
+# 0.20
+(sum(EUR.dat.PLP$TTN_PSI_A_Band.PLP.carrier==1)/nrow(EUR.dat.PLP))*100
+# 0.03
+(sum(EUR.dat.PLP$ALL_PLP_With_TTN_PSI_A_Band.PLP.carrier==1)/nrow(EUR.dat.PLP))*100
+# 2.71
+(sum(EUR.dat.PLP$ALL_PLP_With_TTN_PSI.PLP.carrier==1)/nrow(EUR.dat.PLP))*100
+# 2.84
+
+EUR.dat.PLP.CCM <- EUR.dat.PLP[EUR.dat.PLP$CMP ==2,]
+EUR.dat.PLP.without.CCM <- EUR.dat.PLP[EUR.dat.PLP$CMP ==1,]
+
+(sum(EUR.dat.PLP.CCM$TTN_PSI.PLP.carrier==1)/nrow(EUR.dat.PLP.CCM))*100
+# 0
+(sum(EUR.dat.PLP.without.CCM$TTN_PSI.PLP.carrier==1)/nrow(EUR.dat.PLP.without.CCM))*100
+# 0.21
+
+(sum(EUR.dat.PLP.CCM$TTN_PSI_A_Band.PLP.carrier==1)/nrow(EUR.dat.PLP.CCM))*100
+# 0
+(sum(EUR.dat.PLP.without.CCM$TTN_PSI_A_Band.PLP.carrier==1)/nrow(EUR.dat.PLP.without.CCM))*100
+# 0.04
+
+## Check prevalence of rare variants in AFR
+sum(AFR.dat.PLP$BAG3.PLP.carrier==1)/nrow(AFR.dat.PLP)*100
+# 0.42
+(sum(AFR.dat.PLP$DSP.PLP.carrier==1)/nrow(AFR.dat.PLP))*100
+# 0
+(sum(AFR.dat.PLP$LMNA.PLP.carrier==1)/nrow(AFR.dat.PLP))*100
+# 0.84
+(sum(AFR.dat.PLP$MYH7.PLP.carrier==1)/nrow(AFR.dat.PLP))*100
+# 2.1
+(sum(AFR.dat.PLP$SCN5A.PLP.carrier==1)/nrow(AFR.dat.PLP))*100
+# 0
+(sum(AFR.dat.PLP$TCAP.PLP.carrier==1)/nrow(AFR.dat.PLP))*100
+# 0
+(sum(AFR.dat.PLP$TNNT2.PLP.carrier==1)/nrow(AFR.dat.PLP))*100
+# 0.84
+(sum(AFR.dat.PLP$TTN_PSI.PLP.carrier==1)/nrow(AFR.dat.PLP))*100
+# 0.84
+(sum(AFR.dat.PLP$TTN_PSI_A_Band.PLP.carrier==1)/nrow(AFR.dat.PLP))*100
+# 0
+(sum(AFR.dat.PLP$ALL_PLP_With_TTN_PSI_A_Band.PLP.carrier==1)/nrow(AFR.dat.PLP))*100
+# 4.2
+(sum(AFR.dat.PLP$ALL_PLP_With_TTN_PSI.PLP.carrier==1)/nrow(AFR.dat.PLP))*100
+# 5.04

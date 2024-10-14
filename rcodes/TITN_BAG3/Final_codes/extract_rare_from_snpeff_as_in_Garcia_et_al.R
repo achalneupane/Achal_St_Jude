@@ -6,6 +6,7 @@
 # chr2:178665777 A>G in Table S4 is in exon with PSI 1% and won’t be considered
 # pathogenic. Therefore, I have concerns about their rare genetic variant
 # analysis in the manuscript.
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/")
 
 library(data.table)
 # df <- fread("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/ALL_P_LP_combinations/rare_variant_analysis_v2/pablo_garcia_et_al_nine_genes_SNPEFF/NINE_GENES_ANNOVAR", sep = "\t", header = T)
@@ -27,8 +28,8 @@ df$rsID <- sub(".*;(rs[0-9]+).*", "\\1", df$ID)
 # sjlife.bim <- sjlife.bim[!grepl(";", sjlife.bim$V2),]
 # sum(duplicated(sjlife.bim$KEY1))
 # 
-ccss_exp.bim <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined/merged_plink_PLP_ccss_exp.bim")
-ccss_exp.bim$KEY1 <- paste0(ccss_exp.bim$V1, ":", ccss_exp.bim$V4)
+# ccss_exp.bim <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined/merged_plink_PLP_ccss_exp.bim")
+# ccss_exp.bim$KEY1 <- paste0(ccss_exp.bim$V1, ":", ccss_exp.bim$V4)
 # sum(duplicated(ccss_exp.bim$KEY1))
 # 
 # ## Harmonize CCSS
@@ -56,13 +57,13 @@ ccss_exp.bim$KEY1 <- paste0(ccss_exp.bim$V1, ":", ccss_exp.bim$V4)
 # dim(df.overlap)
 # # 128834    246
 
+
 df.overlap <- df
 table(df.overlap$`ANN[*].GENE`)
 df.overlap$`ANN[*].GENE`[df.overlap$`ANN[*].GENE` == "TTN-AS1"] <- "TTN"
 
 # Remove those with either AF_afr >= 0.0001 0r AF_nfe >= 0.0001
 df.overlap <- df.overlap[which(df.overlap$AF_nfe < 0.0001|df.overlap$AF_afr < 0.0001),]
-
 
 ## add TTN band and PSI
 TTN <- df.overlap[df.overlap$`ANN[*].GENE` == "TTN",]
@@ -90,36 +91,107 @@ for(i in 1:nrow(TTN)) {
 }
 
 # View the updated TTN dataframe
+TTN.saved <- TTN
 head(TTN)
 dim(TTN)
 # 81220
+# 185775 
 
 df.overlap$Ave_PSI <- TTN$Ave_PSI[match(df.overlap$SNP, TTN$SNP)]
 df.overlap$Ave_PSI_GTEX <- TTN$Ave_PSI_GTEX[match(df.overlap$SNP, TTN$SNP)]
 df.overlap$TTN_band <- TTN$TTN_band[match(df.overlap$SNP, TTN$SNP)]
 
-cc <- cbind.data.frame(df.overlap$SNP, df.overlap$`ANN[*].EFFECT`, df.overlap$AF, df.overlap$AF_nfe, df.overlap$AF_afr, df.overlap$rsID)
+cc <- cbind.data.frame(df.overlap$SNP, df.overlap$`ANN[*].GENE`, df.overlap$`ANN[*].EFFECT`, df.overlap$AF, df.overlap$AF_nfe, df.overlap$AF_afr, df.overlap$rsID)
+
+
+
+
+# 1. Protein-Altering Variants (BAG3, LMNA, TCAP, TNNC1, TNNT2)
+# These include missense, nonsense, and frameshift variants:
+# Missense variants: missense_variant
+# Nonsense variants: stop_gained
+# Frameshift variants: frameshift_variant
+# In-frame insertions/deletions: inframe_insertion, inframe_deletion
+
+# 2. Missense Variants and In-frame Insertion/Deletion (MYH7)
+# Missense variants: missense_variant
+# In-frame variants: inframe_insertion, inframe_deletion
+
+# 3. Frameshift, Stop-Gained, Splice-Donor, and Splice-Acceptor Variants (DSP, SCN5A, TTN)
+# Frameshift variants: frameshift_variant
+# Stop-gained variants: stop_gained
+# Splice-donor/acceptor variants: splice_donor_variant, splice_acceptor_variant
+
+# 1. Protein-Altering Variants (BAG3, LMNA, TCAP, TNNC1, TNNT2)
+df.overlap$POS <- as.numeric(df.overlap$POS) 
+df.overlap.saved <- df.overlap
+BAG3 <- df.overlap[(df.overlap$POS >=119651380 & df.overlap$POS <=119677819) & df.overlap$CHROM == "chr10",]
+BAG3 <- BAG3[grepl("missense_variant|stop_gained|frameshift_variant|inframe_insertion|inframe_deletion", BAG3$`ANN[*].EFFECT`),]
+BAG3 <- BAG3[!duplicated(BAG3$SNP),]
+
+LMNA <- df.overlap[(df.overlap$POS >=156082573 & df.overlap$POS <=156140081) & df.overlap$CHROM == "chr1",]
+LMNA <- LMNA[grepl("missense_variant|stop_gained|frameshift_variant|inframe_insertion|inframe_deletion", LMNA$`ANN[*].EFFECT`),]
+LMNA <- LMNA[!duplicated(LMNA$SNP),]
+
+TCAP <- df.overlap[(df.overlap$POS >=39665349 & df.overlap$POS <=39666554) & df.overlap$CHROM == "chr17",]
+TCAP <- TCAP[grepl("missense_variant|stop_gained|frameshift_variant|inframe_insertion|inframe_deletion", TCAP$`ANN[*].EFFECT`),]
+TCAP <- TCAP[!duplicated(TCAP$SNP),]
+
+TNNC1 <- df.overlap[(df.overlap$POS >=52451100 & df.overlap$POS <=52454041) & df.overlap$CHROM == "chr3",]
+TNNC1 <- TNNC1[grepl("missense_variant|stop_gained|frameshift_variant|inframe_insertion|inframe_deletion", TNNC1$`ANN[*].EFFECT`),]
+TNNC1 <- TNNC1[!duplicated(TNNC1$SNP),]
+
+TNNT2 <- df.overlap[(df.overlap$POS >=201359014 & df.overlap$POS <=201377680) & df.overlap$CHROM == "chr1",]
+TNNT2 <- TNNT2[grepl("missense_variant|stop_gained|frameshift_variant|inframe_insertion|inframe_deletion", TNNT2$`ANN[*].EFFECT`),]
+TNNT2 <- TNNT2[!duplicated(TNNT2$SNP),]
+
+# 2. Missense Variants and In-frame Insertion/Deletion (MYH7)
+MYH7 <- df.overlap[(df.overlap$POS >=23412740 & df.overlap$POS <=23435660) & df.overlap$CHROM == "chr14",]
+MYH7 <- MYH7[grepl("missense_variant|stop_gained|inframe_insertion|inframe_deletion", MYH7$`ANN[*].EFFECT`),]
+MYH7 <- MYH7[!duplicated(MYH7$SNP),]
+
+# 3. Frameshift, Stop-Gained, Splice-Donor, and Splice-Acceptor Variants (DSP, SCN5A, TTN)
+DSP <- df.overlap[(df.overlap$POS >=7541671 & df.overlap$POS <=7586714) & df.overlap$CHROM == "chr6",]
+DSP <- DSP[grepl("frameshift_variant|stop_gained|splice_donor_variant|splice_acceptor_variant", DSP$`ANN[*].EFFECT`),]
+DSP <- DSP[!duplicated(DSP$SNP),]
+
+SCN5A <- df.overlap[(df.overlap$POS >=38548062 & df.overlap$POS <=38649687) & df.overlap$CHROM == "chr3",]
+SCN5A <- SCN5A[grepl("frameshift_variant|stop_gained|splice_donor_variant|splice_acceptor_variant", SCN5A$`ANN[*].EFFECT`),]
+SCN5A <- SCN5A[!duplicated(SCN5A$SNP),]
+
+TTN <- df.overlap[(df.overlap$POS >=178525989 & df.overlap$POS <=178807423) & df.overlap$CHROM == "chr2",]
+TTN <- TTN[grepl("frameshift_variant|stop_gained|splice_donor_variant|splice_acceptor_variant", TTN$`ANN[*].EFFECT`),]
+TTN <- TTN[!duplicated(TTN$SNP),]
+df.overlap <- rbind.data.frame(BAG3, LMNA, TCAP, TNNC1, TNNT2, MYH7, DSP, SCN5A, TTN)
+
+cc <- cbind.data.frame(df.overlap$SNP, df.overlap$`ANN[*].GENE`, df.overlap$`ANN[*].EFFECT`, df.overlap$AF, df.overlap$AF_nfe, df.overlap$AF_afr, df.overlap$rsID, df.overlap$Ave_PSI_GTEX, df.overlap$TTN_band)
 
 ## NFE (apply only ancestry specific maf)
 # AF_EUR.0.0001 <- df.overlap[df.overlap$AF < 0.0001 & df.overlap$AF_nfe < 0.0001,]
 AF_EUR.0.0001 <- df.overlap[df.overlap$AF_nfe < 0.0001,]
 table(AF_EUR.0.0001$`ANN[*].EFFECT`)
-AF_EUR.0.0001 <- AF_EUR.0.0001[grepl("stop|missense|frameshift|splice_acceptor", AF_EUR.0.0001$`ANN[*].EFFECT`, ignore.case = T),]
+# AF_EUR.0.0001 <- AF_EUR.0.0001[grepl("stop|missense|frameshift|splice_acceptor", AF_EUR.0.0001$`ANN[*].EFFECT`, ignore.case = T),]
 # AF_EUR.0.0001 <- AF_EUR.0.0001[!grepl("intron", AF_EUR.0.0001$`ANN[*].EFFECT`, ignore.case = T),]
-AF_EUR.0.0001.patho <- AF_EUR.0.0001[grepl("^Pathogenic", AF_EUR.0.0001$CLNSIG),]
-AF_EUR.0.0001 <- AF_EUR.0.0001[!AF_EUR.0.0001$SNP %in% AF_EUR.0.0001.patho$SNP ,]
-AF_EUR.0.0001 <- rbind.data.frame(AF_EUR.0.0001, AF_EUR.0.0001.patho)
-AF_EUR.0.0001 <- AF_EUR.0.0001[!duplicated(AF_EUR.0.0001$ID),]
+# AF_EUR.0.0001.patho <- AF_EUR.0.0001[grepl("^Pathogenic", AF_EUR.0.0001$CLNSIG),]
+# AF_EUR.0.0001 <- AF_EUR.0.0001[!AF_EUR.0.0001$SNP %in% AF_EUR.0.0001.patho$SNP ,]
+# AF_EUR.0.0001 <- rbind.data.frame(AF_EUR.0.0001, AF_EUR.0.0001.patho)
+# AF_EUR.0.0001 <- AF_EUR.0.0001[!duplicated(AF_EUR.0.0001$ID),]
 table(AF_EUR.0.0001$`ANN[*].EFFECT`, AF_EUR.0.0001$`ANN[*].GENE`)
-#                                         BAG3 DSP LMNA MYH7 SCN5A TCAP TNNT2 TTN
-# missense_variant                          9  21    6    5    18    4     1 316
-# missense_variant&splice_region_variant    1   0    0    0     0    0     0   3
-# splice_acceptor_variant&intron_variant    0   0    1    0     0    0     0   2
-# stop_gained                               0   0    2    0     0    0     1   1
+#                                         BAG3 DSP LMNA MYH7 SCN5A TCAP TNNC1 TNNT2 TTN
+# disruptive_inframe_deletion                 1   0    0    0     0    0     0     0   0
+# disruptive_inframe_insertion                1   0    0    0     0    0     0     0   0
+# frameshift_variant                          0   0    1    0     0    1     0     0   4
+# frameshift_variant&splice_region_variant    0   0    1    0     0    0     0     0   0
+# missense_variant                           39   0   41   67     0   13     3    15   0
+# missense_variant&splice_region_variant      1   0    0    4     0    1     0     0   0
+# splice_acceptor_variant&intron_variant      0   0    0    0     0    0     0     0   2
+# splice_donor_variant&intron_variant         0   1    0    0     0    0     0     0   6
+# stop_gained                                 0   0    2    0     1    0     0     1  14
 
 table(AF_EUR.0.0001$CLNSIG)
 dim(AF_EUR.0.0001)
-# 391 249
+# 220 250
+cc <- cbind.data.frame(AF_EUR.0.0001$SNP, AF_EUR.0.0001$`ANN[*].GENE`, AF_EUR.0.0001$`ANN[*].EFFECT`, AF_EUR.0.0001$AF, AF_EUR.0.0001$AF_nfe, AF_EUR.0.0001$AF_afr, AF_EUR.0.0001$rsID, AF_EUR.0.0001$Ave_PSI_GTEX, AF_EUR.0.0001$TTN_band)
 
 write.table(as.data.frame(AF_EUR.0.0001$SNP), "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined/snpEFF_AF_eur_0.0001_vars.txt", col.names = F, row.names = F,  quote = F)
 
@@ -127,28 +199,31 @@ write.table(as.data.frame(AF_EUR.0.0001$SNP), "Z:/ResearchHome/Groups/sapkogrp/p
 # AF_AFR.0.0001 <- df.overlap[df.overlap$AF < 0.0001 & df.overlap$AF_afr < 0.0001,]
 AF_AFR.0.0001 <- df.overlap[df.overlap$AF_afr < 0.0001,]
 table(AF_AFR.0.0001$`ANN[*].EFFECT`)
-AF_AFR.0.0001 <- AF_AFR.0.0001[grepl("stop|missense|frameshift|splice_acceptor", AF_AFR.0.0001$`ANN[*].EFFECT`),]
+# AF_AFR.0.0001 <- AF_AFR.0.0001[grepl("stop|missense|frameshift|splice_acceptor", AF_AFR.0.0001$`ANN[*].EFFECT`),]
 # AF_AFR.0.0001 <- AF_AFR.0.0001[!grepl("intron", AF_AFR.0.0001$`ANN[*].EFFECT`, ignore.case = T),]
-AF_AFR.0.0001.patho <- AF_AFR.0.0001[grepl("^Pathogenic", AF_AFR.0.0001$CLNSIG),]
-AF_AFR.0.0001 <- AF_AFR.0.0001[!AF_AFR.0.0001$SNP %in% AF_AFR.0.0001.patho$SNP ,]
-AF_AFR.0.0001 <- rbind.data.frame(AF_AFR.0.0001, AF_AFR.0.0001.patho)
-AF_AFR.0.0001 <- AF_AFR.0.0001[!duplicated(AF_AFR.0.0001$ID),]
+# AF_AFR.0.0001.patho <- AF_AFR.0.0001[grepl("^Pathogenic", AF_AFR.0.0001$CLNSIG),]
+# AF_AFR.0.0001 <- AF_AFR.0.0001[!AF_AFR.0.0001$SNP %in% AF_AFR.0.0001.patho$SNP ,]
+# AF_AFR.0.0001 <- rbind.data.frame(AF_AFR.0.0001, AF_AFR.0.0001.patho)
+# AF_AFR.0.0001 <- AF_AFR.0.0001[!duplicated(AF_AFR.0.0001$ID),]
 table(AF_AFR.0.0001$`ANN[*].EFFECT`, AF_AFR.0.0001$`ANN[*].GENE`)
-#                                         BAG3 DSP LMNA MYH7 SCN5A TCAP TNNT2 TTN
-# frameshift_variant                        0   0    0    0     0    0     1   0
-# missense_variant                          9  22    7    7    14    4     3 341
-# missense_variant&splice_region_variant    0   0    0    0     0    0     0   7
-# splice_acceptor_variant&intron_variant    0   0    0    0     0    0     0   1
-# stop_gained                               0   0    1    0     0    0     1   2
-# stop_gained&splice_region_variant         0   0    0    0     0    0     1   0
+#                                                                               BAG3 DSP LMNA MYH7 SCN5A TCAP TNNT2 TTN
+# frameshift_variant                                                              0   0    0    0     0    1     0     1   5
+# frameshift_variant&splice_donor_variant&splice_region_variant&intron_variant    0   0    0    0     0    0     0     0   1
+# frameshift_variant&splice_region_variant                                        0   0    1    0     0    0     0     0   0
+# missense_variant                                                               38   0   41   71     0   12     3    17   0
+# missense_variant&splice_region_variant                                          0   0    0    4     0    1     0     0   0
+# splice_acceptor_variant&intron_variant                                          0   0    0    0     0    0     0     0   1
+# splice_donor_variant&intron_variant                                             0   1    0    0     0    0     0     0   6
+# stop_gained                                                                     0   0    1    0     1    0     0     1  16
+# stop_gained&splice_region_variant                                               0   0    0    0     0    0     0     1   0
 
 table(AF_AFR.0.0001$CLNSIG)
 dim(AF_AFR.0.0001)
-# 421 250
+# 224 250
 
 # 14590+18500 = 33090
 
-# write.table(as.data.frame(AF_AFR.0.0001$SNP), "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined/snpEFF_AF_afr_0.0001_vars.txt", col.names = F, row.names = F,  quote = F)
+write.table(as.data.frame(AF_AFR.0.0001$SNP), "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined/snpEFF_AF_afr_0.0001_vars.txt", col.names = F, row.names = F,  quote = F)
 
 
 ## EUR
@@ -164,25 +239,25 @@ HEADER = gsub("....DEL.", ".<*:DEL>",HEADER)
 HEADER = gsub("\\.", ":", HEADER)
 colnames(raw) <- HEADER
 table(AF_EUR.0.0001$SNP %in% colnames(raw))
-# FALSE  TRUE 
-# 2   389 
+# TRUE 
+# 220 
 
 AF_EUR.0.0001 <- AF_EUR.0.0001[AF_EUR.0.0001$SNP %in% colnames(raw),]
 raw[raw == 2] <- 1
 raw.eur <- raw
 dim(AF_EUR.0.0001)
-# [1] 389 250
+# [1] 220 250
 keep.with.carriers <- names(colSums(raw.eur, na.rm = T))[colSums(raw.eur, na.rm = T) > 0]
 raw.eur <- raw.eur[colnames(raw.eur) %in% keep.with.carriers]
 dim(raw.eur)
-# 3102  177
+# 3102  50
 AF_EUR.0.0001.carrier <- AF_EUR.0.0001[AF_EUR.0.0001$SNP %in% colnames(raw.eur),]
 dim(AF_EUR.0.0001.carrier)
-# 177  250
+# 50  250
 ## Variants with at least one carrier
 table(AF_EUR.0.0001.carrier$`ANN[*].GENE`)
 # BAG3   DSP  LMNA  MYH7 SCN5A  TCAP TNNT2   TTN 
-#    2    13     7     2     7     3     1   142 
+#    16     1    23    22     6     1     6    12
 
 AF_EUR.0.0001.final <- AF_EUR.0.0001[, c("CHROM", "POS", "rsID", "SNP", "REF", "ALT", "ANN[*].GENE", "ANN[*].EFFECT", 
                                "Ave_PSI", "Ave_PSI_GTEX", "TTN_band", "AF", "AF_nfe", "AF_afr")]
@@ -209,23 +284,23 @@ HEADER = gsub("....DEL.", ".<*:DEL>",HEADER)
 HEADER = gsub("\\.", ":", HEADER)
 colnames(raw) <- HEADER
 table(AF_AFR.0.0001$SNP %in% colnames(raw))
-# 421
+# 143
 AF_AFR.0.0001 <- AF_AFR.0.0001[AF_AFR.0.0001$SNP %in% colnames(raw),]
 raw[raw == 2] <- 1
 raw.afr <- raw
 dim(AF_AFR.0.0001)
-# [1] 421 250
+# [1] 143 250
 keep.with.carriers <- names(colSums(raw.afr, na.rm = T))[colSums(raw.afr, na.rm = T) > 0]
 raw.afr <- raw.afr[colnames(raw.afr) %in% keep.with.carriers]
 dim(raw.afr)
-# 246  18
+# 246  11
 AF_AFR.0.0001.carrier <- AF_AFR.0.0001[AF_AFR.0.0001$SNP %in% colnames(raw.afr),]
 dim(AF_AFR.0.0001.carrier)
-# 18  246
+# 11  250
 ## Variants with at least one carrier
 table(AF_AFR.0.0001.carrier$`ANN[*].GENE`)
-# DSP TTN 
-# 1  17 
+# BAG3  LMNA  MYH7 TNNT2   TTN 
+# 1     2     5     2     1 
 
 AF_AFR.0.0001.final <- AF_AFR.0.0001[, c("CHROM", "POS", "rsID", "SNP", "REF", "ALT", "ANN[*].GENE", "ANN[*].EFFECT", 
                                          "Ave_PSI", "Ave_PSI_GTEX", "TTN_band", "AF", "AF_nfe", "AF_afr")]
@@ -282,6 +357,7 @@ for (i in 1:nrow(AF_AFR.0.0001.final)){
 AF_EUR.0.0001.final$`ANN[*].EFFECT`[AF_EUR.0.0001.final$`ANN[*].EFFECT` == "missense_variant&splice_region_variant"] <- "missense"
 AF_EUR.0.0001.final$`ANN[*].EFFECT`[AF_EUR.0.0001.final$`ANN[*].EFFECT` == "splice_acceptor_variant&intron_variant"] <- "splice acceptor"
 AF_EUR.0.0001.final$`ANN[*].EFFECT`[AF_EUR.0.0001.final$`ANN[*].EFFECT` == "stop_gained&splice_region_variant"] <- "stop-gained"
+AF_EUR.0.0001.final$`ANN[*].EFFECT` <- gsub("disruptive-|&splice-region|&intron", "", AF_EUR.0.0001.final$`ANN[*].EFFECT`)
 AF_EUR.0.0001.final$`ANN[*].EFFECT` <- gsub("_variant", "", AF_EUR.0.0001.final$`ANN[*].EFFECT`)
 AF_EUR.0.0001.final$`ANN[*].EFFECT` <- gsub("_", "-", AF_EUR.0.0001.final$`ANN[*].EFFECT`)
 table(AF_EUR.0.0001.final$`ANN[*].EFFECT`)
@@ -289,6 +365,7 @@ table(AF_EUR.0.0001.final$`ANN[*].EFFECT`)
 AF_AFR.0.0001.final$`ANN[*].EFFECT`[AF_AFR.0.0001.final$`ANN[*].EFFECT` == "missense_variant&splice_region_variant"] <- "missense"
 AF_AFR.0.0001.final$`ANN[*].EFFECT`[AF_AFR.0.0001.final$`ANN[*].EFFECT` == "splice_acceptor_variant&intron_variant"] <- "splice acceptor"
 AF_AFR.0.0001.final$`ANN[*].EFFECT`[AF_AFR.0.0001.final$`ANN[*].EFFECT` == "stop_gained&splice_region_variant"] <- "stop-gained"
+AF_AFR.0.0001.final$`ANN[*].EFFECT` <- gsub("disruptive-|&splice-region|&intron|&splice-donor", "", AF_AFR.0.0001.final$`ANN[*].EFFECT`)
 AF_AFR.0.0001.final$`ANN[*].EFFECT` <- gsub("_variant", "", AF_AFR.0.0001.final$`ANN[*].EFFECT`)
 AF_AFR.0.0001.final$`ANN[*].EFFECT` <- gsub("_", "-", AF_AFR.0.0001.final$`ANN[*].EFFECT`)
 table(AF_AFR.0.0001.final$`ANN[*].EFFECT`)
@@ -324,7 +401,7 @@ AF_EUR.0.0001.final$TTN_PSI_A_Band [which(AF_EUR.0.0001.final$Ave_PSI_GTEX > 0.8
 # extract variants by gene categories
 table(AF_EUR.0.0001.final$`ANN[*].GENE`)
 # BAG3   DSP  LMNA  MYH7 SCN5A  TCAP TNNT2   TTN 
-# 10    21     9     5    18     4     2   320 
+# 42     1    45    71     1    15     3    16    26
 
 genes <- names(table(AF_EUR.0.0001.final$`ANN[*].GENE`))
 genes <- genes[!genes %in% "TTN"]
@@ -335,24 +412,24 @@ write.table(as.data.frame(gene), paste0("Z:/ResearchHome/Groups/sapkogrp/project
 
 TTN_PSI <- AF_EUR.0.0001.final$SNP[AF_EUR.0.0001.final$TTN_PSI == "Yes"]
 length(TTN_PSI)
-# 267
+# 11
 write.table(as.data.frame(TTN_PSI), "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined/TTN_PSI_EUR_vars.txt", col.names = F, row.names = F,  quote = F, sep = "\t")
 
 TTN_PSI_A_Band <- AF_EUR.0.0001.final$SNP[AF_EUR.0.0001.final$TTN_PSI_A_Band == "Yes"]
 length(TTN_PSI_A_Band)
-# 157
+# 1
 write.table(as.data.frame(TTN_PSI_A_Band), "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined/TTN_PSI_A_Band_EUR_vars.txt", col.names = F, row.names = F,  quote = F, sep = "\t")
 
 
 BAG3.TTN_PSI <- AF_EUR.0.0001.final$SNP[AF_EUR.0.0001.final$`ANN[*].GENE` == "BAG3" | AF_EUR.0.0001.final$TTN_PSI == "Yes"]
 length(BAG3.TTN_PSI)
-# 277
+# 53
 write.table(as.data.frame(BAG3.TTN_PSI), "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined/BAG3.TTN_PSI_EUR_vars.txt", col.names = F, row.names = F,  quote = F, sep = "\t")
 
 
 BAG3.TTN_PSI_A_Band <- AF_EUR.0.0001.final$SNP[AF_EUR.0.0001.final$`ANN[*].GENE` == "BAG3" | AF_EUR.0.0001.final$TTN_PSI_A_Band == "Yes"]
 length(BAG3.TTN_PSI_A_Band)
-# 167
+# 43
 write.table(as.data.frame(BAG3.TTN_PSI_A_Band), "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined/BAG3.TTN_PSI_A_Band_EUR_vars.txt", col.names = F, row.names = F,  quote = F, sep = "\t")
 
 
@@ -369,7 +446,7 @@ AF_AFR.0.0001.final$TTN_PSI_A_Band [which(AF_AFR.0.0001.final$Ave_PSI_GTEX > 0.8
 
 table(AF_AFR.0.0001.final$`ANN[*].GENE`)
 # BAG3   DSP  LMNA  MYH7 SCN5A  TCAP TNNT2   TTN 
-# 9    22     8     7    14     4     6   351 
+# 23     1    26    48     9     3    13    20 
 
 
 
@@ -388,10 +465,6 @@ table(AF_AFR.0.0001.final$`ANN[*].GENE`)
 
 
 # extract variants by gene categories
-table(AF_AFR.0.0001.final$`ANN[*].GENE`)
-# BAG3   DSP  LMNA  MYH7 SCN5A  TCAP TNNT2   TTN 
-#    9    22     8     7    14     4     6   351 
-
 genes <- names(table(AF_AFR.0.0001.final$`ANN[*].GENE`))
 genes <- genes[!genes %in% "TTN"]
 for (i in 1:length(genes)){
@@ -401,22 +474,21 @@ for (i in 1:length(genes)){
 
 TTN_PSI <- AF_AFR.0.0001.final$SNP[AF_AFR.0.0001.final$TTN_PSI == "Yes"]
 length(TTN_PSI)
-# 292
+# 10
 write.table(as.data.frame(TTN_PSI), "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined/TTN_PSI_AFR_vars.txt", col.names = F, row.names = F,  quote = F, sep = "\t")
 
 TTN_PSI_A_Band <- AF_AFR.0.0001.final$SNP[AF_AFR.0.0001.final$TTN_PSI_A_Band == "Yes"]
 length(TTN_PSI_A_Band)
-# 165
+# 2
 write.table(as.data.frame(TTN_PSI_A_Band), "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined/TTN_PSI_A_Band_AFR_vars.txt", col.names = F, row.names = F,  quote = F, sep = "\t")
 
 
 BAG3.TTN_PSI <- AF_AFR.0.0001.final$SNP[AF_AFR.0.0001.final$`ANN[*].GENE` == "BAG3" | AF_AFR.0.0001.final$TTN_PSI == "Yes"]
 length(BAG3.TTN_PSI)
-# 301
+# 33
 write.table(as.data.frame(BAG3.TTN_PSI), "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined/BAG3.TTN_PSI_AFR_vars.txt", col.names = F, row.names = F,  quote = F, sep = "\t")
-
 
 BAG3.TTN_PSI_A_Band <- AF_AFR.0.0001.final$SNP[AF_AFR.0.0001.final$`ANN[*].GENE` == "BAG3" | AF_AFR.0.0001.final$TTN_PSI_A_Band == "Yes"]
 length(BAG3.TTN_PSI_A_Band)
-# 174
+# 25
 write.table(as.data.frame(BAG3.TTN_PSI_A_Band), "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined/BAG3.TTN_PSI_A_Band_AFR_vars.txt", col.names = F, row.names = F,  quote = F, sep = "\t")
