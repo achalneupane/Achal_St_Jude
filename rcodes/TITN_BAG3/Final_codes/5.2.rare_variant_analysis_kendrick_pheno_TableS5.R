@@ -12,8 +12,7 @@ EUR_common_Kendrick <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Card
 EUR.dat.PLP <- EUR.dat.PLP[EUR.dat.PLP$IID %in% EUR_common_Kendrick$IID,]
 dim(EUR.dat.PLP)
 
-saveRDS(EUR.dat.PLP, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Final_analysis/EUR_dat_PLP_v2.rds")
-
+# saveRDS(EUR.dat.PLP, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Final_analysis/EUR_dat_PLP_v2.rds")
 
 # 3062   34
 genes <- colnames(EUR.dat.PLP)[grepl("carrier", colnames(EUR.dat.PLP))]
@@ -85,8 +84,7 @@ dim(AFR.dat.PLP)
 # 238  34
 
 genes <- colnames(AFR.dat.PLP)[grepl("carrier", colnames(AFR.dat.PLP))]
-AFR.dat.PLP$CMP <- ifelse(AFR.dat.PLP$CMP==1, 2, 1)
-saveRDS(AFR.dat.PLP, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Final_analysis/AFR_dat_PLP_v2.rds")
+# saveRDS(AFR.dat.PLP, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Final_analysis/AFR_dat_PLP_v2.rds")
 ## AFR analysis
 
 # Empty dataframe
@@ -205,13 +203,8 @@ sum(AFR.dat.PLP$BAG3.PLP.carrier==1)/nrow(AFR.dat.PLP)*100
 # 5.04
 
 
-
-
-
-
-
-
-
+data = AFR.dat.PLP.subset
+carrier_column="BAG3.PLP.carrier"
 # Function to calculate the proportion and its 95% CI for each carrier gene
 calculate_proportion_and_ci <- function(data, carrier_column) {
   # Number of carriers
@@ -221,31 +214,103 @@ calculate_proportion_and_ci <- function(data, carrier_column) {
   total_samples <- nrow(data)
   
   # Calculate binomial test for exact CI
-  binom_result <- binom.test(num_carriers, total_samples, conf.level = 0.95, p = 0.5)
+  binom_result <- binom.test(num_carriers, total_samples, conf.level = 0.95)
   
-  # Create a list to store results
+  # Calculate proportion and confidence intervals
+  proportion <- round((num_carriers / total_samples) * 100, 2)  # Convert to percentage and round
+  ci_lower <- round(binom_result$conf.int[1] * 100, 2)          # Lower CI in percentage
+  ci_upper <- round(binom_result$conf.int[2] * 100, 2)          # Upper CI in percentage
+  
   # Create a list to store results
   result <- list(
     Gene = carrier_column,
-    Proportion = round((num_carriers / total_samples) * 100, 2),  # Convert to percentage and round
-    CI_Lower = round(binom_result$conf.int[1] * 100, 2),         # Lower CI in percentage
-    CI_Upper = round(binom_result$conf.int[2] * 100, 2)          # Upper CI in percentage
+    Proportion = proportion,
+    CI_Lower = ci_lower,
+    CI_Upper = ci_upper,
+    WANTED_VAR = paste0(num_carriers, " (", proportion, " [", ci_lower, "-", ci_upper, "]", ")")
   )
   
   return(result)
 }
 
-# Get the carrier column names
-EUR.dat.PLP.cases <- EUR.dat.PLP[EUR.dat.PLP$CMP ==2,]
+# 1. EUR Cases 
+EUR.dat.PLP.subset <- EUR.dat.PLP[EUR.dat.PLP$CMP == 2, ]
 
-carrier_columns <- colnames(EUR.dat.PLP.cases)[grepl("carrier", colnames(EUR.dat.PLP.cases))]
+# Get the carrier column names
+carrier_columns <- colnames(EUR.dat.PLP.subset)[grepl("carrier", colnames(EUR.dat.PLP.subset))]
 
 # Initialize a list to store results for all genes
 results_list <- list()
 
 # Loop through each carrier column and calculate proportions and CIs
 for (carrier in carrier_columns) {
-  result <- calculate_proportion_and_ci(EUR.dat.PLP.cases, carrier)
+  result <- calculate_proportion_and_ci(EUR.dat.PLP.subset, carrier)
+  results_list[[carrier]] <- result
+}
+
+# Combine results into a data frame
+results_df <- do.call(rbind, lapply(results_list, as.data.frame))
+
+# Print the results
+print(results_df)
+
+
+# 1. EUR controls
+EUR.dat.PLP.subset <- EUR.dat.PLP[EUR.dat.PLP$CMP == 1, ]
+
+# Get the carrier column names
+carrier_columns <- colnames(EUR.dat.PLP.subset)[grepl("carrier", colnames(EUR.dat.PLP.subset))]
+
+# Initialize a list to store results for all genes
+results_list <- list()
+
+# Loop through each carrier column and calculate proportions and CIs
+for (carrier in carrier_columns) {
+  result <- calculate_proportion_and_ci(EUR.dat.PLP.subset, carrier)
+  results_list[[carrier]] <- result
+}
+
+# Combine results into a data frame
+results_df <- do.call(rbind, lapply(results_list, as.data.frame))
+
+# Print the results
+print(results_df)
+
+
+# 1. AFR cases
+AFR.dat.PLP.subset <- AFR.dat.PLP[AFR.dat.PLP$CMP == 2, ]
+
+# Get the carrier column names
+carrier_columns <- colnames(AFR.dat.PLP.subset)[grepl("carrier", colnames(AFR.dat.PLP.subset))]
+
+# Initialize a list to store results for all genes
+results_list <- list()
+
+# Loop through each carrier column and calculate proportions and CIs
+for (carrier in carrier_columns) {
+  result <- calculate_proportion_and_ci(AFR.dat.PLP.subset, carrier)
+  results_list[[carrier]] <- result
+}
+
+# Combine results into a data frame
+results_df <- do.call(rbind, lapply(results_list, as.data.frame))
+
+# Print the results
+print(results_df)
+
+
+# 1. AFR controls
+AFR.dat.PLP.subset <- AFR.dat.PLP[AFR.dat.PLP$CMP == 1, ]
+
+# Get the carrier column names
+carrier_columns <- colnames(AFR.dat.PLP.subset)[grepl("carrier", colnames(AFR.dat.PLP.subset))]
+
+# Initialize a list to store results for all genes
+results_list <- list()
+
+# Loop through each carrier column and calculate proportions and CIs
+for (carrier in carrier_columns) {
+  result <- calculate_proportion_and_ci(AFR.dat.PLP.subset, carrier)
   results_list[[carrier]] <- result
 }
 

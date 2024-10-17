@@ -1,15 +1,24 @@
 rm(list=ls())
-merged.dat <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno", header = T)
+merged.dat <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno", header = T)
+sjlife.eur.dat <- merged.dat
+sjlife.afr.dat <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ttn_bag3_afr_kendrick.pheno", header = T)
 
-sjlife.eur.dat <- merged.dat[merged.dat$cohort==1| merged.dat$cohort==3,]
-sjlife.afr.dat <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ttn_bag3_afr.pheno", header = T)
+# Keep sjlife and ccss_exp
+merged.dat2 <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno", header = T)
+sjlife.eur.dat2 <- merged.dat2[merged.dat2$cohort==1| merged.dat2$cohort==3,]
+sjlife.eur.dat <- sjlife.eur.dat[sjlife.eur.dat$IID %in% sjlife.eur.dat2$IID,]
+dim(sjlife.eur.dat)
+
+# sjlife.afr.dat <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ttn_bag3_afr.pheno", header = T)
+
 
 colnames(sjlife.eur.dat)
 colnames(sjlife.afr.dat)
 sjlife.eur.dat <- sjlife.eur.dat[c("FID", "IID", "CMP", "agedx", "agelstcontact", "gender", "anthra_jco_dose_any", "hrtavg",
-                 "ejection_fraction_hrt", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "cohort")]
-sjlife.eur.dat$cohort[sjlife.eur.dat$cohort == 1] <- "sjlife_eur"
-sjlife.eur.dat$cohort[sjlife.eur.dat$cohort == 3] <- "ccss_exp_eur"
+                 "ejection_fraction_hrt", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "cohort_two")]
+sjlife.eur.dat$cohort <- NA
+sjlife.eur.dat$cohort[sjlife.eur.dat$cohort_two == 1] <- "sjlife_eur"
+sjlife.eur.dat$cohort[sjlife.eur.dat$cohort_two == 3] <- "ccss_exp_eur"
 sjlife.eur.dat$ancestry <- "EUR"
 sjlife.afr.dat <- sjlife.afr.dat[c("FID", "IID", "CMP", "agedx", "agelstcontact", "gender", "anthra_jco_dose_any", "hrtavg",
                                    "ejection_fraction_hrt", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")]
@@ -147,7 +156,7 @@ save(AFR.dat.PLP, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicit
 
 #######################################
 ## Extract common variant carriers
-pheno_gwas = read.table('pheno/sjlife_ccss_org_ccss_exp_ttn_bag3.pheno', header = TRUE)
+pheno_gwas = read.table('Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno', header = TRUE)
 # Using sjlife_ccss_org_ccss_exp_samples_updated.bim
 
 pheno_gwas$cohort[pheno_gwas$cohort == 1] <- "sjlife"
@@ -215,7 +224,7 @@ EUR_common_variants <- cbind.data.frame(pheno_gwas, raw[match(pheno_gwas$IID, ra
 
 
 ## AFR
-pheno_gwas <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ttn_bag3_afr.pheno", header = T)
+pheno_gwas <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ttn_bag3_afr_kendrick.pheno", header = T)
 raw <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/common_missense_vars_AFR_recodeA.raw", header = T)
 rownames(raw) <- raw$IID
 raw <- raw[-c(1:6)]
