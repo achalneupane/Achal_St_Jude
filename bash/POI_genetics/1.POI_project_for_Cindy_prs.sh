@@ -1,31 +1,25 @@
-# Dear Achal,
+# Hi Achal,
 
-# I am writing to ask you for your help. Do you think you might be able to help us put the following together over the next 2 weeks to meet the mid-Feb ISLCCC abstract deadline?
+# Below are three studies with Cindy which will require P/LP on different sets of genes. For POI study, we need to calculate a PRS based on published study. Can you please include in your list of tasks to do and work on them once we address the issues with P/LP variants? You can calculate the PRS when you get time, however.
 
-# Basically, we would like to get P/LP variant carrier variables in SJLIFE (WES/WGS), CCSS Expansion (WES/WGS), and CCSS Original (WES) considering the following 5 gene lists below, using any of the 3 rare variant masks that were described in our POI concept proposal (SnpEff; LOFTEE; ClinVar - I think if we have to pick one, we should pick the strictest definition, which is probably ClinVar). Since this is a quick preliminary pass, maybe we could focus on getting at least one cancer susceptibility P/LP variant carrier status variable ([1] or [2] below) and at least one BCC-related variable ([3]-[5] below). Do you think this would be feasible? Please let me know if you have questions or if you would like to meet to discuss.
+# Thanks,
 
-# Thank you so much,
-# Cindy
+# Yadav
 
-# Gene lists 
+# 2 - POI genetics
+# 2a - Achal(?) will compute PRS from GWS SNPs from Ruth et al and P/LPs from Ke et al and Shekari et al (would end of Sep. be okay for this?); analyst Kenneth will work on phenotype cleaning and review
+# 2b - POI GWAS in survivors (GRA Aparna will work on this)
+# 2c - P/LP-PRS analysis (analyst Kenneth will work on this)
 
-# (1) 60 cancer susceptibility genes - should be Zhaoming's SJCPG60 list. See Kim_ST1.txt, use "CSG_60" (genes marked with "x"). From Kim et al evaluating cancer susceptibility gene P/LP variants in CCSS, link: https://doi.org/10.1093/jncics/pkab007.
-
-# (2) Expanded list of 172 cancer susceptibility genes. Kim_ST1.txt, use "CSG_172" (genes marked with "x"; 172 genes evaluated in CCSS)
-
-# (3) Literature-based list of BCC genes. See "NCI table 3" for a list of ~20 genes (Table 3 in the cancer.gov). These genes are based on what has been reported in the literature re: BCC-associated syndromes.
-# Based on Kilgour et al, Choquet et al, and NCI cancer.gov (all 3 are very consistent):
-# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8345475/#B6-cancers-13-03870
-# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7259534/
-# https://www.cancer.gov/types/skin/hp/skin-genetics-pdq
-
-# (4) BCC gene panel genes. See "BCC_blueprint_panel.txt" for a list of genes tested by Blueprint Genetics panel for BCC:
-# https://blueprintgenetics.com/tests/panels/dermatology/hereditary-melanoma-and-skin-cancer-panel/
-
-# (5) ClinVar BCC-related genes. See "clinvar_result_BCC.txt". These are all ClinVar listings for "basal AND cell AND carcinoma" annotated as P or LP and with multiple submitters/no conflicts. This list hasn't been reviewed yet in terms of conditions, but I think we can use the variant/gene list. For the final analysis, I can ask the clinicians to help review the conditions to make sure we don't have anything unrelated.
-
-
-# Further details in Email from 1/25/2024
+# 3 - BCC genetics
+# 3a - Achal will provide updated P/LP for cancer and BCC as appropriate (e.g., SJCPG60, Kim172, gene panels), please provide by end of Sep(?)
+# 3b - Clinical risk prediction + BCC genetics update (analyst Kenneth will finish this)
+# 3c - BCC GWAS in survivors (Cindy will work on this)
+ 
+# 4 - ACMG
+# 4a - Achal will provide P/LP by gene, condition grouping, etc. (done by end of Oct?)
+# 4b - Preliminary descriptive summary: analyst Kenneth can complete this because he will be doing something similar for 3b (Yadav, do you want Achal or someone else to do this?)
+# 4c - Other analysis: Kendrick will coordinate
 
 
 ## Extract variants for PRS
@@ -34,7 +28,7 @@ module load bcftools
 module load plink/1.90b
 
 
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/prs/sjlife
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/POI_genetics
 ###################################
 ## create plink files for sjlife ##
 ###################################

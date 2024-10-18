@@ -1,4 +1,4 @@
-prsfile <- read.table(text = "SNP	Chr	Pos (b37)	Effect Allele	Other Allele	Effect Allele Freq.	Effect	SE	P-value	Direction	HetPVal	N
+prsfile <- read.table(text = "SNP	Chr	Pos	Effect_Allele	Other_Allele	Effect_Allele_Freq	Effect	SE	P_value	Direction	HetPVal	N
 rs200448	1	 6701978 	T	C	0.4381	0.099	0.012	4.0E-16	+++	6E-01	 200309 
 rs9438982	1	 39358143 	C	A	0.3219	0.214	0.013	6.4E-62	---	1E-01	 200308 
 rs12046563	1	 43137280 	A	G	0.7609	0.100	0.014	1.7E-12	+++	4E-02	 198947 
@@ -290,6 +290,15 @@ rs5953379	23	 44149649 	C	T	0.9154	0.183	0.023	1.2E-15	---	3E-01	 184045
 rs5981360	23	 74664417 	T	C	0.9629	0.204	0.037	3.0E-08	+++	1E+00	 178641 
 rs3213462	23	 152609450 	C	T	0.4977	0.128	0.013	4.5E-24	---	4E-02	 179565", header = T, sep = "\t")
 
+prsfile[] <- lapply(prsfile, function(x) {
+  if (is.character(x)) {
+    trimws(x)  # Trim whitespace
+  } else {
+    x  # Return as is if not a character column
+  }
+})
+
+
 head(prsfile)
 
 library(biomaRt)
@@ -304,11 +313,130 @@ results <- getBM(attributes = c('refsnp_id', 'chr_name', 'chrom_start'),
                  mart = ensembl)
 
 
-# View the results
+# # View the results
 print(results)
-
+#
 table(results$chr_name)
 results <- results[grepl("^[0-9]+$|X|Y", results$chr_name),]
 results
 
+prsfile$POS_GRCh38 <- results$chrom_start[match(prsfile$SNP, results$refsnp_id)]
 
+# I checked the ones from UCSC table browser and they look good.
+# prsfile$bed37 <- paste0("chr", prsfile$Chr, " ", prsfile$Pos, " ", prsfile$Pos)
+# setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ruth_et_al")
+# write.table(as.data.frame(prsfile$bed37), "prsfile_liftover_37.txt", col.names = F, row.names = F, quote = F)
+# 
+# 
+# # Based on UCSC liftover, these were deleted in new GRCh38
+# # #Deleted in new
+# # chr23:14839840-14839840
+# # #Deleted in new
+# # chr23:21874387-21874387
+# # #Deleted in new
+# # chr23:30753605-30753605
+# # #Deleted in new
+# # chr23:44149649-44149649
+# # #Deleted in new
+# # chr23:74664417-74664417
+# # #Deleted in new
+# # chr23:152609450-152609450
+# 
+# ## Read file from UCSC browser
+# ucsc.df <- read.delim("hgTables_GRCh38.txt", sep = "\t")
+# ucsc.df <- ucsc.df[!grepl("fix|alt", ucsc.df$chrom),]
+# 
+# prsfile$SNP[!(prsfile$SNP %in% ucsc.df$name)]
+# prsfile$matchrsid <- prsfile$SNP %in% ucsc.df$name
+# prsfile$matchGRCh38 <- prsfile$POS_GRCh38 %in% ucsc.df$chromEnd
+# prsfile$UCSC.GRCh38 <- ucsc.df$chromEnd[match(prsfile$SNP, ucsc.df$name)]
+
+filtered_prsfile <- prsfile[
+  nchar(prsfile$Effect_Allele) > 1 | nchar(prsfile$Other_Allele) > 1, 
+]
+
+## So basically, we need to substract 1 base from indel sites 
+prsfile$POS_GRCh38[
+  nchar(prsfile$Effect_Allele) > 1 | nchar(prsfile$Other_Allele) > 1
+] <- prsfile$POS_GRCh38[
+  nchar(prsfile$Effect_Allele) > 1 | nchar(prsfile$Other_Allele) > 1
+] -1
+
+
+prsfile$CHROM <- paste0("chr", prsfile$Chr)
+prsfile$CHROM[prsfile$CHROM == "chr23"] <- "chrX"
+prsfile$CHROM[prsfile$CHROM == "chr24"] <- "chrY"
+#####################
+## GRCh38 PRS file ##
+#####################
+## should be in this format
+# chr1 17445652 G A 0.156747305674524 ST6 ST6
+# chr1 37887731 T C 0.0441608957857698 ST6 ST6
+# chr1 41446467 T C 0.0777940274400202 ST6 ST6
+POI_meta_GRCh38 <- cbind.data.frame(prsfile$CHROM, prsfile$POS_GRCh38, prsfile$Other_Allele, prsfile$Effect_Allele, prsfile$Effect, "POI_META", "POI_META")
+
+# Note: No need to swap the allele based on "Direction +++ or ---" from meta analysis. You just need to make sure beta is positive. If you change its sign, you will need to swap the alleles
+write.table(POI_meta_GRCh38, "POI_meta_GRCh38.dat", col.names = F, row.names = F, quote = F)
+
+# extract from BIM
+POI_meta_GRCh38$KEY <- paste0(POI_meta_GRCh38$`prsfile$CHROM`, ":", POI_meta_GRCh38$`prsfile$POS_GRCh38`)
+
+wantedSNP <- c()
+# Loop through chromosomes 1-22, X, Y
+for (CHR in c(1:22, "X", "Y")) {
+  print(paste0("Doing chr", CHR))
+  # Construct the file path for each chromosome's BIM file
+  BIMfile <- paste0("Survivor_WGS.GATK4180.hg38_renamed_chr", CHR, ".PASS.decomposed.qced.bim")
+  BIMfile <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/QC/", BIMfile)
+
+  # Read the BIM file
+  df <- fread(BIMfile)
+  
+  # Create the KEY for each row by combining chromosome and position
+  df$KEY <- paste0("chr", df$V1, ":", df$V4)
+  # Find SNPs in the POI_meta_GRCh38 based on matching KEYs
+  tmp.wantedSNP <- df$V2[df$KEY %in% POI_meta_GRCh38$KEY]
+  # Append to the wantedSNP list
+  wantedSNP <- c(wantedSNP, tmp.wantedSNP)
+}
+
+wantedSNP_df <- data.frame(SNP = wantedSNP)
+write.table(wantedSNP_df, "wantedSNP_GRCh38.txt", row.names = FALSE, col.names = F, sep = "\t", quote = FALSE)
+
+
+#####################
+## GRCh37 PRS file ##
+#####################
+## should be in this format
+# chr1 17445652 G A 0.156747305674524 ST6 ST6
+# chr1 37887731 T C 0.0441608957857698 ST6 ST6
+# chr1 41446467 T C 0.0777940274400202 ST6 ST6
+POI_meta_GRCh37 <- cbind.data.frame(prsfile$CHROM, prsfile$Pos, prsfile$Other_Allele, prsfile$Effect_Allele, prsfile$Effect, "POI_META", "POI_META")
+
+write.table(prsfile, "POI_meta_GRCh37.dat", col.names = T, row.names = F, quote = F)
+
+
+# extract from BIM
+POI_meta_GRCh37$KEY <- paste0(POI_meta_GRCh37$`prsfile$CHROM`, ":", POI_meta_GRCh37$`prsfile$Pos`)
+
+wantedSNP <- c()
+# Loop through chromosomes 1-22, X, Y
+for (CHR in c(1:22, "X", "Y")) {
+  print(paste0("Doing chr", CHR))
+  # Construct the file path for each chromosome's BIM file
+  BIMfile <- paste0("CCSS_org_GRCh37_chr", CHR, ".bim")
+  BIMfile <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics//common/ccss_org_hrc/plink/", BIMfile)
+  
+  # Read the BIM file
+  df <- fread(BIMfile)
+  
+  # Create the KEY for each row by combining chromosome and position
+  df$KEY <- paste0("chr", df$V1, ":", df$V4)
+  # Find SNPs in the POI_meta_GRCh37 based on matching KEYs
+  tmp.wantedSNP <- df$V2[df$KEY %in% POI_meta_GRCh37$KEY]
+  # Append to the wantedSNP list
+  wantedSNP <- c(wantedSNP, tmp.wantedSNP)
+}
+
+wantedSNP_df <- data.frame(SNP = wantedSNP)
+write.table(wantedSNP_df, "wantedSNP_GRCh37.txt", row.names = FALSE, col.names = F, sep = "\t", quote = FALSE)
