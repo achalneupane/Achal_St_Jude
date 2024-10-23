@@ -1,7 +1,8 @@
 library(biomaRt)
 
 # Select Ensembl dataset
-ensembl <- useMart("ensembl", dataset = "hsapiens_gene_ensembl", version = "GRCh38")
+# ensembl <- useMart("ensembl", dataset = "hsapiens_gene_ensembl", version = "GRCh38")
+ensembl <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
 
 # Define gene list
 genes <- c("ADD3", "DUSP5", "RBM20", "PDCD4", "BBIP1", "SHOC2", 
@@ -11,6 +12,7 @@ genes <- c("ADD3", "DUSP5", "RBM20", "PDCD4", "BBIP1", "SHOC2",
            "SLAIN1", "EDNRB", "GPC6", "TGDS", "GPR180", "ABCC4", 
            "UGGT2", "MBNL2")
 
+genes <- as.character(ACMG$GENE)
 
 # Query Ensembl for start and end positions
 results <- getBM(attributes = c('hgnc_symbol', 'chromosome_name', 'start_position', 'end_position'), 
@@ -20,8 +22,11 @@ results <- getBM(attributes = c('hgnc_symbol', 'chromosome_name', 'start_positio
 
 # View the results
 print(results)
+results <- results[!grepl("PATCH|HSC", results$chromosome_name),]
 results$chromosome_name <- paste0("chr",results$chromosome_name)
 View(results[-1])
+
+genes[!genes %in% results$hgnc_symbol]
 
 # hgnc_symbol	chromosome_name	start_position	end_position
 # ABCC4	13	95019835	95301475

@@ -1,3 +1,6 @@
+library(data.table)
+setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ruth_et_al")
+
 prsfile <- read.table(text = "SNP	Chr	Pos	Effect_Allele	Other_Allele	Effect_Allele_Freq	Effect	SE	P_value	Direction	HetPVal	N
 rs200448	1	 6701978 	T	C	0.4381	0.099	0.012	4.0E-16	+++	6E-01	 200309 
 rs9438982	1	 39358143 	C	A	0.3219	0.214	0.013	6.4E-62	---	1E-01	 200308 
@@ -404,6 +407,11 @@ wantedSNP_df <- data.frame(SNP = wantedSNP)
 write.table(wantedSNP_df, "wantedSNP_GRCh38.txt", row.names = FALSE, col.names = F, sep = "\t", quote = FALSE)
 
 
+bimcheck <- fread(".//prs/prs_out/POI_META.bim")
+bimcheck$KEY <- paste0("chr", bimcheck$V1, ":", bimcheck$V4)
+
+POI_meta_GRCh38[!POI_meta_GRCh38$KEY %in% bimcheck$KEY,]
+
 #####################
 ## GRCh37 PRS file ##
 #####################
@@ -431,7 +439,7 @@ for (CHR in c(1:22, "X", "Y")) {
   df <- fread(BIMfile)
   
   # Create the KEY for each row by combining chromosome and position
-  df$KEY <- paste0("chr", df$V1, ":", df$V4)
+  df$KEY <- paste0(df$V1, ":", df$V4)
   # Find SNPs in the POI_meta_GRCh37 based on matching KEYs
   tmp.wantedSNP <- df$V2[df$KEY %in% POI_meta_GRCh37$KEY]
   # Append to the wantedSNP list

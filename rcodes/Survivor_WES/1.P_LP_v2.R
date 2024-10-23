@@ -43,7 +43,7 @@ SIFT.final <- {}
 SIFT4G.final <- {}
 VEST4.final <- {}
 
-for(i in 19:22){
+for (i in c(1:22, "X", "Y")) {
   CHR=paste0("chr", i)
   print(CHR)
   file_path <- paste0("new_", CHR, ".Survivor_WES.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp_clinvar_12_10_2023_clinvar_12_10_2023.vcf-FIELDS-simple.txt")
@@ -284,16 +284,15 @@ for(i in 19:22){
 }
 
 
-# all_objects <- ls()
-# 
-# # Identify objects ending in "*final"
-# final_objects <- grep("*final$", all_objects, value = TRUE)
-# 
-# # Remove objects not ending in "*final"
-# objects_to_remove <- setdiff(all_objects, final_objects)
-# rm(list = objects_to_remove)
-  
-# save.image("all_missense_deleterious.RData")
+all_objects <- ls()
+
+# Identify objects ending in "*final"
+final_objects <- grep("*final$", all_objects, value = TRUE)
+
+# Remove objects not ending in "*final"
+objects_to_remove <- setdiff(all_objects, final_objects)
+rm(list = objects_to_remove)
+save.image("all_missense_deleterious.RData")
 load("all_missense_deleterious.RData")
 ## Save final only
 
@@ -356,7 +355,8 @@ common_snps <- common_snps[common_snps$Freq >= threshold,]
 common_snps.90percent.overlap <- unique(common_snps$all_unique_snps)
 
 length(common_snps.90percent.overlap)
-# [1] 19896
+# 19896
+# 20037
 
 common_snps <- common_snps[order(-common_snps$Freq), ]
 
@@ -367,7 +367,7 @@ common_snps <- read.table("missense_variants_with_overlap_in_more_than_90_percen
 
 ## Now extract these lines
 all.missense <- {}
-for(i in 1:22){
+for (i in c(1:22, "X", "Y")) {
   CHR=paste0("chr", i)
   print(CHR)
   file_path <- paste0("new_", CHR, ".Survivor_WES.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp_clinvar_12_10_2023_clinvar_12_10_2023.vcf-FIELDS-simple.txt")
@@ -391,7 +391,7 @@ for(i in 1:22){
 write.table(all.missense, "missense_variants_with_overlap_in_more_than_90_percent_of_prediction_tools_all_cols.txt", col.names = T, row.names = F, quote = F, sep = "\t")
 dim(all.missense)
 # 63206
-
+# 63538
 ############################################
 ## b. Predicted loss-of-function (Loftee) ## Done!
 ############################################
@@ -413,7 +413,7 @@ dim(all.missense)
 loftee <- fread("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/loftee/Loftee_HC_all_chr.txt", header = T, sep ="\t")
 
 loftee.lines <- {}
-for(i in 1:22){
+for (i in c(1:22, "X", "Y")) {
   CHR=paste0("chr", i)
   print(CHR)
   file_path <- paste0("new_", CHR, ".Survivor_WES.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp_clinvar_12_10_2023_clinvar_12_10_2023.vcf-FIELDS-simple.txt")

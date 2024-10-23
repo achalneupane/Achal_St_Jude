@@ -5,7 +5,6 @@ setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WES_rare_variant
 clinvar <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/all_new_clinvar_P_LP.txt", header = T, sep = "\t", stringsAsFactors = F)
 dim(clinvar)
 clinvar$SNP <- sub(";.*", "", clinvar$ID)
-clinvar <- clinvar[!duplicated(clinvar$SNP),]
 clinvar$AF <- as.numeric(clinvar$AF)
 clinvar$AF_nfe <- as.numeric(clinvar$AF_nfe)
 clinvar$AF_afr <- as.numeric(clinvar$AF_afr)
@@ -26,7 +25,6 @@ table(loftee$LoF_flags)
 # - 
 # 70494 
 
-loftee <- loftee[!duplicated(loftee$SNP),]
 
 
 loftee$AF <- as.numeric(loftee$AF.1)
@@ -44,7 +42,6 @@ loftee.afr <- loftee[which(loftee$AF <0.01 & loftee$AF_afr < 0.01),]
 snpeff <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/missense_variants_with_overlap_in_more_than_90_percent_of_prediction_tools_all_cols.txt", header = T, sep = "\t", stringsAsFactors = F)
 dim(snpeff)
 snpeff$SNP <- sub(";.*", "", snpeff$ID)
-snpeff <- snpeff[!duplicated(snpeff$SNP),]
 
 snpeff$AF <- as.numeric(snpeff$AF)
 snpeff$AF_nfe <- as.numeric(snpeff$AF_nfe)
@@ -55,8 +52,6 @@ snpeff$AF_afr <- as.numeric(snpeff$AF_afr)
 snpeff.all <- snpeff[which(snpeff$AF <0.01),]
 snpeff.eur <- snpeff[which(snpeff$AF <0.01 & snpeff$AF_nfe < 0.01),]
 snpeff.afr <- snpeff[which(snpeff$AF <0.01 & snpeff$AF_afr < 0.01),]
-
-
 
 
 length(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
