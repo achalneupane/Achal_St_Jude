@@ -1,5 +1,5 @@
 library(data.table)
-
+rm(list=ls())
 ## Read ACMG genes
 ACMG <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/ACMG_genes.txt", header = T, sep = "\t", stringsAsFactors = F)
 ACMG$group <- ACMG$Disease_name_and_MIM_number
@@ -113,6 +113,13 @@ cc.final <- cc[cc$SNP %in% bim.QC$V2,]
 
 write.table(cc.final, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/ACMG_rare_variants_to_extract.txt", row.names = F, col.names = F, quote = F)
 
+## Autosomal recessive gene variants
+AR.genes <- ACMG$GENE[ACMG$inheritence == "AR"]
+AR.genes.clinvar <- clinvar$SNP[clinvar$new_GENE.clinvar %in% AR.genes]
+AR.genes.loftee <- loftee$SNP[loftee$new_GENE.loftee %in% AR.genes]
+AR.genes.snpeff <- snpeff$SNP[snpeff$new_GENE.snpeff %in% AR.genes]
+AR.variants <- (unique(c(AR.genes.clinvar, AR.genes.loftee, AR.genes.snpeff)))
+
 ## preQC
 bim.preQC <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic_ID_updated.bim")
 cc <- as.character(cc$SNP)
@@ -152,11 +159,55 @@ table(colnames(raw) %in% cc)
 # 6   728
 ## Looks good!
 
+# Make AR variants either 0 or 2
+AR.variants.raw <- colnames(raw)[colnames(raw) %in% AR.variants]
+raw[, AR.variants.raw] <- ifelse(raw[, AR.variants.raw] == 2, 2, 0)
 
-## Extract clinvar European
+
+all.survivors.WES <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_ID_updated.fam", header = F)
+all.survivors.WGS <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/QC/Survivor_WGS.GATK4180.hg38_renamed_chr10.PASS.decomposed.qced.fam", header = F)
+
+raw.eur <- raw[rownames(raw) %in% EUR.admix,]
+#################################
+## 1. Extract clinvar European ##
+#################################
 raw.clinvar.eur <- raw[which(colnames(raw) %in% clinvar.eur$SNP)]
-clinvar.eur <- clinvar.eur[clinvar.eur$SNP %in% colnames(raw)]
+
+clinvar.eur <- clinvar.eur[clinvar.eur$SNP %in% colnames(raw),]
+
 genes <- unique(clinvar.eur$new_GENE.clinvar)
-for (i in 1:length(genes))
-clinvar.eur
+carriers.clinvar.eur <- setNames(as.data.frame(rownames(raw)), "IID")
+snps.with.carriers.clinvar.eur <- c()
+
+for (i in 1:length(genes)){
+  wanted.gene <- genes[i]
+  print(paste0("Doing gene ", wanted.gene))
+  wanted.snps <- unique(clinvar.eur$SNP[clinvar.eur$new_GENE.clinvar == wanted.gene])
+  raw.wanted <- raw.clinvar.eur[wanted.snps]
+  snps.with.carriers.tmp <- names(colSums(raw.wanted, na.rm = T))[colSums(raw.wanted, na.rm = T) > 0]
+  if(length(snps.with.carriers.tmp) == 0){
+    next
+  }
+  raw.wanted <- raw.wanted[snps.with.carriers.tmp]
+  snps.with.carriers.clinvar.eur <- c(snps.with.carriers.clinvar.eur, snps.with.carriers.tmp)
+  carriers.tmp <- setNames(as.data.frame(rownames(raw.wanted)), "IID")
+  carriers.tmp$carrier <- ifelse(rowSums(raw.wanted[grepl("chr", colnames(raw.wanted))], na.rm = T) > 0, 1, 0)
+  carriers.clinvar.eur[wanted.gene] <- carriers.tmp$carrier[match(carriers.clinvar.eur$IID, carriers.tmp$IID)]
+}
+
+ACMG$disease <- gsub("\'", "", ACMG$group)
+ACMG$disease <- gsub(" ",".", ACMG$disease)
+disease <- ACMG$disease
+for (i in 1:length(disease)){
+  wanted.disease <- disease[i]
+  print(paste0("Doing disease ", wanted.disease))
+  wanted.genes <- unique(ACMG$GENE[ACMG$disease == wanted.disease])
+  if(sum(colnames(carriers.clinvar.eur) %in% wanted.genes) == 0){
+    next
+  }
+  raw.wanted <- carriers.clinvar.eur[colnames(carriers.clinvar.eur) %in% wanted.genes]
+  carriers.clinvar.eur[wanted.disease] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
+}
+
+carriers.clinvar.eur$IID 
 

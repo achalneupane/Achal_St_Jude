@@ -147,20 +147,20 @@ plink --merge-list merge_list.txt --keep-allele-order --make-bed --out chrALL.Su
 # plink --bfile chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15 --indep-pairwise 100 25 0.2 --keep-allele-order --maf 0.05 --make-bed --out chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15_maf0.05_indep_prune
 
 
-plink \
-  --bfile chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15 \
-  --indep-pairwise 100 25 0.2 \
-  --keep-allele-order \
-  --maf 0.05 \
-  --out geno.0.1.hwe.1e-15_indep_pairwise
-
 # plink \
 #   --bfile chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15 \
-#   --exclude range high-LD-regions-GRCh38.txt \
 #   --indep-pairwise 100 25 0.2 \
 #   --keep-allele-order \
 #   --maf 0.05 \
 #   --out geno.0.1.hwe.1e-15_indep_pairwise
+
+plink \
+  --bfile chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15 \
+  --exclude range /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/high-LD-regions-GRCh38.txt \
+  --indep-pairwise 100 25 0.2 \
+  --keep-allele-order \
+  --maf 0.05 \
+  --out geno.0.1.hwe.1e-15_indep_pairwise
 
 plink --bfile chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15 \
 --keep-allele-order \
@@ -226,9 +226,6 @@ tabix -f -s 1 -b 3 -e 3 new_tabbed_revel_grch38.tsv.gz
 
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff/revel_loftee
 ln -s ../new_chr*.Survivor_WES.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.with.gnomAD.vcf .
-
-
-
 
 
 

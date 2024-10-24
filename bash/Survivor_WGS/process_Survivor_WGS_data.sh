@@ -195,15 +195,15 @@ Rscript ~/bin/PCA_plot_for_SurvivorWGS_samples.R
 # Compute top 20 PCs for Europeans and Africans alone
 plink --nonfounders \
  --bfile Survivor_WGS_and_1kGP_final \
- --keep SurvivorWGS_EUR_based_on_1kGP_Phase_3_data.txt \
- --exclude range ~/bin/high-ld_regions_to_exclude_hg38.txt \
+ --keep Survivor_WGS_EUR_based_on_1kGP_Phase_3_data.txt \
+ --exclude range /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/high-LD-regions-GRCh38_no_chr.txt \
  --pca 20 \
  --out Survivor_WGS_and_1kGP_final_EUR_top_20_PCs
  
  plink --nonfounders \
  --bfile Survivor_WGS_and_1kGP_final \
- --keep SurvivorWGS_AFR_based_on_1kGP_Phase_3_data.txt \
- --exclude range ~/bin/high-ld_regions_to_exclude_hg38.txt \
+ --keep Survivor_WGS_AFR_based_on_1kGP_Phase_3_data.txt \
+ --exclude range /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/high-LD-regions-GRCh38_no_chr.txt \
  --pca 20 \
  --out Survivor_WGS_and_1kGP_final_AFR_top_20_PCs
 
@@ -359,3 +359,47 @@ bash scripts/preprocess.sh
 # SJNORM041132_G2 REMOVE-not SJLIFE       REMOVE  NA      SJNORM041132_G2-TB-15-6904      REMOVE
 # SJNORM041133_G1 REMOVE-not SJLIFE       REMOVE  NA      SJNORM041133_G1-TB-15-6399      REMOVE
 # SJNORM041133_G2 REMOVE-not SJLIFE       REMOVE  NA      SJNORM041133_G2-TB-15-6905      REMOVE
+
+
+
+
+
+
+# ###################
+# ## Run admixture ##
+# ###################
+
+# module load plink/1.90b
+
+# #SJLIFE data
+# bsub -R "rusage[mem=320000]" -P plinkmergeSJLIFE plink --memory 320000 --keep-allele-order --merge-list allfiles.txt --maf 0.05 --hwe 1e-06 --geno 0.05 --make-bed --out SJLIFE_chromosomes_combine_maf0.05_hwe1e-06_geno0.05
+# bsub -R "rusage[mem=120000]" -P plinkmergeSJLIFE plink --bfile chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_ID_updated --keep-allele-order --allow-extra-chr --exclude range /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/high-LD-regions-GRCh38.txt --geno 0.01 --hwe 0.0001 --maf 0.05 --make-bed --indep-pairwise 100 25 0.2 --out All.survivors_indep_pairwise
+# #1000Genome Data
+# # bsub -R "rusage[mem=320000]" -P plinkmergeSJLIFE plink --memory 320000 --keep-allele-order --allow-extra-chr --geno 0.05 --hwe 1e-06 --maf 0.05 --make-bed --out 1000genomes_merged_maf0.05_hwe1e-06_geno0.05 --vcf merged1000genomes.vcf --vcf-half-call h
+# # bsub -R "rusage[mem=320000]" -P plinkmergeSJLIFE plink --bfile 1000genomes_merged_maf0.05_hwe1e-06_geno0.05 --memory 320000 --keep-allele-order --allow-extra-chr --make-bed --indep-pairwise 1500 30 0.3 --out 1000genomes_merged_maf0.05_hwe1e-06_geno0.05_indep_pairwise
+
+# #Merge 1000 genomes data with SJLIFE data
+# bsub -R "rusage[mem=320000]" -P plinkmergeSJLIFE plink --bfile All.survivors_indep_pairwise --bmerge /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/1kGP/1000genomes_merged_maf0.05_hwe1e-06_geno0.05 --keep-allele-order --allow-extra-chr --make-bed --memory 320000 --out 1000genomes_All.survivors_indep_pairwise_maf0.05_geno0.05_indep_pairwise
+# '''
+# 1031903 MB RAM detected; reserving 320000 MB for main workspace.
+# 4481 people loaded from
+# SJLIFE_chromosomes_combine_maf0.05_hwe1e-06_geno0.05_indep_pairwise.fam.
+# 2504 people to be merged from
+# ../../../1kGP/1000genomes_merged_maf0.05_hwe1e-06_geno0.05.fam.
+# Of these, 2504 are new, while 0 are present in the base dataset.
+# 5185765 markers loaded from
+# SJLIFE_chromosomes_combine_maf0.05_hwe1e-06_geno0.05_indep_pairwise.bim.
+# 5120204 markers to be merged from
+# ../../../1kGP/1000genomes_merged_maf0.05_hwe1e-06_geno0.05.bim.
+# Of these, 5119558 are new, while 646 are present in the base dataset.
+# Error: 560 variants with 3+ alleles present.
+# * If you believe this is due to strand inconsistency, try --flip with
+#   1000genomes_SJLIFE_chromosomes_combine_maf0.05_hwe1e-06_geno0.05_indep_pairwise-merge.missnp.
+#   (Warning: if this seems to work, strand errors involving SNPs with A/T or C/G
+#   alleles probably remain in your data.  If LD between nearby SNPs is high,
+#   --flip-scan should detect them.)
+# * If you are dealing with genuine multiallelic variants, we recommend exporting
+#   that subset of the data to VCF (via e.g. '--recode vcf'), merging with
+#   another tool/script, and then importing the result; PLINK is not yet suited
+#   to handling them.
+# '''
