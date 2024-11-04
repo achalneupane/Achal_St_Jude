@@ -208,12 +208,21 @@ plink --nonfounders \
  --out Survivor_WGS_and_1kGP_final_AFR_top_20_PCs
 
 # Also compute top 20 PCs for all the 2986 Survivor_WGS samples, just in case; however analysis of all samples is not recommended
+cat ../dropsamples/excessHet.drop.samples ../remove_duplicate_IDs.txt > drop_all_samples
 plink --nonfounders \
  --bfile Survivor_WGS_and_1kGP_final \
  --keep ../Survivor_WGS.GATK4180.hg38_renamed_chr1-22.PASS.decomposed_common_pruned_indep_biallelic_varnames_updated.clean.fam \
- --remove ../dropsamples/excessHet.drop.samples \
+ --remove drop_all_samples \
  --pca 20 \
  --out Survivor_WGS_and_1kGP_final_all_Survivor_WGS_samples_20_PCs
+
+
+
+## Remove not-SJLIFE or overlapping CCSS IDs from qced plink
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/QC
+for chr in {1..22} X Y; do
+plink --bfile Survivor_WGS.GATK4180.hg38_renamed_chr${chr}.PASS.decomposed.qced --remove remove_duplicate_IDs.txt --keep-allele-order --make-bed --out Survivor_WGS.GATK4180.hg38_renamed_chr${chr}.PASS.decomposed.qced.clean
+done
 
 #---------------- Rename PCGP ids in the VCF files to Survivor_WGS ids --------------------------
 

@@ -14,6 +14,11 @@ as.data.frame(table(ACMG$group))
 ACMG$GENE <- sub("<.*", "", ACMG$Gene_via_GTR)
 ACMG$inheritence <- ""
 
+ACMG$disease <- gsub("\'", "", ACMG$group)
+ACMG$disease <- gsub(" ",".", ACMG$disease)
+disease <- unique(ACMG$disease)
+
+
 ## AD or AR
 ACMG$inheritence[grepl("Adenomatous polyposis coli|Aortic aneurysm|Arrhythmogenic right ventricular cardiomyopathy|Breast-ovarian cancer|Brugada syndrome|Catecholaminergic|Dilated cardiomyopathy|Ehlers|Fabry|Familial hypercholesterolemia|Familial hypertrophic cardiomyopathy|Familial medullary thyroid carcinoma|Hereditary breast cancer|hemochromatosis|Hereditary hemorrhagic telangiectasia|Hereditary paraganglioma-pheochromocytoma|Hereditary transthyretin-related amyloidosis|Hypercholesterolemia|Juvenile polyposis|Li-Fraumeni syndrome|Loeys-Dietz syndrome|Long QT|Lynch|Malignant hyperthermia|Marfan|Maturity-Onset of Diabetes|Multiple endocrine neoplasia|Myofibrillar myopathy|Neurofibromatosis|Ornithine carbamoyltransferase deficiency|Paragangliomas|Peutz-Jeghers syndrome|Pheochromocytoma|PTEN hamartoma|Retinoblastoma|Tuberous sclerosis|Von Hippel-Lindau|Wilms", ACMG$group, ignore.case = T)] <- "AD"
 ACMG$inheritence[grepl("Biotinidase deficiency|MYH-associated polyposis|Pompe disease|RPE65|Wilson disease", ACMG$group, ignore.case = T)] <- "AR"
@@ -112,6 +117,8 @@ cc$SNP[!cc$SNP %in% bim.QC$V2]
 cc.final <- cc[cc$SNP %in% bim.QC$V2,]
 
 write.table(cc.final, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/ACMG_rare_variants_to_extract.txt", row.names = F, col.names = F, quote = F)
+length(cc.final)
+# 728
 
 ## Autosomal recessive gene variants
 AR.genes <- ACMG$GENE[ACMG$inheritence == "AR"]
@@ -155,8 +162,8 @@ HEADER = gsub("....DEL.", ".<*:DEL>",HEADER)
 HEADER = gsub("\\.", ":", HEADER)
 colnames(raw) <- HEADER
 table(colnames(raw) %in% cc)
-# FALSE  TRUE 
-# 6   728
+# TRUE 
+# 728
 ## Looks good!
 
 # Make AR variants either 0 or 2
@@ -164,19 +171,36 @@ AR.variants.raw <- colnames(raw)[colnames(raw) %in% AR.variants]
 raw[, AR.variants.raw] <- ifelse(raw[, AR.variants.raw] == 2, 2, 0)
 
 
-all.survivors.WES <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_ID_updated.fam", header = F)
-all.survivors.WGS <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/QC/Survivor_WGS.GATK4180.hg38_renamed_chr10.PASS.decomposed.qced.fam", header = F)
+# save.image("rare_varaints_ACMG_data.RData")
+load("rare_varaints_ACMG_data.RData")
 
-raw.eur <- raw[rownames(raw) %in% EUR.admix,]
-#################################
-## 1. Extract clinvar European ##
-#################################
-raw.clinvar.eur <- raw[which(colnames(raw) %in% clinvar.eur$SNP)]
+EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/QC/pca/Survivor_WGS_EUR_based_on_1kGP_Phase_3_data.txt", header = T)
+AFR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/QC/pca/Survivor_WGS_AFR_based_on_1kGP_Phase_3_data.txt", header = T)
 
-clinvar.eur <- clinvar.eur[clinvar.eur$SNP %in% colnames(raw),]
+EUR.ccss <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSSEXP_EUR_top_20_PCs.eigenvec.ccssid", header = F)
+AFR.ccss <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSSEXP_AFR_top_20_PCs.eigenvec.ccssid", header = F)
+
+EUR.sjlife <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA/final_EUR-PCAS_EUR.eigenvec", header = F)
+AFR.sjlife <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA/final_AFR-PCAS_AFR.eigenvec", header = F)
+
+EUR.ccss.sjlife <- c(EUR.ccss$V2, EUR.sjlife$V2)
+EUR.control <- c.control.WES$V2[c.control.WES$V2 %in% EUR$IID]
+
+table(rownames(raw) %in% EUR.ccss.sjlife)
+
+
+raw.eur <- raw[rownames(raw) %in% EUR$IID,]
+raw.afr <- raw[rownames(raw) %in% AFR$IID,]
+
+source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/ACMG/utils.R")
+##################################
+## 1.a Extract clinvar European ##
+##################################
+raw.clinvar.eur <- raw.eur[which(colnames(raw.eur) %in% clinvar.eur$SNP)]
+clinvar.eur <- clinvar.eur[clinvar.eur$SNP %in% colnames(raw.eur),]
 
 genes <- unique(clinvar.eur$new_GENE.clinvar)
-carriers.clinvar.eur <- setNames(as.data.frame(rownames(raw)), "IID")
+carriers.clinvar.eur <- setNames(as.data.frame(rownames(raw.eur)), "IID")
 snps.with.carriers.clinvar.eur <- c()
 
 for (i in 1:length(genes)){
@@ -195,9 +219,9 @@ for (i in 1:length(genes)){
   carriers.clinvar.eur[wanted.gene] <- carriers.tmp$carrier[match(carriers.clinvar.eur$IID, carriers.tmp$IID)]
 }
 
-ACMG$disease <- gsub("\'", "", ACMG$group)
-ACMG$disease <- gsub(" ",".", ACMG$disease)
-disease <- ACMG$disease
+length(snps.with.carriers.clinvar.eur)
+# 157
+
 for (i in 1:length(disease)){
   wanted.disease <- disease[i]
   print(paste0("Doing disease ", wanted.disease))
@@ -209,5 +233,213 @@ for (i in 1:length(disease)){
   carriers.clinvar.eur[wanted.disease] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
 }
 
-carriers.clinvar.eur$IID 
+result_table <- count_zeros_ones(carriers.clinvar.eur[-1])
 
+#################################
+## 1.b Extract clinvar African ##
+#################################
+raw.clinvar.afr <- raw.afr[which(colnames(raw.afr) %in% clinvar.afr$SNP)]
+clinvar.afr <- clinvar.afr[clinvar.afr$SNP %in% colnames(raw.afr),]
+
+genes <- unique(clinvar.afr$new_GENE.clinvar)
+carriers.clinvar.afr <- setNames(as.data.frame(rownames(raw.afr)), "IID")
+snps.with.carriers.clinvar.afr <- c()
+
+for (i in 1:length(genes)){
+  wanted.gene <- genes[i]
+  print(paste0("Doing gene ", wanted.gene))
+  wanted.snps <- unique(clinvar.afr$SNP[clinvar.afr$new_GENE.clinvar == wanted.gene])
+  raw.wanted <- raw.clinvar.afr[wanted.snps]
+  snps.with.carriers.tmp <- names(colSums(raw.wanted, na.rm = T))[colSums(raw.wanted, na.rm = T) > 0]
+  if(length(snps.with.carriers.tmp) == 0){
+    next
+  }
+  raw.wanted <- raw.wanted[snps.with.carriers.tmp]
+  snps.with.carriers.clinvar.afr <- c(snps.with.carriers.clinvar.afr, snps.with.carriers.tmp)
+  carriers.tmp <- setNames(as.data.frame(rownames(raw.wanted)), "IID")
+  carriers.tmp$carrier <- ifelse(rowSums(raw.wanted[grepl("chr", colnames(raw.wanted))], na.rm = T) > 0, 1, 0)
+  carriers.clinvar.afr[wanted.gene] <- carriers.tmp$carrier[match(carriers.clinvar.afr$IID, carriers.tmp$IID)]
+}
+
+length(snps.with.carriers.clinvar.afr)
+
+for (i in 1:length(disease)){
+  wanted.disease <- disease[i]
+  print(paste0("Doing disease ", wanted.disease))
+  wanted.genes <- unique(ACMG$GENE[ACMG$disease == wanted.disease])
+  if(sum(colnames(carriers.clinvar.afr) %in% wanted.genes) == 0){
+    next
+  }
+  raw.wanted <- carriers.clinvar.afr[colnames(carriers.clinvar.afr) %in% wanted.genes]
+  carriers.clinvar.afr[wanted.disease] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
+}
+
+result_table <- count_zeros_ones(carriers.clinvar.afr[-1])
+
+
+#################################
+## 2.a Extract loftee European ##
+#################################
+raw.loftee.eur <- raw.eur[which(colnames(raw.eur) %in% loftee.eur$SNP)]
+loftee.eur <- loftee.eur[loftee.eur$SNP %in% colnames(raw.eur),]
+
+genes <- unique(loftee.eur$new_GENE.loftee)
+carriers.loftee.eur <- setNames(as.data.frame(rownames(raw.eur)), "IID")
+snps.with.carriers.loftee.eur <- c()
+
+for (i in 1:length(genes)){
+  wanted.gene <- genes[i]
+  print(paste0("Doing gene ", wanted.gene))
+  wanted.snps <- unique(loftee.eur$SNP[loftee.eur$new_GENE.loftee == wanted.gene])
+  raw.wanted <- raw.loftee.eur[wanted.snps]
+  snps.with.carriers.tmp <- names(colSums(raw.wanted, na.rm = T))[colSums(raw.wanted, na.rm = T) > 0]
+  if(length(snps.with.carriers.tmp) == 0){
+    next
+  }
+  raw.wanted <- raw.wanted[snps.with.carriers.tmp]
+  snps.with.carriers.loftee.eur <- c(snps.with.carriers.loftee.eur, snps.with.carriers.tmp)
+  carriers.tmp <- setNames(as.data.frame(rownames(raw.wanted)), "IID")
+  carriers.tmp$carrier <- ifelse(rowSums(raw.wanted[grepl("chr", colnames(raw.wanted))], na.rm = T) > 0, 1, 0)
+  carriers.loftee.eur[wanted.gene] <- carriers.tmp$carrier[match(carriers.loftee.eur$IID, carriers.tmp$IID)]
+}
+
+length(snps.with.carriers.loftee.eur)
+# 34
+
+for (i in 1:length(disease)){
+  wanted.disease <- disease[i]
+  print(paste0("Doing disease ", wanted.disease))
+  wanted.genes <- unique(ACMG$GENE[ACMG$disease == wanted.disease])
+  if(sum(colnames(carriers.loftee.eur) %in% wanted.genes) == 0){
+    next
+  }
+  raw.wanted <- carriers.loftee.eur[colnames(carriers.loftee.eur) %in% wanted.genes]
+  carriers.loftee.eur[wanted.disease] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
+}
+
+result_table <- count_zeros_ones(carriers.loftee.eur[-1])
+
+################################
+## 2.b Extract loftee African ##
+################################
+raw.loftee.afr <- raw.afr[which(colnames(raw.afr) %in% loftee.afr$SNP)]
+loftee.afr <- loftee.afr[loftee.afr$SNP %in% colnames(raw.afr),]
+
+genes <- unique(loftee.afr$new_GENE.loftee)
+carriers.loftee.afr <- setNames(as.data.frame(rownames(raw.afr)), "IID")
+snps.with.carriers.loftee.afr <- c()
+
+for (i in 1:length(genes)){
+  wanted.gene <- genes[i]
+  print(paste0("Doing gene ", wanted.gene))
+  wanted.snps <- unique(loftee.afr$SNP[loftee.afr$new_GENE.loftee == wanted.gene])
+  raw.wanted <- raw.loftee.afr[wanted.snps]
+  snps.with.carriers.tmp <- names(colSums(raw.wanted, na.rm = T))[colSums(raw.wanted, na.rm = T) > 0]
+  if(length(snps.with.carriers.tmp) == 0){
+    next
+  }
+  raw.wanted <- raw.wanted[snps.with.carriers.tmp]
+  snps.with.carriers.loftee.afr <- c(snps.with.carriers.loftee.afr, snps.with.carriers.tmp)
+  carriers.tmp <- setNames(as.data.frame(rownames(raw.wanted)), "IID")
+  carriers.tmp$carrier <- ifelse(rowSums(raw.wanted[grepl("chr", colnames(raw.wanted))], na.rm = T) > 0, 1, 0)
+  carriers.loftee.afr[wanted.gene] <- carriers.tmp$carrier[match(carriers.loftee.afr$IID, carriers.tmp$IID)]
+}
+
+length(snps.with.carriers.loftee.afr)
+# 7
+for (i in 1:length(disease)){
+  wanted.disease <- disease[i]
+  print(paste0("Doing disease ", wanted.disease))
+  wanted.genes <- unique(ACMG$GENE[ACMG$disease == wanted.disease])
+  if(sum(colnames(carriers.loftee.afr) %in% wanted.genes) == 0){
+    next
+  }
+  raw.wanted <- carriers.loftee.afr[colnames(carriers.loftee.afr) %in% wanted.genes]
+  carriers.loftee.afr[wanted.disease] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
+}
+
+result_table <- count_zeros_ones(carriers.loftee.afr[-1])
+
+
+#################################
+## 3.a Extract snpeff European ##
+#################################
+raw.snpeff.eur <- raw.eur[which(colnames(raw.eur) %in% snpeff.eur$SNP)]
+snpeff.eur <- snpeff.eur[snpeff.eur$SNP %in% colnames(raw.eur),]
+
+genes <- unique(snpeff.eur$new_GENE.snpeff)
+carriers.snpeff.eur <- setNames(as.data.frame(rownames(raw.eur)), "IID")
+snps.with.carriers.snpeff.eur <- c()
+
+for (i in 1:length(genes)){
+  wanted.gene <- genes[i]
+  print(paste0("Doing gene ", wanted.gene))
+  wanted.snps <- unique(snpeff.eur$SNP[snpeff.eur$new_GENE.snpeff == wanted.gene])
+  raw.wanted <- raw.snpeff.eur[wanted.snps]
+  snps.with.carriers.tmp <- names(colSums(raw.wanted, na.rm = T))[colSums(raw.wanted, na.rm = T) > 0]
+  if(length(snps.with.carriers.tmp) == 0){
+    next
+  }
+  raw.wanted <- raw.wanted[snps.with.carriers.tmp]
+  snps.with.carriers.snpeff.eur <- c(snps.with.carriers.snpeff.eur, snps.with.carriers.tmp)
+  carriers.tmp <- setNames(as.data.frame(rownames(raw.wanted)), "IID")
+  carriers.tmp$carrier <- ifelse(rowSums(raw.wanted[grepl("chr", colnames(raw.wanted))], na.rm = T) > 0, 1, 0)
+  carriers.snpeff.eur[wanted.gene] <- carriers.tmp$carrier[match(carriers.snpeff.eur$IID, carriers.tmp$IID)]
+}
+
+length(snps.with.carriers.snpeff.eur)
+# 205
+
+for (i in 1:length(disease)){
+  wanted.disease <- disease[i]
+  print(paste0("Doing disease ", wanted.disease))
+  wanted.genes <- unique(ACMG$GENE[ACMG$disease == wanted.disease])
+  if(sum(colnames(carriers.snpeff.eur) %in% wanted.genes) == 0){
+    next
+  }
+  raw.wanted <- carriers.snpeff.eur[colnames(carriers.snpeff.eur) %in% wanted.genes]
+  carriers.snpeff.eur[wanted.disease] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
+}
+
+result_table <- count_zeros_ones(carriers.snpeff.eur[-1])
+
+################################
+## 3.b Extract snpeff African ##
+################################
+raw.snpeff.afr <- raw.afr[which(colnames(raw.afr) %in% snpeff.afr$SNP)]
+snpeff.afr <- snpeff.afr[snpeff.afr$SNP %in% colnames(raw.afr),]
+
+genes <- unique(snpeff.afr$new_GENE.snpeff)
+carriers.snpeff.afr <- setNames(as.data.frame(rownames(raw.afr)), "IID")
+snps.with.carriers.snpeff.afr <- c()
+
+for (i in 1:length(genes)){
+  wanted.gene <- genes[i]
+  print(paste0("Doing gene ", wanted.gene))
+  wanted.snps <- unique(snpeff.afr$SNP[snpeff.afr$new_GENE.snpeff == wanted.gene])
+  raw.wanted <- raw.snpeff.afr[wanted.snps]
+  snps.with.carriers.tmp <- names(colSums(raw.wanted, na.rm = T))[colSums(raw.wanted, na.rm = T) > 0]
+  if(length(snps.with.carriers.tmp) == 0){
+    next
+  }
+  raw.wanted <- raw.wanted[snps.with.carriers.tmp]
+  snps.with.carriers.snpeff.afr <- c(snps.with.carriers.snpeff.afr, snps.with.carriers.tmp)
+  carriers.tmp <- setNames(as.data.frame(rownames(raw.wanted)), "IID")
+  carriers.tmp$carrier <- ifelse(rowSums(raw.wanted[grepl("chr", colnames(raw.wanted))], na.rm = T) > 0, 1, 0)
+  carriers.snpeff.afr[wanted.gene] <- carriers.tmp$carrier[match(carriers.snpeff.afr$IID, carriers.tmp$IID)]
+}
+
+length(snps.with.carriers.snpeff.afr)
+# 33
+for (i in 1:length(disease)){
+  wanted.disease <- disease[i]
+  print(paste0("Doing disease ", wanted.disease))
+  wanted.genes <- unique(ACMG$GENE[ACMG$disease == wanted.disease])
+  if(sum(colnames(carriers.snpeff.afr) %in% wanted.genes) == 0){
+    next
+  }
+  raw.wanted <- carriers.snpeff.afr[colnames(carriers.snpeff.afr) %in% wanted.genes]
+  carriers.snpeff.afr[wanted.disease] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
+}
+
+result_table <- count_zeros_ones(carriers.snpeff.afr[-1])
