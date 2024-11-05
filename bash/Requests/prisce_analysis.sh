@@ -82,6 +82,7 @@ zcat PGS000677_hmPOS_GRCh38.txt.gz | grep -v "#" > PGS000677_hmPOS_GRCh38.txt
 # split by chrmosomes
 ls /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/preQC_VCF_per_chromosome/CCSS_exp_biallelic_chr*_ID_edited.bed|sort -V | sed 's/\.bed//' > target_list.txt
 
+PRSice.sh
 module load R/4.3.2-shlib
 
 for file in PGS000699 PGS000686 PGS000688 PGS000888 PGS000677; do
