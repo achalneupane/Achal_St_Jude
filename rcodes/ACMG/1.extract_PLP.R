@@ -18,6 +18,60 @@ ACMG$disease <- gsub("\'", "", ACMG$group)
 ACMG$disease <- gsub(" ",".", ACMG$disease)
 disease <- unique(ACMG$disease)
 
+cardiomyopathy <- c(
+  "Arrhythmogenic.right.ventricular.cardiomyopathy", 
+  "Brugada.syndrome", 
+  "Catecholaminergic.polymorphic.ventricular.tachycardia", 
+  "Dilated.cardiomyopathy", 
+  "Dilated.cardiomyopathy.with.woolly.hair", 
+  "Familial.hypertrophic.cardiomyopathy", 
+  "Long.QT.syndrome", 
+  "Myofibrillar.myopathy"
+)
+
+cancer <- c(
+  "Adenomatous.polyposis.coli", 
+  "Breast-ovarian.cancer", 
+  "Familial.medullary.thyroid.carcinoma", 
+  "Hereditary.breast.cancer", 
+  "Hereditary.paraganglioma-pheochromocytoma.syndrome", 
+  "Juvenile.polyposis.syndrome", 
+  "Li-Fraumeni.syndrome", 
+  "Lynch.syndrome", 
+  "Multiple.endocrine.neoplasia", 
+  "MYH-associated.polyposis", 
+  "Neurofibromatosis", 
+  "Paragangliomas", 
+  "Peutz-Jeghers.syndrome", 
+  "Pheochromocytoma", 
+  "PTEN.hamartoma.tumor.syndrome", 
+  "Retinoblastoma", 
+  "Tuberous.sclerosis", 
+  "Von.Hippel-Lindau.syndrome", 
+  "Wilms.tumor"
+)
+
+other_diseases <- c(
+  "Aortic.aneurysm", 
+  "Biotinidase.deficiency", 
+  "Ehlers-Danlos.syndrome", 
+  "Fabrys.disease", 
+  "Familial.hypercholesterolemia", 
+  "Hereditary.hemochromatosis", 
+  "Hereditary.hemorrhagic.telangiectasia", 
+  "Hereditary.transthyretin-related.amyloidosis", 
+  "Hypercholesterolemia", 
+  "Loeys-Dietz.syndrome", 
+  "Malignant.hyperthermia", 
+  "Marfans.syndrome", 
+  "Maturity-Onset.of.Diabetes.of.the.Young", 
+  "Ornithine.carbamoyltransferase.deficiency", 
+  "Pompe.disease", 
+  "RPE65-related.retinopathy", 
+  "Wilson.disease"
+)
+disease_groups <- list(cardiomyopathy=cardiomyopathy, cancer=cancer, other_diseases=other_diseases)
+
 
 ## AD or AR
 ACMG$inheritence[grepl("Adenomatous polyposis coli|Aortic aneurysm|Arrhythmogenic right ventricular cardiomyopathy|Breast-ovarian cancer|Brugada syndrome|Catecholaminergic|Dilated cardiomyopathy|Ehlers|Fabry|Familial hypercholesterolemia|Familial hypertrophic cardiomyopathy|Familial medullary thyroid carcinoma|Hereditary breast cancer|hemochromatosis|Hereditary hemorrhagic telangiectasia|Hereditary paraganglioma-pheochromocytoma|Hereditary transthyretin-related amyloidosis|Hypercholesterolemia|Juvenile polyposis|Li-Fraumeni syndrome|Loeys-Dietz syndrome|Long QT|Lynch|Malignant hyperthermia|Marfan|Maturity-Onset of Diabetes|Multiple endocrine neoplasia|Myofibrillar myopathy|Neurofibromatosis|Ornithine carbamoyltransferase deficiency|Paragangliomas|Peutz-Jeghers syndrome|Pheochromocytoma|PTEN hamartoma|Retinoblastoma|Tuberous sclerosis|Von Hippel-Lindau|Wilms", ACMG$group, ignore.case = T)] <- "AD"
@@ -142,8 +196,8 @@ table(cc %in% bim.QC$V2)
 # 179   751
 
 ## Final SJLIFE QCed data
-bim.QC.sjlife <- fread("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/Survivor_WES/biallelic2/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_ID_updated.bim")
-table(cc %in% bim.QC.sjlife$V2)
+bim.QC.WES <- fread("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/Survivor_WES/biallelic2/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_ID_updated.bim")
+table(cc %in% bim.QC.WES$V2)
 # FALSE  TRUE 
 # 202   728 
 
@@ -174,8 +228,17 @@ raw[, AR.variants.raw] <- ifelse(raw[, AR.variants.raw] == 2, 2, 0)
 # save.image("rare_varaints_ACMG_data.RData")
 load("rare_varaints_ACMG_data.RData")
 
+sjlife_ccss_exp_overlaps <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sjlife_ccss_exp_overlaps.txt", header = TRUE, stringsAsFactors = FALSE, sep = "\t")
 EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/QC/pca/Survivor_WGS_EUR_based_on_1kGP_Phase_3_data.txt", header = T)
+# Find matching indices for SJLID in EUR$IID and replace with CCSSID
+matches <- match(EUR$IID, sjlife_ccss_exp_overlaps$SJLID)
+EUR$IID[!is.na(matches)] <- sjlife_ccss_exp_overlaps$CCSSID[matches[!is.na(matches)]]
+
 AFR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/QC/pca/Survivor_WGS_AFR_based_on_1kGP_Phase_3_data.txt", header = T)
+# Find matching indices for SJLID in EUR$IID and replace with CCSSID
+matches <- match(AFR$IID, sjlife_ccss_exp_overlaps$SJLID)
+AFR$IID[!is.na(matches)] <- sjlife_ccss_exp_overlaps$CCSSID[matches[!is.na(matches)]]
+
 
 EUR.ccss <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSSEXP_EUR_top_20_PCs.eigenvec.ccssid", header = F)
 AFR.ccss <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSSEXP_AFR_top_20_PCs.eigenvec.ccssid", header = F)
@@ -191,6 +254,10 @@ table(rownames(raw) %in% EUR.ccss.sjlife)
 
 raw.eur <- raw[rownames(raw) %in% EUR$IID,]
 raw.afr <- raw[rownames(raw) %in% AFR$IID,]
+dim(raw.eur)
+# [1] 5999  728
+dim(raw.afr)
+# [1] 847 728
 
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/ACMG/utils.R")
 ##################################
@@ -220,7 +287,14 @@ for (i in 1:length(genes)){
 }
 
 length(snps.with.carriers.clinvar.eur)
-# 157
+# 160
+dim(carriers.clinvar.eur)
+# [1] 5999   43
+# Adding carrier status for "All_Genes"
+# Check if any gene column in carriers.clinvar.eur has carrier status (1) across all genes
+carriers.clinvar.eur$All_Genes <- ifelse(rowSums(carriers.clinvar.eur[ , -1], na.rm = TRUE) > 0, 1, 0)
+dim(carriers.clinvar.eur)
+# [1] 5999   44
 
 for (i in 1:length(disease)){
   wanted.disease <- disease[i]
@@ -231,6 +305,18 @@ for (i in 1:length(disease)){
   }
   raw.wanted <- carriers.clinvar.eur[colnames(carriers.clinvar.eur) %in% wanted.genes]
   carriers.clinvar.eur[wanted.disease] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
+}
+
+## disease groups
+for (i in 1:length(disease_groups)){
+  wanted.disease <- unlist(unname(disease_groups[i]))
+  print(paste0("Doing disease ", names(disease_groups[i])))
+  wanted.genes <- unique(ACMG$GENE[ACMG$disease %in% wanted.disease])
+  if(sum(colnames(carriers.clinvar.eur) %in% wanted.genes) == 0){
+    next
+  }
+  raw.wanted <- carriers.clinvar.eur[colnames(carriers.clinvar.eur) %in% wanted.genes]
+  carriers.clinvar.eur[names(disease_groups[i])] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
 }
 
 result_table <- count_zeros_ones(carriers.clinvar.eur[-1])
@@ -262,6 +348,8 @@ for (i in 1:length(genes)){
 }
 
 length(snps.with.carriers.clinvar.afr)
+# 23
+carriers.clinvar.afr$All_Genes <- ifelse(rowSums(carriers.clinvar.afr[ , -1], na.rm = TRUE) > 0, 1, 0)
 
 for (i in 1:length(disease)){
   wanted.disease <- disease[i]
@@ -272,6 +360,18 @@ for (i in 1:length(disease)){
   }
   raw.wanted <- carriers.clinvar.afr[colnames(carriers.clinvar.afr) %in% wanted.genes]
   carriers.clinvar.afr[wanted.disease] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
+}
+
+## disease groups
+for (i in 1:length(disease_groups)){
+  wanted.disease <- unlist(unname(disease_groups[i]))
+  print(paste0("Doing disease ", names(disease_groups[i])))
+  wanted.genes <- unique(ACMG$GENE[ACMG$disease %in% wanted.disease])
+  if(sum(colnames(carriers.clinvar.afr) %in% wanted.genes) == 0){
+    next
+  }
+  raw.wanted <- carriers.clinvar.afr[colnames(carriers.clinvar.afr) %in% wanted.genes]
+  carriers.clinvar.afr[names(disease_groups[i])] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
 }
 
 result_table <- count_zeros_ones(carriers.clinvar.afr[-1])
@@ -304,7 +404,8 @@ for (i in 1:length(genes)){
 }
 
 length(snps.with.carriers.loftee.eur)
-# 34
+# 35
+carriers.loftee.eur$All_Genes <- ifelse(rowSums(carriers.loftee.eur[ , -1], na.rm = TRUE) > 0, 1, 0)
 
 for (i in 1:length(disease)){
   wanted.disease <- disease[i]
@@ -315,6 +416,18 @@ for (i in 1:length(disease)){
   }
   raw.wanted <- carriers.loftee.eur[colnames(carriers.loftee.eur) %in% wanted.genes]
   carriers.loftee.eur[wanted.disease] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
+}
+
+## disease groups
+for (i in 1:length(disease_groups)){
+  wanted.disease <- unlist(unname(disease_groups[i]))
+  print(paste0("Doing disease ", names(disease_groups[i])))
+  wanted.genes <- unique(ACMG$GENE[ACMG$disease %in% wanted.disease])
+  if(sum(colnames(carriers.loftee.eur) %in% wanted.genes) == 0){
+    next
+  }
+  raw.wanted <- carriers.loftee.eur[colnames(carriers.loftee.eur) %in% wanted.genes]
+  carriers.loftee.eur[names(disease_groups[i])] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
 }
 
 result_table <- count_zeros_ones(carriers.loftee.eur[-1])
@@ -347,6 +460,8 @@ for (i in 1:length(genes)){
 
 length(snps.with.carriers.loftee.afr)
 # 7
+carriers.loftee.afr$All_Genes <- ifelse(rowSums(carriers.loftee.afr[ , -1], na.rm = TRUE) > 0, 1, 0)
+
 for (i in 1:length(disease)){
   wanted.disease <- disease[i]
   print(paste0("Doing disease ", wanted.disease))
@@ -356,6 +471,18 @@ for (i in 1:length(disease)){
   }
   raw.wanted <- carriers.loftee.afr[colnames(carriers.loftee.afr) %in% wanted.genes]
   carriers.loftee.afr[wanted.disease] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
+}
+
+## disease groups
+for (i in 1:length(disease_groups)){
+  wanted.disease <- unlist(unname(disease_groups[i]))
+  print(paste0("Doing disease ", names(disease_groups[i])))
+  wanted.genes <- unique(ACMG$GENE[ACMG$disease %in% wanted.disease])
+  if(sum(colnames(carriers.loftee.afr) %in% wanted.genes) == 0){
+    next
+  }
+  raw.wanted <- carriers.loftee.afr[colnames(carriers.loftee.afr) %in% wanted.genes]
+  carriers.loftee.afr[names(disease_groups[i])] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
 }
 
 result_table <- count_zeros_ones(carriers.loftee.afr[-1])
@@ -389,6 +516,7 @@ for (i in 1:length(genes)){
 
 length(snps.with.carriers.snpeff.eur)
 # 205
+carriers.snpeff.eur$All_Genes <- ifelse(rowSums(carriers.snpeff.eur[ , -1], na.rm = TRUE) > 0, 1, 0)
 
 for (i in 1:length(disease)){
   wanted.disease <- disease[i]
@@ -399,6 +527,18 @@ for (i in 1:length(disease)){
   }
   raw.wanted <- carriers.snpeff.eur[colnames(carriers.snpeff.eur) %in% wanted.genes]
   carriers.snpeff.eur[wanted.disease] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
+}
+
+## disease groups
+for (i in 1:length(disease_groups)){
+  wanted.disease <- unlist(unname(disease_groups[i]))
+  print(paste0("Doing disease ", names(disease_groups[i])))
+  wanted.genes <- unique(ACMG$GENE[ACMG$disease %in% wanted.disease])
+  if(sum(colnames(carriers.snpeff.eur) %in% wanted.genes) == 0){
+    next
+  }
+  raw.wanted <- carriers.snpeff.eur[colnames(carriers.snpeff.eur) %in% wanted.genes]
+  carriers.snpeff.eur[names(disease_groups[i])] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
 }
 
 result_table <- count_zeros_ones(carriers.snpeff.eur[-1])
@@ -431,6 +571,8 @@ for (i in 1:length(genes)){
 
 length(snps.with.carriers.snpeff.afr)
 # 33
+carriers.snpeff.afr$All_Genes <- ifelse(rowSums(carriers.snpeff.afr[ , -1], na.rm = TRUE) > 0, 1, 0)
+
 for (i in 1:length(disease)){
   wanted.disease <- disease[i]
   print(paste0("Doing disease ", wanted.disease))
@@ -440,6 +582,18 @@ for (i in 1:length(disease)){
   }
   raw.wanted <- carriers.snpeff.afr[colnames(carriers.snpeff.afr) %in% wanted.genes]
   carriers.snpeff.afr[wanted.disease] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
+}
+
+## disease groups
+for (i in 1:length(disease_groups)){
+  wanted.disease <- unlist(unname(disease_groups[i]))
+  print(paste0("Doing disease ", names(disease_groups[i])))
+  wanted.genes <- unique(ACMG$GENE[ACMG$disease %in% wanted.disease])
+  if(sum(colnames(carriers.snpeff.afr) %in% wanted.genes) == 0){
+    next
+  }
+  raw.wanted <- carriers.snpeff.afr[colnames(carriers.snpeff.afr) %in% wanted.genes]
+  carriers.snpeff.afr[names(disease_groups[i])] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
 }
 
 result_table <- count_zeros_ones(carriers.snpeff.afr[-1])

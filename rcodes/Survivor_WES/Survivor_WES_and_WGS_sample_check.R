@@ -85,6 +85,9 @@ sjlife_ccss_exp_overlaps <- sampleID[(sampleID$SJLID!="" & !is.na(sampleID$CCSSI
 
 table(ccss.not.in.new.wgs %in% sjlife_ccss_exp_overlaps$CCSSID)
 
+table(sjlife_ccss_exp_overlaps$SJLID %in% PHENO.ANY_SN$sjlid)
+write.table(sjlife_ccss_exp_overlaps, file="Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sjlife_ccss_exp_overlaps.txt", row.names=FALSE, col.names=TRUE, quote=FALSE, sep = "\t")
+
 #########################
 ## Old WES VCF samples ##
 #########################
