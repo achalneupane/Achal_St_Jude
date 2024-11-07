@@ -112,7 +112,7 @@ loftee$SNP <- sub(";.*", "", loftee$Uploaded_variation)
 loftee <- loftee[!grepl("NAGNAG_SITE|NON_CAN_SPLICE", loftee$LoF_flags),]
 table(loftee$LoF_flags)
 # - 
-# 70494 
+# 72368  
 
 
 # make rare; .all is based on allee frequency from gnomAD global population; .eur is gnomAD EUR_nfe; .afr is gnomAD AFR
@@ -228,6 +228,7 @@ raw[, AR.variants.raw] <- ifelse(raw[, AR.variants.raw] == 2, 2, 0)
 # save.image("rare_varaints_ACMG_data.RData")
 load("rare_varaints_ACMG_data.RData")
 
+# Some ccss/sjlife overlapping samples in WGS data were renames as SJLIFE, but not in WES, so naming them back to CCSS.
 sjlife_ccss_exp_overlaps <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sjlife_ccss_exp_overlaps.txt", header = TRUE, stringsAsFactors = FALSE, sep = "\t")
 EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/QC/pca/Survivor_WGS_EUR_based_on_1kGP_Phase_3_data.txt", header = T)
 # Find matching indices for SJLID in EUR$IID and replace with CCSSID
@@ -240,25 +241,44 @@ matches <- match(AFR$IID, sjlife_ccss_exp_overlaps$SJLID)
 AFR$IID[!is.na(matches)] <- sjlife_ccss_exp_overlaps$CCSSID[matches[!is.na(matches)]]
 
 
-EUR.ccss <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSSEXP_EUR_top_20_PCs.eigenvec.ccssid", header = F)
-AFR.ccss <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSSEXP_AFR_top_20_PCs.eigenvec.ccssid", header = F)
+# Read the tab-separated file
+filtered_wes_samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/filtered_wes_samples_by_cohort.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+WES.fam <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_ID_updated_unique.fam", header = F)
+table(WES.fam$V2 %in% filtered_wes_samples$SampleID)
+# FALSE  TRUE 
+# 272  7758 
 
-EUR.sjlife <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA/final_EUR-PCAS_EUR.eigenvec", header = F)
-AFR.sjlife <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA/final_AFR-PCAS_AFR.eigenvec", header = F)
+EUR$cohort <- filtered_wes_samples$Source[match(EUR$IID, filtered_wes_samples$SampleID)]
+EUR <- EUR[!grepl("African", EUR$cohort),]
+EUR <- EUR[!is.na(EUR$cohort),]
+table(EUR$cohort)
+# ccss_exp community.controls             sjlife 
+# 2299                375               3345
 
-EUR.ccss.sjlife <- c(EUR.ccss$V2, EUR.sjlife$V2)
-EUR.control <- c.control.WES$V2[c.control.WES$V2 %in% EUR$IID]
+AFR$cohort <- filtered_wes_samples$Source[match(AFR$IID, filtered_wes_samples$SampleID)]
+AFR <- AFR[!is.na(AFR$cohort),]
+table(AFR$cohort)
+# ccss_exp community.controls             sjlife   Survivor_African 
+# 100                 31                642                 76 
 
-table(rownames(raw) %in% EUR.ccss.sjlife)
+## EUR.ccss <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSSEXP_EUR_top_20_PCs.eigenvec.ccssid", header = F)
+## AFR.ccss <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSSEXP_AFR_top_20_PCs.eigenvec.ccssid", header = F)
+## EUR.sjlife <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA/final_EUR-PCAS_EUR.eigenvec", header = F)
+## AFR.sjlife <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/MERGED_SJLIFE_PLINK_PER_CHR/PCA/final_AFR-PCAS_AFR.eigenvec", header = F)
 
+# table(EUR.sjlife$V2 %in% EUR$IID[EUR$cohort=="sjlife"])
+# table(AFR.sjlife$V2 %in% AFR$IID[AFR$cohort=="sjlife"])
+
+table(rownames(raw) %in% EUR$IID)
+# FALSE  TRUE 
+# 2019  6001 
 
 raw.eur <- raw[rownames(raw) %in% EUR$IID,]
 raw.afr <- raw[rownames(raw) %in% AFR$IID,]
 dim(raw.eur)
-# [1] 5999  728
+# [1] 6001  728
 dim(raw.afr)
-# [1] 847 728
-
+# [1] 846 728
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/ACMG/utils.R")
 ##################################
 ## 1.a Extract clinvar European ##
@@ -287,14 +307,14 @@ for (i in 1:length(genes)){
 }
 
 length(snps.with.carriers.clinvar.eur)
-# 160
+# 162
 dim(carriers.clinvar.eur)
-# [1] 5999   43
+# [1] 6001   44
 # Adding carrier status for "All_Genes"
 # Check if any gene column in carriers.clinvar.eur has carrier status (1) across all genes
 carriers.clinvar.eur$All_Genes <- ifelse(rowSums(carriers.clinvar.eur[ , -1], na.rm = TRUE) > 0, 1, 0)
 dim(carriers.clinvar.eur)
-# [1] 5999   44
+# [1] 6001   45
 
 for (i in 1:length(disease)){
   wanted.disease <- disease[i]
@@ -320,6 +340,7 @@ for (i in 1:length(disease_groups)){
 }
 
 result_table <- count_zeros_ones(carriers.clinvar.eur[-1])
+carriers.clinvar.eur$cohort <- filtered_wes_samples$Source[match(carriers.clinvar.eur$IID, filtered_wes_samples$SampleID)]
 
 #################################
 ## 1.b Extract clinvar African ##
@@ -348,7 +369,7 @@ for (i in 1:length(genes)){
 }
 
 length(snps.with.carriers.clinvar.afr)
-# 23
+# 24
 carriers.clinvar.afr$All_Genes <- ifelse(rowSums(carriers.clinvar.afr[ , -1], na.rm = TRUE) > 0, 1, 0)
 
 for (i in 1:length(disease)){
@@ -374,6 +395,7 @@ for (i in 1:length(disease_groups)){
   carriers.clinvar.afr[names(disease_groups[i])] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
 }
 
+carriers.clinvar.afr$cohort <- filtered_wes_samples$Source[match(carriers.clinvar.afr$IID, filtered_wes_samples$SampleID)]
 result_table <- count_zeros_ones(carriers.clinvar.afr[-1])
 
 
@@ -430,6 +452,8 @@ for (i in 1:length(disease_groups)){
   carriers.loftee.eur[names(disease_groups[i])] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
 }
 
+carriers.loftee.eur$cohort <- filtered_wes_samples$Source[match(carriers.loftee.eur$IID, filtered_wes_samples$SampleID)]
+
 result_table <- count_zeros_ones(carriers.loftee.eur[-1])
 
 ################################
@@ -485,6 +509,7 @@ for (i in 1:length(disease_groups)){
   carriers.loftee.afr[names(disease_groups[i])] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
 }
 
+carriers.loftee.afr$cohort <- filtered_wes_samples$Source[match(carriers.loftee.afr$IID, filtered_wes_samples$SampleID)]
 result_table <- count_zeros_ones(carriers.loftee.afr[-1])
 
 
@@ -541,6 +566,7 @@ for (i in 1:length(disease_groups)){
   carriers.snpeff.eur[names(disease_groups[i])] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
 }
 
+carriers.snpeff.eur$cohort <- filtered_wes_samples$Source[match(carriers.snpeff.eur$IID, filtered_wes_samples$SampleID)]
 result_table <- count_zeros_ones(carriers.snpeff.eur[-1])
 
 ################################
@@ -596,4 +622,14 @@ for (i in 1:length(disease_groups)){
   carriers.snpeff.afr[names(disease_groups[i])] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
 }
 
+carriers.snpeff.afr$cohort <- filtered_wes_samples$Source[match(carriers.snpeff.afr$IID, filtered_wes_samples$SampleID)]
 result_table <- count_zeros_ones(carriers.snpeff.afr[-1])
+
+# Save each object as an RDS file in the specified path
+saveRDS(carriers.clinvar.eur, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/carriers_clinvar_eur.rds")
+saveRDS(carriers.clinvar.afr, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/carriers_clinvar_afr.rds")
+saveRDS(carriers.loftee.eur, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/carriers_loftee_eur.rds")
+saveRDS(carriers.loftee.afr, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/carriers_loftee_afr.rds")
+saveRDS(carriers.snpeff.eur, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/carriers_snpeff_eur.rds")
+saveRDS(carriers.snpeff.afr, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/carriers_snpeff_afr.rds")
+

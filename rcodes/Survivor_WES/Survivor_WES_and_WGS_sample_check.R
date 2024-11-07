@@ -158,6 +158,9 @@ table(AA.90samples$V1 %in% sjlife.4507$V2)
 # 90 
 
 ## 3. Check Community controls
+old.wes.samples.Controls = read.table("/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/Controls/chr.ALL.survivor.control_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1.fam", header=F)
+table(old.wes.samples.Controls$V2 %in% community.control$sjlid)
+# 451
 table(old.wes.samples$V2 %in% community.control$sjlid)
 # FALSE  TRUE 
 # 7579   451 
@@ -213,6 +216,23 @@ table(ccss.in.old.wes %in% ccss.in.new.wgs)
 table(sjlife_ccss_exp_overlaps$CCSSID %in% ccss.in.old.wes)
 # TRUE 
 # 146 
+
+
+# Combine sample IDs with their sources
+all.wes.samples <- data.frame(
+  SampleID = c(PHENO.ANY_SN$sjlid, old.wes.samples.Controls$V2,  AA.90samples$V1, ccss_exp$V1),
+  Source = c(
+    rep("sjlife", length(PHENO.ANY_SN$sjlid)),
+    rep("community.controls", length(old.wes.samples.Controls$V2)),
+    rep("Survivor_African", length(AA.90samples$V1)),
+    rep("ccss_exp", length(ccss_exp$V1))
+  )
+)
+
+# Write to a tab-separated file
+write.table(all.wes.samples, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/filtered_wes_samples_by_cohort.txt", sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+
+
 #### postQC 
 old.wes.samples.Survivor = read.table("/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/Survivors/chr.ALL.SURVIVORS_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1.fam", header=F)
 table(sjlife.4507$V2 %in% old.wes.samples.Survivor$V2)
