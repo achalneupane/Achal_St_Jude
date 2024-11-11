@@ -379,7 +379,8 @@ prsfile$CHROM[prsfile$CHROM == "chr24"] <- "chrY"
 POI_meta_GRCh38 <- cbind.data.frame(prsfile$CHROM, prsfile$POS_GRCh38, prsfile$Other_Allele, prsfile$Effect_Allele, prsfile$Effect, "POI_META", "POI_META")
 
 # Note: No need to swap the allele based on "Direction +++ or ---" from meta analysis. You just need to make sure beta is positive. If you change its sign, you will need to swap the alleles
-write.table(POI_meta_GRCh38, "POI_meta_GRCh38.dat", col.names = F, row.names = F, quote = F)
+# write.table(POI_meta_GRCh38, "POI_meta_GRCh38.dat", col.names = F, row.names = F, quote = F)
+POI_meta_GRCh38 <- read.csv("POI_meta_GRCh38.dat", header = F)
 
 # extract from BIM
 POI_meta_GRCh38$KEY <- paste0(POI_meta_GRCh38$`prsfile$CHROM`, ":", POI_meta_GRCh38$`prsfile$POS_GRCh38`)
@@ -389,8 +390,8 @@ wantedSNP <- c()
 for (CHR in c(1:22, "X", "Y")) {
   print(paste0("Doing chr", CHR))
   # Construct the file path for each chromosome's BIM file
-  BIMfile <- paste0("Survivor_WGS.GATK4180.hg38_renamed_chr", CHR, ".PASS.decomposed.qced.bim")
-  BIMfile <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/QC/", BIMfile)
+  BIMfile <- paste0("Survivor_WGS.GATK4180.hg38_renamed_chr", CHR, ".decomposed.preqc.bim")
+  BIMfile <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/preQC/", BIMfile)
 
   # Read the BIM file
   df <- fread(BIMfile)
@@ -405,7 +406,6 @@ for (CHR in c(1:22, "X", "Y")) {
 
 wantedSNP_df <- data.frame(SNP = wantedSNP)
 write.table(wantedSNP_df, "wantedSNP_GRCh38.txt", row.names = FALSE, col.names = F, sep = "\t", quote = FALSE)
-
 
 bimcheck <- fread(".//prs/prs_out/POI_META.bim")
 bimcheck$KEY <- paste0("chr", bimcheck$V1, ":", bimcheck$V4)

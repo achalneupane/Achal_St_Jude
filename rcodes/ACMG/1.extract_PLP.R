@@ -339,8 +339,9 @@ for (i in 1:length(disease_groups)){
   carriers.clinvar.eur[names(disease_groups[i])] <- ifelse(rowSums(raw.wanted, na.rm = T) > 0, 1, 0)
 }
 
-result_table <- count_zeros_ones(carriers.clinvar.eur[-1])
 carriers.clinvar.eur$cohort <- filtered_wes_samples$Source[match(carriers.clinvar.eur$IID, filtered_wes_samples$SampleID)]
+result_table <- count_zeros_ones(carriers.clinvar.eur[-1])
+
 
 #################################
 ## 1.b Extract clinvar African ##
@@ -540,7 +541,7 @@ for (i in 1:length(genes)){
 }
 
 length(snps.with.carriers.snpeff.eur)
-# 205
+# 203
 carriers.snpeff.eur$All_Genes <- ifelse(rowSums(carriers.snpeff.eur[ , -1], na.rm = TRUE) > 0, 1, 0)
 
 for (i in 1:length(disease)){
