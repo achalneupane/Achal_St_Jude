@@ -421,7 +421,7 @@ POI_meta_GRCh38[!POI_meta_GRCh38$KEY %in% bimcheck$KEY,]
 # chr1 41446467 T C 0.0777940274400202 ST6 ST6
 POI_meta_GRCh37 <- cbind.data.frame(prsfile$CHROM, prsfile$Pos, prsfile$Other_Allele, prsfile$Effect_Allele, prsfile$Effect, "POI_META", "POI_META")
 
-write.table(prsfile, "POI_meta_GRCh37.dat", col.names = T, row.names = F, quote = F)
+write.table(POI_meta_GRCh37, "POI_meta_GRCh37.dat", col.names = T, row.names = F, quote = F)
 
 
 # extract from BIM

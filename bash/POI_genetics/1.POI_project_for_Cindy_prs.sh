@@ -191,16 +191,16 @@ plink --bfile prs_out_wgs_survivor/${study}_varname_updated --score prs_out_wgs_
 #####################################
 ## create plink files for CCSS org ##
 #####################################
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/POI_genetics/Ruth_et_al/prs/
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/POI_genetics/Ruth_et_al/plink_data/
 
 module load plink/1.90b
 for CHR in {1..22} X Y; do
 echo "Doing Chr ${CHR}"
-plink --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/plink/CCSS_org_GRCh37_chr${CHR} --extract ../wantedSNP_GRCh37.txt --keep-allele-order --make-bed --out Ruth_etal_PRS_chr${CHR}
+plink --bfile /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/plink/CCSS_org_GRCh37_chr${CHR} --extract ../wantedSNP_GRCh37.txt --keep-allele-order --make-bed --out Ruth_etal_PRS_chr${CHR}_ccss_org
 done
 
 
-ls Ruth_etal_PRS_chr*.bed | sed 's/\..*//' | sort -u > merge_list.txt
+ls Ruth_etal_PRS_chr*_ccss_org.bed | sed 's/\..*//' | sort -u > merge_list.txt
 plink --merge-list merge_list.txt -keep-allele-order --make-bed --out Ruth_etal_PRS_merged_ccss_org
 
 
@@ -213,33 +213,45 @@ ln -s  ../POI_meta_GRCh37.dat .
 
 ## After running R code PRS_scores.R; extract variants
 # Append chr in the first column
-awk '{print "chr"$1, $2, $3, $4, $5, $6}' Ruth_etal_PRS_merged_ccss_org > tmp_bim
-mv tmp_bim Ruth_etal_PRS_merged_ccss_org
+awk '{print "chr"$1, $2, $3, $4, $5, $6}' Ruth_etal_PRS_merged_ccss_org.bim > tmp_bim
+mv tmp_bim Ruth_etal_PRS_merged_ccss_org.bim
 
 ## PRS; studies: PGS000356 (172 vars out of 179) PGS000454 (27 vars out of 27) PGS003416 (460 vars out of 462) ST6 (110 vars out of 110)
 mkdir -p prs_out_ccss_org
-study="ST6"
+study="POI_META"
 # Subset PRS data for each study
-awk -v study=$study '$6==study' all_BCC_effect_ccss_org.dat > prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study}
+awk -v study=$study '$6==study' POI_meta_GRCh37.dat > prs_out_ccss_org/POI_meta_GRCh37.dat_${study}
 # Check for duplicate variants based on chr:pos
-awk 'a[$1":"$2]++' prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study} | wc -l
+awk 'a[$1":"$2]++' prs_out_ccss_org/POI_meta_GRCh37.dat_${study} | wc -l
 ## Look for directly matching variants in the WGS data
-awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study} ccss_org_extracted_chrALL.bim \
-| awk '($4==$6 || $4==$7) && ($5==$6 || $5==$7)' > prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study}_direct_match
+awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out_ccss_org/POI_meta_GRCh37.dat_${study} Ruth_etal_PRS_merged_Survivor_WGS.bim \
+| awk '($4==$6 || $4==$7) && ($5==$6 || $5==$7)' > prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_direct_match
 
+# (base) [aneupane@splprhpc12 prs]$ wc -l prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_direct_match
+# 283 prs_out_ccss_org/POI_meta_GRCh37.dat_POI_META_direct_match
 
 # No direct match
-awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study} ccss_org_extracted_chrALL.bim \
-| awk '!(($4==$6 || $4==$7) && ($5==$6 || $5==$7))' | grep -v DEL > prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study}_no_direct_match
+awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out_ccss_org/POI_meta_GRCh37.dat_${study} Ruth_etal_PRS_merged_Survivor_WGS.bim \
+| awk '!(($4==$6 || $4==$7) && ($5==$6 || $5==$7))' | grep -v '*' > prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_no_direct_match
 # Exclude those that are already a direct match
-awk 'NR==FNR{a[$1":"$3];next}!($1":"$3 in a){print}' prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study}_direct_match prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study}_no_direct_match \
-> prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study}_no_direct_match_final
+awk 'NR==FNR{a[$1":"$3];next}!($1":"$3 in a){print}' prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_direct_match prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_no_direct_match \
+> prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_no_direct_match_final
 
-wc -l prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study}_no_direct_match_final
+wc -l prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_no_direct_match_final
+# 6 prs_out_ccss_org/POI_meta_GRCh37.dat_POI_META_no_direct_match_final
 
 ## Harmonize alleles
-module load R
-Rscript /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/harmonize_alleles.R prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study}_no_direct_match_final
+module load R/4.2.2-rhel8
+Rscript /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/attr_fraction/prs/harmonize_alleles.R prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_no_direct_match_final
+
+## Update the alleles; It checks if the last field ($NF) in each line is equal to 1; if true, then { print $3, $6, $7, $8, $9 } so we can update the plink file for variants with no direct match
+awk '($NF==1){ print $3, $6, $7, $8, $9}' prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_no_direct_match_final_alleles_harmonized > prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_no_direct_match_alleles_harmonized_update_alleles.txt
+
+
+# Extract study-specific variants
+awk '{print $2}' prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_direct_match > prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_direct_match_to_extract.txt
+module load plink/1.90b
+
 
 ## Update the alleles; It checks if the last field ($NF) in each line is equal to 1; if true, then { print $3, $6, $7, $8, $9 } so we can update the plink file for variants with no direct match
 awk '($NF==1){ print $3, $6, $7, $8, $9}' prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study}_no_direct_match_final_alleles_harmonized > prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study}_no_direct_match_alleles_harmonized_update_alleles.txt
