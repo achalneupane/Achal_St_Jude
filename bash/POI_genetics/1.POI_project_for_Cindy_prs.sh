@@ -181,8 +181,7 @@ awk '{print $1":"$2, $4, $5}' prs_out_wgs_survivor/POI_meta_GRCh38.dat_${study} 
 
 # Calculate PRS
 plink --bfile prs_out_wgs_survivor/${study}_varname_updated --score prs_out_wgs_survivor/${study}.prsweight --out prs_out_wgs_survivor/${study}_prs
-
-
+# --score: 279 valid predictors loaded.
 
 
 
@@ -209,12 +208,9 @@ cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/POI_geneti
 ln -s  ../POI_meta_GRCh38.dat .
 ln -s  ../POI_meta_GRCh37.dat .
 
-
+ln -s ../plink_data/Ruth_etal_PRS_merged_ccss_org.* .
 
 ## After running R code PRS_scores.R; extract variants
-# Append chr in the first column
-awk '{print "chr"$1, $2, $3, $4, $5, $6}' Ruth_etal_PRS_merged_ccss_org.bim > tmp_bim
-mv tmp_bim Ruth_etal_PRS_merged_ccss_org.bim
 
 ## PRS; studies: PGS000356 (172 vars out of 179) PGS000454 (27 vars out of 27) PGS003416 (460 vars out of 462) ST6 (110 vars out of 110)
 mkdir -p prs_out_ccss_org
@@ -224,14 +220,14 @@ awk -v study=$study '$6==study' POI_meta_GRCh37.dat > prs_out_ccss_org/POI_meta_
 # Check for duplicate variants based on chr:pos
 awk 'a[$1":"$2]++' prs_out_ccss_org/POI_meta_GRCh37.dat_${study} | wc -l
 ## Look for directly matching variants in the WGS data
-awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out_ccss_org/POI_meta_GRCh37.dat_${study} Ruth_etal_PRS_merged_Survivor_WGS.bim \
+awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out_ccss_org/POI_meta_GRCh37.dat_${study} Ruth_etal_PRS_merged_ccss_org.bim \
 | awk '($4==$6 || $4==$7) && ($5==$6 || $5==$7)' > prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_direct_match
 
 # (base) [aneupane@splprhpc12 prs]$ wc -l prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_direct_match
 # 283 prs_out_ccss_org/POI_meta_GRCh37.dat_POI_META_direct_match
 
 # No direct match
-awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out_ccss_org/POI_meta_GRCh37.dat_${study} Ruth_etal_PRS_merged_Survivor_WGS.bim \
+awk 'NR==FNR{a[$1":"$2]=$3" "$4;next}($1":"$4 in a){print $1, $2, $4, $5, $6, a[$1":"$4]}' prs_out_ccss_org/POI_meta_GRCh37.dat_${study} Ruth_etal_PRS_merged_ccss_org.bim \
 | awk '!(($4==$6 || $4==$7) && ($5==$6 || $5==$7))' | grep -v '*' > prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_no_direct_match
 # Exclude those that are already a direct match
 awk 'NR==FNR{a[$1":"$3];next}!($1":"$3 in a){print}' prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_direct_match prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_no_direct_match \
@@ -253,18 +249,12 @@ awk '{print $2}' prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_direct_match > pr
 module load plink/1.90b
 
 
-## Update the alleles; It checks if the last field ($NF) in each line is equal to 1; if true, then { print $3, $6, $7, $8, $9 } so we can update the plink file for variants with no direct match
-awk '($NF==1){ print $3, $6, $7, $8, $9}' prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study}_no_direct_match_final_alleles_harmonized > prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study}_no_direct_match_alleles_harmonized_update_alleles.txt
-
-
-# Extract study-specific variants
-awk '{print $2}' prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study}_direct_match > prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study}_direct_match_to_extract.txt
 module load plink/1.90b
 
 ## If there are no indirect match, just make this commented first line: --out prs_out_ccss_org/${study} and skip lines with **
-# plink --bfile ccss_org_extracted_chrALL --extract prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study}_direct_match_to_extract.txt --make-bed --out prs_out_ccss_org/${study}_direct_match
-plink --bfile ccss_org_extracted_chrALL --extract prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study}_direct_match_to_extract.txt --make-bed --out prs_out_ccss_org/${study}
-plink --bfile ccss_org_extracted_chrALL --extract prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --update-alleles prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --make-bed --out prs_out_ccss_org/${study}_harmonized ##**
+# plink --bfile Ruth_etal_PRS_merged_ccss_org --extract prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_direct_match_to_extract.txt --make-bed --out prs_out_ccss_org/${study}_direct_match
+plink --bfile Ruth_etal_PRS_merged_ccss_org --extract prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_direct_match_to_extract.txt --make-bed --out prs_out_ccss_org/${study}
+# plink --bfile Ruth_etal_PRS_merged_ccss_org --extract prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --update-alleles prs_out_ccss_org/POI_meta_GRCh37.dat_${study}_no_direct_match_alleles_harmonized_update_alleles.txt --make-bed --out prs_out_ccss_org/${study}_harmonized ##**
 # This command above extracts and updates alleles from 
 # (base) [aneupane@splprhpc08 prs_out_ccss_org]$ grep chr10:46037697 sjlife_extracted_chrALL.bim
 # 10      chr10:46037697:A:G      0       46037697        G       A
@@ -272,12 +262,15 @@ plink --bfile ccss_org_extracted_chrALL --extract prs_out_ccss_org/all_BCC_effec
 # (base) [aneupane@splprhpc08 prs_out_ccss_org]$ cat Pleiotropy_One_directional_Significant_harmonized.bim
 # 10      chr10:46037697:A:G      0       46037697        C       T
 
-plink --bfile prs_out_ccss_org/${study}_direct_match --bmerge prs_out_ccss_org/${study}_harmonized --make-bed --out prs_out_ccss_org/$study ##**
+# plink --bfile prs_out_ccss_org/${study}_direct_match --bmerge prs_out_ccss_org/${study}_harmonized --make-bed --out prs_out_ccss_org/$study ##**
 # Update variant names
 awk '{print $2, "chr"$1":"$4}' prs_out_ccss_org/${study}.bim > prs_out_ccss_org/${study}_update_variantnames
+# wc -l prs_out_ccss_org/${study}_update_variantnames
+# 231 prs_out_ccss_org/POI_META_update_variantnames
+
 plink --bfile prs_out_ccss_org/$study --update-name prs_out_ccss_org/${study}_update_variantnames --make-bed --out prs_out_ccss_org/${study}_varname_updated
 # Create a score file
-awk '{print $1":"$2, $4, $5}' prs_out_ccss_org/all_BCC_effect_ccss_org.dat_${study} > prs_out_ccss_org/${study}.prsweight
+awk '{print $1":"$2, $4, $5}' prs_out_ccss_org/POI_meta_GRCh37.dat_${study} > prs_out_ccss_org/${study}.prsweight
 
 # Calculate PRS
 plink --bfile prs_out_ccss_org/${study}_varname_updated --score prs_out_ccss_org/${study}.prsweight --out prs_out_ccss_org/${study}_prs
