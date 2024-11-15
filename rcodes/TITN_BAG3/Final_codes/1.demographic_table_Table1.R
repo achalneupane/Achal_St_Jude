@@ -41,8 +41,8 @@ anthra_median_range <- paste0(round(median(jco_actual_dose, na.rm = T), 1), " ("
 anthra_0 <- paste0(sum(df$anthra_jco_dose_any == 0, na.rm = T), 
                    " (", round(sum(df$anthra_jco_dose_any == 0, na.rm = T)/nrow(df)*100, 1), "%)")
 
-anthra_1_250 <- paste0(sum(df$anthra_jco_dose_any >= 1 & df$anthra_jco_dose_any <= 250, na.rm = T),
-                       " (", round(sum(df$anthra_jco_dose_any >= 1 & df$anthra_jco_dose_any <= 250, na.rm = T)/nrow(df)*100, 1), "%)")
+anthra_1_250 <- paste0(sum(df$anthra_jco_dose_any > 0 & df$anthra_jco_dose_any <= 250, na.rm = T),
+                       " (", round(sum(df$anthra_jco_dose_any > 0 & df$anthra_jco_dose_any <= 250, na.rm = T)/nrow(df)*100, 1), "%)")
 
 anthra_gt_250 <- paste0(sum(df$anthra_jco_dose_any > 250, na.rm = T), 
                         " (", round(sum(df$anthra_jco_dose_any > 250, na.rm = T)/nrow(df)*100, 1), "%)")
@@ -61,8 +61,8 @@ hrtavg_median_range <- paste0(round(median(hrtavg_actual_dose, na.rm = T), 1), "
 heartrt_0 <- paste0(sum(df$hrtavg == 0, na.rm = T), 
                     " (", round(sum(df$hrtavg == 0, na.rm = T)/nrow(df)*100, 1), "%)")
 
-heartrt_1_25 <- paste0(sum(df$hrtavg >= 1 & df$hrtavg <= 25, na.rm = T), 
-                       " (", round(sum(df$hrtavg >= 1 & df$hrtavg <= 25, na.rm = T)/nrow(df)*100, 1), "%)")
+heartrt_1_25 <- paste0(sum(df$hrtavg > 0 & df$hrtavg <= 25, na.rm = T), 
+                       " (", round(sum(df$hrtavg > 0 & df$hrtavg <= 25, na.rm = T)/nrow(df)*100, 1), "%)")
 
 heartrt_gt_25 <- paste0(sum(df$hrtavg > 25, na.rm = T), 
                         " (", round(sum(df$hrtavg > 25, na.rm = T)/nrow(df)*100, 1), "%)")
@@ -206,8 +206,8 @@ get_demographic <- function(df, n){
   anthra_0 <- paste0(sum(df$anthra_jco_dose_any == 0, na.rm = T), 
                      " (", round(sum(df$anthra_jco_dose_any == 0, na.rm = T)/nrow(df)*100, 1), "%)")
   
-  anthra_1_250 <- paste0(sum(df$anthra_jco_dose_any >= 1 & df$anthra_jco_dose_any <= 250, na.rm = T),
-                         " (", round(sum(df$anthra_jco_dose_any >= 1 & df$anthra_jco_dose_any <= 250, na.rm = T)/nrow(df)*100, 1), "%)")
+  anthra_1_250 <- paste0(sum(df$anthra_jco_dose_any > 0 & df$anthra_jco_dose_any <= 250, na.rm = T),
+                         " (", round(sum(df$anthra_jco_dose_any > 0 & df$anthra_jco_dose_any <= 250, na.rm = T)/nrow(df)*100, 1), "%)")
   
   anthra_gt_250 <- paste0(sum(df$anthra_jco_dose_any > 250, na.rm = T), 
                           " (", round(sum(df$anthra_jco_dose_any > 250, na.rm = T)/nrow(df)*100, 1), "%)")
@@ -226,8 +226,8 @@ get_demographic <- function(df, n){
   heartrt_0 <- paste0(sum(df$hrtavg == 0, na.rm = T), 
                       " (", round(sum(df$hrtavg == 0, na.rm = T)/nrow(df)*100, 1), "%)")
   
-  heartrt_1_25 <- paste0(sum(df$hrtavg >= 1 & df$hrtavg <= 25, na.rm = T), 
-                         " (", round(sum(df$hrtavg >= 1 & df$hrtavg <= 25, na.rm = T)/nrow(df)*100, 1), "%)")
+  heartrt_1_25 <- paste0(sum(df$hrtavg > 0  & df$hrtavg <= 25, na.rm = T), 
+                         " (", round(sum(df$hrtavg > 0 & df$hrtavg <= 25, na.rm = T)/nrow(df)*100, 1), "%)")
   
   heartrt_gt_25 <- paste0(sum(df$hrtavg > 25, na.rm = T), 
                           " (", round(sum(df$hrtavg > 25, na.rm = T)/nrow(df)*100, 1), "%)")

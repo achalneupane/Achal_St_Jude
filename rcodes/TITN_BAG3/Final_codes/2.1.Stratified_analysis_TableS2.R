@@ -1,6 +1,23 @@
 rm(list=ls())
 
 ## Perform stratified association analysis with top TTN and BAG3 common missense variants
+library(haven)
+diagnosis <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/diagnosis.sas7bdat")
+ccss_diagnosis <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/ccss_diagdt_Kendrick.rds")
+SJLIFE_diagdt <- cbind.data.frame(IID=diagnosis$sjlid, diagdt=diagnosis$diagdt)
+CCSS_diagdt <- cbind.data.frame(IID=ccss_diagnosis$ccssid, diagdt=ccss_diagnosis$d_dx)
+diagDT <- rbind.data.frame(SJLIFE_diagdt, CCSS_diagdt)
+
+library(lubridate)
+# Convert diagdt to Date format
+diagDT$diagdt <- as.Date(diagDT$diagdt)
+diagDT$diagdt <- as.Date(diagDT$diagdt, format="%Y-%m-%d")
+# Extract the year
+diagDT$year <- as.numeric(format(diagDT$diagdt, "%Y"))
+diagDT$era_variable <- format(cut(diagDT$year, breaks = seq(min(diagDT$year, na.rm = TRUE), max(diagDT$year, na.rm = TRUE), by = 10), include.lowest = TRUE, right = TRUE), scientific = F)
+head(diagDT)
+
+
 
 ## From Kendrick
 # sjlife_cmp_data <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Re_A_new_manuscript_on_TTN_BAG3_for_your_review//sjlife_ccm_analysis_dat.rds") # N = 3686
@@ -89,6 +106,8 @@ extract_info <- function(df) {
   N = df$n
   return(data.frame(Gender = gender, P_Value = p_value, OR_CI = or_ci, n = N))
 }
+
+
 
 #########
 ## TTN ##
@@ -362,6 +381,130 @@ table_data$OR_CI <- combine_or_ci(table_data$Odds_Ratio, table_data$CI_Lower, ta
 print(table_data)
 
 ttn.female <- table_data
+
+
+#------------------6. Anthracycline alone
+
+all_data <- dat_final[(dat_final$anthra_jco_dose_any > 0 & dat_final$hrtavg <= 2),]
+
+overall_model <- glm(CMP ~ rs3829746 + agedx + agelstcontact + PC1 + PC2 + PC3 +
+                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10+cohort_two, family = binomial, data = all_data)
+
+overall_summary <- summary(overall_model)
+overall_summary
+
+
+# Create the table
+table_data <- data.frame(
+  Group = c("Anthracycline only"),
+  Estimate = c(overall_summary$coefficients[2, 1]),
+  Std_Error = c(overall_summary$coefficients[2, 2]),
+  Z_Value = c(overall_summary$coefficients[2, 3]),
+  P_Value = c(overall_summary$coefficients[2, 4]),
+  n = c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
+  stringsAsFactors = FALSE
+)
+
+# Calculate odds ratio and confidence interval
+odds_ratio_info <- calculate_odds_ratio(table_data$Estimate, table_data$Std_Error)
+table_data$Odds_Ratio <- odds_ratio_info$odds_ratio
+table_data$CI_Lower <- odds_ratio_info$ci_lower
+table_data$CI_Upper <- odds_ratio_info$ci_upper
+
+# Print the table
+print(table_data)
+
+
+# Apply function to data frame
+table_data$OR_CI <- combine_or_ci(table_data$Odds_Ratio, table_data$CI_Lower, table_data$CI_Upper)
+
+# Print the updated data frame
+print(table_data)
+
+ttn.anthra.only <- table_data
+
+
+#------------------6. Anthracycline (with RT)
+
+all_data <- dat_final[(dat_final$anthra_jco_dose_any >= 0),]
+
+overall_model <- glm(CMP ~ rs3829746 + agedx + agelstcontact + PC1 + PC2 + PC3 +
+                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10+cohort_two, family = binomial, data = all_data)
+
+overall_summary <- summary(overall_model)
+overall_summary
+
+
+# Create the table
+table_data <- data.frame(
+  Group = c("Anthracycline with RT"),
+  Estimate = c(overall_summary$coefficients[2, 1]),
+  Std_Error = c(overall_summary$coefficients[2, 2]),
+  Z_Value = c(overall_summary$coefficients[2, 3]),
+  P_Value = c(overall_summary$coefficients[2, 4]),
+  n = c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
+  stringsAsFactors = FALSE
+)
+
+# Calculate odds ratio and confidence interval
+odds_ratio_info <- calculate_odds_ratio(table_data$Estimate, table_data$Std_Error)
+table_data$Odds_Ratio <- odds_ratio_info$odds_ratio
+table_data$CI_Lower <- odds_ratio_info$ci_lower
+table_data$CI_Upper <- odds_ratio_info$ci_upper
+
+# Print the table
+print(table_data)
+
+
+# Apply function to data frame
+table_data$OR_CI <- combine_or_ci(table_data$Odds_Ratio, table_data$CI_Lower, table_data$CI_Upper)
+
+# Print the updated data frame
+print(table_data)
+
+ttn.anthra.with.RT <- table_data
+
+
+#------------------6. heartRT alone
+
+all_data <- dat_final[(dat_final$anthra_jco_dose_any == 0 & dat_final$hrtavg > 2),]
+
+overall_model <- glm(CMP ~ rs3829746 + agedx + agelstcontact + PC1 + PC2 + PC3 +
+                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10+cohort_two, family = binomial, data = all_data)
+
+overall_summary <- summary(overall_model)
+overall_summary
+
+
+# Create the table
+table_data <- data.frame(
+  Group = c("heartRT only"),
+  Estimate = c(overall_summary$coefficients[2, 1]),
+  Std_Error = c(overall_summary$coefficients[2, 2]),
+  Z_Value = c(overall_summary$coefficients[2, 3]),
+  P_Value = c(overall_summary$coefficients[2, 4]),
+  n = c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
+  stringsAsFactors = FALSE
+)
+
+# Calculate odds ratio and confidence interval
+odds_ratio_info <- calculate_odds_ratio(table_data$Estimate, table_data$Std_Error)
+table_data$Odds_Ratio <- odds_ratio_info$odds_ratio
+table_data$CI_Lower <- odds_ratio_info$ci_lower
+table_data$CI_Upper <- odds_ratio_info$ci_upper
+
+# Print the table
+print(table_data)
+
+
+# Apply function to data frame
+table_data$OR_CI <- combine_or_ci(table_data$Odds_Ratio, table_data$CI_Lower, table_data$CI_Upper)
+
+# Print the updated data frame
+print(table_data)
+
+ttn.heartRT.only <- table_data
+
 ##########
 ## BAG3 ##
 ##########

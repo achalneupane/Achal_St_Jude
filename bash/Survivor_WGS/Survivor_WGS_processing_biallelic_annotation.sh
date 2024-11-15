@@ -101,15 +101,22 @@ echo "DONE SNPSIFT Annotation with EXAC for ${CHR}" >> annotation_step.txt
 # rm ${ANNOT_PROJECT}-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf
 ANNOTATED="${ANNOT_PROJECT}-snpeff-ExAC.0.3.GRCh38.vcf"
 
-# cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/gnomAD
-# for i in {1..22}; do 
+# cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/gnomAD/genome_4.0/
+# for i in {1..22} X Y; do 
 # wget https://storage.googleapis.com/gcp-public-data--gnomad/release/4.0/vcf/genomes/gnomad.genomes.v4.0.sites.chr${i}.vcf.bgz
 # wget https://storage.googleapis.com/gcp-public-data--gnomad/release/4.0/vcf/genomes/gnomad.genomes.v4.0.sites.chr${i}.vcf.bgz.tbi 
 # done
 
+## gnomAD 4.1.0
+# cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/gnomAD/genome_4.1/
+# for i in {1..22} X Y; do 
+# wget https://storage.googleapis.com/gcp-public-data--gnomad/release/4.1/vcf/genomes/gnomad.genomes.v4.1.sites.chr${i}.vcf.bgz
+# wget https://storage.googleapis.com/gcp-public-data--gnomad/release/4.1/vcf/genomes/gnomad.genomes.v4.1.sites.chr${i}.vcf.bgz.tbi 
+# done
+
 
 ## GnomAD with Exome
-${JAVA} ${JAVAOPTS} -jar ${SNPSIFT} annotate /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/MERGED_sjlife1_2_PreQC/cleaned/annotation/gnomAD/gnomad.genomes.v4.0.sites.${CHR}.vcf.bgz \
+${JAVA} ${JAVAOPTS} -jar ${SNPSIFT} annotate /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/sjlife/MERGED_SJLIFE_1_2/annotation/snpEff/data/gnomAD/genome_4.0/gnomad.genomes.v4.0.sites.${CHR}.vcf.bgz \
 "${ANNOT_PROJECT}-snpeff-ExAC.0.3.GRCh38.vcf" > "${ANNOT_PROJECT}-snpeff-ExAC.0.3.GRCh38.with.gnomAD.vcf"
 
 ANNOTATED="${ANNOT_PROJECT}-snpeff-ExAC.0.3.GRCh38.with.gnomAD.vcf"
