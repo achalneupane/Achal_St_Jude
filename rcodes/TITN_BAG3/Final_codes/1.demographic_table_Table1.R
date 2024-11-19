@@ -67,11 +67,21 @@ heartrt_1_25 <- paste0(sum(df$hrtavg > 0 & df$hrtavg <= 25, na.rm = T),
 heartrt_gt_25 <- paste0(sum(df$hrtavg > 25, na.rm = T), 
                         " (", round(sum(df$hrtavg > 25, na.rm = T)/nrow(df)*100, 1), "%)")
 
+df$era <- factor(df$era, levels = c("[1958,1968]", "(1968,1978]", "(1978,1988]", "(1988,1998]", "(1998,2008]", "(2008,2018]"))
+
+## ERA
+era1 <- paste0(sum(df$era_numeric == 1, na.rm = TRUE), " (", round(sum(df$era_numeric == 1, na.rm = TRUE) / nrow(df) * 100, 1), "%)")
+era2 <- paste0(sum(df$era_numeric == 2, na.rm = TRUE), " (", round(sum(df$era_numeric == 2, na.rm = TRUE) / nrow(df) * 100, 1), "%)")
+era3 <- paste0(sum(df$era_numeric == 3, na.rm = TRUE), " (", round(sum(df$era_numeric == 3, na.rm = TRUE) / nrow(df) * 100, 1), "%)")
+era4 <- paste0(sum(df$era_numeric == 4, na.rm = TRUE), " (", round(sum(df$era_numeric == 4, na.rm = TRUE) / nrow(df) * 100, 1), "%)")
+era5 <- paste0(sum(df$era_numeric == 5, na.rm = TRUE), " (", round(sum(df$era_numeric == 5, na.rm = TRUE) / nrow(df) * 100, 1), "%)")
+era6 <- paste0(sum(df$era_numeric == 6, na.rm = TRUE), " (", round(sum(df$era_numeric == 6, na.rm = TRUE) / nrow(df) * 100, 1), "%)")
+
 out <- setNames(rbind.data.frame(agedx, agelstcontact, df_elapsedAGE, ejection_fraction_hrt, male, female, anthra_median_range, anthra_0, anthra_1_250, anthra_gt_250, hrtavg_median_range, heartrt_0,
-                                 heartrt_1_25, heartrt_gt_25), paste0("With CMP (n = ", n, ")"))
+                                 heartrt_1_25, heartrt_gt_25, era1, era2, era3, era4, era5, era6), paste0("With CMP (n = ", n, ")"))
 
 rownames(out) <- c("agedx", "agelstcontact", "df_elapsedAGE", "ejection_fraction_hrt", "male", "female", "anthra_median_range", "anthra_0", "anthra_1_250", "anthra_gt_250",
-                   "hrtavg_median_range", "heartrt_0", "heartrt_1_25", "heartrt_gt_25")
+                   "hrtavg_median_range", "heartrt_0", "heartrt_1_25", "heartrt_gt_25", "1958-1968", "1969-1978", "1979-1988", "1989-1998", "1999-2008", "2009-2018")
 
 out
 }
@@ -130,6 +140,7 @@ get_demographic(merged.dat_without_CMP, n)
 # ALL
 n = nrow(merged.dat)
 get_demographic(merged.dat, n)
+
 
 ##########
 ## CCSS ##
@@ -232,11 +243,21 @@ get_demographic <- function(df, n){
   heartrt_gt_25 <- paste0(sum(df$hrtavg > 25, na.rm = T), 
                           " (", round(sum(df$hrtavg > 25, na.rm = T)/nrow(df)*100, 1), "%)")
   
+  df$era <- factor(df$era, levels = c("[1958,1968]", "(1968,1978]", "(1978,1988]", "(1988,1998]", "(1998,2008]", "(2008,2018]"))
+  
+  ## ERA
+  era1 <- paste0(sum(df$era_numeric == 1, na.rm = TRUE), " (", round(sum(df$era_numeric == 1, na.rm = TRUE) / nrow(df) * 100, 1), "%)")
+  era2 <- paste0(sum(df$era_numeric == 2, na.rm = TRUE), " (", round(sum(df$era_numeric == 2, na.rm = TRUE) / nrow(df) * 100, 1), "%)")
+  era3 <- paste0(sum(df$era_numeric == 3, na.rm = TRUE), " (", round(sum(df$era_numeric == 3, na.rm = TRUE) / nrow(df) * 100, 1), "%)")
+  era4 <- paste0(sum(df$era_numeric == 4, na.rm = TRUE), " (", round(sum(df$era_numeric == 4, na.rm = TRUE) / nrow(df) * 100, 1), "%)")
+  era5 <- paste0(sum(df$era_numeric == 5, na.rm = TRUE), " (", round(sum(df$era_numeric == 5, na.rm = TRUE) / nrow(df) * 100, 1), "%)")
+  era6 <- paste0(sum(df$era_numeric == 6, na.rm = TRUE), " (", round(sum(df$era_numeric == 6, na.rm = TRUE) / nrow(df) * 100, 1), "%)")
+  
   out <- setNames(rbind.data.frame(agedx, agelstcontact, ejection_fraction_hrt, male, female, anthra_median_range, anthra_0, anthra_1_250, anthra_gt_250, hrtavg_median_range, heartrt_0,
-                                   heartrt_1_25, heartrt_gt_25), paste0("With CMP (n = ", n, ")"))
+                                   heartrt_1_25, heartrt_gt_25, era1, era2, era3, era4, era5, era6), paste0("With CMP (n = ", n, ")"))
   
   rownames(out) <- c("agedx", "agelstcontact", "ejection_fraction_hrt", "male", "female", "anthra_median_range", "anthra_0", "anthra_1_250", "anthra_gt_250",
-                     "hrtavg_median_range", "heartrt_0", "heartrt_1_25", "heartrt_gt_25")
+                     "hrtavg_median_range", "heartrt_0", "heartrt_1_25", "heartrt_gt_25", "1958-1968", "1969-1978", "1979-1988", "1989-1998", "1999-2008", "2009-2018")
   
   out
 }

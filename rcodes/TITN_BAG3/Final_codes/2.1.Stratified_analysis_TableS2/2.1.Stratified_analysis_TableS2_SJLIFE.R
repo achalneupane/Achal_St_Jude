@@ -26,6 +26,10 @@ unique(diagDT$era_variable)
 diagDT$era_numeric <- as.numeric(factor(diagDT$era_variable, 
                                                            levels = c("[1958,1968]", "(1968,1978]", "(1978,1988]", 
                                                                       "(1988,1998]", "(1998,2008]", "(2008,2018]")))
+diagDT$era <- factor(diagDT$era_variable, 
+                                        levels = c("[1958,1968]", "(1968,1978]", "(1978,1988]", 
+                                                   "(1988,1998]", "(1998,2008]", "(2008,2018]"))
+
 
 saveRDS(diagDT, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/diagDT.rds")
 
@@ -45,8 +49,9 @@ EUR_common_Kendrick <- EUR_common_Kendrick[!(is.na(EUR_common_Kendrick$anthracyc
 colnames(EUR_common_Kendrick)[colnames(EUR_common_Kendrick) == "fid"] <- "FID"
 colnames(EUR_common_Kendrick)[colnames(EUR_common_Kendrick) == "iid"] <- "IID"
 EUR_common_Kendrick$era_numeric <- diagDT$era_numeric[match(EUR_common_Kendrick$IID, diagDT$IID)]
+EUR_common_Kendrick$era <- diagDT$era[match(EUR_common_Kendrick$IID, diagDT$IID)]
 EUR_common_Kendrick.pheno <- EUR_common_Kendrick[,c("FID", "IID", "CMP", "agelstcontact", "gender", "agevent", "ejection_fraction_hrt", "PC1", "PC2",
-                                                   "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "cohort", "cohort_two", "agedx", "anthra_jco_dose_any", "hrtavg", "era_numeric")]
+                                                   "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "cohort", "cohort_two", "agedx", "anthra_jco_dose_any", "hrtavg", "era_numeric", "era")]
 
 EUR_common_Kendrick.pheno$CMP[EUR_common_Kendrick.pheno$CMP==1] <- 2; EUR_common_Kendrick.pheno$CMP[EUR_common_Kendrick.pheno$CMP==0] <- 1
 table(EUR_common_Kendrick.pheno$CMP)
@@ -74,8 +79,9 @@ AFR_common_Kendrick <- AFR_common_Kendrick[!(is.na(AFR_common_Kendrick$anthracyc
 colnames(AFR_common_Kendrick)[colnames(AFR_common_Kendrick) == "fid"] <- "FID"
 colnames(AFR_common_Kendrick)[colnames(AFR_common_Kendrick) == "iid"] <- "IID"
 AFR_common_Kendrick$era_numeric <- diagDT$era_numeric[match(AFR_common_Kendrick$IID, diagDT$IID)]
+AFR_common_Kendrick$era <- diagDT$era[match(AFR_common_Kendrick$IID, diagDT$IID)]
 AFR_common_Kendrick.pheno <- AFR_common_Kendrick[,c("FID", "IID", "CMP", "agelstcontact", "gender", "ejection_fraction_hrt", "PC1", "PC2",
-                                                   "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "cohort", "agedx", "anthra_jco_dose_any", "hrtavg", "era_numeric")]
+                                                   "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "cohort", "agedx", "anthra_jco_dose_any", "hrtavg", "era_numeric", "era")]
 
 # AFR_common_Kendrick.pheno$CMP[AFR_common_Kendrick.pheno$CMP==1] <- 2; AFR_common_Kendrick.pheno$CMP[AFR_common_Kendrick.pheno$CMP==0] <- 1
 table(AFR_common_Kendrick.pheno$CMP)

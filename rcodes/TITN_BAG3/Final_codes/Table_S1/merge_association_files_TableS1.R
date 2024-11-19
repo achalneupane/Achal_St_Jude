@@ -266,6 +266,15 @@ snp_vector <- c("rs744426", "rs3731746", "rs2303838", "rs2042996", "rs9808377",
 
 cc_sorted <- cc[match(snp_vector, cc$rsID), ]
 
+# cc_sorted <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/common_missense_variants_from_kendricks_pheno.txt", header = T, sep = "\t")
+
+## Add frequency for both SJLIFE and CCSS separately
+freq.df <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/sjlife_to_concat_updated_freq_out_kendrick.frq", header = T)
+cc_sorted$SJLIFE.EUR.MAF <- freq.df$MAF[match(cc_sorted$SNP, freq.df$SNP)]  
+
+freq.df <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/merged_ccss_freq_out_kendrick.frq", header = T)
+cc_sorted$CCSS.EUR.MAF <- freq.df$MAF[match(cc_sorted$SNP, freq.df$SNP)]  
+
 write.table(cc_sorted, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/common_missense_variants_from_kendricks_pheno.txt", col.names = T, sep = "\t", quote = F, row.names = F)
 
 # reference <- read.table(text="chr	pos	EA	NEA
