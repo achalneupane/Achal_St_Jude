@@ -283,7 +283,7 @@ wget https://storage.googleapis.com/broad-alkesgroup-public/Eagle/downloads/tabl
 # tar -xzvf 1000GP_Phase3.tgz
 # cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/1000GP_Phase3
 
-
+module load plink/1.90b
 
 for CHR in {1..22}; do
 awk -v CHR=${CHR} '{print CHR, $0}' /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/1000GP_Phase3/genetic_map_chr${CHR}_combined_b37.txt > /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Dyslipidemia/GWAS/MTAG/ldscore/1000GP_Phase3/tmpfile

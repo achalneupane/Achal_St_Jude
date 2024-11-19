@@ -499,7 +499,7 @@ plink --bfile sjlife_afr_ttn_bag3_AN --freq --keep afr_samples --out sjlife_resu
  --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
  --pheno-name CMP \
  --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
- --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10,cohort_two \
+ --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10,era_numeric,cohort_two \
  --out sjlife_ccss_org_ccss_exp_samples_results_kendrick
 
 
@@ -534,7 +534,7 @@ plink \
  --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
  --pheno-name CMP \
  --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
- --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+ --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10,era_numeric \
  --out ccss_org_ccss_exp_kendrick
 
 plink --bfile merged_ccss --freq --keep-allele-order --keep pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno --out merged_ccss_freq_out_kendrick
@@ -550,7 +550,7 @@ plink \
  --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
  --pheno-name CMP \
  --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
- --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+ --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10,era_numeric \
  --out ccss_org_kendrick
 
 plink \
@@ -563,7 +563,7 @@ plink \
  --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
  --pheno-name CMP \
  --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
- --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+ --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10,era_numeric \
  --out ccss_exp_kendrick
 
 
@@ -577,7 +577,7 @@ plink \
  --pheno pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
  --pheno-name CMP \
  --covar pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno \
- --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+ --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10,era_numeric \
  --out sjlife_results_kendrick
 
 
@@ -604,7 +604,7 @@ plink \
   --bfile sjlife_afr_ttn_bag3_AN \
   --ci 0.95 \
   --covar pheno/sjlife_ttn_bag3_afr_kendrick.pheno \
-  --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+  --covar-name agedx,agelstcontact,gender,anthra_jco_dose_any,hrtavg,PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10,era_numeric \
   --hwe 1e-06 \
   --logistic hide-covar \
   --out sjlife_results_afr_AN_kendrick \
@@ -618,8 +618,15 @@ plink --bfile sjlife_afr_ttn_bag3_AN --freq --keep pheno/sjlife_ttn_bag3_afr_ken
 
 
 
+## Meta analsysis with metal 
 
+# 1. meta analysis for startified association
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/meta_analysis
+# follow R code: read_metal_analysis.R
+metal metal_scripts_stratified_analysis.txt
 
+# 2. Meta analysis for common variants
+metal metal_scripts_common_variants.txt
 
 
 
