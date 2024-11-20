@@ -27,7 +27,7 @@ diagDT$era_numeric <- as.numeric(factor(diagDT$era_variable,
                                         levels = c("[1958,1968]", "(1968,1978]", "(1978,1988]", 
                                                    "(1988,1998]", "(1998,2008]", "(2008,2018]")))
 
-saveRDS(diagDT, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/diagDT.rds")
+# saveRDS(diagDT, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/diagDT.rds")
 
 ## From Kendrick
 # sjlife_cmp_data <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Re_A_new_manuscript_on_TTN_BAG3_for_your_review//sjlife_ccm_analysis_dat.rds") # N = 3686

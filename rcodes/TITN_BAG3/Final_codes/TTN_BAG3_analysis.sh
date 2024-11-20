@@ -620,12 +620,13 @@ plink --bfile sjlife_afr_ttn_bag3_AN --freq --keep pheno/sjlife_ttn_bag3_afr_ken
 
 ## Meta analsysis with metal 
 
-# 1. meta analysis for startified association
+# 1. meta analysis for startified association with SJLIFE + CCSS
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/meta_analysis
 # follow R code: read_metal_analysis.R
 metal metal_scripts_stratified_analysis.txt
-
-# 2. Meta analysis for common variants
+# 2. meta analysis for startified association with SJLIFE + CCSS +AFR
+metal metal_scripts_stratified_analysis_3cohorts.txt
+# 3. Meta analysis for common variants
 metal metal_scripts_common_variants.txt
 
 

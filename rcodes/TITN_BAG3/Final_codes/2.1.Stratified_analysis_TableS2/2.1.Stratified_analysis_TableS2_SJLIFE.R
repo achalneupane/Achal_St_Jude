@@ -30,8 +30,8 @@ diagDT$era <- factor(diagDT$era_variable,
                                         levels = c("[1958,1968]", "(1968,1978]", "(1978,1988]", 
                                                    "(1988,1998]", "(1998,2008]", "(2008,2018]"))
 
-
-saveRDS(diagDT, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/diagDT.rds")
+diagDT <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/diagDT.rds")
+# saveRDS(diagDT, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/diagDT.rds")
 
 ## From Kendrick
 # sjlife_cmp_data <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Re_A_new_manuscript_on_TTN_BAG3_for_your_review//sjlife_ccm_analysis_dat.rds") # N = 3686
@@ -1967,3 +1967,25 @@ combined_info <- do.call(rbind, lapply(objects_list, extract_info))
 
 # Print the combined information
 print(combined_info)
+
+
+## Generate metal format file for meta analysis
+metal.SJLIFE.AFR <- combined_info
+metal.SJLIFE.AFR$Gender <- gsub(" ", "_", metal.SJLIFE.AFR$Gender)
+
+n_rows <- nrow(metal.SJLIFE.AFR)
+
+# Split the data frame into two halves
+half_index <- ceiling(n_rows / 2)
+
+# Create a new column with concatenated values
+metal.SJLIFE.AFR <- metal.SJLIFE.AFR %>%
+  mutate(rsID = ifelse(row_number() <= half_index,
+                       paste0("rs3829746_", Gender),
+                       paste0("rs2234962_", Gender)))
+metal.SJLIFE.AFR <- metal.SJLIFE.AFR %>%
+  select(rsID, Estimate, Std_Error, P_Value, n)
+
+metal.SJLIFE.AFR$n <- gsub("\\s*\\(.*\\)", "", metal.SJLIFE.AFR$n)
+colnames(metal.SJLIFE.AFR) <- c("MarkerName", "Effect", "StdErr", "P", "N")
+write.table(metal.SJLIFE.AFR, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/meta_analysis/stratified_analysis_SJLIFE.AFR.txt", col.names  = T, sep = " ", row.names = F, quote = F)

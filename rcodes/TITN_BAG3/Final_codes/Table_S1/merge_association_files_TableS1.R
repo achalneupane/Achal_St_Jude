@@ -224,6 +224,7 @@ cc$OR_95CI_afr <- paste0(round(cc$OR_afr,2), " (", round(cc$L95_afr, 2), "-", ro
 ## Create meta analysis summary statistics ##
 #############################################
 # We need MarkerName Effect StdErr P N
+## SJLIFE
 sjlife <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/sjlife_results_kendrick.assoc.logistic", header = T, sep = "")
 sjlife$BETA <- log(sjlife$OR)
 SJLIFE.metal <- cbind.data.frame(SNP=cc$SNP, cc$OR_95CI_sjlife, P=cc$P_sjlife)
@@ -233,6 +234,7 @@ SJLIFE.metal$BETA <- sjlife$BETA[match(SJLIFE.metal$SNP, sjlife$SNP)]
 SJLIFE.metal <- cbind.data.frame(MarkerName=SJLIFE.metal$SNP, Effect=SJLIFE.metal$BETA, StdErr=SJLIFE.metal$SE, P=SJLIFE.metal$P, N=SJLIFE.metal$N)
 write.table(SJLIFE.metal, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/meta_analysis/common_variant_analysis_SJLIFE.txt", col.names  = T, sep = " ", row.names = F, quote = F)
 
+## CCSS
 CCSS <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/ccss_org_ccss_exp_kendrick.assoc.logistic", header = T, sep = "")
 CCSS$BETA <- log(CCSS$OR)
 CCSS.metal <- cbind.data.frame(SNP=cc$SNP, cc$OR_95CI_ccss_org_exp, P=cc$P_ccss_org_exp)
@@ -241,6 +243,18 @@ CCSS.metal$SE <- CCSS$SE[match(CCSS.metal$SNP, CCSS$SNP)]
 CCSS.metal$BETA <- CCSS$BETA[match(CCSS.metal$SNP, CCSS$SNP)]
 CCSS.metal <- cbind.data.frame(MarkerName=CCSS.metal$SNP, Effect=CCSS.metal$BETA, StdErr=CCSS.metal$SE, P=CCSS.metal$P, N=CCSS.metal$N)
 write.table(CCSS.metal, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/meta_analysis/common_variant_analysis_CCSS.txt", col.names  = T, sep = " ", row.names = F, quote = F)
+
+## SJLIFE AFR
+sjlife.afr <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/sjlife_results_afr_AN_kendrick.assoc.logistic", header = T, sep = "")
+sjlife.afr$BETA <- log(sjlife.afr$OR)
+SJLIFE.AFR.metal <- cbind.data.frame(SNP=cc$SNP, cc$OR_95CI_sjlife.afr, P=cc$P_sjlife.afr)
+SJLIFE.AFR.metal$N <- sjlife.afr$NMISS[match(SJLIFE.AFR.metal$SNP, sjlife.afr$SNP)]
+SJLIFE.AFR.metal$SE <- sjlife.afr$SE[match(SJLIFE.AFR.metal$SNP, sjlife.afr$SNP)]
+SJLIFE.AFR.metal$BETA <- sjlife.afr$BETA[match(SJLIFE.AFR.metal$SNP, sjlife.afr$SNP)]
+SJLIFE.AFR.metal <- cbind.data.frame(MarkerName=SJLIFE.AFR.metal$SNP, Effect=SJLIFE.AFR.metal$BETA, StdErr=SJLIFE.AFR.metal$SE, P=SJLIFE.AFR.metal$P, N=SJLIFE.AFR.metal$N)
+write.table(SJLIFE.AFR.metal, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/meta_analysis/common_variant_analysis_SJLIFE.AFR.txt", col.names  = T, sep = " ", row.names = F, quote = F)
+
+
 
 ## After running metal metal_scripts_common_variants.txt in /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/meta_analysis:
 data <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/meta_analysis/common_variant_Meta_analysis_sjlife_ccss_fixed_stratified_analysis_1.tbl", header = TRUE, sep = "\t")

@@ -1,4 +1,5 @@
-# Load the data
+## Load the data
+## SJLIFE + CCSS
 data <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/meta_analysis/Meta_analysis_sjlife_ccss_fixed_stratified_analysis_1.tbl", header = TRUE, sep = "\t")
 
 # Calculate OR_CI as effect size and standard error
@@ -31,3 +32,19 @@ View(result)
 # 17               rs2234962_heartRT_only 0.602500 0.911(0.641-1.294)
 # 18  rs2234962_heartRT_with_Anthracyline 0.190500   0.872(0.71-1.07)
 # 19                   rs2234962_Low-risk 0.469600 0.819(0.477-1.406)
+
+
+## SJLIFE + CCSS + AFR
+# Load the data
+data <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/meta_analysis/Meta_analysis_sjlife_ccss_fixed_stratified_analysis_1.tbl", header = TRUE, sep = "\t")
+
+# Calculate OR_CI as effect size and standard error
+data$OR_CI <- paste(round(exp(data$Effect), 3), " (", round(exp(data$Effect - 1.96 * data$StdErr), 3), "-", round(exp(data$Effect + 1.96 * data$StdErr), 3), ")", sep = "")
+
+# Select and display relevant columns
+result <- data[, c("MarkerName", "P.value", "OR_CI")]
+metal.SJLIFE <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/meta_analysis/stratified_analysis_SJLIFE.txt", header = T, sep = " ")
+
+# sor the results in the same order
+result <- result[match(metal.SJLIFE$MarkerName, result$MarkerName),]
+View(result)
