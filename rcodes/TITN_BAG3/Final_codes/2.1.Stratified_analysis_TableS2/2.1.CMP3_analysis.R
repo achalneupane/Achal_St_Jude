@@ -115,12 +115,16 @@ combine_or_ci <- function(estimate, ci_lower, ci_upper) {
 # Extract Gender, P_Value, and OR_CI
 extract_info <- function(df) {
   gender <- df$Group
+  Estimate=df$Estimate 
+  Std_Error=df$Std_Error
   p_value <- df$P_Value
   or_ci <- df$OR_CI
   N = df$n
-  return(data.frame(Gender = gender, P_Value = p_value, OR_CI = or_ci, n = N))
+  return(data.frame(Gender = gender, Estimate=Estimate, Std_Error=Std_Error, P_Value = p_value, OR_CI = or_ci, n = N))
 }
 
+EUR_common_Kendrick$era_numeric <- diagDT$era_numeric[match(EUR_common_Kendrick$IID, diagDT$IID)]
+AFR_common_Kendrick$era_numeric <- diagDT$era_numeric[match(AFR_common_Kendrick$IID, diagDT$IID)]
 
 ##############################################  SJLIFE + CCSS EUR ##################################################
 dat_final <- EUR_common_Kendrick
@@ -128,6 +132,7 @@ analysis.group <- "TTN SJLIFE+CCSS EUR"
 #########
 ## TTN ##
 #########
+rsID <- "rs3829746"
 #------------------1. ALL
 
 
@@ -135,7 +140,7 @@ analysis.group <- "TTN SJLIFE+CCSS EUR"
 # Overall Analysis
 all_data <- dat_final
 overall_model <- glm(CMP ~ rs3829746 + gender + agedx + agelstcontact + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
-                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10+cohort_two, family = binomial, data = all_data)
+                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10 + era_numeric +cohort_two, family = binomial, data = all_data)
 overall_summary <- summary(overall_model)
 
 
@@ -146,9 +151,10 @@ table_data <- data.frame(
   Std_Error = c(overall_summary$coefficients[2, 2]),
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
-  n = c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
+  n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
+# n=c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")"))
 
 # Calculate odds ratio and confidence interval
 odds_ratio_info <- calculate_odds_ratio(table_data$Estimate, table_data$Std_Error)
@@ -173,6 +179,7 @@ ttn.sjlife.ccss.eur <- table_data
 ##########
 ## BAG3 ##
 ##########
+rsID <- "rs2234962"
 #------------------1. All
 
 analysis.group <- "BAG3 SJLIFE+CCSS EUR"
@@ -180,7 +187,7 @@ analysis.group <- "BAG3 SJLIFE+CCSS EUR"
 # Overall Analysis
 all_data <- dat_final
 overall_model <- glm(CMP ~ rs2234962 + gender + agedx + agelstcontact + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
-                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10+cohort_two, family = binomial, data = all_data)
+                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10 + era_numeric +cohort_two, family = binomial, data = all_data)
 overall_summary <- summary(overall_model)
 
 
@@ -191,7 +198,7 @@ table_data <- data.frame(
   Std_Error = c(overall_summary$coefficients[2, 2]),
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
-  n = c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
+  n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -221,6 +228,8 @@ dat_final <- EUR_common_Kendrick[EUR_common_Kendrick$cohort_two == 1,]
 #########
 ## TTN ##
 #########
+rsID <- "rs3829746"
+
 #------------------1. ALL
 analysis.group <- "TTN SJLIFE EUR"
 
@@ -228,7 +237,7 @@ analysis.group <- "TTN SJLIFE EUR"
 # Overall Analysis
 all_data <- dat_final
 overall_model <- glm(CMP ~ rs3829746 + gender + agedx + agelstcontact + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
-                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial, data = all_data)
+                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10 + era_numeric , family = binomial, data = all_data)
 overall_summary <- summary(overall_model)
 
 
@@ -239,7 +248,7 @@ table_data <- data.frame(
   Std_Error = c(overall_summary$coefficients[2, 2]),
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
-  n = c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
+  n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -267,13 +276,14 @@ ttn.sjlife.eur <- table_data
 ## BAG3 ##
 ##########
 #------------------1. All
+rsID <- "rs2234962"
 
 analysis.group <- "BAG3 SJLIFE EUR"
 
 # Overall Analysis
 all_data <- dat_final
 overall_model <- glm(CMP ~ rs2234962 + gender + agedx + agelstcontact + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
-                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial, data = all_data)
+                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10 + era_numeric , family = binomial, data = all_data)
 overall_summary <- summary(overall_model)
 
 
@@ -284,7 +294,7 @@ table_data <- data.frame(
   Std_Error = c(overall_summary$coefficients[2, 2]),
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
-  n = c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
+  n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -314,6 +324,8 @@ dat_final <- EUR_common_Kendrick[EUR_common_Kendrick$cohort_two == 2,]
 #########
 ## TTN ##
 #########
+rsID <- "rs3829746"
+
 #------------------1. ALL
 analysis.group <- "TTN CCSS EUR"
 
@@ -321,7 +333,7 @@ analysis.group <- "TTN CCSS EUR"
 # Overall Analysis
 all_data <- dat_final
 overall_model <- glm(CMP ~ rs3829746 + gender + agedx + agelstcontact + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
-                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial, data = all_data)
+                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10 + era_numeric , family = binomial, data = all_data)
 overall_summary <- summary(overall_model)
 
 
@@ -332,7 +344,7 @@ table_data <- data.frame(
   Std_Error = c(overall_summary$coefficients[2, 2]),
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
-  n = c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
+  n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -359,6 +371,8 @@ ttn.ccss.eur <- table_data
 ##########
 ## BAG3 ##
 ##########
+rsID <- "rs2234962"
+
 #------------------1. All
 
 analysis.group <- "BAG3 CCSS EUR"
@@ -366,7 +380,7 @@ analysis.group <- "BAG3 CCSS EUR"
 # Overall Analysis
 all_data <- dat_final
 overall_model <- glm(CMP ~ rs2234962 + gender + agedx + agelstcontact + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
-                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial, data = all_data)
+                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10 + era_numeric , family = binomial, data = all_data)
 overall_summary <- summary(overall_model)
 
 
@@ -377,7 +391,7 @@ table_data <- data.frame(
   Std_Error = c(overall_summary$coefficients[2, 2]),
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
-  n = c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
+  n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -407,6 +421,8 @@ dat_final <- AFR_common_Kendrick
 #########
 ## TTN ##
 #########
+rsID <- "rs3829746"
+
 #------------------1. ALL
 
 analysis.group <- "TTN SJLIFE AFR"
@@ -414,7 +430,7 @@ analysis.group <- "TTN SJLIFE AFR"
 # Overall Analysis
 all_data <- dat_final
 overall_model <- glm(CMP ~ rs3829746 + gender + agedx + agelstcontact + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
-                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial, data = all_data)
+                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10 + era_numeric , family = binomial, data = all_data)
 overall_summary <- summary(overall_model)
 
 
@@ -425,7 +441,7 @@ table_data <- data.frame(
   Std_Error = c(overall_summary$coefficients[2, 2]),
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
-  n = c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
+  n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -452,6 +468,8 @@ ttn.sjlife.afr <- table_data
 ##########
 ## BAG3 ##
 ##########
+rsID <- "rs2234962"
+
 #------------------1. All
 
 analysis.group <- "BAG3 SJLIFE AFR"
@@ -459,7 +477,7 @@ analysis.group <- "BAG3 SJLIFE AFR"
 # Overall Analysis
 all_data <- dat_final
 overall_model <- glm(CMP ~ rs2234962 + gender + agedx + agelstcontact + anthra_jco_dose_any + hrtavg + PC1 + PC2 + PC3 +
-                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10, family = binomial, data = all_data)
+                       PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10 + era_numeric , family = binomial, data = all_data)
 overall_summary <- summary(overall_model)
 
 
@@ -470,7 +488,7 @@ table_data <- data.frame(
   Std_Error = c(overall_summary$coefficients[2, 2]),
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
-  n = c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
+  n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -501,3 +519,13 @@ combined_info <- do.call(rbind, lapply(objects_list, extract_info))
 
 # Print the combined information
 print(combined_info)
+
+## metal file
+data <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/meta_analysis/cmp3_meta_analysis_results_1.tbl", header = TRUE, sep = "\t")
+
+# Calculate OR_CI as effect size and standard error
+data$OR_CI <- paste(round(exp(data$Effect), 3), " (", round(exp(data$Effect - 1.96 * data$StdErr), 3), "-", round(exp(data$Effect + 1.96 * data$StdErr), 3), ")", sep = "")
+
+# Select and display relevant columns
+result <- data[, c("MarkerName", "P.value", "OR_CI")]
+result

@@ -1,14 +1,16 @@
 rm(list=ls())
 # setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Final_analysis")
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/")
-load("EUR.dat.PLP.RData")
+load("EUR.dat.PLP_with_ccss_org.RData")
 # EUR_common_Kendrick <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/analysis_from_Kendrick/Final_analysis//EUR_CMP_analysis_data.rds")
 # EUR.dat.PLP <- EUR.dat.PLP[EUR.dat.PLP$IID %in% EUR_common_Kendrick$iid,]
-# dim(EUR.dat.PLP)
-# # 3086   34
-
-## Using the same number of samples that Kendric used in common variant analysis (in this EUR_CMP_analysis_data.rds file Kendric has dropped some samples with missing anthracycline and missing heart radiation)
-EUR_common_Kendrick <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno", header = T, sep = "\t")
+dim(EUR.dat.PLP)
+# # 3086   34 (SJLIFE+CCSS exp)
+# 6063 36 (SJLIFE+CCSS exp + CCSS exp)
+# ## Using the same number of samples that Kendric used in common variant analysis (in this EUR_CMP_analysis_data.rds file Kendric has dropped some samples with missing anthracycline and missing heart radiation)
+# EUR_common_Kendrick <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno", header = T, sep = "\t")
+## Using the same from KL and CCSS orginal from MIngjuan
+EUR_common_Kendrick <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ccss_org_ccss_exp_ccss_org_KL_Mingjuan.pheno", header = T, sep = "\t")
 EUR.dat.PLP <- EUR.dat.PLP[EUR.dat.PLP$IID %in% EUR_common_Kendrick$IID,]
 dim(EUR.dat.PLP)
 

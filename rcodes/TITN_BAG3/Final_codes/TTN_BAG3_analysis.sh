@@ -625,10 +625,11 @@ cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_
 # follow R code: read_metal_analysis.R
 metal metal_scripts_stratified_analysis.txt
 # 2. meta analysis for startified association with SJLIFE + CCSS +AFR
-metal metal_scripts_stratified_analysis_3cohorts.txt
-# 3. Meta analysis for common variants
+# metal metal_scripts_stratified_analysis_3cohorts.txt (don't need, so did not do this)
+# 3. Meta analysis for common variants SJLIFE+CCSS
 metal metal_scripts_common_variants.txt
-
+# 4. Meta analysis for common variants with SJLIFE+CCSS+AFR
+metal metal_scripts_common_variants_ccss_sjlife_afr.txt
 
 
 

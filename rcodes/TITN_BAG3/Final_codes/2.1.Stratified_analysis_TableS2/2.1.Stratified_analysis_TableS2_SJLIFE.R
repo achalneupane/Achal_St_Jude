@@ -17,8 +17,12 @@ diagDT$diagdt <- as.Date(diagDT$diagdt, format="%Y-%m-%d")
 # Extract the year
 diagDT <- diagDT[!is.na(diagDT$diagdt),]
 diagDT$year <- as.numeric(format(diagDT$diagdt, "%Y"))
-diagDT$era_variable <- format(cut(diagDT$year, breaks = seq(min(diagDT$year, na.rm = TRUE), max(diagDT$year, na.rm = TRUE), by = 10), include.lowest = TRUE, dig.lab=10, right = TRUE), scientific = F)
+# diagDT$era_variable <- format(cut(diagDT$year, breaks = seq(min(diagDT$year, na.rm = TRUE), max(diagDT$year, na.rm = TRUE), by = 10), include.lowest = TRUE, dig.lab=10, right = TRUE), scientific = F)
+diagDT$era_variable <- format(cut(diagDT$year, breaks = seq(from = min(diagDT$year, na.rm = TRUE), to = max(diagDT$year, na.rm = TRUE) + 10, by = 10), include.lowest = TRUE, dig.lab = 10, right = TRUE), scientific = F)
+
+
 head(diagDT)
+
 
 diagDT <- diagDT[!grepl("NA", diagDT$era_variable ),]
 unique(diagDT$era_variable)
@@ -61,8 +65,8 @@ table(EUR_common_Kendrick.pheno$CMP)
 
 
 table(EUR_common_Kendrick.pheno$era_numeric)
-# 1    2    3    4    5 
-# 33 1639 2556 1722  231 
+# 1    2    3    4    5    6 
+# 33 1639 2556 1722  231    1 
 
 # write.table(EUR_common_Kendrick.pheno, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ccss_org_ccss_exp_ttn_bag3_kendrick.pheno", sep ="\t", col.names = T, row.names = F, quote = F)
 
@@ -135,16 +139,23 @@ extract_info <- function(df) {
   p_value <- df$P_Value
   or_ci <- df$OR_CI
   N = df$n
-  return(data.frame(Gender = gender, Estimate=Estimate, Std_Error=Std_Error, P_Value = p_value, OR_CI = or_ci, n = N))
+  total=df$total
+  return(data.frame(Gender = gender, Estimate=Estimate, Std_Error=Std_Error, P_Value = p_value, OR_CI = or_ci, n = N, total=total))
 }
 
+## N is samples analyzed without missing values; total is total samples
 
-## Extract SJLIFE only
-dat_final <- EUR_common_Kendrick[EUR_common_Kendrick$cohort_two == 1,]
+
 
 #########
 ## TTN ##
 #########
+## Extract SJLIFE only
+dat_final <- EUR_common_Kendrick[EUR_common_Kendrick$cohort_two == 1,]
+dat_final <- dat_final[c("rs3829746", "gender", "agedx", "agelstcontact", "anthra_jco_dose_any", "hrtavg", "PC1", "PC2", "PC3",
+                         "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "era_numeric", "CMP", "IID")]
+dat_final <- dat_final[complete.cases(dat_final), ]
+
 rsID <- "rs3829746"
 #------------------1. ALL
 
@@ -164,6 +175,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -216,6 +228,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -265,6 +278,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -313,6 +327,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -354,6 +369,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -394,6 +410,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -435,6 +452,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -476,6 +494,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -517,6 +536,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -557,6 +577,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -581,6 +602,12 @@ ttn.RT.with.anthra <- table_data
 ##########
 ## BAG3 ##
 ##########
+dat_final <- EUR_common_Kendrick[EUR_common_Kendrick$cohort_two == 1,]
+dat_final <- dat_final[c("rs2234962", "gender", "agedx", "agelstcontact", "anthra_jco_dose_any", "hrtavg", "PC1", "PC2", "PC3",
+                         "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "era_numeric", "CMP", "IID")]
+dat_final <- dat_final[complete.cases(dat_final), ]
+
+
 rsID <- "rs2234962"
 #------------------1. All
 
@@ -599,6 +626,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -645,6 +673,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -694,6 +723,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -744,6 +774,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -786,6 +817,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -828,6 +860,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -870,6 +903,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -896,7 +930,7 @@ bag3.anthra.only <- table_data
 
 all_data <- dat_final[(dat_final$anthra_jco_dose_any > 0),]
 
-overall_model <- glm(CMP ~ rs3829746 + agedx + agelstcontact + PC1 + PC2 + PC3 +
+overall_model <- glm(CMP ~ rs2234962 + agedx + agelstcontact + PC1 + PC2 + PC3 +
                        PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10+ era_numeric , family = binomial, data = all_data)
 
 overall_summary <- summary(overall_model)
@@ -911,6 +945,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -937,7 +972,7 @@ bag3.anthra.with.RT <- table_data
 
 all_data <- dat_final[(dat_final$anthra_jco_dose_any == 0 & dat_final$hrtavg > 0),]
 
-overall_model <- glm(CMP ~ rs3829746 + agedx + agelstcontact + PC1 + PC2 + PC3 +
+overall_model <- glm(CMP ~ rs2234962 + agedx + agelstcontact + PC1 + PC2 + PC3 +
                        PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10+ era_numeric , family = binomial, data = all_data)
 
 overall_summary <- summary(overall_model)
@@ -952,6 +987,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -977,7 +1013,7 @@ bag3.RT.only <- table_data
 
 all_data <- dat_final[(dat_final$hrtavg > 0),]
 
-overall_model <- glm(CMP ~ rs3829746 + agedx + agelstcontact + PC1 + PC2 + PC3 +
+overall_model <- glm(CMP ~ rs2234962 + agedx + agelstcontact + PC1 + PC2 + PC3 +
                        PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10+ era_numeric , family = binomial, data = all_data)
 
 overall_summary <- summary(overall_model)
@@ -992,6 +1028,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1089,6 +1126,11 @@ table(dat_final$CMP)
 #########
 ## TTN ##
 #########
+dat_final <- AFR_common_Kendrick
+dat_final <- dat_final[c("rs3829746", "gender", "agedx", "agelstcontact", "anthra_jco_dose_any", "hrtavg", "PC1", "PC2", "PC3",
+                         "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "era_numeric", "CMP", "IID")]
+dat_final <- dat_final[complete.cases(dat_final), ]
+
 rsID <- "rs3829746"
 #------------------1. ALL
 
@@ -1108,6 +1150,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1160,6 +1203,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1209,6 +1253,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1257,6 +1302,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1298,6 +1344,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1338,6 +1385,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1380,6 +1428,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1421,6 +1470,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1462,6 +1512,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1502,6 +1553,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1527,6 +1579,11 @@ ttn.RT.with.anthra <- table_data
 ##########
 ## BAG3 ##
 ##########
+dat_final <- AFR_common_Kendrick
+dat_final <- dat_final[c("rs2234962", "gender", "agedx", "agelstcontact", "anthra_jco_dose_any", "hrtavg", "PC1", "PC2", "PC3",
+                         "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "era_numeric", "CMP", "IID")]
+dat_final <- dat_final[complete.cases(dat_final), ]
+
 rsID <- "rs2234962"
 #------------------1. All
 
@@ -1545,6 +1602,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1589,6 +1647,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1638,6 +1697,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1688,6 +1748,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1730,6 +1791,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1772,6 +1834,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1815,6 +1878,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1841,7 +1905,7 @@ bag3.anthra.only <- table_data
 
 all_data <- dat_final[(dat_final$anthra_jco_dose_any > 0),]
 
-overall_model <- glm(CMP ~ rs3829746 + agedx + agelstcontact + PC1 + PC2 + PC3 +
+overall_model <- glm(CMP ~ rs2234962 + agedx + agelstcontact + PC1 + PC2 + PC3 +
                        PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10+ era_numeric , family = binomial, data = all_data)
 
 overall_summary <- summary(overall_model)
@@ -1856,6 +1920,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1882,7 +1947,7 @@ bag3.anthra.with.RT <- table_data
 
 all_data <- dat_final[(dat_final$anthra_jco_dose_any == 0 & dat_final$hrtavg > 0),]
 
-overall_model <- glm(CMP ~ rs3829746 + agedx + agelstcontact + PC1 + PC2 + PC3 +
+overall_model <- glm(CMP ~ rs2234962 + agedx + agelstcontact + PC1 + PC2 + PC3 +
                        PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10+ era_numeric , family = binomial, data = all_data)
 
 overall_summary <- summary(overall_model)
@@ -1897,6 +1962,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 
@@ -1922,7 +1988,7 @@ bag3.RT.only <- table_data
 
 all_data <- dat_final[(dat_final$hrtavg > 0),]
 
-overall_model <- glm(CMP ~ rs3829746 + agedx + agelstcontact + PC1 + PC2 + PC3 +
+overall_model <- glm(CMP ~ rs2234962 + agedx + agelstcontact + PC1 + PC2 + PC3 +
                        PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10+ era_numeric , family = binomial, data = all_data)
 
 overall_summary <- summary(overall_model)
@@ -1937,6 +2003,7 @@ table_data <- data.frame(
   Z_Value = c(overall_summary$coefficients[2, 3]),
   P_Value = c(overall_summary$coefficients[2, 4]),
   n = c(paste0(sum(!is.na(all_data[rsID])), " (", sum(all_data$CMP==1), ")")),
+  total=c(paste0(nrow(all_data), " (", sum(all_data$CMP==1), ")")),
   stringsAsFactors = FALSE
 )
 

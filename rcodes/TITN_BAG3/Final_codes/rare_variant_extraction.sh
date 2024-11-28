@@ -540,6 +540,7 @@ plink --bfile sjlife_AFR --extract ALL_PLP_With_TTN_PSI_A_Band_AFR.txt --out ALL
 
 
 
+
 #############################################################################################
 #############################################################################################
 #############################################################################################
@@ -640,10 +641,10 @@ plink --bfile sjlife_AFR --recodeA --out sjlife_SNPS_maf_lt_0.0001_gnomad_recode
 # plink --bfile sjlife_AFR --geno 0.01 --extract snpEFF_EUR_vars_final_0.0001_vars.txt --recodeA --out sjlife_SNPS_maf_lt_0.0001_gnomad_recodeA_AFR
 
 
-###############################
-## Create PLP variant variables
-# extract variants by gene categories
-###############################
+#########################################
+## Create PLP variant variables        ##
+## extract variants by gene categories ##
+#########################################
 ## Extract variants for P/LP 
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined
 
@@ -692,6 +693,73 @@ plink --bfile sjlife_AFR --extract BAG3.TTN_PSI_AFR_vars.txt --out BAG3.TTN_PSI_
 plink --bfile sjlife_AFR --extract BAG3.TTN_PSI_A_Band_AFR_vars.txt --out BAG3.TTN_PSI_A_Band_AFR_vars_recodeA --recode A 
 plink --bfile sjlife_AFR --extract ALL_PLP_With_TTN_PSI_AFR.txt --out ALL_PLP_With_TTN_PSI_AFR_vars_recodeA --recode A 
 plink --bfile sjlife_AFR --extract ALL_PLP_With_TTN_PSI_A_Band_AFR.txt --out ALL_PLP_With_TTN_PSI_A_Band_AFR_vars_recodeA --recode A 
+
+
+#################################################################################
+## Extract CCSS original WES data for rare variants using Migjuan's compbioIDs ##
+#################################################################################
+# 11/20/2024: This is for European only analysis for which we decided to merge SJLIFE and CCSS_exp WGS data with CCSS_org WES data. 
+# Use code 5.0.1.merge_SJLIFE_CCSS_exp_WGS_CCSS_org_WES
+
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined/rare_variants_from_ccss_org_WES
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/biallelic2/plink_all/chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.* .
+
+## Extract variants regrions from nine genes: BAG3, DSP, LMNA, MYH7, SCN5A, TCAP, TNNC1, TNNT2, and TTN 
+GENE=NINE_GENES_ANNOVAR
+# cat ../ANNOVAR_MERGED.SJLIFE.1.2.GATKv3.4.VQSR.chr10.preQC_biallelic_renamed_ID_edited.vcf-annot-snpeff-dbnsfp-ExAC.0.3-clinvar.GRCh38.vcf.dbSNP155.vcf.hg38_multianno.txt| awk '/^chr10/ && ($2 >= 119651380 && $2 <= 119677819) && ($38+0 < 0.01 && $38 !=".") && ($44+0 < 0.01 && $44 !=".")' >> ${GENE}
+# BAG3; 10q26.11
+awk '/^10/ && $4 >= 119651380 && $4 <= 119677819' chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.bim >> ${GENE}
+# DSP
+awk '/^6/ && $4 >= 7541671 && $4 <= 7586714' chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.bim >> ${GENE}
+# LMNA
+awk '/^1/ && $4 >= 156082573 && $4 <= 156140081' chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.bim >> ${GENE}
+# MYH7
+awk '/^14/ && $4 >= 23412740 && $4 <= 23435660' chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.bim >> ${GENE}
+# SCN5A
+awk '/^3/ && $4 >= 38548062 && $4 <= 38649687' chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.bim >> ${GENE}
+# TCAP
+awk '/^17/ && $4 >= 39665349 && $4 <= 39666554' chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.bim >> ${GENE}
+# TNNC1
+awk '/^3/ && $4 >= 52451100 && $4 <= 52454041' chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.bim >> ${GENE}
+# TNNT2
+awk '/^1/ && $4 >= 201359014 && $4 <= 201377680' chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.bim >> ${GENE}
+# TTN; 2q31.2
+awk '/^2/ && $4 >= 178525989 && $4 <= 178807423' chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.bim >> ${GENE}
+
+
+plink --bfile chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic --make-bed --update-ids updated_Ids.txt --out chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic_updated
+plink --bfile chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic_updated --make-bed --keep keep_updated_Ids.txt --extract NINE_GENES_ANNOVAR --out chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic_updated_3001_updated_3001
+plink --bfile chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic_updated_3001_updated_3001 --make-bed --extract wanted_snps.txt --out chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic_updated_3001_updated_3001_wanted_snps
+
+## Merge SJLIFE and CCSS exp Eurpoean whole genome data with ccss original WES
+
+plink --bfile sjlife_ccss_exp_merged_EUR --bmerge rare_variants_from_ccss_org_WES/chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic_updated_3001_updated_3001_wanted_snps --make-bed --out merged_SJLIFE_CCSS_Exp_WGS_CCSS_ORG_WESdata
+
+
+
+plink --bfile merged_SJLIFE_CCSS_Exp_WGS_CCSS_ORG_WESdata --extract BAG3_EUR_vars.txt --out BAG3_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA --recode A 
+plink --bfile merged_SJLIFE_CCSS_Exp_WGS_CCSS_ORG_WESdata --extract DSP_EUR_vars.txt --out DSP_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA --recode A 
+plink --bfile merged_SJLIFE_CCSS_Exp_WGS_CCSS_ORG_WESdata --extract LMNA_EUR_vars.txt --out LMNA_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA --recode A 
+plink --bfile merged_SJLIFE_CCSS_Exp_WGS_CCSS_ORG_WESdata --extract MYH7_EUR_vars.txt --out MYH7_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA --recode A 
+plink --bfile merged_SJLIFE_CCSS_Exp_WGS_CCSS_ORG_WESdata --extract SCN5A_EUR_vars.txt --out SCN5A_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA --recode A 
+plink --bfile merged_SJLIFE_CCSS_Exp_WGS_CCSS_ORG_WESdata --extract TCAP_EUR_vars.txt --out TCAP_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA --recode A 
+plink --bfile merged_SJLIFE_CCSS_Exp_WGS_CCSS_ORG_WESdata --extract TNNC1_EUR_vars.txt --out TNNC1_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA --recode A 
+plink --bfile merged_SJLIFE_CCSS_Exp_WGS_CCSS_ORG_WESdata --extract TNNT2_EUR_vars.txt --out TNNT2_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA --recode A 
+plink --bfile merged_SJLIFE_CCSS_Exp_WGS_CCSS_ORG_WESdata --extract TTN_PSI_EUR_vars.txt --out TTN_PSI_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA --recode A 
+plink --bfile merged_SJLIFE_CCSS_Exp_WGS_CCSS_ORG_WESdata --extract TTN_PSI_A_Band_EUR_vars.txt --out TTN_PSI_A_Band_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA --recode A 
+plink --bfile merged_SJLIFE_CCSS_Exp_WGS_CCSS_ORG_WESdata --extract BAG3.TTN_PSI_EUR_vars.txt --out BAG3.TTN_PSI_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA --recode A 
+plink --bfile merged_SJLIFE_CCSS_Exp_WGS_CCSS_ORG_WESdata --extract BAG3.TTN_PSI_A_Band_EUR_vars.txt --out BAG3.TTN_PSI_A_Band_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA --recode A 
+plink --bfile merged_SJLIFE_CCSS_Exp_WGS_CCSS_ORG_WESdata --extract ALL_PLP_With_TTN_PSI_EUR.txt --out ALL_PLP_With_TTN_PSI_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA --recode A 
+plink --bfile merged_SJLIFE_CCSS_Exp_WGS_CCSS_ORG_WESdata --extract ALL_PLP_With_TTN_PSI_A_Band_EUR.txt --out ALL_PLP_With_TTN_PSI_A_Band_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA --recode A 
+
+
+
+#############################################################################################
+#############################################################################################
+#############################################################################################
+#############################################################################################
+#############################################################################################
+#############################################################################################
 
 
 

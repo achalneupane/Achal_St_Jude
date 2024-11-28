@@ -247,7 +247,7 @@ write.table(CCSS.metal, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity
 ## SJLIFE AFR
 sjlife.afr <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects//Cardiotoxicity/common/ttn_bag3/sjlife_results_afr_AN_kendrick.assoc.logistic", header = T, sep = "")
 sjlife.afr$BETA <- log(sjlife.afr$OR)
-SJLIFE.AFR.metal <- cbind.data.frame(SNP=cc$SNP, cc$OR_95CI_sjlife.afr, P=cc$P_sjlife.afr)
+SJLIFE.AFR.metal <- cbind.data.frame(SNP=cc$SNP, cc$OR_95CI_afr, P=cc$P_afr)
 SJLIFE.AFR.metal$N <- sjlife.afr$NMISS[match(SJLIFE.AFR.metal$SNP, sjlife.afr$SNP)]
 SJLIFE.AFR.metal$SE <- sjlife.afr$SE[match(SJLIFE.AFR.metal$SNP, sjlife.afr$SNP)]
 SJLIFE.AFR.metal$BETA <- sjlife.afr$BETA[match(SJLIFE.AFR.metal$SNP, sjlife.afr$SNP)]
@@ -280,7 +280,7 @@ snp_vector <- c("rs744426", "rs3731746", "rs2303838", "rs2042996", "rs9808377",
 
 cc_sorted <- cc[match(snp_vector, cc$rsID), ]
 
-# cc_sorted <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/common_missense_variants_from_kendricks_pheno.txt", header = T, sep = "\t")
+cc_sorted <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/common_missense_variants_from_kendricks_pheno.txt", header = T, sep = "\t")
 
 ## Add frequency for both SJLIFE and CCSS separately
 freq.df <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/sjlife_to_concat_updated_freq_out_kendrick.frq", header = T)
@@ -289,7 +289,22 @@ cc_sorted$SJLIFE.EUR.MAF <- freq.df$MAF[match(cc_sorted$SNP, freq.df$SNP)]
 freq.df <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/merged_ccss_freq_out_kendrick.frq", header = T)
 cc_sorted$CCSS.EUR.MAF <- freq.df$MAF[match(cc_sorted$SNP, freq.df$SNP)]  
 
-write.table(cc_sorted, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/common_missense_variants_from_kendricks_pheno.txt", col.names = T, sep = "\t", quote = F, row.names = F)
+## Add metal analysis results with SJLIFE, CCSS and AFR
+## After running metal metal_scripts_common_variants_ccss_sjlife_afr.txt in /research_jude/rgs01_jude/groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/meta_analysis:
+data <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/meta_analysis/common_variant_Meta_analysis_sjlife_ccss_afr_fixed_stratified_analysis_1.tbl", header = TRUE, sep = "\t")
+
+# Calculate OR_CI as effect size and standard error
+data$OR_CI <- paste(round(exp(data$Effect), 3), " (", round(exp(data$Effect - 1.96 * data$StdErr), 3), "-", round(exp(data$Effect + 1.96 * data$StdErr), 3), ")", sep = "")
+
+# Select and display relevant columns
+result <- data[, c("MarkerName", "P.value", "OR_CI")]
+# sor the results in the same order
+cc_sorted$metaOR.withAFR <- result$OR_CI[match(cc_sorted$SNP, result$MarkerName)]
+cc_sorted$metaP.with.AFR <- result$P.value[match(cc_sorted$SNP, result$MarkerName)]
+
+
+
+write.table(cc_sorted, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/common_missense_variants_from_kendricks_pheno_with_meta_analysis_with_SJLIFE_CCSS_and_AFR.txt", col.names = T, sep = "\t", quote = F, row.names = F)
 
 # reference <- read.table(text="chr	pos	EA	NEA
 # 2	178633315	C	T

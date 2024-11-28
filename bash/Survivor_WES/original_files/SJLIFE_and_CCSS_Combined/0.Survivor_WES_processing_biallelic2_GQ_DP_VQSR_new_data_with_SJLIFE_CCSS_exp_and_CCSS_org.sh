@@ -76,18 +76,18 @@ bcftools index -f -t --threads 4 "${WORKDIR}/biallelic2/$(basename ${VCF} .vcf.g
 
 
 ## Remove LCR region
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/biallelic2/plink_all
 # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4271055/
 # wget https://github.com/lh3/varcmp/raw/master/scripts/LCR-hs38.bed.gz
 ln -s ../biallelic/plink_all/LCR-hs38.bed .
 
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/biallelic2/
 for i in {1..22} X Y; do \
 export CHR="chr${i}"; \
 echo "splitting $CHR"; \
 unset VCF; \
 export THREADS=4; \
-export WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/"; \
+export WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/"; \
 bsub \
         -P "${CHR}_plk" \
         -J "${CHR}_plk" \
@@ -103,8 +103,8 @@ done;
 ## Variant level QC
 # Filter based on call rate (<90%)
 module load plink/1.90b
-plink --vcf "${WORKDIR}/biallelic2/${CHR}.Survivor_WES.GATK4180.hg38_biallelic.vcf.gz" --double-id --vcf-half-call m --keep-allele-order --threads ${THREADS} --make-bed --out "${WORKDIR}/biallelic2/plink_all/${CHR}.Survivor_WES.GATK4180.hg38_biallelic"
-plink --bfile "${WORKDIR}/biallelic2/plink_all/${CHR}.Survivor_WES.GATK4180.hg38_biallelic" --geno 0.10 --keep-allele-order --make-bed --out "${WORKDIR}/biallelic2/plink_all/${CHR}.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1"
+plink --vcf "${WORKDIR}/biallelic2/${CHR}.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.vcf.gz" --double-id --vcf-half-call m --keep-allele-order --threads ${THREADS} --make-bed --out "${WORKDIR}/biallelic2/plink_all/${CHR}.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic"
+plink --bfile "${WORKDIR}/biallelic2/plink_all/${CHR}.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic" --geno 0.10 --keep-allele-order --make-bed --out "${WORKDIR}/biallelic2/plink_all/${CHR}.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1"
 ## Chromosome Y
 # Before main variant filters, 8065 founders and 0 nonfounders present.
 # Calculating allele frequencies... done.
@@ -115,19 +115,26 @@ plink --bfile "${WORKDIR}/biallelic2/plink_all/${CHR}.Survivor_WES.GATK4180.hg38
 
 
 # Filter based on HWE p-value (<1x10^-15)
-plink --bfile "${WORKDIR}/biallelic2/plink_all/${CHR}.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1" --hwe 1e-15 --keep-allele-order --make-bed --out "${WORKDIR}/biallelic2/plink_all/${CHR}.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15"
+plink --bfile "${WORKDIR}/biallelic2/plink_all/${CHR}.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1" --hwe 1e-15 --keep-allele-order --make-bed --out "${WORKDIR}/biallelic2/plink_all/${CHR}.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15"
 # Exclude variants in low-complexity regions (use BED file)
 # bedtools subtract -a filtered_hwe_data.bim -b low_complexity_regions.bed > final_filtered_data.bim
 # plink --bfile final_filtered_data --make-bed --out final_filtered_data
-plink --bfile "${WORKDIR}/biallelic2/plink_all/${CHR}.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15" --exclude range /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/plink_all/LCR-hs38.bed --keep-allele-order --make-bed --out "${WORKDIR}/biallelic2/plink_all/${CHR}.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed"
+plink --bfile "${WORKDIR}/biallelic2/plink_all/${CHR}.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15" --exclude range /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/plink_all/LCR-hs38.bed --keep-allele-order --make-bed --out "${WORKDIR}/biallelic2/plink_all/${CHR}.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed"
 # Calculate MAC
 module load plink/2.0
-plink2 --bfile "${WORKDIR}/biallelic2/plink_all/${CHR}.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed" --mac 1 --keep-allele-order --make-bed --out "${WORKDIR}/biallelic2/plink_all/${CHR}.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1"
+plink2 --bfile "${WORKDIR}/biallelic2/plink_all/${CHR}.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed" --mac 1 --keep-allele-order --make-bed --out "${WORKDIR}/biallelic2/plink_all/${CHR}.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1"
 
 
 ## Merge original plink to get variant counts
-ls chr*.Survivor_WES.GATK4180.hg38_biallelic.bim | sed 's/.bim//'| sort -V > merge_list.txt
-plink --merge-list merge_list.txt --keep-allele-order --make-bed --out chrALL.Survivor_WES.GATK4180.hg38_biallelic
+ls chr*.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.bim | sed 's/.bim//'| sort -V > merge_list.txt
+plink --merge-list merge_list.txt --keep-allele-order --make-bed --out chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic
+
+
+
+
+
+
+
 plink --bfile chrALL.Survivor_WES.GATK4180.hg38_biallelic --update-ids /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/rename_samples.txt --make-bed --keep-allele-order --out chr.ALL.Survivor_WES.GATK4180.hg38_biallelic_ID_updated
 
 
@@ -146,8 +153,8 @@ MAC greater or equal 1: 1340181
 
 ## sample level QC
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all
-ls chr*.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.bim | sed 's/.bim//'| sort -V  > merge_list.txt
-plink --merge-list merge_list.txt --keep-allele-order --make-bed --out chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15
+ls chr*.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.bim | sed 's/.bim//'| sort -V  > merge_list.txt
+plink --merge-list merge_list.txt --keep-allele-order --make-bed --out chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15
 # plink --bfile chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15 --indep-pairwise 100 25 0.2 --keep-allele-order --maf 0.05 --make-bed --out chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15_maf0.05_indep_prune
 
 

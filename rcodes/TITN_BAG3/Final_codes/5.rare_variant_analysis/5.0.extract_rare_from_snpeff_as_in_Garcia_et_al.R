@@ -492,3 +492,4 @@ BAG3.TTN_PSI_A_Band <- AF_AFR.0.0001.final$SNP[AF_AFR.0.0001.final$`ANN[*].GENE`
 length(BAG3.TTN_PSI_A_Band)
 # 25
 write.table(as.data.frame(BAG3.TTN_PSI_A_Band), "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/rare_variant_sjlife_ccss_combined/BAG3.TTN_PSI_A_Band_AFR_vars.txt", col.names = F, row.names = F,  quote = F, sep = "\t")
+

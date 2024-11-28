@@ -18,7 +18,7 @@ sjlife.eur.dat <- sjlife.eur.dat[c("FID", "IID", "CMP", "agedx", "agelstcontact"
                  "ejection_fraction_hrt", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "cohort_two")]
 sjlife.eur.dat$cohort <- NA
 sjlife.eur.dat$cohort[sjlife.eur.dat$cohort_two == 1] <- "sjlife_eur"
-sjlife.eur.dat$cohort[sjlife.eur.dat$cohort_two == 3] <- "ccss_exp_eur"
+sjlife.eur.dat$cohort[sjlife.eur.dat$cohort_two == 2] <- "ccss_exp_eur"
 sjlife.eur.dat$ancestry <- "EUR"
 sjlife.afr.dat <- sjlife.afr.dat[c("FID", "IID", "CMP", "agedx", "agelstcontact", "gender", "anthra_jco_dose_any", "hrtavg",
                                    "ejection_fraction_hrt", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")]
@@ -29,47 +29,65 @@ EUR.dat.PLP <- sjlife.eur.dat
 AFR.dat.PLP <- sjlife.afr.dat
 
 
-## Add PLP EUR
-sjlife.BAG3.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/BAG3_EUR_vars_recodeA.raw", header = T)
-sjlife.BAG3.PLP.EUR$carrier <- ifelse(rowSums(sjlife.BAG3.PLP.EUR[grepl("chr", colnames(sjlife.BAG3.PLP.EUR))], na.rm = T) > 0, 1, 0)
+## Merge CCSS org from Mingjuan
+ccss.org <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/ccss_org_mingjuan_pheno_found_in_WES.txt", header = T, sep = "\t")
+ccss.org$FID <- ccss.org$DBGAP_COMPBIO_ID
+ccss.org$IID <- ccss.org$DBGAP_COMPBIO_ID
+ccss.org <- ccss.org[, c("FID", "IID", "CMP", "agedx", "agelstcontact", "gender", "anthra_jco_dose_any", "hrtavg",
+                         "ejection_fraction_hrt", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")]
+ccss.org$cohort_two <- 2
+ccss.org$cohort <- "ccss_org"
+ccss.org$ancestry <- "EUR"
 
-sjlife.DSP.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/DSP_EUR_vars_recodeA.raw", header = T)
+EUR.dat.PLP <- rbind(EUR.dat.PLP, ccss.org )
+dim(EUR.dat.PLP)
+# 6063   22
+
+write.table(EUR.dat.PLP, "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/pheno/sjlife_ccss_org_ccss_exp_ccss_org_KL_Mingjuan.pheno", col.names = T, row.names = F, sep = "\t", quote = F)
+
+
+## Add PLP EUR
+sjlife.BAG3.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/BAG3_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA.raw", header = T)
+sjlife.BAG3.PLP.EUR$carrier <- ifelse(rowSums(sjlife.BAG3.PLP.EUR[grepl("chr", colnames(sjlife.BAG3.PLP.EUR))], na.rm = T) > 0, 1, 0)
+table(sjlife.BAG3.PLP.EUR$carrier)
+
+sjlife.DSP.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/DSP_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA.raw", header = T)
 sjlife.DSP.PLP.EUR$carrier <- ifelse(rowSums(sjlife.DSP.PLP.EUR[grepl("chr", colnames(sjlife.DSP.PLP.EUR))], na.rm = T) > 0, 1, 0)
 
-sjlife.LMNA.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/LMNA_EUR_vars_recodeA.raw", header = T)
+sjlife.LMNA.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/LMNA_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA.raw", header = T)
 sjlife.LMNA.PLP.EUR$carrier <- ifelse(rowSums(sjlife.LMNA.PLP.EUR[grepl("chr", colnames(sjlife.LMNA.PLP.EUR))], na.rm = T) > 0, 1, 0)
 
-sjlife.MYH7.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/MYH7_EUR_vars_recodeA.raw", header = T)
+sjlife.MYH7.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/MYH7_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA.raw", header = T)
 sjlife.MYH7.PLP.EUR$carrier <- ifelse(rowSums(sjlife.MYH7.PLP.EUR[grepl("chr", colnames(sjlife.MYH7.PLP.EUR))], na.rm = T) > 0, 1, 0)
 
-sjlife.SCN5A.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/SCN5A_EUR_vars_recodeA.raw", header = T)
+sjlife.SCN5A.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/SCN5A_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA.raw", header = T)
 sjlife.SCN5A.PLP.EUR$carrier <- ifelse(rowSums(sjlife.SCN5A.PLP.EUR[grepl("chr", colnames(sjlife.SCN5A.PLP.EUR))], na.rm = T) > 0, 1, 0)
 
-sjlife.TCAP.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/TCAP_EUR_vars_recodeA.raw", header = T)
+sjlife.TCAP.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/TCAP_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA.raw", header = T)
 sjlife.TCAP.PLP.EUR$carrier <- ifelse(rowSums(sjlife.TCAP.PLP.EUR[grepl("chr", colnames(sjlife.TCAP.PLP.EUR))], na.rm = T) > 0, 1, 0)
 
-sjlife.TNNC1.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/TNNC1_EUR_vars_recodeA.raw", header = T)
+sjlife.TNNC1.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/TNNC1_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA.raw", header = T)
 sjlife.TNNC1.PLP.EUR$carrier <- ifelse(rowSums(sjlife.TNNC1.PLP.EUR[grepl("chr", colnames(sjlife.TNNC1.PLP.EUR))], na.rm = T) > 0, 1, 0)
 
-sjlife.TNNT2.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/TNNT2_EUR_vars_recodeA.raw", header = T)
+sjlife.TNNT2.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/TNNT2_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA.raw", header = T)
 sjlife.TNNT2.PLP.EUR$carrier <- ifelse(rowSums(sjlife.TNNT2.PLP.EUR[grepl("chr", colnames(sjlife.TNNT2.PLP.EUR))], na.rm = T) > 0, 1, 0)
 
-sjlife.TTN_PSI.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/TTN_PSI_EUR_vars_recodeA.raw", header = T)
+sjlife.TTN_PSI.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/TTN_PSI_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA.raw", header = T)
 sjlife.TTN_PSI.PLP.EUR$carrier <- ifelse(rowSums(sjlife.TTN_PSI.PLP.EUR[grepl("chr", colnames(sjlife.TTN_PSI.PLP.EUR))], na.rm = T) > 0, 1, 0)
 
-sjlife.TTN_PSI_A_Band.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/TTN_PSI_A_Band_EUR_vars_recodeA.raw", header = T)
+sjlife.TTN_PSI_A_Band.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/TTN_PSI_A_Band_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA.raw", header = T)
 sjlife.TTN_PSI_A_Band.PLP.EUR$carrier <- ifelse(rowSums(sjlife.TTN_PSI_A_Band.PLP.EUR[grepl("chr", colnames(sjlife.TTN_PSI_A_Band.PLP.EUR))], na.rm = T) > 0, 1, 0)
 
-sjlife.BAG3.TTN_PSI.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/BAG3.TTN_PSI_EUR_vars_recodeA.raw", header = T)
+sjlife.BAG3.TTN_PSI.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/BAG3.TTN_PSI_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA.raw", header = T)
 sjlife.BAG3.TTN_PSI.PLP.EUR$carrier <- ifelse(rowSums(sjlife.BAG3.TTN_PSI.PLP.EUR[grepl("chr", colnames(sjlife.BAG3.TTN_PSI.PLP.EUR))], na.rm = T) > 0, 1, 0)
 
-sjlife.BAG3.TTN_PSI_A_Band.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/BAG3.TTN_PSI_A_Band_EUR_vars_recodeA.raw", header = T)
+sjlife.BAG3.TTN_PSI_A_Band.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/BAG3.TTN_PSI_A_Band_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA.raw", header = T)
 sjlife.BAG3.TTN_PSI_A_Band.PLP.EUR$carrier <- ifelse(rowSums(sjlife.BAG3.TTN_PSI_A_Band.PLP.EUR[grepl("chr", colnames(sjlife.BAG3.TTN_PSI_A_Band.PLP.EUR))], na.rm = T) > 0, 1, 0)
 
-sjlife.ALL_PLP_With_TTN_PSI.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/ALL_PLP_With_TTN_PSI_EUR_vars_recodeA.raw", header = T)
+sjlife.ALL_PLP_With_TTN_PSI.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/ALL_PLP_With_TTN_PSI_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA.raw", header = T)
 sjlife.ALL_PLP_With_TTN_PSI.PLP.EUR$carrier <- ifelse(rowSums(sjlife.ALL_PLP_With_TTN_PSI.PLP.EUR[grepl("chr", colnames(sjlife.ALL_PLP_With_TTN_PSI.PLP.EUR))], na.rm = T) > 0, 1, 0)
 
-sjlife.ALL_PLP_With_TTN_PSI_A_Band.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/ALL_PLP_With_TTN_PSI_A_Band_EUR_vars_recodeA.raw", header = T)
+sjlife.ALL_PLP_With_TTN_PSI_A_Band.PLP.EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3//rare_variant_sjlife_ccss_combined/ALL_PLP_With_TTN_PSI_A_Band_EUR_vars_with_sjlife_ccss_exp_wgs_ccss_org_WES_recodeA.raw", header = T)
 sjlife.ALL_PLP_With_TTN_PSI_A_Band.PLP.EUR$carrier <- ifelse(rowSums(sjlife.ALL_PLP_With_TTN_PSI_A_Band.PLP.EUR[grepl("chr", colnames(sjlife.ALL_PLP_With_TTN_PSI_A_Band.PLP.EUR))], na.rm = T) > 0, 1, 0)
 
 
@@ -151,7 +169,7 @@ AFR.dat.PLP$ALL_PLP_With_TTN_PSI.PLP.carrier <- sjlife.ALL_PLP_With_TTN_PSI.PLP.
 AFR.dat.PLP$ALL_PLP_With_TTN_PSI_A_Band.PLP.carrier <- sjlife.ALL_PLP_With_TTN_PSI_A_Band.PLP.AFR$carrier[match(AFR.dat.PLP$IID, sjlife.ALL_PLP_With_TTN_PSI_A_Band.PLP.AFR$IID)]
 
 
-save(EUR.dat.PLP, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/EUR.dat.PLP.RData")
+save(EUR.dat.PLP, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/EUR.dat.PLP_with_ccss_org.RData")
 save(AFR.dat.PLP, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Cardiotoxicity/common/ttn_bag3/Rcodes/AFR.dat.PLP.RData")
 
 #######################################
