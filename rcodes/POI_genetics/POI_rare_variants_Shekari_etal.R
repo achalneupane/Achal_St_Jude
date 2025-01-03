@@ -4,9 +4,14 @@ setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/")
 
 ## read Ke et al genes
 Ke_genes <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_et_al/Ke_et_al_genes.txt", header= T)
-# Shekari_genes <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Shekari_et_al/Shekari_et_al_genes.txt", header= T, sep = "\t")
-# Shekari_genes[!Shekari_genes$Gene %in% Ke_genes$Gene,]
+Shekari_genes <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Shekari_et_al/Shekari_et_al_genes.txt", header= T, sep = "\t")
 
+Shekari_genes[!Shekari_genes$Gene %in% Ke_genes$Gene,]
+common.genes <- Shekari_genes$Gene[Shekari_genes$Gene %in% Ke_genes$Gene]
+
+table(Shekari_genes$Gene %in% Ke_genes$Gene)
+# FALSE  TRUE 
+# 22    83 
 
 ## 1. clinvar
 clinvar <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/all_new_clinvar_P_LP.txt", header = T, sep = "\t", stringsAsFactors = F)
@@ -23,15 +28,20 @@ clinvar$new_GENE.clinvar <- gsub("-.*", "", clinvar$ANN....GENE)
 clinvar <- cbind.data.frame(CHROM=clinvar$CHROM, POS=clinvar$POS, REF=clinvar$REF, ALT=clinvar$ALT, SNP=clinvar$SNP, ID=clinvar$ID, GENE=clinvar$ANN....GENE, new_GENE.clinvar=clinvar$new_GENE.clinvar, AF_nfe=clinvar$AF_nfe, AF_afr=clinvar$AF_afr, AF=clinvar$AF, Effect=clinvar$ANN....EFFECT, CLNSIG=clinvar$CLNSIG)
 clinvar.save <- clinvar
 
-Ke_genes$Gene[!Ke_genes$Gene %in% clinvar$new_GENE.clinvar]
-# [1] "ANKRD31"   "ATG9A"     "BMP15"     "BMPR1A"    "BMPR1B"    "BNC1"      "C14orf39"  "DIAPH2"    "DMC1"      "EIF4ENIF1" "ESR2"      "EXO1"      "FANCL"    
-# [14] "FIGLA"     "FOXE1"     "KHDRBS1"   "MCM9"      "NANOS3"    "NOG"       "NOTCH2"    "PGRMC1"    "POF1B"     "PRDM9"     "PSMC3IP"   "RAD51"     "SALL4"    
-# [27] "SGO2"      "SPIDR"     "SYCE1"     "SYCP2L"    "TP63"      "TWNK"      "XRCC2"
+table(Shekari_genes$Gene %in% clinvar$new_GENE.clinvar)
+# FALSE  TRUE 
+# 42    63 
+
+Shekari_genes$Gene[!Shekari_genes$Gene %in% clinvar$new_GENE.clinvar]
+# [1] "ANKRD31"   "ATG9A"     "BMP15"     "BMPR1A"    "BMPR1B"    "BNC1"      "C14orf39"  "CDKN1B"    "DACH2"     "DIAPH2"    "DMC1"      "EIF4ENIF1" "ERAL1"     "FANCL"     "FIGLA"     "FMN2"     
+# [17] "FOXO4"     "HROB"      "IGSF10"    "KHDRBS1"   "LHX8"      "MCM9"      "NANOS3"    "NOG"       "NOTCH2"    "PGRMC1"    "POF1B"     "POU5F1"    "PRDM9"     "PSMC3IP"   "RAD51"     "REC8"     
+# [33] "SALL4"     "SGO2"      "SMC1B"     "SOHLH2"    "SPIDR"     "SYCE1"     "SYCP2L"    "TP63"      "TWNK"      "YTHDC2" 
 
 
 ## Keep only those in Ke et al
-clinvar <- clinvar[clinvar$new_GENE.clinvar %in% Ke_genes$Gene,]
-
+clinvar <- clinvar[clinvar$new_GENE.clinvar %in% Shekari_genes$Gene,]
+dim(clinvar)
+# 4776   13
 clinvar.all <- clinvar[which(clinvar$AF <0.01),]
 clinvar.eur <- clinvar[which(clinvar$AF_nfe < 0.01),]
 clinvar.afr <- clinvar[which(clinvar$AF_afr < 0.01),]
@@ -52,10 +62,11 @@ table(loftee$LoF_flags)
 # make rare; .all is based on allee frequency from gnomAD global population; .eur is gnomAD EUR_nfe; .afr is gnomAD AFR
 loftee$new_GENE.loftee <- gsub("-.*", "", loftee$SYMBOL)
 
-Ke_genes$Gene[!Ke_genes$Gene %in% loftee$new_GENE.loftee]
+Shekari_genes$Gene[!Shekari_genes$Gene %in% loftee$new_GENE.loftee]
 ## Keep only those in ACMG
-loftee <- loftee[loftee$new_GENE.loftee %in% Ke_genes$Gene,]
-
+loftee <- loftee[loftee$new_GENE.loftee %in% Shekari_genes$Gene,]
+dim(loftee)
+# 612  92
 
 loftee$AF <- as.numeric(loftee$AF.1)
 loftee$AF_nfe <- as.numeric(loftee$AF_nfe)
@@ -71,6 +82,7 @@ loftee.afr <- loftee[which(loftee$AF_afr < 0.01),]
 
 snpeff <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/missense_variants_with_overlap_in_more_than_90_percent_of_prediction_tools_all_cols.txt", header = T, sep = "\t", stringsAsFactors = F)
 dim(snpeff)
+# 63538   217
 snpeff$SNP <- sub(";.*", "", snpeff$ID)
 
 snpeff$AF <- as.numeric(snpeff$AF)
@@ -81,9 +93,9 @@ snpeff$new_GENE.snpeff <- gsub("-.*", "", snpeff$ANN....GENE)
 snpeff <- cbind.data.frame(CHROM=snpeff$CHROM, POS=snpeff$POS, REF=snpeff$REF, ALT=snpeff$ALT, SNP=snpeff$SNP, ID=snpeff$ID, GENE=snpeff$ANN....GENE, new_GENE.snpeff=snpeff$new_GENE.snpeff, AF_nfe=snpeff$AF_nfe, AF_afr=snpeff$AF_afr, AF=snpeff$AF, Effect=snpeff$ANN....EFFECT, CLNSIG=snpeff$CLNSIG)
 snpeff.save <- snpeff
 
-Ke_genes$Gene[!Ke_genes$Gene %in% snpeff$new_GENE.snpeff]
+Shekari_genes$Gene[!Shekari_genes$Gene %in% snpeff$new_GENE.snpeff]
 ## Keep only those in Ke et al
-snpeff <- snpeff[snpeff$new_GENE.snpeff %in% Ke_genes$Gene,]
+snpeff <- snpeff[snpeff$new_GENE.snpeff %in% Shekari_genes$Gene,]
 
 # make rare
 snpeff.all <- snpeff[which(snpeff$AF <0.01),]
@@ -92,10 +104,10 @@ snpeff.afr <- snpeff[which(snpeff$AF_afr < 0.01),]
 
 
 length(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
-# 706
+# 687
 cc <- as.data.frame(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
 dim(cc)
-# 706
+# 687
 colnames(cc) <- "SNP"
 
 ## QCed Bim
@@ -104,16 +116,16 @@ bim.QC <- fread("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/Survi
 cc$SNP[!cc$SNP %in% bim.QC$V2]
 cc.final <- cc[cc$SNP %in% bim.QC$V2,]
 
-write.table(cc.final, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_et_al_POI_rare_variants_to_extract.txt", row.names = F, col.names = F, quote = F)
+write.table(cc.final, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Shekari_et_al_POI_rare_variants_to_extract.txt", row.names = F, col.names = F, quote = F)
 length(cc.final)
-# 580
+# 549
 
-# ## Autosomal recessive gene variants
-# AR.genes <- ACMG$GENE[ACMG$inheritence == "AR"]
-# AR.genes.clinvar <- clinvar$SNP[clinvar$new_GENE.clinvar %in% AR.genes]
-# AR.genes.loftee <- loftee$SNP[loftee$new_GENE.loftee %in% AR.genes]
-# AR.genes.snpeff <- snpeff$SNP[snpeff$new_GENE.snpeff %in% AR.genes]
-# AR.variants <- (unique(c(AR.genes.clinvar, AR.genes.loftee, AR.genes.snpeff)))
+## Autosomal recessive gene variants
+AR.genes <- Shekari_genes$Gene[Shekari_genes$Reported.gene.inheritance == "AR"]
+AR.genes.clinvar <- clinvar$SNP[clinvar$new_GENE.clinvar %in% AR.genes]
+AR.genes.loftee <- loftee$SNP[loftee$new_GENE.loftee %in% AR.genes]
+AR.genes.snpeff <- snpeff$SNP[snpeff$new_GENE.snpeff %in% AR.genes]
+AR.variants <- (unique(c(AR.genes.clinvar, AR.genes.loftee, AR.genes.snpeff)))
 
 ## preQC
 bim.preQC <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic_ID_updated.bim")
@@ -121,22 +133,24 @@ cc <- as.character(cc$SNP)
 cc[!cc %in% bim.preQC$V2]
 table(cc %in% bim.preQC$V2)
 # TRUE 
-# 706
+# 687
 
 ## QCed for GQ, DP and VQSR only
 bim.QC <- fread("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic_ID_updated.bim")
 table(cc %in% bim.QC$V2)
 # FALSE  TRUE 
-# 117   589 
+# 118   569 
+
 
 ## Final SJLIFE QCed data
+bim.QC <- fread("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/Survivor_WES/biallelic2/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_ID_updated.bim")
 table(cc %in% bim.QC$V2)
 # FALSE  TRUE 
-# 126   580
+# 138   549 
 
 
 ## Create carrier status
-raw <- fread("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/POI_genetics//Ke_et_al_POI_rare_variants_ALL_recodeA.raw")
+raw <- fread("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/POI_genetics//Shekari_et_al_POI_rare_variants_ALL_recodeA.raw")
 raw <- as.data.frame(raw)
 rownames(raw) <- raw$IID
 raw <- raw[-c(1:6)]
@@ -150,16 +164,16 @@ HEADER = gsub("\\.", ":", HEADER)
 colnames(raw) <- HEADER
 table(colnames(raw) %in% cc)
 # TRUE 
-# 580
+# 549
 ## Looks good!
 
-## Make AR gene variants either 0 or 2
-# AR.variants.raw <- colnames(raw)[colnames(raw) %in% AR.variants]
-# raw[, AR.variants.raw] <- ifelse(raw[, AR.variants.raw] == 2, 2, 0)
+# Make AR gene variants either 0 or 2
+AR.variants.raw <- colnames(raw)[colnames(raw) %in% AR.variants]
+raw[, AR.variants.raw] <- ifelse(raw[, AR.variants.raw] == 2, 2, 0)
 
 
-# save.image("Ke_et_al_POI_rare_variants_data.RData")
-# load("Ke_et_al_POI_rare_variants_data.RData")
+# save.image("Shekari_et_al_POI_rare_variants_data.RData")
+# load("Shekari_et_al_POI_rare_variants_data.RData")
 
 
 # Some ccss/sjlife overlapping samples in WGS data were renames as SJLIFE, but not in WES, so naming them back to CCSS.
@@ -211,9 +225,9 @@ table(rownames(raw) %in% EUR$IID)
 raw.eur <- raw[rownames(raw) %in% EUR$IID,]
 raw.afr <- raw[rownames(raw) %in% AFR$IID,]
 dim(raw.eur)
-# [1] 6001  728
+# [1] 6001  549
 dim(raw.afr)
-# [1] 846 728
+# [1] 846 549
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/ACMG/utils.R")
 
 
@@ -246,9 +260,9 @@ for (i in 1:length(genes)){
 }
 
 length(snps.with.carriers.clinvar.eur)
-# 256
+# 65
 dim(carriers.clinvar.eur)
-# [1] 6001   56
+# [1] 6001   16
 ## Adding carrier status for "All_Genes"
 ## Check if any gene column in carriers.clinvar.eur has carrier status (1) across all genes
 # carriers.clinvar.eur$All_Genes <- ifelse(rowSums(carriers.clinvar.eur[ , -1], na.rm = TRUE) > 0, 1, 0)
@@ -282,7 +296,7 @@ for (i in 1:length(genes)){
 }
 
 length(snps.with.carriers.clinvar.afr)
-## 35
+## 8
 # carriers.clinvar.afr$All_Genes <- ifelse(rowSums(carriers.clinvar.afr[ , -1], na.rm = TRUE) > 0, 1, 0)
 
 #################################
@@ -313,7 +327,7 @@ for (i in 1:length(genes)){
 }
 
 length(snps.with.carriers.loftee.eur)
-## 66
+## 14
 # carriers.loftee.eur$All_Genes <- ifelse(rowSums(carriers.loftee.eur[ , -1], na.rm = TRUE) > 0, 1, 0)
 
 ################################
@@ -344,7 +358,7 @@ for (i in 1:length(genes)){
 }
 
 length(snps.with.carriers.loftee.afr)
-## 18
+## 5
 # carriers.loftee.afr$All_Genes <- ifelse(rowSums(carriers.loftee.afr[ , -1], na.rm = TRUE) > 0, 1, 0)
 
 #################################
@@ -375,7 +389,7 @@ for (i in 1:length(genes)){
 }
 
 length(snps.with.carriers.snpeff.eur)
-# 142
+# 71
 # carriers.snpeff.eur$All_Genes <- ifelse(rowSums(carriers.snpeff.eur[ , -1], na.rm = TRUE) > 0, 1, 0)
 
 ################################
@@ -406,15 +420,15 @@ for (i in 1:length(genes)){
 }
 
 length(snps.with.carriers.snpeff.afr)
-## 13
+## 5
 # carriers.snpeff.afr$All_Genes <- ifelse(rowSums(carriers.snpeff.afr[ , -1], na.rm = TRUE) > 0, 1, 0)
 
 
 
 # Save each object as an RDS file in the specified path
-saveRDS(carriers.clinvar.eur, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_et_al_POI_genetics_carriers_clinvar_eur.rds")
-saveRDS(carriers.clinvar.afr, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_et_al_POI_genetics_carriers_clinvar_afr.rds")
-saveRDS(carriers.loftee.eur, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_et_al_POI_genetics_carriers_loftee_eur.rds")
-saveRDS(carriers.loftee.afr, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_et_al_POI_genetics_carriers_loftee_afr.rds")
-saveRDS(carriers.snpeff.eur, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_et_al_POI_genetics_carriers_snpeff_eur.rds")
-saveRDS(carriers.snpeff.afr, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_et_al_POI_genetics_carriers_snpeff_afr.rds")
+saveRDS(carriers.clinvar.eur, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Shekari_et_al_POI_genetics_carriers_clinvar_eur.rds")
+saveRDS(carriers.clinvar.afr, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Shekari_et_al_POI_genetics_carriers_clinvar_afr.rds")
+saveRDS(carriers.loftee.eur, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Shekari_et_al_POI_genetics_carriers_loftee_eur.rds")
+saveRDS(carriers.loftee.afr, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Shekari_et_al_POI_genetics_carriers_loftee_afr.rds")
+saveRDS(carriers.snpeff.eur, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Shekari_et_al_POI_genetics_carriers_snpeff_eur.rds")
+saveRDS(carriers.snpeff.afr, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Shekari_et_al_POI_genetics_carriers_snpeff_afr.rds")

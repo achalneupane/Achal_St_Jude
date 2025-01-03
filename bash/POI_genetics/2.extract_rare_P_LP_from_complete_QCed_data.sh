@@ -13,4 +13,9 @@ plink --bfile chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LC
 plink --bfile Ke_et_al_POI_rare_variants_ALL --recodeA --out Ke_et_al_POI_rare_variants_ALL_recodeA
 
 
+## 2. Extract rare variants from Shekari et al
+module load plink/1.90b
+plink --bfile chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_ID_updated_unique --extract Shekari_et_al_POI_rare_variants_to_extract.txt --keep sjlife_ccss_samples.txt --make-bed --keep-allele-order --out Shekari_et_al_POI_rare_variants_ALL
+plink --bfile Shekari_et_al_POI_rare_variants_ALL --recodeA --out Shekari_et_al_POI_rare_variants_ALL_recodeA
+
 

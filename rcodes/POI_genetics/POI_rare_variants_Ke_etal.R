@@ -31,6 +31,8 @@ Ke_genes$Gene[!Ke_genes$Gene %in% clinvar$new_GENE.clinvar]
 
 ## Keep only those in Ke et al
 clinvar <- clinvar[clinvar$new_GENE.clinvar %in% Ke_genes$Gene,]
+dim(clinvar)
+# 5100   13
 
 clinvar.all <- clinvar[which(clinvar$AF <0.01),]
 clinvar.eur <- clinvar[which(clinvar$AF_nfe < 0.01),]
@@ -130,6 +132,7 @@ table(cc %in% bim.QC$V2)
 # 117   589 
 
 ## Final SJLIFE QCed data
+bim.QC <- fread("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/Survivor_WES/biallelic2/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_ID_updated.bim")
 table(cc %in% bim.QC$V2)
 # FALSE  TRUE 
 # 126   580
