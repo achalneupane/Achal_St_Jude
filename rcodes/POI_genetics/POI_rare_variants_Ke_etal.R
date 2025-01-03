@@ -161,6 +161,7 @@ table(colnames(raw) %in% cc)
 # save.image("Ke_et_al_POI_rare_variants_data.RData")
 # load("Ke_et_al_POI_rare_variants_data.RData")
 
+
 # Some ccss/sjlife overlapping samples in WGS data were renames as SJLIFE, but not in WES, so naming them back to CCSS.
 sjlife_ccss_exp_overlaps <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sjlife_ccss_exp_overlaps.txt", header = TRUE, stringsAsFactors = FALSE, sep = "\t")
 EUR <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/QC/pca/Survivor_WGS_EUR_based_on_1kGP_Phase_3_data.txt", header = T)
@@ -178,21 +179,21 @@ AFR$IID[!is.na(matches)] <- sjlife_ccss_exp_overlaps$CCSSID[matches[!is.na(match
 filtered_wes_samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/filtered_wes_samples_by_cohort.txt", header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 WES.fam <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_ID_updated_unique.fam", header = F)
 table(WES.fam$V2 %in% filtered_wes_samples$SampleID)
-# FALSE  TRUE 
-# 272  7758 
+# FALSE  TRUE
+# 272  7758
 
 EUR$cohort <- filtered_wes_samples$Source[match(EUR$IID, filtered_wes_samples$SampleID)]
 EUR <- EUR[!grepl("African", EUR$cohort),]
 EUR <- EUR[!is.na(EUR$cohort),]
 table(EUR$cohort)
-# ccss_exp community.controls             sjlife 
+# ccss_exp community.controls             sjlife
 # 2299                375               3345
 
 AFR$cohort <- filtered_wes_samples$Source[match(AFR$IID, filtered_wes_samples$SampleID)]
 AFR <- AFR[!is.na(AFR$cohort),]
 table(AFR$cohort)
-# ccss_exp community.controls             sjlife   Survivor_African 
-# 100                 31                642                 76 
+# ccss_exp community.controls             sjlife   Survivor_African
+# 100                 31                642                 76
 
 ## EUR.ccss <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSSEXP_EUR_top_20_PCs.eigenvec.ccssid", header = F)
 ## AFR.ccss <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/CCSSEXP_AFR_top_20_PCs.eigenvec.ccssid", header = F)
@@ -203,12 +204,9 @@ table(AFR$cohort)
 # table(AFR.sjlife$V2 %in% AFR$IID[AFR$cohort=="sjlife"])
 
 table(rownames(raw) %in% EUR$IID)
-# FALSE  TRUE 
-# 2019  6001 
+# FALSE  TRUE
+# 2019  6001
 
-# save.image("rare_variant_ACMG_group_data.RData")
-
-load("rare_variant_ACMG_group_data.RData")
 ## Extract European and African genotype data
 raw.eur <- raw[rownames(raw) %in% EUR$IID,]
 raw.afr <- raw[rownames(raw) %in% AFR$IID,]
@@ -223,3 +221,98 @@ source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/ACMG/u
 ##################################
 ## 1.a Extract clinvar European ##
 ##################################
+raw.clinvar.eur <- raw.eur[which(colnames(raw.eur) %in% clinvar.eur$SNP)]
+clinvar.eur <- clinvar.eur[clinvar.eur$SNP %in% colnames(raw.eur),]
+
+genes <- unique(clinvar.eur$new_GENE.clinvar)
+carriers.clinvar.eur <- setNames(as.data.frame(rownames(raw.eur)), "IID")
+snps.with.carriers.clinvar.eur <- c()
+
+## Status per gene
+for (i in 1:length(genes)){
+  wanted.gene <- genes[i]
+  print(paste0("Doing gene ", wanted.gene))
+  wanted.snps <- unique(clinvar.eur$SNP[clinvar.eur$new_GENE.clinvar == wanted.gene])
+  raw.wanted <- raw.clinvar.eur[wanted.snps]
+  snps.with.carriers.tmp <- names(colSums(raw.wanted, na.rm = T))[colSums(raw.wanted, na.rm = T) > 0]
+  if(length(snps.with.carriers.tmp) == 0){
+    next
+  }
+  raw.wanted <- raw.wanted[snps.with.carriers.tmp]
+  snps.with.carriers.clinvar.eur <- c(snps.with.carriers.clinvar.eur, snps.with.carriers.tmp)
+  carriers.tmp <- setNames(as.data.frame(rownames(raw.wanted)), "IID")
+  carriers.tmp$carrier <- ifelse(rowSums(raw.wanted[grepl("chr", colnames(raw.wanted))], na.rm = T) > 0, 1, 0)
+  carriers.clinvar.eur[wanted.gene] <- carriers.tmp$carrier[match(carriers.clinvar.eur$IID, carriers.tmp$IID)]
+}
+
+length(snps.with.carriers.clinvar.eur)
+# 256
+dim(carriers.clinvar.eur)
+# [1] 6001   56
+## Adding carrier status for "All_Genes"
+## Check if any gene column in carriers.clinvar.eur has carrier status (1) across all genes
+# carriers.clinvar.eur$All_Genes <- ifelse(rowSums(carriers.clinvar.eur[ , -1], na.rm = TRUE) > 0, 1, 0)
+dim(carriers.clinvar.eur)
+
+#################################
+## 1.b Extract clinvar African ##
+#################################
+raw.clinvar.afr <- raw.afr[which(colnames(raw.afr) %in% clinvar.afr$SNP)]
+clinvar.afr <- clinvar.afr[clinvar.afr$SNP %in% colnames(raw.afr),]
+
+genes <- unique(clinvar.afr$new_GENE.clinvar)
+carriers.clinvar.afr <- setNames(as.data.frame(rownames(raw.afr)), "IID")
+snps.with.carriers.clinvar.afr <- c()
+
+## Status per gene
+for (i in 1:length(genes)){
+  wanted.gene <- genes[i]
+  print(paste0("Doing gene ", wanted.gene))
+  wanted.snps <- unique(clinvar.afr$SNP[clinvar.afr$new_GENE.clinvar == wanted.gene])
+  raw.wanted <- raw.clinvar.afr[wanted.snps]
+  snps.with.carriers.tmp <- names(colSums(raw.wanted, na.rm = T))[colSums(raw.wanted, na.rm = T) > 0]
+  if(length(snps.with.carriers.tmp) == 0){
+    next
+  }
+  raw.wanted <- raw.wanted[snps.with.carriers.tmp]
+  snps.with.carriers.clinvar.afr <- c(snps.with.carriers.clinvar.afr, snps.with.carriers.tmp)
+  carriers.tmp <- setNames(as.data.frame(rownames(raw.wanted)), "IID")
+  carriers.tmp$carrier <- ifelse(rowSums(raw.wanted[grepl("chr", colnames(raw.wanted))], na.rm = T) > 0, 1, 0)
+  carriers.clinvar.afr[wanted.gene] <- carriers.tmp$carrier[match(carriers.clinvar.afr$IID, carriers.tmp$IID)]
+}
+
+length(snps.with.carriers.clinvar.afr)
+## 35
+# carriers.clinvar.afr$All_Genes <- ifelse(rowSums(carriers.clinvar.afr[ , -1], na.rm = TRUE) > 0, 1, 0)
+
+#################################
+## 2.a Extract loftee European ##
+#################################
+raw.loftee.eur <- raw.eur[which(colnames(raw.eur) %in% loftee.eur$SNP)]
+loftee.eur <- loftee.eur[loftee.eur$SNP %in% colnames(raw.eur),]
+
+genes <- unique(loftee.eur$new_GENE.loftee)
+carriers.loftee.eur <- setNames(as.data.frame(rownames(raw.eur)), "IID")
+snps.with.carriers.loftee.eur <- c()
+
+## Status per gene
+for (i in 1:length(genes)){
+  wanted.gene <- genes[i]
+  print(paste0("Doing gene ", wanted.gene))
+  wanted.snps <- unique(loftee.eur$SNP[loftee.eur$new_GENE.loftee == wanted.gene])
+  raw.wanted <- raw.loftee.eur[wanted.snps]
+  snps.with.carriers.tmp <- names(colSums(raw.wanted, na.rm = T))[colSums(raw.wanted, na.rm = T) > 0]
+  if(length(snps.with.carriers.tmp) == 0){
+    next
+  }
+  raw.wanted <- raw.wanted[snps.with.carriers.tmp]
+  snps.with.carriers.loftee.eur <- c(snps.with.carriers.loftee.eur, snps.with.carriers.tmp)
+  carriers.tmp <- setNames(as.data.frame(rownames(raw.wanted)), "IID")
+  carriers.tmp$carrier <- ifelse(rowSums(raw.wanted[grepl("chr", colnames(raw.wanted))], na.rm = T) > 0, 1, 0)
+  carriers.loftee.eur[wanted.gene] <- carriers.tmp$carrier[match(carriers.loftee.eur$IID, carriers.tmp$IID)]
+}
+
+length(snps.with.carriers.loftee.eur)
+## 66
+# carriers.loftee.eur$All_Genes <- ifelse(rowSums(carriers.loftee.eur[ , -1], na.rm = TRUE) > 0, 1, 0)
+
