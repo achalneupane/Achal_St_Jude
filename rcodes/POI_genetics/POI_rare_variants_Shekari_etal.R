@@ -410,6 +410,7 @@ length(snps.with.carriers.snpeff.afr)
 # carriers.snpeff.afr$All_Genes <- ifelse(rowSums(carriers.snpeff.afr[ , -1], na.rm = TRUE) > 0, 1, 0)
 
 
+
 # Save each object as an RDS file in the specified path
 saveRDS(carriers.clinvar.eur, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_et_al_POI_genetics_carriers_clinvar_eur.rds")
 saveRDS(carriers.clinvar.afr, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_et_al_POI_genetics_carriers_clinvar_afr.rds")
