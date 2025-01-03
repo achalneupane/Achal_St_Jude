@@ -406,7 +406,7 @@ for (i in 1:length(genes)){
 }
 
 length(snps.with.carriers.snpeff.afr)
-# 13
+## 13
 # carriers.snpeff.afr$All_Genes <- ifelse(rowSums(carriers.snpeff.afr[ , -1], na.rm = TRUE) > 0, 1, 0)
 
 
