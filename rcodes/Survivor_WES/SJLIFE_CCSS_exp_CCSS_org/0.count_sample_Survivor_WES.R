@@ -1,6 +1,47 @@
 library(haven)
+library(readxl)
 # https://wiki.stjude.org/display/CAB/Genetic+Ancestry+Estimation+by+PCA
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/CAB/common/SJLIFE_CCSS_WES_101724/GermlineQC/")
+
+## 1. Check how many samples are available 
+# SJLIFE
+pop <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/demographics.sas7bdat")
+pop.survivor <- pop[pop$studypop == "Survivor",]
+pop.survivor.control <- pop[grepl("Control", pop$studypop),]
+
+## Read the specified sheet from the Excel file shared by Yadav. It contains the list of all samples that have been or will be sequenced.
+data <- read_excel("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/SJLIFE_WGS_and_CCSS_SNP_WES_WGS_samples_and_overlap.xlsx", sheet = "SJLIFEWGS_4481", col_names = F)
+table(data$...1 %in% pop.survivor.control$sjlid)
+# FALSE  TRUE 
+# 4375   106 
+
+## List of 4402 SJLIFE samples
+sjlife_4402 <- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_from_Qi_Liu/toyadav.sas7bdat")
+sjlife_4402 <- unique(sjlife_4402$sjlid)
+table(sjlife_4402 %in% data$...1)
+# FALSE  TRUE 
+# 27  4375
+sjlife_4402[!sjlife_4402 %in% data$...1]
+
+
+## This is TB ID conversion file from Yadav
+SJLIFEwes <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/SJLIFE_WESsamplelist_TBIDcheck_YSapkota_02Aug2022_FINAL.txt", header = T)
+table(data$...1 %in% SJLIFEwes$SJLID)
+
+## AA sample list from Jenn
+AA.90samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/RNAseq_sjlife/jenn_RNAseq/AA_samples.txt", header = F)
+table(AA.90samples$V1 %in% SJLIFEwes$SJLID)
+# TRUE 
+# 90
+
+## Classify SJLIFE sample list
+SJLIFEwes$pop <- ""
+SJLIFEwes$pop [SJLIFEwes$SJLID %in% AA.90samples$V1] <- "AA"
+SJLIFEwes$pop [SJLIFEwes$SJLID %in% pop.survivor.control$sjlid] <- "C.Control"
+
+sjlife.to.be.sequenced <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/27April2023_SJLIFE_WGSround4_SampleList.txt", header = T, sep = "\t")
+table(sjlife.to.be.sequenced$sjlid %in% SJLIFEwes$SJLID)
+
 
 ######################
 ## Clean sample IDs ##
@@ -64,12 +105,6 @@ dim(all.samples)
 # dim(all.samples)
 sum(!all.samples$V1 %in% sex.problem.mind.and.3sd.outliers)
 # 7907 # after sample level QC
-
-## 8065 total samples in WES data
-pop <- read_sas("Z:/SJShare/SJCOMMON/ECC/SJLife/SJLIFE Data Freeze/2 Final Data SJLIFE/20200430/Clinical Data/demographics.sas7bdat")
-pop.survivor <- pop[pop$studypop == "Survivor",]
-pop.survivor.control <- pop[grepl("Control", pop$studypop),]
-
 
 
 sum(all.samples$V2 %in% pop$sjlid)

@@ -98,7 +98,7 @@ write.table(all.samples, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/comm
 
 ## There are duplicate SJLIFE IDs, we can romove the ones with low call rate here:
 # Check for duplicated IID values
-imiss = read.table("/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/Survivors/chr.ALL.SURVIVORS_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_updated_missing.imiss", header=TRUE)
+imiss = read.table("/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/chr.ALL.SURVIVORS_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_updated_missing.imiss", header=TRUE)
 duplicate_samples <- imiss[duplicated(imiss$IID) | duplicated(imiss$IID, fromLast = TRUE), ]
 dim(duplicate_samples)
 # 69
@@ -193,6 +193,10 @@ CCSS <- as.data.frame(all.samples[all.samples$cohort == "CCSS",c("V3", "V4")])
 dim(CCSS)
 # [1] 3036    1
 write.table(CCSS, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/extract_CCSS.samples_iid_fid.no.sample.QC.txt", col.names = F, row.names = F, quote = F)
+## remove SJLIFE overlaps from CCSS
+sjlife_ccss_exp_overlaps <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sjlife_ccss_exp_overlaps.txt", header = TRUE, stringsAsFactors = FALSE, sep = "\t")
+ccss.removed.sjlife <- CCSS[!(CCSS$V3 %in% sjlife_ccss_exp_overlaps$VCFID),]
+write.table(ccss.removed.sjlife, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/extract_CCSS_without_sjlife_overlaps.samples_iid_fid.no.sample.QC.txt", col.names = F, row.names = F, quote = F)
 
 SJLIFE_control <- as.data.frame(all.samples[all.samples$cohort == "Community_control",c("V3", "V4")])
 dim(SJLIFE_control)

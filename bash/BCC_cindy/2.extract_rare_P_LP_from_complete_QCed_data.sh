@@ -6,10 +6,7 @@
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis2
 ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic_ID_updated* .
 ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_ID_updated* .
-
-ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis/rare_variants_to_extract.txt .
-
-
+ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_ID_updated_unique.* .
 module load plink/1.90b
 # ## Extracting variants on GQ, DP and VQSR data only
 # plink --bfile chr.ALL.Survivor_WES.GATK4180.hg38_biallelic_ID_updated --extract rare_variants_to_extract.txt --keep-allele-order --make-bed -out all_BCC_rare_variants_VQSR
@@ -17,7 +14,11 @@ module load plink/1.90b
 
 
 ## Extracting variants on completely QCed (including GQ, DP and VQSR) data
-plink --bfile chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_ID_updated --extract rare_variants_to_extract.txt --keep-allele-order --make-bed -out all_BCC_rare_variants
+plink --bfile chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_ID_updated_unique --extract rare_variants_to_extract.txt --keep-allele-order --make-bed -out all_BCC_rare_variants
+# 8030 people (0 males, 0 females, 8030 ambiguous) loaded from .fam.
+# Ambiguous sex IDs written to all_BCC_rare_variants.nosex .
+# --extract: 29711 variants remaining.
+
 plink --bfile all_BCC_rare_variants --recodeA --out all_BCC_rare_variants_recodeA
 
 
@@ -28,7 +29,7 @@ plink --bfile all_BCC_rare_variants --recodeA --out all_BCC_rare_variants_recode
 
 grep 'NA' csg.60.vars.unique.txt | cut -f8 | while read -r line; do
   # echo "Doing ${line}"
-  grep "${line}" /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic_ID_updated.bim
+  grep "${line}" /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all/chr.ALL.Survivor_WES.GATK4180.hg38_biallelic_ID_updated_unique.bim
 done
 
 

@@ -66,6 +66,7 @@ bcftools norm -Ou -m -any WGS_193.GATK4.vcf.gz \
 
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/WGS_Northwestern_110_samples/VQSR_ApplyRecalibration_edited/HANA_Northwestern_request
 ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/CAB/common/WGS_193/variantCalling/WGS_193
+##################
 ## Extract LMNA ##
 ##################
 # Extract ALL LMNA
@@ -79,4 +80,6 @@ plink --bfile LMNA_WGS_193 --recodeA --keep-allele-order --out LMNA_WGS_193_reco
 # Extract ALL EMERIN
 plink --chr X --from-bp 154379295 --make-bed --out EMD_WGS_193 --to-bp 154381523 --vcf-half-call m --keep-allele-order --vcf WGS_193.GATK4.recalibrated.decomposed.vcf.gz
 plink --bfile EMD_WGS_193 --recodeA --keep-allele-order --out EMD_WGS_193_recodeA
+
+
 
