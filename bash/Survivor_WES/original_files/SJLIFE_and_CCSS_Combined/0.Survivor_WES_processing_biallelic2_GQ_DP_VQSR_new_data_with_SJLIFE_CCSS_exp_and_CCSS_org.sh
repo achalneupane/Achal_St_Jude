@@ -149,10 +149,9 @@ MAC greater or equal 1: 1340181
 
 
 ## sample level QC
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all
-ls chr*.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1.bim | sed 's/.bim//'| sort -V  > merge_list.txt
-plink --merge-list merge_list.txt --keep-allele-order --make-bed --out chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1
-
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/biallelic2/plink_all
+ls chr*.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.bim | sed 's/.bim//'| sort -V  > merge_list.txt
+plink --merge-list merge_list.txt --keep-allele-order --make-bed --out chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15
 
 
 # plink --bfile chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15 --indep-pairwise 100 25 0.2 --keep-allele-order --maf 0.05 --make-bed --out chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15_maf0.05_indep_prune
@@ -166,27 +165,27 @@ plink --merge-list merge_list.txt --keep-allele-order --make-bed --out chrALL.SJ
 #   --out geno.0.1.hwe.1e-15_indep_pairwise
 
 plink \
-  --bfile chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15 \
+  --bfile chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15 \
   --exclude range /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/high-LD-regions-GRCh38.txt \
   --indep-pairwise 100 25 0.2 \
   --keep-allele-order \
   --maf 0.05 \
   --out geno.0.1.hwe.1e-15_indep_pairwise
 
-plink --bfile chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15 \
+plink --bfile chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15 \
 --keep-allele-order \
 --extract geno.0.1.hwe.1e-15_indep_pairwise.prune.in \
 --make-bed \
---out chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15_maf0.05_indep_prune
+--out chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15_maf0.05_indep_prune
 
-plink --bfile chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15_maf0.05_indep_prune --het --out chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15_maf0.05_indep_prune_heterozygosity
-plink --bfile chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15 --missing --out chrALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15_missing
+plink --bfile chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15_maf0.05_indep_prune --het --out chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15_maf0.05_indep_prune_heterozygosity
+plink --bfile chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15 --missing --out chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15_missing
 
 
 ## Merge plink
 cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all
-ls chr*.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1.bim | sed 's/.bim//'| sort -V  > merge_list2.txt
-plink --merge-list merge_list2.txt --keep-allele-order --make-bed --out chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1
+ls chr*.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1.bim | sed 's/.bim//'| sort -V  > merge_list.txt
+plink --merge-list merge_list.txt --keep-allele-order --make-bed --out chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1
 
 ## Update IDs
 plink --bfile chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1 --update-ids /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/rename_samples.txt --make-bed --keep-allele-order --out chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_ID_updated
