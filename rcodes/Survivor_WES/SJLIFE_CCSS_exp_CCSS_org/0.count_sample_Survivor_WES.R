@@ -33,18 +33,25 @@ sjlife_4402[!(sjlife_4402 %in% preQCsjlife$V2)]
 ## This is TB ID conversion file from Yadav
 SJLIFEwesTBID <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/SJLIFE_WESsamplelist_TBIDcheck_YSapkota_02Aug2022_FINAL.txt", header = T)
 
+SJLIFEwesTBID$CompBioID_first_part <- sub("_.*", "", SJLIFEwesTBID$CompBioID)
 #####################################################################
 ## This is to remove duplicate samples in TBID file: SJLIFEwesTBID ##
 #####################################################################
 ## There are duplicate SJLIFE IDs, we can romove the ones with low call rate here:
 # Check for duplicated IID values
 imiss = read.table("/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/biallelic2/plink_all/chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15_missing.imiss", header=TRUE)
+# imiss <- imiss[!grepl("CCSS", imiss$IID),]
 imiss$IID2 <- imiss$IID
-imiss$IID <- SJLIFEwesTBID$SJLID[match(imiss$IID, SJLIFEwesTBID$CompBioID)]
+imiss$IID2_first_part <- sub("_.*", "", imiss$IID2)
+imiss$IID <- SJLIFEwesTBID$SJLID[match(imiss$IID2_first_part, SJLIFEwesTBID$CompBioID_first_part)]
 imiss <- imiss[!is.na(imiss$IID),]
 duplicate_samples <- imiss[duplicated(imiss$IID) | duplicated(imiss$IID, fromLast = TRUE), ]
 dim(duplicate_samples)
-# 66
+# 108
+
+# remove those labelled CCSS from duplicates
+remove.dup.ccss <- duplicate_samples[grepl("CCSS", duplicate_samples$FID),]
+
 
 # Sort and keep only the sample with the lowest F_MISS for each IID
 library(dplyr)
@@ -58,15 +65,21 @@ samples_to_remove <- anti_join(duplicate_samples, samples_to_keep, by = c("FID",
 # View the samples to be removed
 # View(samples_to_remove)
 dim(samples_to_remove)
-# 33  7
+# 54  7
+
+# keep SJLIFE and remove CCSS
+samples_to_remove <- samples_to_remove[!samples_to_remove$IID %in% remove.dup.ccss$IID,]
+samples_to_remove <- rbind.data.frame(samples_to_remove, remove.dup.ccss)
+dim(samples_to_remove)
+# 54  8
 table(SJLIFEwesTBID$CompBioID %in% samples_to_remove$IID2)
 # FALSE  TRUE 
-# 4986    33
+# 4977    42 
 
-## Remove these 33 duplicates
+## Remove these 42 duplicates
 SJLIFEwesTBID <- SJLIFEwesTBID[!SJLIFEwesTBID$CompBioID %in% samples_to_remove$IID2,]
 dim(SJLIFEwesTBID)
-# 4986    3
+# 4977    4
 #####################################################################
 
 # table(sequencing.Record$...1 %in% unique(SJLIFEwesTBID$SJLID))
@@ -75,17 +88,26 @@ dim(SJLIFEwesTBID)
 
 ## All WES samples
 all.WES.samples <-  read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/WES_samples.txt", header = F)
+all.WES.samples$CompBioID_first_part <- sub("_.*", "", all.WES.samples$V1)
 dim(all.WES.samples)
 # 13726     1
 sum(duplicated(all.WES.samples$V1))
 # 0
+sum(duplicated(all.WES.samples$CompBioID_first_part))
+# 57
 
-table(all.WES.samples$V1 %in% SJLIFEwesTBID$CompBioID)
+## remove samples identified as duplicates
+table(all.WES.samples$V1 %in% samples_to_remove$IID2)
+all.WES.samples <- all.WES.samples[!all.WES.samples$V1 %in% samples_to_remove$IID2,]
+
+table(all.WES.samples$CompBioID_first_part %in% SJLIFEwesTBID$CompBioID_first_part)
 # FALSE  TRUE 
-# 9170  4556 
+# 9042  4630 
 
 ## AA sample list from Jenn
 AA.90samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/RNAseq/common/RNAseq_sjlife/jenn_RNAseq/AA_samples.txt", header = F)
+# AA.90samples <- read_excel("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/SJLIFE_WGS_and_CCSS_SNP_WES_WGS_samples_and_overlap.xlsx", sheet = "SJLIFEWGS_90AA", col_names = F)
+# table(AA.90samples$...1 %in% SJLIFEwesTBID$SJLID)
 table(AA.90samples$V1 %in% SJLIFEwesTBID$SJLID)
 # TRUE 
 # 90
@@ -97,7 +119,7 @@ SJLIFEwesTBID$pop [SJLIFEwesTBID$SJLID %in% pop.survivor$sjlid] <- "Survivor"
 SJLIFEwesTBID$pop [SJLIFEwesTBID$SJLID %in% AA.90samples$V1] <- "AA"
 table(SJLIFEwesTBID$pop)
 # AA C.Control  Survivor 
-# 90       451      4445 
+# 90       451      4436 
 
 ## Classify WES samples
 all.WES.samples$renameSJLIFE <- NA
@@ -106,14 +128,14 @@ all.WES.samples$renameCCSS_org <- NA
 
 all.WES.samples$pop <- NA
 # Rename SJLIFE
-all.WES.samples$renameSJLIFE <- SJLIFEwesTBID$SJLID[match(all.WES.samples$V1, SJLIFEwesTBID$CompBioID)]
-# Also, combioID with FREQ seem to be sjlife ID so removing all part after "_" to match with mapping file
-all.WES.samples$V2 <- sub("_.*", "", all.WES.samples$V1)
-SJLIFEwesTBID$CompBioID2 <- sub("_.*", "", SJLIFEwesTBID$CompBioID)
-all.WES.samples$renameSJLIFE2 <- NA
-all.WES.samples$renameSJLIFE2 <- SJLIFEwesTBID$SJLID[match(all.WES.samples$V2, SJLIFEwesTBID$CompBioID2)]
-table(all.WES.samples$renameSJLIFE2 %in% samples_to_remove$IID)
-
+all.WES.samples$renameSJLIFE <- SJLIFEwesTBID$SJLID[match(all.WES.samples$CompBioID_first_part, SJLIFEwesTBID$CompBioID_first_part)]
+# # Also, combioID with FREQ seem to be sjlife ID so removing all part after "_" to match with mapping file
+# all.WES.samples$V2 <- sub("_.*", "", all.WES.samples$V1)
+# SJLIFEwesTBID$CompBioID2 <- sub("_.*", "", SJLIFEwesTBID$CompBioID)
+# all.WES.samples$renameSJLIFE2 <- NA
+# all.WES.samples$renameSJLIFE2 <- SJLIFEwesTBID$SJLID[match(all.WES.samples$V2, SJLIFEwesTBID$CompBioID2)]
+table(all.WES.samples$renameSJLIFE %in% samples_to_remove$IID)
+all.WES.samples$sjlife.to.remove <- (all.WES.samples$renameSJLIFE %in% samples_to_remove$IID)
 
 # Rename ccss_exp
 all.WES.samples$renameCCSS_exp [grepl("-CCSS-[0-9]+", all.WES.samples$V1)] <- all.WES.samples$V1 [grepl("-CCSS-[0-9]+", all.WES.samples$V1)]
@@ -129,6 +151,8 @@ all.WES.samples$pop [all.WES.samples$renameSJLIFE %in% pop.survivor$sjlid] <- "S
 all.WES.samples$pop [all.WES.samples$renameSJLIFE %in% AA.90samples$V1] <- "AA"
 all.WES.samples$pop[!is.na(all.WES.samples$renameCCSS_exp)] <-  "CCSS_exp"
 table(all.WES.samples$pop)
+# AA C.Control  CCSS_exp  Survivor 
+# 90       106      3023      4434 
 
 ## combine rename variables
 all.WES.samples$all_rename <- all.WES.samples$renameSJLIFE
@@ -137,15 +161,50 @@ all.WES.samples$all_rename [is.na(all.WES.samples$all_rename)]<- all.WES.samples
 
 cc <- all.WES.samples[is.na(all.WES.samples$all_rename),]
 
+## 2. Check how many of SJLIFE are available in WES
 table(sjlife_4402 %in% all.WES.samples$all_rename)
 # FALSE  TRUE 
-# 102  4300 
+# 21  4381 
+
+View(as.data.frame(sjlife_4402[!sjlife_4402 %in% all.WES.samples$all_rename]))
+missing.sjlife.in.wes <- sjlife_4402[!sjlife_4402 %in% all.WES.samples$all_rename]
 
 sjlife.to.be.sequenced <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/27April2023_SJLIFE_WGSround4_SampleList.txt", header = T, sep = "\t")
-table(sjlife.to.be.sequenced$sjlid %in% SJLIFEwesTBID$SJLID)
+table(sjlife.to.be.sequenced$sjlid %in% all.WES.samples$renameSJLIFE)
+## Yet to be sequenced sjlife
+table(sjlife.to.be.sequenced$sjlid %in% missing.sjlife.in.wes)
+# FALSE 
+# 569
 
+## Missing SJLIFE of sequencing record from WES
+table(sequencing.Record$...1 %in% all.WES.samples$all_rename)
+# FALSE  TRUE 
+# 21  4460 
+View(as.data.frame(sequencing.Record$...1[!sequencing.Record$...1 %in% all.WES.samples$all_rename]))
+missing.sjlife.fromseq.records.in.WES <- sequencing.Record$...1[!sequencing.Record$...1 %in% all.WES.samples$all_rename]
+table(missing.sjlife.fromseq.records.in.WES %in% missing.sjlife.in.wes)
+# TRUE 
+# 21 
 
+## Additional SJLIFE from sequencing record
+sequencing.Record.additional <- read_excel("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/SJLIFE_WGS_and_CCSS_SNP_WES_WGS_samples_and_overlap.xlsx", sheet = "SJLIFEWGS_additional817", col_names = F)
+table(sequencing.Record.additional$...1 %in% sjlife.to.be.sequenced$sjlid)
+# FALSE  TRUE 
+# 248   569
+table(all.WES.samples$renameSJLIFE %in% sequencing.Record.additional$...1)
+# FALSE  TRUE 
+# 13649    23 
+table(missing.sjlife.in.wes %in% sequencing.Record.additional$...1)
+# FALSE 
+# 21
 
+## 2. Check how many of CCSS_exp are available in WES
+sequencing.Record.ccss_exp <- read_excel("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/SJLIFE_WGS_and_CCSS_SNP_WES_WGS_samples_and_overlap.xlsx", sheet = "CCSS_exp_WGS_2839", col_names = F)
+table(sequencing.Record.ccss_exp$...1 %in% all.WES.samples$renameCCSS_exp)
+# FALSE  TRUE 
+# 2  2837
+sequencing.Record.ccss_exp$...1[!sequencing.Record.ccss_exp$...1 %in% all.WES.samples$renameCCSS_exp]
+# 3267622 2512001
 
 ######################
 ## Clean sample IDs ##
