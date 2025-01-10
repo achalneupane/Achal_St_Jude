@@ -37,8 +37,8 @@ gatk IndexFeatureFile -I chrALL.Survivor_WGS.GATK4180.hg38.vcf.gz
  # zcat chrY.Survivor_WGS.GATK4180.hg38.vcf.gz | head -10000 | grep "^#CHROM" | awk '{for (i=10; i<=NF; i++) print $i}' > VCFsample_names.txt
  #---------------- Sample QC --------------------------
 
-## Rename 2 samples in the master VCF file, these are incorrectly labelled for wrong samples
-bcftools reheader -s Phenotypes/master_vcf_rename.txt VCF_original/chrALL.Survivor_WGS.GATK4180.hg38.vcf.gz > VCF_original/chrALL.Survivor_WGS.GATK4180.hg38_renamed2.vcf.gz
+## Rename samples in the master VCF file
+bcftools reheader -s Phenotypes/master_vcf_rename.txt VCF_original/chrALL.Survivor_WGS.GATK4180.hg38.vcf.gz > VCF_original/chrALL.Survivor_WGS.GATK4180.hg38_renamed.vcf.gz
 tabix -pvcf VCF_original/chrALL.Survivor_WGS.GATK4180.hg38_renamed.vcf.gz
 
 WORKDIR="/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed" 

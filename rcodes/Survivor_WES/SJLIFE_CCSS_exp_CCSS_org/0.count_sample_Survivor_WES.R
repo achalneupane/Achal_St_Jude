@@ -1,6 +1,10 @@
 rm(list=ls())
 library(haven)
 library(readxl)
+
+#######################
+## A. working on WES ##
+#######################
 # https://wiki.stjude.org/display/CAB/Genetic+Ancestry+Estimation+by+PCA
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/CAB/common/SJLIFE_CCSS_WES_101724/GermlineQC/")
 
@@ -206,6 +210,48 @@ table(sequencing.Record.ccss_exp$...1 %in% all.WES.samples$renameCCSS_exp)
 sequencing.Record.ccss_exp$...1[!sequencing.Record.ccss_exp$...1 %in% all.WES.samples$renameCCSS_exp]
 # 3267622 2512001
 
+
+#######################
+## B. working on WGS ##
+#######################
+## 1. check SJLIFE
+vcf.samples.wgs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/Survivor_WGS_QCed/Phenotypes/master_vcf_rename.txt", header = T)
+vcf.samples.wgs$renameCCSS_exp <- NA
+
+# Rename ccss_exp
+vcf.samples.wgs$renameCCSS_exp [grepl("-CCSS-[0-9]+", vcf.samples.wgs$VCFID)] <- vcf.samples.wgs$VCFID [grepl("-CCSS-[0-9]+", vcf.samples.wgs$VCFID)]
+vcf.samples.wgs$renameCCSS_exp <- sub(".*CCSS-0", "", vcf.samples.wgs$renameCCSS_exp) 
+vcf.samples.wgs$renameCCSS_exp <- sub(".*CCSS-", "", vcf.samples.wgs$renameCCSS_exp) 
+
+
+table(sequencing.Record$...1 %in% vcf.samples.wgs$VCFrename)
+sequencing.Record$...1[!sequencing.Record$...1 %in% vcf.samples.wgs$VCFrename]
+# "SJL5052915" "SJL5057815"
+sjlife_4402[!sjlife_4402 %in% vcf.samples.wgs$VCFrename]
+
+## 1. check CCSS_exp
+table(sequencing.Record.ccss_exp$...1 %in% vcf.samples.wgs$VCFrename)
+# FALSE  TRUE 
+# 143  2696 
+
+
+table(sequencing.Record.ccss_exp$...1 %in% vcf.samples.wgs$renameCCSS_exp)
+# 2839
+
+
+missing.ccss.exp <- sequencing.Record.ccss_exp$...1[!sequencing.Record.ccss_exp$...1 %in% vcf.samples.wgs$VCFrename]
+missing.ccss.exp <-  vcf.samples.wgs[vcf.samples.wgs$renameCCSS_exp %in% missing.ccss.exp,]
+
+table(missing.ccss.exp$VCFrename %in% sjlife_4402)
+# 143
+table(missing.ccss.exp$VCFrename %in% pop.survivor.control$sjlid)
+# 143
+
+vcf.samples.wgs$VCFrename[(vcf.samples.wgs$VCFrename %in% missing.ccss.exp$VCFrename)] <- vcf.samples.wgs$renameCCSS_exp[(vcf.samples.wgs$VCFrename %in% missing.ccss.exp$VCFrename)]
+table(vcf.samples.wgs$VCFrename == vcf.samples.wgs$renameCCSS_exp)
+
+## These 143 samples were supposed to be CCSS to need to correct the IDs
+write.table(vcf.samples.wgs[1:2], "Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/Survivor_WGS_QCed/Phenotypes/master_vcf_rename_corrected.txt", col.names = F)
 ######################
 ## Clean sample IDs ##
 ######################
