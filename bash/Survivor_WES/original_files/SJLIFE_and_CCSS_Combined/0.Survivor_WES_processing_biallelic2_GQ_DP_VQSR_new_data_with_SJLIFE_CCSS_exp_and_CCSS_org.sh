@@ -130,7 +130,7 @@ ls chr*.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.bim | sed 's/.bim//'| sor
 plink --merge-list merge_list.txt --keep-allele-order --make-bed --out chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic
 
 
-plink --bfile chrALL.Survivor_WES.GATK4180.hg38_biallelic --update-ids /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/rename_samples.txt --make-bed --keep-allele-order --out chr.ALL.Survivor_WES.GATK4180.hg38_biallelic_ID_updated
+plink --bfile chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1 --update-ids /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/rename_samples.txt --make-bed --keep-allele-order --out chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_updated
 
 
 

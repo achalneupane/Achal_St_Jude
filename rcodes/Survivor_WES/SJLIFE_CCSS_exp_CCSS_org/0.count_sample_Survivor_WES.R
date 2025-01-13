@@ -210,6 +210,9 @@ table(sequencing.Record.ccss_exp$...1 %in% all.WES.samples$renameVCF)
 sequencing.Record.ccss_exp$...1[!sequencing.Record.ccss_exp$...1 %in% all.WES.samples$renameVCF]
 # 3267622 2512001
 
+## Write file to rename Plink files
+write.table(all.WES.samples[c(1,1,1,3)], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/rename_samples.txt", col.names = F, row.names = F, sep = "\t", quote = F)
+
 ## 3. Unidentified samples
 unidentified.WES <- all.WES.samples[is.na(all.WES.samples$pop),]
 
