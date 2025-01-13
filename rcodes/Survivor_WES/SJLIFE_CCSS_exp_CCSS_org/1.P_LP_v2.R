@@ -410,13 +410,15 @@ dim(all.missense)
 ## Loftee ##
 ############
 ## Adding gnomad AF because loftee seems to replace with its own
-loftee <- fread("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/loftee/Loftee_HC_all_chr.txt", header = T, sep ="\t")
+library(data.table)
+setwd("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/annotation/snpEff_round3_preQC/")
+loftee <- fread("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/annotation/snpEff_round3_preQC/loftee/Loftee_HC_all_chr.txt", header = T, sep ="\t")
 
 loftee.lines <- {}
 for (i in c(1:22, "X", "Y")) {
   CHR=paste0("chr", i)
   print(CHR)
-  file_path <- paste0("new_", CHR, ".Survivor_WES.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp_clinvar_12_10_2023_clinvar_12_10_2023.vcf-FIELDS-simple.txt")
+  file_path <- paste0("new_", CHR, ".SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp_clinvar_12_10_2023_clinvar_gnomAD4.1_12_10_2023.vcf-FIELDS-simple.txt")
   df <- fread(file_path, header = TRUE, sep ='\t')
   df[df == "."] <- NA
   colnames(df)
@@ -425,7 +427,7 @@ for (i in c(1:22, "X", "Y")) {
   loftee.lines <- rbind.data.frame(loftee.lines, df)
 }
 
-write.table(loftee.lines, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/loftee/loftee_lines_HC_all_cols.txt", col.names = T, row.names = F, quote = F, sep = "\t")
+write.table(loftee.lines, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/annotation/snpEff_round3_preQC/loftee/loftee_lines_HC_all_cols.txt", col.names = T, row.names = F, quote = F, sep = "\t")
 
 loftee2 <- cbind.data.frame(loftee, loftee.lines[match(loftee$Uploaded_variation, loftee.lines$SNP), c("AF_afr", "AF_nfe", "AF_eas", "AF_sas", "AF_raw", "AF")])
-write.table(loftee2, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/loftee/loftee_HC_all_chr_with_gnomad.txt", col.names = T, row.names = F, quote = F, sep = "\t")
+write.table(loftee2, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/annotation/snpEff_round3_preQC/loftee/loftee_HC_all_chr_with_gnomad.txt", col.names = T, row.names = F, quote = F, sep = "\t")

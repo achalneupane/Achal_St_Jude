@@ -260,7 +260,7 @@ echo "DONE for ${CHR}" >> annotation_step.txt
 #####################
 cut -d$'\t' -f210 new_chr19.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp_clinvar_12_10_2023_clinvar_gnomAD4.1_12_10_2023.vcf-FIELDS-simple.txt| sort -V | uniq
 awk -F'\t' 'NR==1 || ($210 ~ /Pathogenic|Likely_pathogenic/) && $210 !~ /Conflicting|Benign/' \
-new_chr19.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp_clinvar_12_10_2023_clinvar_gnomAD4.1_12_10_2023.vcf-FIELDS-simple.txt > all_new_clinvar_P_LP.txt
+new_chr*.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp_clinvar_12_10_2023_clinvar_gnomAD4.1_12_10_2023.vcf-FIELDS-simple.txt > all_new_clinvar_P_LP.txt
 
 # (base) [aneupane@splprhpc07 snpEff_round3]$ wc -l all_new_clinvar_P_LP.txt
 # 99787 all_new_clinvar_P_LP.txt
