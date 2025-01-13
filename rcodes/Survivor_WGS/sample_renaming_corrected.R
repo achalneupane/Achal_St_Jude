@@ -61,10 +61,10 @@ samples.relabel <- sampleID[grepl("SJL", sampleID$VCFrename) & grepl("CCSS", sam
 sampleID$VCFrename [grepl("CCSS", sampleID$VCFID)] <- sampleID$CCSSID [grepl("CCSS", sampleID$VCFID)] 
 write.table(sampleID[c("VCFID", "VCFrename")], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/Phenotypes/master_vcf_rename_corrected.txt", col.names = F, row.names = F, sep ="\t", quote = F)
 
-write.table(samples.relabel[c("VCFrename", "CCSSID")], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/Phenotypes/143_CCSS_rename_corrected.txt", col.names = F, row.names = F, sep ="\t", quote = F)
+# write.table(samples.relabel[c("VCFrename", "CCSSID")], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/Phenotypes/143_CCSS_rename_corrected.txt", col.names = F, row.names = F, sep ="\t", quote = F)
 
-table(cc$VCFrename == sampleID$VCFrename)
-cc[cc$VCFrename != sampleID$VCFrename,]
+# table(cc$VCFrename == sampleID$VCFrename)
+# cc[cc$VCFrename != sampleID$VCFrename,]
 
 ## Remove duplicate IDs and NOT-SJLIFE samples from qced Plink file
 as.data.frame(sampleID[sampleID$dups == "TRUE"| sampleID$VCFrename == "REMOVE", "VCFrename"])

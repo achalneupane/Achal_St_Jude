@@ -1,7 +1,7 @@
 # Specify the file path
 # setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round2/")
 # setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3")
-setwd("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3")
+setwd("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/annotation/snpEff_round3_preQC")
 ##-------------------------------------POI option 1
 # Option 1: Variants in selected genes with the following 3 rare variant masks will be included :
 # a.	Predicted deleterious missense variants: Annotation will be performed using SnpEff27. We will use dbNSFP28 (version 4.1a), which uses 30 in silico prediction tools for annotation . Missense variants will be classified as deleterious if >90% of collated annotations (across all tools) predict deleteriousness.
@@ -46,7 +46,7 @@ VEST4.final <- {}
 for (i in c(1:22, "X", "Y")) {
   CHR=paste0("chr", i)
   print(CHR)
-  file_path <- paste0("new_", CHR, ".Survivor_WES.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp_clinvar_12_10_2023_clinvar_12_10_2023.vcf-FIELDS-simple.txt")
+  file_path <- paste0("new_", CHR, ".SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp_clinvar_12_10_2023_clinvar_gnomAD4.1_12_10_2023.vcf-FIELDS-simple.txt")
   df <- fread(file_path, header = TRUE, sep ='\t')
   df[df == "."] <- NA
   colnames(df)
@@ -370,7 +370,7 @@ all.missense <- {}
 for (i in c(1:22, "X", "Y")) {
   CHR=paste0("chr", i)
   print(CHR)
-  file_path <- paste0("new_", CHR, ".Survivor_WES.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp_clinvar_12_10_2023_clinvar_12_10_2023.vcf-FIELDS-simple.txt")
+  file_path <- paste0("new_", CHR, ".SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.vcf-annot-snpeff-dbnsfp_clinvar_12_10_2023_clinvar_gnomAD4.1_12_10_2023.vcf-FIELDS-simple.txt")
   df <- fread(file_path, header = TRUE, sep ='\t')
   df[df == "."] <- NA
   colnames(df)
