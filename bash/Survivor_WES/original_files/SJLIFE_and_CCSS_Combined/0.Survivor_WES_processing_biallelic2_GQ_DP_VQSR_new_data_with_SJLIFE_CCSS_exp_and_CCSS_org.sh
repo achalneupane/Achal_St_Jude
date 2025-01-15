@@ -50,6 +50,7 @@ bcftools norm -m-any --check-ref -w -f /research_jude/rgs01_jude/groups/sapkogrp
 bcftools annotate --set-id '%CHROM\:%POS\:%REF\:%FIRST_ALT' "${WORKDIR}/biallelic2/$(basename ${VCF} .vcf.gz)_tmp.vcf.gz" -Oz -o "${WORKDIR}/biallelic2/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
 bcftools index -f -t --threads 4 "${WORKDIR}/biallelic2/$(basename ${VCF} .vcf.gz)_biallelic.vcf.gz"
 
+zcat chrY.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.vcf.gz| head -1000 |grep ^#CHROM|  cut -f10- | tr '\t' '\n' > VCFsample_names.txt
 
 # # ## Extract three cohorts
 # bcftools view -O z -o \
