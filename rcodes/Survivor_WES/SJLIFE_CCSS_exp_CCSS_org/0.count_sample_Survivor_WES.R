@@ -219,6 +219,28 @@ unidentified.WES <- all.WES.samples[is.na(all.WES.samples$pop),]
 unidentified.WES$TBID <- sub(".*(TB-[0-9-]+).*", "\\1", unidentified.WES$V1)
 
 write.table(unidentified.WES, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/Unidentified_WES_samples.txt", col.names = T, row.names = F, sep = "\t", quote = F)
+
+
+## On 1/15/2025, I received mapping file from Kubra @ data wrangler, so updating those unidentified TB IDs as well
+all.WES.samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/rename_samples.txt", header = F, sep = "\t")
+unidentified.WES.Kubra <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/Unidentified_WES_samples.txt", header = T, sep = "\t")
+
+table(all.WES.samples$V3 %in% unidentified.WES.Kubra$CompBioID)
+# FALSE  TRUE 
+# 13124   602
+
+# all.WES.samples[all.WES.samples$V4 %in% unidentified.WES.Kubra$sjlid,]
+## exclude duplicates from Kubra's list
+dup.samples <- all.WES.samples[grepl("dups", all.WES.samples$V4),]
+## remove these dups from kubra's list along with missing sjlids
+unidentified.WES.Kubra <- unidentified.WES.Kubra[!unidentified.WES.Kubra$CompBioID %in% dup.samples$V1,]
+unidentified.WES.Kubra <- unidentified.WES.Kubra[(unidentified.WES.Kubra$sjlid!=""),]
+
+# Find matches
+matches <- match(all.WES.samples$V1, unidentified.WES.Kubra$CompBioID)
+# Replace only where matches are not NA
+all.WES.samples$V4[!is.na(matches)] <- unidentified.WES.Kubra$sjlid[matches[!is.na(matches)]]
+
 #######################
 ## B. working on WGS ##
 #######################

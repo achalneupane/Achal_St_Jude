@@ -26,7 +26,7 @@ bcftools norm -Ou -m -any CAB_5428.haplotype.vcf.gz \
  | bcftools norm -Ou -f /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/hg38.fa \
  | bcftools annotate -Ob -x ID -I +'%CHROM:%POS:%REF:%ALT' \
  | bcftools view -Oz \
- > CAB_5428.haplotype.recalibrated.vcf.gz
+ > CAB_5428.haplotype.recalibrated.decomposed.vcf.gz
 
 
 for chr in {1..22} X Y;do
