@@ -1,0 +1,185 @@
+                       row_labels BREASTcancer|0 BREASTcancer|1
+1    maxchestrtdose.category|None           1370             19
+2  maxchestrtdose.category|>0-<20             54              2
+3    maxchestrtdose.category|>=20            254             30
+4 anthra_jco_dose_5.category|None            733             21
+5  anthra_jco_dose_5.category|1st            328              2
+6  anthra_jco_dose_5.category|2nd            329             12
+7  anthra_jco_dose_5.category|3rd            288             16
+  BREASTcancer|#Total cases
+1                      1389
+2                        56
+3                       284
+4                       754
+5                       330
+6                       341
+7                       304
+[1] "maxchestrtdose.category|>0-<20" "anthra_jco_dose_5.category|1st"
+
+Call:
+glm(formula = event ~ Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category + 
+    AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + 
+    AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + maxchestrtdose.category + 
+    anthra_jco_dose_5.category + Smoker_ever_yn + PhysicalActivity_yn + 
+    RiskyHeavyDrink_yn + Obese_yn + EAS + AFR + any_lifestyle_missing + 
+    any_chemo_missing + any_rt_missing, family = "poisson", data = dat_all, 
+    offset = log(dat_all$PY))
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.4679  -0.0810  -0.0401  -0.0228   3.9022  
+
+Coefficients:
+                                                          Estimate Std. Error
+(Intercept)                                             -2.504e+00  5.327e+00
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd  8.139e-02  3.672e-01
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd  5.192e-01  3.534e-01
+AGE_AT_LAST_CONTACT.cs1                                 -2.040e-01  2.064e-01
+AGE_AT_LAST_CONTACT.cs2                                  1.806e-03  1.566e-03
+AGE_AT_LAST_CONTACT.cs3                                 -4.960e-03  5.289e-03
+AGE_AT_LAST_CONTACT.cs4                                  3.425e-03  5.545e-03
+AGE_AT_DIAGNOSIS5-9                                     -1.266e+00  1.099e+00
+AGE_AT_DIAGNOSIS10-14                                    1.656e+00  5.146e-01
+AGE_AT_DIAGNOSIS>=15                                     1.601e+00  5.356e-01
+maxchestrtdose.categoryAny                               1.386e+00  3.106e-01
+anthra_jco_dose_5.category1st-2nd                       -8.072e-02  3.710e-01
+anthra_jco_dose_5.category3rd                            3.603e-01  3.614e-01
+Smoker_ever_ynYes                                       -7.472e-01  3.460e-01
+PhysicalActivity_ynNo                                   -5.773e-01  2.892e-01
+RiskyHeavyDrink_ynYes                                   -9.634e-02  3.507e-01
+Obese_ynYes                                             -1.051e-01  3.419e-01
+EAS                                                      7.815e-01  2.010e+00
+AFR                                                     -7.543e-01  6.381e-01
+any_lifestyle_missingYes                                 2.210e-01  3.087e-01
+any_chemo_missingYes                                    -1.094e+01  1.354e+03
+any_rt_missingYes                                       -1.086e+01  6.836e+02
+                                                        z value Pr(>|z|)    
+(Intercept)                                              -0.470  0.63831    
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd   0.222  0.82459    
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd   1.469  0.14177    
+AGE_AT_LAST_CONTACT.cs1                                  -0.989  0.32281    
+AGE_AT_LAST_CONTACT.cs2                                   1.153  0.24884    
+AGE_AT_LAST_CONTACT.cs3                                  -0.938  0.34838    
+AGE_AT_LAST_CONTACT.cs4                                   0.618  0.53682    
+AGE_AT_DIAGNOSIS5-9                                      -1.152  0.24942    
+AGE_AT_DIAGNOSIS10-14                                     3.219  0.00129 ** 
+AGE_AT_DIAGNOSIS>=15                                      2.989  0.00280 ** 
+maxchestrtdose.categoryAny                                4.462  8.1e-06 ***
+anthra_jco_dose_5.category1st-2nd                        -0.218  0.82776    
+anthra_jco_dose_5.category3rd                             0.997  0.31880    
+Smoker_ever_ynYes                                        -2.159  0.03081 *  
+PhysicalActivity_ynNo                                    -1.996  0.04591 *  
+RiskyHeavyDrink_ynYes                                    -0.275  0.78353    
+Obese_ynYes                                              -0.307  0.75865    
+EAS                                                       0.389  0.69738    
+AFR                                                      -1.182  0.23721    
+any_lifestyle_missingYes                                  0.716  0.47400    
+any_chemo_missingYes                                     -0.008  0.99356    
+any_rt_missingYes                                        -0.016  0.98733    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 648.86  on 12271  degrees of freedom
+Residual deviance: 531.39  on 12250  degrees of freedom
+  (139 observations deleted due to missingness)
+AIC: 677.39
+
+Number of Fisher Scoring iterations: 16
+
+[1] 0.07161237
+[1] NaN
+[1] 0.07161237
+[1] 0.05581462
+[1] 0.0741358
+[1] 0.07382346
+[1] 0.06084216
+[1] 0.469722
+[1] NaN
+[1] 0.469722
+[1] 0.3872131
+[1] 0.4829014
+[1] 0.4820216
+[1] 0.3567578
+[1] 0.511031
+[1] NaN
+[1] 0.511031
+[1] 0.4199728
+[1] 0.525576
+[1] 0.5234327
+[1] 0.3965018
+[1] 0.1769405
+[1] NaN
+[1] 0.1769405
+[1] 0.1976581
+[1] 0.1736312
+[1] 0.1761539
+[1] 0.1778471
+[1] 0.05504559
+[1] NaN
+[1] 0.05504559
+[1] 0.05692473
+[1] 0.05474543
+[1] -216.8003
+[1] -522.1396
+[1] 0.6228485
+[1] NaN
+[1] 0.6228485
+[1] 0.5638017
+[1] 0.6322802
+[1] 0.6302134
+[1] 0.5447182
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+[1] 10
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@noderome112>
+Subject: Job 247079008: <test4_20250120_192947> in cluster <hpcf_research_cluster> Done
+
+Job <test4_20250120_192947> was submitted from host <splprhpc11> by user <aneupane> in cluster <hpcf_research_cluster> at Mon Jan 20 19:29:48 2025
+Job was executed on host(s) <noderome112>, in queue <priority>, as user <aneupane> in cluster <hpcf_research_cluster> at Mon Jan 20 19:29:53 2025
+</home/aneupane> was used as the home directory.
+</home/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V21b_Lancet_Revision_HPC/21b/SJLIFE/With_lifestyle_no_HEI/models_fit/with_collapsed_categories/drinking> was used as the working directory.
+Started at Mon Jan 20 19:29:53 2025
+Terminated at Mon Jan 20 19:29:59 2025
+Results reported at Mon Jan 20 19:29:59 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+bash -c "module load R/4.2.2 && Rscript test4.R"
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   5.70 sec.
+    Max Memory :                                 206 MB
+    Average Memory :                             182.00 MB
+    Total Requested Memory :                     20000.00 MB
+    Delta Memory :                               19794.00 MB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                5
+    Run time :                                   6 sec.
+    Turnaround time :                            11 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <logs/test4_20250120_192947.err> for stderr output of this job.
+

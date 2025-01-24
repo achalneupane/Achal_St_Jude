@@ -1,0 +1,1456 @@
+                        row_labels NMSCs|0 NMSCs|1 NMSCs|#Total cases
+1       maxsegrtdose.category|None    3181     125               3306
+2     maxsegrtdose.category|>0-<18      16       2                 18
+3   maxsegrtdose.category|>=18-<30     474      94                568
+4       maxsegrtdose.category|>=30     478      30                508
+5       maxabdrtdose.category|None    3456     158               3614
+6     maxabdrtdose.category|>0-<30     468      56                524
+7       maxabdrtdose.category|>=30     225      37                262
+8    maxpelvisrtdose.category|None    3532     180               3712
+9  maxpelvisrtdose.category|>0-<20     163       6                169
+10   maxpelvisrtdose.category|>=20     454      65                519
+[1] "maxsegrtdose.category|>0-<18"    "maxpelvisrtdose.category|>0-<20"
+       1 
+5.704545 
+       1 
+7.136691 
+        1 
+0.2932551 
+
+Call:
+glm(formula = event ~ BASALcell_PRS.tertile.category + AGE_AT_LAST_CONTACT.cs1 + 
+    AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + 
+    gender + maxsegrtdose.category + maxabdrtdose.category + 
+    maxpelvisrtdose.category + EAS + AFR + any_rt_missing, family = "poisson", 
+    data = dat_all, offset = log(dat_all$PY))
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.3175  -0.0772  -0.0407  -0.0248   4.5272  
+
+Coefficients:
+                                    Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                       -9.038e+00  1.504e+00  -6.008 1.88e-09 ***
+BASALcell_PRS.tertile.category2nd  1.336e-01  2.076e-01   0.643 0.520052    
+BASALcell_PRS.tertile.category3rd  5.852e-01  1.959e-01   2.987 0.002822 ** 
+AGE_AT_LAST_CONTACT.cs1            4.015e-02  1.053e-01   0.381 0.702966    
+AGE_AT_LAST_CONTACT.cs2            1.638e-05  5.017e-04   0.033 0.973960    
+AGE_AT_LAST_CONTACT.cs3            6.445e-04  1.420e-03   0.454 0.649822    
+AGE_AT_LAST_CONTACT.cs4           -1.878e-03  1.345e-03  -1.396 0.162691    
+genderFemale                       4.417e-01  1.282e-01   3.447 0.000567 ***
+maxsegrtdose.category>0-<30        8.531e-01  1.466e-01   5.819 5.90e-09 ***
+maxsegrtdose.category>=30          8.494e-01  2.134e-01   3.981 6.85e-05 ***
+maxabdrtdose.category>0-<30        9.447e-01  2.439e-01   3.873 0.000107 ***
+maxabdrtdose.category>=30          1.257e+00  2.495e-01   5.037 4.74e-07 ***
+maxpelvisrtdose.categoryAny       -4.780e-01  2.367e-01  -2.020 0.043413 *  
+EAS                               -3.454e+00  2.770e+00  -1.247 0.212481    
+AFR                               -2.990e+00  8.209e-01  -3.643 0.000270 ***
+any_rt_missingYes                  5.730e-01  5.121e-01   1.119 0.263209    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 3474.1  on 92814  degrees of freedom
+Residual deviance: 3046.5  on 92799  degrees of freedom
+  (60 observations deleted due to missingness)
+AIC: 3580.5
+
+Number of Fisher Scoring iterations: 10
+
+[1] 0.4363721
+[1] 0.4481036
+[1] 0.4266101
+[1] 0.4081459
+[1] 0.4524992
+[1] 0.4372735
+[1] 0.3653371
+[1] 0.4363721
+[1] 0.4481036
+[1] 0.4266101
+[1] 0.4081459
+[1] 0.4524992
+[1] 0.4372735
+[1] 0.3653371
+[1] 0.2798842
+[1] 0.2960395
+[1] 0.2664411
+[1] 0.2776158
+[1] 0.2811802
+[1] 0.2830678
+[1] 0.01984723
+[1] 0.5927008
+[1] 0.6069641
+[1] 0.5808321
+[1] 0.5707025
+[1] 0.6052696
+[1] 0.5954109
+[1] 0.3780845
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+[1] 10
+[1] 11
+[1] 12
+[1] 13
+[1] 14
+[1] 15
+[1] 16
+[1] 17
+[1] 18
+[1] 19
+[1] 20
+[1] 21
+[1] 22
+[1] 23
+[1] 24
+[1] 25
+[1] 26
+[1] 27
+[1] 28
+[1] 29
+[1] 30
+[1] 31
+[1] 32
+[1] 33
+[1] 34
+[1] 35
+[1] 36
+[1] 37
+[1] 38
+[1] 39
+[1] 40
+[1] 41
+[1] 42
+[1] 43
+[1] 44
+[1] 45
+[1] 46
+[1] 47
+[1] 48
+[1] 49
+[1] 50
+[1] 51
+[1] 52
+[1] 53
+[1] 54
+[1] 55
+[1] 56
+[1] 57
+[1] 58
+[1] 59
+[1] 60
+[1] 61
+[1] 62
+[1] 63
+[1] 64
+[1] 65
+[1] 66
+[1] 67
+[1] 68
+[1] 69
+[1] 70
+[1] 71
+[1] 72
+[1] 73
+[1] 74
+[1] 75
+[1] 76
+[1] 77
+[1] 78
+[1] 79
+[1] 80
+[1] 81
+[1] 82
+[1] 83
+[1] 84
+[1] 85
+[1] 86
+[1] 87
+[1] 88
+[1] 89
+[1] 90
+[1] 91
+[1] 92
+[1] 93
+[1] 94
+[1] 95
+[1] 96
+[1] 97
+[1] 98
+[1] 99
+[1] 100
+[1] 101
+[1] 102
+[1] 103
+[1] 104
+[1] 105
+[1] 106
+[1] 107
+[1] 108
+[1] 109
+[1] 110
+[1] 111
+[1] 112
+[1] 113
+[1] 114
+[1] 115
+[1] 116
+[1] 117
+[1] 118
+[1] 119
+[1] 120
+[1] 121
+[1] 122
+[1] 123
+[1] 124
+[1] 125
+[1] 126
+[1] 127
+[1] 128
+[1] 129
+[1] 130
+[1] 131
+[1] 132
+[1] 133
+[1] 134
+[1] 135
+[1] 136
+[1] 137
+[1] 138
+[1] 139
+[1] 140
+[1] 141
+[1] 142
+[1] 143
+[1] 144
+[1] 145
+[1] 146
+[1] 147
+[1] 148
+[1] 149
+[1] 150
+[1] 151
+[1] 152
+[1] 153
+[1] 154
+[1] 155
+[1] 156
+[1] 157
+[1] 158
+[1] 159
+[1] 160
+[1] 161
+[1] 162
+[1] 163
+[1] 164
+[1] 165
+[1] 166
+[1] 167
+[1] 168
+[1] 169
+[1] 170
+[1] 171
+[1] 172
+[1] 173
+[1] 174
+[1] 175
+[1] 176
+[1] 177
+[1] 178
+[1] 179
+[1] 180
+[1] 181
+[1] 182
+[1] 183
+[1] 184
+[1] 185
+[1] 186
+[1] 187
+[1] 188
+[1] 189
+[1] 190
+[1] 191
+[1] 192
+[1] 193
+[1] 194
+[1] 195
+[1] 196
+[1] 197
+[1] 198
+[1] 199
+[1] 200
+[1] 201
+[1] 202
+[1] 203
+[1] 204
+[1] 205
+[1] 206
+[1] 207
+[1] 208
+[1] 209
+[1] 210
+[1] 211
+[1] 212
+[1] 213
+[1] 214
+[1] 215
+[1] 216
+[1] 217
+[1] 218
+[1] 219
+[1] 220
+[1] 221
+[1] 222
+[1] 223
+[1] 224
+[1] 225
+[1] 226
+[1] 227
+[1] 228
+[1] 229
+[1] 230
+[1] 231
+[1] 232
+[1] 233
+[1] 234
+[1] 235
+[1] 236
+[1] 237
+[1] 238
+[1] 239
+[1] 240
+[1] 241
+[1] 242
+[1] 243
+[1] 244
+[1] 245
+[1] 246
+[1] 247
+[1] 248
+[1] 249
+[1] 250
+[1] 251
+[1] 252
+[1] 253
+[1] 254
+[1] 255
+[1] 256
+[1] 257
+[1] 258
+[1] 259
+[1] 260
+[1] 261
+[1] 262
+[1] 263
+[1] 264
+[1] 265
+[1] 266
+[1] 267
+[1] 268
+[1] 269
+[1] 270
+[1] 271
+[1] 272
+[1] 273
+[1] 274
+[1] 275
+[1] 276
+[1] 277
+[1] 278
+[1] 279
+[1] 280
+[1] 281
+[1] 282
+[1] 283
+[1] 284
+[1] 285
+[1] 286
+[1] 287
+[1] 288
+[1] 289
+[1] 290
+[1] 291
+[1] 292
+[1] 293
+[1] 294
+[1] 295
+[1] 296
+[1] 297
+[1] 298
+[1] 299
+[1] 300
+[1] 301
+[1] 302
+[1] 303
+[1] 304
+[1] 305
+[1] 306
+[1] 307
+[1] 308
+[1] 309
+[1] 310
+[1] 311
+[1] 312
+[1] 313
+[1] 314
+[1] 315
+[1] 316
+[1] 317
+[1] 318
+[1] 319
+[1] 320
+[1] 321
+[1] 322
+[1] 323
+[1] 324
+[1] 325
+[1] 326
+[1] 327
+[1] 328
+[1] 329
+[1] 330
+[1] 331
+[1] 332
+[1] 333
+[1] 334
+[1] 335
+[1] 336
+[1] 337
+[1] 338
+[1] 339
+[1] 340
+[1] 341
+[1] 342
+[1] 343
+[1] 344
+[1] 345
+[1] 346
+[1] 347
+[1] 348
+[1] 349
+[1] 350
+[1] 351
+[1] 352
+[1] 353
+[1] 354
+[1] 355
+[1] 356
+[1] 357
+[1] 358
+[1] 359
+[1] 360
+[1] 361
+[1] 362
+[1] 363
+[1] 364
+[1] 365
+[1] 366
+[1] 367
+[1] 368
+[1] 369
+[1] 370
+[1] 371
+[1] 372
+[1] 373
+[1] 374
+[1] 375
+[1] 376
+[1] 377
+[1] 378
+[1] 379
+[1] 380
+[1] 381
+[1] 382
+[1] 383
+[1] 384
+[1] 385
+[1] 386
+[1] 387
+[1] 388
+[1] 389
+[1] 390
+[1] 391
+[1] 392
+[1] 393
+[1] 394
+[1] 395
+[1] 396
+[1] 397
+[1] 398
+[1] 399
+[1] 400
+[1] 401
+[1] 402
+[1] 403
+[1] 404
+[1] 405
+[1] 406
+[1] 407
+[1] 408
+[1] 409
+[1] 410
+[1] 411
+[1] 412
+[1] 413
+[1] 414
+[1] 415
+[1] 416
+[1] 417
+[1] 418
+[1] 419
+[1] 420
+[1] 421
+[1] 422
+[1] 423
+[1] 424
+[1] 425
+[1] 426
+[1] 427
+[1] 428
+[1] 429
+[1] 430
+[1] 431
+[1] 432
+[1] 433
+[1] 434
+[1] 435
+[1] 436
+[1] 437
+[1] 438
+[1] 439
+[1] 440
+[1] 441
+[1] 442
+[1] 443
+[1] 444
+[1] 445
+[1] 446
+[1] 447
+[1] 448
+[1] 449
+[1] 450
+[1] 451
+[1] 452
+[1] 453
+[1] 454
+[1] 455
+[1] 456
+[1] 457
+[1] 458
+[1] 459
+[1] 460
+[1] 461
+[1] 462
+[1] 463
+[1] 464
+[1] 465
+[1] 466
+[1] 467
+[1] 468
+[1] 469
+[1] 470
+[1] 471
+[1] 472
+[1] 473
+[1] 474
+[1] 475
+[1] 476
+[1] 477
+[1] 478
+[1] 479
+[1] 480
+[1] 481
+[1] 482
+[1] 483
+[1] 484
+[1] 485
+[1] 486
+[1] 487
+[1] 488
+[1] 489
+[1] 490
+[1] 491
+[1] 492
+[1] 493
+[1] 494
+[1] 495
+[1] 496
+[1] 497
+[1] 498
+[1] 499
+[1] 500
+[1] 501
+[1] 502
+[1] 503
+[1] 504
+[1] 505
+[1] 506
+[1] 507
+[1] 508
+[1] 509
+[1] 510
+[1] 511
+[1] 512
+[1] 513
+[1] 514
+[1] 515
+[1] 516
+[1] 517
+[1] 518
+[1] 519
+[1] 520
+[1] 521
+[1] 522
+[1] 523
+[1] 524
+[1] 525
+[1] 526
+[1] 527
+[1] 528
+[1] 529
+[1] 530
+[1] 531
+[1] 532
+[1] 533
+[1] 534
+[1] 535
+[1] 536
+[1] 537
+[1] 538
+[1] 539
+[1] 540
+[1] 541
+[1] 542
+[1] 543
+[1] 544
+[1] 545
+[1] 546
+[1] 547
+[1] 548
+[1] 549
+[1] 550
+[1] 551
+[1] 552
+[1] 553
+[1] 554
+[1] 555
+[1] 556
+[1] 557
+[1] 558
+[1] 559
+[1] 560
+[1] 561
+[1] 562
+[1] 563
+[1] 564
+[1] 565
+[1] 566
+[1] 567
+[1] 568
+[1] 569
+[1] 570
+[1] 571
+[1] 572
+[1] 573
+[1] 574
+[1] 575
+[1] 576
+[1] 577
+[1] 578
+[1] 579
+[1] 580
+[1] 581
+[1] 582
+[1] 583
+[1] 584
+[1] 585
+[1] 586
+[1] 587
+[1] 588
+[1] 589
+[1] 590
+[1] 591
+[1] 592
+[1] 593
+[1] 594
+[1] 595
+[1] 596
+[1] 597
+[1] 598
+[1] 599
+[1] 600
+[1] 601
+[1] 602
+[1] 603
+[1] 604
+[1] 605
+[1] 606
+[1] 607
+[1] 608
+[1] 609
+[1] 610
+[1] 611
+[1] 612
+[1] 613
+[1] 614
+[1] 615
+[1] 616
+[1] 617
+[1] 618
+[1] 619
+[1] 620
+[1] 621
+[1] 622
+[1] 623
+[1] 624
+[1] 625
+[1] 626
+[1] 627
+[1] 628
+[1] 629
+[1] 630
+[1] 631
+[1] 632
+[1] 633
+[1] 634
+[1] 635
+[1] 636
+[1] 637
+[1] 638
+[1] 639
+[1] 640
+[1] 641
+[1] 642
+[1] 643
+[1] 644
+[1] 645
+[1] 646
+[1] 647
+[1] 648
+[1] 649
+[1] 650
+[1] 651
+[1] 652
+[1] 653
+[1] 654
+[1] 655
+[1] 656
+[1] 657
+[1] 658
+[1] 659
+[1] 660
+[1] 661
+[1] 662
+[1] 663
+[1] 664
+[1] 665
+[1] 666
+[1] 667
+[1] 668
+[1] 669
+[1] 670
+[1] 671
+[1] 672
+[1] 673
+[1] 674
+[1] 675
+[1] 676
+[1] 677
+[1] 678
+[1] 679
+[1] 680
+[1] 681
+[1] 682
+[1] 683
+[1] 684
+[1] 685
+[1] 686
+[1] 687
+[1] 688
+[1] 689
+[1] 690
+[1] 691
+[1] 692
+[1] 693
+[1] 694
+[1] 695
+[1] 696
+[1] 697
+[1] 698
+[1] 699
+[1] 700
+[1] 701
+[1] 702
+[1] 703
+[1] 704
+[1] 705
+[1] 706
+[1] 707
+[1] 708
+[1] 709
+[1] 710
+[1] 711
+[1] 712
+[1] 713
+[1] 714
+[1] 715
+[1] 716
+[1] 717
+[1] 718
+[1] 719
+[1] 720
+[1] 721
+[1] 722
+[1] 723
+[1] 724
+[1] 725
+[1] 726
+[1] 727
+[1] 728
+[1] 729
+[1] 730
+[1] 731
+[1] 732
+[1] 733
+[1] 734
+[1] 735
+[1] 736
+[1] 737
+[1] 738
+[1] 739
+[1] 740
+[1] 741
+[1] 742
+[1] 743
+[1] 744
+[1] 745
+[1] 746
+[1] 747
+[1] 748
+[1] 749
+[1] 750
+[1] 751
+[1] 752
+[1] 753
+[1] 754
+[1] 755
+[1] 756
+[1] 757
+[1] 758
+[1] 759
+[1] 760
+[1] 761
+[1] 762
+[1] 763
+[1] 764
+[1] 765
+[1] 766
+[1] 767
+[1] 768
+[1] 769
+[1] 770
+[1] 771
+[1] 772
+[1] 773
+[1] 774
+[1] 775
+[1] 776
+[1] 777
+[1] 778
+[1] 779
+[1] 780
+[1] 781
+[1] 782
+[1] 783
+[1] 784
+[1] 785
+[1] 786
+[1] 787
+[1] 788
+[1] 789
+[1] 790
+[1] 791
+[1] 792
+[1] 793
+[1] 794
+[1] 795
+[1] 796
+[1] 797
+[1] 798
+[1] 799
+[1] 800
+[1] 801
+[1] 802
+[1] 803
+[1] 804
+[1] 805
+[1] 806
+[1] 807
+[1] 808
+[1] 809
+[1] 810
+[1] 811
+[1] 812
+[1] 813
+[1] 814
+[1] 815
+[1] 816
+[1] 817
+[1] 818
+[1] 819
+[1] 820
+[1] 821
+[1] 822
+[1] 823
+[1] 824
+[1] 825
+[1] 826
+[1] 827
+[1] 828
+[1] 829
+[1] 830
+[1] 831
+[1] 832
+[1] 833
+[1] 834
+[1] 835
+[1] 836
+[1] 837
+[1] 838
+[1] 839
+[1] 840
+[1] 841
+[1] 842
+[1] 843
+[1] 844
+[1] 845
+[1] 846
+[1] 847
+[1] 848
+[1] 849
+[1] 850
+[1] 851
+[1] 852
+[1] 853
+[1] 854
+[1] 855
+[1] 856
+[1] 857
+[1] 858
+[1] 859
+[1] 860
+[1] 861
+[1] 862
+[1] 863
+[1] 864
+[1] 865
+[1] 866
+[1] 867
+[1] 868
+[1] 869
+[1] 870
+[1] 871
+[1] 872
+[1] 873
+[1] 874
+[1] 875
+[1] 876
+[1] 877
+[1] 878
+[1] 879
+[1] 880
+[1] 881
+[1] 882
+[1] 883
+[1] 884
+[1] 885
+[1] 886
+[1] 887
+[1] 888
+[1] 889
+[1] 890
+[1] 891
+[1] 892
+[1] 893
+[1] 894
+[1] 895
+[1] 896
+[1] 897
+[1] 898
+[1] 899
+[1] 900
+[1] 901
+[1] 902
+[1] 903
+[1] 904
+[1] 905
+[1] 906
+[1] 907
+[1] 908
+[1] 909
+[1] 910
+[1] 911
+[1] 912
+[1] 913
+[1] 914
+[1] 915
+[1] 916
+[1] 917
+[1] 918
+[1] 919
+[1] 920
+[1] 921
+[1] 922
+[1] 923
+[1] 924
+[1] 925
+[1] 926
+[1] 927
+[1] 928
+[1] 929
+[1] 930
+[1] 931
+[1] 932
+[1] 933
+[1] 934
+[1] 935
+[1] 936
+[1] 937
+[1] 938
+[1] 939
+[1] 940
+[1] 941
+[1] 942
+[1] 943
+[1] 944
+[1] 945
+[1] 946
+[1] 947
+[1] 948
+[1] 949
+[1] 950
+[1] 951
+[1] 952
+[1] 953
+[1] 954
+[1] 955
+[1] 956
+[1] 957
+[1] 958
+[1] 959
+[1] 960
+[1] 961
+[1] 962
+[1] 963
+[1] 964
+[1] 965
+[1] 966
+[1] 967
+[1] 968
+[1] 969
+[1] 970
+[1] 971
+[1] 972
+[1] 973
+[1] 974
+[1] 975
+[1] 976
+[1] 977
+[1] 978
+[1] 979
+[1] 980
+[1] 981
+[1] 982
+[1] 983
+[1] 984
+[1] 985
+[1] 986
+[1] 987
+[1] 988
+[1] 989
+[1] 990
+[1] 991
+[1] 992
+[1] 993
+[1] 994
+[1] 995
+[1] 996
+[1] 997
+[1] 998
+[1] 999
+[1] 1000
+
+Call:
+glm(formula = event ~ BASALcell_PRS.tertile.category + AGE_AT_LAST_CONTACT.cs1 + 
+    AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + 
+    gender + maxsegrtdose.category + maxabdrtdose.category + 
+    maxpelvisrtdose.category + EAS + AFR + any_rt_missing + maxsegrtdose.category * 
+    BASALcell_PRS.tertile.category + maxabdrtdose.category * 
+    BASALcell_PRS.tertile.category + maxpelvisrtdose.category * 
+    BASALcell_PRS.tertile.category, family = "poisson", data = dat_all, 
+    offset = log(dat_all$PY))
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.3003  -0.0765  -0.0405  -0.0240   4.6265  
+
+Coefficients:
+                                                                Estimate
+(Intercept)                                                   -9.551e+00
+BASALcell_PRS.tertile.category2nd                              7.401e-01
+BASALcell_PRS.tertile.category3rd                              1.155e+00
+AGE_AT_LAST_CONTACT.cs1                                        3.987e-02
+AGE_AT_LAST_CONTACT.cs2                                        1.607e-05
+AGE_AT_LAST_CONTACT.cs3                                        6.525e-04
+AGE_AT_LAST_CONTACT.cs4                                       -1.897e-03
+genderFemale                                                   4.330e-01
+maxsegrtdose.category>0-<30                                    1.598e+00
+maxsegrtdose.category>=30                                      1.547e+00
+maxabdrtdose.category>0-<30                                    1.143e+00
+maxabdrtdose.category>=30                                      1.956e+00
+maxpelvisrtdose.categoryAny                                   -6.355e-01
+EAS                                                           -3.273e+00
+AFR                                                           -2.930e+00
+any_rt_missingYes                                              5.674e-01
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>0-<30 -8.289e-01
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>0-<30 -8.792e-01
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>=30   -7.949e-01
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>=30   -7.902e-01
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>0-<30 -7.002e-01
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>0-<30 -1.349e-02
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>=30   -1.316e+00
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>=30   -5.631e-01
+BASALcell_PRS.tertile.category2nd:maxpelvisrtdose.categoryAny  6.658e-01
+BASALcell_PRS.tertile.category3rd:maxpelvisrtdose.categoryAny -5.399e-02
+                                                              Std. Error
+(Intercept)                                                    1.533e+00
+BASALcell_PRS.tertile.category2nd                              3.926e-01
+BASALcell_PRS.tertile.category3rd                              3.788e-01
+AGE_AT_LAST_CONTACT.cs1                                        1.054e-01
+AGE_AT_LAST_CONTACT.cs2                                        5.019e-04
+AGE_AT_LAST_CONTACT.cs3                                        1.420e-03
+AGE_AT_LAST_CONTACT.cs4                                        1.345e-03
+genderFemale                                                   1.286e-01
+maxsegrtdose.category>0-<30                                    4.150e-01
+maxsegrtdose.category>=30                                      5.423e-01
+maxabdrtdose.category>0-<30                                    7.479e-01
+maxabdrtdose.category>=30                                      6.678e-01
+maxpelvisrtdose.categoryAny                                    6.810e-01
+EAS                                                            2.760e+00
+AFR                                                            8.231e-01
+any_rt_missingYes                                              5.128e-01
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>0-<30  4.828e-01
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>0-<30  4.600e-01
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>=30    6.562e-01
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>=30    6.154e-01
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>0-<30  8.816e-01
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>0-<30  8.085e-01
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>=30    8.308e-01
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>=30    7.406e-01
+BASALcell_PRS.tertile.category2nd:maxpelvisrtdose.categoryAny  8.194e-01
+BASALcell_PRS.tertile.category3rd:maxpelvisrtdose.categoryAny  7.450e-01
+                                                              z value Pr(>|z|)
+(Intercept)                                                    -6.229 4.69e-10
+BASALcell_PRS.tertile.category2nd                               1.885 0.059400
+BASALcell_PRS.tertile.category3rd                               3.049 0.002295
+AGE_AT_LAST_CONTACT.cs1                                         0.378 0.705222
+AGE_AT_LAST_CONTACT.cs2                                         0.032 0.974455
+AGE_AT_LAST_CONTACT.cs3                                         0.459 0.645879
+AGE_AT_LAST_CONTACT.cs4                                        -1.410 0.158602
+genderFemale                                                    3.367 0.000761
+maxsegrtdose.category>0-<30                                     3.850 0.000118
+maxsegrtdose.category>=30                                       2.852 0.004346
+maxabdrtdose.category>0-<30                                     1.528 0.126416
+maxabdrtdose.category>=30                                       2.929 0.003396
+maxpelvisrtdose.categoryAny                                    -0.933 0.350747
+EAS                                                            -1.186 0.235683
+AFR                                                            -3.560 0.000371
+any_rt_missingYes                                               1.106 0.268571
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>0-<30  -1.717 0.086041
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>0-<30  -1.911 0.055980
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>=30    -1.211 0.225727
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>=30    -1.284 0.199178
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>0-<30  -0.794 0.427081
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>0-<30  -0.017 0.986684
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>=30    -1.584 0.113194
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>=30    -0.760 0.447063
+BASALcell_PRS.tertile.category2nd:maxpelvisrtdose.categoryAny   0.813 0.416450
+BASALcell_PRS.tertile.category3rd:maxpelvisrtdose.categoryAny  -0.072 0.942222
+                                                                 
+(Intercept)                                                   ***
+BASALcell_PRS.tertile.category2nd                             .  
+BASALcell_PRS.tertile.category3rd                             ** 
+AGE_AT_LAST_CONTACT.cs1                                          
+AGE_AT_LAST_CONTACT.cs2                                          
+AGE_AT_LAST_CONTACT.cs3                                          
+AGE_AT_LAST_CONTACT.cs4                                          
+genderFemale                                                  ***
+maxsegrtdose.category>0-<30                                   ***
+maxsegrtdose.category>=30                                     ** 
+maxabdrtdose.category>0-<30                                      
+maxabdrtdose.category>=30                                     ** 
+maxpelvisrtdose.categoryAny                                      
+EAS                                                              
+AFR                                                           ***
+any_rt_missingYes                                                
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>0-<30 .  
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>0-<30 .  
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>=30      
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>=30      
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>0-<30    
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>0-<30    
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>=30      
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>=30      
+BASALcell_PRS.tertile.category2nd:maxpelvisrtdose.categoryAny    
+BASALcell_PRS.tertile.category3rd:maxpelvisrtdose.categoryAny    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 3474.1  on 92814  degrees of freedom
+Residual deviance: 3039.0  on 92789  degrees of freedom
+  (60 observations deleted due to missingness)
+AIC: 3593
+
+Number of Fisher Scoring iterations: 10
+
+                                                                   Estimate
+(Intercept)                                                   -9.550955e+00
+BASALcell_PRS.tertile.category2nd                              7.400604e-01
+BASALcell_PRS.tertile.category3rd                              1.154887e+00
+AGE_AT_LAST_CONTACT.cs1                                        3.986818e-02
+AGE_AT_LAST_CONTACT.cs2                                        1.607196e-05
+AGE_AT_LAST_CONTACT.cs3                                        6.525179e-04
+AGE_AT_LAST_CONTACT.cs4                                       -1.896678e-03
+genderFemale                                                   4.329527e-01
+maxsegrtdose.category>0-<30                                    1.597724e+00
+maxsegrtdose.category>=30                                      1.546594e+00
+maxabdrtdose.category>0-<30                                    1.143138e+00
+maxabdrtdose.category>=30                                      1.956276e+00
+maxpelvisrtdose.categoryAny                                   -6.354798e-01
+EAS                                                           -3.273493e+00
+AFR                                                           -2.930092e+00
+any_rt_missingYes                                              5.673883e-01
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>0-<30 -8.288838e-01
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>0-<30 -8.791872e-01
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>=30   -7.949240e-01
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>=30   -7.901537e-01
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>0-<30 -7.001666e-01
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>0-<30 -1.349406e-02
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>=30   -1.316018e+00
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>=30   -5.631148e-01
+BASALcell_PRS.tertile.category2nd:maxpelvisrtdose.categoryAny  6.658355e-01
+BASALcell_PRS.tertile.category3rd:maxpelvisrtdose.categoryAny -5.399426e-02
+                                                                Std. Error
+(Intercept)                                                   1.5333109881
+BASALcell_PRS.tertile.category2nd                             0.3925585101
+BASALcell_PRS.tertile.category3rd                             0.3787542265
+AGE_AT_LAST_CONTACT.cs1                                       0.1053932310
+AGE_AT_LAST_CONTACT.cs2                                       0.0005019199
+AGE_AT_LAST_CONTACT.cs3                                       0.0014200767
+AGE_AT_LAST_CONTACT.cs4                                       0.0013453644
+genderFemale                                                  0.1285978906
+maxsegrtdose.category>0-<30                                   0.4149670123
+maxsegrtdose.category>=30                                     0.5423094849
+maxabdrtdose.category>0-<30                                   0.7479373772
+maxabdrtdose.category>=30                                     0.6677948211
+maxpelvisrtdose.categoryAny                                   0.6810117789
+EAS                                                           2.7604676256
+AFR                                                           0.8230687049
+any_rt_missingYes                                             0.5128431129
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>0-<30 0.4828464178
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>0-<30 0.4600201400
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>=30   0.6561806394
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>=30   0.6154344871
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>0-<30 0.8816044862
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>0-<30 0.8085460217
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>=30   0.8308208597
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>=30   0.7406283875
+BASALcell_PRS.tertile.category2nd:maxpelvisrtdose.categoryAny 0.8193940942
+BASALcell_PRS.tertile.category3rd:maxpelvisrtdose.categoryAny 0.7449870676
+                                                                  z value
+(Intercept)                                                   -6.22897419
+BASALcell_PRS.tertile.category2nd                              1.88522330
+BASALcell_PRS.tertile.category3rd                              3.04917211
+AGE_AT_LAST_CONTACT.cs1                                        0.37828032
+AGE_AT_LAST_CONTACT.cs2                                        0.03202096
+AGE_AT_LAST_CONTACT.cs3                                        0.45949481
+AGE_AT_LAST_CONTACT.cs4                                       -1.40978793
+genderFemale                                                   3.36671664
+maxsegrtdose.category>0-<30                                    3.85024245
+maxsegrtdose.category>=30                                      2.85186618
+maxabdrtdose.category>0-<30                                    1.52838726
+maxabdrtdose.category>=30                                      2.92945697
+maxpelvisrtdose.categoryAny                                   -0.93314064
+EAS                                                           -1.18584720
+AFR                                                           -3.55995996
+any_rt_missingYes                                              1.10635852
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>0-<30 -1.71666131
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>0-<30 -1.91119293
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>=30   -1.21144081
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>=30   -1.28389569
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>0-<30 -0.79419578
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>0-<30 -0.01668929
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>=30   -1.58399776
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>=30   -0.76032029
+BASALcell_PRS.tertile.category2nd:maxpelvisrtdose.categoryAny  0.81259491
+BASALcell_PRS.tertile.category3rd:maxpelvisrtdose.categoryAny -0.07247677
+                                                                  Pr(>|z|)
+(Intercept)                                                   4.694991e-10
+BASALcell_PRS.tertile.category2nd                             5.939970e-02
+BASALcell_PRS.tertile.category3rd                             2.294730e-03
+AGE_AT_LAST_CONTACT.cs1                                       7.052224e-01
+AGE_AT_LAST_CONTACT.cs2                                       9.744553e-01
+AGE_AT_LAST_CONTACT.cs3                                       6.458789e-01
+AGE_AT_LAST_CONTACT.cs4                                       1.586023e-01
+genderFemale                                                  7.606881e-04
+maxsegrtdose.category>0-<30                                   1.180010e-04
+maxsegrtdose.category>=30                                     4.346339e-03
+maxabdrtdose.category>0-<30                                   1.264164e-01
+maxabdrtdose.category>=30                                     3.395548e-03
+maxpelvisrtdose.categoryAny                                   3.507474e-01
+EAS                                                           2.356826e-01
+AFR                                                           3.709113e-04
+any_rt_missingYes                                             2.685714e-01
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>0-<30 8.604107e-02
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>0-<30 5.597979e-02
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>=30   2.257265e-01
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>=30   1.991785e-01
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>0-<30 4.270815e-01
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>0-<30 9.866845e-01
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>=30   1.131942e-01
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>=30   4.470632e-01
+BASALcell_PRS.tertile.category2nd:maxpelvisrtdose.categoryAny 4.164503e-01
+BASALcell_PRS.tertile.category3rd:maxpelvisrtdose.categoryAny 9.422225e-01
+                                                              Estimate
+(Intercept)                                                    -9.5510
+BASALcell_PRS.tertile.category2nd                               0.7401
+BASALcell_PRS.tertile.category3rd                               1.1549
+AGE_AT_LAST_CONTACT.cs1                                         0.0399
+AGE_AT_LAST_CONTACT.cs2                                         0.0000
+AGE_AT_LAST_CONTACT.cs3                                         0.0007
+AGE_AT_LAST_CONTACT.cs4                                        -0.0019
+genderFemale                                                    0.4330
+maxsegrtdose.category>0-<30                                     1.5977
+maxsegrtdose.category>=30                                       1.5466
+maxabdrtdose.category>0-<30                                     1.1431
+maxabdrtdose.category>=30                                       1.9563
+maxpelvisrtdose.categoryAny                                    -0.6355
+EAS                                                            -3.2735
+AFR                                                            -2.9301
+any_rt_missingYes                                               0.5674
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>0-<30  -0.8289
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>0-<30  -0.8792
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>=30    -0.7949
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>=30    -0.7902
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>0-<30  -0.7002
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>0-<30  -0.0135
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>=30    -1.3160
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>=30    -0.5631
+BASALcell_PRS.tertile.category2nd:maxpelvisrtdose.categoryAny   0.6658
+BASALcell_PRS.tertile.category3rd:maxpelvisrtdose.categoryAny  -0.0540
+                                                              Std. Error
+(Intercept)                                                       1.5333
+BASALcell_PRS.tertile.category2nd                                 0.3926
+BASALcell_PRS.tertile.category3rd                                 0.3788
+AGE_AT_LAST_CONTACT.cs1                                           0.1054
+AGE_AT_LAST_CONTACT.cs2                                           0.0005
+AGE_AT_LAST_CONTACT.cs3                                           0.0014
+AGE_AT_LAST_CONTACT.cs4                                           0.0013
+genderFemale                                                      0.1286
+maxsegrtdose.category>0-<30                                       0.4150
+maxsegrtdose.category>=30                                         0.5423
+maxabdrtdose.category>0-<30                                       0.7479
+maxabdrtdose.category>=30                                         0.6678
+maxpelvisrtdose.categoryAny                                       0.6810
+EAS                                                               2.7605
+AFR                                                               0.8231
+any_rt_missingYes                                                 0.5128
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>0-<30     0.4828
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>0-<30     0.4600
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>=30       0.6562
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>=30       0.6154
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>0-<30     0.8816
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>0-<30     0.8085
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>=30       0.8308
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>=30       0.7406
+BASALcell_PRS.tertile.category2nd:maxpelvisrtdose.categoryAny     0.8194
+BASALcell_PRS.tertile.category3rd:maxpelvisrtdose.categoryAny     0.7450
+                                                              z value Pr(>|z|)
+(Intercept)                                                   -6.2290   0.0000
+BASALcell_PRS.tertile.category2nd                              1.8852   0.0594
+BASALcell_PRS.tertile.category3rd                              3.0492   0.0023
+AGE_AT_LAST_CONTACT.cs1                                        0.3783   0.7052
+AGE_AT_LAST_CONTACT.cs2                                        0.0320   0.9745
+AGE_AT_LAST_CONTACT.cs3                                        0.4595   0.6459
+AGE_AT_LAST_CONTACT.cs4                                       -1.4098   0.1586
+genderFemale                                                   3.3667   0.0008
+maxsegrtdose.category>0-<30                                    3.8502   0.0001
+maxsegrtdose.category>=30                                      2.8519   0.0043
+maxabdrtdose.category>0-<30                                    1.5284   0.1264
+maxabdrtdose.category>=30                                      2.9295   0.0034
+maxpelvisrtdose.categoryAny                                   -0.9331   0.3507
+EAS                                                           -1.1858   0.2357
+AFR                                                           -3.5600   0.0004
+any_rt_missingYes                                              1.1064   0.2686
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>0-<30 -1.7167   0.0860
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>0-<30 -1.9112   0.0560
+BASALcell_PRS.tertile.category2nd:maxsegrtdose.category>=30   -1.2114   0.2257
+BASALcell_PRS.tertile.category3rd:maxsegrtdose.category>=30   -1.2839   0.1992
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>0-<30 -0.7942   0.4271
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>0-<30 -0.0167   0.9867
+BASALcell_PRS.tertile.category2nd:maxabdrtdose.category>=30   -1.5840   0.1132
+BASALcell_PRS.tertile.category3rd:maxabdrtdose.category>=30   -0.7603   0.4471
+BASALcell_PRS.tertile.category2nd:maxpelvisrtdose.categoryAny  0.8126   0.4165
+BASALcell_PRS.tertile.category3rd:maxpelvisrtdose.categoryAny -0.0725   0.9422
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@noderome227>
+Subject: Job 247018627: <model_fit3SJ> in cluster <hpcf_research_cluster> Exited
+
+Job <model_fit3SJ> was submitted from host <splprhpc11> by user <aneupane> in cluster <hpcf_research_cluster> at Fri Jan 17 23:13:15 2025
+Job was executed on host(s) <noderome227>, in queue <standard>, as user <aneupane> in cluster <hpcf_research_cluster> at Fri Jan 17 23:13:24 2025
+</home/aneupane> was used as the home directory.
+</home/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V21b_Lancet_Revision_HPC/21b/SJLIFE/Without_lifestyle/Models/with_collapsed_categories> was used as the working directory.
+Started at Fri Jan 17 23:13:24 2025
+Terminated at Fri Jan 17 23:29:00 2025
+Results reported at Fri Jan 17 23:29:00 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+bash -c "module load R/4.2.2 && Rscript 3.model_fit_NMSCs.R"
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   925.48 sec.
+    Max Memory :                                 961 MB
+    Average Memory :                             901.63 MB
+    Total Requested Memory :                     20000.00 MB
+    Delta Memory :                               19039.00 MB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                5
+    Run time :                                   936 sec.
+    Turnaround time :                            945 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <logs/model_fit3SJ.err> for stderr output of this job.
+

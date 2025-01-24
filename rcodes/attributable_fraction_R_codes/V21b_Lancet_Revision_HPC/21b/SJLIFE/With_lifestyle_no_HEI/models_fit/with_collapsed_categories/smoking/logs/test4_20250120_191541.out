@@ -1,0 +1,173 @@
+                       row_labels THYROIDcancer|0 THYROIDcancer|1
+1     maxneckrtdose.category|None            2921              14
+2   maxneckrtdose.category|>0-<11               4               1
+3 maxneckrtdose.category|>=11-<20              75               4
+4 maxneckrtdose.category|>=20-<30             354              21
+5     maxneckrtdose.category|>=30             251               4
+6     epitxn_dose_5.category|None            2355              25
+7      epitxn_dose_5.category|1st             394               7
+8      epitxn_dose_5.category|2nd             393               6
+9      epitxn_dose_5.category|3rd             463               6
+  THYROIDcancer|#Total cases
+1                       2935
+2                          5
+3                         79
+4                        375
+5                        255
+6                       2380
+7                        401
+8                        399
+9                        469
+[1] "maxneckrtdose.category|>0-<11"   "maxneckrtdose.category|>=11-<20"
+[3] "maxneckrtdose.category|>=30"     "epitxn_dose_5.category|1st"     
+[5] "epitxn_dose_5.category|2nd"      "epitxn_dose_5.category|3rd"     
+
+None  Any 
+   0    0 
+
+None  Any 
+   0    0 
+
+Call:
+glm(formula = event ~ Thyroid_PRS.tertile.category + AGE_AT_LAST_CONTACT.cs1 + 
+    AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + 
+    AGE_AT_DIAGNOSIS + gender + maxneckrtdose.category + epitxn_dose_5.category + 
+    Smoker_ever_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + 
+    Obese_yn + EAS + AFR + any_lifestyle_missing + any_chemo_missing + 
+    any_rt_missing, family = "poisson", data = dat_all, offset = log(dat_all$PY))
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.3985  -0.0513  -0.0315  -0.0194   5.0062  
+
+Coefficients:
+                                  Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                     -2.303e+00  3.564e+00  -0.646  0.51805    
+Thyroid_PRS.tertile.category2nd  9.653e-01  4.769e-01   2.024  0.04296 *  
+Thyroid_PRS.tertile.category3rd  1.239e+00  4.718e-01   2.625  0.00866 ** 
+AGE_AT_LAST_CONTACT.cs1         -2.499e-01  1.405e-01  -1.779  0.07524 .  
+AGE_AT_LAST_CONTACT.cs2          1.642e-03  1.145e-03   1.434  0.15157    
+AGE_AT_LAST_CONTACT.cs3         -4.253e-03  4.132e-03  -1.029  0.30332    
+AGE_AT_LAST_CONTACT.cs4          2.176e-03  4.473e-03   0.487  0.62656    
+AGE_AT_DIAGNOSIS5-9             -6.601e-01  6.949e-01  -0.950  0.34219    
+AGE_AT_DIAGNOSIS10-14            9.787e-01  4.757e-01   2.058  0.03962 *  
+AGE_AT_DIAGNOSIS>=15             9.235e-01  5.113e-01   1.806  0.07089 .  
+genderFemale                     1.991e-01  3.188e-01   0.624  0.53232    
+maxneckrtdose.categoryAny        2.075e+00  3.619e-01   5.732 9.93e-09 ***
+epitxn_dose_5.categoryAny        7.321e-01  3.421e-01   2.140  0.03234 *  
+Smoker_ever_ynYes                2.508e-01  3.268e-01   0.767  0.44279    
+PhysicalActivity_ynNo           -2.618e-01  3.239e-01  -0.808  0.41886    
+RiskyHeavyDrink_ynYes           -2.799e-01  3.761e-01  -0.744  0.45668    
+Obese_ynYes                     -1.445e-01  3.559e-01  -0.406  0.68466    
+EAS                             -9.163e-02  2.660e+00  -0.034  0.97252    
+AFR                             -2.181e+00  1.212e+00  -1.799  0.07197 .  
+any_lifestyle_missingYes        -1.336e-01  3.528e-01  -0.379  0.70499    
+any_chemo_missingYes            -1.230e+01  1.234e+03  -0.010  0.99205    
+any_rt_missingYes               -1.167e+01  5.660e+02  -0.021  0.98355    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 639.54  on 25225  degrees of freedom
+Residual deviance: 550.32  on 25204  degrees of freedom
+  (352 observations deleted due to missingness)
+AIC: 678.32
+
+Number of Fisher Scoring iterations: 17
+
+[1] 0.2212069
+[1] 0.2201766
+[1] 0.2220581
+[1] 0.3122082
+[1] 0.1806445
+[1] 0.2215028
+[1] 0.1975247
+[1] 0.6005477
+[1] 0.5767468
+[1] 0.6202094
+[1] 0.5349127
+[1] 0.6298036
+[1] 0.603114
+[1] 0.5793979
+[1] 0.710333
+[1] 0.6927113
+[1] 0.72489
+[1] 0.6856896
+[1] 0.7213174
+[1] 0.7117682
+[1] 0.6879522
+[1] 0.5718737
+[1] 0.5731441
+[1] 0.5708243
+[1] 0.5831881
+[1] 0.5668305
+[1] 0.5725394
+[1] 0.5389913
+[1] 0.03065192
+[1] 0.02800733
+[1] 0.03283657
+[1] -0.004640734
+[1] 0.0463831
+[1] -523.5152
+[1] -3870.692
+[1] 0.8806007
+[1] 0.8744364
+[1] 0.8856929
+[1] 0.864178
+[1] 0.8879208
+[1] 0.8821311
+[1] 0.8521354
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+[1] 10
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@noderome112>
+Subject: Job 247078985: <test4_20250120_191541> in cluster <hpcf_research_cluster> Done
+
+Job <test4_20250120_191541> was submitted from host <splprhpc11> by user <aneupane> in cluster <hpcf_research_cluster> at Mon Jan 20 19:15:42 2025
+Job was executed on host(s) <noderome112>, in queue <priority>, as user <aneupane> in cluster <hpcf_research_cluster> at Mon Jan 20 19:15:42 2025
+</home/aneupane> was used as the home directory.
+</home/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V21b_Lancet_Revision_HPC/21b/SJLIFE/With_lifestyle_no_HEI/models_fit/with_collapsed_categories/smoking> was used as the working directory.
+Started at Mon Jan 20 19:15:42 2025
+Terminated at Mon Jan 20 19:15:53 2025
+Results reported at Mon Jan 20 19:15:53 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+bash -c "module load R/4.2.2 && Rscript test4.R"
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   10.36 sec.
+    Max Memory :                                 262 MB
+    Average Memory :                             225.50 MB
+    Total Requested Memory :                     20000.00 MB
+    Delta Memory :                               19738.00 MB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                5
+    Run time :                                   11 sec.
+    Turnaround time :                            11 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <logs/test4_20250120_191541.err> for stderr output of this job.
+

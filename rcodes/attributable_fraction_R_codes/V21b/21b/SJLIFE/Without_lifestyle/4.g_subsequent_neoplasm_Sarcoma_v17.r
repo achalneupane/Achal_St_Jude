@@ -246,6 +246,8 @@ length(unique(SNs_py$sjlid[SNs_py$event==1 & SNs_py$evt1==1 ]))
 
 SNs_py$PY <- SNs_py$end-SNs_py$start
 
+sum(SNs_py$PY)
+# 89857.59
 ###############
 ## Model fit ##
 ###############

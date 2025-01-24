@@ -42,6 +42,13 @@ Black = sum(PHENO.ANY_SN$race == "Black")
 White = sum(PHENO.ANY_SN$race == "White")
 Other = 4401 - sum(Black, White)
 
+table(PHENO.ANY_SN$ethnic)
+# Caribbean                              Cuban                    Mexican/Chicano 
+# 5                                  2                                 27 
+# Non Spanish speaking, Non Hispanic        NOS Spanish,Hispanic,Latino                       Puerto Rican 
+# 4225                                 60                                 10 
+# South or Central Amercian                          Southwest                            Unknown 
+# 39                                  1                                 32 
 
 as.data.frame(table(PHENO.ANY_SN$diaggrp))
 # as.data.frame(table(PHENO.ANY_SN$diag))

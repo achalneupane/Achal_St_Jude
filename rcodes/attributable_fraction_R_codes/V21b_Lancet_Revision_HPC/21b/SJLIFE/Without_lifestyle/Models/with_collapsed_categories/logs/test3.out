@@ -1,0 +1,505 @@
+                       row_labels BREASTcancer|0 BREASTcancer|1
+1    maxchestrtdose.category|None           1677             27
+2  maxchestrtdose.category|>0-<20             63              2
+3    maxchestrtdose.category|>=20            273             47
+4 anthra_jco_dose_5.category|None            901             34
+5  anthra_jco_dose_5.category|1st            399              2
+6  anthra_jco_dose_5.category|2nd            374             15
+7  anthra_jco_dose_5.category|3rd            339             25
+  BREASTcancer|#Total cases
+1                      1704
+2                        65
+3                       320
+4                       935
+5                       401
+6                       389
+7                       364
+[1] "maxchestrtdose.category|>0-<20" "anthra_jco_dose_5.category|1st"
+
+Call:
+glm(formula = event ~ Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category + 
+    AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + 
+    AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + maxchestrtdose.category + 
+    anthra_jco_dose_5.category + EAS + AFR + any_chemo_missing + 
+    any_rt_missing, family = "poisson", data = dat_all, offset = log(dat_all$PY))
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.3719  -0.0429  -0.0171  -0.0045   4.1362  
+
+Coefficients:
+                                                          Estimate Std. Error
+(Intercept)                                             -39.218729  48.404813
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd   0.177177   0.300974
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd   0.444270   0.296429
+AGE_AT_LAST_CONTACT.cs1                                   1.704891   2.847754
+AGE_AT_LAST_CONTACT.cs2                                  -0.005195   0.008781
+AGE_AT_LAST_CONTACT.cs3                                   0.012707   0.020090
+AGE_AT_LAST_CONTACT.cs4                                  -0.009655   0.012841
+AGE_AT_DIAGNOSIS5-9                                      -0.525179   0.710548
+AGE_AT_DIAGNOSIS10-14                                     1.605493   0.465539
+AGE_AT_DIAGNOSIS>=15                                      1.365827   0.473380
+maxchestrtdose.categoryAny                                1.467353   0.254649
+anthra_jco_dose_5.category1st-2nd                         0.088110   0.310435
+anthra_jco_dose_5.category3rd                             0.731569   0.281404
+EAS                                                       1.917063   1.368662
+AFR                                                      -0.470700   0.504425
+any_chemo_missingYes                                     -9.858004 614.520774
+any_rt_missingYes                                         2.417996   1.067827
+                                                        z value Pr(>|z|)    
+(Intercept)                                              -0.810 0.417812    
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd   0.589 0.556076    
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd   1.499 0.133942    
+AGE_AT_LAST_CONTACT.cs1                                   0.599 0.549387    
+AGE_AT_LAST_CONTACT.cs2                                  -0.592 0.554109    
+AGE_AT_LAST_CONTACT.cs3                                   0.632 0.527064    
+AGE_AT_LAST_CONTACT.cs4                                  -0.752 0.452119    
+AGE_AT_DIAGNOSIS5-9                                      -0.739 0.459835    
+AGE_AT_DIAGNOSIS10-14                                     3.449 0.000563 ***
+AGE_AT_DIAGNOSIS>=15                                      2.885 0.003911 ** 
+maxchestrtdose.categoryAny                                5.762  8.3e-09 ***
+anthra_jco_dose_5.category1st-2nd                         0.284 0.776544    
+anthra_jco_dose_5.category3rd                             2.600 0.009330 ** 
+EAS                                                       1.401 0.161309    
+AFR                                                      -0.933 0.350747    
+any_chemo_missingYes                                     -0.016 0.987201    
+any_rt_missingYes                                         2.264 0.023549 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 1100.80  on 44437  degrees of freedom
+Residual deviance:  860.93  on 44421  degrees of freedom
+  (43 observations deleted due to missingness)
+AIC: 1046.9
+
+Number of Fisher Scoring iterations: 16
+
+[1] 0.1892936
+[1] NaN
+[1] 0.1892936
+[1] 0.2222807
+[1] 0.1801289
+[1] 0.1869027
+[1] 0.1959865
+[1] 0.508088
+[1] NaN
+[1] 0.508088
+[1] 0.4905945
+[1] 0.5129482
+[1] 0.5265407
+[1] 0.3997693
+[1] 0.6125257
+[1] NaN
+[1] 0.6125257
+[1] 0.6036241
+[1] 0.6149988
+[1] 0.6252991
+[1] 0.5266152
+[1] 0.1919754
+[1] NaN
+[1] 0.1919754
+[1] 0.1971461
+[1] 0.1905388
+[1] 0.1907925
+[1] 0.1827682
+[1] 0.6873578
+[1] NaN
+[1] 0.6873578
+[1] 0.682859
+[1] 0.6886077
+[1] 0.6966729
+[1] 0.6133764
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+[1] 10
+
+Call:
+glm(formula = event ~ Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category + 
+    AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + 
+    AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + maxchestrtdose.category + 
+    anthra_jco_dose_5.category + EAS + AFR + any_chemo_missing + 
+    any_rt_missing + maxchestrtdose.category * Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category + 
+    anthra_jco_dose_5.category * Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category, 
+    family = "poisson", data = dat_all, offset = log(dat_all$PY))
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.4056  -0.0422  -0.0167  -0.0045   4.1337  
+
+Coefficients:
+                                                                                            Estimate
+(Intercept)                                                                               -39.382226
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd                                     0.203066
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd                                     0.285763
+AGE_AT_LAST_CONTACT.cs1                                                                     1.715015
+AGE_AT_LAST_CONTACT.cs2                                                                    -0.005234
+AGE_AT_LAST_CONTACT.cs3                                                                     0.012810
+AGE_AT_LAST_CONTACT.cs4                                                                    -0.009740
+AGE_AT_DIAGNOSIS5-9                                                                        -0.509539
+AGE_AT_DIAGNOSIS10-14                                                                       1.656619
+AGE_AT_DIAGNOSIS>=15                                                                        1.408244
+maxchestrtdose.categoryAny                                                                  1.299461
+anthra_jco_dose_5.category1st-2nd                                                          -0.117162
+anthra_jco_dose_5.category3rd                                                               1.067491
+EAS                                                                                         2.070772
+AFR                                                                                        -0.472670
+any_chemo_missingYes                                                                       -9.874511
+any_rt_missingYes                                                                           2.345669
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:maxchestrtdose.categoryAny          0.109722
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:maxchestrtdose.categoryAny          0.325500
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category1st-2nd   0.476911
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category1st-2nd   0.046492
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category3rd      -0.686308
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category3rd      -0.237124
+                                                                                          Std. Error
+(Intercept)                                                                                48.591276
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd                                     0.605974
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd                                     0.619690
+AGE_AT_LAST_CONTACT.cs1                                                                     2.858383
+AGE_AT_LAST_CONTACT.cs2                                                                     0.008812
+AGE_AT_LAST_CONTACT.cs3                                                                     0.020158
+AGE_AT_LAST_CONTACT.cs4                                                                     0.012882
+AGE_AT_DIAGNOSIS5-9                                                                         0.711570
+AGE_AT_DIAGNOSIS10-14                                                                       0.470101
+AGE_AT_DIAGNOSIS>=15                                                                        0.474053
+maxchestrtdose.categoryAny                                                                  0.468648
+anthra_jco_dose_5.category1st-2nd                                                           0.609611
+anthra_jco_dose_5.category3rd                                                               0.519952
+EAS                                                                                         1.417717
+AFR                                                                                         0.509152
+any_chemo_missingYes                                                                      614.245183
+any_rt_missingYes                                                                           1.073066
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:maxchestrtdose.categoryAny          0.621284
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:maxchestrtdose.categoryAny          0.618348
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category1st-2nd   0.755912
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category1st-2nd   0.813416
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category3rd       0.695700
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category3rd       0.667196
+                                                                                          z value
+(Intercept)                                                                                -0.810
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd                                     0.335
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd                                     0.461
+AGE_AT_LAST_CONTACT.cs1                                                                     0.600
+AGE_AT_LAST_CONTACT.cs2                                                                    -0.594
+AGE_AT_LAST_CONTACT.cs3                                                                     0.635
+AGE_AT_LAST_CONTACT.cs4                                                                    -0.756
+AGE_AT_DIAGNOSIS5-9                                                                        -0.716
+AGE_AT_DIAGNOSIS10-14                                                                       3.524
+AGE_AT_DIAGNOSIS>=15                                                                        2.971
+maxchestrtdose.categoryAny                                                                  2.773
+anthra_jco_dose_5.category1st-2nd                                                          -0.192
+anthra_jco_dose_5.category3rd                                                               2.053
+EAS                                                                                         1.461
+AFR                                                                                        -0.928
+any_chemo_missingYes                                                                       -0.016
+any_rt_missingYes                                                                           2.186
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:maxchestrtdose.categoryAny          0.177
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:maxchestrtdose.categoryAny          0.526
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category1st-2nd   0.631
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category1st-2nd   0.057
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category3rd      -0.986
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category3rd      -0.355
+                                                                                          Pr(>|z|)
+(Intercept)                                                                               0.417665
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd                                   0.737544
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd                                   0.644699
+AGE_AT_LAST_CONTACT.cs1                                                                   0.548510
+AGE_AT_LAST_CONTACT.cs2                                                                   0.552506
+AGE_AT_LAST_CONTACT.cs3                                                                   0.525108
+AGE_AT_LAST_CONTACT.cs4                                                                   0.449572
+AGE_AT_DIAGNOSIS5-9                                                                       0.473943
+AGE_AT_DIAGNOSIS10-14                                                                     0.000425
+AGE_AT_DIAGNOSIS>=15                                                                      0.002972
+maxchestrtdose.categoryAny                                                                0.005558
+anthra_jco_dose_5.category1st-2nd                                                         0.847592
+anthra_jco_dose_5.category3rd                                                             0.040067
+EAS                                                                                       0.144115
+AFR                                                                                       0.353228
+any_chemo_missingYes                                                                      0.987174
+any_rt_missingYes                                                                         0.028819
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:maxchestrtdose.categoryAny        0.859818
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:maxchestrtdose.categoryAny        0.598609
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category1st-2nd 0.528100
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category1st-2nd 0.954420
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category3rd     0.323888
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category3rd     0.722287
+                                                                                             
+(Intercept)                                                                                  
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd                                      
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd                                      
+AGE_AT_LAST_CONTACT.cs1                                                                      
+AGE_AT_LAST_CONTACT.cs2                                                                      
+AGE_AT_LAST_CONTACT.cs3                                                                      
+AGE_AT_LAST_CONTACT.cs4                                                                      
+AGE_AT_DIAGNOSIS5-9                                                                          
+AGE_AT_DIAGNOSIS10-14                                                                     ***
+AGE_AT_DIAGNOSIS>=15                                                                      ** 
+maxchestrtdose.categoryAny                                                                ** 
+anthra_jco_dose_5.category1st-2nd                                                            
+anthra_jco_dose_5.category3rd                                                             *  
+EAS                                                                                          
+AFR                                                                                          
+any_chemo_missingYes                                                                         
+any_rt_missingYes                                                                         *  
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:maxchestrtdose.categoryAny           
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:maxchestrtdose.categoryAny           
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category1st-2nd    
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category1st-2nd    
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category3rd        
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category3rd        
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 1100.80  on 44437  degrees of freedom
+Residual deviance:  858.15  on 44415  degrees of freedom
+  (43 observations deleted due to missingness)
+AIC: 1056.1
+
+Number of Fisher Scoring iterations: 16
+
+                                                                                               Estimate
+(Intercept)                                                                               -39.382226109
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd                                     0.203066086
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd                                     0.285763440
+AGE_AT_LAST_CONTACT.cs1                                                                     1.715015091
+AGE_AT_LAST_CONTACT.cs2                                                                    -0.005234314
+AGE_AT_LAST_CONTACT.cs3                                                                     0.012810364
+AGE_AT_LAST_CONTACT.cs4                                                                    -0.009740139
+AGE_AT_DIAGNOSIS5-9                                                                        -0.509539470
+AGE_AT_DIAGNOSIS10-14                                                                       1.656619093
+AGE_AT_DIAGNOSIS>=15                                                                        1.408244486
+maxchestrtdose.categoryAny                                                                  1.299460535
+anthra_jco_dose_5.category1st-2nd                                                          -0.117162098
+anthra_jco_dose_5.category3rd                                                               1.067491387
+EAS                                                                                         2.070771986
+AFR                                                                                        -0.472669644
+any_chemo_missingYes                                                                       -9.874510554
+any_rt_missingYes                                                                           2.345668547
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:maxchestrtdose.categoryAny          0.109722165
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:maxchestrtdose.categoryAny          0.325499751
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category1st-2nd   0.476911161
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category1st-2nd   0.046492278
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category3rd      -0.686307724
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category3rd      -0.237123593
+                                                                                            Std. Error
+(Intercept)                                                                               4.859128e+01
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd                                   6.059737e-01
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd                                   6.196904e-01
+AGE_AT_LAST_CONTACT.cs1                                                                   2.858383e+00
+AGE_AT_LAST_CONTACT.cs2                                                                   8.811846e-03
+AGE_AT_LAST_CONTACT.cs3                                                                   2.015820e-02
+AGE_AT_LAST_CONTACT.cs4                                                                   1.288158e-02
+AGE_AT_DIAGNOSIS5-9                                                                       7.115697e-01
+AGE_AT_DIAGNOSIS10-14                                                                     4.701007e-01
+AGE_AT_DIAGNOSIS>=15                                                                      4.740534e-01
+maxchestrtdose.categoryAny                                                                4.686482e-01
+anthra_jco_dose_5.category1st-2nd                                                         6.096106e-01
+anthra_jco_dose_5.category3rd                                                             5.199515e-01
+EAS                                                                                       1.417717e+00
+AFR                                                                                       5.091521e-01
+any_chemo_missingYes                                                                      6.142452e+02
+any_rt_missingYes                                                                         1.073066e+00
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:maxchestrtdose.categoryAny        6.212842e-01
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:maxchestrtdose.categoryAny        6.183476e-01
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category1st-2nd 7.559117e-01
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category1st-2nd 8.134158e-01
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category3rd     6.957001e-01
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category3rd     6.671955e-01
+                                                                                              z value
+(Intercept)                                                                               -0.81047935
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd                                    0.33510710
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd                                    0.46113902
+AGE_AT_LAST_CONTACT.cs1                                                                    0.59999491
+AGE_AT_LAST_CONTACT.cs2                                                                   -0.59400883
+AGE_AT_LAST_CONTACT.cs3                                                                    0.63549153
+AGE_AT_LAST_CONTACT.cs4                                                                   -0.75612938
+AGE_AT_DIAGNOSIS5-9                                                                       -0.71607814
+AGE_AT_DIAGNOSIS10-14                                                                      3.52396676
+AGE_AT_DIAGNOSIS>=15                                                                       2.97064495
+maxchestrtdose.categoryAny                                                                 2.77278476
+anthra_jco_dose_5.category1st-2nd                                                         -0.19219171
+anthra_jco_dose_5.category3rd                                                              2.05305937
+EAS                                                                                        1.46063846
+AFR                                                                                       -0.92834671
+any_chemo_missingYes                                                                      -0.01607585
+any_rt_missingYes                                                                          2.18594981
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:maxchestrtdose.categoryAny         0.17660544
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:maxchestrtdose.categoryAny         0.52640254
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category1st-2nd  0.63090854
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category1st-2nd  0.05715684
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category3rd     -0.98649936
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category3rd     -0.35540346
+                                                                                              Pr(>|z|)
+(Intercept)                                                                               0.4176647273
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd                                   0.7375442954
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd                                   0.6446988712
+AGE_AT_LAST_CONTACT.cs1                                                                   0.5485096249
+AGE_AT_LAST_CONTACT.cs2                                                                   0.5525062047
+AGE_AT_LAST_CONTACT.cs3                                                                   0.5251078889
+AGE_AT_LAST_CONTACT.cs4                                                                   0.4495716283
+AGE_AT_DIAGNOSIS5-9                                                                       0.4739431022
+AGE_AT_DIAGNOSIS10-14                                                                     0.0004251376
+AGE_AT_DIAGNOSIS>=15                                                                      0.0029717513
+maxchestrtdose.categoryAny                                                                0.0055578869
+anthra_jco_dose_5.category1st-2nd                                                         0.8475920373
+anthra_jco_dose_5.category3rd                                                             0.0400668196
+EAS                                                                                       0.1441146848
+AFR                                                                                       0.3532277506
+any_chemo_missingYes                                                                      0.9871738837
+any_rt_missingYes                                                                         0.0288192773
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:maxchestrtdose.categoryAny        0.8598183207
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:maxchestrtdose.categoryAny        0.5986085503
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category1st-2nd 0.5281003269
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category1st-2nd 0.9544202595
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category3rd     0.3238881307
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category3rd     0.7222873596
+                                                                                          Estimate
+(Intercept)                                                                               -39.3822
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd                                     0.2031
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd                                     0.2858
+AGE_AT_LAST_CONTACT.cs1                                                                     1.7150
+AGE_AT_LAST_CONTACT.cs2                                                                    -0.0052
+AGE_AT_LAST_CONTACT.cs3                                                                     0.0128
+AGE_AT_LAST_CONTACT.cs4                                                                    -0.0097
+AGE_AT_DIAGNOSIS5-9                                                                        -0.5095
+AGE_AT_DIAGNOSIS10-14                                                                       1.6566
+AGE_AT_DIAGNOSIS>=15                                                                        1.4082
+maxchestrtdose.categoryAny                                                                  1.2995
+anthra_jco_dose_5.category1st-2nd                                                          -0.1172
+anthra_jco_dose_5.category3rd                                                               1.0675
+EAS                                                                                         2.0708
+AFR                                                                                        -0.4727
+any_chemo_missingYes                                                                       -9.8745
+any_rt_missingYes                                                                           2.3457
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:maxchestrtdose.categoryAny          0.1097
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:maxchestrtdose.categoryAny          0.3255
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category1st-2nd   0.4769
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category1st-2nd   0.0465
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category3rd      -0.6863
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category3rd      -0.2371
+                                                                                          Std. Error
+(Intercept)                                                                                  48.5913
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd                                       0.6060
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd                                       0.6197
+AGE_AT_LAST_CONTACT.cs1                                                                       2.8584
+AGE_AT_LAST_CONTACT.cs2                                                                       0.0088
+AGE_AT_LAST_CONTACT.cs3                                                                       0.0202
+AGE_AT_LAST_CONTACT.cs4                                                                       0.0129
+AGE_AT_DIAGNOSIS5-9                                                                           0.7116
+AGE_AT_DIAGNOSIS10-14                                                                         0.4701
+AGE_AT_DIAGNOSIS>=15                                                                          0.4741
+maxchestrtdose.categoryAny                                                                    0.4686
+anthra_jco_dose_5.category1st-2nd                                                             0.6096
+anthra_jco_dose_5.category3rd                                                                 0.5200
+EAS                                                                                           1.4177
+AFR                                                                                           0.5092
+any_chemo_missingYes                                                                        614.2452
+any_rt_missingYes                                                                             1.0731
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:maxchestrtdose.categoryAny            0.6213
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:maxchestrtdose.categoryAny            0.6183
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category1st-2nd     0.7559
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category1st-2nd     0.8134
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category3rd         0.6957
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category3rd         0.6672
+                                                                                          z value
+(Intercept)                                                                               -0.8105
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd                                    0.3351
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd                                    0.4611
+AGE_AT_LAST_CONTACT.cs1                                                                    0.6000
+AGE_AT_LAST_CONTACT.cs2                                                                   -0.5940
+AGE_AT_LAST_CONTACT.cs3                                                                    0.6355
+AGE_AT_LAST_CONTACT.cs4                                                                   -0.7561
+AGE_AT_DIAGNOSIS5-9                                                                       -0.7161
+AGE_AT_DIAGNOSIS10-14                                                                      3.5240
+AGE_AT_DIAGNOSIS>=15                                                                       2.9706
+maxchestrtdose.categoryAny                                                                 2.7728
+anthra_jco_dose_5.category1st-2nd                                                         -0.1922
+anthra_jco_dose_5.category3rd                                                              2.0531
+EAS                                                                                        1.4606
+AFR                                                                                       -0.9283
+any_chemo_missingYes                                                                      -0.0161
+any_rt_missingYes                                                                          2.1859
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:maxchestrtdose.categoryAny         0.1766
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:maxchestrtdose.categoryAny         0.5264
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category1st-2nd  0.6309
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category1st-2nd  0.0572
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category3rd     -0.9865
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category3rd     -0.3554
+                                                                                          Pr(>|z|)
+(Intercept)                                                                                 0.4177
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd                                     0.7375
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd                                     0.6447
+AGE_AT_LAST_CONTACT.cs1                                                                     0.5485
+AGE_AT_LAST_CONTACT.cs2                                                                     0.5525
+AGE_AT_LAST_CONTACT.cs3                                                                     0.5251
+AGE_AT_LAST_CONTACT.cs4                                                                     0.4496
+AGE_AT_DIAGNOSIS5-9                                                                         0.4739
+AGE_AT_DIAGNOSIS10-14                                                                       0.0004
+AGE_AT_DIAGNOSIS>=15                                                                        0.0030
+maxchestrtdose.categoryAny                                                                  0.0056
+anthra_jco_dose_5.category1st-2nd                                                           0.8476
+anthra_jco_dose_5.category3rd                                                               0.0401
+EAS                                                                                         0.1441
+AFR                                                                                         0.3532
+any_chemo_missingYes                                                                        0.9872
+any_rt_missingYes                                                                           0.0288
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:maxchestrtdose.categoryAny          0.8598
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:maxchestrtdose.categoryAny          0.5986
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category1st-2nd   0.5281
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category1st-2nd   0.9544
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category2nd:anthra_jco_dose_5.category3rd       0.3239
+Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category3rd:anthra_jco_dose_5.category3rd       0.7223
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@noderome188>
+Subject: Job 247002289: <test3> in cluster <hpcf_research_cluster> Exited
+
+Job <test3> was submitted from host <splprhpc11> by user <aneupane> in cluster <hpcf_research_cluster> at Fri Jan 17 16:57:30 2025
+Job was executed on host(s) <noderome188>, in queue <standard>, as user <aneupane> in cluster <hpcf_research_cluster> at Fri Jan 17 16:57:37 2025
+</home/aneupane> was used as the home directory.
+</home/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V21b_Lancet_Revision_HPC/21b/SJLIFE/Without_lifestyle/Models/with_collapsed_categories> was used as the working directory.
+Started at Fri Jan 17 16:57:37 2025
+Terminated at Fri Jan 17 16:57:53 2025
+Results reported at Fri Jan 17 16:57:53 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+bash -c "module load R/4.2.2 && Rscript test3.R"
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   10.34 sec.
+    Max Memory :                                 569 MB
+    Average Memory :                             423.80 MB
+    Total Requested Memory :                     20000.00 MB
+    Delta Memory :                               19431.00 MB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                5
+    Run time :                                   16 sec.
+    Turnaround time :                            23 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <logs/test3.err> for stderr output of this job.
+

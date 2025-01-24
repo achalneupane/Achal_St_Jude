@@ -1,0 +1,15 @@
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Error in data.frame(..., check.names = FALSE) : 
+  object 'estimate' not found
+Calls: setNames -> cbind.data.frame -> data.frame
+Execution halted

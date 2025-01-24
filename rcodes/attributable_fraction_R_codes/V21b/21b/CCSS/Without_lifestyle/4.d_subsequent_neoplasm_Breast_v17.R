@@ -264,7 +264,8 @@ length(unique(SNs_py$ccssid[SNs_py$event==1]))
 length(unique(SNs_py$ccssid[SNs_py$event==1 & SNs_py$evt1==1 ]))
 
 SNs_py$PY <- SNs_py$end-SNs_py$start
-
+sum(SNs_py$PY) ##  comment out # PHENO.ANY_SN <- PHENO.ANY_SN[PHENO.ANY_SN$gender == "Female",]
+# 182791.3
 ###############
 ## Model fit ##
 ###############

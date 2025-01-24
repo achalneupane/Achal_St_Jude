@@ -1,0 +1,192 @@
+                       row_labels ANY_SNs|0 ANY_SNs|1 ANY_SNs|#Total cases
+1      maxsegrtdose.category|None      2211       173                 2384
+2    maxsegrtdose.category|>0-<18        41         7                   48
+3  maxsegrtdose.category|>=18-<30       135        22                  157
+4      maxsegrtdose.category|>=30       274        66                  340
+5    maxchestrtdose.category|None      2210       156                 2366
+6  maxchestrtdose.category|>0-<20       123        27                  150
+7    maxchestrtdose.category|>=20       328        85                  413
+8      maxabdrtdose.category|None      2268       185                 2453
+9    maxabdrtdose.category|>0-<30       259        47                  306
+10     maxabdrtdose.category|>=30       134        36                  170
+11    epitxn_dose_5.category|None      2079       193                 2272
+12     epitxn_dose_5.category|1st       173        25                  198
+13     epitxn_dose_5.category|2nd       214        27                  241
+14     epitxn_dose_5.category|3rd       195        23                  218
+[1] "maxsegrtdose.category|>0-<18"
+
+  None >0-<20   >=20 
+ 39815   2105   3909 
+
+Call:
+glm(formula = event ~ Zhaoming_carriers + Qin_without_Zhaoming_vars_carriers + 
+    Pleiotropy_PRSWEB_PRS.tertile.category + AGE_AT_LAST_CONTACT.cs1 + 
+    AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + 
+    AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + maxabdrtdose.category + 
+    maxchestrtdose.category + epitxn_dose_5.category + EAS + 
+    AFR + any_chemo_missing + any_rt_missing, family = "poisson", 
+    data = dat_all, offset = log(dat_all$PY))
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.7730  -0.1055  -0.0669  -0.0419   4.5249  
+
+Coefficients:
+                                            Estimate Std. Error z value
+(Intercept)                               -1.160e+01  2.186e+00  -5.306
+Zhaoming_carriersY                         5.138e-01  5.952e-01   0.863
+Qin_without_Zhaoming_vars_carriersY       -5.128e-02  3.440e-01  -0.149
+Pleiotropy_PRSWEB_PRS.tertile.category2nd  8.812e-02  1.562e-01   0.564
+Pleiotropy_PRSWEB_PRS.tertile.category3rd  5.809e-02  1.553e-01   0.374
+AGE_AT_LAST_CONTACT.cs1                    2.912e-01  1.536e-01   1.896
+AGE_AT_LAST_CONTACT.cs2                   -6.867e-04  9.684e-04  -0.709
+AGE_AT_LAST_CONTACT.cs3                    2.067e-03  3.250e-03   0.636
+AGE_AT_LAST_CONTACT.cs4                   -1.788e-03  3.579e-03  -0.499
+AGE_AT_DIAGNOSIS5-9                       -4.384e-01  2.039e-01  -2.150
+AGE_AT_DIAGNOSIS10-14                     -1.075e+00  2.162e-01  -4.973
+AGE_AT_DIAGNOSIS>=15                      -1.322e+00  2.459e-01  -5.375
+genderFemale                               4.295e-01  1.305e-01   3.291
+maxsegrtdose.category>0-<30                1.211e-01  2.467e-01   0.491
+maxsegrtdose.category>=30                  8.841e-01  1.740e-01   5.080
+maxabdrtdose.category>0-<30                1.551e-01  2.352e-01   0.659
+maxabdrtdose.category>=30                 -1.345e-01  2.527e-01  -0.532
+maxchestrtdose.category>0-<20              8.901e-01  2.904e-01   3.065
+maxchestrtdose.category>=20                8.900e-01  1.927e-01   4.620
+epitxn_dose_5.category1st                  3.764e-01  2.230e-01   1.688
+epitxn_dose_5.category2nd                  7.099e-01  2.123e-01   3.345
+epitxn_dose_5.category3rd                  5.541e-01  2.288e-01   2.422
+EAS                                       -1.326e-01  4.711e-01  -0.282
+AFR                                       -1.631e+00  6.875e-01  -2.372
+any_chemo_missingYes                       3.403e-01  3.139e-01   1.084
+any_rt_missingYes                          4.102e-01  2.994e-01   1.370
+                                          Pr(>|z|)    
+(Intercept)                               1.12e-07 ***
+Zhaoming_carriersY                        0.388036    
+Qin_without_Zhaoming_vars_carriersY       0.881507    
+Pleiotropy_PRSWEB_PRS.tertile.category2nd 0.572669    
+Pleiotropy_PRSWEB_PRS.tertile.category3rd 0.708361    
+AGE_AT_LAST_CONTACT.cs1                   0.058010 .  
+AGE_AT_LAST_CONTACT.cs2                   0.478275    
+AGE_AT_LAST_CONTACT.cs3                   0.524777    
+AGE_AT_LAST_CONTACT.cs4                   0.617432    
+AGE_AT_DIAGNOSIS5-9                       0.031550 *  
+AGE_AT_DIAGNOSIS10-14                     6.59e-07 ***
+AGE_AT_DIAGNOSIS>=15                      7.65e-08 ***
+genderFemale                              0.000998 ***
+maxsegrtdose.category>0-<30               0.623423    
+maxsegrtdose.category>=30                 3.77e-07 ***
+maxabdrtdose.category>0-<30               0.509616    
+maxabdrtdose.category>=30                 0.594453    
+maxchestrtdose.category>0-<20             0.002174 ** 
+maxchestrtdose.category>=20               3.84e-06 ***
+epitxn_dose_5.category1st                 0.091391 .  
+epitxn_dose_5.category2nd                 0.000824 ***
+epitxn_dose_5.category3rd                 0.015446 *  
+EAS                                       0.778293    
+AFR                                       0.017699 *  
+any_chemo_missingYes                      0.278411    
+any_rt_missingYes                         0.170588    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 3211.5  on 48217  degrees of freedom
+Residual deviance: 2798.0  on 48192  degrees of freedom
+  (1742 observations deleted due to missingness)
+AIC: 3366
+
+Number of Fisher Scoring iterations: 9
+
+[1] 0.1359524
+[1] 0.146642
+[1] 0.1288491
+[1] 0.1454142
+[1] 0.1138932
+[1] 0.1358261
+[1] 0.1332087
+[1] 0.3693359
+[1] 0.4044594
+[1] 0.3459958
+[1] 0.3850737
+[1] 0.3326445
+[1] 0.3683365
+[1] 0.3644609
+[1] 0.4580897
+[1] 0.4910558
+[1] 0.4361832
+[1] 0.4777438
+[1] 0.4122679
+[1] 0.4565319
+[1] 0.4539041
+[1] 0.04660275
+[1] 0.04479651
+[1] 0.04780303
+[1] 0.0467906
+[1] 0.0461648
+[1] 0.04775852
+[1] 0.05798038
+[1] 0.0007394694
+[1] 0.003861175
+[1] 0.04843633
+[1] 0.06150165
+[1] 0.482551
+[1] 0.5143741
+[1] 0.4614041
+[1] 0.5022242
+[1] 0.4366847
+[1] 0.4815895
+[1] 0.4889066
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+[1] 10
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@noderome326>
+Subject: Job 247033310: <test4_20250118_101508> in cluster <hpcf_research_cluster> Done
+
+Job <test4_20250118_101508> was submitted from host <splprhpc11> by user <aneupane> in cluster <hpcf_research_cluster> at Sat Jan 18 10:15:11 2025
+Job was executed on host(s) <noderome326>, in queue <priority>, as user <aneupane> in cluster <hpcf_research_cluster> at Sat Jan 18 10:15:37 2025
+</home/aneupane> was used as the home directory.
+</home/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V21b_Lancet_Revision_HPC/21b/CCSS/Without_lifestyle_ccss_exp_PLP/models/with_collapsed_categories> was used as the working directory.
+Started at Sat Jan 18 10:15:37 2025
+Terminated at Sat Jan 18 10:15:54 2025
+Results reported at Sat Jan 18 10:15:54 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+bash -c "module load R/4.2.2 && Rscript test4.R"
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   14.87 sec.
+    Max Memory :                                 574 MB
+    Average Memory :                             432.17 MB
+    Total Requested Memory :                     20000.00 MB
+    Delta Memory :                               19426.00 MB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                5
+    Run time :                                   16 sec.
+    Turnaround time :                            43 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <logs/test4_20250118_101508.err> for stderr output of this job.
+

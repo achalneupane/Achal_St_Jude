@@ -1,0 +1,258 @@
+                      row_labels MENINGIOMA|0 MENINGIOMA|1
+1     maxsegrtdose.category|None         5864           26
+2   maxsegrtdose.category|>0-<18           80            3
+3 maxsegrtdose.category|>=18-<30          898           99
+4     maxsegrtdose.category|>=30          763           82
+5    epitxn_dose_5.category|None         6802          193
+6     epitxn_dose_5.category|1st          265            8
+7     epitxn_dose_5.category|2nd          269            3
+8     epitxn_dose_5.category|3rd          269            6
+  MENINGIOMA|#Total cases
+1                    5890
+2                      83
+3                     997
+4                     845
+5                    6995
+6                     273
+7                     272
+8                     275
+[1] "maxsegrtdose.category|>0-<18" "epitxn_dose_5.category|1st"  
+[3] "epitxn_dose_5.category|2nd"   "epitxn_dose_5.category|3rd"  
+
+ <30 >=30 
+   0    0 
+
+Call:
+glm(formula = event ~ Meningioma_PRS.tertile.category + AGE_AT_LAST_CONTACT.cs1 + 
+    AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + 
+    AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + epitxn_dose_5.category + 
+    Smoker_ever_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + 
+    Obese_yn + EAS + AFR + any_lifestyle_missing + any_chemo_missing + 
+    any_rt_missing, family = "poisson", data = dat_all, offset = log(dat_all$PY))
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.4196  -0.0715  -0.0511  -0.0357   4.8898  
+
+Coefficients:
+                                     Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                        -9.061e+00  1.702e+00  -5.324 1.02e-07 ***
+Meningioma_PRS.tertile.category2nd  1.052e-02  1.477e-01   0.071 0.943199    
+Meningioma_PRS.tertile.category3rd  4.032e-01  3.047e-01   1.323 0.185672    
+AGE_AT_LAST_CONTACT.cs1             7.550e-02  6.652e-02   1.135 0.256360    
+AGE_AT_LAST_CONTACT.cs2             3.638e-05  6.831e-04   0.053 0.957528    
+AGE_AT_LAST_CONTACT.cs3             3.242e-04  2.213e-03   0.147 0.883488    
+AGE_AT_LAST_CONTACT.cs4            -9.268e-04  2.412e-03  -0.384 0.700852    
+AGE_AT_DIAGNOSIS5-9                -3.303e-01  1.756e-01  -1.881 0.059938 .  
+AGE_AT_DIAGNOSIS10-14              -1.265e+00  2.222e-01  -5.694 1.24e-08 ***
+AGE_AT_DIAGNOSIS>=15               -2.193e+00  3.071e-01  -7.140 9.32e-13 ***
+genderFemale                        4.794e-01  1.440e-01   3.328 0.000874 ***
+maxsegrtdose.category>=30           1.754e+00  1.506e-01  11.644  < 2e-16 ***
+epitxn_dose_5.categoryAny           1.033e+00  2.626e-01   3.932 8.41e-05 ***
+Smoker_ever_ynYes                  -1.522e-01  1.874e-01  -0.812 0.416684    
+PhysicalActivity_ynNo               1.734e-02  1.444e-01   0.120 0.904397    
+RiskyHeavyDrink_ynYes              -4.606e-01  2.626e-01  -1.754 0.079492 .  
+Obese_ynYes                         1.704e-01  1.942e-01   0.877 0.380336    
+EAS                                 4.534e-01  6.055e-01   0.749 0.453945    
+AFR                                -1.161e+00  8.788e-01  -1.321 0.186402    
+any_lifestyle_missingYes            4.016e-01  1.676e-01   2.396 0.016590 *  
+any_chemo_missingYes                8.848e-01  3.785e-01   2.338 0.019398 *  
+any_rt_missingYes                  -3.934e-01  4.346e-01  -0.905 0.365355    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 2930.9  on 86284  degrees of freedom
+Residual deviance: 2666.8  on 86263  degrees of freedom
+  (321 observations deleted due to missingness)
+AIC: 3126.8
+
+Number of Fisher Scoring iterations: 9
+
+[1] 0.0865028
+[1] 0.09794459
+[1] 0.07890546
+[1] 0.1317791
+[1] 0.05468029
+[1] 0.0835831
+[1] 0.201745
+[1] 0.2971887
+[1] 0.3476218
+[1] 0.2637012
+[1] 0.3187116
+[1] 0.2820613
+[1] 0.2955122
+[1] 0.4367177
+[1] 0.3705454
+[1] 0.4215068
+[1] 0.3367071
+[1] 0.4231951
+[1] 0.3335405
+[1] 0.3657944
+[1] 0.5532121
+[1] 0.02322112
+[1] 0.0242921
+[1] 0.02250999
+[1] 0.02812171
+[1] 0.01977672
+[1] 0.02398902
+[1] 0.008524546
+[1] 0.05401293
+[1] 0.04073127
+[1] 0.06283195
+[1] 0.1145113
+[1] 0.01149153
+[1] -412.7235
+[1] -729.318
+[1] 0.414557
+[1] 0.4550049
+[1] 0.3876996
+[1] 0.5059472
+[1] 0.3503233
+[1] 0.410308
+[1] 0.6004118
+
+Call:
+glm(formula = event ~ Meningioma_PRS.tertile.category + AGE_AT_LAST_CONTACT.cs1 + 
+    AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + 
+    AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + epitxn_dose_5.category + 
+    Smoker_ever_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + 
+    Obese_yn + EAS + AFR + any_lifestyle_missing + any_chemo_missing + 
+    any_rt_missing, family = "poisson", data = dat_all, offset = log(dat_all$PY))
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.4196  -0.0715  -0.0511  -0.0357   4.8898  
+
+Coefficients:
+                                     Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                        -9.061e+00  1.702e+00  -5.324 1.02e-07 ***
+Meningioma_PRS.tertile.category2nd  1.052e-02  1.477e-01   0.071 0.943199    
+Meningioma_PRS.tertile.category3rd  4.032e-01  3.047e-01   1.323 0.185672    
+AGE_AT_LAST_CONTACT.cs1             7.550e-02  6.652e-02   1.135 0.256360    
+AGE_AT_LAST_CONTACT.cs2             3.638e-05  6.831e-04   0.053 0.957528    
+AGE_AT_LAST_CONTACT.cs3             3.242e-04  2.213e-03   0.147 0.883488    
+AGE_AT_LAST_CONTACT.cs4            -9.268e-04  2.412e-03  -0.384 0.700852    
+AGE_AT_DIAGNOSIS5-9                -3.303e-01  1.756e-01  -1.881 0.059938 .  
+AGE_AT_DIAGNOSIS10-14              -1.265e+00  2.222e-01  -5.694 1.24e-08 ***
+AGE_AT_DIAGNOSIS>=15               -2.193e+00  3.071e-01  -7.140 9.32e-13 ***
+genderFemale                        4.794e-01  1.440e-01   3.328 0.000874 ***
+maxsegrtdose.category>=30           1.754e+00  1.506e-01  11.644  < 2e-16 ***
+epitxn_dose_5.categoryAny           1.033e+00  2.626e-01   3.932 8.41e-05 ***
+Smoker_ever_ynYes                  -1.522e-01  1.874e-01  -0.812 0.416684    
+PhysicalActivity_ynNo               1.734e-02  1.444e-01   0.120 0.904397    
+RiskyHeavyDrink_ynYes              -4.606e-01  2.626e-01  -1.754 0.079492 .  
+Obese_ynYes                         1.704e-01  1.942e-01   0.877 0.380336    
+EAS                                 4.534e-01  6.055e-01   0.749 0.453945    
+AFR                                -1.161e+00  8.788e-01  -1.321 0.186402    
+any_lifestyle_missingYes            4.016e-01  1.676e-01   2.396 0.016590 *  
+any_chemo_missingYes                8.848e-01  3.785e-01   2.338 0.019398 *  
+any_rt_missingYes                  -3.934e-01  4.346e-01  -0.905 0.365355    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 2930.9  on 86284  degrees of freedom
+Residual deviance: 2666.8  on 86263  degrees of freedom
+  (321 observations deleted due to missingness)
+AIC: 3126.8
+
+Number of Fisher Scoring iterations: 9
+
+[1] 0.0865028
+[1] 0.09794459
+[1] 0.07890546
+[1] 0.1317791
+[1] 0.05468029
+[1] 0.0835831
+[1] 0.201745
+[1] 0.2971887
+[1] 0.3476218
+[1] 0.2637012
+[1] 0.3187116
+[1] 0.2820613
+[1] 0.2955122
+[1] 0.4367177
+[1] 0.3705454
+[1] 0.4215068
+[1] 0.3367071
+[1] 0.4231951
+[1] 0.3335405
+[1] 0.3657944
+[1] 0.5532121
+[1] 0.02322112
+[1] 0.0242921
+[1] 0.02250999
+[1] 0.02812171
+[1] 0.01977672
+[1] 0.02398902
+[1] 0.008524546
+[1] 0.05401293
+[1] 0.04073127
+[1] 0.06283195
+[1] 0.1145113
+[1] 0.01149153
+[1] -412.7235
+[1] -729.318
+[1] 0.414557
+[1] 0.4550049
+[1] 0.3876996
+[1] 0.5059472
+[1] 0.3503233
+[1] 0.410308
+[1] 0.6004118
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+[1] 10
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@noderome112>
+Subject: Job 247078230: <test4_20250120_182119> in cluster <hpcf_research_cluster> Done
+
+Job <test4_20250120_182119> was submitted from host <splprhpc11> by user <aneupane> in cluster <hpcf_research_cluster> at Mon Jan 20 18:21:20 2025
+Job was executed on host(s) <noderome112>, in queue <priority>, as user <aneupane> in cluster <hpcf_research_cluster> at Mon Jan 20 18:21:22 2025
+</home/aneupane> was used as the home directory.
+</home/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V21b_Lancet_Revision_HPC/21b/CCSS/With_lifestyle_no_diet/models/with_collapsed_categories/drinking> was used as the working directory.
+Started at Mon Jan 20 18:21:22 2025
+Terminated at Mon Jan 20 18:21:32 2025
+Results reported at Mon Jan 20 18:21:32 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+bash -c "module load R/4.2.2 && Rscript test4.R"
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   4.37 sec.
+    Max Memory :                                 333 MB
+    Average Memory :                             250.00 MB
+    Total Requested Memory :                     20000.00 MB
+    Delta Memory :                               19667.00 MB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                4
+    Run time :                                   10 sec.
+    Turnaround time :                            12 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <logs/test4_20250120_182119.err> for stderr output of this job.
+

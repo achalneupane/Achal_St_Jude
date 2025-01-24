@@ -1,0 +1,1759 @@
+                       row_labels SMNs|0 SMNs|1 SMNs|#Total cases
+1      maxsegrtdose.category|None   5364    580              5944
+2    maxsegrtdose.category|>0-<18     78     10                88
+3  maxsegrtdose.category|>=18-<30    923     87              1010
+4      maxsegrtdose.category|>=30    793     85               878
+5    maxchestrtdose.category|None   5718    413              6131
+6  maxchestrtdose.category|>0-<20    338     50               388
+7    maxchestrtdose.category|>=20   1102    299              1401
+8      maxabdrtdose.category|None   5763    477              6240
+9    maxabdrtdose.category|>0-<30    808    101               909
+10     maxabdrtdose.category|>=30    587    184               771
+11    epitxn_dose_5.category|None   6377    708              7085
+12     epitxn_dose_5.category|1st    266     13               279
+13     epitxn_dose_5.category|2nd    261     16               277
+14     epitxn_dose_5.category|3rd    254     25               279
+character(0)
+
+Call:
+glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category + 
+    AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + 
+    AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + 
+    maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category + 
+    EAS + AFR + any_chemo_missing + any_rt_missing, family = "poisson", 
+    data = dat_all, offset = log(dat_all$PY))
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.4732  -0.0985  -0.0620  -0.0418   4.7672  
+
+Coefficients:
+                                            Estimate Std. Error z value
+(Intercept)                               -8.403e+00  7.510e-01 -11.188
+Pleiotropy_PRSWEB_PRS.tertile.category2nd  7.098e-02  9.113e-02   0.779
+Pleiotropy_PRSWEB_PRS.tertile.category3rd  7.197e-02  8.997e-02   0.800
+AGE_AT_LAST_CONTACT.cs1                    4.613e-02  4.874e-02   0.946
+AGE_AT_LAST_CONTACT.cs2                    1.845e-04  2.185e-04   0.844
+AGE_AT_LAST_CONTACT.cs3                   -3.947e-04  8.066e-04  -0.489
+AGE_AT_LAST_CONTACT.cs4                   -1.288e-05  8.931e-04  -0.014
+AGE_AT_DIAGNOSIS5-9                       -2.370e-01  1.237e-01  -1.916
+AGE_AT_DIAGNOSIS10-14                     -1.771e-01  1.161e-01  -1.525
+AGE_AT_DIAGNOSIS>=15                      -3.251e-01  1.238e-01  -2.627
+genderFemale                               6.288e-01  7.660e-02   8.209
+maxsegrtdose.category>0-<30               -1.436e-01  1.175e-01  -1.222
+maxsegrtdose.category>=30                  7.204e-02  1.204e-01   0.598
+maxabdrtdose.category>0-<30                9.921e-02  1.289e-01   0.770
+maxabdrtdose.category>=30                  3.198e-01  1.108e-01   2.887
+maxchestrtdose.category>0-<20              6.957e-01  1.674e-01   4.156
+maxchestrtdose.category>=20                6.360e-01  1.026e-01   6.202
+epitxn_dose_5.category1st                  3.685e-02  2.825e-01   0.130
+epitxn_dose_5.category2nd                  6.307e-01  2.568e-01   2.456
+epitxn_dose_5.category3rd                  8.897e-01  2.080e-01   4.277
+EAS                                        9.132e-02  4.075e-01   0.224
+AFR                                       -9.268e-02  3.631e-01  -0.255
+any_chemo_missingYes                       2.861e-01  2.051e-01   1.395
+any_rt_missingYes                          3.407e-02  2.045e-01   0.167
+                                          Pr(>|z|)    
+(Intercept)                                < 2e-16 ***
+Pleiotropy_PRSWEB_PRS.tertile.category2nd  0.43604    
+Pleiotropy_PRSWEB_PRS.tertile.category3rd  0.42376    
+AGE_AT_LAST_CONTACT.cs1                    0.34397    
+AGE_AT_LAST_CONTACT.cs2                    0.39851    
+AGE_AT_LAST_CONTACT.cs3                    0.62459    
+AGE_AT_LAST_CONTACT.cs4                    0.98850    
+AGE_AT_DIAGNOSIS5-9                        0.05530 .  
+AGE_AT_DIAGNOSIS10-14                      0.12726    
+AGE_AT_DIAGNOSIS>=15                       0.00863 ** 
+genderFemale                              2.24e-16 ***
+maxsegrtdose.category>0-<30                0.22164    
+maxsegrtdose.category>=30                  0.54962    
+maxabdrtdose.category>0-<30                0.44144    
+maxabdrtdose.category>=30                  0.00389 ** 
+maxchestrtdose.category>0-<20             3.24e-05 ***
+maxchestrtdose.category>=20               5.58e-10 ***
+epitxn_dose_5.category1st                  0.89622    
+epitxn_dose_5.category2nd                  0.01404 *  
+epitxn_dose_5.category3rd                 1.89e-05 ***
+EAS                                        0.82267    
+AFR                                        0.79852    
+any_chemo_missingYes                       0.16305    
+any_rt_missingYes                          0.86764    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 9814.7  on 185366  degrees of freedom
+Residual deviance: 8872.1  on 185343  degrees of freedom
+  (1677 observations deleted due to missingness)
+AIC: 10440
+
+Number of Fisher Scoring iterations: 9
+
+[1] 0.04196112
+[1] 0.04205599
+[1] 0.04191092
+[1] 0.06979505
+[1] 0.02374162
+[1] 0.03945296
+[1] 0.08890544
+[1] 0.2548251
+[1] 0.2566614
+[1] 0.2538534
+[1] 0.2125317
+[1] 0.2825095
+[1] 0.2594287
+[1] 0.1965852
+[1] 0.2902296
+[1] 0.2925775
+[1] 0.2889871
+[1] 0.2708286
+[1] 0.3029291
+[1] 0.2928146
+[1] 0.2716892
+[1] 0.04757016
+[1] 0.04818884
+[1] 0.04724277
+[1] 0.04718757
+[1] 0.0478206
+[1] 0.04831327
+[1] 0.05552047
+[1] 0.3238412
+[1] 0.3263572
+[1] 0.3225097
+[1] 0.3051462
+[1] 0.3360785
+[1] 0.3268701
+[1] 0.3117318
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+[1] 10
+[1] 11
+[1] 12
+[1] 13
+[1] 14
+[1] 15
+[1] 16
+[1] 17
+[1] 18
+[1] 19
+[1] 20
+[1] 21
+[1] 22
+[1] 23
+[1] 24
+[1] 25
+[1] 26
+[1] 27
+[1] 28
+[1] 29
+[1] 30
+[1] 31
+[1] 32
+[1] 33
+[1] 34
+[1] 35
+[1] 36
+[1] 37
+[1] 38
+[1] 39
+[1] 40
+[1] 41
+[1] 42
+[1] 43
+[1] 44
+[1] 45
+[1] 46
+[1] 47
+[1] 48
+[1] 49
+[1] 50
+[1] 51
+[1] 52
+[1] 53
+[1] 54
+[1] 55
+[1] 56
+[1] 57
+[1] 58
+[1] 59
+[1] 60
+[1] 61
+[1] 62
+[1] 63
+[1] 64
+[1] 65
+[1] 66
+[1] 67
+[1] 68
+[1] 69
+[1] 70
+[1] 71
+[1] 72
+[1] 73
+[1] 74
+[1] 75
+[1] 76
+[1] 77
+[1] 78
+[1] 79
+[1] 80
+[1] 81
+[1] 82
+[1] 83
+[1] 84
+[1] 85
+[1] 86
+[1] 87
+[1] 88
+[1] 89
+[1] 90
+[1] 91
+[1] 92
+[1] 93
+[1] 94
+[1] 95
+[1] 96
+[1] 97
+[1] 98
+[1] 99
+[1] 100
+[1] 101
+[1] 102
+[1] 103
+[1] 104
+[1] 105
+[1] 106
+[1] 107
+[1] 108
+[1] 109
+[1] 110
+[1] 111
+[1] 112
+[1] 113
+[1] 114
+[1] 115
+[1] 116
+[1] 117
+[1] 118
+[1] 119
+[1] 120
+[1] 121
+[1] 122
+[1] 123
+[1] 124
+[1] 125
+[1] 126
+[1] 127
+[1] 128
+[1] 129
+[1] 130
+[1] 131
+[1] 132
+[1] 133
+[1] 134
+[1] 135
+[1] 136
+[1] 137
+[1] 138
+[1] 139
+[1] 140
+[1] 141
+[1] 142
+[1] 143
+[1] 144
+[1] 145
+[1] 146
+[1] 147
+[1] 148
+[1] 149
+[1] 150
+[1] 151
+[1] 152
+[1] 153
+[1] 154
+[1] 155
+[1] 156
+[1] 157
+[1] 158
+[1] 159
+[1] 160
+[1] 161
+[1] 162
+[1] 163
+[1] 164
+[1] 165
+[1] 166
+[1] 167
+[1] 168
+[1] 169
+[1] 170
+[1] 171
+[1] 172
+[1] 173
+[1] 174
+[1] 175
+[1] 176
+[1] 177
+[1] 178
+[1] 179
+[1] 180
+[1] 181
+[1] 182
+[1] 183
+[1] 184
+[1] 185
+[1] 186
+[1] 187
+[1] 188
+[1] 189
+[1] 190
+[1] 191
+[1] 192
+[1] 193
+[1] 194
+[1] 195
+[1] 196
+[1] 197
+[1] 198
+[1] 199
+[1] 200
+[1] 201
+[1] 202
+[1] 203
+[1] 204
+[1] 205
+[1] 206
+[1] 207
+[1] 208
+[1] 209
+[1] 210
+[1] 211
+[1] 212
+[1] 213
+[1] 214
+[1] 215
+[1] 216
+[1] 217
+[1] 218
+[1] 219
+[1] 220
+[1] 221
+[1] 222
+[1] 223
+[1] 224
+[1] 225
+[1] 226
+[1] 227
+[1] 228
+[1] 229
+[1] 230
+[1] 231
+[1] 232
+[1] 233
+[1] 234
+[1] 235
+[1] 236
+[1] 237
+[1] 238
+[1] 239
+[1] 240
+[1] 241
+[1] 242
+[1] 243
+[1] 244
+[1] 245
+[1] 246
+[1] 247
+[1] 248
+[1] 249
+[1] 250
+[1] 251
+[1] 252
+[1] 253
+[1] 254
+[1] 255
+[1] 256
+[1] 257
+[1] 258
+[1] 259
+[1] 260
+[1] 261
+[1] 262
+[1] 263
+[1] 264
+[1] 265
+[1] 266
+[1] 267
+[1] 268
+[1] 269
+[1] 270
+[1] 271
+[1] 272
+[1] 273
+[1] 274
+[1] 275
+[1] 276
+[1] 277
+[1] 278
+[1] 279
+[1] 280
+[1] 281
+[1] 282
+[1] 283
+[1] 284
+[1] 285
+[1] 286
+[1] 287
+[1] 288
+[1] 289
+[1] 290
+[1] 291
+[1] 292
+[1] 293
+[1] 294
+[1] 295
+[1] 296
+[1] 297
+[1] 298
+[1] 299
+[1] 300
+[1] 301
+[1] 302
+[1] 303
+[1] 304
+[1] 305
+[1] 306
+[1] 307
+[1] 308
+[1] 309
+[1] 310
+[1] 311
+[1] 312
+[1] 313
+[1] 314
+[1] 315
+[1] 316
+[1] 317
+[1] 318
+[1] 319
+[1] 320
+[1] 321
+[1] 322
+[1] 323
+[1] 324
+[1] 325
+[1] 326
+[1] 327
+[1] 328
+[1] 329
+[1] 330
+[1] 331
+[1] 332
+[1] 333
+[1] 334
+[1] 335
+[1] 336
+[1] 337
+[1] 338
+[1] 339
+[1] 340
+[1] 341
+[1] 342
+[1] 343
+[1] 344
+[1] 345
+[1] 346
+[1] 347
+[1] 348
+[1] 349
+[1] 350
+[1] 351
+[1] 352
+[1] 353
+[1] 354
+[1] 355
+[1] 356
+[1] 357
+[1] 358
+[1] 359
+[1] 360
+[1] 361
+[1] 362
+[1] 363
+[1] 364
+[1] 365
+[1] 366
+[1] 367
+[1] 368
+[1] 369
+[1] 370
+[1] 371
+[1] 372
+[1] 373
+[1] 374
+[1] 375
+[1] 376
+[1] 377
+[1] 378
+[1] 379
+[1] 380
+[1] 381
+[1] 382
+[1] 383
+[1] 384
+[1] 385
+[1] 386
+[1] 387
+[1] 388
+[1] 389
+[1] 390
+[1] 391
+[1] 392
+[1] 393
+[1] 394
+[1] 395
+[1] 396
+[1] 397
+[1] 398
+[1] 399
+[1] 400
+[1] 401
+[1] 402
+[1] 403
+[1] 404
+[1] 405
+[1] 406
+[1] 407
+[1] 408
+[1] 409
+[1] 410
+[1] 411
+[1] 412
+[1] 413
+[1] 414
+[1] 415
+[1] 416
+[1] 417
+[1] 418
+[1] 419
+[1] 420
+[1] 421
+[1] 422
+[1] 423
+[1] 424
+[1] 425
+[1] 426
+[1] 427
+[1] 428
+[1] 429
+[1] 430
+[1] 431
+[1] 432
+[1] 433
+[1] 434
+[1] 435
+[1] 436
+[1] 437
+[1] 438
+[1] 439
+[1] 440
+[1] 441
+[1] 442
+[1] 443
+[1] 444
+[1] 445
+[1] 446
+[1] 447
+[1] 448
+[1] 449
+[1] 450
+[1] 451
+[1] 452
+[1] 453
+[1] 454
+[1] 455
+[1] 456
+[1] 457
+[1] 458
+[1] 459
+[1] 460
+[1] 461
+[1] 462
+[1] 463
+[1] 464
+[1] 465
+[1] 466
+[1] 467
+[1] 468
+[1] 469
+[1] 470
+[1] 471
+[1] 472
+[1] 473
+[1] 474
+[1] 475
+[1] 476
+[1] 477
+[1] 478
+[1] 479
+[1] 480
+[1] 481
+[1] 482
+[1] 483
+[1] 484
+[1] 485
+[1] 486
+[1] 487
+[1] 488
+[1] 489
+[1] 490
+[1] 491
+[1] 492
+[1] 493
+[1] 494
+[1] 495
+[1] 496
+[1] 497
+[1] 498
+[1] 499
+[1] 500
+[1] 501
+[1] 502
+[1] 503
+[1] 504
+[1] 505
+[1] 506
+[1] 507
+[1] 508
+[1] 509
+[1] 510
+[1] 511
+[1] 512
+[1] 513
+[1] 514
+[1] 515
+[1] 516
+[1] 517
+[1] 518
+[1] 519
+[1] 520
+[1] 521
+[1] 522
+[1] 523
+[1] 524
+[1] 525
+[1] 526
+[1] 527
+[1] 528
+[1] 529
+[1] 530
+[1] 531
+[1] 532
+[1] 533
+[1] 534
+[1] 535
+[1] 536
+[1] 537
+[1] 538
+[1] 539
+[1] 540
+[1] 541
+[1] 542
+[1] 543
+[1] 544
+[1] 545
+[1] 546
+[1] 547
+[1] 548
+[1] 549
+[1] 550
+[1] 551
+[1] 552
+[1] 553
+[1] 554
+[1] 555
+[1] 556
+[1] 557
+[1] 558
+[1] 559
+[1] 560
+[1] 561
+[1] 562
+[1] 563
+[1] 564
+[1] 565
+[1] 566
+[1] 567
+[1] 568
+[1] 569
+[1] 570
+[1] 571
+[1] 572
+[1] 573
+[1] 574
+[1] 575
+[1] 576
+[1] 577
+[1] 578
+[1] 579
+[1] 580
+[1] 581
+[1] 582
+[1] 583
+[1] 584
+[1] 585
+[1] 586
+[1] 587
+[1] 588
+[1] 589
+[1] 590
+[1] 591
+[1] 592
+[1] 593
+[1] 594
+[1] 595
+[1] 596
+[1] 597
+[1] 598
+[1] 599
+[1] 600
+[1] 601
+[1] 602
+[1] 603
+[1] 604
+[1] 605
+[1] 606
+[1] 607
+[1] 608
+[1] 609
+[1] 610
+[1] 611
+[1] 612
+[1] 613
+[1] 614
+[1] 615
+[1] 616
+[1] 617
+[1] 618
+[1] 619
+[1] 620
+[1] 621
+[1] 622
+[1] 623
+[1] 624
+[1] 625
+[1] 626
+[1] 627
+[1] 628
+[1] 629
+[1] 630
+[1] 631
+[1] 632
+[1] 633
+[1] 634
+[1] 635
+[1] 636
+[1] 637
+[1] 638
+[1] 639
+[1] 640
+[1] 641
+[1] 642
+[1] 643
+[1] 644
+[1] 645
+[1] 646
+[1] 647
+[1] 648
+[1] 649
+[1] 650
+[1] 651
+[1] 652
+[1] 653
+[1] 654
+[1] 655
+[1] 656
+[1] 657
+[1] 658
+[1] 659
+[1] 660
+[1] 661
+[1] 662
+[1] 663
+[1] 664
+[1] 665
+[1] 666
+[1] 667
+[1] 668
+[1] 669
+[1] 670
+[1] 671
+[1] 672
+[1] 673
+[1] 674
+[1] 675
+[1] 676
+[1] 677
+[1] 678
+[1] 679
+[1] 680
+[1] 681
+[1] 682
+[1] 683
+[1] 684
+[1] 685
+[1] 686
+[1] 687
+[1] 688
+[1] 689
+[1] 690
+[1] 691
+[1] 692
+[1] 693
+[1] 694
+[1] 695
+[1] 696
+[1] 697
+[1] 698
+[1] 699
+[1] 700
+[1] 701
+[1] 702
+[1] 703
+[1] 704
+[1] 705
+[1] 706
+[1] 707
+[1] 708
+[1] 709
+[1] 710
+[1] 711
+[1] 712
+[1] 713
+[1] 714
+[1] 715
+[1] 716
+[1] 717
+[1] 718
+[1] 719
+[1] 720
+[1] 721
+[1] 722
+[1] 723
+[1] 724
+[1] 725
+[1] 726
+[1] 727
+[1] 728
+[1] 729
+[1] 730
+[1] 731
+[1] 732
+[1] 733
+[1] 734
+[1] 735
+[1] 736
+[1] 737
+[1] 738
+[1] 739
+[1] 740
+[1] 741
+[1] 742
+[1] 743
+[1] 744
+[1] 745
+[1] 746
+[1] 747
+[1] 748
+[1] 749
+[1] 750
+[1] 751
+[1] 752
+[1] 753
+[1] 754
+[1] 755
+[1] 756
+[1] 757
+[1] 758
+[1] 759
+[1] 760
+[1] 761
+[1] 762
+[1] 763
+[1] 764
+[1] 765
+[1] 766
+[1] 767
+[1] 768
+[1] 769
+[1] 770
+[1] 771
+[1] 772
+[1] 773
+[1] 774
+[1] 775
+[1] 776
+[1] 777
+[1] 778
+[1] 779
+[1] 780
+[1] 781
+[1] 782
+[1] 783
+[1] 784
+[1] 785
+[1] 786
+[1] 787
+[1] 788
+[1] 789
+[1] 790
+[1] 791
+[1] 792
+[1] 793
+[1] 794
+[1] 795
+[1] 796
+[1] 797
+[1] 798
+[1] 799
+[1] 800
+[1] 801
+[1] 802
+[1] 803
+[1] 804
+[1] 805
+[1] 806
+[1] 807
+[1] 808
+[1] 809
+[1] 810
+[1] 811
+[1] 812
+[1] 813
+[1] 814
+[1] 815
+[1] 816
+[1] 817
+[1] 818
+[1] 819
+[1] 820
+[1] 821
+[1] 822
+[1] 823
+[1] 824
+[1] 825
+[1] 826
+[1] 827
+[1] 828
+[1] 829
+[1] 830
+[1] 831
+[1] 832
+[1] 833
+[1] 834
+[1] 835
+[1] 836
+[1] 837
+[1] 838
+[1] 839
+[1] 840
+[1] 841
+[1] 842
+[1] 843
+[1] 844
+[1] 845
+[1] 846
+[1] 847
+[1] 848
+[1] 849
+[1] 850
+[1] 851
+[1] 852
+[1] 853
+[1] 854
+[1] 855
+[1] 856
+[1] 857
+[1] 858
+[1] 859
+[1] 860
+[1] 861
+[1] 862
+[1] 863
+[1] 864
+[1] 865
+[1] 866
+[1] 867
+[1] 868
+[1] 869
+[1] 870
+[1] 871
+[1] 872
+[1] 873
+[1] 874
+[1] 875
+[1] 876
+[1] 877
+[1] 878
+[1] 879
+[1] 880
+[1] 881
+[1] 882
+[1] 883
+[1] 884
+[1] 885
+[1] 886
+[1] 887
+[1] 888
+[1] 889
+[1] 890
+[1] 891
+[1] 892
+[1] 893
+[1] 894
+[1] 895
+[1] 896
+[1] 897
+[1] 898
+[1] 899
+[1] 900
+[1] 901
+[1] 902
+[1] 903
+[1] 904
+[1] 905
+[1] 906
+[1] 907
+[1] 908
+[1] 909
+[1] 910
+[1] 911
+[1] 912
+[1] 913
+[1] 914
+[1] 915
+[1] 916
+[1] 917
+[1] 918
+[1] 919
+[1] 920
+[1] 921
+[1] 922
+[1] 923
+[1] 924
+[1] 925
+[1] 926
+[1] 927
+[1] 928
+[1] 929
+[1] 930
+[1] 931
+[1] 932
+[1] 933
+[1] 934
+[1] 935
+[1] 936
+[1] 937
+[1] 938
+[1] 939
+[1] 940
+[1] 941
+[1] 942
+[1] 943
+[1] 944
+[1] 945
+[1] 946
+[1] 947
+[1] 948
+[1] 949
+[1] 950
+[1] 951
+[1] 952
+[1] 953
+[1] 954
+[1] 955
+[1] 956
+[1] 957
+[1] 958
+[1] 959
+[1] 960
+[1] 961
+[1] 962
+[1] 963
+[1] 964
+[1] 965
+[1] 966
+[1] 967
+[1] 968
+[1] 969
+[1] 970
+[1] 971
+[1] 972
+[1] 973
+[1] 974
+[1] 975
+[1] 976
+[1] 977
+[1] 978
+[1] 979
+[1] 980
+[1] 981
+[1] 982
+[1] 983
+[1] 984
+[1] 985
+[1] 986
+[1] 987
+[1] 988
+[1] 989
+[1] 990
+[1] 991
+[1] 992
+[1] 993
+[1] 994
+[1] 995
+[1] 996
+[1] 997
+[1] 998
+[1] 999
+[1] 1000
+
+Call:
+glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category + 
+    AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + 
+    AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + 
+    maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category + 
+    EAS + AFR + any_chemo_missing + any_rt_missing + maxsegrtdose.category * 
+    Pleiotropy_PRSWEB_PRS.tertile.category + maxabdrtdose.category * 
+    Pleiotropy_PRSWEB_PRS.tertile.category + maxchestrtdose.category * 
+    Pleiotropy_PRSWEB_PRS.tertile.category + epitxn_dose_5.category * 
+    Pleiotropy_PRSWEB_PRS.tertile.category, family = "poisson", 
+    data = dat_all, offset = log(dat_all$PY))
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.4783  -0.0976  -0.0614  -0.0411   4.7023  
+
+Coefficients:
+                                                                          Estimate
+(Intercept)                                                             -8.442e+00
+Pleiotropy_PRSWEB_PRS.tertile.category2nd                                6.072e-02
+Pleiotropy_PRSWEB_PRS.tertile.category3rd                                1.383e-01
+AGE_AT_LAST_CONTACT.cs1                                                  4.582e-02
+AGE_AT_LAST_CONTACT.cs2                                                  1.864e-04
+AGE_AT_LAST_CONTACT.cs3                                                 -3.991e-04
+AGE_AT_LAST_CONTACT.cs4                                                 -1.188e-05
+AGE_AT_DIAGNOSIS5-9                                                     -2.262e-01
+AGE_AT_DIAGNOSIS10-14                                                   -1.566e-01
+AGE_AT_DIAGNOSIS>=15                                                    -3.030e-01
+genderFemale                                                             6.303e-01
+maxsegrtdose.category>0-<30                                             -3.796e-01
+maxsegrtdose.category>=30                                                2.460e-01
+maxabdrtdose.category>0-<30                                              4.555e-01
+maxabdrtdose.category>=30                                                4.456e-01
+maxchestrtdose.category>0-<20                                            3.469e-01
+maxchestrtdose.category>=20                                              5.445e-01
+epitxn_dose_5.category1st                                               -9.762e-02
+epitxn_dose_5.category2nd                                                1.202e+00
+epitxn_dose_5.category3rd                                                8.065e-01
+EAS                                                                      4.222e-02
+AFR                                                                     -1.439e-01
+any_chemo_missingYes                                                     2.739e-01
+any_rt_missingYes                                                        5.985e-02
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>0-<30    5.697e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>0-<30    1.508e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>=30     -7.661e-02
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>=30     -4.270e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>0-<30   -1.065e+00
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>0-<30   -1.094e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>=30     -2.147e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>=30     -1.728e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>0-<20  7.173e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>0-<20  3.397e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>=20    2.051e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>=20    6.433e-02
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category1st      8.946e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category1st     -8.186e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category2nd     -7.831e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category2nd     -1.012e+00
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category3rd      6.733e-02
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category3rd      1.491e-01
+                                                                        Std. Error
+(Intercept)                                                              7.540e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd                                1.381e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd                                1.371e-01
+AGE_AT_LAST_CONTACT.cs1                                                  4.876e-02
+AGE_AT_LAST_CONTACT.cs2                                                  2.185e-04
+AGE_AT_LAST_CONTACT.cs3                                                  8.067e-04
+AGE_AT_LAST_CONTACT.cs4                                                  8.932e-04
+AGE_AT_DIAGNOSIS5-9                                                      1.237e-01
+AGE_AT_DIAGNOSIS10-14                                                    1.164e-01
+AGE_AT_DIAGNOSIS>=15                                                     1.240e-01
+genderFemale                                                             7.679e-02
+maxsegrtdose.category>0-<30                                              2.208e-01
+maxsegrtdose.category>=30                                                2.023e-01
+maxabdrtdose.category>0-<30                                              2.174e-01
+maxabdrtdose.category>=30                                                1.995e-01
+maxchestrtdose.category>0-<20                                            3.202e-01
+maxchestrtdose.category>=20                                              1.792e-01
+epitxn_dose_5.category1st                                                5.068e-01
+epitxn_dose_5.category2nd                                                3.645e-01
+epitxn_dose_5.category3rd                                                3.645e-01
+EAS                                                                      4.057e-01
+AFR                                                                      3.627e-01
+any_chemo_missingYes                                                     2.050e-01
+any_rt_missingYes                                                        2.043e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>0-<30    2.883e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>0-<30    2.970e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>=30      2.816e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>=30      2.955e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>0-<30    3.358e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>0-<30    2.910e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>=30      2.779e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>=30      2.684e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>0-<20  4.231e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>0-<20  4.231e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>=20    2.481e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>=20    2.354e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category1st      6.368e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category1st      8.745e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category2nd      6.233e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category2nd      6.219e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category3rd      5.302e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category3rd      4.904e-01
+                                                                        z value
+(Intercept)                                                             -11.196
+Pleiotropy_PRSWEB_PRS.tertile.category2nd                                 0.440
+Pleiotropy_PRSWEB_PRS.tertile.category3rd                                 1.009
+AGE_AT_LAST_CONTACT.cs1                                                   0.940
+AGE_AT_LAST_CONTACT.cs2                                                   0.853
+AGE_AT_LAST_CONTACT.cs3                                                  -0.495
+AGE_AT_LAST_CONTACT.cs4                                                  -0.013
+AGE_AT_DIAGNOSIS5-9                                                      -1.829
+AGE_AT_DIAGNOSIS10-14                                                    -1.345
+AGE_AT_DIAGNOSIS>=15                                                     -2.444
+genderFemale                                                              8.209
+maxsegrtdose.category>0-<30                                              -1.719
+maxsegrtdose.category>=30                                                 1.216
+maxabdrtdose.category>0-<30                                               2.095
+maxabdrtdose.category>=30                                                 2.234
+maxchestrtdose.category>0-<20                                             1.083
+maxchestrtdose.category>=20                                               3.039
+epitxn_dose_5.category1st                                                -0.193
+epitxn_dose_5.category2nd                                                 3.298
+epitxn_dose_5.category3rd                                                 2.213
+EAS                                                                       0.104
+AFR                                                                      -0.397
+any_chemo_missingYes                                                      1.336
+any_rt_missingYes                                                         0.293
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>0-<30     1.976
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>0-<30     0.508
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>=30      -0.272
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>=30      -1.445
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>0-<30    -3.172
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>0-<30    -0.376
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>=30      -0.772
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>=30      -0.644
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>0-<20   1.695
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>0-<20   0.803
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>=20     0.827
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>=20     0.273
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category1st       1.405
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category1st      -0.936
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category2nd      -1.256
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category2nd      -1.627
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category3rd       0.127
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category3rd       0.304
+                                                                        Pr(>|z|)
+(Intercept)                                                              < 2e-16
+Pleiotropy_PRSWEB_PRS.tertile.category2nd                               0.660106
+Pleiotropy_PRSWEB_PRS.tertile.category3rd                               0.313004
+AGE_AT_LAST_CONTACT.cs1                                                 0.347304
+AGE_AT_LAST_CONTACT.cs2                                                 0.393786
+AGE_AT_LAST_CONTACT.cs3                                                 0.620796
+AGE_AT_LAST_CONTACT.cs4                                                 0.989389
+AGE_AT_DIAGNOSIS5-9                                                     0.067467
+AGE_AT_DIAGNOSIS10-14                                                   0.178491
+AGE_AT_DIAGNOSIS>=15                                                    0.014537
+genderFemale                                                            2.23e-16
+maxsegrtdose.category>0-<30                                             0.085619
+maxsegrtdose.category>=30                                               0.223996
+maxabdrtdose.category>0-<30                                             0.036189
+maxabdrtdose.category>=30                                               0.025492
+maxchestrtdose.category>0-<20                                           0.278732
+maxchestrtdose.category>=20                                             0.002373
+epitxn_dose_5.category1st                                               0.847261
+epitxn_dose_5.category2nd                                               0.000975
+epitxn_dose_5.category3rd                                               0.026914
+EAS                                                                     0.917113
+AFR                                                                     0.691521
+any_chemo_missingYes                                                    0.181593
+any_rt_missingYes                                                       0.769610
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>0-<30   0.048135
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>0-<30   0.611684
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>=30     0.785563
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>=30     0.148466
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>0-<30   0.001515
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>0-<30   0.707034
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>=30     0.439827
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>=30     0.519820
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>0-<20 0.089984
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>0-<20 0.422016
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>=20   0.408385
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>=20   0.784646
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category1st     0.160071
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category1st     0.349202
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category2nd     0.209033
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category2nd     0.103779
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category3rd     0.898944
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category3rd     0.761152
+                                                                           
+(Intercept)                                                             ***
+Pleiotropy_PRSWEB_PRS.tertile.category2nd                                  
+Pleiotropy_PRSWEB_PRS.tertile.category3rd                                  
+AGE_AT_LAST_CONTACT.cs1                                                    
+AGE_AT_LAST_CONTACT.cs2                                                    
+AGE_AT_LAST_CONTACT.cs3                                                    
+AGE_AT_LAST_CONTACT.cs4                                                    
+AGE_AT_DIAGNOSIS5-9                                                     .  
+AGE_AT_DIAGNOSIS10-14                                                      
+AGE_AT_DIAGNOSIS>=15                                                    *  
+genderFemale                                                            ***
+maxsegrtdose.category>0-<30                                             .  
+maxsegrtdose.category>=30                                                  
+maxabdrtdose.category>0-<30                                             *  
+maxabdrtdose.category>=30                                               *  
+maxchestrtdose.category>0-<20                                              
+maxchestrtdose.category>=20                                             ** 
+epitxn_dose_5.category1st                                                  
+epitxn_dose_5.category2nd                                               ***
+epitxn_dose_5.category3rd                                               *  
+EAS                                                                        
+AFR                                                                        
+any_chemo_missingYes                                                       
+any_rt_missingYes                                                          
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>0-<30   *  
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>0-<30      
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>=30        
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>=30        
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>0-<30   ** 
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>0-<30      
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>=30        
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>=30        
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>0-<20 .  
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>0-<20    
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>=20      
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>=20      
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category1st        
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category1st        
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category2nd        
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category2nd        
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category3rd        
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category3rd        
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 9814.7  on 185366  degrees of freedom
+Residual deviance: 8843.4  on 185325  degrees of freedom
+  (1677 observations deleted due to missingness)
+AIC: 10447
+
+Number of Fisher Scoring iterations: 9
+
+                                                                             Estimate
+(Intercept)                                                             -8.441688e+00
+Pleiotropy_PRSWEB_PRS.tertile.category2nd                                6.071975e-02
+Pleiotropy_PRSWEB_PRS.tertile.category3rd                                1.382851e-01
+AGE_AT_LAST_CONTACT.cs1                                                  4.582361e-02
+AGE_AT_LAST_CONTACT.cs2                                                  1.863468e-04
+AGE_AT_LAST_CONTACT.cs3                                                 -3.991126e-04
+AGE_AT_LAST_CONTACT.cs4                                                 -1.187863e-05
+AGE_AT_DIAGNOSIS5-9                                                     -2.261873e-01
+AGE_AT_DIAGNOSIS10-14                                                   -1.565574e-01
+AGE_AT_DIAGNOSIS>=15                                                    -3.030135e-01
+genderFemale                                                             6.303288e-01
+maxsegrtdose.category>0-<30                                             -3.795955e-01
+maxsegrtdose.category>=30                                                2.459523e-01
+maxabdrtdose.category>0-<30                                              4.554984e-01
+maxabdrtdose.category>=30                                                4.455747e-01
+maxchestrtdose.category>0-<20                                            3.468655e-01
+maxchestrtdose.category>=20                                              5.445109e-01
+epitxn_dose_5.category1st                                               -9.762203e-02
+epitxn_dose_5.category2nd                                                1.201841e+00
+epitxn_dose_5.category3rd                                                8.064548e-01
+EAS                                                                      4.222396e-02
+AFR                                                                     -1.439240e-01
+any_chemo_missingYes                                                     2.739156e-01
+any_rt_missingYes                                                        5.984559e-02
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>0-<30    5.697364e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>0-<30    1.507755e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>=30     -7.661220e-02
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>=30     -4.270405e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>0-<30   -1.065121e+00
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>0-<30   -1.093757e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>=30     -2.146514e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>=30     -1.727657e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>0-<20  7.172758e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>0-<20  3.397384e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>=20    2.051258e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>=20    6.432736e-02
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category1st      8.945969e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category1st     -8.186370e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category2nd     -7.830526e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category2nd     -1.011730e+00
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category3rd      6.733129e-02
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category3rd      1.490649e-01
+                                                                          Std. Error
+(Intercept)                                                             0.7539982653
+Pleiotropy_PRSWEB_PRS.tertile.category2nd                               0.1380725354
+Pleiotropy_PRSWEB_PRS.tertile.category3rd                               0.1370599505
+AGE_AT_LAST_CONTACT.cs1                                                 0.0487572176
+AGE_AT_LAST_CONTACT.cs2                                                 0.0002185191
+AGE_AT_LAST_CONTACT.cs3                                                 0.0008067407
+AGE_AT_LAST_CONTACT.cs4                                                 0.0008931838
+AGE_AT_DIAGNOSIS5-9                                                     0.1236976744
+AGE_AT_DIAGNOSIS10-14                                                   0.1163636267
+AGE_AT_DIAGNOSIS>=15                                                    0.1239974926
+genderFemale                                                            0.0767859076
+maxsegrtdose.category>0-<30                                             0.2208266476
+maxsegrtdose.category>=30                                               0.2022681043
+maxabdrtdose.category>0-<30                                             0.2174431572
+maxabdrtdose.category>=30                                               0.1994637821
+maxchestrtdose.category>0-<20                                           0.3202312809
+maxchestrtdose.category>=20                                             0.1791731062
+epitxn_dose_5.category1st                                               0.5068269045
+epitxn_dose_5.category2nd                                               0.3644627997
+epitxn_dose_5.category3rd                                               0.3644562543
+EAS                                                                     0.4057232549
+AFR                                                                     0.3627187233
+any_chemo_missingYes                                                    0.2050472315
+any_rt_missingYes                                                       0.2043310339
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>0-<30   0.2883030937
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>0-<30   0.2969941661
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>=30     0.2815826811
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>=30     0.2955353225
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>0-<30   0.3358019763
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>0-<30   0.2910150322
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>=30     0.2778711958
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>=30     0.2684267055
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>0-<20 0.4230514474
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>0-<20 0.4231243647
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>=20   0.2481143364
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>=20   0.2353990287
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category1st     0.6367988551
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category1st     0.8744833109
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category2nd     0.6233352850
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category2nd     0.6219123348
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category3rd     0.5301842253
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category3rd     0.4903952943
+                                                                            z value
+(Intercept)                                                             -11.1958986
+Pleiotropy_PRSWEB_PRS.tertile.category2nd                                 0.4397670
+Pleiotropy_PRSWEB_PRS.tertile.category3rd                                 1.0089386
+AGE_AT_LAST_CONTACT.cs1                                                   0.9398323
+AGE_AT_LAST_CONTACT.cs2                                                   0.8527714
+AGE_AT_LAST_CONTACT.cs3                                                  -0.4947223
+AGE_AT_LAST_CONTACT.cs4                                                  -0.0132992
+AGE_AT_DIAGNOSIS5-9                                                      -1.8285492
+AGE_AT_DIAGNOSIS10-14                                                    -1.3454153
+AGE_AT_DIAGNOSIS>=15                                                     -2.4437068
+genderFemale                                                              8.2089128
+maxsegrtdose.category>0-<30                                              -1.7189751
+maxsegrtdose.category>=30                                                 1.2159718
+maxabdrtdose.category>0-<30                                               2.0947930
+maxabdrtdose.category>=30                                                 2.2338628
+maxchestrtdose.category>0-<20                                             1.0831719
+maxchestrtdose.category>=20                                               3.0390212
+epitxn_dose_5.category1st                                                -0.1926141
+epitxn_dose_5.category2nd                                                 3.2975680
+epitxn_dose_5.category3rd                                                 2.2127616
+EAS                                                                       0.1040708
+AFR                                                                      -0.3967923
+any_chemo_missingYes                                                      1.3358661
+any_rt_missingYes                                                         0.2928855
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>0-<30     1.9761715
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>0-<30     0.5076715
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>=30      -0.2720771
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>=30      -1.4449727
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>0-<30    -3.1718718
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>0-<30    -0.3758420
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>=30      -0.7724851
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>=30      -0.6436234
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>0-<20   1.6954812
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>0-<20   0.8029279
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>=20     0.8267388
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>=20     0.2732694
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category1st       1.4048344
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category1st      -0.9361379
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category2nd      -1.2562301
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category2nd      -1.6268044
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category3rd       0.1269960
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category3rd       0.3039689
+                                                                            Pr(>|z|)
+(Intercept)                                                             4.270505e-29
+Pleiotropy_PRSWEB_PRS.tertile.category2nd                               6.601059e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd                               3.130041e-01
+AGE_AT_LAST_CONTACT.cs1                                                 3.473036e-01
+AGE_AT_LAST_CONTACT.cs2                                                 3.937861e-01
+AGE_AT_LAST_CONTACT.cs3                                                 6.207961e-01
+AGE_AT_LAST_CONTACT.cs4                                                 9.893891e-01
+AGE_AT_DIAGNOSIS5-9                                                     6.746716e-02
+AGE_AT_DIAGNOSIS10-14                                                   1.784911e-01
+AGE_AT_DIAGNOSIS>=15                                                    1.453723e-02
+genderFemale                                                            2.232002e-16
+maxsegrtdose.category>0-<30                                             8.561891e-02
+maxsegrtdose.category>=30                                               2.239957e-01
+maxabdrtdose.category>0-<30                                             3.618940e-02
+maxabdrtdose.category>=30                                               2.549210e-02
+maxchestrtdose.category>0-<20                                           2.787321e-01
+maxchestrtdose.category>=20                                             2.373481e-03
+epitxn_dose_5.category1st                                               8.472612e-01
+epitxn_dose_5.category2nd                                               9.752607e-04
+epitxn_dose_5.category3rd                                               2.691409e-02
+EAS                                                                     9.171131e-01
+AFR                                                                     6.915207e-01
+any_chemo_missingYes                                                    1.815930e-01
+any_rt_missingYes                                                       7.696097e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>0-<30   4.813536e-02
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>0-<30   6.116837e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>=30     7.855627e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>=30     1.484656e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>0-<30   1.514599e-03
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>0-<30   7.070344e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>=30     4.398272e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>=30     5.198197e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>0-<20 8.998417e-02
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>0-<20 4.220164e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>=20   4.083851e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>=20   7.846461e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category1st     1.600705e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category1st     3.492022e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category2nd     2.090325e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category2nd     1.037787e-01
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category3rd     8.989435e-01
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category3rd     7.611516e-01
+                                                                        Estimate
+(Intercept)                                                              -8.4417
+Pleiotropy_PRSWEB_PRS.tertile.category2nd                                 0.0607
+Pleiotropy_PRSWEB_PRS.tertile.category3rd                                 0.1383
+AGE_AT_LAST_CONTACT.cs1                                                   0.0458
+AGE_AT_LAST_CONTACT.cs2                                                   0.0002
+AGE_AT_LAST_CONTACT.cs3                                                  -0.0004
+AGE_AT_LAST_CONTACT.cs4                                                  -0.0000
+AGE_AT_DIAGNOSIS5-9                                                      -0.2262
+AGE_AT_DIAGNOSIS10-14                                                    -0.1566
+AGE_AT_DIAGNOSIS>=15                                                     -0.3030
+genderFemale                                                              0.6303
+maxsegrtdose.category>0-<30                                              -0.3796
+maxsegrtdose.category>=30                                                 0.2460
+maxabdrtdose.category>0-<30                                               0.4555
+maxabdrtdose.category>=30                                                 0.4456
+maxchestrtdose.category>0-<20                                             0.3469
+maxchestrtdose.category>=20                                               0.5445
+epitxn_dose_5.category1st                                                -0.0976
+epitxn_dose_5.category2nd                                                 1.2018
+epitxn_dose_5.category3rd                                                 0.8065
+EAS                                                                       0.0422
+AFR                                                                      -0.1439
+any_chemo_missingYes                                                      0.2739
+any_rt_missingYes                                                         0.0598
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>0-<30     0.5697
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>0-<30     0.1508
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>=30      -0.0766
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>=30      -0.4270
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>0-<30    -1.0651
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>0-<30    -0.1094
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>=30      -0.2147
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>=30      -0.1728
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>0-<20   0.7173
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>0-<20   0.3397
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>=20     0.2051
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>=20     0.0643
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category1st       0.8946
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category1st      -0.8186
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category2nd      -0.7831
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category2nd      -1.0117
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category3rd       0.0673
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category3rd       0.1491
+                                                                        Std. Error
+(Intercept)                                                                 0.7540
+Pleiotropy_PRSWEB_PRS.tertile.category2nd                                   0.1381
+Pleiotropy_PRSWEB_PRS.tertile.category3rd                                   0.1371
+AGE_AT_LAST_CONTACT.cs1                                                     0.0488
+AGE_AT_LAST_CONTACT.cs2                                                     0.0002
+AGE_AT_LAST_CONTACT.cs3                                                     0.0008
+AGE_AT_LAST_CONTACT.cs4                                                     0.0009
+AGE_AT_DIAGNOSIS5-9                                                         0.1237
+AGE_AT_DIAGNOSIS10-14                                                       0.1164
+AGE_AT_DIAGNOSIS>=15                                                        0.1240
+genderFemale                                                                0.0768
+maxsegrtdose.category>0-<30                                                 0.2208
+maxsegrtdose.category>=30                                                   0.2023
+maxabdrtdose.category>0-<30                                                 0.2174
+maxabdrtdose.category>=30                                                   0.1995
+maxchestrtdose.category>0-<20                                               0.3202
+maxchestrtdose.category>=20                                                 0.1792
+epitxn_dose_5.category1st                                                   0.5068
+epitxn_dose_5.category2nd                                                   0.3645
+epitxn_dose_5.category3rd                                                   0.3645
+EAS                                                                         0.4057
+AFR                                                                         0.3627
+any_chemo_missingYes                                                        0.2050
+any_rt_missingYes                                                           0.2043
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>0-<30       0.2883
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>0-<30       0.2970
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>=30         0.2816
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>=30         0.2955
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>0-<30       0.3358
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>0-<30       0.2910
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>=30         0.2779
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>=30         0.2684
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>0-<20     0.4231
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>0-<20     0.4231
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>=20       0.2481
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>=20       0.2354
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category1st         0.6368
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category1st         0.8745
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category2nd         0.6233
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category2nd         0.6219
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category3rd         0.5302
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category3rd         0.4904
+                                                                         z value
+(Intercept)                                                             -11.1959
+Pleiotropy_PRSWEB_PRS.tertile.category2nd                                 0.4398
+Pleiotropy_PRSWEB_PRS.tertile.category3rd                                 1.0089
+AGE_AT_LAST_CONTACT.cs1                                                   0.9398
+AGE_AT_LAST_CONTACT.cs2                                                   0.8528
+AGE_AT_LAST_CONTACT.cs3                                                  -0.4947
+AGE_AT_LAST_CONTACT.cs4                                                  -0.0133
+AGE_AT_DIAGNOSIS5-9                                                      -1.8285
+AGE_AT_DIAGNOSIS10-14                                                    -1.3454
+AGE_AT_DIAGNOSIS>=15                                                     -2.4437
+genderFemale                                                              8.2089
+maxsegrtdose.category>0-<30                                              -1.7190
+maxsegrtdose.category>=30                                                 1.2160
+maxabdrtdose.category>0-<30                                               2.0948
+maxabdrtdose.category>=30                                                 2.2339
+maxchestrtdose.category>0-<20                                             1.0832
+maxchestrtdose.category>=20                                               3.0390
+epitxn_dose_5.category1st                                                -0.1926
+epitxn_dose_5.category2nd                                                 3.2976
+epitxn_dose_5.category3rd                                                 2.2128
+EAS                                                                       0.1041
+AFR                                                                      -0.3968
+any_chemo_missingYes                                                      1.3359
+any_rt_missingYes                                                         0.2929
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>0-<30     1.9762
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>0-<30     0.5077
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>=30      -0.2721
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>=30      -1.4450
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>0-<30    -3.1719
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>0-<30    -0.3758
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>=30      -0.7725
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>=30      -0.6436
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>0-<20   1.6955
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>0-<20   0.8029
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>=20     0.8267
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>=20     0.2733
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category1st       1.4048
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category1st      -0.9361
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category2nd      -1.2562
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category2nd      -1.6268
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category3rd       0.1270
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category3rd       0.3040
+                                                                        Pr(>|z|)
+(Intercept)                                                               0.0000
+Pleiotropy_PRSWEB_PRS.tertile.category2nd                                 0.6601
+Pleiotropy_PRSWEB_PRS.tertile.category3rd                                 0.3130
+AGE_AT_LAST_CONTACT.cs1                                                   0.3473
+AGE_AT_LAST_CONTACT.cs2                                                   0.3938
+AGE_AT_LAST_CONTACT.cs3                                                   0.6208
+AGE_AT_LAST_CONTACT.cs4                                                   0.9894
+AGE_AT_DIAGNOSIS5-9                                                       0.0675
+AGE_AT_DIAGNOSIS10-14                                                     0.1785
+AGE_AT_DIAGNOSIS>=15                                                      0.0145
+genderFemale                                                              0.0000
+maxsegrtdose.category>0-<30                                               0.0856
+maxsegrtdose.category>=30                                                 0.2240
+maxabdrtdose.category>0-<30                                               0.0362
+maxabdrtdose.category>=30                                                 0.0255
+maxchestrtdose.category>0-<20                                             0.2787
+maxchestrtdose.category>=20                                               0.0024
+epitxn_dose_5.category1st                                                 0.8473
+epitxn_dose_5.category2nd                                                 0.0010
+epitxn_dose_5.category3rd                                                 0.0269
+EAS                                                                       0.9171
+AFR                                                                       0.6915
+any_chemo_missingYes                                                      0.1816
+any_rt_missingYes                                                         0.7696
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>0-<30     0.0481
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>0-<30     0.6117
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxsegrtdose.category>=30       0.7856
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxsegrtdose.category>=30       0.1485
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>0-<30     0.0015
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>0-<30     0.7070
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxabdrtdose.category>=30       0.4398
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxabdrtdose.category>=30       0.5198
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>0-<20   0.0900
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>0-<20   0.4220
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:maxchestrtdose.category>=20     0.4084
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:maxchestrtdose.category>=20     0.7846
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category1st       0.1601
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category1st       0.3492
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category2nd       0.2090
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category2nd       0.1038
+Pleiotropy_PRSWEB_PRS.tertile.category2nd:epitxn_dose_5.category3rd       0.8989
+Pleiotropy_PRSWEB_PRS.tertile.category3rd:epitxn_dose_5.category3rd       0.7612
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@noderome224>
+Subject: Job 247021696: <model_fit2> in cluster <hpcf_research_cluster> Exited
+
+Job <model_fit2> was submitted from host <splprhpc11> by user <aneupane> in cluster <hpcf_research_cluster> at Sat Jan 18 00:30:08 2025
+Job was executed on host(s) <noderome224>, in queue <standard>, as user <aneupane> in cluster <hpcf_research_cluster> at Sat Jan 18 00:30:20 2025
+</home/aneupane> was used as the home directory.
+</home/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V21b_Lancet_Revision_HPC/21b/CCSS/Without_lifestyle/models/with_collapsed_categories> was used as the working directory.
+Started at Sat Jan 18 00:30:20 2025
+Terminated at Sat Jan 18 01:24:20 2025
+Results reported at Sat Jan 18 01:24:20 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+bash -c "module load R/4.2.2 && Rscript 2.model_fit_SMNs.R"
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   3198.16 sec.
+    Max Memory :                                 2047 MB
+    Average Memory :                             1696.12 MB
+    Total Requested Memory :                     20000.00 MB
+    Delta Memory :                               17953.00 MB
+    Max Swap :                                   2 MB
+    Max Processes :                              3
+    Max Threads :                                5
+    Run time :                                   3240 sec.
+    Turnaround time :                            3252 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <logs/model_fit2.err> for stderr output of this job.
+

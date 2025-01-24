@@ -1,0 +1,166 @@
+                      row_labels MENINGIOMA|0 MENINGIOMA|1
+1     maxsegrtdose.category|None         2684            5
+2   maxsegrtdose.category|>0-<18           14            2
+3 maxsegrtdose.category|>=18-<30          461           55
+4     maxsegrtdose.category|>=30          387           19
+5    epitxn_dose_5.category|None         2333           42
+6     epitxn_dose_5.category|1st          377           15
+7     epitxn_dose_5.category|2nd          389           10
+8     epitxn_dose_5.category|3rd          447           14
+  MENINGIOMA|#Total cases
+1                    2689
+2                      16
+3                     516
+4                     406
+5                    2375
+6                     392
+7                     399
+8                     461
+[1] "maxsegrtdose.category|None"   "maxsegrtdose.category|>0-<18"
+
+ <30 >=30 
+   0    0 
+
+Call:
+glm(formula = event ~ Meningioma_PRS.tertile.category + AGE_AT_LAST_CONTACT.cs1 + 
+    AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + 
+    AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + epitxn_dose_5.category + 
+    Smoker_ever_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + 
+    Obese_yn + EAS + AFR + any_lifestyle_missing + any_chemo_missing + 
+    any_rt_missing, family = "poisson", data = dat_all, offset = log(dat_all$PY))
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.4481  -0.0878  -0.0565  -0.0347   4.2834  
+
+Coefficients:
+                                     Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                        -9.522e+00  3.682e+00  -2.586  0.00971 ** 
+Meningioma_PRS.tertile.category2nd -3.146e-01  2.405e-01  -1.308  0.19075    
+Meningioma_PRS.tertile.category3rd  7.200e-03  5.241e-01   0.014  0.98904    
+AGE_AT_LAST_CONTACT.cs1             8.755e-02  1.393e-01   0.628  0.52982    
+AGE_AT_LAST_CONTACT.cs2             3.664e-04  1.001e-03   0.366  0.71437    
+AGE_AT_LAST_CONTACT.cs3            -1.151e-03  3.460e-03  -0.333  0.73930    
+AGE_AT_LAST_CONTACT.cs4             6.277e-04  3.636e-03   0.173  0.86294    
+AGE_AT_DIAGNOSIS5-9                 3.964e-02  2.665e-01   0.149  0.88175    
+AGE_AT_DIAGNOSIS10-14              -5.340e-01  3.046e-01  -1.753  0.07956 .  
+AGE_AT_DIAGNOSIS>=15               -2.252e+00  6.166e-01  -3.652  0.00026 ***
+genderFemale                        3.004e-01  2.316e-01   1.297  0.19460    
+maxsegrtdose.category>=30           1.514e+00  2.787e-01   5.433 5.53e-08 ***
+epitxn_dose_5.categoryAny           1.090e+00  2.525e-01   4.319 1.57e-05 ***
+Smoker_ever_ynYes                  -6.029e-01  2.822e-01  -2.136  0.03266 *  
+PhysicalActivity_ynNo              -1.804e-01  2.297e-01  -0.785  0.43245    
+RiskyHeavyDrink_ynYes              -6.097e-01  3.176e-01  -1.920  0.05487 .  
+Obese_ynYes                         4.047e-01  2.371e-01   1.707  0.08791 .  
+EAS                                -1.254e+00  2.318e+00  -0.541  0.58835    
+AFR                                -5.209e-01  4.616e-01  -1.128  0.25914    
+any_lifestyle_missingYes            2.413e-02  2.570e-01   0.094  0.92519    
+any_chemo_missingYes               -1.108e+01  4.573e+02  -0.024  0.98067    
+any_rt_missingYes                   1.539e-01  1.017e+00   0.151  0.87971    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 1108.7  on 24829  degrees of freedom
+Residual deviance: 1002.9  on 24808  degrees of freedom
+  (353 observations deleted due to missingness)
+AIC: 1208.9
+
+Number of Fisher Scoring iterations: 15
+
+[1] 0.3182555
+[1] 0.3122899
+[1] 0.323272
+[1] 0.4544186
+[1] 0.2725394
+[1] 0.3210008
+[1] 0.2664032
+[1] 0.1847236
+[1] 0.2248145
+[1] 0.1510108
+[1] 0.2513864
+[1] 0.1623419
+[1] 0.1835087
+[1] 0.1909326
+[1] 0.4556974
+[1] 0.4789143
+[1] 0.436174
+[1] 0.6226611
+[1] 0.3996401
+[1] 0.4577826
+[1] 0.4118727
+[1] -0.1228953
+[1] -0.1270308
+[1] -0.1194177
+[1] -0.1203628
+[1] -0.1237455
+[1] -0.1222871
+[1] -0.1175198
+[1] 0.1511455
+[1] 0.1580147
+[1] 0.1453692
+[1] 0.1270286
+[1] 0.1592427
+[1] -284.4033
+[1] -504.1908
+[1] 0.4815393
+[1] 0.5055432
+[1] 0.4613542
+[1] 0.6278634
+[1] 0.4324116
+[1] 0.4846821
+[1] 0.4388364
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+[1] 10
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@noderome112>
+Subject: Job 247080078: <test4_20250120_195715> in cluster <hpcf_research_cluster> Done
+
+Job <test4_20250120_195715> was submitted from host <splprhpc11> by user <aneupane> in cluster <hpcf_research_cluster> at Mon Jan 20 19:57:16 2025
+Job was executed on host(s) <noderome112>, in queue <priority>, as user <aneupane> in cluster <hpcf_research_cluster> at Mon Jan 20 19:57:17 2025
+</home/aneupane> was used as the home directory.
+</home/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V21b_Lancet_Revision_HPC/21b/SJLIFE/With_lifestyle_no_HEI/models_fit/with_collapsed_categories/obesity> was used as the working directory.
+Started at Mon Jan 20 19:57:17 2025
+Terminated at Mon Jan 20 19:57:27 2025
+Results reported at Mon Jan 20 19:57:27 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+bash -c "module load R/4.2.2 && Rscript test4.R"
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   9.13 sec.
+    Max Memory :                                 270 MB
+    Average Memory :                             233.25 MB
+    Total Requested Memory :                     20000.00 MB
+    Delta Memory :                               19730.00 MB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                5
+    Run time :                                   10 sec.
+    Turnaround time :                            11 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <logs/test4_20250120_195715.err> for stderr output of this job.
+

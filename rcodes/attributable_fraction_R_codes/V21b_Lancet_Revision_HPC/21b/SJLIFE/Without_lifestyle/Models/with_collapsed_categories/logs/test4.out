@@ -1,0 +1,360 @@
+                     row_labels SARCOMA|0 SARCOMA|1 SARCOMA|#Total cases
+1 aa_class_dose_5.category|None      1946         9                 1955
+2  aa_class_dose_5.category|1st       815         4                  819
+3  aa_class_dose_5.category|2nd       805         7                  812
+4  aa_class_dose_5.category|3rd       800        13                  813
+[1] "aa_class_dose_5.category|None" "aa_class_dose_5.category|1st" 
+[3] "aa_class_dose_5.category|2nd" 
+
+Call:
+glm(formula = event ~ Sarcoma_Machiela_PRS.tertile.category + 
+    AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + 
+    AGE_AT_LAST_CONTACT.cs4 + gender + aa_class_dose_5.category + 
+    EAS + AFR + any_chemo_missing, family = "poisson", data = dat_all, 
+    offset = log(dat_all$PY))
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.1143  -0.0299  -0.0229  -0.0170   4.6227  
+
+Coefficients:
+                                           Estimate Std. Error z value Pr(>|z|)
+(Intercept)                              -9.104e+00  2.345e+00  -3.882 0.000103
+Sarcoma_Machiela_PRS.tertile.category2nd -4.384e-02  4.228e-01  -0.104 0.917402
+Sarcoma_Machiela_PRS.tertile.category3rd -1.827e-01  4.231e-01  -0.432 0.665902
+AGE_AT_LAST_CONTACT.cs1                   9.205e-03  1.689e-01   0.054 0.956550
+AGE_AT_LAST_CONTACT.cs2                   2.622e-05  8.838e-04   0.030 0.976328
+AGE_AT_LAST_CONTACT.cs3                   4.034e-04  2.645e-03   0.152 0.878799
+AGE_AT_LAST_CONTACT.cs4                  -1.279e-03  2.715e-03  -0.471 0.637551
+genderFemale                              2.763e-01  3.525e-01   0.784 0.433124
+aa_class_dose_5.category2nd-3rd           7.456e-01  3.677e-01   2.028 0.042566
+EAS                                      -7.214e+00  9.591e+00  -0.752 0.451959
+AFR                                      -2.015e-01  6.368e-01  -0.316 0.751660
+any_chemo_missingYes                      2.313e+00  1.052e+00   2.198 0.027919
+                                            
+(Intercept)                              ***
+Sarcoma_Machiela_PRS.tertile.category2nd    
+Sarcoma_Machiela_PRS.tertile.category3rd    
+AGE_AT_LAST_CONTACT.cs1                     
+AGE_AT_LAST_CONTACT.cs2                     
+AGE_AT_LAST_CONTACT.cs3                     
+AGE_AT_LAST_CONTACT.cs4                     
+genderFemale                                
+aa_class_dose_5.category2nd-3rd          *  
+EAS                                         
+AFR                                         
+any_chemo_missingYes                     *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 596.17  on 94144  degrees of freedom
+Residual deviance: 577.25  on 94133  degrees of freedom
+  (60 observations deleted due to missingness)
+AIC: 667.25
+
+Number of Fisher Scoring iterations: 12
+
+[1] 0.3458146
+[1] 0.3420778
+[1] 0.3489285
+[1] 0.3289981
+[1] 0.3713193
+[1] 0.3490556
+[1] 0.3219235
+[1] 0.3458146
+[1] 0.3420778
+[1] 0.3489285
+[1] 0.3289981
+[1] 0.3713193
+[1] 0.3490556
+[1] 0.3219235
+[1] -0.07431444
+[1] -0.07496367
+[1] -0.07377342
+[1] -0.07343544
+[1] -0.07564759
+[1] -0.07657833
+[1] -0.05737726
+[1] 0.2975307
+[1] 0.2932647
+[1] 0.3010856
+[1] 0.2799667
+[1] 0.3241691
+[1] 0.2996416
+[1] 0.2821988
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+[1] 10
+
+Call:
+glm(formula = event ~ Sarcoma_Machiela_PRS.tertile.category + 
+    AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + 
+    AGE_AT_LAST_CONTACT.cs4 + gender + aa_class_dose_5.category + 
+    EAS + AFR + any_chemo_missing + aa_class_dose_5.category * 
+    Sarcoma_Machiela_PRS.tertile.category, family = "poisson", 
+    data = dat_all, offset = log(dat_all$PY))
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.1236  -0.0306  -0.0224  -0.0171   4.6700  
+
+Coefficients:
+                                                                           Estimate
+(Intercept)                                                              -9.015e+00
+Sarcoma_Machiela_PRS.tertile.category2nd                                  1.410e-01
+Sarcoma_Machiela_PRS.tertile.category3rd                                 -8.775e-01
+AGE_AT_LAST_CONTACT.cs1                                                   9.050e-03
+AGE_AT_LAST_CONTACT.cs2                                                   2.939e-05
+AGE_AT_LAST_CONTACT.cs3                                                   3.940e-04
+AGE_AT_LAST_CONTACT.cs4                                                  -1.273e-03
+genderFemale                                                              2.751e-01
+aa_class_dose_5.category2nd-3rd                                           5.856e-01
+EAS                                                                      -7.389e+00
+AFR                                                                      -1.876e-01
+any_chemo_missingYes                                                      2.237e+00
+Sarcoma_Machiela_PRS.tertile.category2nd:aa_class_dose_5.category2nd-3rd -3.277e-01
+Sarcoma_Machiela_PRS.tertile.category3rd:aa_class_dose_5.category2nd-3rd  9.980e-01
+                                                                         Std. Error
+(Intercept)                                                               2.355e+00
+Sarcoma_Machiela_PRS.tertile.category2nd                                  6.065e-01
+Sarcoma_Machiela_PRS.tertile.category3rd                                  8.175e-01
+AGE_AT_LAST_CONTACT.cs1                                                   1.689e-01
+AGE_AT_LAST_CONTACT.cs2                                                   8.835e-04
+AGE_AT_LAST_CONTACT.cs3                                                   2.645e-03
+AGE_AT_LAST_CONTACT.cs4                                                   2.715e-03
+genderFemale                                                              3.521e-01
+aa_class_dose_5.category2nd-3rd                                           5.631e-01
+EAS                                                                       9.742e+00
+AFR                                                                       6.366e-01
+any_chemo_missingYes                                                      1.052e+00
+Sarcoma_Machiela_PRS.tertile.category2nd:aa_class_dose_5.category2nd-3rd  8.429e-01
+Sarcoma_Machiela_PRS.tertile.category3rd:aa_class_dose_5.category2nd-3rd  9.677e-01
+                                                                         z value
+(Intercept)                                                               -3.828
+Sarcoma_Machiela_PRS.tertile.category2nd                                   0.232
+Sarcoma_Machiela_PRS.tertile.category3rd                                  -1.073
+AGE_AT_LAST_CONTACT.cs1                                                    0.054
+AGE_AT_LAST_CONTACT.cs2                                                    0.033
+AGE_AT_LAST_CONTACT.cs3                                                    0.149
+AGE_AT_LAST_CONTACT.cs4                                                   -0.469
+genderFemale                                                               0.781
+aa_class_dose_5.category2nd-3rd                                            1.040
+EAS                                                                       -0.758
+AFR                                                                       -0.295
+any_chemo_missingYes                                                       2.126
+Sarcoma_Machiela_PRS.tertile.category2nd:aa_class_dose_5.category2nd-3rd  -0.389
+Sarcoma_Machiela_PRS.tertile.category3rd:aa_class_dose_5.category2nd-3rd   1.031
+                                                                         Pr(>|z|)
+(Intercept)                                                              0.000129
+Sarcoma_Machiela_PRS.tertile.category2nd                                 0.816181
+Sarcoma_Machiela_PRS.tertile.category3rd                                 0.283091
+AGE_AT_LAST_CONTACT.cs1                                                  0.957267
+AGE_AT_LAST_CONTACT.cs2                                                  0.973466
+AGE_AT_LAST_CONTACT.cs3                                                  0.881554
+AGE_AT_LAST_CONTACT.cs4                                                  0.639301
+genderFemale                                                             0.434564
+aa_class_dose_5.category2nd-3rd                                          0.298381
+EAS                                                                      0.448202
+AFR                                                                      0.768257
+any_chemo_missingYes                                                     0.033485
+Sarcoma_Machiela_PRS.tertile.category2nd:aa_class_dose_5.category2nd-3rd 0.697410
+Sarcoma_Machiela_PRS.tertile.category3rd:aa_class_dose_5.category2nd-3rd 0.302391
+                                                                            
+(Intercept)                                                              ***
+Sarcoma_Machiela_PRS.tertile.category2nd                                    
+Sarcoma_Machiela_PRS.tertile.category3rd                                    
+AGE_AT_LAST_CONTACT.cs1                                                     
+AGE_AT_LAST_CONTACT.cs2                                                     
+AGE_AT_LAST_CONTACT.cs3                                                     
+AGE_AT_LAST_CONTACT.cs4                                                     
+genderFemale                                                                
+aa_class_dose_5.category2nd-3rd                                             
+EAS                                                                         
+AFR                                                                         
+any_chemo_missingYes                                                     *  
+Sarcoma_Machiela_PRS.tertile.category2nd:aa_class_dose_5.category2nd-3rd    
+Sarcoma_Machiela_PRS.tertile.category3rd:aa_class_dose_5.category2nd-3rd    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 596.17  on 94144  degrees of freedom
+Residual deviance: 575.27  on 94131  degrees of freedom
+  (60 observations deleted due to missingness)
+AIC: 669.27
+
+Number of Fisher Scoring iterations: 12
+
+                                                                              Estimate
+(Intercept)                                                              -9.014974e+00
+Sarcoma_Machiela_PRS.tertile.category2nd                                  1.409779e-01
+Sarcoma_Machiela_PRS.tertile.category3rd                                 -8.775475e-01
+AGE_AT_LAST_CONTACT.cs1                                                   9.050184e-03
+AGE_AT_LAST_CONTACT.cs2                                                   2.938669e-05
+AGE_AT_LAST_CONTACT.cs3                                                   3.940389e-04
+AGE_AT_LAST_CONTACT.cs4                                                  -1.272601e-03
+genderFemale                                                              2.751388e-01
+aa_class_dose_5.category2nd-3rd                                           5.855540e-01
+EAS                                                                      -7.388822e+00
+AFR                                                                      -1.875869e-01
+any_chemo_missingYes                                                      2.236572e+00
+Sarcoma_Machiela_PRS.tertile.category2nd:aa_class_dose_5.category2nd-3rd -3.277413e-01
+Sarcoma_Machiela_PRS.tertile.category3rd:aa_class_dose_5.category2nd-3rd  9.980093e-01
+                                                                           Std. Error
+(Intercept)                                                              2.3552676373
+Sarcoma_Machiela_PRS.tertile.category2nd                                 0.6064605920
+Sarcoma_Machiela_PRS.tertile.category3rd                                 0.8175384295
+AGE_AT_LAST_CONTACT.cs1                                                  0.1688981701
+AGE_AT_LAST_CONTACT.cs2                                                  0.0008835166
+AGE_AT_LAST_CONTACT.cs3                                                  0.0026445616
+AGE_AT_LAST_CONTACT.cs4                                                  0.0027153066
+genderFemale                                                             0.3521075212
+aa_class_dose_5.category2nd-3rd                                          0.5630802482
+EAS                                                                      9.7424288630
+AFR                                                                      0.6366303624
+any_chemo_missingYes                                                     1.0519035807
+Sarcoma_Machiela_PRS.tertile.category2nd:aa_class_dose_5.category2nd-3rd 0.8429148971
+Sarcoma_Machiela_PRS.tertile.category3rd:aa_class_dose_5.category2nd-3rd 0.9677008462
+                                                                             z value
+(Intercept)                                                              -3.82757937
+Sarcoma_Machiela_PRS.tertile.category2nd                                  0.23246009
+Sarcoma_Machiela_PRS.tertile.category3rd                                 -1.07340211
+AGE_AT_LAST_CONTACT.cs1                                                   0.05358367
+AGE_AT_LAST_CONTACT.cs2                                                   0.03326105
+AGE_AT_LAST_CONTACT.cs3                                                   0.14899971
+AGE_AT_LAST_CONTACT.cs4                                                  -0.46867661
+genderFemale                                                              0.78140572
+aa_class_dose_5.category2nd-3rd                                           1.03991219
+EAS                                                                      -0.75841681
+AFR                                                                      -0.29465588
+any_chemo_missingYes                                                      2.12621356
+Sarcoma_Machiela_PRS.tertile.category2nd:aa_class_dose_5.category2nd-3rd -0.38881901
+Sarcoma_Machiela_PRS.tertile.category3rd:aa_class_dose_5.category2nd-3rd  1.03132010
+                                                                             Pr(>|z|)
+(Intercept)                                                              0.0001294097
+Sarcoma_Machiela_PRS.tertile.category2nd                                 0.8161806781
+Sarcoma_Machiela_PRS.tertile.category3rd                                 0.2830907387
+AGE_AT_LAST_CONTACT.cs1                                                  0.9572668667
+AGE_AT_LAST_CONTACT.cs2                                                  0.9734664179
+AGE_AT_LAST_CONTACT.cs3                                                  0.8815538590
+AGE_AT_LAST_CONTACT.cs4                                                  0.6393008098
+genderFemale                                                             0.4345639080
+aa_class_dose_5.category2nd-3rd                                          0.2983806968
+EAS                                                                      0.4482015006
+AFR                                                                      0.7682567664
+any_chemo_missingYes                                                     0.0334854811
+Sarcoma_Machiela_PRS.tertile.category2nd:aa_class_dose_5.category2nd-3rd 0.6974100341
+Sarcoma_Machiela_PRS.tertile.category3rd:aa_class_dose_5.category2nd-3rd 0.3023907378
+                                                                         Estimate
+(Intercept)                                                               -9.0150
+Sarcoma_Machiela_PRS.tertile.category2nd                                   0.1410
+Sarcoma_Machiela_PRS.tertile.category3rd                                  -0.8775
+AGE_AT_LAST_CONTACT.cs1                                                    0.0091
+AGE_AT_LAST_CONTACT.cs2                                                    0.0000
+AGE_AT_LAST_CONTACT.cs3                                                    0.0004
+AGE_AT_LAST_CONTACT.cs4                                                   -0.0013
+genderFemale                                                               0.2751
+aa_class_dose_5.category2nd-3rd                                            0.5856
+EAS                                                                       -7.3888
+AFR                                                                       -0.1876
+any_chemo_missingYes                                                       2.2366
+Sarcoma_Machiela_PRS.tertile.category2nd:aa_class_dose_5.category2nd-3rd  -0.3277
+Sarcoma_Machiela_PRS.tertile.category3rd:aa_class_dose_5.category2nd-3rd   0.9980
+                                                                         Std. Error
+(Intercept)                                                                  2.3553
+Sarcoma_Machiela_PRS.tertile.category2nd                                     0.6065
+Sarcoma_Machiela_PRS.tertile.category3rd                                     0.8175
+AGE_AT_LAST_CONTACT.cs1                                                      0.1689
+AGE_AT_LAST_CONTACT.cs2                                                      0.0009
+AGE_AT_LAST_CONTACT.cs3                                                      0.0026
+AGE_AT_LAST_CONTACT.cs4                                                      0.0027
+genderFemale                                                                 0.3521
+aa_class_dose_5.category2nd-3rd                                              0.5631
+EAS                                                                          9.7424
+AFR                                                                          0.6366
+any_chemo_missingYes                                                         1.0519
+Sarcoma_Machiela_PRS.tertile.category2nd:aa_class_dose_5.category2nd-3rd     0.8429
+Sarcoma_Machiela_PRS.tertile.category3rd:aa_class_dose_5.category2nd-3rd     0.9677
+                                                                         z value
+(Intercept)                                                              -3.8276
+Sarcoma_Machiela_PRS.tertile.category2nd                                  0.2325
+Sarcoma_Machiela_PRS.tertile.category3rd                                 -1.0734
+AGE_AT_LAST_CONTACT.cs1                                                   0.0536
+AGE_AT_LAST_CONTACT.cs2                                                   0.0333
+AGE_AT_LAST_CONTACT.cs3                                                   0.1490
+AGE_AT_LAST_CONTACT.cs4                                                  -0.4687
+genderFemale                                                              0.7814
+aa_class_dose_5.category2nd-3rd                                           1.0399
+EAS                                                                      -0.7584
+AFR                                                                      -0.2947
+any_chemo_missingYes                                                      2.1262
+Sarcoma_Machiela_PRS.tertile.category2nd:aa_class_dose_5.category2nd-3rd -0.3888
+Sarcoma_Machiela_PRS.tertile.category3rd:aa_class_dose_5.category2nd-3rd  1.0313
+                                                                         Pr(>|z|)
+(Intercept)                                                                0.0001
+Sarcoma_Machiela_PRS.tertile.category2nd                                   0.8162
+Sarcoma_Machiela_PRS.tertile.category3rd                                   0.2831
+AGE_AT_LAST_CONTACT.cs1                                                    0.9573
+AGE_AT_LAST_CONTACT.cs2                                                    0.9735
+AGE_AT_LAST_CONTACT.cs3                                                    0.8816
+AGE_AT_LAST_CONTACT.cs4                                                    0.6393
+genderFemale                                                               0.4346
+aa_class_dose_5.category2nd-3rd                                            0.2984
+EAS                                                                        0.4482
+AFR                                                                        0.7683
+any_chemo_missingYes                                                       0.0335
+Sarcoma_Machiela_PRS.tertile.category2nd:aa_class_dose_5.category2nd-3rd   0.6974
+Sarcoma_Machiela_PRS.tertile.category3rd:aa_class_dose_5.category2nd-3rd   0.3024
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@noderome228>
+Subject: Job 247022298: <test4> in cluster <hpcf_research_cluster> Exited
+
+Job <test4> was submitted from host <splprhpc11> by user <aneupane> in cluster <hpcf_research_cluster> at Sat Jan 18 00:42:23 2025
+Job was executed on host(s) <noderome228>, in queue <standard>, as user <aneupane> in cluster <hpcf_research_cluster> at Sat Jan 18 00:42:35 2025
+</home/aneupane> was used as the home directory.
+</home/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V21b_Lancet_Revision_HPC/21b/SJLIFE/Without_lifestyle/Models/with_collapsed_categories> was used as the working directory.
+Started at Sat Jan 18 00:42:35 2025
+Terminated at Sat Jan 18 00:42:49 2025
+Results reported at Sat Jan 18 00:42:49 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+bash -c "module load R/4.2.2 && Rscript test4.R"
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   11.95 sec.
+    Max Memory :                                 802 MB
+    Average Memory :                             599.60 MB
+    Total Requested Memory :                     20000.00 MB
+    Delta Memory :                               19198.00 MB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                5
+    Run time :                                   14 sec.
+    Turnaround time :                            26 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <logs/test4.err> for stderr output of this job.
+

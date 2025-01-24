@@ -1,0 +1,301 @@
+                        row_labels NMSCs|0 NMSCs|1 NMSCs|#Total cases
+1       maxsegrtdose.category|None    5514     446               5960
+2     maxsegrtdose.category|>0-<18      76      12                 88
+3   maxsegrtdose.category|>=18-<30     843     168               1011
+4       maxsegrtdose.category|>=30     781     102                883
+5       maxabdrtdose.category|None    5812     444               6256
+6     maxabdrtdose.category|>0-<30     818      92                910
+7       maxabdrtdose.category|>=30     584     192                776
+8    maxpelvisrtdose.category|None    6057     511               6568
+9  maxpelvisrtdose.category|>0-<20     300      35                335
+10   maxpelvisrtdose.category|>=20     857     182               1039
+character(0)
+       1 
+9.166457 
+       1 
+9.870093 
+  1 
+0.5 
+
+Call:
+glm(formula = event ~ BASALcell_PRS.tertile.category + AGE_AT_LAST_CONTACT.cs1 + 
+    AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + 
+    gender + maxsegrtdose.category + maxabdrtdose.category + 
+    maxpelvisrtdose.category + EAS + AFR + any_rt_missing, family = "poisson", 
+    data = dat_all, offset = log(dat_all$PY))
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.4857  -0.0971  -0.0541  -0.0248   4.5571  
+
+Coefficients:
+                                    Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                       -1.547e+01  2.646e+00  -5.849 4.96e-09 ***
+BASALcell_PRS.tertile.category2nd  3.764e-01  1.046e-01   3.598  0.00032 ***
+BASALcell_PRS.tertile.category3rd  7.037e-01  1.014e-01   6.941 3.89e-12 ***
+AGE_AT_LAST_CONTACT.cs1            3.801e-01  1.536e-01   2.474  0.01335 *  
+AGE_AT_LAST_CONTACT.cs2           -5.672e-04  5.179e-04  -1.095  0.27343    
+AGE_AT_LAST_CONTACT.cs3            1.476e-03  1.657e-03   0.890  0.37325    
+AGE_AT_LAST_CONTACT.cs4           -1.266e-03  1.616e-03  -0.783  0.43347    
+genderFemale                       1.747e-01  7.481e-02   2.336  0.01950 *  
+maxsegrtdose.category>0-<30        9.944e-01  9.732e-02  10.218  < 2e-16 ***
+maxsegrtdose.category>=30          5.498e-01  1.149e-01   4.784 1.72e-06 ***
+maxabdrtdose.category>0-<30        4.707e-01  1.510e-01   3.116  0.00183 ** 
+maxabdrtdose.category>=30          1.113e+00  1.261e-01   8.829  < 2e-16 ***
+maxpelvisrtdose.categoryAny       -1.161e-01  1.264e-01  -0.919  0.35825    
+EAS                                1.848e-01  4.481e-01   0.412  0.68010    
+AFR                               -2.072e+00  8.539e-01  -2.426  0.01526 *  
+any_rt_missingYes                  5.387e-01  1.666e-01   3.233  0.00123 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 9458.6  on 185786  degrees of freedom
+Residual deviance: 8246.1  on 185771  degrees of freedom
+  (1675 observations deleted due to missingness)
+AIC: 9732.1
+
+Number of Fisher Scoring iterations: 11
+
+[1] 0.4156155
+[1] 0.4205178
+[1] 0.4116079
+[1] 0.4092074
+[1] 0.4190243
+[1] 0.4163208
+[1] 0.4500181
+[1] 0.4156155
+[1] 0.4205178
+[1] 0.4116079
+[1] 0.4092074
+[1] 0.4190243
+[1] 0.4163208
+[1] 0.4500181
+[1] 0.3313961
+[1] 0.3336468
+[1] 0.3295562
+[1] 0.3328945
+[1] 0.330599
+[1] 0.3399404
+[1] 0.08379979
+[1] 0.6101914
+[1] 0.6140879
+[1] 0.607006
+[1] 0.6075072
+[1] 0.6116193
+[1] 0.6157994
+[1] 0.4904246
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+[1] 10
+
+Call:
+glm(formula = event ~ BASALcell_PRS.tertile.category + AGE_AT_LAST_CONTACT.cs1 + 
+    AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + 
+    gender + maxsegrtdose.category + maxabdrtdose.category + 
+    maxpelvisrtdose.category + ancestry + any_rt_missing + maxsegrtdose.category * 
+    ancestry + maxabdrtdose.category * ancestry + maxpelvisrtdose.category * 
+    ancestry, family = "poisson", data = dat_all, offset = log(dat_all$PY))
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.6933  -0.0968  -0.0537  -0.0231   4.5612  
+
+Coefficients:
+                                            Estimate Std. Error z value
+(Intercept)                               -1.607e+01  2.772e+00  -5.799
+BASALcell_PRS.tertile.category2nd          3.823e-01  1.041e-01   3.674
+BASALcell_PRS.tertile.category3rd          7.142e-01  1.004e-01   7.115
+AGE_AT_LAST_CONTACT.cs1                    4.082e-01  1.601e-01   2.549
+AGE_AT_LAST_CONTACT.cs2                   -6.219e-04  5.331e-04  -1.167
+AGE_AT_LAST_CONTACT.cs3                    1.573e-03  1.694e-03   0.928
+AGE_AT_LAST_CONTACT.cs4                   -1.260e-03  1.638e-03  -0.769
+genderFemale                               1.777e-01  7.488e-02   2.373
+maxsegrtdose.category>0-<30                1.005e+00  9.923e-02  10.124
+maxsegrtdose.category>=30                  5.506e-01  1.176e-01   4.681
+maxabdrtdose.category>0-<30                4.876e-01  1.530e-01   3.187
+maxabdrtdose.category>=30                  1.125e+00  1.275e-01   8.825
+maxpelvisrtdose.categoryAny               -1.274e-01  1.280e-01  -0.995
+ancestryAFR                               -3.040e+01  3.992e+02  -0.076
+ancestryOther                              5.292e-02  2.820e-01   0.188
+any_rt_missingYes                          5.271e-01  1.668e-01   3.160
+maxsegrtdose.category>0-<30:ancestryAFR   -2.401e-01  6.346e+02   0.000
+maxsegrtdose.category>=30:ancestryAFR      1.839e+01  2.957e+02   0.062
+maxsegrtdose.category>0-<30:ancestryOther  5.658e-02  4.595e-01   0.123
+maxsegrtdose.category>=30:ancestryOther   -1.510e-01  5.808e-01  -0.260
+maxabdrtdose.category>0-<30:ancestryAFR    1.646e+01  1.388e+03   0.012
+maxabdrtdose.category>=30:ancestryAFR     -5.033e+00  1.717e+03  -0.003
+maxabdrtdose.category>0-<30:ancestryOther -1.047e+00  1.077e+00  -0.971
+maxabdrtdose.category>=30:ancestryOther   -2.345e-01  8.801e-01  -0.266
+maxpelvisrtdose.categoryAny:ancestryAFR    2.151e+00  1.362e+03   0.002
+maxpelvisrtdose.categoryAny:ancestryOther  2.654e-01  8.492e-01   0.313
+                                          Pr(>|z|)    
+(Intercept)                               6.68e-09 ***
+BASALcell_PRS.tertile.category2nd         0.000239 ***
+BASALcell_PRS.tertile.category3rd         1.12e-12 ***
+AGE_AT_LAST_CONTACT.cs1                   0.010811 *  
+AGE_AT_LAST_CONTACT.cs2                   0.243377    
+AGE_AT_LAST_CONTACT.cs3                   0.353180    
+AGE_AT_LAST_CONTACT.cs4                   0.441737    
+genderFemale                              0.017625 *  
+maxsegrtdose.category>0-<30                < 2e-16 ***
+maxsegrtdose.category>=30                 2.86e-06 ***
+maxabdrtdose.category>0-<30               0.001437 ** 
+maxabdrtdose.category>=30                  < 2e-16 ***
+maxpelvisrtdose.categoryAny               0.319602    
+ancestryAFR                               0.939290    
+ancestryOther                             0.851157    
+any_rt_missingYes                         0.001576 ** 
+maxsegrtdose.category>0-<30:ancestryAFR   0.999698    
+maxsegrtdose.category>=30:ancestryAFR     0.950405    
+maxsegrtdose.category>0-<30:ancestryOther 0.902012    
+maxsegrtdose.category>=30:ancestryOther   0.794921    
+maxabdrtdose.category>0-<30:ancestryAFR   0.990539    
+maxabdrtdose.category>=30:ancestryAFR     0.997661    
+maxabdrtdose.category>0-<30:ancestryOther 0.331388    
+maxabdrtdose.category>=30:ancestryOther   0.789926    
+maxpelvisrtdose.categoryAny:ancestryAFR   0.998740    
+maxpelvisrtdose.categoryAny:ancestryOther 0.754638    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 9481.8  on 187461  degrees of freedom
+Residual deviance: 8241.7  on 187436  degrees of freedom
+AIC: 9749.7
+
+Number of Fisher Scoring iterations: 19
+
+                                               Estimate   Std. Error
+(Intercept)                               -1.607202e+01 2.771635e+00
+BASALcell_PRS.tertile.category2nd          3.823272e-01 1.040750e-01
+BASALcell_PRS.tertile.category3rd          7.142045e-01 1.003751e-01
+AGE_AT_LAST_CONTACT.cs1                    4.081579e-01 1.601398e-01
+AGE_AT_LAST_CONTACT.cs2                   -6.219255e-04 5.331151e-04
+AGE_AT_LAST_CONTACT.cs3                    1.572672e-03 1.693890e-03
+AGE_AT_LAST_CONTACT.cs4                   -1.259674e-03 1.637508e-03
+genderFemale                               1.777207e-01 7.488041e-02
+maxsegrtdose.category>0-<30                1.004561e+00 9.923052e-02
+maxsegrtdose.category>=30                  5.505669e-01 1.176215e-01
+maxabdrtdose.category>0-<30                4.875735e-01 1.529798e-01
+maxabdrtdose.category>=30                  1.124905e+00 1.274681e-01
+maxpelvisrtdose.categoryAny               -1.273638e-01 1.279683e-01
+ancestryAFR                               -3.040083e+01 3.991602e+02
+ancestryOther                              5.291741e-02 2.820124e-01
+any_rt_missingYes                          5.271148e-01 1.667961e-01
+maxsegrtdose.category>0-<30:ancestryAFR   -2.401143e-01 6.346223e+02
+maxsegrtdose.category>=30:ancestryAFR      1.839490e+01 2.957435e+02
+maxsegrtdose.category>0-<30:ancestryOther  5.657815e-02 4.595348e-01
+maxsegrtdose.category>=30:ancestryOther   -1.509614e-01 5.807875e-01
+maxabdrtdose.category>0-<30:ancestryAFR    1.645693e+01 1.387827e+03
+maxabdrtdose.category>=30:ancestryAFR     -5.033419e+00 1.716919e+03
+maxabdrtdose.category>0-<30:ancestryOther -1.046519e+00 1.077417e+00
+maxabdrtdose.category>=30:ancestryOther   -2.344573e-01 8.800736e-01
+maxpelvisrtdose.categoryAny:ancestryAFR    2.150976e+00 1.361690e+03
+maxpelvisrtdose.categoryAny:ancestryOther  2.653853e-01 8.491519e-01
+                                                z value     Pr(>|z|)
+(Intercept)                               -5.7987492385 6.681135e-09
+BASALcell_PRS.tertile.category2nd          3.6735728849 2.391824e-04
+BASALcell_PRS.tertile.category3rd          7.1153568697 1.116236e-12
+AGE_AT_LAST_CONTACT.cs1                    2.5487599235 1.081067e-02
+AGE_AT_LAST_CONTACT.cs2                   -1.1665877818 2.433769e-01
+AGE_AT_LAST_CONTACT.cs3                    0.9284383817 3.531802e-01
+AGE_AT_LAST_CONTACT.cs4                   -0.7692628184 4.417373e-01
+genderFemale                               2.3733937260 1.762546e-02
+maxsegrtdose.category>0-<30               10.1235130104 4.345332e-24
+maxsegrtdose.category>=30                  4.6808356223 2.857080e-06
+maxabdrtdose.category>0-<30                3.1871769464 1.436689e-03
+maxabdrtdose.category>=30                  8.8249956614 1.094641e-18
+maxpelvisrtdose.categoryAny               -0.9952759126 3.196021e-01
+ancestryAFR                               -0.0761619751 9.392902e-01
+ancestryOther                              0.1876421340 8.511572e-01
+any_rt_missingYes                          3.1602339536 1.576425e-03
+maxsegrtdose.category>0-<30:ancestryAFR   -0.0003783578 9.996981e-01
+maxsegrtdose.category>=30:ancestryAFR      0.0621988200 9.504045e-01
+maxsegrtdose.category>0-<30:ancestryOther  0.1231204777 9.020117e-01
+maxsegrtdose.category>=30:ancestryOther   -0.2599253528 7.949214e-01
+maxabdrtdose.category>0-<30:ancestryAFR    0.0118580554 9.905389e-01
+maxabdrtdose.category>=30:ancestryAFR     -0.0029316584 9.976609e-01
+maxabdrtdose.category>0-<30:ancestryOther -0.9713220988 3.313879e-01
+maxabdrtdose.category>=30:ancestryOther   -0.2664064086 7.899262e-01
+maxpelvisrtdose.categoryAny:ancestryAFR    0.0015796377 9.987396e-01
+maxpelvisrtdose.categoryAny:ancestryOther  0.3125297866 7.546379e-01
+                                          Estimate Std. Error z value Pr(>|z|)
+(Intercept)                               -16.0720     2.7716 -5.7987   0.0000
+BASALcell_PRS.tertile.category2nd           0.3823     0.1041  3.6736   0.0002
+BASALcell_PRS.tertile.category3rd           0.7142     0.1004  7.1154   0.0000
+AGE_AT_LAST_CONTACT.cs1                     0.4082     0.1601  2.5488   0.0108
+AGE_AT_LAST_CONTACT.cs2                    -0.0006     0.0005 -1.1666   0.2434
+AGE_AT_LAST_CONTACT.cs3                     0.0016     0.0017  0.9284   0.3532
+AGE_AT_LAST_CONTACT.cs4                    -0.0013     0.0016 -0.7693   0.4417
+genderFemale                                0.1777     0.0749  2.3734   0.0176
+maxsegrtdose.category>0-<30                 1.0046     0.0992 10.1235   0.0000
+maxsegrtdose.category>=30                   0.5506     0.1176  4.6808   0.0000
+maxabdrtdose.category>0-<30                 0.4876     0.1530  3.1872   0.0014
+maxabdrtdose.category>=30                   1.1249     0.1275  8.8250   0.0000
+maxpelvisrtdose.categoryAny                -0.1274     0.1280 -0.9953   0.3196
+ancestryAFR                               -30.4008   399.1602 -0.0762   0.9393
+ancestryOther                               0.0529     0.2820  0.1876   0.8512
+any_rt_missingYes                           0.5271     0.1668  3.1602   0.0016
+maxsegrtdose.category>0-<30:ancestryAFR    -0.2401   634.6223 -0.0004   0.9997
+maxsegrtdose.category>=30:ancestryAFR      18.3949   295.7435  0.0622   0.9504
+maxsegrtdose.category>0-<30:ancestryOther   0.0566     0.4595  0.1231   0.9020
+maxsegrtdose.category>=30:ancestryOther    -0.1510     0.5808 -0.2599   0.7949
+maxabdrtdose.category>0-<30:ancestryAFR    16.4569  1387.8273  0.0119   0.9905
+maxabdrtdose.category>=30:ancestryAFR      -5.0334  1716.9187 -0.0029   0.9977
+maxabdrtdose.category>0-<30:ancestryOther  -1.0465     1.0774 -0.9713   0.3314
+maxabdrtdose.category>=30:ancestryOther    -0.2345     0.8801 -0.2664   0.7899
+maxpelvisrtdose.categoryAny:ancestryAFR     2.1510  1361.6897  0.0016   0.9987
+maxpelvisrtdose.categoryAny:ancestryOther   0.2654     0.8492  0.3125   0.7546
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@noderome231>
+Subject: Job 247019096: <test4> in cluster <hpcf_research_cluster> Exited
+
+Job <test4> was submitted from host <splprhpc11> by user <aneupane> in cluster <hpcf_research_cluster> at Fri Jan 17 23:16:45 2025
+Job was executed on host(s) <noderome231>, in queue <standard>, as user <aneupane> in cluster <hpcf_research_cluster> at Fri Jan 17 23:16:51 2025
+</home/aneupane> was used as the home directory.
+</home/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V21b_Lancet_Revision_HPC/21b/CCSS/Without_lifestyle/models/with_collapsed_categories> was used as the working directory.
+Started at Fri Jan 17 23:16:51 2025
+Terminated at Fri Jan 17 23:17:33 2025
+Results reported at Fri Jan 17 23:17:33 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+bash -c "module load R/4.2.2 && Rscript test4.R"
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   26.51 sec.
+    Max Memory :                                 1219 MB
+    Average Memory :                             465.36 MB
+    Total Requested Memory :                     20000.00 MB
+    Delta Memory :                               18781.00 MB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                5
+    Run time :                                   42 sec.
+    Turnaround time :                            48 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <logs/test4.err> for stderr output of this job.
+

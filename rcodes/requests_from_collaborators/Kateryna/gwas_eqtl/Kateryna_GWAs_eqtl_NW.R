@@ -24,6 +24,8 @@ colnames(RNAseq)
 # [82] "SC281A_3"        "SC29_11_0"       "SC29_11_1"       "SC29_11_3"       "SC34_0"          "SC34_1"          "SC34_3"          "SC35_0"          "SC35_1"         
 # [91] "SC35_3"          "SC41c11_0"       "SC41c11_1"       "SC41c11_3"      
 
+# SC281A_0 is SC28
+
 unique(raw$IID)
 unique(raw$IID)
 # [1] "442332"       "442333c13_5"  "442333c8"     "CE01_C5_P26"  "CE11-5"       "CE12-1"       "CE16-1"       "CE17"         "CE20-2"       "CE21-14"      "CE22-1"      

@@ -1,0 +1,16 @@
+The HEI-2015 scores range from 0 to 100, and a higher score indicates a greater adherence to the dietary guidelines. A higher HEI score has been associated with a lower risk of chronic diseases, such as diabetes, cardiovascular disease, and cancer, and mortality [18,19].
+https://www.sciencedirect.com/science/article/pii/S0002916524000200#bib19
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10258145/
+
+
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10318686/
+Association Between Healthy Eating Patterns and Risk of Cardiovascular Disease
+https://epi.grants.cancer.gov/hei/developing.html#f1b
+
+https://ascopubs.org/doi/abs/10.1200/JCO.2021.39.15_suppl.e22017
+"Adherence to the 2015 Dietary Guidelines for Americans was scored with the Healthy Eating Index-15 (HEI). Intake of key food groups and nutrients was estimated and divided into quartiles for analysis."
+
+[18] M.L. McCullough, D. Feskanich, M.J. Stampfer, E.L. Giovannucci, E.B. Rimm, F.B. Hu, et al.
+Diet quality and major chronic disease risk in men and women: moving toward improved dietary guidance 
+[19] J. Reedy, J.L. Lerman, S.M. Krebs-Smith, S.I. Kirkpatrick, T.E. Pannucci, M.M. Wilson, et al.
+Evaluation of the Healthy Eating Index-2015
