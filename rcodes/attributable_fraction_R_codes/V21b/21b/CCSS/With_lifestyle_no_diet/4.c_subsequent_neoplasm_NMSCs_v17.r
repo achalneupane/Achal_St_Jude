@@ -222,6 +222,36 @@ PHENO.ANY_SN$Obese_yn [which(PHENO.ANY_SN$Obese_yn_agesurvey != PHENO.ANY_SN$sur
 PHENO.ANY_SN <- PHENO.ANY_SN[-which(PHENO.ANY_SN$survey_min > PHENO.ANY_SN$AGE.ANY_SN),]
 dim(PHENO.ANY_SN)
 # 7737   62
+
+
+library(dplyr)
+library(knitr)
+
+new.lifestyle <- PHENO.ANY_SN
+
+# Total number of participants
+total_n <- nrow(new.lifestyle)
+
+# Create a data frame summarizing the counts and percentages
+lifestyle_summary <- data.frame(
+  Category = c("Ever a Smoker", "No Physical Activity", "Risky/Heavy Drinking", "Obesity"),
+  Count = c(
+    sum(new.lifestyle$Smoker_ever_yn == "Yes", na.rm = TRUE),
+    sum(new.lifestyle$PhysicalActivity_yn == "No", na.rm = TRUE),
+    sum(new.lifestyle$RiskyHeavyDrink_yn == "Yes", na.rm = TRUE),
+    sum(new.lifestyle$Obese_yn == "Yes", na.rm = TRUE)
+  ),
+  Percentage = round((c(
+    sum(new.lifestyle$Smoker_ever_yn == "Yes", na.rm = TRUE),
+    sum(new.lifestyle$PhysicalActivity_yn == "No", na.rm = TRUE),
+    sum(new.lifestyle$RiskyHeavyDrink_yn == "Yes", na.rm = TRUE),
+    sum(new.lifestyle$Obese_yn == "Yes", na.rm = TRUE)
+  ) / total_n) * 100, 1)
+)
+
+colnames(lifestyle_summary) <- c("Lifestyle Factor", paste0("% (n total=", total_n, ")"))
+View(lifestyle_summary)
+
 ######################### ** END
 
 

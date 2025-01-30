@@ -156,19 +156,73 @@ ALL.LIFESTYLE$Obese_yn [which(ALL.LIFESTYLE$Not_obese_yn_agesurvey != ALL.LIFEST
 ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.lt60.category [which(ALL.LIFESTYLE$HEI2015_TOTAL_SCORE_agesurvey != ALL.LIFESTYLE$survey_min)] <- "Unknown" ## **
 
 
+# table(ALL.LIFESTYLE$Smoker_ever_yn)
+# # Ever a smoker Yes: 1116
+# 25.4%
+# table(ALL.LIFESTYLE$PhysicalActivity_yn)
+# # No physical activity: 1677
+# 38.1%
+# table(ALL.LIFESTYLE$RiskyHeavyDrink_yn)
+# # Risky/heavy Drinking: 1050
+# Risky or heavy drinking Yes: 23.9%
+# table(ALL.LIFESTYLE$Obese_yn)
+# # Obesity Yes: 1107
+# Obesity Yes: 25.1
+# table(ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.lt60.category )
+# # Unhealthy diet: 1641
+# Unhealthy diet Yes: 37.3% 
+
+
+
+
 to.remove <- ALL.LIFESTYLE$SJLIFEID[which(ALL.LIFESTYLE$survey_min > ALL.LIFESTYLE$AGE.ANY_SN)]
 PHENO.ANY_SN <- PHENO.ANY_SN[!PHENO.ANY_SN$sjlid %in% to.remove,]
 
 sum(PHENO.ANY_SN$sjlid %in% ALL.LIFESTYLE$SJLIFEID)
 # 3382
 
+
+
 ## Remove any samples that do not have lifestyle
 PHENO.ANY_SN  <- PHENO.ANY_SN[PHENO.ANY_SN$sjlid %in% ALL.LIFESTYLE$SJLIFEID,]
+
 
 #############################
 ## Addd lifestyle to Pheno ##
 ############################# ** add survey_min
 PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, ALL.LIFESTYLE[match(PHENO.ANY_SN$sjlid, ALL.LIFESTYLE$SJLIFEID),c("survey_min", "Smoker_ever_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "HEI2015_TOTAL_SCORE.lt60.category", "Obese_yn")]) ## **
+
+
+library(dplyr)
+library(knitr)
+
+new.lifestyle <- PHENO.ANY_SN
+
+# Total number of participants
+total_n <- nrow(new.lifestyle)
+
+# Create a data frame summarizing the counts and percentages
+lifestyle_summary <- data.frame(
+  Category = c("Ever a Smoker", "No Physical Activity", "Risky/Heavy Drinking", "Obesity", "Unhealthy Diet"),
+  Count = c(
+    sum(new.lifestyle$Smoker_ever_yn == "Yes", na.rm = TRUE),
+    sum(new.lifestyle$PhysicalActivity_yn == "No", na.rm = TRUE),
+    sum(new.lifestyle$RiskyHeavyDrink_yn == "Yes", na.rm = TRUE),
+    sum(new.lifestyle$Obese_yn == "Yes", na.rm = TRUE),
+    sum(new.lifestyle$HEI2015_TOTAL_SCORE.lt60.category == "Yes", na.rm = TRUE)
+  ),
+  Percentage = round((c(
+    sum(new.lifestyle$Smoker_ever_yn == "Yes", na.rm = TRUE),
+    sum(new.lifestyle$PhysicalActivity_yn == "No", na.rm = TRUE),
+    sum(new.lifestyle$RiskyHeavyDrink_yn == "Yes", na.rm = TRUE),
+    sum(new.lifestyle$Obese_yn == "Yes", na.rm = TRUE),
+    sum(new.lifestyle$HEI2015_TOTAL_SCORE.lt60.category == "Yes", na.rm = TRUE)
+  ) / total_n) * 100, 1)
+)
+
+colnames(lifestyle_summary) <- c("Lifestyle Factor", paste0("% (n total=", total_n, ")"))
+View(lifestyle_summary)
+
 
 
 ## Add any missing to each lifestyle variable

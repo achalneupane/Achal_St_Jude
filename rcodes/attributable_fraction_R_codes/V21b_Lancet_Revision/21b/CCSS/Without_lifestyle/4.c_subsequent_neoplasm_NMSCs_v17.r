@@ -27,6 +27,14 @@ data1=as.data.frame(data1)
 data1$KEY <- paste0(data1$ccssid,":",data1$d_candx)
 
 
+
+kyla.status <- read_excel("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Kyla/combinedsn_final_02_17_2023.xlsx")
+kyla.status$d_candx <- as.numeric(kyla.status$d_candx)
+kyla.status$d_candx <- as.Date(kyla.status$d_candx, origin = "1899-12-30") 
+# kyla.status$KEY <- paste0(kyla.status$ccssid, ":", kyla.status$n_cond)
+kyla.status$KEY <- paste0(kyla.status$ccssid, ":", kyla.status$d_candx)
+
+
 #########################
 ## Subsequent neoplasm ##
 #########################

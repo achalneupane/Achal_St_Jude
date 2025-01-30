@@ -203,6 +203,36 @@ dim(PHENO.ANY_SN)
 # 7636   53
 
 
+library(dplyr)
+library(knitr)
+
+new.lifestyle <- PHENO.ANY_SN
+
+# Total number of participants
+total_n <- nrow(new.lifestyle)
+
+# Create a data frame summarizing the counts and percentages
+lifestyle_summary <- data.frame(
+  Category = c("Ever a Smoker", "No Physical Activity", "Risky/Heavy Drinking", "Obesity"),
+  Count = c(
+    sum(new.lifestyle$Smoker_ever_yn == "Yes", na.rm = TRUE),
+    sum(new.lifestyle$PhysicalActivity_yn == "No", na.rm = TRUE),
+    sum(new.lifestyle$RiskyHeavyDrink_yn == "Yes", na.rm = TRUE),
+    sum(new.lifestyle$Obese_yn == "Yes", na.rm = TRUE)
+  ),
+  Percentage = round((c(
+    sum(new.lifestyle$Smoker_ever_yn == "Yes", na.rm = TRUE),
+    sum(new.lifestyle$PhysicalActivity_yn == "No", na.rm = TRUE),
+    sum(new.lifestyle$RiskyHeavyDrink_yn == "Yes", na.rm = TRUE),
+    sum(new.lifestyle$Obese_yn == "Yes", na.rm = TRUE)
+  ) / total_n) * 100, 1)
+)
+
+colnames(lifestyle_summary) <- c("Lifestyle Factor", paste0("% (n total=", total_n, ")"))
+View(lifestyle_summary)
+
+
+
 ## Add any missing to each lifestyle variable
 # PHENO.ANY_SN[c("Smoker_ever_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn")]
 PHENO.ANY_SN$any_lifestyle_missing <- apply(PHENO.ANY_SN[c("Smoker_ever_yn", "PhysicalActivity_yn", "RiskyHeavyDrink_yn", "Obese_yn")], 1, function(x) any("Unknown" %in% x))
@@ -210,6 +240,22 @@ PHENO.ANY_SN$any_lifestyle_missing  <- factor(ifelse(PHENO.ANY_SN$any_lifestyle_
 
 table(PHENO.ANY_SN$any_lifestyle_missing)
 
+
+
+table(PHENO.ANY_SN$Smoker_ever_yn)
+# # Ever a smoker Yes: 1957
+# 24.6%
+1957/
+
+table(PHENO.ANY_SN$PhysicalActivity_yn)
+# # No physical activity: 4258
+# 53.6%
+table(PHENO.ANY_SN$RiskyHeavyDrink_yn)
+# # Risky/heavy Drinking: 1952
+# Risky or heavy drinking Yes: 24.6%
+table(PHENO.ANY_SN$Obese_yn)
+# # Obesity Yes: 1102
+# Obesity Yes: 13.9
 ########################################
 ## Do the same for missing treatments ##
 ########################################

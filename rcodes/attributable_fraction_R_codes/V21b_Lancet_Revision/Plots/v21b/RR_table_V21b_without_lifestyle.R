@@ -1,15 +1,38 @@
 ## to perfrom test of trend!!
 
-function (PHENO.ANY_SN){
-  PHENO.ANY_SN$Pleiotropy_PRSWEB_PRS.tertile.category <- as.numeric(PHENO.ANY_SN$Pleiotropy_PRSWEB_PRS.tertile.category)-1
-  PHENO.ANY_SN$Pleiotropy_PRSWEB_PRS.tertile.category <- as.numeric(PHENO.ANY_SN$Pleiotropy_PRSWEB_PRS.tertile.category)-1
-return (PHENO.ANY_SN)
-}
 
 ## 1.------------------------------------- SJLIFE (Exactly as Qin et al)
 # This is based on Z:\ResearchHome\ClusterHome\aneupane\St_Jude\Achal_St_Jude\rcodes\attributable_fraction_R_codes\V18_no_merger_rule_in_v17\SJLIFE\Without_lifestyle_exactly_as_Qin_etal
 
 rm(list=ls())
+
+is.trend <- "Yes"
+get_trend_var <- function(PHENO.ANY_SN) {
+  if (is.trend == "Yes") {
+    PHENO.ANY_SN$Admixture  <- NA
+    PHENO.ANY_SN$Pleiotropy_PRSWEB_PRS.tertile.category <- as.numeric(PHENO.ANY_SN$Pleiotropy_PRSWEB_PRS.tertile.category)-1
+    PHENO.ANY_SN$Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category <- as.numeric(PHENO.ANY_SN$Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category)-1
+    PHENO.ANY_SN$BASALcell_PRS.tertile.category <- as.numeric(PHENO.ANY_SN$BASALcell_PRS.tertile.category)-1
+    PHENO.ANY_SN$Thyroid_PRS.tertile.category <- as.numeric(PHENO.ANY_SN$Thyroid_PRS.tertile.category)-1
+    PHENO.ANY_SN$Meningioma_PRS.tertile.category <- as.numeric(PHENO.ANY_SN$Meningioma_PRS.tertile.category)-1
+    PHENO.ANY_SN$Sarcoma_Machiela_PRS.tertile.category <- as.numeric(PHENO.ANY_SN$Sarcoma_Machiela_PRS.tertile.category)-1
+    PHENO.ANY_SN$AGE_AT_DIAGNOSIS <- as.numeric(PHENO.ANY_SN$AGE_AT_DIAGNOSIS)-1
+    PHENO.ANY_SN$maxsegrtdose.category <- as.numeric(PHENO.ANY_SN$maxsegrtdose.category)-1
+    PHENO.ANY_SN$maxabdrtdose.category <- as.numeric(PHENO.ANY_SN$maxabdrtdose.category)-1
+    PHENO.ANY_SN$maxpelvisrtdose.category <- as.numeric(PHENO.ANY_SN$maxpelvisrtdose.category)-1
+    PHENO.ANY_SN$maxchestrtdose.category <- as.numeric(PHENO.ANY_SN$maxchestrtdose.category)-1
+    PHENO.ANY_SN$maxneckrtdose.category <- as.numeric(PHENO.ANY_SN$maxneckrtdose.category)-1
+    PHENO.ANY_SN$aa_class_dose_5.category <- as.numeric(PHENO.ANY_SN$aa_class_dose_5.category)-1
+    PHENO.ANY_SN$anthra_jco_dose_5.category <- as.numeric(PHENO.ANY_SN$anthra_jco_dose_5.category)-1
+    PHENO.ANY_SN$epitxn_dose_5.category <- as.numeric(PHENO.ANY_SN$epitxn_dose_5.category)-1
+    PHENO.ANY_SN$Admixture [PHENO.ANY_SN$EUR > 0.8] <- 0
+    PHENO.ANY_SN$Admixture [PHENO.ANY_SN$AFR > 0.6] <- 1
+    PHENO.ANY_SN$Admixture [is.na(PHENO.ANY_SN$Admixture)] <- 2
+    PHENO.ANY_SN$Admixture [is.na(PHENO.ANY_SN$EAS)] <- NA
+    # PHENO.ANY_SN$gender <- as.numeric(PHENO.ANY_SN$epitxn_dose_5.category)-1
+  }
+  return (PHENO.ANY_SN)
+}
 ######################################
 ## Attributable fraction of Any SNs ##
 ######################################
@@ -26,16 +49,17 @@ PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">0-<18
 PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">=18-<30"] <- ">0-<30"
 PHENO.ANY_SN$maxsegrtdose.category <- factor(PHENO.ANY_SN$maxsegrtdose.category, levels = c("None", ">0-<30", ">=30"))
 
+PHENO.ANY_SN <- get_trend_var(PHENO.ANY_SN)
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 
-
+# AFR + EAS have been replaced by Admixture
 # Fit the Poisson regression model
 fit_all <- glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
                  AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                  AGE_AT_DIAGNOSIS + gender + 
                  maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category +
-                 EAS + AFR + 
+                 Admixture + 
                  any_chemo_missing + any_rt_missing,
                family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
@@ -54,7 +78,7 @@ results <- data.frame(
 
 
 
-ANY_SN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
+ANY_SN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|Admixture|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
 ANY_SN.vars
 ###################################
 ## Attributable fraction of SMNs ##
@@ -72,14 +96,14 @@ PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">0-<18
 PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">=18-<30"] <- ">0-<30"
 PHENO.ANY_SN$maxsegrtdose.category <- factor(PHENO.ANY_SN$maxsegrtdose.category, levels = c("None", ">0-<30", ">=30"))
 
-
+PHENO.ANY_SN <- get_trend_var(PHENO.ANY_SN)
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 fit_all = glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender +
                 maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category +
-                EAS + AFR + 
+                Admixture + 
                 any_chemo_missing + any_rt_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
@@ -99,7 +123,7 @@ results <- data.frame(
 
 
 
-SMN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
+SMN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|Admixture|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
 SMN.vars
 ########################################
 ## Attributable fraction of Any NMSCs ##
@@ -124,13 +148,14 @@ PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$maxpelvisrtdose.category == "
 PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$maxpelvisrtdose.category == ">=20"] <- "Any"
 PHENO.ANY_SN$maxpelvisrtdose.category <- factor(PHENO.ANY_SN$maxpelvisrtdose.category, levels = c("None", "Any"))
 
+PHENO.ANY_SN <- get_trend_var(PHENO.ANY_SN)
 dat_all = PHENO.ANY_SN
 
 # dat_all=dat_all[dat_all$evt1==1,]
 fit_all = glm(formula = event ~ BASALcell_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 gender + maxsegrtdose.category + maxabdrtdose.category + maxpelvisrtdose.category +
-                EAS + AFR +
+                Admixture +
                 any_rt_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
@@ -151,7 +176,7 @@ results <- data.frame(
 
 
 
-NMSC.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS|any_rt_missingYes", results$Predictor, ignore.case = T),]
+NMSC.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|Admixture|any_rt_missingYes", results$Predictor, ignore.case = T),]
 NMSC.vars
 ################################################
 ## Attributable fraction of Any Breast cancer ##
@@ -183,6 +208,8 @@ PHENO.ANY_SN$anthra_jco_dose_5.category[PHENO.ANY_SN$anthra_jco_dose_5.category 
 PHENO.ANY_SN$anthra_jco_dose_5.category <- factor(PHENO.ANY_SN$anthra_jco_dose_5.category, levels = c("None", "1st-2nd", "3rd"))
 
 PHENO.ANY_SN <- PHENO.ANY_SN[PHENO.ANY_SN$gender == "Female",]
+
+PHENO.ANY_SN <- get_trend_var(PHENO.ANY_SN)
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 
@@ -195,7 +222,7 @@ fit_all = glm(formula = event ~ Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.cate
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + 
                 AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS +
                 maxchestrtdose.category + anthra_jco_dose_5.category +
-                EAS + AFR +
+                Admixture +
                 any_chemo_missing + any_rt_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
@@ -216,7 +243,7 @@ results <- data.frame(
 
 
 
-BREASTCANCER.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
+BREASTCANCER.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|Admixture|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
 BREASTCANCER.vars
 ##########################################
 ## Attributable fraction of Any THYROID ##
@@ -245,6 +272,7 @@ PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "2nd"
 PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "3rd"] <- "Any"
 PHENO.ANY_SN$epitxn_dose_5.category <- factor(PHENO.ANY_SN$epitxn_dose_5.category, levels = c("None", "Any"))
 
+PHENO.ANY_SN <- get_trend_var(PHENO.ANY_SN)
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 
@@ -253,7 +281,7 @@ fit_all = glm(formula = event ~
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + 
                 maxneckrtdose.category + epitxn_dose_5.category +
-                EAS + AFR +
+                Admixture +
                 any_chemo_missing + any_rt_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
@@ -274,7 +302,7 @@ results <- data.frame(
 
 
 
-THYROID.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
+THYROID.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|Admixture|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
 THYROID.vars
 
 #############################################
@@ -302,6 +330,7 @@ PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "2nd"
 PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "3rd"] <- "2nd-3rd"
 PHENO.ANY_SN$epitxn_dose_5.category <- factor(PHENO.ANY_SN$epitxn_dose_5.category, levels = c("None", "1st", "2nd-3rd"))
 
+PHENO.ANY_SN <- get_trend_var(PHENO.ANY_SN)
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 
@@ -309,7 +338,7 @@ fit_all = glm(formula = event ~ Meningioma_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + 
                 maxsegrtdose.category + epitxn_dose_5.category +
-                EAS + AFR +
+                Admixture +
                 any_chemo_missing + any_rt_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
@@ -330,7 +359,7 @@ results <- data.frame(
 
 
 
-MENINGIOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
+MENINGIOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|Admixture|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
 MENINGIOMA.vars
 
 ##########################################
@@ -352,6 +381,7 @@ PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "
 PHENO.ANY_SN$aa_class_dose_5.category <- factor(PHENO.ANY_SN$aa_class_dose_5.category, levels = c("1st", "2nd-3rd"))
 
 
+PHENO.ANY_SN <- get_trend_var(PHENO.ANY_SN)
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 
@@ -359,7 +389,7 @@ fit_all = glm(formula = event ~ Sarcoma_Machiela_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 gender + 
                 aa_class_dose_5.category +
-                EAS + AFR +
+                Admixture +
                 any_chemo_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
@@ -379,7 +409,7 @@ results <- data.frame(
 
 
 
-SARCOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose|anthra|epitxn|prs|AFR|EAS|any_chemo_missingYes", results$Predictor, ignore.case = T),]
+SARCOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose|anthra|epitxn|prs|Admixture|any_chemo_missingYes", results$Predictor, ignore.case = T),]
 SARCOMA.vars
 
 ## Combine all
@@ -414,25 +444,40 @@ for (col in colnames(p_columns)) {
 }
 
 
-## Sort
-empty_dataframe.ordered <- empty_dataframe[match(c(NA, "AGE_AT_DIAGNOSIS5-9", "AGE_AT_DIAGNOSIS10-14", "AGE_AT_DIAGNOSIS>=15", "genderFemale", 
-                            NA, "maxsegrtdose.category>0-<30", "maxsegrtdose.category>=18-<30", "maxsegrtdose.category>=30",
-                            NA, "maxabdrtdose.category>0-<30", "maxabdrtdose.category>=30",
-                            NA, "maxpelvisrtdose.categoryAny",
-                            NA, "maxchestrtdose.category>0-<20", "maxchestrtdose.category>=20", "maxchestrtdose.categoryAny", 
-                            NA, "maxneckrtdose.category>0-<30", "maxneckrtdose.category>=30",
-                            NA, "aa_class_dose_5.category2nd-3rd",
-                            NA, "anthra_jco_dose_5.category1st-2nd", "anthra_jco_dose_5.category3rd",
-                            NA, "epitxn_dose_5.category1st", "epitxn_dose_5.category2nd", "epitxn_dose_5.category2nd-3rd", "epitxn_dose_5.category3rd", "epitxn_dose_5.categoryAny",
-                            NA, "PRS_tertile_2nd", "PRS_tertile_3rd",
-                            NA, "AFR", "EAS",
-                            NA, "any_chemo_missingYes", "any_rt_missingYes"), empty_dataframe$Predictor),]
+# ## Sort (If is.trend ,- "No")
+# empty_dataframe.ordered <- empty_dataframe[match(c(NA, "AGE_AT_DIAGNOSIS5-9", "AGE_AT_DIAGNOSIS10-14", "AGE_AT_DIAGNOSIS>=15", "genderFemale", 
+#                             NA, "maxsegrtdose.category>0-<30", "maxsegrtdose.category>=18-<30", "maxsegrtdose.category>=30",
+#                             NA, "maxabdrtdose.category>0-<30", "maxabdrtdose.category>=30",
+#                             NA, "maxpelvisrtdose.categoryAny",
+#                             NA, "maxchestrtdose.category>0-<20", "maxchestrtdose.category>=20", "maxchestrtdose.categoryAny", 
+#                             NA, "maxneckrtdose.category>0-<30", "maxneckrtdose.category>=30",
+#                             NA, "aa_class_dose_5.category2nd-3rd",
+#                             NA, "anthra_jco_dose_5.category1st-2nd", "anthra_jco_dose_5.category3rd",
+#                             NA, "epitxn_dose_5.category1st", "epitxn_dose_5.category2nd", "epitxn_dose_5.category2nd-3rd", "epitxn_dose_5.category3rd", "epitxn_dose_5.categoryAny",
+#                             NA, "PRS_tertile_2nd", "PRS_tertile_3rd",
+#                             NA, "AFR", "EAS",
+#                             NA, "any_chemo_missingYes", "any_rt_missingYes"), empty_dataframe$Predictor),]
+# 
+
+# ## Sort (If is.trend ,- "Yes")
+empty_dataframe.ordered <- empty_dataframe[match(c(NA, "AGE_AT_DIAGNOSIS", "genderFemale", 
+                                                   NA, "maxsegrtdose.category",
+                                                   NA, "maxabdrtdose.category",
+                                                   NA, "maxpelvisrtdose.category",
+                                                   NA, "maxchestrtdose.category", 
+                                                   NA, "maxneckrtdose.category",
+                                                   NA, "aa_class_dose_5.category",
+                                                   NA, "anthra_jco_dose_5.category",
+                                                   NA, "epitxn_dose_5.category",
+                                                   NA, "PRS_tertile_",
+                                                   NA, "Admixture",
+                                                   NA, "any_chemo_missingYes", "any_rt_missingYes"), empty_dataframe$Predictor),]
 
 
 # Fill missing values with NA
 empty_dataframe.ordered[is.na(empty_dataframe.ordered)] <- ""                  
-desired_order <- c("Predictor",  "RR (95% CI)_ANY_SN", "P_ANY_SN", "RR (95% CI)_SMN", "P_SMN", "RR (95% CI)_NMSC", "P_NMSC", "RR (95% CI)_Breast", "P_Breast",
-  "RR (95% CI)_Thyroid", "P_Thyroid", "RR (95% CI)_Meningioma", "P_Meningioma", "RR (95% CI)_Sarcoma", "P_Sarcoma")
+desired_order <- c("Predictor",  "RR (95% CI)_ANY_SN", "P_ANY_SN", "RR (95% CI)_SMN", "P_SMN", "RR (95% CI)_Meningioma", "P_Meningioma", "RR (95% CI)_NMSC", "P_NMSC", "RR (95% CI)_Breast", "P_Breast",
+  "RR (95% CI)_Thyroid", "P_Thyroid", "RR (95% CI)_Sarcoma", "P_Sarcoma")
 empty_dataframe.ordered <- empty_dataframe.ordered[, desired_order]
 
 ## 2.------------------------------------- SJLIFE
@@ -443,6 +488,34 @@ empty_dataframe.ordered <- empty_dataframe.ordered[, desired_order]
 ###################################################################################
 ## 3.------------------------------------- CCSS
 rm(list=ls())
+
+is.trend <- "Yes"
+get_trend_var <- function(PHENO.ANY_SN) {
+  if (is.trend == "Yes") {
+    PHENO.ANY_SN$Admixture  <- NA
+    PHENO.ANY_SN$Pleiotropy_PRSWEB_PRS.tertile.category <- as.numeric(PHENO.ANY_SN$Pleiotropy_PRSWEB_PRS.tertile.category)-1
+    PHENO.ANY_SN$Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category <- as.numeric(PHENO.ANY_SN$Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.category)-1
+    PHENO.ANY_SN$BASALcell_PRS.tertile.category <- as.numeric(PHENO.ANY_SN$BASALcell_PRS.tertile.category)-1
+    PHENO.ANY_SN$Thyroid_PRS.tertile.category <- as.numeric(PHENO.ANY_SN$Thyroid_PRS.tertile.category)-1
+    PHENO.ANY_SN$Meningioma_PRS.tertile.category <- as.numeric(PHENO.ANY_SN$Meningioma_PRS.tertile.category)-1
+    PHENO.ANY_SN$Sarcoma_Machiela_PRS.tertile.category <- as.numeric(PHENO.ANY_SN$Sarcoma_Machiela_PRS.tertile.category)-1
+    PHENO.ANY_SN$AGE_AT_DIAGNOSIS <- as.numeric(PHENO.ANY_SN$AGE_AT_DIAGNOSIS)-1
+    PHENO.ANY_SN$maxsegrtdose.category <- as.numeric(PHENO.ANY_SN$maxsegrtdose.category)-1
+    PHENO.ANY_SN$maxabdrtdose.category <- as.numeric(PHENO.ANY_SN$maxabdrtdose.category)-1
+    PHENO.ANY_SN$maxpelvisrtdose.category <- as.numeric(PHENO.ANY_SN$maxpelvisrtdose.category)-1
+    PHENO.ANY_SN$maxchestrtdose.category <- as.numeric(PHENO.ANY_SN$maxchestrtdose.category)-1
+    PHENO.ANY_SN$maxneckrtdose.category <- as.numeric(PHENO.ANY_SN$maxneckrtdose.category)-1
+    PHENO.ANY_SN$aa_class_dose_5.category <- as.numeric(PHENO.ANY_SN$aa_class_dose_5.category)-1
+    PHENO.ANY_SN$anthra_jco_dose_5.category <- as.numeric(PHENO.ANY_SN$anthra_jco_dose_5.category)-1
+    PHENO.ANY_SN$epitxn_dose_5.category <- as.numeric(PHENO.ANY_SN$epitxn_dose_5.category)-1
+    PHENO.ANY_SN$Admixture [PHENO.ANY_SN$EUR > 0.8] <- 0
+    PHENO.ANY_SN$Admixture [PHENO.ANY_SN$AFR > 0.6] <- 1
+    PHENO.ANY_SN$Admixture [is.na(PHENO.ANY_SN$Admixture)] <- 2
+    PHENO.ANY_SN$Admixture [is.na(PHENO.ANY_SN$EAS)] <- NA
+    # PHENO.ANY_SN$gender <- as.numeric(PHENO.ANY_SN$epitxn_dose_5.category)-1
+  }
+  return (PHENO.ANY_SN)
+}
 ######################################
 ## Attributable fraction of Any SNs ##
 ######################################
@@ -462,7 +535,7 @@ PHENO.ANY_SN$maxsegrtdose.category <- factor(PHENO.ANY_SN$maxsegrtdose.category,
 
 # table(PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$event == 1]) ## **
 
-
+PHENO.ANY_SN <- get_trend_var(PHENO.ANY_SN)
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 
@@ -471,7 +544,7 @@ fit_all <- glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
                  AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                  AGE_AT_DIAGNOSIS + gender + 
                  maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category +
-                 EAS + AFR + 
+                 Admixture + 
                  any_chemo_missing + any_rt_missing,
                  family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
@@ -490,7 +563,7 @@ results <- data.frame(
 
 
 
-ANY_SN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
+ANY_SN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|Admixture|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
 
 ###################################
 ## Attributable fraction of SMNs ##
@@ -509,14 +582,14 @@ PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">0-<18
 PHENO.ANY_SN$maxsegrtdose.category[PHENO.ANY_SN$maxsegrtdose.category == ">=18-<30"] <- ">0-<30"
 PHENO.ANY_SN$maxsegrtdose.category <- factor(PHENO.ANY_SN$maxsegrtdose.category, levels = c("None", ">0-<30", ">=30"))
 
-
+PHENO.ANY_SN <- get_trend_var(PHENO.ANY_SN)
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 fit_all = glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender +
                 maxsegrtdose.category + maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category +
-                EAS + AFR + 
+                Admixture + 
                 any_chemo_missing + any_rt_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
@@ -536,7 +609,7 @@ results <- data.frame(
 
 
 
-SMN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
+SMN.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|Admixture|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
 
 ########################################
 ## Attributable fraction of Any NMSCs ##
@@ -561,14 +634,14 @@ PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$maxpelvisrtdose.category == "
 PHENO.ANY_SN$maxpelvisrtdose.category[PHENO.ANY_SN$maxpelvisrtdose.category == ">=20"] <- "Any"
 PHENO.ANY_SN$maxpelvisrtdose.category <- factor(PHENO.ANY_SN$maxpelvisrtdose.category, levels = c("None", "Any"))
 
-
+PHENO.ANY_SN <- get_trend_var(PHENO.ANY_SN)
 dat_all = PHENO.ANY_SN
 
 dat_all=dat_all[dat_all$evt1==1,]
 fit_all = glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 gender + maxsegrtdose.category + maxabdrtdose.category + maxpelvisrtdose.category +
-                EAS + AFR +
+                Admixture +
                 any_rt_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
@@ -589,7 +662,7 @@ results <- data.frame(
 
 
 
-NMSC.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS|any_rt_missingYes", results$Predictor, ignore.case = T),]
+NMSC.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|Admixture|any_rt_missingYes", results$Predictor, ignore.case = T),]
 NMSC.vars
 ################################################
 ## Attributable fraction of Any Breast cancer ##
@@ -615,6 +688,8 @@ PHENO.ANY_SN$anthra_jco_dose_5.category[PHENO.ANY_SN$anthra_jco_dose_5.category 
 PHENO.ANY_SN$anthra_jco_dose_5.category <- factor(PHENO.ANY_SN$anthra_jco_dose_5.category, levels = c("None", "1st-2nd", "3rd"))
 
 PHENO.ANY_SN <- PHENO.ANY_SN[PHENO.ANY_SN$gender == "Female",]
+
+PHENO.ANY_SN <- get_trend_var(PHENO.ANY_SN)
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 
@@ -622,7 +697,7 @@ fit_all = glm(formula = event ~ Mavaddat_2019_ER_OVERALL_Breast_PRS.tertile.cate
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + 
                 AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS +
                 maxchestrtdose.category + anthra_jco_dose_5.category +
-                EAS + AFR +
+                Admixture +
                 any_chemo_missing + any_rt_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
@@ -643,7 +718,7 @@ results <- data.frame(
 
 
 
-BREASTCANCER.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
+BREASTCANCER.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|Admixture|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
 
 ##########################################
 ## Attributable fraction of Any THYROID ##
@@ -672,7 +747,7 @@ PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "3rd"
 PHENO.ANY_SN$epitxn_dose_5.category <- factor(PHENO.ANY_SN$epitxn_dose_5.category, levels = c("None", "Any"))
 
 
-
+PHENO.ANY_SN <- get_trend_var(PHENO.ANY_SN)
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 
@@ -680,7 +755,7 @@ fit_all = glm(formula = event ~ Thyroid_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + 
                 maxneckrtdose.category + epitxn_dose_5.category +
-                EAS + AFR +
+                Admixture +
                 any_chemo_missing + any_rt_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
@@ -701,7 +776,7 @@ results <- data.frame(
 
 
 
-THYROID.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
+THYROID.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|Admixture|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
 
 
 #############################################
@@ -729,7 +804,7 @@ PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "2nd"
 PHENO.ANY_SN$epitxn_dose_5.category[PHENO.ANY_SN$epitxn_dose_5.category == "3rd"] <- "2nd-3rd"
 PHENO.ANY_SN$epitxn_dose_5.category <- factor(PHENO.ANY_SN$epitxn_dose_5.category, levels = c("None", "1st", "2nd-3rd"))
 
-
+PHENO.ANY_SN <- get_trend_var(PHENO.ANY_SN)
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 
@@ -737,7 +812,7 @@ fit_all = glm(formula = event ~ Meningioma_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 AGE_AT_DIAGNOSIS + gender + 
                 maxsegrtdose.category + epitxn_dose_5.category +
-                EAS + AFR +
+                Admixture +
                 any_chemo_missing + any_rt_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
@@ -758,7 +833,7 @@ results <- data.frame(
 
 
 
-MENINGIOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|AFR|EAS|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
+MENINGIOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose_5|anthra|epitxn|prs|Admixture|any_chemo_missingYes|any_rt_missingYes", results$Predictor, ignore.case = T),]
 
 
 ##########################################
@@ -779,7 +854,7 @@ PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "
 PHENO.ANY_SN$aa_class_dose_5.category[PHENO.ANY_SN$aa_class_dose_5.category == "3rd"] <- "2nd-3rd"
 PHENO.ANY_SN$aa_class_dose_5.category <- factor(PHENO.ANY_SN$aa_class_dose_5.category, levels = c("1st", "2nd-3rd"))
 
-
+PHENO.ANY_SN <- get_trend_var(PHENO.ANY_SN)
 dat_all = PHENO.ANY_SN
 dat_all=dat_all[dat_all$evt1==1,]
 
@@ -787,7 +862,7 @@ fit_all = glm(formula = event ~ Sarcoma_Machiela_PRS.tertile.category +
                 AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + AGE_AT_LAST_CONTACT.cs4 +
                 gender + 
                 aa_class_dose_5.category +
-                EAS + AFR +
+                Admixture +
                 any_chemo_missing,
               family = "poisson", offset = log(dat_all$PY), data = dat_all)
 
@@ -807,7 +882,7 @@ results <- data.frame(
 
 
 
-SARCOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose|anthra|epitxn|prs|AFR|EAS|any_chemo_missingYes", results$Predictor, ignore.case = T),]
+SARCOMA.vars <- results[grepl("diagnosis|gender|maxsegrt|maxabdrtdose|pelvis|chest|neck|aa_class_dose|anthra|epitxn|prs|Admixture|any_chemo_missingYes", results$Predictor, ignore.case = T),]
 SARCOMA.vars
 
 ## Combine all
@@ -843,24 +918,24 @@ for (col in colnames(p_columns)) {
 
 
 ## Sort
-empty_dataframe.ordered <- empty_dataframe[match(c(NA, "AGE_AT_DIAGNOSIS5-9", "AGE_AT_DIAGNOSIS10-14", "AGE_AT_DIAGNOSIS>=15", "genderFemale", 
-                                                   NA, "maxsegrtdose.category>0-<30", "maxsegrtdose.category>=18-<30", "maxsegrtdose.category>=30",
-                                                   NA, "maxabdrtdose.category>0-<30", "maxabdrtdose.category>=30",
-                                                   NA, "maxpelvisrtdose.categoryAny",
-                                                   NA, "maxchestrtdose.category>0-<20", "maxchestrtdose.category>=20", "maxchestrtdose.categoryAny", 
-                                                   NA, "maxneckrtdose.category>0-<30", "maxneckrtdose.category>=30",
-                                                   NA, "aa_class_dose_5.category2nd-3rd",
-                                                   NA, "anthra_jco_dose_5.category1st-2nd", "anthra_jco_dose_5.category3rd",
-                                                   NA, "epitxn_dose_5.category1st", "epitxn_dose_5.category2nd", "epitxn_dose_5.category2nd-3rd", "epitxn_dose_5.category3rd", "epitxn_dose_5.categoryAny",
-                                                   NA, "PRS_tertile_2nd", "PRS_tertile_3rd",
-                                                   NA, "AFR", "EAS",
+empty_dataframe.ordered <- empty_dataframe[match(c(NA, "AGE_AT_DIAGNOSIS", "genderFemale", 
+                                                   NA, "maxsegrtdose.category",
+                                                   NA, "maxabdrtdose.category",
+                                                   NA, "maxpelvisrtdose.category",
+                                                   NA, "maxchestrtdose.category", 
+                                                   NA, "maxneckrtdose.category",
+                                                   NA, "aa_class_dose_5.category",
+                                                   NA, "anthra_jco_dose_5.category",
+                                                   NA, "epitxn_dose_5.category",
+                                                   NA, "PRS_tertile_",
+                                                   NA, "Admixture",
                                                    NA, "any_chemo_missingYes", "any_rt_missingYes"), empty_dataframe$Predictor),]
 
 
 # Fill missing values with NA
 empty_dataframe.ordered[is.na(empty_dataframe.ordered)] <- ""                  
-desired_order <- c("Predictor",  "RR (95% CI)_ANY_SN", "P_ANY_SN", "RR (95% CI)_SMN", "P_SMN", "RR (95% CI)_NMSC", "P_NMSC", "RR (95% CI)_Breast", "P_Breast",
-                   "RR (95% CI)_Thyroid", "P_Thyroid", "RR (95% CI)_Meningioma", "P_Meningioma", "RR (95% CI)_Sarcoma", "P_Sarcoma")
+desired_order <- c("Predictor",  "RR (95% CI)_ANY_SN", "P_ANY_SN", "RR (95% CI)_SMN", "P_SMN", "RR (95% CI)_Meningioma", "P_Meningioma", "RR (95% CI)_NMSC", "P_NMSC", "RR (95% CI)_Breast", "P_Breast",
+                   "RR (95% CI)_Thyroid", "P_Thyroid", "RR (95% CI)_Sarcoma", "P_Sarcoma")
 empty_dataframe.ordered <- empty_dataframe.ordered[, desired_order]
 
 

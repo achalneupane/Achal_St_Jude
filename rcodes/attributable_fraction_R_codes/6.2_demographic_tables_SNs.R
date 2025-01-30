@@ -4,6 +4,7 @@
 #########################
 ## Load Phenotype data ##
 #########################
+library(haven)
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
 
@@ -622,6 +623,7 @@ other <- SMNs[!SMNs$sjlid %in% all.malignants,]
 table(other$diag)
 
 
+## Create SN and SMN tables
 
 
 SMNs$KEY <- paste0(SMNs$sjlid, ":", SMNs$sncount)
@@ -631,33 +633,179 @@ THYROIDcancer$KEY <- paste0(THYROIDcancer$sjlid, ":", THYROIDcancer$sncount)
 MENINGIOMA$KEY <- paste0(MENINGIOMA$sjlid, ":", MENINGIOMA$sncount)
 SARCOMA$KEY <- paste0(SARCOMA$sjlid, ":", SARCOMA$sncount)
 
-SMNs$smnTYPE <- "Unique"
-SMNs$smnTYPE [SMNs$KEY %in% NMSCs$KEY] <- "NMSCs"
-SMNs$smnTYPE [SMNs$KEY %in% BREASTcancer$KEY] <- "BREASTcancer"
-SMNs$smnTYPE [SMNs$KEY %in% THYROIDcancer$KEY] <- "THYROIDcancer"
-SMNs$smnTYPE [SMNs$KEY %in% MENINGIOMA$KEY] <- "MENINGIOMA"
-SMNs$smnTYPE [SMNs$KEY %in% SARCOMA$KEY] <- "SARCOMA"
-other <- SMNs[SMNs$smnTYPE == "Unique",]
+ANY_SNs.sjlife <- ANY_SNs
+SMNs.sjlife <- SMNs
 
-table(SMNs$smnTYPE)
+##########
+## SMNs ##
+##########
+SMNs.sjlife$new.diagnosis <- NA
 
-table(NMSCs$KEY %in% SMNs$KEY)
-# FALSE  TRUE 
-# 225   238
-table(BREASTcancer$sjlid %in% SMNs$sjlid)
-# FALSE  TRUE 
-# 14    62 
-table(THYROIDcancer$sjlid %in% SMNs$sjlid)
-# FALSE  TRUE 
-# 2    85 
-table(MENINGIOMA$sjlid %in% SMNs$sjlid)
-# FALSE  TRUE 
-# 103    46 
-table(SARCOMA$sjlid %in% SMNs$sjlid)
-# FALSE  TRUE 
-# 1    32
+SMNs.sjlife$new.diagnosis[grepl("basal cell|squamous cell|squamous", SMNs.sjlife$diag, ignore.case = T)] <- "NMSCs"
+SMNs.sjlife$new.diagnosis[grepl("breast", SMNs.sjlife$diaggrp, ignore.case = T)] <- "Breast"
+SMNs.sjlife$new.diagnosis[grepl("thyroid", SMNs.sjlife$diag, ignore.case = T)] <- "Thyroid"
+SMNs.sjlife$new.diagnosis[grepl("meningioma", SMNs.sjlife$diag, ignore.case = T)] <- "Meningioma"
+SMNs.sjlife$new.diagnosis[grepl("Sarcoma", SMNs.sjlife$diag, ignore.case = T)] <- "Sarcoma"
+SMNs.sjlife$new.diagnosis[is.na(SMNs.sjlife$new.diagnosis)] <- "Other"
 
-table(all.malignants %in% SMNs$sjlid)
+other.smn.sjlife <- SMNs.sjlife[SMNs.sjlife$new.diagnosis=="Other",]
+malignant.sjlife <- SMNs.sjlife[SMNs.sjlife$new.diagnosis!="Other",]
+
+SMNs.sjlife$new.diagnosis.cleaned <- NA
+SMNs.sjlife$new.diagnosis.cleaned[grepl("basal cell", SMNs.sjlife$diag, ignore.case = T)] <- "Basal cell carcinoma"
+SMNs.sjlife$new.diagnosis.cleaned[grepl("squamous", SMNs.sjlife$diag, ignore.case = T)] <- "Squamous cell carcinoma"
+
+SMNs.sjlife$new.diagnosis.cleaned[grepl("ductal|Mammary Carcinoma", SMNs.sjlife$diag, ignore.case = T)] <- "Infiltrating ductal carcinoma of breast"
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Carcinoma, Secretory", SMNs.sjlife$diag, ignore.case = T)] <- "Secretory carcinoma of breast"
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Carcinoma, Metaplastic, Breast", SMNs.sjlife$diag, ignore.case = T)] <- "Metaplastic carcinoma of breast"
+cc <- SMNs.sjlife[SMNs.sjlife$new.diagnosis == "Breast",]
+
+
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Carcinoma, Papillary|Carcinoma, Hurthle Cell and Papillary|Papillary carcinoma", SMNs.sjlife$diag, ignore.case = T)] <- "Carcinoma, Papillary, Thyroid"
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Adenocarcinoma, Papillary", SMNs.sjlife$diag, ignore.case = T)] <- "Adenocarcinoma, Papillary, Thyroid"
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Carcinoma, Follicular, Thyroid", SMNs.sjlife$diag, ignore.case = T)] <- "Adenocarcinoma, Follicular, Thyroid"
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Microcarcinoma, Papillary", SMNs.sjlife$diag, ignore.case = T)] <- "Microcarcinoma, Papillary, Thyroid"
+
+SMNs.sjlife$new.diagnosis.cleaned[grepl("meningioma", SMNs.sjlife$diag, ignore.case = T)] <- "Meningioma"
+
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Osteosarcoma", SMNs.sjlife$diag, ignore.case = T)] <- "Osteosarcoma"
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Chondrosarcoma", SMNs.sjlife$diag, ignore.case = T)] <- "Chondrosarcoma"
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Dermatofibrosarcoma", SMNs.sjlife$diag, ignore.case = T)] <- "Dermatofibrosarcoma"
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Leiomyosarcoma", SMNs.sjlife$diag, ignore.case = T)] <- "Leiomyosarcoma"
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Ewing", SMNs.sjlife$diag, ignore.case = T)] <- "Ewing's Sarcoma"
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Histiocytic Sarcoma", SMNs.sjlife$diag, ignore.case = T)] <- "Histiocytic Sarcoma"
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Epithelioid", SMNs.sjlife$diag, ignore.case = T)] <- "Epithelioid Sarcoma"
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Liposarcoma", SMNs.sjlife$diag, ignore.case = T)] <- "Liposarcoma"
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Spindle Cell Sarcoma", SMNs.sjlife$diag, ignore.case = T)] <- "Spindle Cell Sarcoma"
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Sarcoma, High Grade Spindle Cell", SMNs.sjlife$diag, ignore.case = T)] <- "Spindle Cell Sarcoma"
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Sarcoma, High Grade, Adrenal Gland", SMNs.sjlife$diag, ignore.case = T)] <- "Sarcoma, High Grade Adrenal Gland"
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Sarcoma, Soft Tissue", SMNs.sjlife$diag, ignore.case = T)] <- "Leiomyosarcoma"
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Spindle Cell Sarcoma", SMNs.sjlife$diag, ignore.case = T)] <- "Spindle Cell Sarcoma"
+
+# SMNs.sjlife$diag[grepl("sarcoma" , SMNs.sjlife$diag, ignore.case = T)][!SMNs.sjlife$diag[grepl("sarcoma" , SMNs.sjlife$diag, ignore.case = T)] %in% SMNs.sjlife$diag[grepl("sarcoma" , SMNs.sjlife$new.diagnosis.cleaned, ignore.case = T)]]
+
+
+SMNs.sjlife$new.diagnosis.cleaned[grepl("Sarcoma", SMNs.sjlife$diaggrp, ignore.case = T)& grepl("^Malignant|Dermatofibro|Ganglioma|papillary|firbromatosis|fibromyxoid|Giant cell|Neurilemoma|lipoma|Haemangioblastoma|comedocarcinoma", SMNs.sjlife$diag, ignore.case = T)] <- "Soft tissue tumor"
+SMNs.sjlife$new.diagnosis.cleaned[is.na(SMNs.sjlife$new.diagnosis.cleaned)] <- "Other"
+
+# Malignant Peripheral Nerve Sheath Tumor, Neck, Left
+
+other.SMN.sjlife <- SMNs.sjlife[(SMNs.sjlife$new.diagnosis.cleaned=="Other"),]
+table(ifelse(grepl("^Malignant", other.SMN.sjlife$icdo3behavior), "M", "B"))
+# M 
+# 96
+SMNs.sjlife$new.diagnosis.cleaned2 <- SMNs.sjlife$new.diagnosis.cleaned
+SMNs.sjlife$new.diagnosis.cleaned2[grepl("Soft tissue tumor", SMNs.sjlife$new.diagnosis.cleaned, ignore.case = T)] <- "Other"
+other.SMN.sjlife <- SMNs.sjlife[(SMNs.sjlife$new.diagnosis.cleaned2=="Other"),]
+
+cc <- SMNs.sjlife[grepl("Sarcoma, Soft Tissue", SMNs.sjlife$new.diagnosis.cleaned),]
+
+View(table(SMNs.sjlife$new.diagnosis.cleaned2))
+
+#############
+## Any SNs ##
+#############
+ANY_SNs.sjlife$KEY <- paste0(ANY_SNs.sjlife$sjlid, ":", ANY_SNs.sjlife$sncount)
+
+ANY_SNs.sjlife$new.diagnosis <- NA
+
+ANY_SNs.sjlife$new.diagnosis[grepl("basal cell|squamous cell|squamous", ANY_SNs.sjlife$diag, ignore.case = T)] <- "NMSCs"
+ANY_SNs.sjlife$new.diagnosis[grepl("breast", ANY_SNs.sjlife$diaggrp, ignore.case = T)] <- "Breast"
+ANY_SNs.sjlife$new.diagnosis[grepl("thyroid", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Thyroid"
+ANY_SNs.sjlife$new.diagnosis[grepl("meningioma", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Meningioma"
+ANY_SNs.sjlife$new.diagnosis[grepl("Sarcoma", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Sarcoma"
+ANY_SNs.sjlife$new.diagnosis[is.na(ANY_SNs.sjlife$new.diagnosis)] <- "Other"
+
+other.sjlife <- ANY_SNs.sjlife[ANY_SNs.sjlife$new.diagnosis=="Other",]
+checkanySN.sjlife <- ANY_SNs.sjlife[ANY_SNs.sjlife$new.diagnosis!="Other",]
+
+# Breast               Meningioma Non Melanoma Skin Cancer       Other Solid Tumors 
+# 54                      125                      184                       22 
+# Sarcoma                  Thyroid 
+# 26                       68 
+
+ANY_SNs.sjlife$new.diagnosis.cleaned <- NA
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("basal cell", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Basal cell carcinoma"
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("squamous", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Squamous cell carcinoma"
+
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("ductal|Mammary Carcinoma", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Infiltrating ductal carcinoma of breast"
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Carcinoma, Secretory", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Secretory carcinoma of breast"
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Carcinoma, Metaplastic, Breast", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Metaplastic carcinoma of breast"
+cc <- ANY_SNs.sjlife[ANY_SNs.sjlife$new.diagnosis == "Breast",]
+
+
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Carcinoma, Papillary|Carcinoma, Hurthle Cell and Papillary|Papillary carcinoma", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Carcinoma, Papillary, Thyroid"
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Adenocarcinoma, Papillary", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Adenocarcinoma, Papillary, Thyroid"
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Carcinoma, Follicular, Thyroid", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Adenocarcinoma, Follicular, Thyroid"
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Microcarcinoma, Papillary", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Microcarcinoma, Papillary, Thyroid"
+
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("meningioma", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Meningioma"
+
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Osteosarcoma", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Osteosarcoma"
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Chondrosarcoma", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Chondrosarcoma"
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Dermatofibrosarcoma", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Sarcoma, Soft Tissue"
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Ewing", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Ewing's Sarcoma"
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Histiocytic Sarcoma", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Histiocytic Sarcoma"
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Epithelioid", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Epithelioid Sarcoma"
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Myxoid Liposarcoma", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Liposarcoma"
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Spindle Cell Sarcoma", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Spindle Cell Sarcoma"
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Sarcoma, High Grade Spindle Cell", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Spindle Cell Sarcoma"
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Sarcoma, High Grade, Adrenal Gland", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Sarcoma, High Grade Adrenal Gland"
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Sarcoma, Soft Tissue", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Sarcoma, Soft Tissue"
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Spindle Cell Sarcoma", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Spindle Cell Sarcoma"
+ANY_SNs.sjlife$new.diagnosis.cleaned[grepl("Leiomyosarcoma", ANY_SNs.sjlife$diag, ignore.case = T)] <- "Leiomyosarcoma"
+
+ANY_SNs.sjlife$new.diagnosis.cleaned2 <- ANY_SNs.sjlife$new.diagnosis.cleaned
+ANY_SNs.sjlife$new.diagnosis.cleaned2[grepl("Soft tissue|Dermatofibroma", ANY_SNs.sjlife$new.diagnosis.cleaned2, ignore.case = T)] <- "Other"
+ANY_SNs.sjlife$new.diagnosis.cleaned2[is.na(ANY_SNs.sjlife$new.diagnosis.cleaned)] <- "Other"
+
+ANY_SNs.sjlife$new.diagnosis.cleaned.malignant <- ANY_SNs.sjlife$new.diagnosis.cleaned2
+ANY_SNs.sjlife$new.diagnosis.cleaned.malignant <- paste0(ANY_SNs.sjlife$new.diagnosis.cleaned.malignant, "_", ifelse(grepl("^Malignant", ANY_SNs.sjlife$icdo3behavior), "M", "B"))
+ANY_SNs.sjlife$new.diagnosis.cleaned.malignant[grepl("NA_M|NA_B",ANY_SNs.sjlife$new.diagnosis.cleaned.malignant)] <- NA
+
+
+other.anySN.sjlife <- ANY_SNs.sjlife[ANY_SNs.sjlife$new.diagnosis.cleaned2 =="Other",]
+
+View(table(ANY_SNs.sjlife$new.diagnosis.cleaned.malignant))
+# other.anySN.sjlife <- ANY_SNs.sjlife[is.na(ANY_SNs.sjlife$new.diagnosis.cleaned),]
+
+table(ifelse(grepl("^Malignant", other.anySN.sjlife$icdo3behavior), "M", "B"))
+# B  M 
+# 25 98
+
+other.SMN.sjlife[!other.SMN.sjlife$KEY %in% other.sjlife.sn$KEY,]
+
+
+# cc <- other.SMN.ccss[other.SMN.ccss$ccssid %in% NMSCs$ccssid,]
+
+#############
+# SMNs$smnTYPE <- "Unique"
+# SMNs$smnTYPE [SMNs$KEY %in% NMSCs$KEY] <- "NMSCs"
+# SMNs$smnTYPE [SMNs$KEY %in% BREASTcancer$KEY] <- "BREASTcancer"
+# SMNs$smnTYPE [SMNs$KEY %in% THYROIDcancer$KEY] <- "THYROIDcancer"
+# SMNs$smnTYPE [SMNs$KEY %in% MENINGIOMA$KEY] <- "MENINGIOMA"
+# SMNs$smnTYPE [SMNs$KEY %in% SARCOMA$KEY] <- "SARCOMA"
+# other <- SMNs[SMNs$smnTYPE == "Unique",]
+# 
+# table(SMNs$smnTYPE)
+# 
+# table(NMSCs$KEY %in% SMNs$KEY)
+# # FALSE  TRUE 
+# # 225   238
+# table(BREASTcancer$sjlid %in% SMNs$sjlid)
+# # FALSE  TRUE 
+# # 14    62 
+# table(THYROIDcancer$sjlid %in% SMNs$sjlid)
+# # FALSE  TRUE 
+# # 2    85 
+# table(MENINGIOMA$sjlid %in% SMNs$sjlid)
+# # FALSE  TRUE 
+# # 103    46 
+# table(SARCOMA$sjlid %in% SMNs$sjlid)
+# # FALSE  TRUE 
+# # 1    32
+# 
+# table(all.malignants %in% SMNs$sjlid)
 
 ##################################################
 ##################################################
@@ -1503,6 +1651,426 @@ SARCOMA$dob <- SARCOMA$gradedt - as.numeric(SARCOMA$gradeage) * 365.2422
 sum(SARCOMA$ccssid %in% subneo.within5$ccssid)
 
 SARCOMA <- SARCOMA[!(SARCOMA$ccssid %in% subneo.within5$ccssid),]
+
+###########################
+## Get SN and SMN tables ##
+###########################
+
+SMNs.ccss <- SMNs 
+AnySN.ccss <- ANY_SNs
+
+## Malignant status from Qi
+malignantStatus <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/CCSS_Data_from_Huiqi/RE__CCSS_phenotype_data2/ExportedCCSS_data_update_malignant.txt", header = T, stringsAsFactors = F)
+malignantStatus$KEY <- paste0(malignantStatus$ccssid, ":", malignantStatus$count)
+
+
+SMNs.ccss$KEY <- paste0(SMNs.ccss$ccssid, ":", SMNs.ccss$count)
+table(SMNs.ccss$KEY %in% malignantStatus$KEY)
+
+SMNs.ccss$d_candx <- as.Date(SMNs.ccss$d_candx, format = "%d%b%Y")
+SMNs.ccss$KEY <- paste0(SMNs.ccss$ccssid, ":", SMNs.ccss$d_candx)
+
+
+
+
+library(readxl)
+## Read file from Kyla
+kyla.status <- read_excel("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Kyla/combinedsn_final_02_17_2023.xlsx")
+kyla.status$d_candx <- as.numeric(kyla.status$d_candx)
+kyla.status$d_candx <- as.Date(kyla.status$d_candx, origin = "1899-12-30") 
+# kyla.status$KEY <- paste0(kyla.status$ccssid, ":", kyla.status$n_cond)
+kyla.status$KEY <- paste0(kyla.status$ccssid, ":", kyla.status$d_candx)
+
+table(SMNs.ccss$KEY %in% kyla.status$KEY)
+
+###############
+## CCSS SMNs ##
+###############
+
+# NMSC
+NMSCs.ccss <- NMSCs
+NMSCs.ccss$d_candx <- as.Date(NMSCs.ccss$d_candx, format = "%d%b%Y")
+# NMSCs$KEY <- paste0(NMSCs$ccssid, ":", NMSCs$count)
+NMSCs.ccss$KEY <- paste0(NMSCs.ccss$ccssid, ":", NMSCs.ccss$d_candx)
+NMSCs.ccss <- cbind(diag=kyla.status$candxo3[match(NMSCs.ccss$KEY, kyla.status$KEY)],NMSCs.ccss)
+
+# Breast
+BREASTcancer.ccss <- BREASTcancer
+BREASTcancer.ccss$d_candx <- as.Date(BREASTcancer.ccss$d_candx, format = "%d%b%Y")
+
+# MENINGIOMA
+MENINGIOMA.ccss <- MENINGIOMA
+MENINGIOMA.ccss$d_candx <- as.Date(MENINGIOMA.ccss$d_candx, format = "%d%b%Y")
+
+# Thyroid
+THYROIDcancer.ccss <- THYROIDcancer 
+THYROIDcancer.ccss$d_candx <- as.Date(THYROIDcancer.ccss$d_candx, format = "%d%b%Y")
+
+SARCOMA.ccss <- SARCOMA
+SARCOMA.ccss$d_candx <- as.Date(SARCOMA.ccss$d_candx, format = "%d%b%Y")
+# SARCOMA$KEY <- paste0(SARCOMA$ccssid, ":", SARCOMA$count)
+SARCOMA.ccss$KEY <- paste0(SARCOMA.ccss$ccssid, ":", SARCOMA.ccss$d_candx)
+SARCOMA.ccss <- cbind(diag=kyla.status$candxo3[match(SARCOMA.ccss$KEY, kyla.status$KEY)],SARCOMA.ccss)
+
+
+
+
+SMNs.ccss <- cbind(diag=kyla.status$candxo3 [match(SMNs.ccss$KEY, kyla.status$KEY)], SMNs.ccss)
+SMNs.ccss <- cbind(diaggrp=SMNs.ccss$groupdx3, SMNs.ccss)
+# cc <- cbind.data.frame(SMNs.ccss$candxo3, SMNs.ccss$groupdx3)
+# table(SMNs.ccss$ccssid %in% to.remove)
+
+SMNs.ccss$diag[is.na(SMNs.ccss$diag)] <- SMNs.ccss$groupdx3[is.na(SMNs.ccss$diag)]
+
+
+check.sarcoma <- SMNs.ccss[grepl("Sarcoma", SMNs.ccss$groupdx3, ignore.case = T),]
+
+
+SMNs.ccss$new.diagnosis <- NA
+
+# SMNs.ccss$new.diagnosis[grepl("basal cell|squamous cell|squamous", SMNs.ccss$diag, ignore.case = T)] <- "NMSCs"
+SMNs.ccss$new.diagnosis[grepl("basal cell|squamous cell|squamous", SMNs.ccss$diag, ignore.case = T)] <- "Other"
+SMNs.ccss$new.diagnosis[grepl("breast", SMNs.ccss$diaggrp, ignore.case = T)] <- "Breast"
+SMNs.ccss$new.diagnosis[grepl("thyroid", SMNs.ccss$diaggrp, ignore.case = T)] <- "Thyroid"
+SMNs.ccss$new.diagnosis[grepl("meningioma", SMNs.ccss$diaggrp, ignore.case = T)] <- "Meningioma"
+SMNs.ccss$new.diagnosis[grepl("Sarcoma", SMNs.ccss$diaggrp, ignore.case = T)] <- "Sarcoma"
+SMNs.ccss$new.diagnosis[is.na(SMNs.ccss$new.diagnosis)] <- "Other"
+
+other.smn.ccss <- SMNs.ccss[SMNs.ccss$new.diagnosis=="Other",]
+malignant.ccss <- SMNs.ccss[SMNs.ccss$new.diagnosis!="Other",]
+
+SMNs.ccss$new.diagnosis.cleaned <- NA
+SMNs.ccss$new.diagnosis.cleaned[grepl("basal cell", SMNs.ccss$diag, ignore.case = T)] <- "Other"
+SMNs.ccss$new.diagnosis.cleaned[grepl("squamous", SMNs.ccss$diag, ignore.case = T)] <- "Other"
+SMNs.ccss$new.diagnosis.cleaned[grepl("melanoma", SMNs.ccss$diag, ignore.case = T)] <- "Malignant melanoma"
+
+SMNs.ccss$new.diagnosis.cleaned[grepl("ductal|Mammary Carcinoma|Infiltrating duct carcinoma|Infiltrating duct", SMNs.ccss$diag, ignore.case = T)] <- "Infiltrating ductal carcinoma of breast"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Carcinoma, Secretory", SMNs.ccss$diag, ignore.case = T)] <- "Secretory carcinoma of breast"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Carcinoma, Metaplastic, Breast", SMNs.ccss$diag, ignore.case = T)] <- "Metaplastic carcinoma of breast"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Cribriform carcinoma|Cribriform", SMNs.ccss$diag, ignore.case = T)] <- "Cribriform carcinoma of breast"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Lobular carcinoma,", SMNs.ccss$diag, ignore.case = T)] <- "Lobular carcinoma"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Mucinous adenocarcinoma", SMNs.ccss$diag, ignore.case = T)] <- "Mucinous adenocarcinoma of breast"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Medullary carcinoma", SMNs.ccss$diag, ignore.case = T)] <- "Medullary carcinoma of breast"
+
+
+cc <- SMNs.ccss[SMNs.ccss$new.diagnosis == "Breast",]
+
+other.smn.ccss <- SMNs.ccss[SMNs.ccss$new.diagnosis=="Other",]
+malignant.ccss <- SMNs.ccss[SMNs.ccss$new.diagnosis!="Other",]
+malignant.ccss <- cbind.data.frame(new.diagnosis.cleaned=malignant.ccss$new.diagnosis.cleaned, malignant.ccss)
+
+SMNs.ccss$new.diagnosis.cleaned[grepl("Carcinoma, Papillary|Carcinoma, Hurthle Cell and Papillary|Papillary carcinoma", SMNs.ccss$diag, ignore.case = T)] <- "Carcinoma, Papillary, Thyroid"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Adenocarcinoma, Papillary", SMNs.ccss$diag, ignore.case = T)] <- "Adenocarcinoma, Papillary, Thyroid"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Papillary adenocarcinoma", SMNs.ccss$diag, ignore.case = T)] <- "Adenocarcinoma, Papillary, Thyroid"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Carcinoma, Follicular, Thyroid|Follicular carcinoma|Follicular", SMNs.ccss$diag, ignore.case = T)] <- "Adenocarcinoma, Follicular, Thyroid"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Microcarcinoma, Papillary|Papillary microcarcinoma", SMNs.ccss$diag, ignore.case = T)] <- "Microcarcinoma, Papillary, Thyroid"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Oxyphilic adenocarcinoma", SMNs.ccss$diag, ignore.case = T)] <- "Oxyphilic Adenocarcinoma, Thyroid"
+
+
+SMNs.ccss$new.diagnosis.cleaned[grepl("meningioma|Meningeal sarcomatosis", SMNs.ccss$diag, ignore.case = T)] <- "Meningioma"
+
+SMNs.ccss$new.diagnosis.cleaned[grepl("Osteosarcoma", SMNs.ccss$diag, ignore.case = T)] <- "Osteosarcoma"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Chondrosarcoma", SMNs.ccss$diag, ignore.case = T)] <- "Chondrosarcoma"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Dermatofibrosarcoma", SMNs.ccss$diag, ignore.case = T)] <- "Dermatofibrosarcoma"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Leiomyosarcoma", SMNs.ccss$diag, ignore.case = T)] <- "Leiomyosarcoma"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Ewing", SMNs.ccss$diag, ignore.case = T)] <- "Ewing's Sarcoma"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Histiocytic Sarcoma", SMNs.ccss$diag, ignore.case = T)] <- "Histiocytic Sarcoma"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Epithelioid", SMNs.ccss$diag, ignore.case = T)] <- "Epithelioid Sarcoma"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Liposarcoma|Lipoarcoma", SMNs.ccss$diag, ignore.case = T)] <- "Liposarcoma"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Haemangiosarcoma", SMNs.ccss$diag, ignore.case = T)] <- "Haemangiosarcoma"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Fibrosarcoma", SMNs.ccss$diag, ignore.case = T)] <- "Fibrosarcoma"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Kaposi sarcoma", SMNs.ccss$diag, ignore.case = T)] <- "Kaposi sarcoma"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Giant cell sarcoma", SMNs.ccss$diag, ignore.case = T)] <- "Giant cell sarcoma"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Haemangiosarcoma", SMNs.ccss$diag, ignore.case = T)] <- "Haemangiosarcoma"
+
+SMNs.ccss$new.diagnosis.cleaned[grepl("Spindle Cell Sarcoma", SMNs.ccss$diag, ignore.case = T)] <- "Spindle Cell Sarcoma"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Sarcoma, High Grade Spindle Cell", SMNs.ccss$diag, ignore.case = T)] <- "Spindle Cell Sarcoma"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Sarcoma, High Grade, Adrenal Gland", SMNs.ccss$diag, ignore.case = T)] <- "Sarcoma, High Grade Adrenal Gland"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Sarcoma, Soft Tissue", SMNs.ccss$diag, ignore.case = T)] <- "Sarcoma, Soft Tissue"
+SMNs.ccss$new.diagnosis.cleaned[grepl("Spindle Cell Sarcoma", SMNs.ccss$diag, ignore.case = T)] <- "Spindle Cell Sarcoma"
+
+SMNs.ccss$diaggrp[grepl("breast", SMNs.ccss$diaggrp, ignore.case = T)] <- "Breast"
+SMNs.ccss$diaggrp[grepl("meningioma", SMNs.ccss$diaggrp, ignore.case = T)] <- "Meningioma"
+SMNs.ccss$diaggrp[grepl("thyroid", SMNs.ccss$diaggrp, ignore.case = T)] <- "Thyroid"
+SMNs.ccss$diaggrp[grepl("Sarcoma", SMNs.ccss$diaggrp, ignore.case = T)] <- "Sarcoma"
+
+
+
+other.smn.ccss <- SMNs.ccss[SMNs.ccss$new.diagnosis=="Other",]
+malignant.ccss <- SMNs.ccss[SMNs.ccss$new.diagnosis!="Other",]
+malignant.ccss <- cbind.data.frame(new.diagnosis.cleaned=malignant.ccss$new.diagnosis.cleaned, malignant.ccss)
+
+
+# SMNs.ccss$diag[grepl("sarcoma" , SMNs.ccss$diag, ignore.case = T)][!SMNs.ccss$diag[grepl("sarcoma" , SMNs.ccss$diag, ignore.case = T)] %in% SMNs.ccss$diag[grepl("sarcoma" , SMNs.ccss$new.diagnosis.cleaned, ignore.case = T)]]
+cc <- SMNs.ccss[SMNs.ccss$new.diagnosis == "Breast",]
+
+SMNs.ccss$new.diagnosis.cleaned2 <- SMNs.ccss$new.diagnosis.cleaned
+SMNs.ccss$new.diagnosis.cleaned2[grepl("Sarcoma", SMNs.ccss$diaggrp, ignore.case = T)& grepl("^Malignant|Dermatofibro|Ganglioma|papillary|firbromatosis|fibromyxoid|Giant cell|Neurilemoma|lipoma|Haemangioblastoma|comedocarcinoma", SMNs.ccss$diag, ignore.case = T)] <- "Other"
+SMNs.ccss$new.diagnosis.cleaned2[grepl("Malignant melanoma", SMNs.ccss$new.diagnosis.cleaned, ignore.case = T)] <- "Other"
+SMNs.ccss$new.diagnosis.cleaned2[is.na(SMNs.ccss$new.diagnosis.cleaned2)] <- "Other"
+
+other.smn.ccss <- SMNs.ccss[SMNs.ccss$new.diagnosis=="Other",]
+malignant.ccss <- SMNs.ccss[SMNs.ccss$new.diagnosis!="Other",]
+malignant.ccss <- cbind.data.frame(new.diagnosis.cleaned2=malignant.ccss$new.diagnosis.cleaned2, malignant.ccss)
+
+# Malignant Peripheral Nerve Sheath Tumor, Neck, Left
+
+other.SMN.ccss <- SMNs.ccss[(SMNs.ccss$new.diagnosis.cleaned2=="Other"),]
+table(ifelse(grepl("Yes", other.SMN.ccss$seersmn), "M", "B"))
+# M 
+# 342
+
+SMNs.ccss.table <- as.data.frame(table(SMNs.ccss$new.diagnosis.cleaned2, SMNs.ccss$diaggrp))
+SMNs.ccss.table <- SMNs.ccss.table[SMNs.ccss.table$Freq !=0,]
+
+View(table(SMNs.ccss$new.diagnosis.cleaned2))
+
+#############
+## Any SNs ##
+#############
+
+
+AnySN.ccss <- ANY_SNs
+
+AnySN.ccss$KEY <- paste0(AnySN.ccss$ccssid, ":", AnySN.ccss$count)
+table(AnySN.ccss$KEY %in% malignantStatus$KEY)
+
+AnySN.ccss$d_candx <- as.Date(AnySN.ccss$d_candx, format = "%d%b%Y")
+AnySN.ccss$KEY <- paste0(AnySN.ccss$ccssid, ":", AnySN.ccss$d_candx)
+
+
+AnySN.ccss <- cbind(diag=kyla.status$candxo3 [match(AnySN.ccss$KEY, kyla.status$KEY)], AnySN.ccss)
+AnySN.ccss <- cbind(diaggrp=AnySN.ccss$groupdx3, AnySN.ccss)
+# cc <- cbind.data.frame(AnySN.ccss$candxo3, AnySN.ccss$groupdx3)
+# table(AnySN.ccss$ccssid %in% to.remove)
+
+AnySN.ccss$diag[is.na(AnySN.ccss$diag)] <- AnySN.ccss$groupdx3[is.na(AnySN.ccss$diag)]
+
+
+check.sarcoma <- AnySN.ccss[grepl("Sarcoma", AnySN.ccss$groupdx3, ignore.case = T),]
+
+
+AnySN.ccss$new.diagnosis <- NA
+
+# AnySN.ccss$new.diagnosis[grepl("basal cell|squamous cell|squamous", AnySN.ccss$diag, ignore.case = T)] <- "NMSCs"
+AnySN.ccss$new.diagnosis[grepl("basal cell|squamous cell|squamous", AnySN.ccss$diag, ignore.case = T)] <- "Other"
+AnySN.ccss$new.diagnosis[grepl("breast", AnySN.ccss$diaggrp, ignore.case = T)] <- "Breast"
+AnySN.ccss$new.diagnosis[grepl("thyroid", AnySN.ccss$diaggrp, ignore.case = T)] <- "Thyroid"
+AnySN.ccss$new.diagnosis[grepl("meningioma", AnySN.ccss$diaggrp, ignore.case = T)] <- "Meningioma"
+AnySN.ccss$new.diagnosis[grepl("Sarcoma", AnySN.ccss$diaggrp, ignore.case = T)] <- "Sarcoma"
+AnySN.ccss$new.diagnosis[is.na(AnySN.ccss$new.diagnosis)] <- "Other"
+
+other.sn.ccss <- AnySN.ccss[AnySN.ccss$new.diagnosis=="Other",]
+malignant.ccss <- AnySN.ccss[AnySN.ccss$new.diagnosis!="Other",]
+
+AnySN.ccss$new.diagnosis.cleaned <- NA
+AnySN.ccss$new.diagnosis.cleaned[grepl("basal cell", AnySN.ccss$diag, ignore.case = T)] <- "Other"
+AnySN.ccss$new.diagnosis.cleaned[grepl("squamous", AnySN.ccss$diag, ignore.case = T)] <- "Other"
+AnySN.ccss$new.diagnosis.cleaned[grepl("melanoma", AnySN.ccss$diag, ignore.case = T)] <- "Malignant melanoma"
+
+AnySN.ccss$new.diagnosis.cleaned[grepl("ductal|Mammary Carcinoma|Infiltrating duct carcinoma|Infiltrating duct", AnySN.ccss$diag, ignore.case = T)] <- "Infiltrating ductal carcinoma of breast"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Carcinoma, Secretory", AnySN.ccss$diag, ignore.case = T)] <- "Secretory carcinoma of breast"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Carcinoma, Metaplastic, Breast", AnySN.ccss$diag, ignore.case = T)] <- "Metaplastic carcinoma of breast"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Cribriform carcinoma|Cribriform", AnySN.ccss$diag, ignore.case = T)] <- "Cribriform carcinoma of breast"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Lobular carcinoma,", AnySN.ccss$diag, ignore.case = T)] <- "Lobular carcinoma"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Mucinous adenocarcinoma", AnySN.ccss$diag, ignore.case = T)] <- "Mucinous adenocarcinoma of breast"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Medullary carcinoma", AnySN.ccss$diag, ignore.case = T)] <- "Medullary carcinoma of breast"
+
+
+cc <- AnySN.ccss[AnySN.ccss$new.diagnosis == "Breast",]
+
+other.sn.ccss <- AnySN.ccss[AnySN.ccss$new.diagnosis=="Other",]
+malignant.ccss <- AnySN.ccss[AnySN.ccss$new.diagnosis!="Other",]
+malignant.ccss <- cbind.data.frame(new.diagnosis.cleaned=malignant.ccss$new.diagnosis.cleaned, malignant.ccss)
+
+AnySN.ccss$new.diagnosis.cleaned[grepl("Carcinoma, Papillary|Carcinoma, Hurthle Cell and Papillary|Papillary carcinoma", AnySN.ccss$diag, ignore.case = T)] <- "Carcinoma, Papillary, Thyroid"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Adenocarcinoma, Papillary", AnySN.ccss$diag, ignore.case = T)] <- "Adenocarcinoma, Papillary, Thyroid"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Papillary adenocarcinoma", AnySN.ccss$diag, ignore.case = T)] <- "Adenocarcinoma, Papillary, Thyroid"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Carcinoma, Follicular, Thyroid|Follicular carcinoma|Follicular", AnySN.ccss$diag, ignore.case = T)] <- "Adenocarcinoma, Follicular, Thyroid"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Microcarcinoma, Papillary|Papillary microcarcinoma", AnySN.ccss$diag, ignore.case = T)] <- "Microcarcinoma, Papillary, Thyroid"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Oxyphilic adenocarcinoma", AnySN.ccss$diag, ignore.case = T)] <- "Oxyphilic Adenocarcinoma, Thyroid"
+
+
+AnySN.ccss$new.diagnosis.cleaned[grepl("meningioma|Meningeal sarcomatosis", AnySN.ccss$diag, ignore.case = T)] <- "Meningioma"
+
+AnySN.ccss$new.diagnosis.cleaned[grepl("Osteosarcoma", AnySN.ccss$diag, ignore.case = T)] <- "Osteosarcoma"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Chondrosarcoma", AnySN.ccss$diag, ignore.case = T)] <- "Chondrosarcoma"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Dermatofibrosarcoma", AnySN.ccss$diag, ignore.case = T)] <- "Dermatofibrosarcoma"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Leiomyosarcoma", AnySN.ccss$diag, ignore.case = T)] <- "Leiomyosarcoma"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Ewing", AnySN.ccss$diag, ignore.case = T)] <- "Ewing's Sarcoma"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Histiocytic Sarcoma", AnySN.ccss$diag, ignore.case = T)] <- "Histiocytic Sarcoma"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Epithelioid", AnySN.ccss$diag, ignore.case = T)] <- "Epithelioid Sarcoma"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Liposarcoma|Lipoarcoma", AnySN.ccss$diag, ignore.case = T)] <- "Liposarcoma"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Haemangiosarcoma", AnySN.ccss$diag, ignore.case = T)] <- "Haemangiosarcoma"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Fibrosarcoma", AnySN.ccss$diag, ignore.case = T)] <- "Fibrosarcoma"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Kaposi sarcoma", AnySN.ccss$diag, ignore.case = T)] <- "Kaposi sarcoma"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Giant cell sarcoma", AnySN.ccss$diag, ignore.case = T)] <- "Giant cell sarcoma"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Haemangiosarcoma", AnySN.ccss$diag, ignore.case = T)] <- "Haemangiosarcoma"
+
+AnySN.ccss$new.diagnosis.cleaned[grepl("Spindle Cell Sarcoma", AnySN.ccss$diag, ignore.case = T)] <- "Spindle Cell Sarcoma"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Sarcoma, High Grade Spindle Cell", AnySN.ccss$diag, ignore.case = T)] <- "Spindle Cell Sarcoma"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Sarcoma, High Grade, Adrenal Gland", AnySN.ccss$diag, ignore.case = T)] <- "Sarcoma, High Grade Adrenal Gland"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Sarcoma, Soft Tissue", AnySN.ccss$diag, ignore.case = T)] <- "Sarcoma, Soft Tissue"
+AnySN.ccss$new.diagnosis.cleaned[grepl("Spindle Cell Sarcoma", AnySN.ccss$diag, ignore.case = T)] <- "Spindle Cell Sarcoma"
+
+AnySN.ccss$diaggrp[grepl("breast", AnySN.ccss$diaggrp, ignore.case = T)] <- "Breast"
+AnySN.ccss$diaggrp[grepl("meningioma", AnySN.ccss$diaggrp, ignore.case = T)] <- "Meningioma"
+AnySN.ccss$diaggrp[grepl("thyroid", AnySN.ccss$diaggrp, ignore.case = T)] <- "Thyroid"
+AnySN.ccss$diaggrp[grepl("Sarcoma", AnySN.ccss$diaggrp, ignore.case = T)] <- "Sarcoma"
+
+
+
+other.sn.ccss <- AnySN.ccss[AnySN.ccss$new.diagnosis=="Other",]
+malignant.ccss <- AnySN.ccss[AnySN.ccss$new.diagnosis!="Other",]
+malignant.ccss <- cbind.data.frame(new.diagnosis.cleaned=malignant.ccss$new.diagnosis.cleaned, malignant.ccss)
+
+
+# AnySN.ccss$diag[grepl("sarcoma" , AnySN.ccss$diag, ignore.case = T)][!AnySN.ccss$diag[grepl("sarcoma" , AnySN.ccss$diag, ignore.case = T)] %in% AnySN.ccss$diag[grepl("sarcoma" , AnySN.ccss$new.diagnosis.cleaned, ignore.case = T)]]
+cc <- AnySN.ccss[AnySN.ccss$new.diagnosis == "Breast",]
+
+AnySN.ccss$new.diagnosis.cleaned2 <- AnySN.ccss$new.diagnosis.cleaned
+AnySN.ccss$new.diagnosis.cleaned2[grepl("Sarcoma", AnySN.ccss$diaggrp, ignore.case = T)& grepl("^Malignant|Dermatofibro|Ganglioma|papillary|firbromatosis|fibromyxoid|Giant cell|Neurilemoma|lipoma|Haemangioblastoma|comedocarcinoma", AnySN.ccss$diag, ignore.case = T)] <- "Other"
+AnySN.ccss$new.diagnosis.cleaned2[grepl("Malignant melanoma", AnySN.ccss$new.diagnosis.cleaned, ignore.case = T)] <- "Other"
+AnySN.ccss$new.diagnosis.cleaned2[is.na(AnySN.ccss$new.diagnosis.cleaned2)] <- "Other"
+
+other.AnySN.ccss <- AnySN.ccss[AnySN.ccss$new.diagnosis=="Other",]
+malignant.ccss <- AnySN.ccss[AnySN.ccss$new.diagnosis!="Other",]
+malignant.ccss <- cbind.data.frame(new.diagnosis.cleaned2=malignant.ccss$new.diagnosis.cleaned2, malignant.ccss)
+
+# Malignant Peripheral Nerve Sheath Tumor, Neck, Left
+other.AnySN.ccss <- AnySN.ccss[(AnySN.ccss$new.diagnosis.cleaned2=="Other"),]
+table(ifelse(grepl("Yes", other.SMN.ccss$seersmn), "M", "B"))
+# B   M 
+# 727 303 
+
+AnySN.ccss.table <- as.data.frame(table(AnySN.ccss$new.diagnosis.cleaned2, AnySN.ccss$diaggrp))
+AnySN.ccss.table <- AnySN.ccss.table[AnySN.ccss.table$Freq !=0,]
+
+View(table(AnySN.ccss$new.diagnosis.cleaned2))
+
+
+
+# Malignant Peripheral Nerve Sheath Tumor, Neck, Left
+
+other.AnySN.ccss <- AnySN.ccss[(AnySN.ccss$new.diagnosis.cleaned=="Other"),]
+table(ifelse(grepl("Yes", other.AnySN.ccss$seersmn), "M", "B"))
+# M 
+# 96
+
+AnySN.ccss$new.diagnosis.cleaned.malignant <- AnySN.ccss$new.diagnosis.cleaned2
+AnySN.ccss$new.diagnosis.cleaned.malignant <- paste0(AnySN.ccss$new.diagnosis.cleaned.malignant, "_", ifelse(grepl("Yes", AnySN.ccss$seersmn), "M", "B"))
+# AnySN.ccss$new.diagnosis.cleaned.malignant[grepl("NA_M|NA_B",AnySN.ccss$new.diagnosis.cleaned.malignant)] <- NA
+
+
+View(table(AnySN.ccss$new.diagnosis.cleaned.malignant))
+View(table(AnySN.ccss$new.diagnosis.cleaned2))
+
+# cc <- as.data.frame(table(AnySN.ccss$new.diagnosis.cleaned2))
+# 
+# ## How many of AnySN.ccss are NMSCs
+AnySN.ccss.NMSC <- AnySN.ccss[AnySN.ccss$KEY %in% NMSCs.ccss$KEY,]
+
+AnySN.ccss.table <- as.data.frame(table(AnySN.ccss$new.diagnosis.cleaned, AnySN.ccss$diaggrp))
+AnySN.ccss.table <- AnySN.ccss.table[AnySN.ccss.table$Freq !=0,]
+
+other.AnySN.ccss <- AnySN.ccss[(AnySN.ccss$new.diagnosis.cleaned2=="Other"),]
+other.AnySN.ccss <- other.AnySN.ccss[!other.AnySN.ccss$KEY %in% AnySN.ccss.NMSC$KEY]
+# sum(grepl("Basal", other.AnySN.ccss$diag))
+
+cc <- AnySN.ccss[grepl("Basal", AnySN.ccss$diag),]
+
+# save(other.SMN.sjlife, other.anySN.sjlife, other.SMN.ccss, other.AnySN.ccss, 
+#     file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/other_SN_and_SMN_objects.RData")
+
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/other_SN_and_SMN_objects.RData")
+
+## Create table for other SNs
+
+sub.other.any.sn.sjlife <- cbind.data.frame(KEY=other.anySN.sjlife$KEY,sjlid=other.anySN.sjlife$sjlid, diag=other.anySN.sjlife$diag, 
+                                            diaggrp=other.anySN.sjlife$diaggrp, icdo3morph=other.anySN.sjlife$icdo3morph,
+                                            icdo3behavior=other.anySN.sjlife$icdo3behavior)
+
+sub.other.smn.sjlife <- cbind.data.frame(KEY=other.SMN.sjlife$KEY, sjlid=other.SMN.sjlife$sjlid, diag=other.SMN.sjlife$diag, 
+                                            diaggrp=other.SMN.sjlife$diaggrp, icdo3morph=other.SMN.sjlife$icdo3morph, 
+                                            icdo3behavior=other.SMN.sjlife$icdo3behavior)
+
+
+merged.sjlife.other <- merge(sub.other.any.sn.sjlife, sub.other.smn.sjlife, by="KEY", all = T, suffixes = c(".SN", ".SMN"))
+
+# merged.sjlife.other$diag.SN[grepl("Dermatofibrosarcoma", merged.sjlife.other$diag.SN, ignore.case = T)] <- "Malignant peripheral nerve sheath tumor"
+merged.sjlife.other$diag.SMN[grepl("Dermatofibrosarcoma", merged.sjlife.other$diag.SMN, ignore.case = T)] <- "Dermatofibroma"
+
+merged.sjlife.other$icdo3morph.SMN[grepl("sarcoma", merged.sjlife.other$icdo3morph.SMN, ignore.case = T)] <- merged.sjlife.other$diag.SMN[grepl("sarcoma", merged.sjlife.other$icdo3morph.SMN, ignore.case = T)]
+merged.sjlife.other$icdo3morph.SN[grepl("Sarcoma", merged.sjlife.other$icdo3morph.SN, ignore.case = F)] <- merged.sjlife.other$diag.SN[grepl("Sarcoma", merged.sjlife.other$icdo3morph.SN, ignore.case = F)]
+merged.sjlife.other$icdo3morph.SN[grepl("Sarcoma, Soft Tissue, Undifferentiated", merged.sjlife.other$icdo3morph.SN, ignore.case = T)] <- "Malignant peripheral nerve sheath tumor"
+merged.sjlife.other$icdo3morph.SMN[grepl("Sarcoma, Soft Tissue, Undifferentiated", merged.sjlife.other$icdo3morph.SMN, ignore.case = T)] <- "Malignant peripheral nerve sheath tumor"
+merged.sjlife.other$icdo3morph.SN[grepl("Squamous cell carcinoma in situ", merged.sjlife.other$icdo3morph.SN, ignore.case = T)] <- merged.sjlife.other$diag.SN[grepl("Squamous cell carcinoma in situ", merged.sjlife.other$icdo3morph.SN, ignore.case = T)] 
+merged.sjlife.other$icdo3morph.SMN[grepl("Squamous cell carcinoma in situ", merged.sjlife.other$icdo3morph.SMN, ignore.case = T)] <- merged.sjlife.other$diag.SMN[grepl("Squamous cell carcinoma in situ", merged.sjlife.other$icdo3morph.SMN, ignore.case = T)] 
+
+
+merged.sjlife.other$icdo3morph.SN <- gsub("\\, NOS|NOS|lymphocyte-rich|Neck, Left|, Retroperitoneum|, nodular lymphocyte predominance|diffuse", "",merged.sjlife.other$icdo3morph.SN, ignore.case = T)
+merged.sjlife.other$icdo3morph.SMN <- gsub("\\, NOS|NOS|lymphocyte-rich|Neck, Left|, Retroperitoneum|, nodular lymphocyte predominance|diffuse", "",merged.sjlife.other$icdo3morph.SMN, ignore.case = T)
+
+merged.sjlife.other$icdo3morph.SN[grepl("Malignant peripheral", merged.sjlife.other$icdo3morph.SN, ignore.case = T)] <- "Malignant peripheral nerve sheath tumor"
+merged.sjlife.other$icdo3morph.SMN[grepl("Malignant peripheral", merged.sjlife.other$icdo3morph.SMN, ignore.case = T)] <- "Malignant peripheral nerve sheath tumor"
+
+merged.sjlife.other$icdo3morph.SN <- gsub(", $", "",merged.sjlife.other$icdo3morph.SN, ignore.case = T)
+merged.sjlife.other$icdo3morph.SMN <- gsub(", $", "",merged.sjlife.other$icdo3morph.SMN, ignore.case = T)
+
+cc.smn <- as.data.frame(table(merged.sjlife.other$icdo3morph.SMN))
+cc.sn <- as.data.frame(table(merged.sjlife.other$icdo3morph.SN))
+
+merged.sjlife.other$icdo3morph.SMN.B.M <- paste0(merged.sjlife.other$icdo3morph.SMN, "_", merged.sjlife.other$icdo3behavior.SMN)
+merged.sjlife.other$icdo3morph.SN.B.M <- paste0(merged.sjlife.other$icdo3morph.SN, "_", merged.sjlife.other$icdo3behavior.SN)
+
+
+cc <- merge (cc.smn, cc.sn, by = "Var1", all = T)
+View(table(merged.sjlife.other$icdo3morph.SN.B.M))
+
+merged.sjlife.other$icdo3morph.SN[!grepl("Malignant", merged.sjlife.other$icdo3behavior.SN, ignore.case = T)]
+
+View(table(SMN=merged.sjlife.other$icdo3morph.SMN, SN=merged.sjlife.other$icdo3morph.SN))
+
+
+## CCSS
+sub.other.any.sn.ccss <- cbind.data.frame(KEY=other.AnySN.ccss$KEY,ccssid=other.AnySN.ccss$ccssid, diag=other.AnySN.ccss$diag, 
+                                            diaggrp=other.AnySN.ccss$diaggrp, icdo3behavior=other.AnySN.ccss$seersmn)
+
+sub.other.smn.ccss <- cbind.data.frame(KEY=other.SMN.ccss$KEY,ccssid=other.SMN.ccss$ccssid, diag=other.SMN.ccss$diag, 
+                                          diaggrp=other.SMN.ccss$diaggrp, icdo3behavior=other.SMN.ccss$seersmn)
+
+
+sub.other.any.sn.ccss$diag_clean <- gsub("^[0-9]+/[0-9]+\\s+", "", sub.other.any.sn.ccss$diag)  # Remove leading number/number  
+sub.other.any.sn.ccss$diag_clean <- gsub("\\s*,?\\s*NOS.*", "", sub.other.any.sn.ccss$diag_clean)  # Remove everything after 'NOS' or ', NOS'  
+
+sub.other.any.sn.ccss$diag_clean <- gsub("^[0-9]+/[0-9]+\\s+", "", sub.other.any.sn.ccss$diag)  # Remove leading number/number  
+sub.other.any.sn.ccss$diag_clean <- gsub("\\s*,?\\s*NOS.*", "", sub.other.any.sn.ccss$diag_clean)  # Remove everything after 'NOS' or ', NOS'  
+sub.other.any.sn.ccss$diag_clean <- gsub("\\s*\\(.*?\\)", "", sub.other.any.sn.ccss$diag_clean)  # Remove everything inside parentheses  
+
+
+
+sub.other.smn.ccss$diag_clean <- gsub("^[0-9]+/[0-9]+\\s+", "", sub.other.smn.ccss$diag)  # Remove leading number/number  
+sub.other.smn.ccss$diag_clean <- gsub("\\s*,?\\s*NOS.*", "", sub.other.smn.ccss$diag_clean)  # Remove everything after 'NOS' or ', NOS'  
+sub.other.smn.ccss$diag_clean <- gsub("\\s*\\(.*?\\)", "", sub.other.smn.ccss$diag_clean)  # Remove everything inside parentheses  
+
+# sub.other.any.sn.ccss$diag_clean[grepl("lobular", sub.other.any.sn.ccss$diag_clean, ignore.case = T)] <- "Carcinoma"
+# sub.other.smn.ccss$diag_clean[grepl("lobular", sub.other.smn.ccss$diag_clean, ignore.case = T)] <- "Carcinoma"
+
+sub.other.any.sn.ccss$diag_clean[grepl("Dermatofibrosarcoma", sub.other.any.sn.ccss$diag_clean, ignore.case = T)] <- "Neurilemoma"
+sub.other.smn.ccss$diag_clean[grepl("Dermatofibrosarcoma", sub.other.smn.ccss$diag_clean, ignore.case = T)] <- "Malignant peripheral nerve sheath tumor"
+
+sub.other.any.sn.ccss$diag_clean[grepl("Basal|Squamous", sub.other.any.sn.ccss$diag_clean, ignore.case = T)] <- sub.other.any.sn.ccss$diaggrp[grepl("Basal|Squamous", sub.other.any.sn.ccss$diag_clean, ignore.case = T)]
+sub.other.smn.ccss$diag_clean[grepl("Basal|Squamous", sub.other.smn.ccss$diag_clean, ignore.case = T)] <-  sub.other.any.smn.ccss$diaggrp[grepl("Basal|Squamous", sub.other.any.smn.ccss$diag_clean, ignore.case = T)]
+
+sub.other.any.sn.ccss$diag_clean[grepl("8340.2000000000007", sub.other.any.sn.ccss$diag_clean, ignore.case = T)] <- "Unknown diagnosis"
+sub.other.smn.ccss$diag_clean[grepl("8340.2000000000007", sub.other.smn.ccss$diag_clean, ignore.case = T)] <-  "Unknown diagnosis"
+
+View(table(SN=sub.other.any.sn.ccss$diag_clean, SMN=sub.other.any.sn.ccss$diag_clean))
+
+count.sn <- as.data.frame(table(sub.other.any.sn.ccss$diag_clean))
+count.smn <- as.data.frame(table(sub.other.smn.ccss$diag_clean))
+
+cc <-merge (count.smn, count.sn, by = "Var1", all = T, suffixes = c("SMN", "SN"))
 
 #######################
 ## Demographic table ##

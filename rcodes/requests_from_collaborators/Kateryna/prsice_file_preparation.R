@@ -47,27 +47,46 @@ for (i in 1:length(files)){
 
 
 # # This is an additional comparison I was conducting to verify if the results align with the Plink PRS calculations, so there's no need to run it.
-# ####################################################################
-# ## Check whether PRSICE and PLINK methods give correlated results ##
-# ####################################################################
-# plink.method <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Dyslipidemia/PRS_CCSS/ccss_exp/prs_out/PGS000688_prs_tab_separated.profile", header = T, sep = "\t")
-# prsice.method <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Dyslipidemia/PRS_CCSS/ccss_exp/PGS000688_PRS_output.all_score", header = T, sep = " ")
-# prsice.method$plinkscores <- plink.method$SCORE[match(prsice.method$IID, plink.method$IID)]
-# # Compute the correlation
-# correlation <- cor(prsice.method$Pt_1, prsice.method$plinkscores)
-# correlation
-# # 0.9955616
-# print(paste("Correlation: ", correlation))
-# 
-# # Create a scatter plot with a regression line
-# library(ggplot2)
-# ggplot(prsice.method, aes(x = Pt_1, y = plinkscores)) +
-#   geom_point() +
-#   geom_smooth(method = "lm", col = "blue") +
-#   labs(title = paste("Correlation between Pt_1 and Plink Scores: ", round(correlation, 2)),
-#        x = "Pt_1",
-#        y = "Plink Scores") +
-#   theme_minimal()
+####################################################################
+## Check whether PRSICE and PLINK methods give correlated results ##
+####################################################################
+plink.method <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Dyslipidemia/PRS_CCSS/ccss_exp/prs_out/PGS000688_prs_tab_separated.profile", header = T, sep = "\t")
+prsice.method <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Dyslipidemia/PRS_CCSS/ccss_exp/PGS000688_PRS_output.all_score", header = T, sep = " ")
+prsice.method$plinkscores <- plink.method$SCORE[match(prsice.method$IID, plink.method$IID)]
+# Compute the correlation
+correlation <- cor(prsice.method$Pt_1, prsice.method$plinkscores)
+correlation
+# 0.9955616
+print(paste("Correlation: ", correlation))
+
+# Create a scatter plot with a regression line
+library(ggplot2)
+ggplot(prsice.method, aes(x = Pt_1, y = plinkscores)) +
+  geom_point() +
+  geom_smooth(method = "lm", col = "blue") +
+  labs(title = paste("Correlation between Pt_1 and Plink Scores: ", round(correlation, 2)),
+       x = "Pt_1",
+       y = "Plink Scores") +
+  theme_minimal()
 
 
+library(ggplot2)
+library(tidyr)
+
+# Reshape the data to a long format for easy distinction
+prsice_long <- prsice.method %>%
+  pivot_longer(cols = c(Pt_1, plinkscores), 
+               names_to = "variable", 
+               values_to = "value")
+
+# Scatter plot for correlation, distinguishing Pt_1 and plinkscores
+ggplot(prsice_long, aes(x = value, y = plinkscores, color = variable)) +
+  geom_point(size = 2) +
+  geom_smooth(method = "lm", aes(x = value, y = plinkscores), color = "black") +
+  labs(title = "Correlation between Pt_1 and Plink Scores",
+       x = "Values (Pt_1 or plinkscores)",
+       y = "Plink Scores",
+       color = "Variable") +
+  theme_minimal() +
+  scale_color_manual(values = c("Pt_1" = "blue", "plinkscores" = "red"))
 

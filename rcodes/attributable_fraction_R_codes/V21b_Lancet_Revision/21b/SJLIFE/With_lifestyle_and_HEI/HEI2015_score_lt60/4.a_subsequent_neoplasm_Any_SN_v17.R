@@ -3,9 +3,9 @@ rm(list=ls())
 #########################
 ## Load Phenotype data ##
 #########################
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11_modified_for_HEI_tertiles.RDATA")
-source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
-ALL.LIFESTYLE <- edit_lifestyle(ALL.LIFESTYLE)
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/lancetOncology/5_lifestyle_v11_modified_for_HEI_tertiles.RDATA")
+# source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/edit_lifestyle_variables.R")
+# ALL.LIFESTYLE <- edit_lifestyle(ALL.LIFESTYLE)
 #########################
 ## Subsequent Neoplasm ##
 #########################
@@ -403,4 +403,4 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, cs)
 
 
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/6.sjlife_with_diet.Any_SNs.V21b_HEI2015_lt60.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/lancetOncology/6.sjlife_with_diet.Any_SNs.V21b_HEI2015_lt60.Rdata")

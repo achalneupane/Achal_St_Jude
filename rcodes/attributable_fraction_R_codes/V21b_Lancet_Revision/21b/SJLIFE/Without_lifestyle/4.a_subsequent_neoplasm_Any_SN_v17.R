@@ -10,6 +10,23 @@ source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attrib
 # write.table(as.data.frame(PHENO.ANY_SN$sjlid), "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/SJLIDs_in_AF_project.txt", col.names = T, quote = F, row.names = F, sep = "\t")
 
 ALL.LIFESTYLE <- edit_lifestyle(ALL.LIFESTYLE)
+
+
+# ## Admixture classification
+# admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
+# admixture$INDIVIDUAL <- sapply(strsplit(admixture$INDIVIDUAL,"_"), `[`, 1)
+# EUR.admix <- admixture$INDIVIDUAL[admixture$EUR > 0.8]
+# AFR.admix <- admixture$INDIVIDUAL[admixture$AFR > 0.6]
+# 
+# PHENO.ANY_SN$admixture <- NA
+# PHENO.ANY_SN$admixture [PHENO.ANY_SN$sjlid %in% EUR.admix] <- "EUR"
+# PHENO.ANY_SN$admixture [PHENO.ANY_SN$sjlid %in% AFR.admix] <- "AFR"
+# PHENO.ANY_SN$admixture[is.na(PHENO.ANY_SN$admixture)] <- "Other"
+# table(PHENO.ANY_SN$admixture)
+# # AFR   EUR Other 
+# # 682  3476   243 
+
+
 #########################
 ## Subsequent Neoplasm ##
 #########################

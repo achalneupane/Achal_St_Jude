@@ -22,6 +22,19 @@ source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/attrib
 PHENO.ANY_SN <- edit_lifestyle.ccss(PHENO.ANY_SN)
 
 
+# ## Admixture classification
+# admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
+# admixture$INDIVIDUAL <- sapply(strsplit(admixture$INDIVIDUAL,"_"), `[`, 1)
+# EUR.admix <- admixture$INDIVIDUAL[admixture$EUR > 0.8]
+# AFR.admix <- admixture$INDIVIDUAL[admixture$AFR > 0.6]
+# 
+# PHENO.ANY_SN$admixture <- NA
+# PHENO.ANY_SN$admixture [PHENO.ANY_SN$ccssid %in% EUR.admix] <- "EUR"
+# PHENO.ANY_SN$admixture [PHENO.ANY_SN$ccssid %in% AFR.admix] <- "AFR"
+# # CCSS
+# # EUR=7083, AFR=200,  Other = 660
+
+
 common.cols <- colnames(PHENO.ANY_SN)[colnames(PHENO.ANY_SN) %in% colnames(subneo)]
 common.cols <- common.cols[-1]
 subneo2 <- subneo[,!colnames(subneo) %in% common.cols]
