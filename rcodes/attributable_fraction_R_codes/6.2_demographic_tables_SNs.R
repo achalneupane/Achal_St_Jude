@@ -2025,6 +2025,7 @@ merged.sjlife.other$icdo3morph.SN.B.M <- paste0(merged.sjlife.other$icdo3morph.S
 
 
 cc <- merge (cc.smn, cc.sn, by = "Var1", all = T)
+View(cc)
 View(table(merged.sjlife.other$icdo3morph.SN.B.M))
 
 merged.sjlife.other$icdo3morph.SN[!grepl("Malignant", merged.sjlife.other$icdo3behavior.SN, ignore.case = T)]
@@ -2069,6 +2070,8 @@ View(table(SN=sub.other.any.sn.ccss$diag_clean, SMN=sub.other.any.sn.ccss$diag_c
 
 count.sn <- as.data.frame(table(sub.other.any.sn.ccss$diag_clean))
 count.smn <- as.data.frame(table(sub.other.smn.ccss$diag_clean))
+
+View(table(SN=sub.other.any.sn.ccss$diag_clean, ICDO=sub.other.any.sn.ccss$icdo3behavior))
 
 cc <-merge (count.smn, count.sn, by = "Var1", all = T, suffixes = c("SMN", "SN"))
 

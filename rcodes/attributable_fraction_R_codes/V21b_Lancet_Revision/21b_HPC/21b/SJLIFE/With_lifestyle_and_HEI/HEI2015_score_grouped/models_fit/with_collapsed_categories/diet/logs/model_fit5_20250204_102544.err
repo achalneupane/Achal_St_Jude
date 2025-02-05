@@ -1,0 +1,17 @@
+R version '4.2.2' loaded
+Java version '20.0.2' loaded
+cmake version '3.27.3' loaded
+geos version '3.12.0' loaded
+pcre2 version '10.42' loaded
+nlopt version '2.4.2' loaded
+ImageMagick version '7.1.1-22' loaded
+
+Loading R/4.2.2
+  Loading requirement: gcc/13.1.0 java/20.0.2 cmake/3.27.3 geos/3.12.0
+    pcre2/10.42 nlopt/2.4.2 imagemagick/7.1.1-22 udunits/2.2.28
+Error in readChar(con, 5L, useBytes = TRUE) : cannot open the connection
+Calls: load -> readChar
+In addition: Warning message:
+In readChar(con, 5L, useBytes = TRUE) :
+  cannot open compressed file 'Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE//lancetOncology/6.sjlife_with_diet.THYROIDcancer.V21b_HEI2015_lt60.Rdata', probable reason 'No such file or directory'
+Execution halted

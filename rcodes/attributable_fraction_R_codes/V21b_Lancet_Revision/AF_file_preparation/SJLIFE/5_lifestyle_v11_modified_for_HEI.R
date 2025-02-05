@@ -13,7 +13,12 @@ library(lubridate)
 #########################
 ## Load Phenotype data ##
 #########################
-rm(list=ls())
+
+## Load previous phenotype file
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11_modified_for_HEI_tertiles.RDATA")
+PHENO.ANY_SN.old <- PHENO.ANY_SN
+rm(list = setdiff(ls(), "PHENO.ANY_SN.old"))
+
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/3_PRS_scores_categories_v11.RDATA")
 
 ##########################################################################################################
@@ -473,8 +478,10 @@ table(ALL.LIFESTYLE$smoker_former_or_never_yn)
 ALL.LIFESTYLE$Smoker_ever_yn <- ALL.LIFESTYLE$smoker_former_or_never_yn 
 ALL.LIFESTYLE$Smoker_ever_yn_agesurvey <- ALL.LIFESTYLE$smoker_former_or_never_yn_agesurvey
 
+
+## New drinking
 ALL.LIFESTYLE$RiskyHeavyDrink_yn <- drk_iid_dob_18_uniq$RiskyHeavyDrink_yn[match(ALL.LIFESTYLE$SJLIFEID, drk_iid_dob_18_uniq$SJLIFEID)]
-ALL.LIFESTYLE$Smoker_ever_yn_agesurvey <- drk_iid_dob_18_uniq$agesurvey[match(ALL.LIFESTYLE$SJLIFEID, drk_iid_dob_18_uniq$SJLIFEID)]
+ALL.LIFESTYLE$RiskyHeavyDrink_yn_agesurvey <- drk_iid_dob_18_uniq$agesurvey[match(ALL.LIFESTYLE$SJLIFEID, drk_iid_dob_18_uniq$SJLIFEID)]
 # ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn[is.na(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn)] <- "Unknown"
 # ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn <- factor(ALL.LIFESTYLE$NOT_RiskyHeavyDrink_yn, level = c(1, 0, "Unknown")) 
 table(ALL.LIFESTYLE$RiskyHeavyDrink_yn)
@@ -532,7 +539,7 @@ for(i in 1:length(HEI.to.categorize)){
                                                          include.lowest = TRUE))
   
   ALL.LIFESTYLE$HEI.tmp.tert.category[is.na(ALL.LIFESTYLE$HEI.tmp.tert.category)] <- "Unknown"
-  ALL.LIFESTYLE$HEI.tmp.tert.category <- factor(ALL.LIFESTYLE$HEI.tmp.tert.category, levels = c("3rd", "2nd", "1st", "Unknown"))
+  ALL.LIFESTYLE$HEI.tmp.tert.category <- factor(ALL.LIFESTYLE$HEI.tmp.tert.category, levels = c("No", "2nd", "1st", "Unknown"))
   colnames(ALL.LIFESTYLE)[colnames(ALL.LIFESTYLE) == "HEI.tmp.tert.category"] <- paste0(HEI.to.categorize[i], ".tertile.category")
 }
 
@@ -545,7 +552,7 @@ table(ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.tertile.category)
 ## Physical activity tertiles
 TERT = unname(quantile(ALL.LIFESTYLE$PhysicalActivity_yn[ALL.LIFESTYLE$PhysicalActivity_yn !=0], c(1/3, 2/3, 1), na.rm = T))
 ALL.LIFESTYLE$PhysicalActivity_yn <- cut(ALL.LIFESTYLE$PhysicalActivity_yn, 
-                                         breaks = c(-Inf, TERT[1], TERT[2], Inf), 
+                                         breaks = c(0, TERT), 
                                          labels = c("1st", "2nd", "Yes"), 
                                          include.lowest = TRUE)
 
@@ -558,8 +565,8 @@ ALL.LIFESTYLE$PhysicalActivity_yn <- factor(ALL.LIFESTYLE$PhysicalActivity_yn,
 
 ## Smoking tertiles
 TERT = unname(quantile(ALL.LIFESTYLE$Smoker_ever_yn[ALL.LIFESTYLE$Smoker_ever_yn !=0], c(1/3, 2/3, 1), na.rm = T))
-ALL.LIFESTYLE$Smoker_ever_yn <- cut(ALL.LIFESTYLE$Smoker_ever_yn, breaks = c(-Inf, 0, TERT),
-                                                          labels = c("No", "1st", "2nd", "3rd"),
+ALL.LIFESTYLE$Smoker_ever_yn <- cut(ALL.LIFESTYLE$Smoker_ever_yn, breaks = c(0, TERT),
+                                                          labels = c("No", "1st", "2nd"),
                                                           include.lowest = TRUE)
 levels(ALL.LIFESTYLE$Smoker_ever_yn) <- c(levels(ALL.LIFESTYLE$Smoker_ever_yn), "Unknown")
 ALL.LIFESTYLE$Smoker_ever_yn [is.na(ALL.LIFESTYLE$Smoker_ever_yn)] <- "Unknown"
@@ -587,13 +594,16 @@ ALL.LIFESTYLE$Obese_yn <- cut(ALL.LIFESTYLE$Obese_yn,
                               right = FALSE)
 
 ALL.LIFESTYLE$Obese_yn <- factor(ALL.LIFESTYLE$Obese_yn, 
-                                 levels = c("No", "Underweight", "Overweight", "Obese"))
+                                 levels = c("No", "Underweight", "Overweight", "Obese", "Unknown"))
 
 
-## Create HEI2015 <60
-ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.lt60.category <- ifelse(ALL.LIFESTYLE$HEI2015_TOTAL_SCORE >= 60, "No", "Yes") 
-ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.lt60.category[is.na(ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.lt60.category)] <- "Unknown"
-ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.lt60.category <- factor(ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.lt60.category, levels = c("No", "Yes", "Unknown"))
+# ## Create HEI2015 <60
+# ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.lt60.category <- ifelse(ALL.LIFESTYLE$HEI2015_TOTAL_SCORE >= 60, "No", "Yes") 
+# ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.lt60.category[is.na(ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.lt60.category)] <- "Unknown"
+# ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.lt60.category <- factor(ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.lt60.category, levels = c("No", "Yes", "Unknown"))
+
+## Keep HEI tertiles
+ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.lt60.category <- ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.tertile.category
 
 # https://www.fns.usda.gov/cnpp/hei-scores-americans
 gg <- data.frame(ALL.LIFESTYLE$SJLIFEID, ALL.LIFESTYLE$HEI2015_TOTAL_SCORE.tertile.category, ALL.LIFESTYLE$HEI2015_TOTAL_SCORE)

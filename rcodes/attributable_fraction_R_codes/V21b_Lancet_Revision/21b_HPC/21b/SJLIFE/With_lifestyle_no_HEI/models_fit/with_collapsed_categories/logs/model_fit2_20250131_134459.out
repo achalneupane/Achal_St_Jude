@@ -1,0 +1,59 @@
+                       row_labels SMNs|0 SMNs|1 SMNs|#Total cases
+1      maxsegrtdose.category|None   2405    153              2558
+2    maxsegrtdose.category|>0-<18      8      7                15
+3  maxsegrtdose.category|>=18-<30    431     51               482
+4      maxsegrtdose.category|>=30    374     23               397
+5    maxchestrtdose.category|None   2625    131              2756
+6  maxchestrtdose.category|>0-<20    110     11               121
+7    maxchestrtdose.category|>=20    483     92               575
+8      maxabdrtdose.category|None   2692    142              2834
+9    maxabdrtdose.category|>0-<30    352     58               410
+10     maxabdrtdose.category|>=30    174     34               208
+11    epitxn_dose_5.category|None   2059    163              2222
+12     epitxn_dose_5.category|1st    366     21               387
+13     epitxn_dose_5.category|2nd    363     25               388
+14     epitxn_dose_5.category|3rd    430     25               455
+[1] "maxsegrtdose.category|>0-<18"
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@noderome113>
+Subject: Job 247866062: <model_fit2_20250131_134459> in cluster <hpcf_research_cluster> Exited
+
+Job <model_fit2_20250131_134459> was submitted from host <splprhpc12> by user <aneupane> in cluster <hpcf_research_cluster> at Fri Jan 31 13:45:01 2025
+Job was executed on host(s) <noderome113>, in queue <priority>, as user <aneupane> in cluster <hpcf_research_cluster> at Fri Jan 31 13:45:07 2025
+</home/aneupane> was used as the home directory.
+</home/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V21b_Lancet_Revision/21b_HPC/21b/SJLIFE/With_lifestyle_no_HEI/models_fit/with_collapsed_categories> was used as the working directory.
+Started at Fri Jan 31 13:45:07 2025
+Terminated at Fri Jan 31 13:45:11 2025
+Results reported at Fri Jan 31 13:45:11 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+bash -c "module load R/4.2.2 && Rscript 2.model_fit_SMNs.R"
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   0.50 sec.
+    Max Memory :                                 9 MB
+    Average Memory :                             6.33 MB
+    Total Requested Memory :                     20000.00 MB
+    Delta Memory :                               19991.00 MB
+    Max Swap :                                   -
+    Max Processes :                              6
+    Max Threads :                                7
+    Run time :                                   4 sec.
+    Turnaround time :                            10 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <logs/model_fit2_20250131_134459.err> for stderr output of this job.
+

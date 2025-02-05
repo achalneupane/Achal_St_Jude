@@ -1,0 +1,208 @@
+                       row_labels SMNs|0 SMNs|1 SMNs|#Total cases
+1      maxsegrtdose.category|None   2405    153              2558
+2    maxsegrtdose.category|>0-<18      8      7                15
+3  maxsegrtdose.category|>=18-<30    431     51               482
+4      maxsegrtdose.category|>=30    374     23               397
+5    maxchestrtdose.category|None   2625    131              2756
+6  maxchestrtdose.category|>0-<20    110     11               121
+7    maxchestrtdose.category|>=20    483     92               575
+8      maxabdrtdose.category|None   2692    142              2834
+9    maxabdrtdose.category|>0-<30    352     58               410
+10     maxabdrtdose.category|>=30    174     34               208
+11    epitxn_dose_5.category|None   2059    163              2222
+12     epitxn_dose_5.category|1st    366     21               387
+13     epitxn_dose_5.category|2nd    363     25               388
+14     epitxn_dose_5.category|3rd    430     25               455
+[1] "maxsegrtdose.category|>0-<18"
+
+Call:
+glm(formula = event ~ Pleiotropy_PRSWEB_PRS.tertile.category + 
+    AGE_AT_LAST_CONTACT.cs1 + AGE_AT_LAST_CONTACT.cs2 + AGE_AT_LAST_CONTACT.cs3 + 
+    AGE_AT_LAST_CONTACT.cs4 + AGE_AT_DIAGNOSIS + gender + maxsegrtdose.category + 
+    maxabdrtdose.category + maxchestrtdose.category + epitxn_dose_5.category + 
+    Smoker_ever_yn + PhysicalActivity_yn + RiskyHeavyDrink_yn + 
+    Obese_yn + EAS + AFR + any_lifestyle_missing + any_chemo_missing + 
+    any_rt_missing, family = "poisson", data = dat_all, offset = log(dat_all$PY))
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-0.5417  -0.1526  -0.1091  -0.0831   4.3443  
+
+Coefficients:
+                                            Estimate Std. Error z value
+(Intercept)                               -5.215e+00  1.974e+00  -2.642
+Pleiotropy_PRSWEB_PRS.tertile.category2nd  2.437e-01  1.643e-01   1.483
+Pleiotropy_PRSWEB_PRS.tertile.category3rd  2.065e-01  1.667e-01   1.239
+AGE_AT_LAST_CONTACT.cs1                   -2.502e-02  7.683e-02  -0.326
+AGE_AT_LAST_CONTACT.cs2                    3.816e-04  7.185e-04   0.531
+AGE_AT_LAST_CONTACT.cs3                   -6.732e-04  2.096e-03  -0.321
+AGE_AT_LAST_CONTACT.cs4                    1.488e-05  2.179e-03   0.007
+AGE_AT_DIAGNOSIS5-9                       -8.273e-02  2.034e-01  -0.407
+AGE_AT_DIAGNOSIS10-14                      2.793e-01  1.980e-01   1.411
+AGE_AT_DIAGNOSIS>=15                       4.742e-01  2.121e-01   2.236
+genderFemale                               3.240e-01  1.374e-01   2.358
+maxsegrtdose.category>0-<30                3.366e-01  1.941e-01   1.734
+maxsegrtdose.category>=30                 -1.128e-01  2.492e-01  -0.453
+maxabdrtdose.category>0-<30                5.717e-01  2.152e-01   2.657
+maxabdrtdose.category>=30                  7.649e-01  2.422e-01   3.158
+maxchestrtdose.category>0-<20              1.536e-01  3.610e-01   0.425
+maxchestrtdose.category>=20                7.612e-01  1.995e-01   3.816
+epitxn_dose_5.category1st                  1.054e-01  2.488e-01   0.424
+epitxn_dose_5.category2nd                  1.502e-01  2.295e-01   0.654
+epitxn_dose_5.category3rd                  1.321e-02  2.472e-01   0.053
+Smoker_ever_yn1st                          1.307e-01  5.142e-01   0.254
+Smoker_ever_yn2nd                         -1.121e-02  1.484e-01  -0.076
+PhysicalActivity_yn2nd                     2.644e-01  1.589e-01   1.664
+PhysicalActivity_yn1st                    -3.316e-02  1.719e-01  -0.193
+RiskyHeavyDrink_yn1st                     -1.216e-01  1.840e-01  -0.661
+RiskyHeavyDrink_yn2nd                     -2.586e-01  2.052e-01  -1.260
+Obese_ynUnderweight                       -5.905e-01  5.935e-01  -0.995
+Obese_ynOverweight                         5.739e-02  1.766e-01   0.325
+Obese_ynObese                             -1.056e-01  1.741e-01  -0.607
+EAS                                       -9.195e-01  1.434e+00  -0.641
+AFR                                       -1.349e+00  3.385e-01  -3.986
+any_lifestyle_missingYes                   1.981e-01  1.644e-01   1.206
+any_chemo_missingYes                       8.169e-01  1.018e+00   0.803
+any_rt_missingYes                          5.454e-01  5.936e-01   0.919
+                                          Pr(>|z|)    
+(Intercept)                               0.008252 ** 
+Pleiotropy_PRSWEB_PRS.tertile.category2nd 0.137996    
+Pleiotropy_PRSWEB_PRS.tertile.category3rd 0.215504    
+AGE_AT_LAST_CONTACT.cs1                   0.744737    
+AGE_AT_LAST_CONTACT.cs2                   0.595395    
+AGE_AT_LAST_CONTACT.cs3                   0.748037    
+AGE_AT_LAST_CONTACT.cs4                   0.994550    
+AGE_AT_DIAGNOSIS5-9                       0.684177    
+AGE_AT_DIAGNOSIS10-14                     0.158364    
+AGE_AT_DIAGNOSIS>=15                      0.025364 *  
+genderFemale                              0.018395 *  
+maxsegrtdose.category>0-<30               0.082890 .  
+maxsegrtdose.category>=30                 0.650620    
+maxabdrtdose.category>0-<30               0.007882 ** 
+maxabdrtdose.category>=30                 0.001590 ** 
+maxchestrtdose.category>0-<20             0.670473    
+maxchestrtdose.category>=20               0.000136 ***
+epitxn_dose_5.category1st                 0.671820    
+epitxn_dose_5.category2nd                 0.512889    
+epitxn_dose_5.category3rd                 0.957370    
+Smoker_ever_yn1st                         0.799397    
+Smoker_ever_yn2nd                         0.939793    
+PhysicalActivity_yn2nd                    0.096083 .  
+PhysicalActivity_yn1st                    0.847018    
+RiskyHeavyDrink_yn1st                     0.508481    
+RiskyHeavyDrink_yn2nd                     0.207605    
+Obese_ynUnderweight                       0.319760    
+Obese_ynOverweight                        0.745149    
+Obese_ynObese                             0.544084    
+EAS                                       0.521433    
+AFR                                       6.73e-05 ***
+any_lifestyle_missingYes                  0.227988    
+any_chemo_missingYes                      0.422159    
+any_rt_missingYes                         0.358166    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 2618.8  on 23150  degrees of freedom
+Residual deviance: 2416.5  on 23117  degrees of freedom
+  (90 observations deleted due to missingness)
+AIC: 2948.5
+
+Number of Fisher Scoring iterations: 8
+
+[1] 0.02790156
+[1] 0.02838069
+[1] 0.02752563
+[1] 0.04701176
+[1] 0.02059048
+[1] 0.02814346
+[1] 0.02178985
+[1] 0.380119
+[1] 0.3803052
+[1] 0.3799728
+[1] 0.2970435
+[1] 0.4119016
+[1] 0.3818885
+[1] 0.379772
+[1] 0.397909
+[1] 0.397156
+[1] 0.3984997
+[1] 0.3272221
+[1] 0.424952
+[1] 0.3998075
+[1] 0.3926387
+[1] 0.1418402
+[1] 0.1448686
+[1] 0.1394641
+[1] 0.1420318
+[1] 0.141767
+[1] 0.1411881
+[1] 0.1578985
+[1] 0.01863788
+[1] 0.00571837
+[1] 0.02877472
+[1] 0.004568554
+[1] 0.02402045
+[1] -86.93728
+[1] -269.4588
+[1] 0.4938458
+[1] 0.48598
+[1] 0.5000175
+[1] 0.422265
+[1] 0.5212309
+[1] 0.4942779
+[1] 0.507117
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+[1] 10
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@noderome112>
+Subject: Job 247867780: <model_fit2_20250131_134935> in cluster <hpcf_research_cluster> Done
+
+Job <model_fit2_20250131_134935> was submitted from host <splprhpc12> by user <aneupane> in cluster <hpcf_research_cluster> at Fri Jan 31 13:49:36 2025
+Job was executed on host(s) <noderome112>, in queue <priority>, as user <aneupane> in cluster <hpcf_research_cluster> at Fri Jan 31 13:49:42 2025
+</home/aneupane> was used as the home directory.
+</home/aneupane/St_Jude/Achal_St_Jude/rcodes/attributable_fraction_R_codes/V21b_Lancet_Revision/21b_HPC/21b/SJLIFE/With_lifestyle_no_HEI/models_fit/with_collapsed_categories> was used as the working directory.
+Started at Fri Jan 31 13:49:42 2025
+Terminated at Fri Jan 31 13:49:56 2025
+Results reported at Fri Jan 31 13:49:56 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+bash -c "module load R/4.2.2 && Rscript 2.model_fit_SMNs.R"
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   8.96 sec.
+    Max Memory :                                 311 MB
+    Average Memory :                             247.80 MB
+    Total Requested Memory :                     20000.00 MB
+    Delta Memory :                               19689.00 MB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                5
+    Run time :                                   14 sec.
+    Turnaround time :                            20 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <logs/model_fit2_20250131_134935.err> for stderr output of this job.
+

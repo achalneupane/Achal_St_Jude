@@ -28,7 +28,7 @@ BMI.PA.SMK.DRK <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/
 new_physical_activity <- read.delim("ExportedCCSS_physical_activity_vig.txt", header = T, sep = "\t", stringsAsFactors = F)
 
 # keep only wanted columns
-new_physical_activity <- new_physical_activity[c("CCSSID", "vig_meetcdc_base", "vig_meetcdc_fu2", "vig_meetcdc_fu5", "vig_meetcdc_fu6")]
+# new_physical_activity <- new_physical_activity[c("CCSSID", "vig_meetcdc_base", "vig_meetcdc_fu2", "vig_meetcdc_fu5", "vig_meetcdc_fu6")]
 head(new_physical_activity)
 
 BMI.PA.SMK.DRK <- cbind.data.frame(BMI.PA.SMK.DRK, new_physical_activity[match(BMI.PA.SMK.DRK$ccssid, new_physical_activity$CCSSID),-1])
@@ -48,25 +48,31 @@ colnames(BMI.PA.SMK.DRK)
 ## Keep continous variables
 BMI.PA.SMK.DRK <- BMI.PA.SMK.DRK[c("ccssid", "a_base", "a_fu1", "a_fu2", "a_fu3", "a_fu5", "a_fu6", "a_fu2007",
                                    "cbmi_0",  "cbmi_2", "cbmi_5", "cbmi_2007",
-                                   "t_eqmodfu2", "t_eqmodfu5", "t_eqmodfu6", 
+                                   "t_eqmodfu2", "t_eqmodfu5", "t_eqmodfu6",
                                    "cdc_fu2", "cdc_fu5", "cdc_fu6", 
-                                   "vig_meetcdc_base", "vig_meetcdc_fu2", "vig_meetcdc_fu5", "vig_meetcdc_fu6",
-                                   "smkcatb", "smkcatf2", "smkcatf5", "smkcatf07",
+                                   "MET_vig_base", "met_vig_fu2", "met_vig_fu5", "MET_vig_fu6",
                                    "N_CIGDAY_b", "N_CIGDAY_fu5", "N_CIGDAY_f7", 
-                                   "riskyb", "riskyfu5", "riskyf7", 
                                    "MultDrinkFreq_b", "MultDrinkFreq_fu5", "MultDrinkFreq_f7")]
 
 
 
 colnames(BMI.PA.SMK.DRK)
 
+# colnames(BMI.PA.SMK.DRK) <- c("ccssid", "base.age", "fu1.age", "fu2.age", "fu3.age", "fu5.age", "fu6.age", "fu7.age",
+#                           "base.bmi",  "fu2.bmi", "fu5.bmi", "fu7.bmi",
+#                           "fu2.MET", "fu5.MET", "fu6.MET",
+#                           "fu2.CDC", "fu5.CDC", "fu6.CDC", 
+#                           "base.met_vig", "fu2.met_vig", "fu5.met_vig", "fu6.met_vig",
+#                           "base.smk", "fu2.smk", "fu5.smk", "fu7.smk",
+#                           "base.riskydrk", "fu5.riskydrk", "fu7.riskydrk")
+
 colnames(BMI.PA.SMK.DRK) <- c("ccssid", "base.age", "fu1.age", "fu2.age", "fu3.age", "fu5.age", "fu6.age", "fu7.age",
-                          "base.bmi",  "fu2.bmi", "fu5.bmi", "fu7.bmi",
-                          "fu2.MET", "fu5.MET", "fu6.MET",
-                          "fu2.CDC", "fu5.CDC", "fu6.CDC", 
-                          "base.met_vig", "fu2.met_vig", "fu5.met_vig", "fu6.met_vig",
-                          "base.smk", "fu2.smk", "fu5.smk", "fu7.smk",
-                          "base.riskydrk", "fu5.riskydrk", "fu7.riskydrk")
+                              "base.bmi",  "fu2.bmi", "fu5.bmi", "fu7.bmi",
+                              "fu2.MET", "fu5.MET", "fu6.MET",
+                              "fu2.CDC", "fu5.CDC", "fu6.CDC", 
+                              "base.met_vig", "fu2.met_vig", "fu5.met_vig", "fu6.met_vig",
+                              "base.smk", "fu5.smk", "fu7.smk",
+                              "base.riskydrk", "fu5.riskydrk", "fu7.riskydrk")
 
 ## Keep only those present in ccss WGS
 BMI.PA.SMK.DRK <- BMI.PA.SMK.DRK[BMI.PA.SMK.DRK$ccssid %in% ccss_samples,]
@@ -83,6 +89,7 @@ BMI.PA.SMK.DRK$fu1.smk <- NA
 BMI.PA.SMK.DRK$fu1.riskydrk <- NA
 
 BMI.PA.SMK.DRK$fu2.riskydrk <- NA
+BMI.PA.SMK.DRK$fu2.smk <- NA
 
 BMI.PA.SMK.DRK$fu3.bmi <- NA
 BMI.PA.SMK.DRK$fu3.MET <- NA
@@ -145,13 +152,21 @@ bmi_iid_dob_18_sorted = bmi_iid_dob_18[order(bmi_iid_dob_18$ccssid, bmi_iid_dob_
 bmi_iid_dob_18_uniq = bmi_iid_dob_18_sorted[!duplicated(bmi_iid_dob_18_sorted$ccssid),]
 bmi_iid_dob_18_uniq = bmi_iid_dob_18_uniq[,c("ccssid", "time", "age", "bmi")]
 
-## MET
+## Wrong variabls
 # MET_iid_dob_18 = subset(cc, age >= 18)
-# MET_iid_dob_18 <- MET_iid_dob_18[!is.na(MET_iid_dob_18$MET), ]
+# MET_iid_dob_18 <- MET_iid_dob_18[!is.na(MET_iid_dob_18$met_vig), ]
 # MET_iid_dob_18_sorted = MET_iid_dob_18[order(MET_iid_dob_18$ccssid, MET_iid_dob_18$age, decreasing = FALSE),]
 # MET_iid_dob_18_uniq = MET_iid_dob_18_sorted[!duplicated(MET_iid_dob_18_sorted$ccssid),]
-# MET_iid_dob_18_uniq = MET_iid_dob_18_uniq[,c("ccssid", "time", "age", "CDC")]
+# MET_iid_dob_18_uniq = MET_iid_dob_18_uniq[,c("ccssid", "time", "age", "MET")]
+# colnames(MET_iid_dob_18_uniq)[colnames(MET_iid_dob_18_uniq) == "MET"] <- "CDC"
 
+# ## MET
+# # MET_iid_dob_18 = subset(cc, age >= 18)
+# # MET_iid_dob_18 <- MET_iid_dob_18[!is.na(MET_iid_dob_18$MET), ]
+# # MET_iid_dob_18_sorted = MET_iid_dob_18[order(MET_iid_dob_18$ccssid, MET_iid_dob_18$age, decreasing = FALSE),]
+# # MET_iid_dob_18_uniq = MET_iid_dob_18_sorted[!duplicated(MET_iid_dob_18_sorted$ccssid),]
+# # MET_iid_dob_18_uniq = MET_iid_dob_18_uniq[,c("ccssid", "time", "age", "CDC")]
+# 
 # New met after Huiqi added Physical activity for baseline
 MET_iid_dob_18 = subset(cc, age >= 18)
 MET_iid_dob_18 <- MET_iid_dob_18[!is.na(MET_iid_dob_18$met_vig), ]
@@ -159,6 +174,8 @@ MET_iid_dob_18_sorted = MET_iid_dob_18[order(MET_iid_dob_18$ccssid, MET_iid_dob_
 MET_iid_dob_18_uniq = MET_iid_dob_18_sorted[!duplicated(MET_iid_dob_18_sorted$ccssid),]
 MET_iid_dob_18_uniq = MET_iid_dob_18_uniq[,c("ccssid", "time", "age", "met_vig")]
 colnames(MET_iid_dob_18_uniq)[colnames(MET_iid_dob_18_uniq) == "met_vig"] <- "CDC"
+
+
 
 ## smk
 smk_iid_dob_18 = subset(cc, age >= 18)
@@ -199,47 +216,69 @@ table(test$same_count)
 
 
 
+# # Obesity
+# CCSS_data$BMI <- as.numeric(bmi_iid_dob_18_uniq$bmi[match(CCSS_data$ccssid, bmi_iid_dob_18_uniq$ccssid)])
+# CCSS_data$Obese_yn_agesurvey <- as.numeric(bmi_iid_dob_18_uniq$age[match(CCSS_data$ccssid, bmi_iid_dob_18_uniq$ccssid)])
+# CCSS_data$Obese_yn <- factor(ifelse(CCSS_data$BMI < 30, "No", "Yes"))
+# CCSS_data$Obese_yn <- factor(CCSS_data$Obese_yn, level = c("No", "Yes", "Unknown")) 
+# CCSS_data$Obese_yn[is.na(CCSS_data$Obese_yn)] <- "Unknown"
+
+## New Obesity
 # Obesity
 CCSS_data$BMI <- as.numeric(bmi_iid_dob_18_uniq$bmi[match(CCSS_data$ccssid, bmi_iid_dob_18_uniq$ccssid)])
 CCSS_data$Obese_yn_agesurvey <- as.numeric(bmi_iid_dob_18_uniq$age[match(CCSS_data$ccssid, bmi_iid_dob_18_uniq$ccssid)])
-CCSS_data$Obese_yn <- factor(ifelse(CCSS_data$BMI < 30, "No", "Yes"))
-CCSS_data$Obese_yn <- factor(CCSS_data$Obese_yn, level = c("No", "Yes", "Unknown")) 
-CCSS_data$Obese_yn[is.na(CCSS_data$Obese_yn)] <- "Unknown";
+CCSS_data$Obese_yn <- CCSS_data$BMI
 
-# Physical activity
+# # Physical activity
+# CCSS_data$CDC <- MET_iid_dob_18_uniq$CDC[match(CCSS_data$ccssid, MET_iid_dob_18_uniq$ccssid)]
+# CCSS_data$PhysicalActivity_yn_agesurvey <- as.numeric(MET_iid_dob_18_uniq$age[match(CCSS_data$ccssid, MET_iid_dob_18_uniq$ccssid)])
+# CCSS_data$PhysicalActivity_yn <- factor(CCSS_data$CDC)
+# CCSS_data$PhysicalActivity_yn <- ifelse (CCSS_data$PhysicalActivity_yn == "Yes", "Yes", "No")
+# CCSS_data$PhysicalActivity_yn[is.na(CCSS_data$PhysicalActivity_yn)] <- "Unknown"
+# CCSS_data$PhysicalActivity_yn <- factor(CCSS_data$PhysicalActivity_yn, level = c("Yes", "No", "Unknown")) 
+
+## New physical Activity lancet oncology
 CCSS_data$CDC <- MET_iid_dob_18_uniq$CDC[match(CCSS_data$ccssid, MET_iid_dob_18_uniq$ccssid)]
 CCSS_data$PhysicalActivity_yn_agesurvey <- as.numeric(MET_iid_dob_18_uniq$age[match(CCSS_data$ccssid, MET_iid_dob_18_uniq$ccssid)])
-CCSS_data$PhysicalActivity_yn <- factor(CCSS_data$CDC)
-CCSS_data$PhysicalActivity_yn <- ifelse (CCSS_data$PhysicalActivity_yn == "Yes", "Yes", "No")
-CCSS_data$PhysicalActivity_yn[is.na(CCSS_data$PhysicalActivity_yn)] <- "Unknown"
-CCSS_data$PhysicalActivity_yn <- factor(CCSS_data$PhysicalActivity_yn, level = c("Yes", "No", "Unknown")) 
+CCSS_data$PhysicalActivity_yn <- CCSS_data$CDC
 
-# Smoker
-# Smoking status from most recent data (1=Never, 2=Former, 3=Current)
-CCSS_data$SMK <- smk_iid_dob_18_uniq$smk[match(CCSS_data$ccssid, smk_iid_dob_18_uniq$ccssid)]
-CCSS_data$Current_smoker_yn_agesurvey <- as.numeric(smk_iid_dob_18_uniq$age[match(CCSS_data$ccssid, smk_iid_dob_18_uniq$ccssid)])
-CCSS_data$Current_smoker_yn <- factor(CCSS_data$SMK)
-CCSS_data$Current_smoker_yn <- factor(ifelse(CCSS_data$Current_smoker_yn != 3, "No", "Yes"))
-CCSS_data$Current_smoker_yn <- factor(CCSS_data$Current_smoker_yn, level = c("No", "Yes", "Unknown")) 
-CCSS_data$Current_smoker_yn[is.na(CCSS_data$Current_smoker_yn)] <- "Unknown"
 
-## Smoker ever vs never
-CCSS_data$Smoker_ever_yn_agesurvey <- as.numeric(smk_iid_dob_18_uniq$age[match(CCSS_data$ccssid, smk_iid_dob_18_uniq$ccssid)])
-CCSS_data$Smoker_ever_yn <- factor(CCSS_data$SMK)
-CCSS_data$Smoker_ever_yn <- factor(ifelse(CCSS_data$Smoker_ever_yn != 1, "Yes", "No"))
-CCSS_data$Smoker_ever_yn <- factor(CCSS_data$Smoker_ever_yn, level = c("No", "Yes", "Unknown")) 
-CCSS_data$Smoker_ever_yn[is.na(CCSS_data$Smoker_ever_yn)] <- "Unknown"
-table(CCSS_data$Smoker_ever_yn)
+# # Smoker
+# # Smoking status from most recent data (1=Never, 2=Former, 3=Current)
+# CCSS_data$SMK <- smk_iid_dob_18_uniq$smk[match(CCSS_data$ccssid, smk_iid_dob_18_uniq$ccssid)]
+# CCSS_data$Current_smoker_yn_agesurvey <- as.numeric(smk_iid_dob_18_uniq$age[match(CCSS_data$ccssid, smk_iid_dob_18_uniq$ccssid)])
+# CCSS_data$Current_smoker_yn <- factor(CCSS_data$SMK)
+# CCSS_data$Current_smoker_yn <- factor(ifelse(CCSS_data$Current_smoker_yn != 3, "No", "Yes"))
+# CCSS_data$Current_smoker_yn <- factor(CCSS_data$Current_smoker_yn, level = c("No", "Yes", "Unknown")) 
+# CCSS_data$Current_smoker_yn[is.na(CCSS_data$Current_smoker_yn)] <- "Unknown"
+
+# ## Smoker ever vs never
+# CCSS_data$Smoker_ever_yn_agesurvey <- as.numeric(smk_iid_dob_18_uniq$age[match(CCSS_data$ccssid, smk_iid_dob_18_uniq$ccssid)])
+# CCSS_data$Smoker_ever_yn <- factor(CCSS_data$SMK)
+# CCSS_data$Smoker_ever_yn <- factor(ifelse(CCSS_data$Smoker_ever_yn != 1, "Yes", "No"))
+# CCSS_data$Smoker_ever_yn <- factor(CCSS_data$Smoker_ever_yn, level = c("No", "Yes", "Unknown")) 
+# CCSS_data$Smoker_ever_yn[is.na(CCSS_data$Smoker_ever_yn)] <- "Unknown"
+# table(CCSS_data$Smoker_ever_yn)
 # No     Yes Unknown 
 # 7212    2429     106
 
+## New smoking
+CCSS_data$Smoker_ever_yn_agesurvey <- as.numeric(smk_iid_dob_18_uniq$age[match(CCSS_data$ccssid, smk_iid_dob_18_uniq$ccssid)])
+CCSS_data$SMK <- smk_iid_dob_18_uniq$smk[match(CCSS_data$ccssid, smk_iid_dob_18_uniq$ccssid)]
+CCSS_data$Smoker_ever_yn <- CCSS_data$SMK
+table(CCSS_data$Smoker_ever_yn)
+
 # drinker
+# CCSS_data$DRK <- drk_iid_dob_18_uniq$riskydrk[match(CCSS_data$ccssid, drk_iid_dob_18_uniq$ccssid)]
+# CCSS_data$RiskyHeavyDrink_yn_agesurvey <- as.numeric(drk_iid_dob_18_uniq$age[match(CCSS_data$ccssid, drk_iid_dob_18_uniq$ccssid)])
+# CCSS_data$RiskyHeavyDrink_yn <- factor(ifelse(factor(CCSS_data$DRK) == "No", "No", "Yes"))
+# CCSS_data$RiskyHeavyDrink_yn <- factor(CCSS_data$RiskyHeavyDrink_yn, level = c("No", "Yes", "Unknown")) 
+# CCSS_data$RiskyHeavyDrink_yn[is.na(CCSS_data$RiskyHeavyDrink_yn)] <- "Unknown"
+
+## New drinking
 CCSS_data$DRK <- drk_iid_dob_18_uniq$riskydrk[match(CCSS_data$ccssid, drk_iid_dob_18_uniq$ccssid)]
 CCSS_data$RiskyHeavyDrink_yn_agesurvey <- as.numeric(drk_iid_dob_18_uniq$age[match(CCSS_data$ccssid, drk_iid_dob_18_uniq$ccssid)])
-CCSS_data$RiskyHeavyDrink_yn <- factor(ifelse(factor(CCSS_data$DRK) == "No", "No", "Yes"))
-CCSS_data$RiskyHeavyDrink_yn <- factor(CCSS_data$RiskyHeavyDrink_yn, level = c("No", "Yes", "Unknown")) 
-CCSS_data$RiskyHeavyDrink_yn[is.na(CCSS_data$RiskyHeavyDrink_yn)] <- "Unknown"
-
+CCSS_data$RiskyHeavyDrink_yn <- CCSS_data$DRK
 
 # # remove those with all 4 lifestyle missing
 # CCSS_data <- CCSS_data[!(is.na(CCSS_data$Obese_yn_agesurvey) & is.na(CCSS_data$Current_smoker_yn_agesurvey) &
@@ -259,7 +298,7 @@ test$same_count <- apply(test, 1, count_same)
 table(test$same_count)
 
 test <- CCSS_data[!duplicated(CCSS_data$ccssid),]
-test <- test[c("Obese_yn_agesurvey", "Current_smoker_yn_agesurvey", "RiskyHeavyDrink_yn_agesurvey")]
+test <- test[c("Obese_yn_agesurvey", "Smoker_ever_yn_agesurvey", "RiskyHeavyDrink_yn_agesurvey")]
 
 test$same_count <- apply(test, 1, count_same)
 table(test$same_count)
@@ -297,8 +336,74 @@ subneo <- CCSS_data
 PHENO.ANY_SN <- CCSS_data[c('ccssid', 'SEX', 'agedx', 'AGE_AT_DIAGNOSIS', 'agelstcontact', 
                            'chestrtgrp', 'neckrtgrp', 'abdomenrtgrp', 'abdomenrtgrp', 'brainrtgrp', 'pelvisrtgrp', 
                            'chestmaxrtdose', 'neckmaxrtdose', 'pelvismaxrtdose', 'abdmaxrtdose', 'maxsegrtdose', 'anth_DED5', 'alk_CED5', 'epipdose5', 'pt_cisED5', 
-                           "Obese_yn_agesurvey", "Obese_yn", "PhysicalActivity_yn_agesurvey", "PhysicalActivity_yn", "Smoker_ever_yn", "Smoker_ever_yn_agesurvey", "Current_smoker_yn_agesurvey", "Current_smoker_yn", "RiskyHeavyDrink_yn_agesurvey", "RiskyHeavyDrink_yn")]
+                           "Obese_yn_agesurvey", "Obese_yn", "PhysicalActivity_yn_agesurvey", "PhysicalActivity_yn", "Smoker_ever_yn", "Smoker_ever_yn_agesurvey", "RiskyHeavyDrink_yn_agesurvey", "RiskyHeavyDrink_yn")]
 PHENO.ANY_SN <- PHENO.ANY_SN[!duplicated(PHENO.ANY_SN$ccssid),]
+
+####################################
+## Create new lifestyle variables ##
+####################################
+PHENO.ANY_SN$PhysicalActivity_yn <- as.numeric(PHENO.ANY_SN$PhysicalActivity_yn)
+## Physical activity tertiles
+TERT = unname(quantile(PHENO.ANY_SN$PhysicalActivity_yn[PHENO.ANY_SN$PhysicalActivity_yn !=0], c(1/3, 2/3, 1), na.rm = T))
+PHENO.ANY_SN$PhysicalActivity_yn <- cut(PHENO.ANY_SN$PhysicalActivity_yn, 
+                                        breaks = c(0, TERT), 
+                                        labels = c("Yes", "1st", "2nd"), 
+                                        include.lowest = TRUE)
+
+
+levels(PHENO.ANY_SN$PhysicalActivity_yn) <- c(levels(PHENO.ANY_SN$PhysicalActivity_yn), "Unknown")
+PHENO.ANY_SN$PhysicalActivity_yn [is.na(PHENO.ANY_SN$PhysicalActivity_yn)] <- "Unknown"
+table(PHENO.ANY_SN$PhysicalActivity_yn)
+PHENO.ANY_SN$PhysicalActivity_yn <- factor(PHENO.ANY_SN$PhysicalActivity_yn, 
+                                           levels = c("Yes", "2nd", "1st", "Unknown"))
+
+## Smoking tertiles
+PHENO.ANY_SN$Smoker_ever_yn <- as.numeric(PHENO.ANY_SN$Smoker_ever_yn)
+TERT = unname(quantile(PHENO.ANY_SN$Smoker_ever_yn[PHENO.ANY_SN$Smoker_ever_yn !=0], c(1/3, 2/3, 1), na.rm = T))
+PHENO.ANY_SN$Smoker_ever_yn <- cut(PHENO.ANY_SN$Smoker_ever_yn,  breaks = c(0, TERT),
+                                   labels = c("No", "1st", "2nd"),
+                                   include.lowest = TRUE)
+levels(PHENO.ANY_SN$Smoker_ever_yn) <- c(levels(PHENO.ANY_SN$Smoker_ever_yn), "Unknown")
+PHENO.ANY_SN$Smoker_ever_yn [is.na(PHENO.ANY_SN$Smoker_ever_yn)] <- "Unknown"
+table(PHENO.ANY_SN$Smoker_ever_yn)
+
+
+## Drinkiing
+PHENO.ANY_SN$RiskyHeavyDrink_yn[grepl("_",PHENO.ANY_SN$RiskyHeavyDrink_yn)] <- NA
+PHENO.ANY_SN$RiskyHeavyDrink_yn[grepl("Never",PHENO.ANY_SN$RiskyHeavyDrink_yn)] <- 10
+PHENO.ANY_SN$RiskyHeavyDrink_yn[grepl("1 or 2 times",PHENO.ANY_SN$RiskyHeavyDrink_yn)] <- 9
+PHENO.ANY_SN$RiskyHeavyDrink_yn[grepl("3 to 11 times",PHENO.ANY_SN$RiskyHeavyDrink_yn)] <- 8
+PHENO.ANY_SN$RiskyHeavyDrink_yn[grepl("once a month",PHENO.ANY_SN$RiskyHeavyDrink_yn)] <- 7
+PHENO.ANY_SN$RiskyHeavyDrink_yn[grepl("2 to 3 times",PHENO.ANY_SN$RiskyHeavyDrink_yn)] <- 6
+PHENO.ANY_SN$RiskyHeavyDrink_yn[grepl("once a week",PHENO.ANY_SN$RiskyHeavyDrink_yn)] <- 5
+PHENO.ANY_SN$RiskyHeavyDrink_yn[grepl("twice a week",PHENO.ANY_SN$RiskyHeavyDrink_yn)] <- 4
+PHENO.ANY_SN$RiskyHeavyDrink_yn[grepl("3 to 4 times a week",PHENO.ANY_SN$RiskyHeavyDrink_yn)] <- 3
+PHENO.ANY_SN$RiskyHeavyDrink_yn[grepl("5 to 6",PHENO.ANY_SN$RiskyHeavyDrink_yn)] <- 2
+PHENO.ANY_SN$RiskyHeavyDrink_yn[grepl("Every",PHENO.ANY_SN$RiskyHeavyDrink_yn)] <- 1
+
+PHENO.ANY_SN$RiskyHeavyDrink_yn <- factor(
+  ifelse(PHENO.ANY_SN$RiskyHeavyDrink_yn %in% c(9, 10), "No",
+         ifelse(PHENO.ANY_SN$RiskyHeavyDrink_yn %in% 7:8, "Category_7_8",
+                ifelse(PHENO.ANY_SN$RiskyHeavyDrink_yn %in% 4:6, "Category_4_6",
+                       ifelse(PHENO.ANY_SN$RiskyHeavyDrink_yn %in% 1:3, "Category_1_3", NA)))),
+  levels = c("No", "Category_7_8", "Category_4_6", "Category_1_3", "Unknown")  # Ensures order
+)
+
+PHENO.ANY_SN$RiskyHeavyDrink_yn [is.na(PHENO.ANY_SN$RiskyHeavyDrink_yn)] <- "Unknown"
+table(PHENO.ANY_SN$RiskyHeavyDrink_yn)
+
+## Obesity 
+## Obese (https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html?CDC_AAref_Val=https://www.cdc.gov/obesity/basics/adult-defining.html)
+# Reorder levels so "Normal weight" is the base/reference level
+PHENO.ANY_SN$Obese_yn <- cut(PHENO.ANY_SN$Obese_yn,
+                             breaks = c(-Inf, 18.5, 24.9, 29.9, Inf),
+                             labels = c("Underweight", "No", "Overweight", "Obese"),
+                             right = FALSE)
+
+PHENO.ANY_SN$Obese_yn <- factor(PHENO.ANY_SN$Obese_yn, 
+                                levels = c("No", "Underweight", "Overweight", "Obese", "Unknown"))
+
+####################################
 
 
 
@@ -405,7 +510,7 @@ PHENO.ANY_SN <- PHENO.ANY_SN[c('ccssid', 'gender', "agedx", 'agelstcontact', 'AG
                                  'maxchestrtdose.category', 'maxneckrtdose.category', 'maxabdrtdose.category', 'maxsegrtdose.category', 'maxpelvisrtdose.category',
                                  'anthra_jco_dose_5.category', 'aa_class_dose_5.category', 'epitxn_dose_5.category', 'cisplateq_dose_5.category',
                                'chestmaxrtdose', 'neckmaxrtdose', 'pelvismaxrtdose', 'abdmaxrtdose', 'maxsegrtdose', 'anth_DED5', 'alk_CED5', 'epipdose5', 'pt_cisED5',
-                               "Obese_yn_agesurvey", "Obese_yn", "PhysicalActivity_yn_agesurvey", "PhysicalActivity_yn", "Smoker_ever_yn", "Smoker_ever_yn_agesurvey", "Current_smoker_yn_agesurvey", "Current_smoker_yn", "RiskyHeavyDrink_yn_agesurvey", "RiskyHeavyDrink_yn")]
+                               "Obese_yn_agesurvey", "Obese_yn", "PhysicalActivity_yn_agesurvey", "PhysicalActivity_yn", "Smoker_ever_yn", "Smoker_ever_yn_agesurvey", "RiskyHeavyDrink_yn_agesurvey", "RiskyHeavyDrink_yn")]
 ## Meningioma_from_variants_also_in_CCSS_org_prs.profile-----------------------------------------------
 Meningioma.exp <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_exp_wgs/attr_fraction/prs/prs_out/Meningioma_from_variants_also_in_CCSS_org_prs.profile", header = T)
 Meningioma.org <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ccss_org_hrc/ccss_org_hrc_vcf_GRCh38/attr_fraction/prs/prs_out/Meningioma_prs.profile", header = T)
