@@ -3,7 +3,7 @@ obj_keep <- c("miss_Any_SN", "miss_SMN", "miss_NMSC", "miss_BREAST", "miss_THYRO
 rm(list = setdiff(ls(), obj_keep))
 # rm(list=ls())
 # load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_combined_Genetic_data_P_LP_v14.Rdata")
-load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/00.CCSS_Genetic_data_P_LP_v17.Rdata") # V17b
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/lancetOncology/00.CCSS_Genetic_data_P_LP_v17.Rdata") # V17b
 
 library(haven)
 library(benchmarkme)
@@ -246,9 +246,9 @@ columns_to_check <- c("PhysicalActivity_yn", "Smoker_ever_yn", "RiskyHeavyDrink_
 
 miss_Any_SN <- get_missing_combinations(PHENO.ANY_SN, columns_to_check)
 
-miss_Any_SN <- calculate_missing_counts(PHENO.ANY_SN)
+# miss_Any_SN <- calculate_missing_counts(PHENO.ANY_SN)
 ## Yutaka on 08/10/2023: Could you breakdown the "any 1 missing" to each item missing so that I can see what variables are missing more
-miss_Any_SN <- calculate_missing_percentages(PHENO.ANY_SN)
+# miss_Any_SN <- calculate_missing_percentages(PHENO.ANY_SN)
 
 ############################################################
 ## Drop Unknown level from the lifestyle factor variables ##
@@ -445,5 +445,5 @@ PHENO.ANY_SN <- cbind.data.frame(PHENO.ANY_SN, cs)
 
 
 rm(list = setdiff(ls(), c("cc", "PHENO.ANY_SN")))
-save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/ccss.Any_SNs.V21b_without_diet.Rdata")
+save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/lancetOncology/ccss.Any_SNs.V21b_without_diet.Rdata")
 

@@ -23,6 +23,10 @@ find ./ -type f| grep V11_with_overlapping| egrep -v "Pheno|Rhistory|Merge_all_a
 find ./ -type f -name "*model_fit*" -exec sed -i '/round(/ s/^/# /' {} +
 find ./ -type f -name "*model_fit*" -exec sed -i '/View(/ s/^/# /' {} +
 
+find ./ -type f -name "*model_fit*" -exec sed -i 's|PHENOTYPE/6|PHENOTYPE/lancetOncology/6|g' {} +
+find ./ -type f -name "*model_fit*" -exec sed -i 's|PHENOTYPE/ccss|PHENOTYPE/lancetOncology/ccss|g' {} +
+
+
 
 
 job=test4_$(date +%Y%m%d_%H%M%S)
