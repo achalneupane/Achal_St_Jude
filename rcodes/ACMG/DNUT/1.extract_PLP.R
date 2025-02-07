@@ -236,7 +236,7 @@ table(rownames(raw) %in% EUR$IID)
 
 # save.image("rare_variant_ACMG_group_data.RData")
 
-load("rare_variant_ACMG_group_data.RData")
+# load("rare_variant_ACMG_group_data.RData")
 ## Extract European and African genotype data
 raw.eur <- raw[rownames(raw) %in% EUR$IID,]
 raw.afr <- raw[rownames(raw) %in% AFR$IID,]
