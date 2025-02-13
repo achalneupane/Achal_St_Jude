@@ -378,9 +378,6 @@ prsfile$CHROM[prsfile$CHROM == "chr24"] <- "chrY"
 # chr1 41446467 T C 0.0777940274400202 ST6 ST6
 POI_meta_GRCh38 <- cbind.data.frame(prsfile$CHROM, prsfile$POS_GRCh38, prsfile$Other_Allele, prsfile$Effect_Allele, prsfile$Effect, "POI_META", "POI_META")
 
-# Note: No need to swap the allele based on "Direction +++ or ---" from meta analysis. You just need to make sure beta is positive. If you change its sign, you will need to swap the alleles
-# write.table(POI_meta_GRCh38, "POI_meta_GRCh38.dat", col.names = F, row.names = F, quote = F)
-POI_meta_GRCh38 <- read.csv("POI_meta_GRCh38.dat", header = F)
 
 # extract from BIM
 POI_meta_GRCh38$KEY <- paste0(POI_meta_GRCh38$`prsfile$CHROM`, ":", POI_meta_GRCh38$`prsfile$POS_GRCh38`)
@@ -412,6 +409,30 @@ bimcheck$KEY <- paste0("chr", bimcheck$V1, ":", bimcheck$V4)
 
 POI_meta_GRCh38[!POI_meta_GRCh38$KEY %in% bimcheck$KEY,]
 
+
+# Note: No need to swap the allele based on "Direction +++ or ---" from meta analysis. You just need to make sure beta is positive. If you change its sign, you will need to swap the alleles
+# write.table(POI_meta_GRCh38, "POI_meta_GRCh38.dat", col.names = F, row.names = F, quote = F)
+POI_meta_GRCh38 <- read.table("POI_meta_GRCh38.dat", header = F)
+POI_meta_GRCh38
+
+########################
+# Hi Achal,
+# I just checked the Ruth manuscript and ST2 is the correct table. Could you please recalculate this PRS, but coded so that it should be associated with decreased age at natural menopause? This would mean you are counting the non-effect allele ("other allele", column E) and then multiplying the effect sizes in column G by -1 (all positive effect sizes should be negative). Note that the genomic coordinates here are in hg19.
+# Sorry for the lack of clarification. I should have specified this earlier.
+########################
+
+# Swap V3 and V4, and change the sign of V5
+POI_meta_GRCh38_v2 <- POI_meta_GRCh38
+temp <- POI_meta_GRCh38_v2$V3
+POI_meta_GRCh38_v2$V3 <- POI_meta_GRCh38_v2$V4
+POI_meta_GRCh38_v2$V4 <- temp
+
+# Change the sign of V5
+POI_meta_GRCh38_v2$V5 <- -POI_meta_GRCh38_v2$V5
+
+write.table(POI_meta_GRCh38_v2, "POI_meta_GRCh38_v2.dat", col.names = F, row.names = F, quote = F)
+########################
+
 #####################
 ## GRCh37 PRS file ##
 #####################
@@ -421,11 +442,31 @@ POI_meta_GRCh38[!POI_meta_GRCh38$KEY %in% bimcheck$KEY,]
 # chr1 41446467 T C 0.0777940274400202 ST6 ST6
 POI_meta_GRCh37 <- cbind.data.frame(prsfile$CHROM, prsfile$Pos, prsfile$Other_Allele, prsfile$Effect_Allele, prsfile$Effect, "POI_META", "POI_META")
 
-write.table(POI_meta_GRCh37, "POI_meta_GRCh37.dat", col.names = T, row.names = F, quote = F)
+write.table(POI_meta_GRCh37, "POI_meta_GRCh37.dat", col.names = F, row.names = F, quote = F)
 
+
+########################
+# Hi Achal,
+# I just checked the Ruth manuscript and ST2 is the correct table. Could you please recalculate this PRS, but coded so that it should be associated with decreased age at natural menopause? This would mean you are counting the non-effect allele ("other allele", column E) and then multiplying the effect sizes in column G by -1 (all positive effect sizes should be negative). Note that the genomic coordinates here are in hg19.
+# Sorry for the lack of clarification. I should have specified this earlier.
+########################
+POI_meta_GRCh37 <- read.table("POI_meta_GRCh37.dat", header = F)
+# Swap V3 and V4, and change the sign of V5
+POI_meta_GRCh37_v2 <- POI_meta_GRCh37
+temp <- POI_meta_GRCh37_v2$V3
+POI_meta_GRCh37_v2$V3 <- POI_meta_GRCh37_v2$V4
+POI_meta_GRCh37_v2$V4 <- temp
+
+# Change the sign of V5
+POI_meta_GRCh37_v2$V5 <- -POI_meta_GRCh37_v2$V5
+
+write.table(POI_meta_GRCh37_v2, "POI_meta_GRCh37_v2.dat", col.names = F, row.names = F, quote = F)
+########################
 
 # extract from BIM
 POI_meta_GRCh37$KEY <- paste0(POI_meta_GRCh37$`prsfile$CHROM`, ":", POI_meta_GRCh37$`prsfile$Pos`)
+
+
 
 wantedSNP <- c()
 # Loop through chromosomes 1-22, X, Y
@@ -448,3 +489,6 @@ for (CHR in c(1:22, "X", "Y")) {
 
 wantedSNP_df <- data.frame(SNP = wantedSNP)
 write.table(wantedSNP_df, "wantedSNP_GRCh37.txt", row.names = FALSE, col.names = F, sep = "\t", quote = FALSE)
+
+
+

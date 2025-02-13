@@ -1044,14 +1044,6 @@ AFR <- AFR[AFR$IID %in% carriers.clinvar.afr$IID,]
 saveRDS(EUR, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/EUR.PCA.rds")
 saveRDS(AFR, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/AFR.PCA.rds")
 
-admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
-admixture$INDIVIDUAL <- sub("_.*", "", admixture$INDIVIDUAL)
-admixture$ancestry <- NA
-admixture$ancestry[admixture$EUR > 0.8] <- "EUR"
-admixture$ancestry[admixture$AFR > 0.6] <- "AFR"
-admixture$ancestry[is.na(admixture$ancestry)] <- "Other"
-
-saveRDS(admixture, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/admixture.rds")
 
 
 ACMG <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/ACMG2.txt", header = T, sep = "\t", stringsAsFactors = F) ## From Lauren
@@ -1137,3 +1129,45 @@ lauren.cardio.samples$IID[!lauren.cardio.samples$IID %in% gg]
 # cc <- gg[gg$cohort == "ccss_exp",]
 
 # 24447368
+
+######################
+## Identify samples ##
+######################
+vcf.samples.wgs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/Survivor_WGS_QCed/Phenotypes//final_WGS_samples.txt", header = T)
+table(ALL$IID %in% vcf.samples.wgs$VCFrename )
+# FALSE  TRUE 
+# 5  7829
+table(vcf.samples.wgs$VCFrename %in% rownames(raw))
+# FALSE  TRUE 
+# 37  7942
+vcf.samples.wgs$YESNO <- vcf.samples.wgs$VCFrename %in% admixture$INDIVIDUAL
+
+
+## Admixture
+admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
+admixture$cohort [grepl("_", admixture$INDIVIDUAL)] <- "CCSS_original"
+admixture$INDIVIDUAL <- sub("_.*", "", admixture$INDIVIDUAL)
+admixture$ancestry <- NA
+admixture$ancestry[admixture$EUR > 0.8] <- "EUR"
+admixture$ancestry[admixture$AFR > 0.6] <- "AFR"
+admixture$ancestry[is.na(admixture$ancestry)] <- "Other"
+
+# Find the matching indices
+matched_idx <- match(admixture$INDIVIDUAL, vcf.samples.wgs$VCFrename)
+# Update only non-NA matches without overwriting existing values
+update_mask <- !is.na(matched_idx) & is.na(admixture$cohort)  # Only update if cohort is NA
+admixture$cohort[update_mask] <- vcf.samples.wgs$pop[matched_idx[update_mask]]
+
+saveRDS(admixture, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/admixture.rds")
+## Check
+load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/5_lifestyle_v11.RDATA")
+cc <- admixture[admixture$cohort == "Survivor",]
+table(cc$INDIVIDUAL %in% PHENO.ANY_SN$sjlid)
+# FALSE  TRUE 
+# 2  4393 
+cc[!cc$INDIVIDUAL %in% PHENO.ANY_SN$sjlid,]
+
+sequencing.Record.ccss_exp <- read_excel("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/SJLIFE_WGS_and_CCSS_SNP_WES_WGS_samples_and_overlap.xlsx", sheet = "CCSS_exp_WGS_2839", col_names = F)
+table(admixture$INDIVIDUAL %in% sequencing.Record.ccss_exp$...1)
+# FALSE  TRUE 
+# 10240  2839 

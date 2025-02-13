@@ -294,6 +294,10 @@ table((vcf.samples.wgs$pop))
 
 vcf.samples.wgs[is.na(vcf.samples.wgs$pop),]
 
+write.table(vcf.samples.wgs, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WGS_QCed/Phenotypes/final_WGS_samples.txt", col.names = T, row.names = F, sep = "\t", quote = F)
+
 vcf.samples.wgs.renamed <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects//Genomics/common/Survivor_WGS_QCed/VCF_original/vcf_samples_renamed.txt", header = F)
 
 
+table(PHENO.ANY_SN$sjlid %in% vcf.samples.wgs.renamed$V1)
+PHENO.ANY_SN$sjlid[!PHENO.ANY_SN$sjlid %in% vcf.samples.wgs.renamed$V1]

@@ -177,9 +177,10 @@ table(colnames(raw) %in% cc$SNP)
 
 
 ## Admixture classification
-admixture <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/admixture/merged.ancestry.file.txt", header = T)
-EUR <- admixture$INDIVIDUAL[admixture$EUR > 0.8]
-AFR <- admixture$INDIVIDUAL[admixture$AFR > 0.6]
+admixture <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/admixture.rds")
+EUR <- admixture$INDIVIDUAL[admixture$ancestry =="EUR"]
+AFR <- admixture$INDIVIDUAL[admixture$ancestry =="AFR"]
+Other <- admixture$INDIVIDUAL[admixture$ancestry == "Other"]
 
 
 
@@ -193,10 +194,14 @@ table(rownames(raw) %in% EUR)
 ## Extract European and African genotype data
 raw.eur <- raw[rownames(raw) %in% EUR,]
 raw.afr <- raw[rownames(raw) %in% AFR,]
+raw.all <- raw[rownames(raw) %in% Other,]
+
 dim(raw.eur)
 # [1] 5965  656
 dim(raw.afr)
 # [1] 801 656
+dim(raw.all)
+# 551
 source("Z:/ResearchHome/ClusterHome/aneupane/St_Jude/Achal_St_Jude/rcodes/ACMG/utils.R")
 
 
@@ -271,6 +276,46 @@ length(snps.with.carriers.clinvar.afr)
 ## 33
 # carriers.clinvar.afr$All_Genes <- ifelse(rowSums(carriers.clinvar.afr[ , -1], na.rm = TRUE) > 0, 1, 0)
 
+###############################
+## 1.c Extract clinvar Other ##
+###############################
+raw.clinvar.all <- raw.all[which(colnames(raw.all) %in% clinvar.all$SNP)]
+clinvar.all <- clinvar.all[clinvar.all$SNP %in% colnames(raw.all),]
+
+genes <- unique(clinvar.all$new_GENE.clinvar)
+carriers.clinvar.all <- setNames(as.data.frame(rownames(raw.all)), "IID")
+snps.with.carriers.clinvar.all <- c()
+
+## Status per gene
+for (i in 1:length(genes)){
+  wanted.gene <- genes[i]
+  print(paste0("Doing gene ", wanted.gene))
+  wanted.snps <- unique(clinvar.all$SNP[clinvar.all$new_GENE.clinvar == wanted.gene])
+  raw.wanted <- raw.clinvar.all[wanted.snps]
+  snps.with.carriers.tmp <- names(colSums(raw.wanted, na.rm = T))[colSums(raw.wanted, na.rm = T) > 0]
+  if(length(snps.with.carriers.tmp) == 0){
+    next
+  }
+  raw.wanted <- raw.wanted[snps.with.carriers.tmp]
+  snps.with.carriers.clinvar.all <- c(snps.with.carriers.clinvar.all, snps.with.carriers.tmp)
+  carriers.tmp <- setNames(as.data.frame(rownames(raw.wanted)), "IID")
+  carriers.tmp$carrier <- ifelse(rowSums(raw.wanted[grepl("chr", colnames(raw.wanted))], na.rm = T) > 0, 1, 0)
+  carriers.clinvar.all[wanted.gene] <- carriers.tmp$carrier[match(carriers.clinvar.all$IID, carriers.tmp$IID)]
+}
+
+length(snps.with.carriers.clinvar.all)
+# 241
+dim(carriers.clinvar.all)
+# [1] 551  25
+## Adding carrier status for "All_Genes"
+## Check if any gene column in carriers.clinvar.all has carrier status (1) across all genes
+# carriers.clinvar.all$All_Genes <- ifelse(rowSums(carriers.clinvar.all[ , -1], na.rm = TRUE) > 0, 1, 0)
+dim(carriers.clinvar.all)
+# 551  25
+table(ifelse(rowSums(carriers.clinvar.all[ , -1], na.rm = TRUE) > 0, 1, 0))
+# 0    1 
+# 516  35 
+
 #################################
 ## 2.a Extract loftee European ##
 #################################
@@ -332,6 +377,37 @@ for (i in 1:length(genes)){
 length(snps.with.carriers.loftee.afr)
 ## 11
 # carriers.loftee.afr$All_Genes <- ifelse(rowSums(carriers.loftee.afr[ , -1], na.rm = TRUE) > 0, 1, 0)
+
+##############################
+## 2.c Extract loftee Other ##
+##############################
+raw.loftee.all <- raw.all[which(colnames(raw.all) %in% loftee.all$SNP)]
+loftee.all <- loftee.all[loftee.all$SNP %in% colnames(raw.all),]
+
+genes <- unique(loftee.all$new_GENE.loftee)
+carriers.loftee.all <- setNames(as.data.frame(rownames(raw.all)), "IID")
+snps.with.carriers.loftee.all <- c()
+
+## Status per gene
+for (i in 1:length(genes)){
+  wanted.gene <- genes[i]
+  print(paste0("Doing gene ", wanted.gene))
+  wanted.snps <- unique(loftee.all$SNP[loftee.all$new_GENE.loftee == wanted.gene])
+  raw.wanted <- raw.loftee.all[wanted.snps]
+  snps.with.carriers.tmp <- names(colSums(raw.wanted, na.rm = T))[colSums(raw.wanted, na.rm = T) > 0]
+  if(length(snps.with.carriers.tmp) == 0){
+    next
+  }
+  raw.wanted <- raw.wanted[snps.with.carriers.tmp]
+  snps.with.carriers.loftee.all <- c(snps.with.carriers.loftee.all, snps.with.carriers.tmp)
+  carriers.tmp <- setNames(as.data.frame(rownames(raw.wanted)), "IID")
+  carriers.tmp$carrier <- ifelse(rowSums(raw.wanted[grepl("chr", colnames(raw.wanted))], na.rm = T) > 0, 1, 0)
+  carriers.loftee.all[wanted.gene] <- carriers.tmp$carrier[match(carriers.loftee.all$IID, carriers.tmp$IID)]
+}
+
+length(snps.with.carriers.loftee.all)
+## 5
+# carriers.loftee.all$All_Genes <- ifelse(rowSums(carriers.loftee.all[ , -1], na.rm = TRUE) > 0, 1, 0)
 
 #################################
 ## 3.a Extract snpeff European ##
@@ -396,11 +472,50 @@ length(snps.with.carriers.snpeff.afr)
 # carriers.snpeff.afr$All_Genes <- ifelse(rowSums(carriers.snpeff.afr[ , -1], na.rm = TRUE) > 0, 1, 0)
 
 
+##############################
+## 3.c Extract snpeff Other ##
+##############################
+raw.snpeff.all <- raw.all[which(colnames(raw.all) %in% snpeff.all$SNP)]
+snpeff.all <- snpeff.all[snpeff.all$SNP %in% colnames(raw.all),]
+
+genes <- unique(snpeff.all$new_GENE.snpeff)
+carriers.snpeff.all <- setNames(as.data.frame(rownames(raw.all)), "IID")
+snps.with.carriers.snpeff.all <- c()
+
+## Status per gene
+for (i in 1:length(genes)){
+  wanted.gene <- genes[i]
+  print(paste0("Doing gene ", wanted.gene))
+  wanted.snps <- unique(snpeff.all$SNP[snpeff.all$new_GENE.snpeff == wanted.gene])
+  raw.wanted <- raw.snpeff.all[wanted.snps]
+  snps.with.carriers.tmp <- names(colSums(raw.wanted, na.rm = T))[colSums(raw.wanted, na.rm = T) > 0]
+  if(length(snps.with.carriers.tmp) == 0){
+    next
+  }
+  raw.wanted <- raw.wanted[snps.with.carriers.tmp]
+  snps.with.carriers.snpeff.all <- c(snps.with.carriers.snpeff.all, snps.with.carriers.tmp)
+  carriers.tmp <- setNames(as.data.frame(rownames(raw.wanted)), "IID")
+  carriers.tmp$carrier <- ifelse(rowSums(raw.wanted[grepl("chr", colnames(raw.wanted))], na.rm = T) > 0, 1, 0)
+  carriers.snpeff.all[wanted.gene] <- carriers.tmp$carrier[match(carriers.snpeff.all$IID, carriers.tmp$IID)]
+}
+
+length(snps.with.carriers.snpeff.all)
+# 15
+# carriers.snpeff.all$All_Genes <- ifelse(rowSums(carriers.snpeff.all[ , -1], na.rm = TRUE) > 0, 1, 0)
+
+
 # Save each object as an RDS file in the specified path
 saveRDS(carriers.clinvar.eur, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_Shekari_etal_POI_genetics_carriers_clinvar_gnomAD_eur_AR_as_heterozygous.rds")
 saveRDS(carriers.clinvar.afr, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_Shekari_etal_POI_genetics_carriers_clinvar_gnomAD_afr_AR_as_heterozygous.rds")
+saveRDS(carriers.clinvar.all, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_Shekari_etal_POI_genetics_carriers_clinvar_gnomAD_other_AR_as_heterozygous.rds")
+
+
 saveRDS(carriers.loftee.eur, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_Shekari_etal_POI_genetics_carriers_loftee_gnomAD_eur_AR_as_heterozygous.rds")
 saveRDS(carriers.loftee.afr, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_Shekari_etal_POI_genetics_carriers_loftee_gnomAD_afr_AR_as_heterozygous.rds")
+saveRDS(carriers.loftee.all, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_Shekari_etal_POI_genetics_carriers_loftee_gnomAD_other_AR_as_heterozygous.rds")
+
+
 saveRDS(carriers.snpeff.eur, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_Shekari_etal_POI_genetics_carriers_snpeff_gnomAD_eur_AR_as_heterozygous.rds")
 saveRDS(carriers.snpeff.afr, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_Shekari_etal_POI_genetics_carriers_snpeff_gnomAD_afr_AR_as_heterozygous.rds")
+saveRDS(carriers.snpeff.all, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/POI_genetics/Ke_Shekari_etal_POI_genetics_carriers_snpeff_gnomAD_other_AR_as_heterozygous.rds")
 

@@ -173,12 +173,12 @@ length(unique(kim_data.csg60$`Gene Name`))
 # kim_ST1.csg60 <- gene_regions[gene_regions$external_gene_name %in% kim_ST1.csg60$Gene.Name,]
 # kim_ST1.csg60.clinvar.all <- extract_variants(kim_ST1.csg60, clinvar.all)
 
-kim_ST1.csg60.clinvar.eur <- clinvar.eur[clinvar.eur$ANN....GENE %in% kim_ST1.csg60$Gene.Name,]
-dim(kim_ST1.csg60.clinvar.eur)
+kim_ST1.csg60.clinvar.all <- clinvar.all[clinvar.all$ANN....GENE %in% kim_ST1.csg60$Gene.Name,]
+dim(kim_ST1.csg60.clinvar.all)
 # [1] 177 217
-length(unique(kim_ST1.csg60.clinvar.eur$ANN....GENE))
+length(unique(kim_ST1.csg60.clinvar.all$ANN....GENE))
 # 34
-kim_ST1.csg60.clinvar.eur$KEY <- paste0(kim_ST1.csg60.clinvar.eur$CHROM, ":", kim_ST1.csg60.clinvar.eur$POS)
+kim_ST1.csg60.clinvar.all$KEY <- paste0(kim_ST1.csg60.clinvar.all$CHROM, ":", kim_ST1.csg60.clinvar.all$POS)
 # check if they are in CSG60 vars lists
 csg.60.vars <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/rare_variants/CSG60_zhaoming/CSG_60_variants_edited.txt", header = T, sep = "\t")
 pp <- csg.60.vars
@@ -190,15 +190,15 @@ csg.60.vars <- csg.60.vars[csg.60.vars$Gene %in% kim_ST1.csg60$Gene.Name,]
 
 csg.60.vars$KEY <- paste0("chr",csg.60.vars$CHROM, ":", csg.60.vars$POS_GRCh38)
 
-sum(csg.60.vars$KEY %in% kim_ST1.csg60.clinvar.eur$KEY)
+sum(csg.60.vars$KEY %in% kim_ST1.csg60.clinvar.all$KEY)
 ## 47/ 166
 length(unique(csg.60.vars$Gene))
 ## 31
-length(unique(kim_ST1.csg60.clinvar.eur$SNP))
+length(unique(kim_ST1.csg60.clinvar.all$SNP))
 # 177
-length(unique(kim_ST1.csg60.clinvar.eur$ANN....GENE))
+length(unique(kim_ST1.csg60.clinvar.all$ANN....GENE))
 ## 34 genes
-sum(unique(csg.60.vars$Gene) %in% unique(kim_ST1.csg60.clinvar.eur$ANN....GENE))
+sum(unique(csg.60.vars$Gene) %in% unique(kim_ST1.csg60.clinvar.all$ANN....GENE))
 ## 26
 
 csg.60.vars$duplicated <- ifelse(duplicated(csg.60.vars$KEY), "yes", "no")
@@ -207,7 +207,7 @@ csg.60.vars$SNP <- paste0(csg.60.vars$KEY, ":", csg.60.vars$REF, ":", csg.60.var
 length(unique(csg.60.vars$SNP))
 ## 148
 csg.60.vars.unique <- csg.60.vars[!duplicated(csg.60.vars$SNP),]
-csg.60.vars.unique$matched <- kim_ST1.csg60.clinvar.eur$SNP[match(csg.60.vars.unique$KEY, kim_ST1.csg60.clinvar.eur$KEY)]
+csg.60.vars.unique$matched <- kim_ST1.csg60.clinvar.all$SNP[match(csg.60.vars.unique$KEY, kim_ST1.csg60.clinvar.all$KEY)]
 table(is.na(csg.60.vars.unique$matched))
 # FALSE  TRUE 
 # 39    109 
@@ -215,9 +215,9 @@ table(is.na(csg.60.vars.unique$matched))
 ## 34 0f 60 genes and total of 177 variants found in WES based on clinvar. 26/31 genes match based on clinvar annotation Of these, 39 variants match out of 148 variants in Kim (clinvar set) 
 # write.table(csg.60.vars.unique, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/csg.60.vars.unique.txt", row.names = F, col.names = T, quote = F, sep ="\t")
 
-kim_ST1.csg60.loftee.eur <- loftee.eur[loftee.eur$SYMBOL %in% kim_ST1.csg60$Gene.Name,]
+kim_ST1.csg60.loftee.all <- loftee.all[loftee.all$SYMBOL %in% kim_ST1.csg60$Gene.Name,]
 
-kim_ST1.csg60.snpeff.eur <- snpeff.eur[snpeff.eur$ANN....GENE %in% kim_ST1.csg60$Gene.Name,]
+kim_ST1.csg60.snpeff.all <- snpeff.all[snpeff.all$ANN....GENE %in% kim_ST1.csg60$Gene.Name,]
 
 
 # (2) Expanded list of 172 cancer susceptibility genes. Kim_ST1.txt, use
@@ -227,14 +227,14 @@ kim_ST1.csg60.snpeff.eur <- snpeff.eur[snpeff.eur$ANN....GENE %in% kim_ST1.csg60
 kim_ST1.csg172 <- kim_ST1[grepl("x", kim_ST1$CSG_172),]
 
 
-kim_ST1.csg172.clinvar.eur <- clinvar.eur[clinvar.eur$ANN....GENE %in% kim_ST1.csg172$Gene.Name,]
-dim(kim_ST1.csg172.clinvar.eur) ## These are extracted variants from matched genes
+kim_ST1.csg172.clinvar.all <- clinvar.all[clinvar.all$ANN....GENE %in% kim_ST1.csg172$Gene.Name,]
+dim(kim_ST1.csg172.clinvar.all) ## These are extracted variants from matched genes
 # [1] 473 218
 # 366 217
-length(unique(kim_ST1.csg172$Gene.Name[!kim_ST1.csg172$Gene.Name %in% kim_ST1.csg172.clinvar.eur$ANN....GENE]))
+length(unique(kim_ST1.csg172$Gene.Name[!kim_ST1.csg172$Gene.Name %in% kim_ST1.csg172.clinvar.all$ANN....GENE]))
 # 88 of 172 genes match
 # 97 of 172 genes match
-kim_ST1.csg172.clinvar.eur$KEY <- paste0(kim_ST1.csg172.clinvar.eur$CHROM, ":", kim_ST1.csg172.clinvar.eur$POS)
+kim_ST1.csg172.clinvar.all$KEY <- paste0(kim_ST1.csg172.clinvar.all$CHROM, ":", kim_ST1.csg172.clinvar.all$POS)
 ## check if they are in CSG172 vars lists
 kim_ST1.csg172.vars <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/rare_variants/kim_et_al/CS20-0146R1 Kim Supp tables1-3_010721.txt", header = T, sep = "\t")
 kim_ST1.csg172.vars <- kim_ST1.csg172.vars[grepl("Clinvar", kim_ST1.csg172.vars$Method.of.classification, ignore.case = T),]
@@ -249,19 +249,19 @@ kim_ST1.csg172.vars <- kim_ST1.csg172.vars[kim_ST1.csg172.vars$Gene.Name %in% ki
 
 kim_ST1.csg172.vars$KEY <- paste0(kim_ST1.csg172.vars$Chr, ":", kim_ST1.csg172.vars$Position)
 
-sum(kim_ST1.csg172.vars$KEY %in% kim_ST1.csg172.clinvar.eur$KEY)
+sum(kim_ST1.csg172.vars$KEY %in% kim_ST1.csg172.clinvar.all$KEY)
 ## 160/ 383
 # 212
 length(unique(kim_ST1.csg172.vars$Gene.Name))
 ## 46
 ## 46
-length(unique(kim_ST1.csg172.clinvar.eur$SNP))
+length(unique(kim_ST1.csg172.clinvar.all$SNP))
 # 473
 # 366
-length(unique(kim_ST1.csg172.clinvar.eur$ANN....GENE))
+length(unique(kim_ST1.csg172.clinvar.all$ANN....GENE))
 ## 84 genes
 ## 75 genes
-sum(unique(kim_ST1.csg172.vars$Gene.Name) %in% unique(kim_ST1.csg172.clinvar.eur$ANN....GENE))
+sum(unique(kim_ST1.csg172.vars$Gene.Name) %in% unique(kim_ST1.csg172.clinvar.all$ANN....GENE))
 ## 41
 ## 39
 kim_ST1.csg172.vars$duplicated <- ifelse(duplicated(kim_ST1.csg172.vars$KEY), "yes", "no")
@@ -270,14 +270,14 @@ kim_ST1.csg172.vars$SNP <- paste0(kim_ST1.csg172.vars$KEY, ":", kim_ST1.csg172.v
 length(unique(kim_ST1.csg172.vars$SNP))
 ## 188
 kim_ST1.csg172.vars.unique <- kim_ST1.csg172.vars[!duplicated(kim_ST1.csg172.vars$SNP),]
-kim_ST1.csg172.vars.unique$matched <- kim_ST1.csg172.clinvar.eur$SNP[match(kim_ST1.csg172.vars.unique$KEY, kim_ST1.csg172.clinvar.eur$KEY)]
+kim_ST1.csg172.vars.unique$matched <- kim_ST1.csg172.clinvar.all$SNP[match(kim_ST1.csg172.vars.unique$KEY, kim_ST1.csg172.clinvar.all$KEY)]
 table(is.na(kim_ST1.csg172.vars.unique$matched))
 # FALSE  TRUE 
 # 64   124 
 # 112 76
 ## 97 0f 172 genes and total of 366 variants found in WES based on clinvar. 39/46 genes match based on clinvar annotation Of these, 112 variants match out of 188 variants in Kim (clinvar set) 
 
-# cc <- kim_ST1.csg172.clinvar.eur
+# cc <- kim_ST1.csg172.clinvar.all
 # cc$matched <- kim_ST1.csg172.vars.unique$SNP[match(cc$KEY, kim_ST1.csg172.vars.unique$KEY)]
 # table(is.na(cc$matched))
 # gg <- cbind.data.frame(cc$SNP, cc$matched)
@@ -285,9 +285,9 @@ table(is.na(kim_ST1.csg172.vars.unique$matched))
 # write.table(gg, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/found_inSJLIFE_but_not_in_kim_ST1.csg172.vars.unique.txt", row.names = F, col.names = T, quote = F, sep ="\t")
 # write.table(kim_ST1.csg172.vars.unique, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/kim_ST1.csg172.vars.unique.txt", row.names = F, col.names = T, quote = F, sep ="\t")
 
-kim_ST1.csg172.loftee.eur <- loftee.eur[loftee.eur$SYMBOL %in% kim_ST1.csg172$Gene.Name,]
+kim_ST1.csg172.loftee.all <- loftee.all[loftee.all$SYMBOL %in% kim_ST1.csg172$Gene.Name,]
 
-kim_ST1.csg172.snpeff.eur <- snpeff.eur[snpeff.eur$ANN....GENE %in% kim_ST1.csg172$Gene.Name,]
+kim_ST1.csg172.snpeff.all <- snpeff.all[snpeff.all$ANN....GENE %in% kim_ST1.csg172$Gene.Name,]
 
 
 # (3) Literature-based list of BCC genes. See "NCI table 3" for a list of ~20
@@ -301,13 +301,13 @@ kim_ST1.csg172.snpeff.eur <- snpeff.eur[snpeff.eur$ANN....GENE %in% kim_ST1.csg1
 NCI_table3 <- unique(c("PTCH1","PTCH2","SUFU", "CYLD", "XPA","XPB", "ERCC3","XPC","XPD", "ERCC2", "XPE", "DDB2", "XPF", "ERCC4", "XPG", "ERCC5", "POLH"))
 
 
-NCI_table3.clinvar.eur <- clinvar.eur[clinvar.eur$ANN....GENE %in% NCI_table3,]
+NCI_table3.clinvar.all <- clinvar.all[clinvar.all$ANN....GENE %in% NCI_table3,]
 
 
-NCI_table3.loftee.eur <- loftee.eur[loftee.eur$SYMBOL %in% NCI_table3,]
+NCI_table3.loftee.all <- loftee.all[loftee.all$SYMBOL %in% NCI_table3,]
 
 
-NCI_table3.snpeff.eur <- snpeff.eur[snpeff.eur$ANN....GENE %in% NCI_table3,]
+NCI_table3.snpeff.all <- snpeff.all[snpeff.all$ANN....GENE %in% NCI_table3,]
 
 
 # (4) BCC gene panel genes. See "BCC_blueprint_panel.txt" for a list of genes
@@ -316,13 +316,13 @@ NCI_table3.snpeff.eur <- snpeff.eur[snpeff.eur$ANN....GENE %in% NCI_table3,]
 
 BCC.panel <- c("BAP1","BRCA1","BRCA2","CDK4","CDKN2A","DDB2","ERCC2","ERCC3","ERCC4","ERCC5","MITF","POT1","PTCH1","PTEN","SUFU","TP53","WRN","XPA","XPC")
 
-BCC.panel.clinvar.eur <- clinvar.eur[clinvar.eur$ANN....GENE %in% BCC.panel,]
+BCC.panel.clinvar.all <- clinvar.all[clinvar.all$ANN....GENE %in% BCC.panel,]
 
 
-BCC.panel.loftee.eur <- loftee.eur[loftee.eur$SYMBOL %in% BCC.panel,]
+BCC.panel.loftee.all <- loftee.all[loftee.all$SYMBOL %in% BCC.panel,]
 
 
-BCC.panel.snpeff.eur <- snpeff.eur[snpeff.eur$ANN....GENE %in% BCC.panel,]
+BCC.panel.snpeff.all <- snpeff.all[snpeff.all$ANN....GENE %in% BCC.panel,]
 
 
 # (5) ClinVar BCC-related genes. See "clinvar_result_BCC.txt". These are all
@@ -342,13 +342,13 @@ clinvar.BCC.result <- unique(c('ERCC3','XPC','LOC129936244','XPC','BAP1','CCNH',
                         'ERCC4','PALB2','TP53','ERCC2','MT-TL1'))
 
 
-clinvar.BCC.result.clinvar.eur <- clinvar.eur[clinvar.eur$ANN....GENE %in% clinvar.BCC.result,]
+clinvar.BCC.result.clinvar.all <- clinvar.all[clinvar.all$ANN....GENE %in% clinvar.BCC.result,]
 
 
-clinvar.BCC.result.loftee.eur <- loftee.eur[loftee.eur$SYMBOL %in% clinvar.BCC.result,]
+clinvar.BCC.result.loftee.all <- loftee.all[loftee.all$SYMBOL %in% clinvar.BCC.result,]
 
 
-clinvar.BCC.result.snpeff.eur <- snpeff.eur[snpeff.eur$ANN....GENE %in% clinvar.BCC.result,]
+clinvar.BCC.result.snpeff.all <- snpeff.all[snpeff.all$ANN....GENE %in% clinvar.BCC.result,]
 
 
 ########################
@@ -382,7 +382,7 @@ raw$cohort[(raw$IID %in% ccss_exp$V1)] <- "CCSS_exp"
 ## CSG60 ##
 ###########
 ## Extract variant carrier status
-col.extract <- colnames(raw)[colnames(raw) %in% kim_ST1.csg60.clinvar.eur$SNP]
+col.extract <- colnames(raw)[colnames(raw) %in% kim_ST1.csg60.clinvar.all$SNP]
 
 # check which of CSG60 variants are also in Zhaomings paper
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/1_demographics.RDATA")
@@ -426,7 +426,7 @@ df.zhaoming.vars$CLNSIG <- clinvar$CLNSIG[match(df.zhaoming.vars$SNP, clinvar$SN
 
 # write.table(df.zhaoming.vars, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/qin_zhaoming_PLP_comparison/zhaoming_PLP_comparison.txt", col.names = T, row.names = F, sep = "\t", quote = F)
 
-cc <- clinvar.eur[clinvar.eur$SNP %in% col.extract ,]
+cc <- clinvar.all[clinvar.all$SNP %in% col.extract ,]
 cc3 <- cbind.data.frame(cc$SNP, cc$AF_nfe, cc$AF_afr, cc$AF, cc$CLNSIG, cc$ANN....GENE)
 cc3 <- cbind.data.frame(cc3, df.zhaoming.vars[match(cc3$`cc$SNP`, df.zhaoming.vars$SNP),])
 
@@ -466,38 +466,38 @@ df.qin.vars$CLNSIG <- clinvar$CLNSIG[match(df.qin.vars$SNP, clinvar$SNP)]
 # write.table(df.qin.vars, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/qin_zhaoming_PLP_comparison/qin_PLP_comparison.txt", col.names = T, row.names = F, sep = "\t", quote = F)
 ###########
 
-raw$kim_ST1.csg60.clinvar.eur.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+raw$kim_ST1.csg60.clinvar.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 ## Extract variant carrier status
-col.extract <- colnames(raw)[colnames(raw) %in% kim_ST1.csg60.loftee.eur$SNP]
-raw$kim_ST1.csg60.loftee.eur.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+col.extract <- colnames(raw)[colnames(raw) %in% kim_ST1.csg60.loftee.all$SNP]
+raw$kim_ST1.csg60.loftee.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 ## Extract variant carrier status
-col.extract <- colnames(raw)[colnames(raw) %in% kim_ST1.csg60.snpeff.eur$SNP]
-raw$kim_ST1.csg60.snpeff.eur.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+col.extract <- colnames(raw)[colnames(raw) %in% kim_ST1.csg60.snpeff.all$SNP]
+raw$kim_ST1.csg60.snpeff.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 ############
 ## CSG172 ##
 ############
 
 ## Extract variant carrier status
-col.extract <- colnames(raw)[colnames(raw) %in% kim_ST1.csg172.clinvar.eur$SNP]
+col.extract <- colnames(raw)[colnames(raw) %in% kim_ST1.csg172.clinvar.all$SNP]
 # col.extract <- col.extract[!col.extract %in% c("chr3:69964940:G:A", "chr3:142555897:A:AT", "chr3:142555897:AT:A", "chr7:142750600:A:C",
 #                                                "chr7:142751920:G:C", "chr7:142751938:G:A", "chr13:20189473:C:T", "chr13:20189546:AC:A")]
 # col.extract <- col.extract[!col.extract %in% c("chr3:142555897:A:AT", "chr3:142555897:AT:A", "chr7:142751920:G:C")]
 
-raw$kim_ST1.csg172.clinvar.eur.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+raw$kim_ST1.csg172.clinvar.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 ## Extract variant carrier status
-col.extract <- colnames(raw)[colnames(raw) %in% kim_ST1.csg172.loftee.eur$SNP]
-raw$kim_ST1.csg172.loftee.eur.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+col.extract <- colnames(raw)[colnames(raw) %in% kim_ST1.csg172.loftee.all$SNP]
+raw$kim_ST1.csg172.loftee.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 ## Extract variant carrier status
-col.extract <- colnames(raw)[colnames(raw) %in% kim_ST1.csg172.snpeff.eur$SNP]
-raw$kim_ST1.csg172.snpeff.eur.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+col.extract <- colnames(raw)[colnames(raw) %in% kim_ST1.csg172.snpeff.all$SNP]
+raw$kim_ST1.csg172.snpeff.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 
-# test<-  kim_ST1.csg172.clinvar.eur[!kim_ST1.csg172.clinvar.eur$ANN....GENE %in% kim_ST1.csg60.clinvar.eur$ANN....GENE,]
+# test<-  kim_ST1.csg172.clinvar.all[!kim_ST1.csg172.clinvar.all$ANN....GENE %in% kim_ST1.csg60.clinvar.all$ANN....GENE,]
 # gg <- cbind.data.frame(test$ID, test$SNP, test$AF, test$AF_nfe, test$AF_afr, test$ANN....GENE, test$CLNSIG)
 # col.extract <- colnames(raw)[colnames(raw) %in% test$SNP]
 # pp <- raw[, c(col.extract)]
@@ -523,48 +523,48 @@ raw$kim_ST1.csg172.snpeff.eur.status <- ifelse(rowSums(raw[, c(col.extract)], na
 ################
 
 ## Extract variant carrier status
-col.extract <- colnames(raw)[colnames(raw) %in% NCI_table3.clinvar.eur$SNP]
-raw$NCI_table3.clinvar.eur.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+col.extract <- colnames(raw)[colnames(raw) %in% NCI_table3.clinvar.all$SNP]
+raw$NCI_table3.clinvar.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 ## Extract variant carrier status
-col.extract <- colnames(raw)[colnames(raw) %in% NCI_table3.loftee.eur$SNP]
-raw$NCI_table3.loftee.eur.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+col.extract <- colnames(raw)[colnames(raw) %in% NCI_table3.loftee.all$SNP]
+raw$NCI_table3.loftee.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 ## Extract variant carrier status
-col.extract <- colnames(raw)[colnames(raw) %in% NCI_table3.snpeff.eur$SNP]
-raw$NCI_table3.snpeff.eur.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+col.extract <- colnames(raw)[colnames(raw) %in% NCI_table3.snpeff.all$SNP]
+raw$NCI_table3.snpeff.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 ###############
 ## BCC.panel ##
 ###############
 
 ## Extract variant carrier status
-col.extract <- colnames(raw)[colnames(raw) %in% BCC.panel.clinvar.eur$SNP]
-raw$BCC.panel.clinvar.eur.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+col.extract <- colnames(raw)[colnames(raw) %in% BCC.panel.clinvar.all$SNP]
+raw$BCC.panel.clinvar.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 ## Extract variant carrier status
-col.extract <- colnames(raw)[colnames(raw) %in% BCC.panel.loftee.eur$SNP]
-raw$BCC.panel.loftee.eur.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+col.extract <- colnames(raw)[colnames(raw) %in% BCC.panel.loftee.all$SNP]
+raw$BCC.panel.loftee.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 ## Extract variant carrier status
-col.extract <- colnames(raw)[colnames(raw) %in% BCC.panel.snpeff.eur$SNP]
-raw$BCC.panel.snpeff.eur.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+col.extract <- colnames(raw)[colnames(raw) %in% BCC.panel.snpeff.all$SNP]
+raw$BCC.panel.snpeff.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 ########################
 ## clinvar.BCC.result ##
 ########################
 
 ## Extract variant carrier status
-col.extract <- colnames(raw)[colnames(raw) %in% clinvar.BCC.result.clinvar.eur$SNP]
-raw$clinvar.BCC.result.clinvar.eur.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+col.extract <- colnames(raw)[colnames(raw) %in% clinvar.BCC.result.clinvar.all$SNP]
+raw$clinvar.BCC.result.clinvar.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 ## Extract variant carrier status
-col.extract <- colnames(raw)[colnames(raw) %in% clinvar.BCC.result.loftee.eur$SNP]
-raw$clinvar.BCC.result.loftee.eur.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+col.extract <- colnames(raw)[colnames(raw) %in% clinvar.BCC.result.loftee.all$SNP]
+raw$clinvar.BCC.result.loftee.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 ## Extract variant carrier status
-col.extract <- colnames(raw)[colnames(raw) %in% clinvar.BCC.result.snpeff.eur$SNP]
-raw$clinvar.BCC.result.snpeff.eur.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+col.extract <- colnames(raw)[colnames(raw) %in% clinvar.BCC.result.snpeff.all$SNP]
+raw$clinvar.BCC.result.snpeff.all.status <- ifelse(rowSums(raw[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 
 
@@ -575,15 +575,15 @@ EUR <- admixture$INDIVIDUAL[admixture$ancestry =="EUR"]
 AFR <- admixture$INDIVIDUAL[admixture$ancestry =="AFR"]
 Other <- admixture$INDIVIDUAL[admixture$ancestry == "Other"]
 
-table(rownames(raw) %in% EUR)
+table(rownames(raw) %in% Other)
 # FALSE  TRUE 
-# 7761  5965
+# 13175   551
 
 raw.all <- raw
 ## Extract European data only
 # raw.eur <- raw[rownames(raw) %in% EUR,]
 # raw.afr <- raw[rownames(raw) %in% AFR,]
-raw <- raw[rownames(raw) %in% EUR,]
+raw <- raw[rownames(raw) %in% Other,]
 
 
 
@@ -600,30 +600,30 @@ carrier.status.sjlife2986 <- carrier.status.sjlife[carrier.status.sjlife$IID %in
 
 
 ## SJLIFE
-round(table(carrier.status.sjlife$kim_ST1.csg60.clinvar.eur.status)[2]/nrow(carrier.status.sjlife)*100,2)
+round(table(carrier.status.sjlife$kim_ST1.csg60.clinvar.all.status)[2]/nrow(carrier.status.sjlife)*100,2)
 # 2.89
-round(table(carrier.status.sjlife$kim_ST1.csg172.clinvar.eur.status)[2]/nrow(carrier.status.sjlife)*100,2)
+round(table(carrier.status.sjlife$kim_ST1.csg172.clinvar.all.status)[2]/nrow(carrier.status.sjlife)*100,2)
 # 9.34
-round(table(carrier.status.sjlife$BCC.panel.clinvar.eur.status)[2]/nrow(carrier.status.sjlife)*100,2) 
+round(table(carrier.status.sjlife$BCC.panel.clinvar.all.status)[2]/nrow(carrier.status.sjlife)*100,2) 
 # 2.57
-round(table(carrier.status.sjlife$clinvar.BCC.result.clinvar.eur.status)[2]/nrow(carrier.status.sjlife)*100,2)
+round(table(carrier.status.sjlife$clinvar.BCC.result.clinvar.all.status)[2]/nrow(carrier.status.sjlife)*100,2)
 # 1.94
-round(table(carrier.status.sjlife$NCI_table3.clinvar.eur.status)[2]/nrow(carrier.status.sjlife)*100,2) 
+round(table(carrier.status.sjlife$NCI_table3.clinvar.all.status)[2]/nrow(carrier.status.sjlife)*100,2) 
 # 0.9
 
 ## CCSS
-round(table(carrier.status.ccss$kim_ST1.csg60.clinvar.eur.status)[2]/nrow(carrier.status.ccss)*100,2) 
-round(table(carrier.status.ccss$kim_ST1.csg172.clinvar.eur.status)[2]/nrow(carrier.status.ccss)*100,2)
-round(table(carrier.status.ccss$BCC.panel.clinvar.eur.status)[2]/nrow(carrier.status.ccss)*100,2) 
-round(table(carrier.status.ccss$clinvar.BCC.result.clinvar.eur.status)[2]/nrow(carrier.status.ccss)*100,2) 
-round(table(carrier.status.ccss$NCI_table3.clinvar.eur.status)[2]/nrow(carrier.status.ccss)*100,2) 
+round(table(carrier.status.ccss$kim_ST1.csg60.clinvar.all.status)[2]/nrow(carrier.status.ccss)*100,2) 
+round(table(carrier.status.ccss$kim_ST1.csg172.clinvar.all.status)[2]/nrow(carrier.status.ccss)*100,2)
+round(table(carrier.status.ccss$BCC.panel.clinvar.all.status)[2]/nrow(carrier.status.ccss)*100,2) 
+round(table(carrier.status.ccss$clinvar.BCC.result.clinvar.all.status)[2]/nrow(carrier.status.ccss)*100,2) 
+round(table(carrier.status.ccss$NCI_table3.clinvar.all.status)[2]/nrow(carrier.status.ccss)*100,2) 
 
 ## SJLIFE1 (2986 samples)
-round(table(carrier.status.sjlife2986$kim_ST1.csg60.clinvar.eur.status)[2]/nrow(carrier.status.sjlife2986)*100,2) 
-round(table(carrier.status.sjlife2986$kim_ST1.csg172.clinvar.eur.status)[2]/nrow(carrier.status.sjlife2986)*100,2)
-round(table(carrier.status.sjlife2986$BCC.panel.clinvar.eur.status)[2]/nrow(carrier.status.sjlife2986)*100,2) 
-round(table(carrier.status.sjlife2986$clinvar.BCC.result.clinvar.eur.status)[2]/nrow(carrier.status.sjlife2986)*100,2) 
-round(table(carrier.status.sjlife2986$NCI_table3.clinvar.eur.status)[2]/nrow(carrier.status.sjlife2986)*100,2) 
+round(table(carrier.status.sjlife2986$kim_ST1.csg60.clinvar.all.status)[2]/nrow(carrier.status.sjlife2986)*100,2) 
+round(table(carrier.status.sjlife2986$kim_ST1.csg172.clinvar.all.status)[2]/nrow(carrier.status.sjlife2986)*100,2)
+round(table(carrier.status.sjlife2986$BCC.panel.clinvar.all.status)[2]/nrow(carrier.status.sjlife2986)*100,2) 
+round(table(carrier.status.sjlife2986$clinvar.BCC.result.clinvar.all.status)[2]/nrow(carrier.status.sjlife2986)*100,2) 
+round(table(carrier.status.sjlife2986$NCI_table3.clinvar.all.status)[2]/nrow(carrier.status.sjlife2986)*100,2) 
 
 
 # IN SJLIFE (EUR) with P/LP based on gnomAD EUR maf
@@ -636,43 +636,43 @@ round(table(carrier.status.sjlife2986$NCI_table3.clinvar.eur.status)[2]/nrow(car
 
 carrier.status
 
-# ##############################
-# ## Add PRS scores to SJLIFE ##
-# ##############################
+# # ##############################
+# # ## Add PRS scores to SJLIFE ##
+# # ##############################
+# # 
+# ST6_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/sjlife/prs_out/ST6_prs.profile", header = T)
+# PGS000356_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/sjlife/prs_out/PGS000356_prs.profile", header = T)
+# PGS000454_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/sjlife/prs_out/PGS000454_prs.profile", header = T)
+# PGS003416_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/sjlife/prs_out/PGS003416_prs.profile", header = T)
 # 
-ST6_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/sjlife/prs_out/ST6_prs.profile", header = T)
-PGS000356_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/sjlife/prs_out/PGS000356_prs.profile", header = T)
-PGS000454_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/sjlife/prs_out/PGS000454_prs.profile", header = T)
-PGS003416_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/sjlife/prs_out/PGS003416_prs.profile", header = T)
-
-SJLIFE.PRS <- cbind.data.frame(IID = ST6_prs$IID, ST6_prs=ST6_prs$SCORE, PGS000356_prs=PGS000356_prs$SCORE, PGS000454_prs=PGS000454_prs$SCORE, PGS003416_prs=PGS003416_prs$SCORE)
+# SJLIFE.PRS <- cbind.data.frame(IID = ST6_prs$IID, ST6_prs=ST6_prs$SCORE, PGS000356_prs=PGS000356_prs$SCORE, PGS000454_prs=PGS000454_prs$SCORE, PGS003416_prs=PGS003416_prs$SCORE)
+# # 
+# # 
+# # ################################
+# # ## Add PRS scores to ccss_exp ##
+# # ################################
+# # 
+# ST6_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/ccss_exp/prs_out/ST6_prs.profile", header = T)
+# PGS000356_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/ccss_exp/prs_out/PGS000356_prs.profile", header = T)
+# PGS000454_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/ccss_exp/prs_out/PGS000454_prs.profile", header = T)
+# PGS003416_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/ccss_exp/prs_out/PGS003416_prs.profile", header = T)
 # 
+# CCSS_exp.PRS <- cbind.data.frame(IID = ST6_prs$IID, ST6_prs=ST6_prs$SCORE, PGS000356_prs=PGS000356_prs$SCORE, PGS000454_prs=PGS000454_prs$SCORE, PGS003416_prs=PGS003416_prs$SCORE)
+# # 
+# # 
+# # ################################
+# # ## Add PRS scores to ccss_org ##
+# # ################################
+# # 
+# ST6_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/ccss_org/prs_out/ST6_prs.profile", header = T)
+# PGS000356_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/ccss_org/prs_out/PGS000356_prs.profile", header = T)
+# PGS000454_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/ccss_org/prs_out/PGS000454_prs.profile", header = T)
+# PGS003416_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/ccss_org/prs_out/PGS003416_prs.profile", header = T)
 # 
-# ################################
-# ## Add PRS scores to ccss_exp ##
-# ################################
-# 
-ST6_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/ccss_exp/prs_out/ST6_prs.profile", header = T)
-PGS000356_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/ccss_exp/prs_out/PGS000356_prs.profile", header = T)
-PGS000454_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/ccss_exp/prs_out/PGS000454_prs.profile", header = T)
-PGS003416_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/ccss_exp/prs_out/PGS003416_prs.profile", header = T)
-
-CCSS_exp.PRS <- cbind.data.frame(IID = ST6_prs$IID, ST6_prs=ST6_prs$SCORE, PGS000356_prs=PGS000356_prs$SCORE, PGS000454_prs=PGS000454_prs$SCORE, PGS003416_prs=PGS003416_prs$SCORE)
-# 
-# 
-# ################################
-# ## Add PRS scores to ccss_org ##
-# ################################
-# 
-ST6_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/ccss_org/prs_out/ST6_prs.profile", header = T)
-PGS000356_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/ccss_org/prs_out/PGS000356_prs.profile", header = T)
-PGS000454_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/ccss_org/prs_out/PGS000454_prs.profile", header = T)
-PGS003416_prs <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/prs/ccss_org/prs_out/PGS003416_prs.profile", header = T)
-
-CCSS_org.PRS <- cbind.data.frame(IID = ST6_prs$IID, ST6_prs=ST6_prs$SCORE, PGS000356_prs=PGS000356_prs$SCORE, PGS000454_prs=PGS000454_prs$SCORE, PGS003416_prs=PGS003416_prs$SCORE)
+# CCSS_org.PRS <- cbind.data.frame(IID = ST6_prs$IID, ST6_prs=ST6_prs$SCORE, PGS000356_prs=PGS000356_prs$SCORE, PGS000454_prs=PGS000454_prs$SCORE, PGS003416_prs=PGS003416_prs$SCORE)
 
 ## save(list = c("carrier.status", "SJLIFE.PRS", "CCSS_exp.PRS", "CCSS_org.PRS"), file = "BCC_carrier_and_PRS_v2.RData")
-save(list = c("carrier.status"), file = "BCC_carrier.EUR.RData")
+save(list = c("carrier.status"), file = "BCC_carrier.Other.RData")
 
 # load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/BCC_carrier_and_PRS_v2.EUR.RData")
 
@@ -683,8 +683,8 @@ write.table(all.genes, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common
 
 # save.image("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/BCC_rare_variants_cindy_v2.EUR.RData")
 
-BCC.prs <- rbind.data.frame(SJLIFE.PRS, CCSS_exp.PRS, CCSS_org.PRS)
-saveRDS(BCC.prs, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/BCC.prs.sjlife.ccss.org.ccss.exp.rds")
+# BCC.prs <- rbind.data.frame(SJLIFE.PRS, CCSS_exp.PRS, CCSS_org.PRS)
+# saveRDS(BCC.prs, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/BCC.prs.sjlife.ccss.org.ccss.exp.rds")
 
 ###########################################################################################################################
 
@@ -710,7 +710,6 @@ saveRDS(BCC.prs, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/commo
 ###################################
 ## 1. kim_ST1.csg172.clinvar.eur ##
 ###################################
-library(dplyr)
 # load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/BCC_rare_variants_cindy_v2.EUR.RData")
 # setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/")
 # # setwd("/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy")
@@ -736,6 +735,7 @@ all.tools.genes <- rbind.data.frame(clinvar.genes, snpeff.genes, loftee.genes)
 all.tools.genes <- all.tools.genes %>% distinct()
 
 
+library(dplyr)
 ## Make genotype 2 to 1, so we can get the frequency
 # raw.2 <- raw.2 %>%
 #   mutate_at(vars(-c(1, 2)), ~ ifelse(. == 2, 1, .)) # except first 2 columns
@@ -749,27 +749,27 @@ raw.2 <- t(raw.2)
 ## CSG 172 ##
 #############
 ## Clinvar 
-kim_ST1.csg172.clinvar.eur.raw.2 <- as.data.frame(raw.2[kim_ST1.csg172.clinvar.eur$SNP,])
-kim_ST1.csg172.clinvar.eur.raw.2$Carriers_by_variant <- rowSums(kim_ST1.csg172.clinvar.eur.raw.2, na.rm = T)
-kim_ST1.csg172.clinvar.eur.raw.2$SNP <- row.names(kim_ST1.csg172.clinvar.eur.raw.2)
-kim_ST1.csg172.clinvar.eur.raw.2 <- cbind.data.frame(SNP=kim_ST1.csg172.clinvar.eur.raw.2$SNP, Carriers_by_variant=kim_ST1.csg172.clinvar.eur.raw.2$Carriers_by_variant)
-kim_ST1.csg172.clinvar.eur.raw.2$GENE <- all.tools.genes$GENE[match(kim_ST1.csg172.clinvar.eur.raw.2$SNP, all.tools.genes$SNP)]
-kim_ST1.csg172.clinvar.eur.raw.2 <- kim_ST1.csg172.clinvar.eur.raw.2 %>%
+kim_ST1.csg172.clinvar.all.raw.2 <- as.data.frame(raw.2[kim_ST1.csg172.clinvar.all$SNP,])
+kim_ST1.csg172.clinvar.all.raw.2$Carriers_by_variant <- rowSums(kim_ST1.csg172.clinvar.all.raw.2, na.rm = T)
+kim_ST1.csg172.clinvar.all.raw.2$SNP <- row.names(kim_ST1.csg172.clinvar.all.raw.2)
+kim_ST1.csg172.clinvar.all.raw.2 <- cbind.data.frame(SNP=kim_ST1.csg172.clinvar.all.raw.2$SNP, Carriers_by_variant=kim_ST1.csg172.clinvar.all.raw.2$Carriers_by_variant)
+kim_ST1.csg172.clinvar.all.raw.2$GENE <- all.tools.genes$GENE[match(kim_ST1.csg172.clinvar.all.raw.2$SNP, all.tools.genes$SNP)]
+kim_ST1.csg172.clinvar.all.raw.2 <- kim_ST1.csg172.clinvar.all.raw.2 %>%
   group_by(GENE) %>%
   mutate(variants_n = n())
 
-# kim_ST1.csg172.clinvar.eur.raw.2 <- kim_ST1.csg172.clinvar.eur.raw.2[kim_ST1.csg172.clinvar.eur.raw.2$Carriers_by_variant != 0,]
+# kim_ST1.csg172.clinvar.all.raw.2 <- kim_ST1.csg172.clinvar.all.raw.2[kim_ST1.csg172.clinvar.all.raw.2$Carriers_by_variant != 0,]
 
-write.table(kim_ST1.csg172.clinvar.eur.raw.2, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/kim_ST1.csg172.clinvar.eur.raw.2.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+write.table(kim_ST1.csg172.clinvar.all.raw.2, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/kim_ST1.csg172.clinvar.all.raw.2.txt", row.names = F, col.names = T, quote = F, sep = "\t")
 
-kim_ST1.csg172.clinvar.eur.raw.2_summary <- kim_ST1.csg172.clinvar.eur.raw.2 %>%
+kim_ST1.csg172.clinvar.all.raw.2_summary <- kim_ST1.csg172.clinvar.all.raw.2 %>%
   group_by(GENE) %>%
   summarize(
     total_carriers = sum(Carriers_by_variant),
     total_variants = first(variants_n)
   )
 
-write.table(kim_ST1.csg172.clinvar.eur.raw.2_summary, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/kim_ST1.csg172.clinvar.eur.raw.2_summary.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+write.table(kim_ST1.csg172.clinvar.all.raw.2_summary, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/kim_ST1.csg172.clinvar.all.raw.2_summary.txt", row.names = F, col.names = T, quote = F, sep = "\t")
 
 
 ## Check for discrepancy in prevalence between SJLIFE and 
@@ -779,126 +779,126 @@ kim_ST1.csg172.vars
 
 
 ## loftee 
-kim_ST1.csg172.loftee.eur.raw.2 <- as.data.frame(raw.2[kim_ST1.csg172.loftee.eur$SNP,])
-kim_ST1.csg172.loftee.eur.raw.2$Carriers_by_variant <- rowSums(kim_ST1.csg172.loftee.eur.raw.2, na.rm = T)
-kim_ST1.csg172.loftee.eur.raw.2$SNP <- row.names(kim_ST1.csg172.loftee.eur.raw.2)
-kim_ST1.csg172.loftee.eur.raw.2 <- cbind.data.frame(SNP=kim_ST1.csg172.loftee.eur.raw.2$SNP, Carriers_by_variant=kim_ST1.csg172.loftee.eur.raw.2$Carriers_by_variant)
-kim_ST1.csg172.loftee.eur.raw.2$GENE <- all.tools.genes$GENE[match(kim_ST1.csg172.loftee.eur.raw.2$SNP, all.tools.genes$SNP)]
-kim_ST1.csg172.loftee.eur.raw.2 <- kim_ST1.csg172.loftee.eur.raw.2 %>%
+kim_ST1.csg172.loftee.all.raw.2 <- as.data.frame(raw.2[kim_ST1.csg172.loftee.all$SNP,])
+kim_ST1.csg172.loftee.all.raw.2$Carriers_by_variant <- rowSums(kim_ST1.csg172.loftee.all.raw.2, na.rm = T)
+kim_ST1.csg172.loftee.all.raw.2$SNP <- row.names(kim_ST1.csg172.loftee.all.raw.2)
+kim_ST1.csg172.loftee.all.raw.2 <- cbind.data.frame(SNP=kim_ST1.csg172.loftee.all.raw.2$SNP, Carriers_by_variant=kim_ST1.csg172.loftee.all.raw.2$Carriers_by_variant)
+kim_ST1.csg172.loftee.all.raw.2$GENE <- all.tools.genes$GENE[match(kim_ST1.csg172.loftee.all.raw.2$SNP, all.tools.genes$SNP)]
+kim_ST1.csg172.loftee.all.raw.2 <- kim_ST1.csg172.loftee.all.raw.2 %>%
   group_by(GENE) %>%
   mutate(variants_n = n())
 
-# kim_ST1.csg172.loftee.eur.raw.2 <- kim_ST1.csg172.loftee.eur.raw.2[-1]
+# kim_ST1.csg172.loftee.all.raw.2 <- kim_ST1.csg172.loftee.all.raw.2[-1]
 
-write.table(kim_ST1.csg172.loftee.eur.raw.2, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/kim_ST1.csg172.loftee.eur.raw.2.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+write.table(kim_ST1.csg172.loftee.all.raw.2, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/kim_ST1.csg172.loftee.all.raw.2.txt", row.names = F, col.names = T, quote = F, sep = "\t")
 
-kim_ST1.csg172.loftee.eur.raw.2_summary <- kim_ST1.csg172.loftee.eur.raw.2 %>%
+kim_ST1.csg172.loftee.all.raw.2_summary <- kim_ST1.csg172.loftee.all.raw.2 %>%
   group_by(GENE) %>%
   summarize(
     total_carriers = sum(Carriers_by_variant),
     total_variants = first(variants_n)
   )
 
-write.table(kim_ST1.csg172.loftee.eur.raw.2_summary, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/kim_ST1.csg172.loftee.eur.raw.2_summary.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+write.table(kim_ST1.csg172.loftee.all.raw.2_summary, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/kim_ST1.csg172.loftee.all.raw.2_summary.txt", row.names = F, col.names = T, quote = F, sep = "\t")
 
 
 ## loftee or clinvar
-kim_ST1.csg172.loftee.clinvar.eur.raw.2 <- as.data.frame(raw.2[unique(c(kim_ST1.csg172.loftee.eur$SNP,kim_ST1.csg172.clinvar.eur$SNP)),])
-kim_ST1.csg172.loftee.clinvar.eur.raw.2$Carriers_by_variant <- rowSums(kim_ST1.csg172.loftee.clinvar.eur.raw.2, na.rm = T)
-kim_ST1.csg172.loftee.clinvar.eur.raw.2$SNP <- row.names(kim_ST1.csg172.loftee.clinvar.eur.raw.2)
-kim_ST1.csg172.loftee.clinvar.eur.raw.2 <- cbind.data.frame(SNP=kim_ST1.csg172.loftee.clinvar.eur.raw.2$SNP, Carriers_by_variant=kim_ST1.csg172.loftee.clinvar.eur.raw.2$Carriers_by_variant)
-kim_ST1.csg172.loftee.clinvar.eur.raw.2$GENE <- all.tools.genes$GENE[match(kim_ST1.csg172.loftee.clinvar.eur.raw.2$SNP, all.tools.genes$SNP)]
-kim_ST1.csg172.loftee.clinvar.eur.raw.2 <- kim_ST1.csg172.loftee.clinvar.eur.raw.2 %>%
+kim_ST1.csg172.loftee.clinvar.all.raw.2 <- as.data.frame(raw.2[unique(c(kim_ST1.csg172.loftee.all$SNP,kim_ST1.csg172.clinvar.all$SNP)),])
+kim_ST1.csg172.loftee.clinvar.all.raw.2$Carriers_by_variant <- rowSums(kim_ST1.csg172.loftee.clinvar.all.raw.2, na.rm = T)
+kim_ST1.csg172.loftee.clinvar.all.raw.2$SNP <- row.names(kim_ST1.csg172.loftee.clinvar.all.raw.2)
+kim_ST1.csg172.loftee.clinvar.all.raw.2 <- cbind.data.frame(SNP=kim_ST1.csg172.loftee.clinvar.all.raw.2$SNP, Carriers_by_variant=kim_ST1.csg172.loftee.clinvar.all.raw.2$Carriers_by_variant)
+kim_ST1.csg172.loftee.clinvar.all.raw.2$GENE <- all.tools.genes$GENE[match(kim_ST1.csg172.loftee.clinvar.all.raw.2$SNP, all.tools.genes$SNP)]
+kim_ST1.csg172.loftee.clinvar.all.raw.2 <- kim_ST1.csg172.loftee.clinvar.all.raw.2 %>%
   group_by(GENE) %>%
   mutate(variants_n = n())
 
-# kim_ST1.csg172.loftee.clinvar.eur.raw.2 <- kim_ST1.csg172.loftee.clinvar.eur.raw.2[-1]
+# kim_ST1.csg172.loftee.clinvar.all.raw.2 <- kim_ST1.csg172.loftee.clinvar.all.raw.2[-1]
 
-write.table(kim_ST1.csg172.loftee.clinvar.eur.raw.2, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/kim_ST1.csg172.loftee.Or.clinvar.eur.raw.2.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+write.table(kim_ST1.csg172.loftee.clinvar.all.raw.2, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/kim_ST1.csg172.loftee.Or.clinvar.all.raw.2.txt", row.names = F, col.names = T, quote = F, sep = "\t")
 
-kim_ST1.csg172.loftee.clinvar.eur.raw.2_summary <- kim_ST1.csg172.loftee.clinvar.eur.raw.2 %>%
+kim_ST1.csg172.loftee.clinvar.all.raw.2_summary <- kim_ST1.csg172.loftee.clinvar.all.raw.2 %>%
   group_by(GENE) %>%
   summarize(
     total_carriers = sum(Carriers_by_variant),
     total_variants = first(variants_n)
   )
 
-write.table(kim_ST1.csg172.loftee.clinvar.eur.raw.2_summary, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/kim_ST1.csg172.loftee.Or.clinvar.eur.raw.2_summary.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+write.table(kim_ST1.csg172.loftee.clinvar.all.raw.2_summary, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/kim_ST1.csg172.loftee.Or.clinvar.all.raw.2_summary.txt", row.names = F, col.names = T, quote = F, sep = "\t")
 
 
 ###############
 ## BCC panel ##
 ###############
 ## Clinvar 
-BCC.panel.clinvar.eur.raw.2 <- as.data.frame(raw.2[BCC.panel.clinvar.eur$SNP,])
-BCC.panel.clinvar.eur.raw.2$Carriers_by_variant <- rowSums(BCC.panel.clinvar.eur.raw.2, na.rm = T)
-BCC.panel.clinvar.eur.raw.2$SNP <- row.names(BCC.panel.clinvar.eur.raw.2)
-BCC.panel.clinvar.eur.raw.2 <- cbind.data.frame(SNP=BCC.panel.clinvar.eur.raw.2$SNP, Carriers_by_variant=BCC.panel.clinvar.eur.raw.2$Carriers_by_variant)
-BCC.panel.clinvar.eur.raw.2$GENE <- all.tools.genes$GENE[match(BCC.panel.clinvar.eur.raw.2$SNP, all.tools.genes$SNP)]
-BCC.panel.clinvar.eur.raw.2 <- BCC.panel.clinvar.eur.raw.2 %>%
+BCC.panel.clinvar.all.raw.2 <- as.data.frame(raw.2[BCC.panel.clinvar.all$SNP,])
+BCC.panel.clinvar.all.raw.2$Carriers_by_variant <- rowSums(BCC.panel.clinvar.all.raw.2, na.rm = T)
+BCC.panel.clinvar.all.raw.2$SNP <- row.names(BCC.panel.clinvar.all.raw.2)
+BCC.panel.clinvar.all.raw.2 <- cbind.data.frame(SNP=BCC.panel.clinvar.all.raw.2$SNP, Carriers_by_variant=BCC.panel.clinvar.all.raw.2$Carriers_by_variant)
+BCC.panel.clinvar.all.raw.2$GENE <- all.tools.genes$GENE[match(BCC.panel.clinvar.all.raw.2$SNP, all.tools.genes$SNP)]
+BCC.panel.clinvar.all.raw.2 <- BCC.panel.clinvar.all.raw.2 %>%
   group_by(GENE) %>%
   mutate(variants_n = n())
 
-# BCC.panel.clinvar.eur.raw.2 <- BCC.panel.clinvar.eur.raw.2[BCC.panel.clinvar.eur.raw.2$Carriers_by_variant != 0,]
+# BCC.panel.clinvar.all.raw.2 <- BCC.panel.clinvar.all.raw.2[BCC.panel.clinvar.all.raw.2$Carriers_by_variant != 0,]
 
-write.table(BCC.panel.clinvar.eur.raw.2, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/BCC.panel.clinvar.eur.raw.2.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+write.table(BCC.panel.clinvar.all.raw.2, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/BCC.panel.clinvar.all.raw.2.txt", row.names = F, col.names = T, quote = F, sep = "\t")
 
-BCC.panel.clinvar.eur.raw.2_summary <- BCC.panel.clinvar.eur.raw.2 %>%
+BCC.panel.clinvar.all.raw.2_summary <- BCC.panel.clinvar.all.raw.2 %>%
   group_by(GENE) %>%
   summarize(
     total_carriers = sum(Carriers_by_variant),
     total_variants = first(variants_n)
   )
 
-write.table(BCC.panel.clinvar.eur.raw.2_summary, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/BCC.panel.clinvar.eur.raw.2_summary.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+write.table(BCC.panel.clinvar.all.raw.2_summary, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/BCC.panel.clinvar.all.raw.2_summary.txt", row.names = F, col.names = T, quote = F, sep = "\t")
 
 
 ## loftee 
-BCC.panel.loftee.eur.raw.2 <- as.data.frame(raw.2[BCC.panel.loftee.eur$SNP,])
-BCC.panel.loftee.eur.raw.2$Carriers_by_variant <- rowSums(BCC.panel.loftee.eur.raw.2, na.rm = T)
-BCC.panel.loftee.eur.raw.2$SNP <- row.names(BCC.panel.loftee.eur.raw.2)
-BCC.panel.loftee.eur.raw.2 <- cbind.data.frame(SNP=BCC.panel.loftee.eur.raw.2$SNP, Carriers_by_variant=BCC.panel.loftee.eur.raw.2$Carriers_by_variant)
-BCC.panel.loftee.eur.raw.2$GENE <- all.tools.genes$GENE[match(BCC.panel.loftee.eur.raw.2$SNP, all.tools.genes$SNP)]
-BCC.panel.loftee.eur.raw.2 <- BCC.panel.loftee.eur.raw.2 %>%
+BCC.panel.loftee.all.raw.2 <- as.data.frame(raw.2[BCC.panel.loftee.all$SNP,])
+BCC.panel.loftee.all.raw.2$Carriers_by_variant <- rowSums(BCC.panel.loftee.all.raw.2, na.rm = T)
+BCC.panel.loftee.all.raw.2$SNP <- row.names(BCC.panel.loftee.all.raw.2)
+BCC.panel.loftee.all.raw.2 <- cbind.data.frame(SNP=BCC.panel.loftee.all.raw.2$SNP, Carriers_by_variant=BCC.panel.loftee.all.raw.2$Carriers_by_variant)
+BCC.panel.loftee.all.raw.2$GENE <- all.tools.genes$GENE[match(BCC.panel.loftee.all.raw.2$SNP, all.tools.genes$SNP)]
+BCC.panel.loftee.all.raw.2 <- BCC.panel.loftee.all.raw.2 %>%
   group_by(GENE) %>%
   mutate(variants_n = n())
 
-# BCC.panel.loftee.eur.raw.2 <- BCC.panel.loftee.eur.raw.2[-1]
+# BCC.panel.loftee.all.raw.2 <- BCC.panel.loftee.all.raw.2[-1]
 
-write.table(BCC.panel.loftee.eur.raw.2, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/BCC.panel.loftee.eur.raw.2.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+write.table(BCC.panel.loftee.all.raw.2, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/BCC.panel.loftee.all.raw.2.txt", row.names = F, col.names = T, quote = F, sep = "\t")
 
-BCC.panel.loftee.eur.raw.2_summary <- BCC.panel.loftee.eur.raw.2 %>%
+BCC.panel.loftee.all.raw.2_summary <- BCC.panel.loftee.all.raw.2 %>%
   group_by(GENE) %>%
   summarize(
     total_carriers = sum(Carriers_by_variant),
     total_variants = first(variants_n)
   )
 
-write.table(BCC.panel.loftee.eur.raw.2_summary, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/BCC.panel.loftee.eur.raw.2_summary.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+write.table(BCC.panel.loftee.all.raw.2_summary, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/BCC.panel.loftee.all.raw.2_summary.txt", row.names = F, col.names = T, quote = F, sep = "\t")
 
 
 ## loftee or clinvar
-BCC.panel.loftee.clinvar.eur.raw.2 <- as.data.frame(raw.2[unique(c(BCC.panel.loftee.eur$SNP,BCC.panel.clinvar.eur$SNP)),])
-BCC.panel.loftee.clinvar.eur.raw.2$Carriers_by_variant <- rowSums(BCC.panel.loftee.clinvar.eur.raw.2, na.rm = T)
-BCC.panel.loftee.clinvar.eur.raw.2$SNP <- row.names(BCC.panel.loftee.clinvar.eur.raw.2)
-BCC.panel.loftee.clinvar.eur.raw.2 <- cbind.data.frame(SNP=BCC.panel.loftee.clinvar.eur.raw.2$SNP, Carriers_by_variant=BCC.panel.loftee.clinvar.eur.raw.2$Carriers_by_variant)
-BCC.panel.loftee.clinvar.eur.raw.2$GENE <- all.tools.genes$GENE[match(BCC.panel.loftee.clinvar.eur.raw.2$SNP, all.tools.genes$SNP)]
-BCC.panel.loftee.clinvar.eur.raw.2 <- BCC.panel.loftee.clinvar.eur.raw.2 %>%
+BCC.panel.loftee.clinvar.all.raw.2 <- as.data.frame(raw.2[unique(c(BCC.panel.loftee.all$SNP,BCC.panel.clinvar.all$SNP)),])
+BCC.panel.loftee.clinvar.all.raw.2$Carriers_by_variant <- rowSums(BCC.panel.loftee.clinvar.all.raw.2, na.rm = T)
+BCC.panel.loftee.clinvar.all.raw.2$SNP <- row.names(BCC.panel.loftee.clinvar.all.raw.2)
+BCC.panel.loftee.clinvar.all.raw.2 <- cbind.data.frame(SNP=BCC.panel.loftee.clinvar.all.raw.2$SNP, Carriers_by_variant=BCC.panel.loftee.clinvar.all.raw.2$Carriers_by_variant)
+BCC.panel.loftee.clinvar.all.raw.2$GENE <- all.tools.genes$GENE[match(BCC.panel.loftee.clinvar.all.raw.2$SNP, all.tools.genes$SNP)]
+BCC.panel.loftee.clinvar.all.raw.2 <- BCC.panel.loftee.clinvar.all.raw.2 %>%
   group_by(GENE) %>%
   mutate(variants_n = n())
 
-# BCC.panel.loftee.clinvar.eur.raw.2 <- BCC.panel.loftee.clinvar.eur.raw.2[-1]
+# BCC.panel.loftee.clinvar.all.raw.2 <- BCC.panel.loftee.clinvar.all.raw.2[-1]
 
-write.table(BCC.panel.loftee.clinvar.eur.raw.2, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/BCC.panel.loftee.Or.clinvar.eur.raw.2.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+write.table(BCC.panel.loftee.clinvar.all.raw.2, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/BCC.panel.loftee.Or.clinvar.all.raw.2.txt", row.names = F, col.names = T, quote = F, sep = "\t")
 
-BCC.panel.loftee.clinvar.eur.raw.2_summary <- BCC.panel.loftee.clinvar.eur.raw.2 %>%
+BCC.panel.loftee.clinvar.all.raw.2_summary <- BCC.panel.loftee.clinvar.all.raw.2 %>%
   group_by(GENE) %>%
   summarize(
     total_carriers = sum(Carriers_by_variant),
     total_variants = first(variants_n)
   )
 
-write.table(BCC.panel.loftee.clinvar.eur.raw.2_summary, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/BCC.panel.loftee.Or.clinvar.eur.raw.2_summary.txt", row.names = F, col.names = T, quote = F, sep = "\t")
+write.table(BCC.panel.loftee.clinvar.all.raw.2_summary, "/research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/BCC/files_shared_by_cindy/analysis3/BCC.panel.loftee.Or.clinvar.all.raw.2_summary.txt", row.names = F, col.names = T, quote = F, sep = "\t")
 
 
 
@@ -923,17 +923,17 @@ raw.3 <- raw.3[-c(1:2)]
 #############
 ## Clinvar ##
 #############
-col.extract <- colnames(raw.3)[colnames(raw.3) %in% kim_ST1.csg172.clinvar.eur$SNP]
+col.extract <- colnames(raw.3)[colnames(raw.3) %in% kim_ST1.csg172.clinvar.all$SNP]
 
 
 # 1. first check with unknown as AR
 kim_ST1.csg172.AR.unknown.clinvar <- kim_ST1.csg172[!grepl("^dominant$", kim_ST1.csg172$Mode.of.Inheritance),]
-kim_ST1.csg172.AR.unknown.clinvar.var <- kim_ST1.csg172.clinvar.eur$SNP[kim_ST1.csg172.clinvar.eur$ANN....GENE %in% kim_ST1.csg172.AR.unknown.clinvar$Gene.Name]
+kim_ST1.csg172.AR.unknown.clinvar.var <- kim_ST1.csg172.clinvar.all$SNP[kim_ST1.csg172.clinvar.all$ANN....GENE %in% kim_ST1.csg172.AR.unknown.clinvar$Gene.Name]
 
 
 # 2. then unknown as AD
 kim_ST1.csg172.AR.clinvar <- kim_ST1.csg172[!grepl("^dominant$|unknown", kim_ST1.csg172$Mode.of.Inheritance),]
-kim_ST1.csg172.AR.clinvar.var <- kim_ST1.csg172.clinvar.eur$SNP[kim_ST1.csg172.clinvar.eur$ANN....GENE %in% kim_ST1.csg172.AR.clinvar$Gene.Name]
+kim_ST1.csg172.AR.clinvar.var <- kim_ST1.csg172.clinvar.all$SNP[kim_ST1.csg172.clinvar.all$ANN....GENE %in% kim_ST1.csg172.AR.clinvar$Gene.Name]
 
 
 # Unknown as AR
@@ -943,7 +943,7 @@ sum(raw.4.AR.unknown.as.recessive.clinvar[,kim_ST1.csg172.AR.unknown.clinvar.var
 # 183
 
 raw.4.AR.unknown.as.recessive.clinvar[,kim_ST1.csg172.AR.unknown.clinvar.var] <- replace(raw.4.AR.unknown.as.recessive.clinvar[, kim_ST1.csg172.AR.unknown.clinvar.var], raw.4.AR.unknown.as.recessive.clinvar[, kim_ST1.csg172.AR.unknown.clinvar.var] == 1, 0)
-raw.4.AR.unknown.as.recessive.clinvar$kim_ST1.csg172.clinvar.eur.status <- ifelse(rowSums(raw.4.AR.unknown.as.recessive.clinvar[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+raw.4.AR.unknown.as.recessive.clinvar$kim_ST1.csg172.clinvar.all.status <- ifelse(rowSums(raw.4.AR.unknown.as.recessive.clinvar[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 # Unknown as AD
 raw.4.AR.only.as.recessive.clinvar <- raw.3[, c(col.extract)]
@@ -952,23 +952,23 @@ sum(raw.4.AR.only.as.recessive.clinvar[,kim_ST1.csg172.AR.clinvar.var] == 1, na.
 # 173
 
 raw.4.AR.only.as.recessive.clinvar[,kim_ST1.csg172.AR.clinvar.var] <- replace(raw.4.AR.only.as.recessive.clinvar[, kim_ST1.csg172.AR.clinvar.var], raw.4.AR.only.as.recessive.clinvar[, kim_ST1.csg172.AR.clinvar.var] == 1, 0)
-raw.4.AR.only.as.recessive.clinvar$kim_ST1.csg172.clinvar.eur.status <- ifelse(rowSums(raw.4.AR.only.as.recessive.clinvar[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+raw.4.AR.only.as.recessive.clinvar$kim_ST1.csg172.clinvar.all.status <- ifelse(rowSums(raw.4.AR.only.as.recessive.clinvar[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 ############
 ## Loftee ##
 ############
 ## Extract variant carrier status
-col.extract <- colnames(raw.3)[colnames(raw.3) %in% kim_ST1.csg172.loftee.eur$SNP]
+col.extract <- colnames(raw.3)[colnames(raw.3) %in% kim_ST1.csg172.loftee.all$SNP]
 
 
 # 1. first check with unknown as AR
 kim_ST1.csg172.AR.unknown.loftee <- kim_ST1.csg172[!grepl("^dominant$", kim_ST1.csg172$Mode.of.Inheritance),]
-kim_ST1.csg172.AR.unknown.loftee.var <- kim_ST1.csg172.loftee.eur$SNP[kim_ST1.csg172.loftee.eur$SYMBOL %in% kim_ST1.csg172.AR.unknown.loftee$Gene.Name]
+kim_ST1.csg172.AR.unknown.loftee.var <- kim_ST1.csg172.loftee.all$SNP[kim_ST1.csg172.loftee.all$SYMBOL %in% kim_ST1.csg172.AR.unknown.loftee$Gene.Name]
 
 
 # 2. then unknown as AD
 kim_ST1.csg172.AR.loftee <- kim_ST1.csg172[!grepl("^dominant$|unknown", kim_ST1.csg172$Mode.of.Inheritance),]
-kim_ST1.csg172.AR.loftee.var <- kim_ST1.csg172.loftee.eur$SNP[kim_ST1.csg172.loftee.eur$SYMBOL %in% kim_ST1.csg172.AR.loftee$Gene.Name]
+kim_ST1.csg172.AR.loftee.var <- kim_ST1.csg172.loftee.all$SNP[kim_ST1.csg172.loftee.all$SYMBOL %in% kim_ST1.csg172.AR.loftee$Gene.Name]
 
 # Unknown as AR
 raw.4.AR.unknown.as.recessive.loftee <- raw.3[, c(col.extract)]
@@ -977,7 +977,7 @@ sum(raw.4.AR.unknown.as.recessive.loftee[,kim_ST1.csg172.AR.unknown.loftee.var] 
 # 258
 
 raw.4.AR.unknown.as.recessive.loftee[,kim_ST1.csg172.AR.unknown.loftee.var] <- replace(raw.4.AR.unknown.as.recessive.loftee[, kim_ST1.csg172.AR.unknown.loftee.var], raw.4.AR.unknown.as.recessive.loftee[, kim_ST1.csg172.AR.unknown.loftee.var] == 1, 0)
-raw.4.AR.unknown.as.recessive.loftee$kim_ST1.csg172.loftee.eur.status <- ifelse(rowSums(raw.4.AR.unknown.as.recessive.loftee[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+raw.4.AR.unknown.as.recessive.loftee$kim_ST1.csg172.loftee.all.status <- ifelse(rowSums(raw.4.AR.unknown.as.recessive.loftee[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 # Unknown as AD
 raw.4.AR.only.as.recessive.loftee <- raw.3[, c(col.extract)]
@@ -986,22 +986,22 @@ sum(raw.4.AR.only.as.recessive.loftee[,kim_ST1.csg172.AR.loftee.var] == 1, na.rm
 # 242
 
 raw.4.AR.only.as.recessive.loftee[,kim_ST1.csg172.AR.loftee.var] <- replace(raw.4.AR.only.as.recessive.loftee[, kim_ST1.csg172.AR.loftee.var], raw.4.AR.only.as.recessive.loftee[, kim_ST1.csg172.AR.loftee.var] == 1, 0)
-raw.4.AR.only.as.recessive.loftee$kim_ST1.csg172.loftee.eur.status <- ifelse(rowSums(raw.4.AR.only.as.recessive.loftee[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+raw.4.AR.only.as.recessive.loftee$kim_ST1.csg172.loftee.all.status <- ifelse(rowSums(raw.4.AR.only.as.recessive.loftee[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 ############
 ## snpeff ##
 ############
 
-col.extract <- colnames(raw.3)[colnames(raw.3) %in% kim_ST1.csg172.snpeff.eur$SNP]
+col.extract <- colnames(raw.3)[colnames(raw.3) %in% kim_ST1.csg172.snpeff.all$SNP]
 
 # 1. first check with unknown as AR
 kim_ST1.csg172.AR.unknown.snpeff <- kim_ST1.csg172[!grepl("^dominant$", kim_ST1.csg172$Mode.of.Inheritance),]
-kim_ST1.csg172.AR.unknown.snpeff.var <- kim_ST1.csg172.snpeff.eur$SNP[kim_ST1.csg172.snpeff.eur$ANN....GENE %in% kim_ST1.csg172.AR.unknown.snpeff$Gene.Name]
+kim_ST1.csg172.AR.unknown.snpeff.var <- kim_ST1.csg172.snpeff.all$SNP[kim_ST1.csg172.snpeff.all$ANN....GENE %in% kim_ST1.csg172.AR.unknown.snpeff$Gene.Name]
 
 
 # 2. then unknown as AD
 kim_ST1.csg172.AR.snpeff <- kim_ST1.csg172[!grepl("^dominant$|unknown", kim_ST1.csg172$Mode.of.Inheritance),]
-kim_ST1.csg172.AR.snpeff.var <- kim_ST1.csg172.snpeff.eur$SNP[kim_ST1.csg172.snpeff.eur$ANN....GENE %in% kim_ST1.csg172.AR.snpeff$Gene.Name]
+kim_ST1.csg172.AR.snpeff.var <- kim_ST1.csg172.snpeff.all$SNP[kim_ST1.csg172.snpeff.all$ANN....GENE %in% kim_ST1.csg172.AR.snpeff$Gene.Name]
 
 # Unknown as AR
 raw.4.AR.unknown.as.recessive.snpeff <- raw.3[, c(col.extract)]
@@ -1010,7 +1010,7 @@ sum(raw.4.AR.unknown.as.recessive.snpeff[,kim_ST1.csg172.AR.unknown.snpeff.var] 
 # 121
 
 raw.4.AR.unknown.as.recessive.snpeff[,kim_ST1.csg172.AR.unknown.snpeff.var] <- replace(raw.4.AR.unknown.as.recessive.snpeff[, kim_ST1.csg172.AR.unknown.snpeff.var], raw.4.AR.unknown.as.recessive.snpeff[, kim_ST1.csg172.AR.unknown.snpeff.var] == 1, 0)
-raw.4.AR.unknown.as.recessive.snpeff$kim_ST1.csg172.snpeff.eur.status <- ifelse(rowSums(raw.4.AR.unknown.as.recessive.snpeff[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+raw.4.AR.unknown.as.recessive.snpeff$kim_ST1.csg172.snpeff.all.status <- ifelse(rowSums(raw.4.AR.unknown.as.recessive.snpeff[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 # Unknown as AD
 raw.4.AR.only.as.recessive.snpeff <- raw.3[, c(col.extract)]
@@ -1019,17 +1019,16 @@ sum(raw.4.AR.only.as.recessive.snpeff[,kim_ST1.csg172.AR.snpeff.var] == 1, na.rm
 # 109
 
 raw.4.AR.only.as.recessive.snpeff[,kim_ST1.csg172.AR.snpeff.var] <- replace(raw.4.AR.only.as.recessive.snpeff[, kim_ST1.csg172.AR.snpeff.var], raw.4.AR.only.as.recessive.snpeff[, kim_ST1.csg172.AR.snpeff.var] == 1, 0)
-raw.4.AR.only.as.recessive.snpeff$kim_ST1.csg172.snpeff.eur.status <- ifelse(rowSums(raw.4.AR.only.as.recessive.snpeff[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
+raw.4.AR.only.as.recessive.snpeff$kim_ST1.csg172.snpeff.all.status <- ifelse(rowSums(raw.4.AR.only.as.recessive.snpeff[, c(col.extract)], na.rm = T)> 0, "Yes", "No")
 
 
 
 
-carrier_status_unknown.as.AR <- cbind.data.frame(IID = rownames(raw.4.AR.unknown.as.recessive.clinvar), kim_ST1.csg172.clinvar.eur.status= raw.4.AR.unknown.as.recessive.clinvar$kim_ST1.csg172.clinvar.eur.status, kim_ST1.csg172.loftee.eur.status= raw.4.AR.unknown.as.recessive.loftee$kim_ST1.csg172.loftee.eur.status, kim_ST1.csg172.snpeff.eur.status = raw.4.AR.unknown.as.recessive.snpeff$kim_ST1.csg172.snpeff.eur.status)
-carrier_status_unknown.as.AD <- cbind.data.frame(IID = rownames(raw.4.AR.only.as.recessive.clinvar), kim_ST1.csg172.clinvar.eur.status= raw.4.AR.only.as.recessive.clinvar$kim_ST1.csg172.clinvar.eur.status, kim_ST1.csg172.loftee.eur.status= raw.4.AR.only.as.recessive.loftee$kim_ST1.csg172.loftee.eur.status, kim_ST1.csg172.snpeff.eur.status = raw.4.AR.only.as.recessive.snpeff$kim_ST1.csg172.snpeff.eur.status)
-
+carrier_status_unknown.as.AR <- cbind.data.frame(IID = rownames(raw.4.AR.unknown.as.recessive.clinvar), kim_ST1.csg172.clinvar.all.status= raw.4.AR.unknown.as.recessive.clinvar$kim_ST1.csg172.clinvar.all.status, kim_ST1.csg172.loftee.all.status= raw.4.AR.unknown.as.recessive.loftee$kim_ST1.csg172.loftee.all.status, kim_ST1.csg172.snpeff.all.status = raw.4.AR.unknown.as.recessive.snpeff$kim_ST1.csg172.snpeff.all.status)
+carrier_status_unknown.as.AD <- cbind.data.frame(IID = rownames(raw.4.AR.only.as.recessive.clinvar), kim_ST1.csg172.clinvar.all.status= raw.4.AR.only.as.recessive.clinvar$kim_ST1.csg172.clinvar.all.status, kim_ST1.csg172.loftee.all.status= raw.4.AR.only.as.recessive.loftee$kim_ST1.csg172.loftee.all.status, kim_ST1.csg172.snpeff.all.status = raw.4.AR.only.as.recessive.snpeff$kim_ST1.csg172.snpeff.all.status)
 
 # This is when treating AR gene geneotypes with 2 as carriers. I have Unknown treated as AR and AD both.
-save(list = c("carrier_status_unknown.as.AR", "carrier_status_unknown.as.AD"), file = "CSG172_carrier_updated_for_AR_genes_with_both_copies_of_PLP_EUR.RData")
+save(list = c("carrier_status_unknown.as.AR", "carrier_status_unknown.as.AD"), file = "CSG172_carrier_updated_for_AR_genes_with_both_copies_of_PLP_Other.RData")
 
 
 # # install.packages("biomaRt")
