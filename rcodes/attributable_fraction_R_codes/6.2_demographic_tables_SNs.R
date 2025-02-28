@@ -2356,6 +2356,18 @@ df <- cbind(df.sjlife, df.ccss)
 #########################
 ## Age at last contact ##
 #########################
+toyadav<- read_sas("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/Data_from_Qi_Liu/toyadav.sas7bdat")
+toyadav$age_at_last_contact <- as.numeric(difftime(toyadav$lstcondt, toyadav$dob, units = "days")) / 365.25
+toyadav$SNdt <- as.numeric(toyadav$diagdt - toyadav$dob) / 365.25
+
+cc <- cbind.data.frame(sjlid=toyadav$sjlid, sndx=toyadav$sndx, agedx=toyadav$agedx, d_entry=toyadav$d_entry, sn=toyadav$sn, agefup = toyadav$agefup, ageend=toyadav$ageend, age_at_last_contact=toyadav$age_at_last_contact, age.at.SN=toyadav$SNdt, dob=toyadav$dob, lstcondt=toyadav$lstcondt)
+unique_sn_data <- toyadav %>%
+  select(sjlid, sndx, age_at_last_contact) %>%
+  distinct()
+median(unique_sn_data$age_at_last_contact, na.rm = TRUE)
+
+cc$agefupAN <- as.numeric(difftime(cc$lstcondt, cc$dob, units = "days")) / 365.25  # Convert to years
+
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/PHENOTYPE/")
 ccss <- readRDS("CCSS_complete_data.rds")
 
@@ -2373,6 +2385,25 @@ agelstcontact.IQR <- paste0(unname(round((quantile(ccss$agelstcontact, prob=c(.2
 agelstcontact.IQR <- gsub(" ", "-", agelstcontact.IQR)
 agelstcontact <- paste0(agelstcontact, " (", agelstcontact.IQR, ")")
 # "36.1 (29.7-43.5)"
+
+## Age at follow up
+ccss$count <- as.numeric(ccss$count)
+ccss$agelstcontact[!is.na(ccss$AGE.ANY_SN)] <- ccss$AGE.ANY_SN[!is.na(ccss$AGE.ANY_SN)]
+
+
+unique_samples <- ccss %>%
+  distinct(ccssid, .keep_all = TRUE) %>%  # Keep only unique samples based on sjlid
+  select(ccssid, agelstcontact)  # Select relevant columns
+
+# Step 2: Calculate median follow-up age and IQR
+median_agefup <- median(unique_samples$agelstcontact, na.rm = TRUE)  # Calculate median
+iqr_agefup <- IQR(unique_samples$agelstcontact, na.rm = TRUE)  # Calculate IQR
+
+# Display results
+median_agefup
+iqr_agefup
+
+
 
 ## SJLIFE
 ## Age at last contact
@@ -2396,6 +2427,237 @@ agelstcontact <- round(median(sj$agelstcontact, na.rm= T),1)
 agelstcontact.IQR <- paste0(unname(round((quantile(sj$agelstcontact, prob=c(.25,.5,.75), type=1, na.rm = T))[c(1,3)], 1)), collapse = " ")
 agelstcontact.IQR <- gsub(" ", "-", agelstcontact.IQR)
 agelstcontact <- paste0(agelstcontact, " (", agelstcontact.IQR, ")")
+
+
+
+
+
+
+
+
+# sj.cc <- cbind.data.frame(sj$sjlid, sj$agedx, sj$agelstcontact, sj$sncount, sj$agedx)
+data <- sj
+data$AGE.ANY_SN <- time_length(interval(as.Date(data$dob), as.Date(data$gradedt)), "years")
+## Age at last contact for cases is SN diagnosis data
+# data$agelstcontact[!is.na(data$AGE.ANY_SN)] <- data$AGE.ANY_SN[!is.na(data$AGE.ANY_SN)]
+data$fuyears <- data$agelstcontact - data$AGE.ANY_SN
+data$fuyears[is.na(data$fuyears)] <- data$agelstcontact[is.na(data$fuyears)]
+
+data$event <- ifelse(!is.na(data$gradedt), 1, 0)
+
+data$first <- ave(data$agelstcontact, data$sjlid, FUN = seq_along)
+M <- max(data$first, na.rm = T)  ### maximum number of events
+data[data$first==M,]$sjlid  #the id for the person with the maximum number of rows.
+data[data$sjlid==data[data$first==M,]$sjlid,]
+
+### Take the last row so we know the maximum number of events per person
+event.number <- do.call(rbind, lapply(split(data, data$sjlid), tail, 1))[,c("sjlid","first")]
+colnames(event.number) <- c("sjlid","maxE")
+
+alldata <- merge(data,event.number,by.x="sjlid",by.y="sjlid")
+
+alldata$start <- NULL
+alldata$end <- NULL
+### For those without event, start is agedx and end is Fu date === for SN, analysis starts from 5 years post DX (SNs within 5 years have been removed from the analysis)
+alldata$start[alldata$event==0] <- alldata$agedx[alldata$event==0] + 5
+### Achal: Since the analysis start from 5 years post DX, the above line has been revised to: alldata$start[alldata$event==0] <- alldata$agedx[alldata$event==0]+5
+alldata$end[alldata$event==0] <- alldata$agelstcontact[alldata$event==0] 
+
+### For the first event, start is agedx and end is first event time
+alldata$start[alldata$event==1 & alldata$first==1] <- alldata$agedx[alldata$event==1 & alldata$first==1] + 5
+### Achal: also added +5 in the above line
+alldata$end[alldata$event==1 & alldata$first==1] <- as.numeric(difftime(alldata$gradedt[alldata$event==1 & alldata$first==1],alldata$dob[alldata$event==1 & alldata$first==1], units = 'days')/365.25)
+
+#### For events that are not the first, segments are from the previous event date to this event date
+alldata$previous <- as.Date(c(NA,alldata$gradedt[1:length(alldata$gradedt)-1]),origin = "1970-01-01")
+alldata[1:10,]
+### if first>1 (i.e, 2 or more events, previous event time remained, others are missing)
+alldata$previous[alldata$first==1] <- NA
+alldata$start[alldata$first>1] <- as.numeric(difftime(alldata$previous[alldata$first>1],alldata$dob[alldata$first>1], units = 'days')/365.25)
+alldata$end[alldata$first>1] <- as.numeric(difftime(alldata$gradedt[alldata$first>1],alldata$dob[alldata$first>1], units = 'days')/365.25)
+
+
+### If one person has only 1 event, we need to have segment from agedx to event date (handled above), and then from event date to end of FU
+### If one person has multiple events, we need to add segments from the last event to end of Fu.
+row_add <- alldata[alldata$event==1 & alldata$first==alldata$maxE,] ## this includes (1) people with only 1 event (2) The last row for people with multiple events
+row_add$start <- as.numeric(difftime(row_add$gradedt, row_add$dob, units = 'days')/365.25)
+row_add$end <- row_add$agelstcontact;
+#### remember to make these rows event as 0, as we are adding the time after the last event date.
+row_add$event <- 0
+### If we do first event analysis, we would not need these. I need to add an indicator here, in case I only need to get the first event analysis segments.
+row_add$evt1 <- 0;
+
+alldata$evt1 <- 0;
+alldata$evt1[alldata$first==1] <- 1
+adata <- rbind(alldata,row_add)
+#### order by person and start date
+adata <- adata[order(adata$sjlid, adata$start, decreasing = FALSE),]
+table(adata$event)## Double check event numebr is correct
+
+###any stop time <=start time
+adata$end[adata$end<=adata$start] <- adata$end[adata$end<=adata$start] + 1/365
+any <- adata[adata$end<=adata$start,] # 
+diff=any$start-any$end 
+dim(adata)
+final <- adata[adata$end>adata$start,]
+
+# final$sjlid[duplicated(final$sjlid)]
+# cc.final <- final[, c(1,(ncol(final)-11):ncol(final))]
+# cc.data <- data[, c(1,(ncol(data)-11):ncol(data))]
+
+minimum  <-  min(final$start, na.rm = TRUE) - 1
+if (minimum < 0) minimum <- 0
+maximum  <-  max(final$end, na.rm = TRUE) + 1
+SNs_py <-  survSplit(final, cut=seq(minimum, maximum, 1), end="end",start="start",event="event") 
+table(SNs_py$event)   ## Double check event numebr is correct
+#### If you need the rows for first event analysis, take evt1=1
+length(unique(SNs_py$sjlid[SNs_py$event==1]))
+length(unique(SNs_py$sjlid[SNs_py$event==1 & SNs_py$evt1==1 ]))
+
+SNs_py$PY <- SNs_py$end-SNs_py$start
+
+sum(SNs_py$PY)
+
+pp <- data [is.na(data$sncount)| data$sncount==1,]
+
+## Attained age
+attained.age <- round(median(SNs_py$agelstcontact, na.rm= T),1)
+attained.age.IQR <- paste0(unname(round((quantile(SNs_py$agelstcontact, prob=c(.25,.5,.75), type=1, na.rm = T))[c(1,3)], 1)), collapse = " ")
+attained.age.IQR <- gsub(" ", "-", attained.age.IQR)
+attained.age <- paste0(attained.age, " (", attained.age.IQR, ")")
+# "36.2 (26.2-46.9)"
+
+
+## Follow up age
+follow.up <- round(median(data$fuyears, na.rm= T),1)
+follow.up.IQR <- paste0(unname(round((quantile(data$fuyears, prob=c(.25,.5,.75), type=1, na.rm = T))[c(1,3)], 1)), collapse = " ")
+follow.up.IQR <- gsub(" ", "-", follow.up.IQR)
+follow.up <- paste0(follow.up, " (", follow.up.IQR, ")")
+follow.up
+"24.2 (11.7-35.4)"
+
+##########
+## CCSS ##
+##########
+
+# sj.cc <- cbind.data.frame(sj$sjlid, sj$agedx, sj$agelstcontact, sj$sncount, sj$agedx)
+data <- ccss
+data$AGE.ANY_SN <- as.numeric(data$a_candx)
+
+data$gradeage <- data$gradedt
+data$gradedt <- as.Date(data$d_candx, format = "%d%b%Y")
+
+data$dob <- data$gradedt - as.numeric(data$gradeage)
+## Age at last contact for cases is SN diagnosis data
+# data$agelstcontact[!is.na(data$AGE.ANY_SN)] <- data$AGE.ANY_SN[!is.na(data$AGE.ANY_SN)]
+
+data$fuyears <- data$agelstcontact - data$AGE.ANY_SN
+data$fuyears[is.na(data$fuyears)] <- data$agelstcontact[is.na(data$fuyears)]
+
+pp <- cbind.data.frame(data$ccssid, data$fuyears, data$AGE.ANY_SN, data$agelstcontact, data$a_candx)
+
+data$event <- ifelse(!is.na(data$gradedt), 1, 0)
+
+data$first <- ave(data$agelstcontact, data$ccssid, FUN = seq_along)
+M <- max(data$first, na.rm = T)  ### maximum number of events
+data[data$first==M,]$ccssid  #the id for the person with the maximum number of rows.
+data[data$ccssid==data[data$first==M,]$ccssid,]
+
+### Take the last row so we know the maximum number of events per person
+event.number <- do.call(rbind, lapply(split(data, data$ccssid), tail, 1))[,c("ccssid","first")]
+colnames(event.number) <- c("ccssid","maxE")
+
+alldata <- merge(data,event.number,by.x="ccssid",by.y="ccssid")
+
+alldata$start <- NULL
+alldata$end <- NULL
+### For those without event, start is agedx and end is Fu date === for SN, analysis starts from 5 years post DX (SNs within 5 years have been removed from the analysis)
+alldata$start[alldata$event==0] <- alldata$agedx[alldata$event==0] + 5
+### Achal: Since the analysis start from 5 years post DX, the above line has been revised to: alldata$start[alldata$event==0] <- alldata$agedx[alldata$event==0]+5
+alldata$end[alldata$event==0] <- alldata$agelstcontact[alldata$event==0] 
+
+### For the first event, start is agedx and end is first event time
+alldata$start[alldata$event==1 & alldata$first==1] <- alldata$agedx[alldata$event==1 & alldata$first==1] + 5
+### Achal: also added +5 in the above line
+alldata$end[alldata$event==1 & alldata$first==1] <- as.numeric(difftime(alldata$gradedt[alldata$event==1 & alldata$first==1],alldata$dob[alldata$event==1 & alldata$first==1], units = 'days')/365.25)
+
+#### For events that are not the first, segments are from the previous event date to this event date
+alldata$previous <- as.Date(c(NA,alldata$gradedt[1:length(alldata$gradedt)-1]),origin = "1970-01-01")
+alldata[1:10,]
+### if first>1 (i.e, 2 or more events, previous event time remained, others are missing)
+alldata$previous[alldata$first==1] <- NA
+alldata$start[alldata$first>1] <- as.numeric(difftime(alldata$previous[alldata$first>1],alldata$dob[alldata$first>1], units = 'days')/365.25)
+alldata$end[alldata$first>1] <- as.numeric(difftime(alldata$gradedt[alldata$first>1],alldata$dob[alldata$first>1], units = 'days')/365.25)
+
+
+### If one person has only 1 event, we need to have segment from agedx to event date (handled above), and then from event date to end of FU
+### If one person has multiple events, we need to add segments from the last event to end of Fu.
+row_add <- alldata[alldata$event==1 & alldata$first==alldata$maxE,] ## this includes (1) people with only 1 event (2) The last row for people with multiple events
+row_add$start <- as.numeric(difftime(row_add$gradedt, row_add$dob, units = 'days')/365.25)
+row_add$end <- row_add$agelstcontact;
+#### remember to make these rows event as 0, as we are adding the time after the last event date.
+row_add$event <- 0
+### If we do first event analysis, we would not need these. I need to add an indicator here, in case I only need to get the first event analysis segments.
+row_add$evt1 <- 0;
+
+alldata$evt1 <- 0;
+alldata$evt1[alldata$first==1] <- 1
+adata <- rbind(alldata,row_add)
+#### order by person and start date
+adata <- adata[order(adata$ccssid, adata$start, decreasing = FALSE),]
+table(adata$event)## Double check event numebr is correct
+
+###any stop time <=start time
+adata$end[adata$end<=adata$start] <- adata$end[adata$end<=adata$start] + 1/365
+any <- adata[adata$end<=adata$start,] # 
+### 2 people had the stroke date on the Fu date. In this case, either get rid of the 2 lines [i.e, no time is follow-up after the last event date], or add 1 day on end date of these 2 segments, assuming there were followed up 1 more day. Will not make much difference. 1 day out of 365 days is 0.0027.
+diff=any$start-any$end ###Qi: These are people who had SN after the last contact date. Just wonder why this could happen. While it may not make the results differ, I wonder is there any reason to keep the events but change last contact date to be SN+1day? Depends on why there are SN after last contact date.
+dim(adata)
+final <- adata[adata$end>adata$start,]
+
+minimum  <-  min(final$start, na.rm = TRUE) - 1
+if (minimum < 0) minimum <- 0
+maximum  <-  max(final$end, na.rm = TRUE) + 1
+SNs_py <-  survSplit(final, cut=seq(minimum, maximum, 1), end="end",start="start",event="event") 
+table(SNs_py$event)   ## Double check event numebr is correct
+#### If you need the rows for first event analysis, take evt1=1
+length(unique(SNs_py$ccssid[SNs_py$event==1]))
+length(unique(SNs_py$ccssid[SNs_py$event==1 & SNs_py$evt1==1 ]))
+
+SNs_py$PY <- SNs_py$end-SNs_py$start
+sum(SNs_py$PY)
+
+
+## Attained age
+attained.age <- round(median(SNs_py$agelstcontact, na.rm= T),1)
+attained.age.IQR <- paste0(unname(round((quantile(SNs_py$agelstcontact, prob=c(.25,.5,.75), type=1, na.rm = T))[c(1,3)], 1)), collapse = " ")
+attained.age.IQR <- gsub(" ", "-", attained.age.IQR)
+attained.age <- paste0(attained.age, " (", attained.age.IQR, ")")
+attained.age
+
+
+data$count <- as.numeric(data$count)
+pp <- data [is.na(data$count)| data$count==1,]
+
+## Follow up age
+follow.up <- round(median(data$fuyears, na.rm= T),1)
+follow.up.IQR <- paste0(unname(round((quantile(data$fuyears, prob=c(.25,.5,.75), type=1, na.rm = T))[c(1,3)], 1)), collapse = " ")
+follow.up.IQR <- gsub(" ", "-", follow.up.IQR)
+follow.up <- paste0(follow.up, " (", follow.up.IQR, ")")
+follow.up
+# 28 (8.9-37.2)
+
+######
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -46,6 +46,9 @@ disease_groups <- list(cancer=cancer, cardiovascular=cardiovascular, miscellaneo
 # ACMG$inheritence[grepl("Adenomatous polyposis coli|Aortic aneurysm|Arrhythmogenic right ventricular cardiomyopathy|Breast-ovarian cancer|Brugada syndrome|Catecholaminergic|Dilated cardiomyopathy|Ehlers|Fabry|Familial hypercholesterolemia|Familial hypertrophic cardiomyopathy|Familial medullary thyroid carcinoma|Hereditary breast cancer|hemochromatosis|Hereditary hemorrhagic telangiectasia|Hereditary paraganglioma-pheochromocytoma|Hereditary transthyretin-related amyloidosis|Hypercholesterolemia|Juvenile polyposis|Li-Fraumeni syndrome|Loeys-Dietz syndrome|Long QT|Lynch|Malignant hyperthermia|Marfan|Maturity-Onset of Diabetes|Multiple endocrine neoplasia|Myofibrillar myopathy|Neurofibromatosis|Ornithine carbamoyltransferase deficiency|Paragangliomas|Peutz-Jeghers syndrome|Pheochromocytoma|PTEN hamartoma|Retinoblastoma|Tuberous sclerosis|Von Hippel-Lindau|Wilms", ACMG$group, ignore.case = T)] <- "AD"
 # ACMG$inheritence[grepl("Biotinidase deficiency|MYH-associated polyposis|Pompe disease|RPE65|Wilson disease", ACMG$group, ignore.case = T)] <- "AR"
 ACMG$inheritence <- ACMG$inheritance
+check.AR.genes <- ACMG[ACMG$inheritence == "AR",]$GENE
+check.AR.genes
+# "ATP7B" "BTD"   "CASQ2" "GAA"   "HFE"   "MUTYH" "RPE65" "TRDN"  "TRDN" 
 
 setwd("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/")
 
@@ -325,9 +328,11 @@ for (i in 1:length(genes)){
 }
 
 length(snps.with.carriers.clinvar.eur)
-# 162
+# 159
+snps.with.carriers.clinvar.eur.new <- snps.with.carriers.clinvar.eur
+# "chr1:115705208:G:A" "chr6:26091475:G:T"  "chr6:123503899:G:A" $# missing in new 
 dim(carriers.clinvar.eur)
-# [1] 6001   44
+# [1] 6001   41
 # Adding carrier status for "All_Genes"
 # Check if any gene column in carriers.clinvar.eur has carrier status (1) across all genes
 carriers.clinvar.eur$All_Genes <- ifelse(rowSums(carriers.clinvar.eur[ , -1], na.rm = TRUE) > 0, 1, 0)
@@ -1028,6 +1033,41 @@ saveRDS(carriers.snpeff.all, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Ge
 saveRDS(carriers.union.eur, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/carriers_union_eur.rds")
 saveRDS(carriers.union.afr, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/carriers_union_afr.rds")
 saveRDS(carriers.union.all, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/carriers_union_other.rds")
+
+
+
+## Missing
+## 1
+all.WES.samples <- read.table("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/WES_samples_after_Kubra.txt", header = T, sep = "\t")
+carriers.clinvar.all <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/carriers_clinvar_other.rds")
+missing.cohort <- carriers.clinvar.all[is.na(carriers.clinvar.all$cohort),]
+missing.cohort$cohort<- all.WES.samples$pop[match(missing.cohort$IID,  all.WES.samples$V4)]
+missing.cohort$cohort[missing.cohort$cohort == "Survivor"] <- "sjlife"
+missing.cohort$cohort[missing.cohort$cohort == "CCSS_exp"] <- "ccss_exp"
+
+# Find matching indices
+matched_indices <- match(carriers.clinvar.all$IID, missing.cohort$IID)
+# Identify positions where cohort is missing (NA) in carriers.clinvar.all
+missing_positions <- which(is.na(carriers.clinvar.all$cohort))
+# Only update missing values in cohort
+carriers.clinvar.all$cohort[missing_positions] <- missing.cohort$cohort[matched_indices][missing_positions]
+saveRDS(carriers.clinvar.all, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/carriers_clinvar_other.rds")
+
+## 2
+carriers.loftee.all <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/carriers_loftee_other.rds")
+carriers.loftee.all$cohort[missing_positions] <- missing.cohort$cohort[matched_indices][missing_positions]
+saveRDS(carriers.loftee.all, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/carriers_loftee_other.rds")
+
+## 3
+carriers.snpeff.all <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/carriers_snpeff_other.rds")
+carriers.snpeff.all$cohort[missing_positions] <- missing.cohort$cohort[matched_indices][missing_positions]
+saveRDS(carriers.snpeff.all, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/carriers_snpeff_other.rds")
+
+## 4
+carriers.union.all <- readRDS("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/carriers_union_other.rds")
+carriers.union.all$cohort[missing_positions] <- missing.cohort$cohort[matched_indices][missing_positions]
+saveRDS(carriers.union.all, file = "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/ACMG/carriers_union_other.rds")
+
 
 
 ## CSG60

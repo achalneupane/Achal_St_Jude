@@ -1,7 +1,7 @@
 library(data.table)
 load("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WES_rare_variant/sjlife/phenotype.RData")
 ## 1. clinvar
-clinvar <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/all_new_clinvar_P_LP.txt", header = T, sep = "\t", stringsAsFactors = F)
+clinvar <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC//annotation/snpEff_round3_preQC//all_new_clinvar_P_LP.txt", header = T, sep = "\t", stringsAsFactors = F)
 dim(clinvar)
 clinvar$SNP <- sub(";.*", "", clinvar$ID)
 clinvar <- clinvar[!duplicated(clinvar$SNP),]
@@ -22,7 +22,7 @@ clinvar.eur <- clinvar[which(clinvar$AF < MAF & clinvar$AF_nfe <  MAF),]
 clinvar.afr <- clinvar[which(clinvar$AF < MAF & clinvar$AF_afr <  MAF),]
 
 
-loftee <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/loftee/loftee_HC_all_chr_with_gnomad.txt", header = T, sep = "\t", stringsAsFactors = F)
+loftee <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC//annotation/snpEff_round3_preQC/loftee/loftee_HC_all_chr_with_gnomad.txt", header = T, sep = "\t", stringsAsFactors = F)
 dim(loftee)
 loftee$SNP <- sub(";.*", "", loftee$Uploaded_variation)
 # LOF variants flagged by LOFTEE as dubious (e.g., affecting poorly conserved exons and splice variants affecting NAGNAG sites or non-canonical splice regions) will be excluded.
@@ -46,7 +46,7 @@ loftee.eur <- loftee[which(loftee$AF < MAF & loftee$AF_nfe <  MAF),]
 loftee.afr <- loftee[which(loftee$AF < MAF & loftee$AF_afr <  MAF),]
 
 
-snpeff <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation/snpEff_round3/missense_variants_with_overlap_in_more_than_90_percent_of_prediction_tools_all_cols.txt", header = T, sep = "\t", stringsAsFactors = F)
+snpeff <- read.delim("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC//annotation/snpEff_round3_preQC/missense_variants_with_overlap_in_more_than_90_percent_of_prediction_tools_all_cols.txt", header = T, sep = "\t", stringsAsFactors = F)
 dim(snpeff)
 snpeff$SNP <- sub(";.*", "", snpeff$ID)
 snpeff <- snpeff[!duplicated(snpeff$SNP),]
@@ -71,15 +71,15 @@ cc <- c(unique(c(clinvar$SNP, loftee$SNP, snpeff$SNP)))
 bim.QC.sjlife.PLP <- fread(paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WES_rare_variant//sjlife/all_rare_variants", MAFname,"_all_sjlife.bim"))
 table(cc %in% bim.QC.sjlife.PLP$V2)
 # FALSE  TRUE 
-# 16818 29254 # maf 0.01
-# 34256 11820 # maf 0.0001
+#  # maf 0.01
+# 49730 34697 # maf 0.0001
 
 raw <- fread(paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/WES_rare_variant//sjlife/all_rare_variants", MAFname,"_all_sjlife_recodeA.raw"))
 sum(duplicated(raw$IID))
 # 0
 dim(raw)
-# 4516 11826 # maf 0.0001
-# 4516 29406 no maf filtered raw
+# 4486 34703 # maf 0.0001
+
 # raw <- raw[!(duplicated(raw$IID)),]
 raw <- as.data.frame(raw)
 rownames(raw) <- raw$IID

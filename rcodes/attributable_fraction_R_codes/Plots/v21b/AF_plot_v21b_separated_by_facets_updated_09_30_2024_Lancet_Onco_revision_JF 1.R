@@ -278,8 +278,10 @@ p
 
 
 p
-plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v21b/combined_all_SNs_without_lifestyle_plot_with_CI.tiff")
-ggsave(plot_name, p, width = 10, height = 9, dpi = 600, device = "tiff", compression = "lzw")
+# plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v21b/combined_all_SNs_without_lifestyle_plot_with_CI.tiff")
+# ggsave(plot_name, p, width = 10, height = 9, dpi = 600, device = "tiff", compression = "lzw")
+plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v21b/combined_all_SNs_without_lifestyle_plot_with_CI.pdf")
+ggsave(plot_name, p, width = 10, height = 9, device = cairo_pdf)
 
 
 
@@ -398,9 +400,10 @@ p <- ggplot(data_melted, aes(x = Cohort, y = value, fill = legend_group, pattern
   coord_cartesian(clip = "off")  # Prevent clipping of text
 
 p
-plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v21b/combined_SNs_and_SMNs_without_lifestyle_plot_with_CI.tiff")
-ggsave(plot_name, p, width = 14.6, height = 10, dpi = 600, device = "tiff", compression = "lzw")
-
+# plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v21b/combined_SNs_and_SMNs_without_lifestyle_plot_with_CI.tiff")
+# ggsave(plot_name, p, width = 14.6, height = 10, dpi = 600, device = "tiff", compression = "lzw")
+plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v21b/combined_SNs_and_SMNs_without_lifestyle_plot_with_CI.pdf")
+ggsave(plot_name, p, width = 14.6, height = 10, device = cairo_pdf)
 ##############
 ## Figure 3 ## 
 ##############
@@ -522,8 +525,10 @@ p <- ggplot(data_melted, aes(x = Cohort, y = value, fill = legend_group, pattern
   coord_cartesian(clip = "off")  # Prevent clipping of text
 
 p
-plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v21b/combined_5SNs_without_lifestyle_plot_with_CI.tiff")
-ggsave(plot_name, p, width = 14, height = 16, dpi = 400, device = "tiff", compression = "lzw")
+# plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v21b/combined_5SNs_without_lifestyle_plot_with_CI.tiff")
+# ggsave(plot_name, p, width = 14, height = 16, dpi = 400, device = "tiff", compression = "lzw")
+plot_name <- paste0("Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/attr_fraction/ANALYSIS/results/plots/v21b/combined_5SNs_without_lifestyle_plot_with_CI.pdf")
+ggsave(plot_name, p, width = 14, height = 16, device = cairo_pdf)
 
 # legend.margin = margin(t = 30, b = 10, l = 20, r = 180),
 # legend.key.size = unit(1, "cm"),

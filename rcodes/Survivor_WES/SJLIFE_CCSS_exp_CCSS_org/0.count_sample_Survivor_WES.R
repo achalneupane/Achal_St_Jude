@@ -241,6 +241,23 @@ matches <- match(all.WES.samples$V1, unidentified.WES.Kubra$CompBioID)
 # Replace only where matches are not NA
 all.WES.samples$V4[!is.na(matches)] <- unidentified.WES.Kubra$sjlid[matches[!is.na(matches)]]
 
+
+
+## Classify population
+all.WES.samples$pop <- NA
+all.WES.samples$pop [grepl("CCSS_SUBJECT", all.WES.samples$V1)] <- "CCSS_org"
+all.WES.samples$pop [all.WES.samples$V4 %in% pop.survivor.control$sjlid] <- "C.Control"
+all.WES.samples$pop [all.WES.samples$V4 %in% pop.survivor$sjlid] <- "Survivor"
+all.WES.samples$pop [all.WES.samples$V4 %in% AA.90samples$V1] <- "AA"
+all.WES.samples$pop[grepl("-CCSS-", all.WES.samples$V1)] <-  "CCSS_exp"
+table(all.WES.samples$pop)
+# AA C.Control  CCSS_exp  CCSS_org  Survivor 
+# 90       106      3034      5451      4984 
+
+write.table(all.WES.samples, "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/WES_samples_after_Kubra.txt", col.names = T, row.names = F, sep = "\t", quote = F)
+write.table(all.WES.samples[1:4], "Z:/ResearchHome/Groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/rename_samples2.txt", col.names = T, row.names = F, sep = "\t", quote = F)
+
+
 #######################
 ## B. working on WGS ##
 #######################

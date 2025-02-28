@@ -9,7 +9,60 @@ hpcf_interactive -n 12 -R "rusage[mem=8000]" -q standard
 # bcftools annotate --set-id '%CHROM\:%POS\:%REF\:%FIRST_ALT' MERGED_biallelic_sorted_sjlife_1_2_zhaoming_v2.vcf.gz -Oz -o MERGED_biallelic_sorted_sjlife_1_2_zhaoming_ID_edited.vcf.gz
 # bcftools index -f -t --threads 4 MERGED_biallelic_sorted_sjlife_1_2_zhaoming_ID_edited.vcf.gz
 
+
+
+
+
 ln -s /research_jude/rgs01_jude/groups/sapkogrp/projects/CAB/common/SJLIFE_CCSS_WES_101724/*SJLIFE_CCSS_WES_101724.GATK4180.hg38.vcf.gz* .
+
+################################
+## For Mingjuan to rename VCF ##
+################################
+module load bcftools
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/mingjuan_WES_rename
+hpcf_interactive -n 12 -R "rusage[mem=20000]" -q standard
+zcat chrY.SJLIFE_CCSS_WES_101724.GATK4180.hg38.vcf.gz | head -10000 | grep "^#CHROM" | awk '{for (i=10; i<=NF; i++) print $i}' > VCFsample_names.txt
+
+
+## Example VCF (View file)
+bcftools view -S extract_example.txt -Oz -o extracted_example.vcf.gz chrY.SJLIFE_CCSS_WES_101724.GATK4180.hg38.vcf.gz
+less -S extracted_example.vcf.gz
+less -S extracted_example.vcf.gz| grep -v ^##|less -S
+
+# ------>>
+# 1. login and load module on HPC
+ssh user@hpc # Login
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/mingjuan_WES_rename # Working directory
+hpcf_interactive -n 12 -R "rusage[mem=20000]" -q standard # create working interactive session
+module load bcftools # load module
+
+# 2. Try to rename example VCF (extracted_example.vcf.gz) and using example mapping file (ID_to_rename_example.txt)
+original_ID                        ID_to_rename
+SJALL085650_G1-CCSS_SUBJECT_001_032630_WES      S1
+SJALL085652_G1-CCSS_SUBJECT_001_032671_WES      S2
+SJALL085654_G1-CCSS_SUBJECT_001_032698_WES      S3
+SJALL085657_G1-CCSS_SUBJECT_001_032773_WES      S4
+
+
+bcftools reheader -s ID_to_rename_example.txt extracted_example.vcf.gz > extracted_example_renamed.vcf.gz
+
+# View file after renaming
+less -S extracted_example_renamed.vcf.gz| grep -v ^##|less -S
+
+# 3. Edit Mapping file CCSS_ID_to_rename.txt so ID_to_rename (second) column has CCSS ID
+original_ID                                     ID_to_rename
+SJALL085650_G1-CCSS_SUBJECT_001_032630_WES      SJALL085650_G1-CCSS_SUBJECT_001_032630_WES (replace with CCSS ID)
+SJALL085652_G1-CCSS_SUBJECT_001_032671_WES      SJALL085652_G1-CCSS_SUBJECT_001_032671_WES (replace with CCSS ID)
+SJALL085654_G1-CCSS_SUBJECT_001_032698_WES      SJALL085654_G1-CCSS_SUBJECT_001_032698_WES (replace with CCSS ID)
+SJALL085657_G1-CCSS_SUBJECT_001_032773_WES      SJALL085657_G1-CCSS_SUBJECT_001_032773_WES (replace with CCSS ID)
+
+
+# 4. Then, run the command on the actual WES files
+module load bcftools
+for CHR in {1..22} X Y; do
+bcftools reheader -s CCSS_ID_to_rename.txt chr${CHR}.SJLIFE_CCSS_WES_101724.GATK4180.hg38.vcf.gz > chr${CHR}.SJLIFE_CCSS_WES_101724.GATK4180.hg38_renamed.vcf.gz
+done
+
 
 ## Incase we need to rename
 awk '{cmd="echo "$0" | sed -e '\''s/.*CCSS-//g; s/^0\\+\\([^0]\\)/\\1/g'\''"; cmd | getline result; close(cmd); print $0"\t"result}' Survivor_WES.samplelist.ccss  > ./biallelic2/rename_ccss.txt
@@ -131,9 +184,8 @@ ls chr*.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.bim | sed 's/.bim//'| sor
 plink --merge-list merge_list.txt --keep-allele-order --make-bed --out chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic
 
 
-plink --bfile chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1 --update-ids /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/rename_samples.txt --make-bed --keep-allele-order --out chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_updated
 
-
+#########################################################
 
 ## This needs to be updated
 # <plinkQC.sh>
@@ -184,13 +236,12 @@ plink --bfile chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe
 
 
 ## Merge plink
-cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic2/plink_all
+cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/biallelic2/plink_all
 ls chr*.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1.bim | sed 's/.bim//'| sort -V  > merge_list.txt
 plink --merge-list merge_list.txt --keep-allele-order --make-bed --out chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1
 
 ## Update IDs
-plink --bfile chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1 --update-ids /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/rename_samples.txt --make-bed --keep-allele-order --out chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_ID_updated
-
+plink --bfile chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1 --update-ids /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/rename_samples2.txt --make-bed --keep-allele-order --out chrALL.SJLIFE_CCSS_WES_101724.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_updated
 
 
 #######################################################
@@ -198,17 +249,17 @@ plink --bfile chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LC
 #######################################################
 ## Survivor; ../extract_SJLIFE_survivor_iid_fid.txt
 plink --bfile chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1 --keep-allele-order --keep /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/extract_SJLIFE_survivor_iid_fid.txt --make-bed --out Survivors/chr.ALL.SURVIVORS_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1
-plink --bfile  Survivors/chr.ALL.SURVIVORS_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1 --update-ids /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/rename_samples.txt --make-bed --keep-allele-order --out Survivors/chr.ALL.SURVIVORS_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_updated
+plink --bfile  Survivors/chr.ALL.SURVIVORS_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1 --update-ids /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/rename_samples2.txt --make-bed --keep-allele-order --out Survivors/chr.ALL.SURVIVORS_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_updated
 ## SJLIFE als has 35 duplicates, we can remove them based on low call rates:
 plink --bfile chr.ALL.SURVIVORS_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_updated --missing --out chr.ALL.SURVIVORS_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_updated_missing
 plink --bfile chr.ALL.SURVIVORS_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_updated --remove duplicate_samples_to_remove.txt --keep-allele-order --make-bed --out chr.ALL.SURVIVORS_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_updated_unique
 
 ## CCSS exp; ../extract_CCSS.samples_iid_fid.txt
 plink --bfile chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1 --keep-allele-order --keep /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/extract_CCSS.samples_iid_fid.txt --make-bed --out CCSS_exp/chr.ALL.CCSS_exp_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1
-plink --bfile CCSS_exp/chr.ALL.CCSS_exp_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1 --update-ids /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/rename_samples.txt --make-bed --keep-allele-order --out CCSS_exp/chr.ALL.CCSS_exp_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_updated
+plink --bfile CCSS_exp/chr.ALL.CCSS_exp_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1 --update-ids /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/rename_samples2.txt --make-bed --keep-allele-order --out CCSS_exp/chr.ALL.CCSS_exp_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_updated
 ## Control; ../extract_SJLIFE_survivor_control_iid_fid.txt
 plink --bfile chr.ALL.Survivor_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1 --keep-allele-order --keep /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/biallelic/extract_SJLIFE_survivor_control_iid_fid.txt --make-bed --out Controls/chr.ALL.survivor.control_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1
-plink --bfile Controls/chr.ALL.survivor.control_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1 --update-ids /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/rename_samples.txt --make-bed --keep-allele-order --out Controls/chr.ALL.survivor.control_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_updated
+plink --bfile Controls/chr.ALL.survivor.control_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1 --update-ids /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES_QC/sample_mapping_files/rename_samples2.txt --make-bed --keep-allele-order --out Controls/chr.ALL.survivor.control_WES.GATK4180.hg38_biallelic.geno.0.1.hwe.1e-15.LCR.removed.MAC.ge.1_updated
 
 
 ## We can still use the same annotation done on cd /research_jude/rgs01_jude/groups/sapkogrp/projects/Genomics/common/Survivor_WES/annotation

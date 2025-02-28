@@ -182,8 +182,6 @@ EUR <- admixture$INDIVIDUAL[admixture$ancestry =="EUR"]
 AFR <- admixture$INDIVIDUAL[admixture$ancestry =="AFR"]
 Other <- admixture$INDIVIDUAL[admixture$ancestry == "Other"]
 
-
-
 # table(EUR.sjlife$V2 %in% EUR$IID[EUR$cohort=="sjlife"])
 # table(AFR.sjlife$V2 %in% AFR$IID[AFR$cohort=="sjlife"])
 
